@@ -15,4 +15,4 @@ def test_main_help_exits_zero() -> None:
         check=False,
     )
     assert proc.returncode == 0
-    assert "input" in proc.stdout.lower() or "--input" in proc.stdout
+    assert "encode" in proc.stdout.lower() and "decode" in proc.stdout.lower()

@@ -1,0 +1,302 @@
+[
+  {
+    "name": "w_div0_inv0",
+    "kind": "wire",
+    "connections": [
+      "div0",
+      "inv0"
+    ]
+  },
+  {
+    "name": "w_dto0_clk_sys",
+    "kind": "wire",
+    "connections": [
+      "dto0",
+      "clk_sys"
+    ]
+  },
+  {
+    "name": "w_gate0_div0",
+    "kind": "wire",
+    "connections": [
+      "gate0",
+      "div0"
+    ]
+  },
+  {
+    "name": "w_inv0_dto0",
+    "kind": "wire",
+    "connections": [
+      "inv0",
+      "dto0"
+    ]
+  },
+  {
+    "name": "w_mux2_clk",
+    "kind": "wire",
+    "connections": [
+      "mux2",
+      "clk_m2"
+    ]
+  },
+  {
+    "name": "w_mux3_clk",
+    "kind": "wire",
+    "connections": [
+      "mux3",
+      "clk_m3"
+    ]
+  },
+  {
+    "name": "w_mux4_clk",
+    "kind": "wire",
+    "connections": [
+      "mux4",
+      "clk_m4"
+    ]
+  },
+  {
+    "name": "w_mux5_clk",
+    "kind": "wire",
+    "connections": [
+      "mux5",
+      "clk_m5"
+    ]
+  },
+  {
+    "name": "w_mux6_clk",
+    "kind": "wire",
+    "connections": [
+      "mux6",
+      "clk_m6"
+    ]
+  },
+  {
+    "name": "w_pll_main_gate0",
+    "kind": "wire",
+    "connections": [
+      "pll_main",
+      "gate0"
+    ]
+  },
+  {
+    "name": "clk_m2",
+    "kind": "clock",
+    "freq": "200",
+    "source": "w_mux2_clk"
+  },
+  {
+    "name": "clk_m3",
+    "kind": "clock",
+    "freq": "300",
+    "source": "w_mux3_clk"
+  },
+  {
+    "name": "clk_m4",
+    "kind": "clock",
+    "freq": "400",
+    "source": "w_mux4_clk"
+  },
+  {
+    "name": "clk_m5",
+    "kind": "clock",
+    "freq": "500",
+    "source": "w_mux5_clk"
+  },
+  {
+    "name": "clk_m6",
+    "kind": "clock",
+    "freq": "600",
+    "source": "w_mux6_clk"
+  },
+  {
+    "name": "clk_sys",
+    "kind": "clock",
+    "freq": "100",
+    "source": "w_dto0_clk_sys"
+  },
+  {
+    "name": "div0",
+    "kind": "div",
+    "source": "w_gate0_div0",
+    "target": "w_div0_inv0"
+  },
+  {
+    "name": "dto0",
+    "kind": "dto",
+    "source": "w_inv0_dto0",
+    "target": "w_dto0_clk_sys"
+  },
+  {
+    "name": "gate0",
+    "kind": "gate",
+    "source": "w_pll_main_gate0",
+    "target": "w_gate0_div0"
+  },
+  {
+    "name": "inv0",
+    "kind": "inv",
+    "source": "w_div0_inv0",
+    "target": "w_inv0_dto0"
+  },
+  {
+    "name": "mux2",
+    "kind": "mux",
+    "source": {
+      "in0": "pll_m2a",
+      "in1": "pll_m2b"
+    },
+    "target": "w_mux2_clk"
+  },
+  {
+    "name": "mux3",
+    "kind": "mux",
+    "source": {
+      "in0": "pll_m3a",
+      "in1": "pll_m3b",
+      "in2": "pll_m3c"
+    },
+    "target": "w_mux3_clk"
+  },
+  {
+    "name": "mux4",
+    "kind": "mux",
+    "source": {
+      "in0": "pll_m4a",
+      "in1": "pll_m4b",
+      "in2": "pll_m4c",
+      "in3": "pll_m4d"
+    },
+    "target": "w_mux4_clk"
+  },
+  {
+    "name": "mux5",
+    "kind": "mux",
+    "source": {
+      "in0": "pll_m5a",
+      "in1": "pll_m5b",
+      "in2": "pll_m5c",
+      "in3": "pll_m5d",
+      "in4": "pll_m5e"
+    },
+    "target": "w_mux5_clk"
+  },
+  {
+    "name": "mux6",
+    "kind": "mux",
+    "source": {
+      "in0": "pll_m6a",
+      "in1": "pll_m6b",
+      "in2": "pll_m6c",
+      "in3": "pll_m6d",
+      "in4": "pll_m6e",
+      "in5": "pll_m6f"
+    },
+    "target": "w_mux6_clk"
+  },
+  {
+    "name": "pll_m2a",
+    "kind": "pll",
+    "target": "mux2"
+  },
+  {
+    "name": "pll_m2b",
+    "kind": "pll",
+    "target": "mux2"
+  },
+  {
+    "name": "pll_m3a",
+    "kind": "pll",
+    "target": "mux3"
+  },
+  {
+    "name": "pll_m3b",
+    "kind": "pll",
+    "target": "mux3"
+  },
+  {
+    "name": "pll_m3c",
+    "kind": "pll",
+    "target": "mux3"
+  },
+  {
+    "name": "pll_m4a",
+    "kind": "pll",
+    "target": "mux4"
+  },
+  {
+    "name": "pll_m4b",
+    "kind": "pll",
+    "target": "mux4"
+  },
+  {
+    "name": "pll_m4c",
+    "kind": "pll",
+    "target": "mux4"
+  },
+  {
+    "name": "pll_m4d",
+    "kind": "pll",
+    "target": "mux4"
+  },
+  {
+    "name": "pll_m5a",
+    "kind": "pll",
+    "target": "mux5"
+  },
+  {
+    "name": "pll_m5b",
+    "kind": "pll",
+    "target": "mux5"
+  },
+  {
+    "name": "pll_m5c",
+    "kind": "pll",
+    "target": "mux5"
+  },
+  {
+    "name": "pll_m5d",
+    "kind": "pll",
+    "target": "mux5"
+  },
+  {
+    "name": "pll_m5e",
+    "kind": "pll",
+    "target": "mux5"
+  },
+  {
+    "name": "pll_m6a",
+    "kind": "pll",
+    "target": "mux6"
+  },
+  {
+    "name": "pll_m6b",
+    "kind": "pll",
+    "target": "mux6"
+  },
+  {
+    "name": "pll_m6c",
+    "kind": "pll",
+    "target": "mux6"
+  },
+  {
+    "name": "pll_m6d",
+    "kind": "pll",
+    "target": "mux6"
+  },
+  {
+    "name": "pll_m6e",
+    "kind": "pll",
+    "target": "mux6"
+  },
+  {
+    "name": "pll_m6f",
+    "kind": "pll",
+    "target": "mux6"
+  },
+  {
+    "name": "pll_main",
+    "kind": "pll",
+    "target": "w_pll_main_gate0"
+  }
+]

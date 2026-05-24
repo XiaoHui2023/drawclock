@@ -1,0 +1,1125 @@
+{
+  "version": 1,
+  "vertices": [
+    {
+      "name": "clk_m2",
+      "cell_id": "25",
+      "drawclock_type": "clock",
+      "x": 400.0,
+      "y": 279.0,
+      "width": 240.0,
+      "height": 72.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=clock;points=[[0.2583,0.4167,0,0,0]];",
+      "object": {
+        "name": "clk_m2",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 240 72\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 62 36 L 62 24 L 66 24 L 66 36 L 71 36 L 71 24 L 75 24 L 75 36 L 80 36 L 80 24 L 84 24 L 84 36 L 89 36 L 89 24 L 93 24 L 93 36 L 98 36\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"/></svg></div><div style=\"position:absolute;left:40.833333333333336%;top:36.11111111111111%;display:flex;align-items:center;white-space:nowrap;transform:translateY(-50%);\"><div style=\"flex:0 0 auto;width:60px;\"></div><span style=\"flex:0 0 auto;font-size:11px;line-height:1;white-space:nowrap;\">(200hz)</span></div><div style=\"position:absolute;left:33.33333333333333%;top:50.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:16px;\">clk_m2</div></div>",
+        "placeholders": "0",
+        "freq": "200"
+      }
+    },
+    {
+      "name": "clk_m3",
+      "cell_id": "31",
+      "drawclock_type": "clock",
+      "x": 400.0,
+      "y": 479.0,
+      "width": 240.0,
+      "height": 72.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=clock;points=[[0.2583,0.4167,0,0,0]];",
+      "object": {
+        "name": "clk_m3",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 240 72\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 62 36 L 62 24 L 66 24 L 66 36 L 71 36 L 71 24 L 75 24 L 75 36 L 80 36 L 80 24 L 84 24 L 84 36 L 89 36 L 89 24 L 93 24 L 93 36 L 98 36\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"/></svg></div><div style=\"position:absolute;left:40.833333333333336%;top:36.11111111111111%;display:flex;align-items:center;white-space:nowrap;transform:translateY(-50%);\"><div style=\"flex:0 0 auto;width:60px;\"></div><span style=\"flex:0 0 auto;font-size:11px;line-height:1;white-space:nowrap;\">(300hz)</span></div><div style=\"position:absolute;left:33.33333333333333%;top:50.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:16px;\">clk_m3</div></div>",
+        "placeholders": "0",
+        "freq": "300"
+      }
+    },
+    {
+      "name": "clk_m4",
+      "cell_id": "38",
+      "drawclock_type": "clock",
+      "x": 400.0,
+      "y": 679.0,
+      "width": 240.0,
+      "height": 72.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=clock;points=[[0.2583,0.4167,0,0,0]];",
+      "object": {
+        "name": "clk_m4",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 240 72\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 62 36 L 62 24 L 66 24 L 66 36 L 71 36 L 71 24 L 75 24 L 75 36 L 80 36 L 80 24 L 84 24 L 84 36 L 89 36 L 89 24 L 93 24 L 93 36 L 98 36\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"/></svg></div><div style=\"position:absolute;left:40.833333333333336%;top:36.11111111111111%;display:flex;align-items:center;white-space:nowrap;transform:translateY(-50%);\"><div style=\"flex:0 0 auto;width:60px;\"></div><span style=\"flex:0 0 auto;font-size:11px;line-height:1;white-space:nowrap;\">(400hz)</span></div><div style=\"position:absolute;left:33.33333333333333%;top:50.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:16px;\">clk_m4</div></div>",
+        "placeholders": "0",
+        "freq": "400"
+      }
+    },
+    {
+      "name": "clk_m5",
+      "cell_id": "46",
+      "drawclock_type": "clock",
+      "x": 400.0,
+      "y": 879.0,
+      "width": 240.0,
+      "height": 72.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=clock;points=[[0.2583,0.4167,0,0,0]];",
+      "object": {
+        "name": "clk_m5",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 240 72\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 62 36 L 62 24 L 66 24 L 66 36 L 71 36 L 71 24 L 75 24 L 75 36 L 80 36 L 80 24 L 84 24 L 84 36 L 89 36 L 89 24 L 93 24 L 93 36 L 98 36\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"/></svg></div><div style=\"position:absolute;left:40.833333333333336%;top:36.11111111111111%;display:flex;align-items:center;white-space:nowrap;transform:translateY(-50%);\"><div style=\"flex:0 0 auto;width:60px;\"></div><span style=\"flex:0 0 auto;font-size:11px;line-height:1;white-space:nowrap;\">(500hz)</span></div><div style=\"position:absolute;left:33.33333333333333%;top:50.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:16px;\">clk_m5</div></div>",
+        "placeholders": "0",
+        "freq": "500"
+      }
+    },
+    {
+      "name": "clk_m6",
+      "cell_id": "55",
+      "drawclock_type": "clock",
+      "x": 400.0,
+      "y": 1079.0,
+      "width": 240.0,
+      "height": 72.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=clock;points=[[0.2583,0.4167,0,0,0]];",
+      "object": {
+        "name": "clk_m6",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 240 72\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 62 36 L 62 24 L 66 24 L 66 36 L 71 36 L 71 24 L 75 24 L 75 36 L 80 36 L 80 24 L 84 24 L 84 36 L 89 36 L 89 24 L 93 24 L 93 36 L 98 36\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"/></svg></div><div style=\"position:absolute;left:40.833333333333336%;top:36.11111111111111%;display:flex;align-items:center;white-space:nowrap;transform:translateY(-50%);\"><div style=\"flex:0 0 auto;width:60px;\"></div><span style=\"flex:0 0 auto;font-size:11px;line-height:1;white-space:nowrap;\">(600hz)</span></div><div style=\"position:absolute;left:33.33333333333333%;top:50.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:16px;\">clk_m6</div></div>",
+        "placeholders": "0",
+        "freq": "600"
+      }
+    },
+    {
+      "name": "clk_sys",
+      "cell_id": "20",
+      "drawclock_type": "clock",
+      "x": 840.0,
+      "y": 79.0,
+      "width": 240.0,
+      "height": 72.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=clock;points=[[0.2583,0.4167,0,0,0]];",
+      "object": {
+        "name": "clk_sys",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 240 72\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 62 36 L 62 24 L 66 24 L 66 36 L 71 36 L 71 24 L 75 24 L 75 36 L 80 36 L 80 24 L 84 24 L 84 36 L 89 36 L 89 24 L 93 24 L 93 36 L 98 36\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.5\" stroke-linecap=\"square\" stroke-linejoin=\"miter\"/></svg></div><div style=\"position:absolute;left:40.833333333333336%;top:36.11111111111111%;display:flex;align-items:center;white-space:nowrap;transform:translateY(-50%);\"><div style=\"flex:0 0 auto;width:60px;\"></div><span style=\"flex:0 0 auto;font-size:11px;line-height:1;white-space:nowrap;\">(100hz)</span></div><div style=\"position:absolute;left:33.33333333333333%;top:50.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:16px;\">clk_sys</div></div>",
+        "placeholders": "0",
+        "freq": "100"
+      }
+    },
+    {
+      "name": "div0",
+      "cell_id": "14",
+      "drawclock_type": "div",
+      "x": 360.0,
+      "y": 80.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=div;points=[[0.3500,0.3333,0,0,0],[0.6500,0.3333,0,0,0]];",
+      "object": {
+        "name": "div0",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><polygon points=\"53.0,37.5 40.0,45.0 27.0,37.5 27.0,22.5 40.0,15.0 53.0,22.5\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\"/></svg><span style=\"position:absolute;left:50.0%;top:31.11111111111111%;font-size:16px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">÷</span><span style=\"position:absolute;left:50.0%;top:41.11111111111111%;font-size:6px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">DIV</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">div0</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "dto0",
+      "cell_id": "18",
+      "drawclock_type": "dto",
+      "x": 680.0,
+      "y": 80.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=dto;points=[[0.3500,0.3333,0,0,0],[0.6500,0.3333,0,0,0]];",
+      "object": {
+        "name": "dto0",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><rect x=\"27\" y=\"11\" width=\"26\" height=\"40\" rx=\"5\" ry=\"5\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\"/><path d=\"M 31 32 L 31 24 L 36 24 L 36 29 L 41 29 L 41 20 L 49 20\" fill=\"none\" stroke=\"#000000\" stroke-width=\"1.5\" stroke-linecap=\"square\"/></svg><span style=\"position:absolute;left:50.0%;top:51.11111111111111%;font-size:7px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">DTO</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:16px;\">dto0</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "gate0",
+      "cell_id": "12",
+      "drawclock_type": "gate",
+      "x": 200.0,
+      "y": 80.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=gate;points=[[0.3875,0.3333,0,0,0],[0.7375,0.3333,0,0,0]];",
+      "object": {
+        "name": "gate0",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 31 18 L 39 18 A 12 12 0 1 1 39 42 L 31 42 Z\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"miter\"/><circle cx=\"59\" cy=\"30\" r=\"3\" fill=\"#ffffff\" stroke=\"#000000\" stroke-width=\"2\"/></svg></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">gate0</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "inv0",
+      "cell_id": "16",
+      "drawclock_type": "inv",
+      "x": 520.0,
+      "y": 80.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=inv;points=[[0.3500,0.3333,0,0,0],[0.6000,0.3333,0,0,0]];",
+      "object": {
+        "name": "inv0",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><polygon points=\"28,30 28,13 48,30 28,47\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">inv0</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "mux2",
+      "cell_id": "21",
+      "drawclock_type": "mux2",
+      "x": 240.0,
+      "y": 271.0,
+      "width": 80.0,
+      "height": 106.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=mux2;points=[[0.3500,0.2075,0,0,0],[0.3500,0.5094,0,0,0],[0.6500,0.3585,0,0,0]];",
+      "object": {
+        "name": "mux2",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 106\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><polygon points=\"28,6 28,70 52,60 52,16\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\"/></svg><span style=\"position:absolute;left:42.5%;top:20.754716981132077%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">a</span><span style=\"position:absolute;left:42.5%;top:50.943396226415096%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">b</span></div><div style=\"position:absolute;left:50%;top:73.58490566037736%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">mux2</div></div>",
+        "placeholders": "0",
+        "in0_label": "a",
+        "in1_label": "b"
+      }
+    },
+    {
+      "name": "mux3",
+      "cell_id": "26",
+      "drawclock_type": "mux3",
+      "x": 240.0,
+      "y": 471.0,
+      "width": 80.0,
+      "height": 106.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=mux3;points=[[0.3500,0.2075,0,0,0],[0.3500,0.3585,0,0,0],[0.3500,0.5094,0,0,0],[0.6500,0.3585,0,0,0]];",
+      "object": {
+        "name": "mux3",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 106\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><polygon points=\"28,6 28,70 52,60 52,16\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\"/></svg><span style=\"position:absolute;left:42.5%;top:20.754716981132077%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">0</span><span style=\"position:absolute;left:42.5%;top:35.84905660377358%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">1</span><span style=\"position:absolute;left:42.5%;top:50.943396226415096%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">2</span></div><div style=\"position:absolute;left:50%;top:73.58490566037736%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">mux3</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "mux4",
+      "cell_id": "32",
+      "drawclock_type": "mux4",
+      "x": 240.0,
+      "y": 664.0,
+      "width": 80.0,
+      "height": 122.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=mux4;points=[[0.3500,0.1803,0,0,0],[0.3500,0.3115,0,0,0],[0.3500,0.4426,0,0,0],[0.3500,0.5738,0,0,0],[0.6500,0.3770,0,0,0]];",
+      "object": {
+        "name": "mux4",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 122\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><polygon points=\"28,6 28,86 52,76 52,16\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\"/></svg><span style=\"position:absolute;left:42.5%;top:18.0327868852459%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">0</span><span style=\"position:absolute;left:42.5%;top:31.147540983606557%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">1</span><span style=\"position:absolute;left:42.5%;top:44.26229508196721%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">2</span><span style=\"position:absolute;left:42.5%;top:57.377049180327866%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">3</span></div><div style=\"position:absolute;left:50%;top:77.04918032786885%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">mux4</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "mux5",
+      "cell_id": "39",
+      "drawclock_type": "mux5",
+      "x": 240.0,
+      "y": 853.0,
+      "width": 80.0,
+      "height": 142.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=mux5;points=[[0.3500,0.1620,0,0,0],[0.3500,0.2746,0,0,0],[0.3500,0.3944,0,0,0],[0.3500,0.5141,0,0,0],[0.3500,0.6268,0,0,0],[0.6500,0.3944,0,0,0]];",
+      "object": {
+        "name": "mux5",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 142\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><polygon points=\"28,6 28,106 52,96 52,16\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\"/></svg><span style=\"position:absolute;left:42.5%;top:16.19718309859155%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">0</span><span style=\"position:absolute;left:42.5%;top:27.464788732394368%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">1</span><span style=\"position:absolute;left:42.5%;top:39.436619718309856%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">2</span><span style=\"position:absolute;left:42.5%;top:51.40845070422535%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">3</span><span style=\"position:absolute;left:42.5%;top:62.676056338028175%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">4</span></div><div style=\"position:absolute;left:50%;top:80.28169014084507%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">mux5</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "mux6",
+      "cell_id": "47",
+      "drawclock_type": "mux6",
+      "x": 240.0,
+      "y": 1044.0,
+      "width": 80.0,
+      "height": 162.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=mux6;points=[[0.3500,0.1420,0,0,0],[0.3500,0.2469,0,0,0],[0.3500,0.3519,0,0,0],[0.3500,0.4630,0,0,0],[0.3500,0.5679,0,0,0],[0.3500,0.6728,0,0,0],[0.6500,0.4074,0,0,0]];",
+      "object": {
+        "name": "mux6",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 162\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><polygon points=\"28,6 28,126 52,116 52,16\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\"/></svg><span style=\"position:absolute;left:42.5%;top:14.19753086419753%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">0</span><span style=\"position:absolute;left:42.5%;top:24.691358024691358%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">1</span><span style=\"position:absolute;left:42.5%;top:35.18518518518518%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">2</span><span style=\"position:absolute;left:42.5%;top:46.2962962962963%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">3</span><span style=\"position:absolute;left:42.5%;top:56.79012345679012%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">4</span><span style=\"position:absolute;left:42.5%;top:67.28395061728395%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">5</span></div><div style=\"position:absolute;left:50%;top:82.71604938271605%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">mux6</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m2a",
+      "cell_id": "22",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 263.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m2a",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m2a</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m2b",
+      "cell_id": "23",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 295.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m2b",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m2b</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m3a",
+      "cell_id": "27",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 463.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m3a",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m3a</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m3b",
+      "cell_id": "28",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 480.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m3b",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m3b</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m3c",
+      "cell_id": "29",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 495.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m3c",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m3c</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m4a",
+      "cell_id": "33",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 656.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m4a",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m4a</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m4b",
+      "cell_id": "34",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 672.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m4b",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m4b</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m4c",
+      "cell_id": "35",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 688.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m4c",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m4c</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m4d",
+      "cell_id": "36",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 704.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m4d",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m4d</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m5a",
+      "cell_id": "40",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 847.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m5a",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m5a</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m5b",
+      "cell_id": "41",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 862.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m5b",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m5b</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m5c",
+      "cell_id": "42",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 880.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m5c",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m5c</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m5d",
+      "cell_id": "43",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 897.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m5d",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m5d</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m5e",
+      "cell_id": "44",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 913.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m5e",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m5e</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m6a",
+      "cell_id": "48",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 1037.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m6a",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m6a</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m6b",
+      "cell_id": "49",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 1054.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m6b",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m6b</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m6c",
+      "cell_id": "50",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 1071.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m6c",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m6c</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m6d",
+      "cell_id": "51",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 1089.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m6d",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m6d</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m6e",
+      "cell_id": "52",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 1106.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m6e",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m6e</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_m6f",
+      "cell_id": "53",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 1122.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_m6f",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_m6f</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "pll_main",
+      "cell_id": "10",
+      "drawclock_type": "pll",
+      "x": 40.0,
+      "y": 80.0,
+      "width": 80.0,
+      "height": 90.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll;points=[[0.7000,0.3333,0,0,0]];",
+      "object": {
+        "name": "pll_main",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 90\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 22 20 L 48 20 L 56 30 L 48 40 L 22 40\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></svg><span style=\"position:absolute;left:43.75%;top:33.33333333333333%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);\">PLL</span></div><div style=\"position:absolute;left:50%;top:64.44444444444444%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">pll_main</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "w_div0_inv0",
+      "cell_id": "15",
+      "drawclock_type": "wire",
+      "x": 440.0,
+      "y": 96.0,
+      "width": 80.0,
+      "height": 40.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=wire;points=[[0.2500,0.3500,0,0,0],[0.7500,0.3500,0,0,0]];",
+      "object": {
+        "name": "w_div0_inv0",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 40\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 20 14 Q 25 9 30 14 T 40 14 T 50 14 T 60 14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:55.00000000000001%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">w_div0_inv0</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "w_dto0_clk_sys",
+      "cell_id": "19",
+      "drawclock_type": "wire",
+      "x": 760.0,
+      "y": 96.0,
+      "width": 80.0,
+      "height": 40.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=wire;points=[[0.2500,0.3500,0,0,0],[0.7500,0.3500,0,0,0]];",
+      "object": {
+        "name": "w_dto0_clk_sys",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 40\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 20 14 Q 25 9 30 14 T 40 14 T 50 14 T 60 14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:55.00000000000001%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">w_dto0_clk_sys</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "w_gate0_div0",
+      "cell_id": "13",
+      "drawclock_type": "wire",
+      "x": 280.0,
+      "y": 96.0,
+      "width": 80.0,
+      "height": 40.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=wire;points=[[0.2500,0.3500,0,0,0],[0.7500,0.3500,0,0,0]];",
+      "object": {
+        "name": "w_gate0_div0",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 40\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 20 14 Q 25 9 30 14 T 40 14 T 50 14 T 60 14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:55.00000000000001%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">w_gate0_div0</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "w_inv0_dto0",
+      "cell_id": "17",
+      "drawclock_type": "wire",
+      "x": 600.0,
+      "y": 96.0,
+      "width": 80.0,
+      "height": 40.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=wire;points=[[0.2500,0.3500,0,0,0],[0.7500,0.3500,0,0,0]];",
+      "object": {
+        "name": "w_inv0_dto0",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 40\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 20 14 Q 25 9 30 14 T 40 14 T 50 14 T 60 14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:55.00000000000001%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">w_inv0_dto0</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "w_mux2_clk",
+      "cell_id": "24",
+      "drawclock_type": "wire",
+      "x": 320.0,
+      "y": 296.0,
+      "width": 80.0,
+      "height": 40.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=wire;points=[[0.2500,0.3500,0,0,0],[0.7500,0.3500,0,0,0]];",
+      "object": {
+        "name": "w_mux2_clk",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 40\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 20 14 Q 25 9 30 14 T 40 14 T 50 14 T 60 14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:55.00000000000001%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">w_mux2_clk</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "w_mux3_clk",
+      "cell_id": "30",
+      "drawclock_type": "wire",
+      "x": 320.0,
+      "y": 496.0,
+      "width": 80.0,
+      "height": 40.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=wire;points=[[0.2500,0.3500,0,0,0],[0.7500,0.3500,0,0,0]];",
+      "object": {
+        "name": "w_mux3_clk",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 40\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 20 14 Q 25 9 30 14 T 40 14 T 50 14 T 60 14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:55.00000000000001%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">w_mux3_clk</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "w_mux4_clk",
+      "cell_id": "37",
+      "drawclock_type": "wire",
+      "x": 320.0,
+      "y": 696.0,
+      "width": 80.0,
+      "height": 40.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=wire;points=[[0.2500,0.3500,0,0,0],[0.7500,0.3500,0,0,0]];",
+      "object": {
+        "name": "w_mux4_clk",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 40\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 20 14 Q 25 9 30 14 T 40 14 T 50 14 T 60 14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:55.00000000000001%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">w_mux4_clk</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "w_mux5_clk",
+      "cell_id": "45",
+      "drawclock_type": "wire",
+      "x": 320.0,
+      "y": 896.0,
+      "width": 80.0,
+      "height": 40.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=wire;points=[[0.2500,0.3500,0,0,0],[0.7500,0.3500,0,0,0]];",
+      "object": {
+        "name": "w_mux5_clk",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 40\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 20 14 Q 25 9 30 14 T 40 14 T 50 14 T 60 14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:55.00000000000001%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">w_mux5_clk</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "w_mux6_clk",
+      "cell_id": "54",
+      "drawclock_type": "wire",
+      "x": 320.0,
+      "y": 1096.0,
+      "width": 80.0,
+      "height": 40.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=wire;points=[[0.2500,0.3500,0,0,0],[0.7500,0.3500,0,0,0]];",
+      "object": {
+        "name": "w_mux6_clk",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 40\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 20 14 Q 25 9 30 14 T 40 14 T 50 14 T 60 14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:55.00000000000001%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">w_mux6_clk</div></div>",
+        "placeholders": "0"
+      }
+    },
+    {
+      "name": "w_pll_main_gate0",
+      "cell_id": "11",
+      "drawclock_type": "wire",
+      "x": 120.0,
+      "y": 96.0,
+      "width": 80.0,
+      "height": 40.0,
+      "style": "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=0;overflow=fill;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=wire;points=[[0.2500,0.3500,0,0,0],[0.7500,0.3500,0,0,0]];",
+      "object": {
+        "name": "w_pll_main_gate0",
+        "label": "<div style=\"position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:100%;height:100%;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;\"><div style=\"position:absolute;left:0;top:0;width:100%;height:100%;\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\" viewBox=\"0 0 80 40\" preserveAspectRatio=\"none\" style=\"display:block;overflow:visible;\"><path d=\"M 20 14 Q 25 9 30 14 T 40 14 T 50 14 T 60 14\" fill=\"none\" stroke=\"#000000\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></div><div style=\"position:absolute;left:50%;top:55.00000000000001%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;\">w_pll_main_gate0</div></div>",
+        "placeholders": "0"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "cell_id": "56",
+      "source": "10",
+      "target": "11",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.25;entryY=0.35;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "57",
+      "source": "11",
+      "target": "12",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.75;exitY=0.35;entryX=0.3875;entryY=0.3333;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "58",
+      "source": "12",
+      "target": "13",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7375;exitY=0.3333;entryX=0.25;entryY=0.35;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "59",
+      "source": "13",
+      "target": "14",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.75;exitY=0.35;entryX=0.35;entryY=0.3333;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "60",
+      "source": "14",
+      "target": "15",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.65;exitY=0.3333;entryX=0.25;entryY=0.35;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "61",
+      "source": "15",
+      "target": "16",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.75;exitY=0.35;entryX=0.35;entryY=0.3333;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "62",
+      "source": "16",
+      "target": "17",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.6;exitY=0.3333;entryX=0.25;entryY=0.35;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "63",
+      "source": "17",
+      "target": "18",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.75;exitY=0.35;entryX=0.35;entryY=0.3333;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "64",
+      "source": "18",
+      "target": "19",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.65;exitY=0.3333;entryX=0.25;entryY=0.35;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "65",
+      "source": "19",
+      "target": "20",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.75;exitY=0.35;entryX=0.2583;entryY=0.4167;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "66",
+      "source": "22",
+      "target": "21",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.2075;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          293.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "67",
+      "source": "23",
+      "target": "21",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.5094;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          325.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "68",
+      "source": "21",
+      "target": "24",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.65;exitY=0.3585;entryX=0.25;entryY=0.35;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "69",
+      "source": "24",
+      "target": "25",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.75;exitY=0.35;entryX=0.2583;entryY=0.4167;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "70",
+      "source": "27",
+      "target": "26",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.2075;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          493.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "71",
+      "source": "28",
+      "target": "26",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.3585;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          510.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "72",
+      "source": "29",
+      "target": "26",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.5094;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          525.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "73",
+      "source": "26",
+      "target": "30",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.65;exitY=0.3585;entryX=0.25;entryY=0.35;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "74",
+      "source": "30",
+      "target": "31",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.75;exitY=0.35;entryX=0.2583;entryY=0.4167;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "75",
+      "source": "33",
+      "target": "32",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.1803;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          686.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "76",
+      "source": "34",
+      "target": "32",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.3115;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          702.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "77",
+      "source": "35",
+      "target": "32",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.4426;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          718.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "78",
+      "source": "36",
+      "target": "32",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.5738;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          734.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "79",
+      "source": "32",
+      "target": "37",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.65;exitY=0.377;entryX=0.25;entryY=0.35;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "80",
+      "source": "37",
+      "target": "38",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.75;exitY=0.35;entryX=0.2583;entryY=0.4167;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "81",
+      "source": "40",
+      "target": "39",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.162;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          876.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "82",
+      "source": "41",
+      "target": "39",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.2746;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          892.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "83",
+      "source": "42",
+      "target": "39",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.3944;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          910.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "84",
+      "source": "43",
+      "target": "39",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.5141;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          926.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "85",
+      "source": "44",
+      "target": "39",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.6268;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          943.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "86",
+      "source": "39",
+      "target": "45",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.65;exitY=0.3944;entryX=0.25;entryY=0.35;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "87",
+      "source": "45",
+      "target": "46",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.75;exitY=0.35;entryX=0.2583;entryY=0.4167;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "88",
+      "source": "48",
+      "target": "47",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.142;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          1067.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "89",
+      "source": "49",
+      "target": "47",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.2469;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          1083.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "90",
+      "source": "50",
+      "target": "47",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.3519;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          1101.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "91",
+      "source": "51",
+      "target": "47",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.463;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          1119.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "92",
+      "source": "52",
+      "target": "47",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.5679;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          1136.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "93",
+      "source": "53",
+      "target": "47",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7;exitY=0.3333;entryX=0.35;entryY=0.6728;",
+      "relative": true,
+      "waypoints": [
+        [
+          204.0,
+          1152.0
+        ]
+      ]
+    },
+    {
+      "cell_id": "94",
+      "source": "47",
+      "target": "54",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.65;exitY=0.4074;entryX=0.25;entryY=0.35;",
+      "relative": true,
+      "waypoints": []
+    },
+    {
+      "cell_id": "95",
+      "source": "54",
+      "target": "55",
+      "style": "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;strokeColor=#000000;exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.75;exitY=0.35;entryX=0.2583;entryY=0.4167;",
+      "relative": true,
+      "waypoints": []
+    }
+  ]
+}

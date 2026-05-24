@@ -1,0 +1,43 @@
+from __future__ import annotations
+
+import importlib
+import sys
+from math import isclose
+from pathlib import Path
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPTS = ROOT / "scripts"
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+
+from drawio_lib.components import mux_geometry as geom
+
+
+@pytest.mark.parametrize("num_inputs", [2, 3, 4, 5, 6])
+def test_mux_verify_geometry_passes(num_inputs: int) -> None:
+    mod = importlib.import_module(f"drawio_lib.components.mux{num_inputs}")
+    mod.verify_geometry()
+
+
+@pytest.mark.parametrize("num_inputs", [2, 3, 4, 5, 6])
+def test_mux_style_point_count(num_inputs: int) -> None:
+    mod = importlib.import_module(f"drawio_lib.components.mux{num_inputs}")
+    pts = mod._parse_points(mod.cell_style())
+    assert len(pts) == num_inputs + 1
+
+
+@pytest.mark.parametrize("num_inputs", [3, 4, 5, 6])
+def test_mux_taller_than_mux2(num_inputs: int) -> None:
+    mod = importlib.import_module(f"drawio_lib.components.mux{num_inputs}")
+    mux2 = importlib.import_module("drawio_lib.components.mux2")
+    assert mod.H >= mux2.H
+
+
+def test_mux3_input_fractions() -> None:
+    g = geom.compute_geometry(3)
+    fracs = geom.input_fractions(3)
+    assert len(g.inputs) == 3
+    for port, frac in zip(g.inputs, fracs):
+        assert isclose(port.trap.trap_y, g.trap.h * frac, abs_tol=0.01)

@@ -10,3 +10,12 @@ build/
 *.egg-info/
 .cursor/
 *.drawio.bak
+
+# 测试与本地临时输出
+tests/_tmp_cli/
+tests/_tmp_roundtrip/
+example/out/roundtrip/
+example/out/restored.drawio
+
+# 本地试画图（非示例）
+test.drawio.svg

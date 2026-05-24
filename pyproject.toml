@@ -3,7 +3,7 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "drawio-to-clock-tree"
+name = "drawclock"
 version = "0.0.0"
 description = "从 draw.io 图生成时钟树相关输出"
 readme = "README.md"
