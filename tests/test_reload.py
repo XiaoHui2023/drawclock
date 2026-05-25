@@ -15,9 +15,11 @@ for path in (SRC, RELOAD):
         sys.path.insert(0, str(path))
 
 from drawio_decode import decompress_diagram_payload  # noqa: E402
+from drawio_library import load_library_shapes  # noqa: E402
 from migrate import migrate_mxfile_xml, reload_drawio_file  # noqa: E402
 
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
+SHAPES = load_library_shapes(LIBRARY)
 COMPRESSED_FIXTURE = ROOT / "tests" / "fixtures" / "mini-tree-compressed.drawio"
 
 
@@ -185,6 +187,35 @@ def test_reload_preserves_geometry_and_upgrades_style(tmp_path: Path) -> None:
     assert gate is not None
     assert gate.group(1) == "180"
     assert gate.group(2) == "50"
+    assert gate.group(3) == str(SHAPES["gate"].w)
+    assert gate.group(4) == str(SHAPES["gate"].h)
+
+
+def test_reload_applies_library_width_from_narrow_fixture(tmp_path: Path) -> None:
+    narrow_w = max(SHAPES["gate"].w - 40, 40)
+    inp = tmp_path / "narrow.drawio"
+    inp.write_text(
+        f"""<mxfile><diagram><mxGraphModel><root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <object name="g" placeholders="0" id="10">
+          <mxCell style="drawclockType=gate;html=1;" vertex="1" parent="1">
+            <mxGeometry x="10" y="20" width="{narrow_w}" height="70" as="geometry"/>
+          </mxCell>
+        </object>
+        </root></mxGraphModel></diagram></mxfile>""",
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.drawio"
+    reload_drawio_file(inp, LIBRARY, out)
+    inner = _mxfile_searchable(out.read_text(encoding="utf-8"))
+    geom = re.search(
+        r'name="g"[^>]*>[\s\S]*?<mxGeometry x="10" y="20" width="(\d+)" height="(\d+)"',
+        inner,
+    )
+    assert geom is not None
+    assert geom.group(1) == str(SHAPES["gate"].w)
+    assert geom.group(2) == str(SHAPES["gate"].h)
+    assert int(geom.group(1)) > narrow_w
 
 
 def test_reload_keeps_non_library_vertex(tmp_path: Path) -> None:

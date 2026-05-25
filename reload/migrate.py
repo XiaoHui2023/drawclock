@@ -11,6 +11,7 @@ from drawio_decode import (
 )
 from drawio_library import (
     LABEL_PLACEHOLDER_RE,
+    LibraryShape,
     canonical_object_attrs,
     load_library_shapes,
     load_library_titles,
@@ -26,7 +27,7 @@ def reload_drawio_file(
     library_path: str | Path,
     output_path: str | Path,
 ) -> Path:
-    """Upgrade library cell styles/labels; preserve geometry and non-library cells."""
+    """Upgrade library styles/labels and default cell size; preserve position (x,y) and non-library cells."""
     lib = Path(library_path)
     inp = Path(input_path)
     out = Path(output_path)
@@ -88,7 +89,7 @@ def _migrate_root(
         dtype = DRAWCLOCK_TYPE_ALIASES.get(dtype, dtype)
         if dtype not in known:
             raise ValueError(f"图中器件类型不在新器件库中: {dtype}")
-        _upgrade_library_vertex(obj, mxcell, dtype, library_path)
+        _upgrade_library_vertex(obj, mxcell, dtype, shapes[dtype], library_path)
         id_to_type[cell_id] = dtype
 
     for child in list(root_el):
@@ -133,9 +134,10 @@ def _upgrade_library_vertex(
     obj: ET.Element,
     mxcell: ET.Element,
     dtype: str,
+    shape: LibraryShape,
     library_path: str | Path,
 ) -> None:
-    shape = load_library_shapes(library_path)[dtype]
+    _apply_library_geometry(mxcell, shape)
     if obj is mxcell:
         mxcell.set("style", shape.style)
         return
@@ -156,6 +158,19 @@ def _upgrade_library_vertex(
         obj.set(key, value)
     if "label" in canonical and not LABEL_PLACEHOLDER_RE.search(canonical["label"]):
         obj.set("placeholders", "0")
+
+
+def _apply_library_geometry(mxcell: ET.Element, shape: LibraryShape) -> None:
+    geom = mxcell.find("mxGeometry")
+    if geom is None:
+        geom = ET.SubElement(mxcell, "mxGeometry")
+        geom.set("as", "geometry")
+    if geom.get("x") is None:
+        geom.set("x", "0")
+    if geom.get("y") is None:
+        geom.set("y", "0")
+    geom.set("width", str(shape.w))
+    geom.set("height", str(shape.h))
 
 
 def _style_dtype(style: str) -> str | None:
