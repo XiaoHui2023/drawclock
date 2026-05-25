@@ -16,7 +16,7 @@ from drawio_library import (
     load_library_titles,
     reload_object_attrs,
 )
-from drawio_ports import finalize_edge_style
+from drawio_ports import port_anchors, resolve_edge_style
 
 DRAWCLOCK_TYPE_RE = re.compile(r"drawclockType=([^;]+)")
 DRAWCLOCK_TYPE_ALIASES = {"clksrc": "source"}
@@ -79,7 +79,7 @@ def _migrate_root(
     known: set[str],
     library_path: str | Path,
 ) -> None:
-    id_to_type: dict[str, str] = {}
+    id_to_vertex: dict[str, tuple[str, str]] = {}
 
     for child in list(root_el):
         parsed = _parse_library_vertex(child)
@@ -90,7 +90,7 @@ def _migrate_root(
         if dtype not in known:
             raise ValueError(f"图中器件类型不在新器件库中: {dtype}")
         _upgrade_library_vertex(obj, mxcell, dtype, shapes[dtype], library_path)
-        id_to_type[cell_id] = dtype
+        id_to_vertex[cell_id] = (dtype, mxcell.get("style") or "")
 
     for child in list(root_el):
         if child.tag != "mxCell" or child.get("edge") != "1":
@@ -99,9 +99,20 @@ def _migrate_root(
         tgt_id = child.get("target")
         if not src_id or not tgt_id:
             continue
-        if src_id not in id_to_type or tgt_id not in id_to_type:
+        if src_id not in id_to_vertex or tgt_id not in id_to_vertex:
             continue
-        child.set("style", finalize_edge_style(child.get("style") or ""))
+        src_type, src_style = id_to_vertex[src_id]
+        tgt_type, tgt_style = id_to_vertex[tgt_id]
+        child.set(
+            "style",
+            resolve_edge_style(
+                src_style,
+                src_type,
+                tgt_style,
+                tgt_type,
+                child.get("style") or "",
+            ),
+        )
 
 
 def _parse_library_vertex(

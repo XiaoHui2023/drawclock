@@ -17,6 +17,7 @@ for path in (SRC, RELOAD):
 
 from drawio_decode import decompress_diagram_payload  # noqa: E402
 from drawio_library import bake_label_placeholders, load_library_shapes  # noqa: E402
+from drawio_ports import port_anchors  # noqa: E402
 from migrate import migrate_mxfile_xml, reload_drawio_file  # noqa: E402
 
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
@@ -235,6 +236,44 @@ def test_reload_replaces_stale_baked_label_viewbox(tmp_path: Path) -> None:
     assert f'viewBox="0 0 {gate.w} {gate.h}"' in inner
     assert f'viewBox="0 0 {stale_w} {gate.h}"' not in inner
     assert f'width="{gate.w}"' in inner
+
+
+def test_reload_realigns_edge_ports_after_geometry_change(tmp_path: Path) -> None:
+    gate = SHAPES["gate"]
+    pll = SHAPES["pll"]
+    stale_w = max(gate.w - 40, 40)
+    pll_out = port_anchors(pll.style, "pll")["right"]
+    gate_in = port_anchors(gate.style, "gate")["left"]
+    inp = tmp_path / "edge-misaligned.drawio"
+    inp.write_text(
+        f"""<mxfile><diagram><mxGraphModel><root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <object name="pll0" placeholders="0" id="10">
+          <mxCell style="{pll.style}" vertex="1" parent="1">
+            <mxGeometry x="40" y="40" width="{pll.w}" height="{pll.h}" as="geometry"/>
+          </mxCell>
+        </object>
+        <object name="gate0" placeholders="0" id="11">
+          <mxCell style="{gate.style}" vertex="1" parent="1">
+            <mxGeometry x="200" y="40" width="{stale_w}" height="{gate.h}" as="geometry"/>
+          </mxCell>
+        </object>
+        <mxCell id="20" style="exitX=1;exitY=0.5;entryX=0;entryY=0.5;edgeStyle=none;html=1;" edge="1" parent="1" source="10" target="11">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        </root></mxGraphModel></diagram></mxfile>""",
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.drawio"
+    reload_drawio_file(inp, LIBRARY, out)
+    inner = html.unescape(_mxfile_searchable(out.read_text(encoding="utf-8")))
+    edge = re.search(r'id="20" style="([^"]*)"', inner)
+    assert edge is not None
+    style = edge.group(1).replace(" ", "")
+    exit_part = style.split("entryX", 1)[0]
+    assert f"exitX={pll_out[0]}" in exit_part or f"exitX={pll_out[0]:g}" in exit_part
+    assert "exitX=1" not in exit_part
+    assert f"entryX={gate_in[0]}" in style or f"entryX={gate_in[0]:g}" in style
 
 
 def test_reload_applies_library_width_from_narrow_fixture(tmp_path: Path) -> None:
