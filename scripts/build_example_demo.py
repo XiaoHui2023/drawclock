@@ -14,6 +14,7 @@ for path in (SRC, RELOAD):
         sys.path.insert(0, str(path))
 
 from drawio_build import xml_attr  # noqa: E402
+from drawio_decode import compress_diagram_payload  # noqa: E402
 from drawio_library import (  # noqa: E402
     DEFAULT_LIBRARY_PATH,
     LibraryShape,
@@ -192,9 +193,6 @@ def _edge_xml(edge_id: int, edge: EdgeSpec, name_to_id: dict[str, int]) -> str:
 
 def _assemble(diagram_name: str, placed: list[Placed], edges: list[EdgeSpec]) -> str:
     lines = [
-        "<mxfile>",
-        f'  <diagram name="{xml_attr(diagram_name)}">',
-        "    <mxGraphModel>",
         "      <root>",
         '        <mxCell id="0"/>',
         '        <mxCell id="1" parent="0"/>',
@@ -208,16 +206,19 @@ def _assemble(diagram_name: str, placed: list[Placed], edges: list[EdgeSpec]) ->
     for edge in edges:
         lines.append(_edge_xml(next_id, edge, name_to_id))
         next_id += 1
-    lines.extend(
-        [
-            "      </root>",
-            "    </mxGraphModel>",
-            "  </diagram>",
-            "</mxfile>",
-            "",
-        ]
+    lines.append("      </root>")
+    model_xml = (
+        "<mxGraphModel>\n"
+        + "\n".join(lines)
+        + "\n    </mxGraphModel>"
     )
-    return "\n".join(lines)
+    payload = compress_diagram_payload(model_xml)
+    return (
+        "<mxfile>\n"
+        f'  <diagram id="{xml_attr(diagram_name)}" name="{xml_attr(diagram_name)}">'
+        f"{payload}</diagram>\n"
+        "</mxfile>\n"
+    )
 
 
 def build_fig1(shapes: dict[str, LibraryShape]) -> str:

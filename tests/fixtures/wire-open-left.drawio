@@ -1,0 +1,23 @@
+<mxfile>
+  <diagram>
+    <mxGraphModel>
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <object gap="4" name="bus" placeholders="1" id="10">
+          <mxCell style="drawclockType=wire;points=[[0.0000,0.5000,0,0,0],[1.0000,0.5000,0,0,0]];" vertex="1" parent="1">
+            <mxGeometry x="120" y="50" width="40" height="28" as="geometry"/>
+          </mxCell>
+        </object>
+        <object gap="4" name="gate0" placeholders="1" id="11">
+          <mxCell style="drawclockType=gate;points=[[0.0000,0.5000,0,0,0],[1.0000,0.5000,0,0,0]];" vertex="1" parent="1">
+            <mxGeometry x="220" y="40" width="40" height="70" as="geometry"/>
+          </mxCell>
+        </object>
+        <mxCell id="20" style="exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="10" target="11">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -15,9 +15,9 @@ example.bat
 ```bat
 python scripts/build_drawio_lib.py
 python scripts/build_example_demo.py
-python src -i example\fig1.drawio example\fig2.drawio -o example\out --library drawio-lib\drawclock.xml
-python reload -i example\fig1.drawio --library drawio-lib\drawclock.xml -o example\out\fig1-reloaded.drawio
-python reload -i example\fig2.drawio --library drawio-lib\drawclock.xml -o example\out\fig2-reloaded.drawio
+python src -i example\fig1.drawio example\fig2.drawio -o example\out\clock-tree.json -l drawio-lib\drawclock.xml
+python reload -i example\fig1.drawio -l drawio-lib\drawclock.xml -o example\out\fig1-reloaded.drawio
+python reload -i example\fig2.drawio -l drawio-lib\drawclock.xml -o example\out\fig2-reloaded.drawio
 ```
 
 上游（库或示例图）变更后，须从对应步骤起重新执行并检查输出。
@@ -31,6 +31,8 @@ pytest tests\test_reload.py -q
 ```
 
 ## 输入图
+
+`scripts/build_example_demo.py` 生成的 `fig1.drawio` / `fig2.drawio` 使用 draw.io **压缩 diagram**（与 `.drawio.svg` 导出同类）；`reload` 产物同样保持压缩。
 
 | 文件 | 内容 |
 | --- | --- |
@@ -55,8 +57,8 @@ pytest tests\test_reload.py -q
 | 文件 | 说明 |
 | --- | --- |
 | `example/out/clock-tree.json` | `src` 合并两图后的样例 |
-| `example/out/fig1-reloaded.drawio` | reload 刷新图 1 |
-| `example/out/fig2-reloaded.drawio` | reload 刷新图 2 |
+| `example/out/fig1-reloaded.drawio` | reload 刷新图 1（压缩 diagram） |
+| `example/out/fig2-reloaded.drawio` | reload 刷新图 2（压缩 diagram） |
 
 ## JSON 要点（本示例）
 

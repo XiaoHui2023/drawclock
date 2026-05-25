@@ -14,29 +14,29 @@
 
 ## src：提取 clock-tree.json
 
-运行：`python src -i <文件>… [-o 目录] [--library drawio-lib/drawclock.xml]`
+运行：`python src -i <文件>… -l <库.xml> [-o <json文件>]`
 
 | 长参数 | 短参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
 | `--input` | `-i` | 文件路径（可多次） | 必填 | 一个或多个 `.drawio.svg` / `.drawio` |
-| `--output` | `-o` | 目录 | | 写入 `clock-tree.json`；未指定时打印到标准输出 |
-| `--library` | | 文件 | `drawio-lib/drawclock.xml` | 器件库，用于校验 `drawclockType` |
+| `--output` | `-o` | 文件 | | 输出的 JSON 文件路径；未指定时打印到标准输出 |
+| `--library` | `-l` | 文件 | 必填 | 器件库，用于校验 `drawclockType` |
 
 行为说明：
 
 - 仅带 **`drawclockType`** 的器件库图形参与连线逻辑与 JSON；文本框等其它图形**忽略**。
 - 同名 **wire** 多段图形在 JSON 中**合并**为一条（`source` 左端 + `targets` 右端列表）；左端至多一个，合并后仍须满足校验。
-- 输出文件名为 **`clock-tree.json`**。记录字段见 [docs/clock-tree-json.md](docs/clock-tree-json.md)；导出规则见项目 design-notes skill。
+- 记录字段见 [docs/clock-tree-json.md](docs/clock-tree-json.md)；导出规则见项目 design-notes skill。
 
 ## reload：刷新器件库样式
 
-运行：`python reload -i <旧图> --library <新库.xml> -o <新图.drawio>`（打包后：`dist/drawclock-reload.exe`，参数相同）
+运行：`python reload -i <旧图> -l <新库.xml> -o <新图.drawio>`（打包后：`dist/drawclock-reload.exe`，参数相同）
 
-| 参数 | 说明 |
-| --- | --- |
-| `-i` / `--input` | 旧 `.drawio` / `.drawio.svg` |
-| `--library` | 新器件库 `drawclock.xml`（默认 `drawio-lib/drawclock.xml`） |
-| `-o` / `--output` | 输出的 `.drawio` |
+| 长参数 | 短参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `--input` | `-i` | 文件 | 必填 | 旧 `.drawio` / `.drawio.svg`（含压缩 diagram） |
+| `--library` | `-l` | 文件 | 必填 | 新器件库 `drawclock.xml` |
+| `--output` | `-o` | 文件 | 必填 | 输出的 `.drawio` |
 
 - 器件库图形：换成新库的 **style / label**，**保留** `mxGeometry` 与 `name`、`freq`、`in*_label` 等对象属性。
 - 非器件库图形与连线：**原样保留**。

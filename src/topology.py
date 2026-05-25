@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from drawio_graph import GraphCell, ParsedDiagram, edge_attachment
 from device_model import DeviceState, MUX_KIND_RE
+from wire_resolve import WireEndpoints, build_wire_endpoints
 
 
 def build_device_states(diagram: ParsedDiagram) -> tuple[dict[str, DeviceState], dict[str, list[str]]]:
@@ -169,23 +170,22 @@ def validate_topology(
     errors.extend(_duplicate_device_name_errors(devices))
     device_names = {s.name for s in devices.values() if s.kind != "wire"}
     wire_names = set(wire_by_name.keys())
+    wire_endpoints = build_wire_endpoints(devices, wire_by_name)
+
+    for wire_name, endpoints in wire_endpoints.items():
+        errors.extend(_wire_endpoint_errors(wire_name, endpoints, device_names))
 
     for state in devices.values():
         if state.kind == "wire":
-            source = state.bindings.get("left")
-            targets = list(state.wire_targets)
-            if not source and not targets:
-                errors.append(f"连线 {state.name} 的图形未连接任何器件")
-            for peer in ([source] if source else []) + targets:
-                if peer not in device_names:
-                    errors.append(f"连线 {state.name} 连接到未知器件 {peer}")
             continue
 
         required = _required_ports(state.kind)
         missing = required - set(state.bindings)
         extra = set(state.bindings) - required
         if state.kind in ("pll", "source"):
-            if not state.out_targets:
+            if not state.out_targets and not _output_blocked_by_open_wire(
+                state, wire_names, wire_endpoints
+            ):
                 errors.append(f"器件 {state.name} 的输出端口未连接")
             extra = extra | (set(state.bindings) - required)
         elif missing:
@@ -201,7 +201,6 @@ def validate_topology(
 
     for wire_name, cell_ids in wire_by_name.items():
         merged_sources: list[str] = []
-        merged_targets: list[str] = []
         for cell_id in cell_ids:
             state = devices.get(cell_id)
             if state is None:
@@ -209,9 +208,6 @@ def validate_topology(
             left = state.bindings.get("left")
             if left and left not in merged_sources:
                 merged_sources.append(left)
-            for peer in state.wire_targets:
-                if peer not in merged_targets:
-                    merged_targets.append(peer)
         if len(merged_sources) > 1:
             errors.append(
                 f"连线名 {wire_name} 左端合并后只能接一个器件，当前为 {len(merged_sources)} 个"
@@ -219,6 +215,41 @@ def validate_topology(
 
     if errors:
         raise ValueError("\n".join(errors))
+
+
+def _wire_endpoint_errors(
+    wire_name: str,
+    endpoints: WireEndpoints,
+    device_names: set[str],
+) -> list[str]:
+    left = endpoints.left
+    targets = list(endpoints.targets)
+    errors: list[str] = []
+    for peer in ([left] if left else []) + targets:
+        if peer not in device_names:
+            errors.append(f"连线 {wire_name} 连接到未知器件 {peer}")
+
+    if not left and not targets:
+        errors.append(f"连线 {wire_name} 两端均未连接器件")
+        return errors
+    if left and not targets:
+        errors.append(f"连线 {wire_name} 左端接了器件 {left}，右端未连接任何器件")
+        return errors
+    if targets and not left:
+        joined = "、".join(targets)
+        errors.append(f"连线 {wire_name} 左端未接上游器件（右端接了 {joined}）")
+    return errors
+
+
+def _output_blocked_by_open_wire(
+    state: DeviceState,
+    wire_names: set[str],
+    wire_endpoints: dict[str, WireEndpoints],
+) -> bool:
+    for peer in state.out_targets:
+        if peer in wire_names and not wire_endpoints[peer].targets:
+            return True
+    return False
 
 
 def _duplicate_device_name_errors(devices: dict[str, DeviceState]) -> list[str]:

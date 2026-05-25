@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
@@ -91,14 +92,18 @@ def test_library_styles_load() -> None:
 
 
 def test_example_fig1_embeds_library_labels() -> None:
+    from drawio_decode import extract_mxfile_xml, iter_diagram_models  # noqa: E402
+
     fig1 = ROOT / "example" / "fig1.drawio"
     if not fig1.is_file():
         pytest.skip("先运行 scripts/build_example_demo.py")
     text = fig1.read_text(encoding="utf-8")
-    assert 'label="' in text and ("&lt;svg" in text or "<svg" in text)
-    assert "%name%" not in text
-    assert "exitPerimeter=0" in text
-    assert "drawclockType=source" in text
+    assert "<mxGraphModel" not in text
+    model_xml = ET.tostring(iter_diagram_models(extract_mxfile_xml(str(fig1)))[0], encoding="unicode")
+    assert 'label="' in model_xml and ("&lt;svg" in model_xml or "<svg" in model_xml)
+    assert "%name%" not in model_xml
+    assert "exitPerimeter=0" in model_xml
+    assert "drawclockType=source" in model_xml
 
 
 def test_example_two_figs_cross_wire_no_wire_in_json() -> None:
@@ -132,5 +137,21 @@ def test_reload_restores_drawable_html_style(tmp_path: Path) -> None:
 
 def test_wire_only_fixture_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-only.drawio"
-    with pytest.raises(ValueError, match="未连接任何器件"):
+    with pytest.raises(ValueError, match="两端均未连接器件"):
         parse_drawio_paths([path])
+
+
+def test_wire_open_left_reports_wire_not_device_input() -> None:
+    path = ROOT / "tests" / "fixtures" / "wire-open-left.drawio"
+    with pytest.raises(ValueError, match="连线 bus 左端未接上游器件") as exc:
+        parse_drawio_paths([path])
+    msg = str(exc.value)
+    assert "gate0" in msg
+    assert "输入端口未连接" not in msg
+
+
+def test_wire_open_right_reports_wire_not_pll_output() -> None:
+    path = ROOT / "tests" / "fixtures" / "wire-open-right.drawio"
+    with pytest.raises(ValueError, match="连线 bus 左端接了器件 pll0，右端未连接") as exc:
+        parse_drawio_paths([path])
+    assert "输出端口未连接" not in str(exc.value)

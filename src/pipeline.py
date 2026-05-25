@@ -45,14 +45,12 @@ def parse_drawio_paths(
 
 def write_clock_tree_json(
     config: list[dict[str, Any]],
-    output_dir: Path | None,
-    *,
-    filename: str = "clock-tree.json",
+    output_path: Path | None,
 ) -> Path | None:
     text = json.dumps(config, ensure_ascii=False, indent=2)
-    if output_dir is None:
+    if output_path is None:
         return None
-    output_dir.mkdir(parents=True, exist_ok=True)
-    out_path = output_dir / filename
-    out_path.write_text(text + "\n", encoding="utf-8")
-    return out_path
+    output_path = Path(output_path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(text + "\n", encoding="utf-8")
+    return output_path

@@ -4,7 +4,11 @@ import re
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from drawio_decode import extract_mxfile_xml
+from drawio_decode import (
+    compress_diagram_payload,
+    decompress_diagram_payload,
+    extract_mxfile_xml,
+)
 from drawio_library import (
     LABEL_PLACEHOLDER_RE,
     canonical_object_attrs,
@@ -14,6 +18,7 @@ from drawio_library import (
 from drawio_ports import finalize_edge_style
 
 DRAWCLOCK_TYPE_RE = re.compile(r"drawclockType=([^;]+)")
+DRAWCLOCK_TYPE_ALIASES = {"clksrc": "source"}
 
 
 def reload_drawio_file(
@@ -37,15 +42,21 @@ def migrate_mxfile_xml(mxfile_xml: str, library_path: str | Path) -> str:
     shapes = load_library_shapes(library_path)
     known = load_library_titles(library_path)
     for diagram in root.findall("diagram"):
+        was_compressed = False
         model = diagram.find("mxGraphModel")
         if model is None:
             payload = (diagram.text or "").strip()
             if not payload:
                 continue
             if not payload.startswith("<"):
-                raise ValueError(
-                    "压缩 diagram 暂不支持 reload；请在 draw.io 中另存为未压缩 XML"
-                )
+                was_compressed = True
+                try:
+                    payload = decompress_diagram_payload(payload)
+                except Exception as exc:
+                    raise ValueError(
+                        "无法解压 diagram 内容；"
+                        "请确认文件为 draw.io 导出的 .drawio / .drawio.svg"
+                    ) from exc
             model = ET.fromstring(payload)
             diagram.text = None
             diagram.append(model)
@@ -53,6 +64,10 @@ def migrate_mxfile_xml(mxfile_xml: str, library_path: str | Path) -> str:
         if root_el is None:
             continue
         _migrate_root(root_el, shapes, known, library_path)
+        if was_compressed:
+            model_xml = ET.tostring(model, encoding="unicode")
+            diagram.remove(model)
+            diagram.text = compress_diagram_payload(model_xml)
     ET.indent(root, space="  ")
     return ET.tostring(root, encoding="unicode") + "\n"
 
@@ -70,6 +85,7 @@ def _migrate_root(
         if parsed is None:
             continue
         cell_id, dtype, obj, mxcell = parsed
+        dtype = DRAWCLOCK_TYPE_ALIASES.get(dtype, dtype)
         if dtype not in known:
             raise ValueError(f"图中器件类型不在新器件库中: {dtype}")
         _upgrade_library_vertex(obj, mxcell, dtype, library_path)

@@ -25,15 +25,13 @@ pack.bat
 ## 运行打包产物
 
 ```bat
-dist\drawclock.exe -i example\demo.drawio -o example\out
+dist\drawclock.exe -i example\demo.drawio -l drawio-lib\drawclock.xml -o example\out\clock-tree.json
 ```
-
-`--library` 可省略：默认可执行文件内嵌的 `drawio-lib/drawclock.xml`。
 
 reload 示例：
 
 ```bat
-dist\drawclock-reload.exe -i example\fig1.drawio -o example\out\fig1-reloaded.drawio
+dist\drawclock-reload.exe -i example\fig1.drawio -l drawio-lib\drawclock.xml -o example\out\fig1-reloaded.drawio
 ```
 
 ## Linux staticx

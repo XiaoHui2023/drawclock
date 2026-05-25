@@ -8,7 +8,6 @@ _SRC = Path(__file__).resolve().parents[1] / "src"
 if str(_SRC) not in sys.path:
     sys.path.insert(0, str(_SRC))
 
-from drawio_library import DEFAULT_LIBRARY_PATH  # noqa: E402
 from migrate import reload_drawio_file  # noqa: E402
 
 
@@ -29,10 +28,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="旧 .drawio / .drawio.svg",
     )
     parser.add_argument(
+        "-l",
         "--library",
         type=str,
         metavar="FILE",
-        default=str(DEFAULT_LIBRARY_PATH),
+        required=True,
         help="新器件库 drawclock.xml",
     )
     parser.add_argument(

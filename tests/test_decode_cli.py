@@ -9,14 +9,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_src_writes_clock_tree_only() -> None:
-    out = ROOT / "tests" / "_tmp_cli_src"
-    out.mkdir(parents=True, exist_ok=True)
+    out = ROOT / "tests" / "_tmp_cli_src" / "clock-tree.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
     proc = subprocess.run(
         [
             sys.executable,
             str(ROOT / "src"),
             "-i",
             str(ROOT / "tests" / "fixtures" / "mini-tree.drawio"),
+            "-l",
+            str(ROOT / "drawio-lib" / "drawclock.xml"),
             "-o",
             str(out),
         ],
@@ -25,7 +27,6 @@ def test_src_writes_clock_tree_only() -> None:
         check=False,
     )
     assert proc.returncode == 0, proc.stderr
-    assert (out / "clock-tree.json").is_file()
-    assert not (out / "drawio-layout.json").exists()
-    config = json.loads((out / "clock-tree.json").read_text(encoding="utf-8"))
+    assert out.is_file()
+    config = json.loads(out.read_text(encoding="utf-8"))
     assert any(item["name"] == "pll0" for item in config)

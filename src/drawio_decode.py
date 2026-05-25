@@ -14,6 +14,14 @@ def decompress_diagram_payload(data: str) -> str:
     return urllib.parse.unquote(raw.decode("utf-8"))
 
 
+def compress_diagram_payload(model_xml: str) -> str:
+    """Encode mxGraphModel XML the way draw.io stores compressed diagrams."""
+    quoted = urllib.parse.quote(model_xml)
+    compressor = zlib.compressobj(level=9, wbits=-15)
+    raw = compressor.compress(quoted.encode("utf-8")) + compressor.flush()
+    return base64.b64encode(raw).decode("ascii")
+
+
 def extract_mxfile_xml(path: str) -> str:
     text = open(path, encoding="utf-8").read()
     lower = path.lower()
@@ -36,6 +44,10 @@ def _mxfile_from_svg(svg_text: str) -> str:
 
 def _normalize_drawio_file(text: str) -> str:
     stripped = text.strip()
+    if stripped.startswith("<?xml"):
+        end = stripped.find("?>")
+        if end != -1:
+            stripped = stripped[end + 2 :].strip()
     if stripped.startswith("<mxfile"):
         return stripped
     if stripped.startswith("<mxGraphModel"):
