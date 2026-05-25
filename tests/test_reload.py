@@ -193,6 +193,16 @@ def test_reload_preserves_geometry_and_upgrades_style(tmp_path: Path) -> None:
     assert gate.group(4) == str(SHAPES["gate"].h)
 
 
+def test_reload_keeps_placeholder_template_for_edit(tmp_path: Path) -> None:
+    inp = ROOT / "tests" / "fixtures" / "mini-tree.drawio"
+    out = tmp_path / "out.drawio"
+    reload_drawio_file(inp, LIBRARY, out)
+    inner = html.unescape(_mxfile_searchable(out.read_text(encoding="utf-8")))
+    assert 'placeholders="1"' in inner
+    assert "%name%" in inner
+    assert 'name="pll0"' in inner
+
+
 def test_reload_replaces_stale_baked_label_viewbox(tmp_path: Path) -> None:
     gate = SHAPES["gate"]
     stale_w = max(gate.w - 40, 40)
@@ -236,6 +246,8 @@ def test_reload_replaces_stale_baked_label_viewbox(tmp_path: Path) -> None:
     assert f'viewBox="0 0 {gate.w} {gate.h}"' in inner
     assert f'viewBox="0 0 {stale_w} {gate.h}"' not in inner
     assert f'width="{gate.w}"' in inner
+    assert "%name%" in inner
+    assert 'placeholders="1"' in inner
 
 
 def test_reload_realigns_edge_ports_after_geometry_change(tmp_path: Path) -> None:

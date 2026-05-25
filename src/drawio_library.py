@@ -188,18 +188,25 @@ def reload_object_attrs(
     *,
     library_path: str | Path | None = None,
 ) -> dict[str, str]:
-    """Rebuild label from the library template so viewBox matches default w/h (no stale stretch)."""
+    """Apply library label template with placeholders=1; keep name/freq/in*_label for draw.io edit fields."""
     lib = str(library_path or DEFAULT_LIBRARY_PATH)
     shape = _cached_library_shapes(lib).get(drawclock_type)
     if shape is None:
         return canonical_object_attrs(drawclock_type, stored_attrs, library_path=lib)
-    base = {
+    out = {
         key: value
         for key, value in stored_attrs.items()
         if key not in ("label", "placeholders") and value is not None
     }
-    out = dict(base)
-    out["label"] = bake_label_placeholders(shape.label, out)
-    if not LABEL_PLACEHOLDER_RE.search(out["label"]):
-        out["placeholders"] = "0"
+    if not out.get("name"):
+        out["name"] = drawclock_type
+    template = shape.label
+    if "%freq%" in template and "freq" not in out:
+        out["freq"] = ""
+    for index in range(6):
+        key = f"in{index}_label"
+        if f"%{key}%" in template and key not in out:
+            out[key] = str(index)
+    out["label"] = template
+    out["placeholders"] = "1"
     return out

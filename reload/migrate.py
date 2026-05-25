@@ -10,7 +10,6 @@ from drawio_decode import (
     extract_mxfile_xml,
 )
 from drawio_library import (
-    LABEL_PLACEHOLDER_RE,
     LibraryShape,
     load_library_shapes,
     load_library_titles,
@@ -156,10 +155,7 @@ def _upgrade_library_vertex(
     if "name" not in attrs and attrs.get("_name"):
         attrs["name"] = attrs["_name"]
     canonical = reload_object_attrs(dtype, attrs, library_path=library_path)
-    style = shape.style
-    if canonical.get("placeholders") == "0":
-        style = style.replace("placeholders=1;", "placeholders=0;")
-    mxcell.set("style", style)
+    mxcell.set("style", shape.style)
     for key in ("label", "placeholders"):
         if key in obj.attrib:
             del obj.attrib[key]
@@ -167,8 +163,6 @@ def _upgrade_library_vertex(
         if key == "id":
             continue
         obj.set(key, value)
-    if "label" in canonical and not LABEL_PLACEHOLDER_RE.search(canonical["label"]):
-        obj.set("placeholders", "0")
 
 
 def _apply_library_geometry(mxcell: ET.Element, shape: LibraryShape) -> None:
