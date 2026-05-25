@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -15,7 +16,7 @@ for path in (SRC, RELOAD):
         sys.path.insert(0, str(path))
 
 from drawio_decode import decompress_diagram_payload  # noqa: E402
-from drawio_library import load_library_shapes  # noqa: E402
+from drawio_library import bake_label_placeholders, load_library_shapes  # noqa: E402
 from migrate import migrate_mxfile_xml, reload_drawio_file  # noqa: E402
 
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
@@ -189,6 +190,51 @@ def test_reload_preserves_geometry_and_upgrades_style(tmp_path: Path) -> None:
     assert gate.group(2) == "50"
     assert gate.group(3) == str(SHAPES["gate"].w)
     assert gate.group(4) == str(SHAPES["gate"].h)
+
+
+def test_reload_replaces_stale_baked_label_viewbox(tmp_path: Path) -> None:
+    gate = SHAPES["gate"]
+    stale_w = max(gate.w - 40, 40)
+    stale_label = bake_label_placeholders(
+        gate.label.replace(f"0 0 {gate.w} {gate.h}", f"0 0 {stale_w} {gate.h}"),
+        {"name": "g1"},
+    )
+    obj = ET.Element(
+        "object",
+        {"name": "g1", "placeholders": "0", "id": "10", "label": stale_label},
+    )
+    mxcell = ET.SubElement(
+        obj,
+        "mxCell",
+        {
+            "style": "drawclockType=gate;html=1;",
+            "vertex": "1",
+            "parent": "1",
+        },
+    )
+    geom = ET.SubElement(mxcell, "mxGeometry", {"as": "geometry"})
+    geom.set("x", "0")
+    geom.set("y", "0")
+    geom.set("width", str(stale_w))
+    geom.set("height", str(gate.h))
+    root = ET.Element("root")
+    ET.SubElement(root, "mxCell", {"id": "0"})
+    ET.SubElement(root, "mxCell", {"id": "1", "parent": "0"})
+    root.append(obj)
+    model = ET.Element("mxGraphModel")
+    model.append(root)
+    diagram = ET.Element("diagram")
+    diagram.append(model)
+    mxfile = ET.Element("mxfile")
+    mxfile.append(diagram)
+    inp = tmp_path / "stale-label.drawio"
+    inp.write_text(ET.tostring(mxfile, encoding="unicode"), encoding="utf-8")
+    out = tmp_path / "out.drawio"
+    reload_drawio_file(inp, LIBRARY, out)
+    inner = html.unescape(_mxfile_searchable(out.read_text(encoding="utf-8")))
+    assert f'viewBox="0 0 {gate.w} {gate.h}"' in inner
+    assert f'viewBox="0 0 {stale_w} {gate.h}"' not in inner
+    assert f'width="{gate.w}"' in inner
 
 
 def test_reload_applies_library_width_from_narrow_fixture(tmp_path: Path) -> None:

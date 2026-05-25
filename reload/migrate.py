@@ -12,9 +12,9 @@ from drawio_decode import (
 from drawio_library import (
     LABEL_PLACEHOLDER_RE,
     LibraryShape,
-    canonical_object_attrs,
     load_library_shapes,
     load_library_titles,
+    reload_object_attrs,
 )
 from drawio_ports import finalize_edge_style
 
@@ -144,7 +144,7 @@ def _upgrade_library_vertex(
     attrs = {key: obj.get(key) for key in obj.attrib if obj.get(key) is not None}
     if "name" not in attrs and attrs.get("_name"):
         attrs["name"] = attrs["_name"]
-    canonical = canonical_object_attrs(dtype, attrs, library_path=library_path)
+    canonical = reload_object_attrs(dtype, attrs, library_path=library_path)
     style = shape.style
     if canonical.get("placeholders") == "0":
         style = style.replace("placeholders=1;", "placeholders=0;")

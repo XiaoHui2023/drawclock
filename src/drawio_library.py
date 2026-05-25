@@ -180,3 +180,26 @@ def canonical_object_attrs(
         if not LABEL_PLACEHOLDER_RE.search(out["label"]):
             out["placeholders"] = "0"
     return out
+
+
+def reload_object_attrs(
+    drawclock_type: str,
+    stored_attrs: dict[str, str],
+    *,
+    library_path: str | Path | None = None,
+) -> dict[str, str]:
+    """Rebuild label from the library template so viewBox matches default w/h (no stale stretch)."""
+    lib = str(library_path or DEFAULT_LIBRARY_PATH)
+    shape = _cached_library_shapes(lib).get(drawclock_type)
+    if shape is None:
+        return canonical_object_attrs(drawclock_type, stored_attrs, library_path=lib)
+    base = {
+        key: value
+        for key, value in stored_attrs.items()
+        if key not in ("label", "placeholders") and value is not None
+    }
+    out = dict(base)
+    out["label"] = bake_label_placeholders(shape.label, out)
+    if not LABEL_PLACEHOLDER_RE.search(out["label"]):
+        out["placeholders"] = "0"
+    return out
