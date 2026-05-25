@@ -55,3 +55,4 @@ python src encode -i example\out\restored.drawio -o example\out --layout
 | 安装依赖 | `update.bat` |
 | 运行示例 | `example.bat` |
 | 运行测试 | `test.bat` |
+| 打包单文件 CLI | `pack.bat`（产物 `dist/drawclock.exe`；说明见 [PACKAGING.md](PACKAGING.md)） |

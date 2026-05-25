@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from functools import lru_cache
@@ -11,7 +12,15 @@ LABEL_PLACEHOLDER_RE = re.compile(r"%(?:name|freq|in\d+_label)%")
 
 from drawio_decode import decompress_diagram_payload
 
-DEFAULT_LIBRARY_PATH = Path(__file__).resolve().parents[1] / "drawio-lib" / "drawclock.xml"
+
+def package_root() -> Path:
+    """Repository root in dev; PyInstaller extract dir when frozen."""
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
+        return Path(sys._MEIPASS)
+    return Path(__file__).resolve().parents[1]
+
+
+DEFAULT_LIBRARY_PATH = package_root() / "drawio-lib" / "drawclock.xml"
 
 
 @dataclass(frozen=True)

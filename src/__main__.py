@@ -5,6 +5,7 @@ import json
 import sys
 from pathlib import Path
 
+from drawio_library import DEFAULT_LIBRARY_PATH
 from pipeline import decode_to_drawio, encode_drawio_paths, parse_drawio_paths
 
 
@@ -57,8 +58,8 @@ def _build_parser() -> argparse.ArgumentParser:
         "--library",
         type=str,
         metavar="FILE",
-        required=True,
-        help="drawclock 器件库（drawio-lib/drawclock.xml）",
+        default=str(DEFAULT_LIBRARY_PATH),
+        help="drawclock 器件库（默认 drawio-lib/drawclock.xml；打包版为内置副本）",
     )
     decode.add_argument(
         "-o",
