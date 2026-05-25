@@ -30,7 +30,7 @@
 
 ## reload：刷新器件库样式
 
-运行：`python reload -i <旧图> --library <新库.xml> -o <新图.drawio>`
+运行：`python reload -i <旧图> --library <新库.xml> -o <新图.drawio>`（打包后：`dist/drawclock-reload.exe`，参数相同）
 
 | 参数 | 说明 |
 | --- | --- |
@@ -55,4 +55,4 @@
 | 安装依赖 | `update.bat` |
 | 运行示例（含 reload 与 reload 测试） | `example.bat` |
 | 运行全量测试 | `test.bat` |
-| 打包 CLI | `pack.bat`（产物 `dist/drawclock.exe`；说明见 [PACKAGING.md](PACKAGING.md)） |
+| 打包 CLI | `pack.bat`（产物 `dist/drawclock.exe`、`dist/drawclock-reload.exe`；说明见 [PACKAGING.md](PACKAGING.md)） |

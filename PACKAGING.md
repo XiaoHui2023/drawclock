@@ -18,7 +18,9 @@ pack.bat
 
 | 命令 | 产物（`dist/`） |
 | --- | --- |
-| `./tools/pack.sh` 或 `all` / `src` | `drawclock` / `drawclock.exe` |
+| `./tools/pack.sh` 或 `all` | `drawclock`、`drawclock-reload`（Windows 为 `.exe`） |
+| `./tools/pack.sh src` | `drawclock` / `drawclock.exe` |
+| `./tools/pack.sh reload` | `drawclock-reload` / `drawclock-reload.exe` |
 
 ## 运行打包产物
 
@@ -26,7 +28,13 @@ pack.bat
 dist\drawclock.exe -i example\demo.drawio -o example\out
 ```
 
-`--library` 可省略：默认可执行文件内嵌的 `drawio-lib/drawclock.xml`。reload 为独立入口，见根目录 README。
+`--library` 可省略：默认可执行文件内嵌的 `drawio-lib/drawclock.xml`。
+
+reload 示例：
+
+```bat
+dist\drawclock-reload.exe -i example\fig1.drawio -o example\out\fig1-reloaded.drawio
+```
 
 ## Linux staticx
 
@@ -34,7 +42,8 @@ dist\drawclock.exe -i example\demo.drawio -o example\out
 
 ## Spec 文件
 
-- `drawclock-cli.spec` → 二进制名 **`drawclock`**
+- `drawclock-cli.spec` → **`drawclock`**
+- `drawclock-reload.spec` → **`drawclock-reload`**
 
 ## 兼容边界
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PyInstaller onefile for drawclock; Linux runs staticx after PyInstaller.
-# Usage (repo root): ./tools/pack.sh [all|src]
+# Usage (repo root): ./tools/pack.sh [all|src|reload]
 # Linux also needs patchelf (e.g. apt install patchelf).
 set -euo pipefail
 
@@ -41,8 +41,9 @@ ensure_venv() {
 spec_for_target() {
   case "$1" in
     src) echo "$ROOT/drawclock-cli.spec" ;;
+    reload) echo "$ROOT/drawclock-reload.spec" ;;
     *)
-      echo "错误: 未知目标 $1（可用: all、src）。" >&2
+      echo "错误: 未知目标 $1（可用: all、src、reload）。" >&2
       exit 1
       ;;
   esac
@@ -51,6 +52,7 @@ spec_for_target() {
 dist_name_for_target() {
   case "$1" in
     src) echo "drawclock" ;;
+    reload) echo "drawclock-reload" ;;
     *) exit 1 ;;
   esac
 }
@@ -115,11 +117,16 @@ ensure_venv
 rm -rf "$ROOT/build" "$ROOT/dist"
 
 case "$TARGET" in
-  all|src)
+  all)
     build_target src
+    rm -rf "$ROOT/build"
+    build_target reload
+    ;;
+  src|reload)
+    build_target "$TARGET"
     ;;
   *)
-    echo "用法: ./tools/pack.sh [all|src]" >&2
+    echo "用法: ./tools/pack.sh [all|src|reload]" >&2
     exit 1
     ;;
 esac

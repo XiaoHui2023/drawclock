@@ -20,5 +20,11 @@ echo ==^> PyInstaller: drawclock-cli.spec
 %PY% -m PyInstaller --clean --noconfirm drawclock-cli.spec
 if errorlevel 1 exit /b 1
 
-echo Done: dist\drawclock.exe
+if exist build rmdir /s /q build
+
+echo ==^> PyInstaller: drawclock-reload.spec
+%PY% -m PyInstaller --clean --noconfirm drawclock-reload.spec
+if errorlevel 1 exit /b 1
+
+echo Done: dist\drawclock.exe dist\drawclock-reload.exe
 echo See PACKAGING.md for usage.
