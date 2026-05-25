@@ -21,6 +21,7 @@ if str(SCRIPTS) not in sys.path:
         ("dto", 2),
         ("inv", 2),
         ("pll", 1),
+        ("source", 1),
         ("clock", 1),
         ("wire", 2),
     ],
@@ -36,7 +37,23 @@ def test_pll_only_right_point() -> None:
     pll = importlib.import_module("drawio_lib.components.pll")
     pts = pll._parse_points(pll.cell_style())
     assert len(pts) == 1
-    assert isclose(pts[0][0], 0.7, abs_tol=0.02)
+    assert pll.G.right is not None
+    assert isclose(pts[0][0], pll.G.right.anchor.x_rel, abs_tol=0.001)
+
+
+def test_source_only_right_point() -> None:
+    source = importlib.import_module("drawio_lib.components.source")
+    pts = source._parse_points(source.cell_style())
+    assert len(pts) == 1
+    assert source.G.right is not None
+    assert isclose(pts[0][0], source.G.right.anchor.x_rel, abs_tol=0.001)
+
+
+def test_source_no_center_src_label() -> None:
+    source = importlib.import_module("drawio_lib.components.source")
+    html = source.label_html()
+    assert ">SRC</span>" not in html
+    assert ">SRC<" not in html
 
 
 def test_pll_center_label_on_graphic() -> None:
@@ -68,7 +85,7 @@ def test_wire_ports_on_graphic() -> None:
     wire = importlib.import_module("drawio_lib.components.wire")
     pts = wire._parse_points(wire.cell_style())
     assert len(pts) == 2
-    pad = 20 / 80
+    pad = 40 / 120
     assert isclose(pts[0][0], pad, abs_tol=0.02)
     assert isclose(pts[1][0], 1.0 - pad, abs_tol=0.02)
 
@@ -94,7 +111,7 @@ def test_clock_only_left_point() -> None:
 
     wave_left_rel = (CLOCK_LEFT_PAD + CLOCK_BODY_MARGIN_X) / clock.W
     assert isclose(pts[0][0], wave_left_rel, abs_tol=0.02)
-    assert clock.W == 240
+    assert clock.W == 260
     assert CLOCK_WAVE_W == 36
     assert "%freq%hz)" in clock.label_html()
     assert f"width:{CLOCK_FREQ_GAP_PX}px" in clock.label_html()

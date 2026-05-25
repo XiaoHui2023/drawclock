@@ -3,52 +3,42 @@
 cd /d "%~dp0"
 
 if not exist ".venv\Scripts\python.exe" (
-
     call "%~dp0update.bat"
-
 )
 
 call ".venv\Scripts\activate.bat"
 
 if not exist "example\out" mkdir "example\out"
 
-if not exist "example\demo.drawio" (
-
-    python scripts\build_example_demo.py
-
-    if errorlevel 1 exit /b 1
-
-)
-
-echo === encode: demo.drawio -^> JSON ===
-
-python src encode -i example\demo.drawio -o example\out --layout
-
+echo === 1/5 build drawio library ===
+python scripts\build_drawio_lib.py
 if errorlevel 1 exit /b 1
 
 echo.
-
-echo === decode: JSON -^> restored.drawio ===
-
-python src decode --config example\out\clock-tree.json --layout example\out\drawio-layout.json --library drawio-lib\drawclock.xml -o example\out\restored.drawio
-
+echo === 2/5 build example fig1 + fig2 ===
+python scripts\build_example_demo.py
 if errorlevel 1 exit /b 1
 
 echo.
-
-echo === encode: round-trip check ===
-
-python src encode -i example\out\restored.drawio -o example\out\roundtrip --layout
-
+echo === 3/5 src: fig1 + fig2 -^> clock-tree.json ===
+python src -i example\fig1.drawio example\fig2.drawio -o example\out --library drawio-lib\drawclock.xml
 if errorlevel 1 exit /b 1
 
 echo.
+echo === 4/5 reload fig1 + fig2 ===
+python reload -i example\fig1.drawio --library drawio-lib\drawclock.xml -o example\out\fig1-reloaded.drawio
+if errorlevel 1 exit /b 1
+python reload -i example\fig2.drawio --library drawio-lib\drawclock.xml -o example\out\fig2-reloaded.drawio
+if errorlevel 1 exit /b 1
 
+echo.
+echo === 5/5 pytest: reload + example ===
+pytest tests\test_reload.py tests\test_parse_drawio.py::test_example_fig1_embeds_library_labels tests\test_parse_drawio.py::test_example_two_figs_cross_wire_no_wire_in_json -q --tb=short
+if errorlevel 1 exit /b 1
+
+echo.
 echo === example\out\clock-tree.json (excerpt) ===
-
-powershell -NoProfile -Command "Get-Content example\out\clock-tree.json -TotalCount 40"
+powershell -NoProfile -Command "Get-Content example\out\clock-tree.json -TotalCount 50"
 
 echo.
-
-echo Done. See example\out\roundtrip\ and example\out\restored.drawio
-
+echo Done. Outputs: example\out\clock-tree.json, fig1-reloaded.drawio, fig2-reloaded.drawio

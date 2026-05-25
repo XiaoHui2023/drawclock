@@ -3,6 +3,12 @@ from __future__ import annotations
 from typing import Any
 
 from device_model import DeviceState, MUX_KIND_RE
+from wire_resolve import (
+    build_wire_endpoints,
+    mux_source_entry,
+    resolve_input_peer,
+    resolve_output_peers,
+)
 
 
 def export_kind(drawclock_type: str) -> str:
@@ -15,62 +21,87 @@ def devices_to_config(
     devices: dict[str, DeviceState],
     wire_by_name: dict[str, list[str]],
 ) -> list[dict[str, Any]]:
+    wire_endpoints = build_wire_endpoints(devices, wire_by_name)
+    wire_names = set(wire_by_name.keys())
     entries: list[dict[str, Any]] = []
-    seen_wire_names: set[str] = set()
 
     for state in devices.values():
         if state.kind == "wire":
             continue
-        entries.append(_device_entry(state))
+        entries.append(_device_entry(state, wire_names=wire_names, wire_endpoints=wire_endpoints))
 
-    for wire_name, cell_ids in sorted(wire_by_name.items()):
-        if wire_name in seen_wire_names:
-            continue
-        seen_wire_names.add(wire_name)
-        connections: list[str] = []
-        for cell_id in cell_ids:
-            state = devices.get(cell_id)
-            if state is None:
-                continue
-            for peer in state.bindings.values():
-                if peer not in connections:
-                    connections.append(peer)
-        entries.append(
-            {"name": wire_name, "kind": "wire", "connections": connections}
-        )
-
-    entries.sort(key=lambda item: (item.get("connections") is None, item["name"]))
+    entries.sort(key=lambda item: item["name"])
     return entries
 
 
-def _device_entry(state: DeviceState) -> dict[str, Any]:
+def _device_entry(
+    state: DeviceState,
+    *,
+    wire_names: set[str],
+    wire_endpoints: dict,
+) -> dict[str, Any]:
     entry: dict[str, Any] = {"name": state.name, "kind": export_kind(state.kind)}
     if state.kind == "clock" and state.freq:
         entry["freq"] = state.freq
 
     if MUX_KIND_RE.match(state.kind):
-        source: dict[str, str] = {}
-        for key, peer in sorted(state.bindings.items()):
-            if key.startswith("in"):
-                source[key] = peer
-        if source:
-            entry["source"] = source
+        raw_source = mux_source_entry(state)
+        if raw_source:
+            entry["source"] = {
+                key: resolve_input_peer(
+                    peer,
+                    wire_names=wire_names,
+                    wire_endpoints=wire_endpoints,
+                )
+                or peer
+                for key, peer in sorted(raw_source.items())
+            }
         if "out" in state.bindings:
-            entry["target"] = state.bindings["out"]
+            out_peer = state.bindings["out"]
+            resolved = resolve_output_peers(
+                [out_peer],
+                wire_names=wire_names,
+                wire_endpoints=wire_endpoints,
+            )
+            if len(resolved) == 1:
+                entry["target"] = resolved[0]
         return entry
 
-    if state.kind == "pll":
-        if "right" in state.bindings:
-            entry["target"] = state.bindings["right"]
+    if state.kind in ("pll", "source"):
+        targets = resolve_output_peers(
+            list(state.out_targets),
+            wire_names=wire_names,
+            wire_endpoints=wire_endpoints,
+        )
+        if targets:
+            entry["targets"] = targets
         return entry
 
     if state.kind == "clock":
         if "left" in state.bindings:
-            entry["source"] = state.bindings["left"]
+            resolved = resolve_input_peer(
+                state.bindings["left"],
+                wire_names=wire_names,
+                wire_endpoints=wire_endpoints,
+            )
+            if resolved:
+                entry["source"] = resolved
         return entry
 
     if "left" in state.bindings:
-        entry["source"] = state.bindings["left"]
+        resolved = resolve_input_peer(
+            state.bindings["left"],
+            wire_names=wire_names,
+            wire_endpoints=wire_endpoints,
+        )
+        if resolved:
+            entry["source"] = resolved
     if "right" in state.bindings:
-        entry["target"] = state.bindings["right"]
+        resolved = resolve_output_peers(
+            [state.bindings["right"]],
+            wire_names=wire_names,
+            wire_endpoints=wire_endpoints,
+        )
+        if len(resolved) == 1:
+            entry["target"] = resolved[0]
     return entry

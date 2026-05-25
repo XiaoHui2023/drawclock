@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from drawio_lib.components import (
     clock,
+    source,
     div,
     dto,
     gate,
@@ -51,6 +52,7 @@ ALL: tuple[ComponentSpec, ...] = (
     ComponentSpec(dto),
     ComponentSpec(inv),
     ComponentSpec(pll),
+    ComponentSpec(source),
     ComponentSpec(clock),
     ComponentSpec(wire),
 )

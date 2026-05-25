@@ -25,7 +25,14 @@ def build_device_states(diagram: ParsedDiagram) -> tuple[dict[str, DeviceState],
     wire_by_name: dict[str, list[str]] = {}
     for cell in wire_cells:
         wire_by_name.setdefault(cell.name, []).append(cell.cell_id)
+        if cell.cell_id not in devices:
+            devices[cell.cell_id] = DeviceState(
+                kind="wire",
+                name=cell.name,
+                points=cell.points,
+            )
 
+    wire_names = set(wire_by_name.keys())
     for edge in diagram.cells.values():
         if not edge.is_edge or not edge.source_id or not edge.target_id:
             continue
@@ -33,10 +40,28 @@ def build_device_states(diagram: ParsedDiagram) -> tuple[dict[str, DeviceState],
         tgt = diagram.cells.get(edge.target_id)
         if not src or not tgt or src.is_edge or tgt.is_edge:
             continue
+        if not src.drawclock_type or not tgt.drawclock_type:
+            continue
         exit_xy = edge_attachment(edge.style, end="exit")
         entry_xy = edge_attachment(edge.style, end="entry")
-        _bind_endpoint(devices, wire_by_name, src, exit_xy, tgt.name, outgoing=True)
-        _bind_endpoint(devices, wire_by_name, tgt, entry_xy, src.name, outgoing=False)
+        _bind_endpoint(
+            devices,
+            wire_by_name,
+            src,
+            exit_xy,
+            tgt.name,
+            outgoing=True,
+            wire_names=wire_names,
+        )
+        _bind_endpoint(
+            devices,
+            wire_by_name,
+            tgt,
+            entry_xy,
+            src.name,
+            outgoing=False,
+            wire_names=wire_names,
+        )
 
     validate_topology(devices, wire_by_name)
     return devices, wire_by_name
@@ -50,16 +75,26 @@ def _bind_endpoint(
     peer_name: str,
     *,
     outgoing: bool,
+    wire_names: set[str],
 ) -> None:
     if cell.drawclock_type == "wire":
         port = resolve_port(cell, xy)
         if port is None:
             port = "left" if not outgoing else "right"
-        devices.setdefault(
+        state = devices.setdefault(
             cell.cell_id,
             DeviceState(kind="wire", name=cell.name, points=cell.points),
         )
-        devices[cell.cell_id].bindings[port] = peer_name
+        if port == "left":
+            if "left" in state.bindings:
+                raise ValueError(
+                    f"连线 {cell.name} 左端已有连接 {state.bindings['left']}，"
+                    f"不能再接 {peer_name}"
+                )
+            state.bindings["left"] = peer_name
+        else:
+            if peer_name not in state.wire_targets:
+                state.wire_targets.append(peer_name)
         return
 
     state = devices.get(cell.cell_id)
@@ -68,9 +103,22 @@ def _bind_endpoint(
     port = resolve_port(cell, xy)
     if port is None:
         port = "right" if outgoing else "left"
+    if state.kind in ("pll", "source") and port == "right":
+        if peer_name not in state.out_targets:
+            state.out_targets.append(peer_name)
+        return
+
     if port in state.bindings:
+        existing = state.bindings[port]
+        if not outgoing and (
+            (existing in wire_names and peer_name not in wire_names)
+            or (existing not in wire_names and peer_name in wire_names)
+        ):
+            if peer_name in wire_names:
+                state.bindings[port] = peer_name
+            return
         raise ValueError(
-            f"器件 {state.name} 的端口 {port} 已有连接 {state.bindings[port]}，不能再接 {peer_name}"
+            f"器件 {state.name} 的端口 {port} 已有连接 {existing}，不能再接 {peer_name}"
         )
     state.bindings[port] = peer_name
 
@@ -106,7 +154,7 @@ def port_key_for_index(cell: GraphCell, index: int) -> str:
         return "right"
     if kind == "clock":
         return "left"
-    if kind == "pll":
+    if kind in ("pll", "source"):
         return "right"
     if index == 0:
         return "left"
@@ -124,12 +172,11 @@ def validate_topology(
 
     for state in devices.values():
         if state.kind == "wire":
-            peers = list(state.bindings.values())
-            if not peers:
+            source = state.bindings.get("left")
+            targets = list(state.wire_targets)
+            if not source and not targets:
                 errors.append(f"连线 {state.name} 的图形未连接任何器件")
-            elif len(peers) > 2:
-                errors.append(f"连线 {state.name} 的一个图形连接了超过 2 个端口")
-            for peer in peers:
+            for peer in ([source] if source else []) + targets:
                 if peer not in device_names:
                     errors.append(f"连线 {state.name} 连接到未知器件 {peer}")
             continue
@@ -137,26 +184,37 @@ def validate_topology(
         required = _required_ports(state.kind)
         missing = required - set(state.bindings)
         extra = set(state.bindings) - required
-        if missing:
+        if state.kind in ("pll", "source"):
+            if not state.out_targets:
+                errors.append(f"器件 {state.name} 的输出端口未连接")
+            extra = extra | (set(state.bindings) - required)
+        elif missing:
             errors.append(f"器件 {state.name} 未连接的端口: {', '.join(sorted(missing))}")
         if extra:
             errors.append(f"器件 {state.name} 存在未知端口连接: {', '.join(sorted(extra))}")
         for peer in state.bindings.values():
             if peer not in device_names and peer not in wire_names:
                 errors.append(f"器件 {state.name} 连接到未知对象 {peer}")
+        for peer in state.out_targets:
+            if peer not in device_names and peer not in wire_names:
+                errors.append(f"器件 {state.name} 连接到未知对象 {peer}")
 
     for wire_name, cell_ids in wire_by_name.items():
-        merged: list[str] = []
+        merged_sources: list[str] = []
+        merged_targets: list[str] = []
         for cell_id in cell_ids:
             state = devices.get(cell_id)
             if state is None:
                 continue
-            for peer in state.bindings.values():
-                if peer not in merged:
-                    merged.append(peer)
-        if len(merged) not in (1, 2):
+            left = state.bindings.get("left")
+            if left and left not in merged_sources:
+                merged_sources.append(left)
+            for peer in state.wire_targets:
+                if peer not in merged_targets:
+                    merged_targets.append(peer)
+        if len(merged_sources) > 1:
             errors.append(
-                f"连线名 {wire_name} 合并后应对接 1 或 2 个器件，当前为 {len(merged)} 个"
+                f"连线名 {wire_name} 左端合并后只能接一个器件，当前为 {len(merged_sources)} 个"
             )
 
     if errors:
@@ -186,8 +244,8 @@ def _required_ports(kind: str) -> set[str]:
         return {*(f"in{i}" for i in range(n)), "out"}
     if kind == "clock":
         return {"left"}
-    if kind == "pll":
-        return {"right"}
+    if kind in ("pll", "source"):
+        return set()
     if kind == "wire":
         return {"left", "right"}
     return {"left", "right"}

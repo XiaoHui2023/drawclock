@@ -73,7 +73,7 @@ def test_min_width_shell_rejected() -> None:
     gate = importlib.import_module("drawio_lib.components.gate")
     html = gate.label_html().replace(
         "display:block;width:100%;height:100%;",
-        "display:block;width:100%;height:100%;min-width:80px;min-height:86px;",
+        f"display:block;width:100%;height:100%;min-width:{gate.W}px;min-height:{gate.H}px;",
     )
     with pytest.raises(ValueError, match="min-width/min-height"):
         verify_label_stretch_policy(

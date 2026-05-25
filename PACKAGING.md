@@ -23,11 +23,10 @@ pack.bat
 ## 运行打包产物
 
 ```bat
-dist\drawclock.exe encode -i example\demo.drawio -o example\out --layout
-dist\drawclock.exe decode --config example\out\clock-tree.json --layout example\out\drawio-layout.json -o example\out\restored.drawio
+dist\drawclock.exe -i example\demo.drawio -o example\out
 ```
 
-decode 的 `--library` 可省略：默认可执行文件内嵌的 `drawio-lib/drawclock.xml`。也可显式传入仓库中的 `drawio-lib/drawclock.xml` 覆盖。
+`--library` 可省略：默认可执行文件内嵌的 `drawio-lib/drawclock.xml`。reload 为独立入口，见根目录 README。
 
 ## Linux staticx
 

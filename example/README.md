@@ -1,33 +1,10 @@
-# 示例
+# example
 
-演示复杂时钟树图经 **encode** 导出 JSON，再经 **decode** 无损还原为 draw.io。
-
-## 在 draw.io 里看到器件图案
-
-| 文件 | 作用 |
-| --- | --- |
-| `demo.drawio` | 手工/脚本维护的示例原理图 |
-| `out/restored.drawio` | **decode 还原图**：由 `clock-tree.json` + `drawio-layout.json` 生成，应与 `demo.drawio` 拓扑一致 |
-
-画布上的 PLL、mux、方波等外形来自 `drawclock.xml` 里每条形状的 **`object label="..."` HTML**（含 SVG），与 mxCell 的 `style`（`html=1`、`points` 等）一起写入 `.drawio`。
-
-- **生成示例图**：`python scripts\build_example_demo.py` 只读 `drawio-lib/drawclock.xml`，**不必**在 draw.io 里导入器件库即可查看 `demo.drawio`。
-- **若只看到方框**：说明文件里缺少 `label` HTML。重新运行上述脚本或 `example.bat`。
-- **从面板拖新器件**（手工编辑）：仍可在 draw.io 中导入 `drawclock.xml`（见 [drawio-lib/README.md](../drawio-lib/README.md)）。
-
-## 准备
-
-在仓库根目录执行 `update.bat` 安装依赖。
-
-生成或更新示例图（可选，改器件布局后执行）：
-
-```bat
-python scripts\build_example_demo.py
-```
+演示完整工作流：**器件库 → 图 → src → JSON + reload 图**。
 
 ## 运行
 
-在仓库根目录：
+仓库根目录：
 
 ```bat
 example.bat
@@ -36,24 +13,54 @@ example.bat
 或分步：
 
 ```bat
-python src encode -i example\demo.drawio -o example\out --layout
-python src decode --config example\out\clock-tree.json --layout example\out\drawio-layout.json --library drawio-lib\drawclock.xml -o example\out\restored.drawio
-python src encode -i example\out\restored.drawio -o example\out --layout
+python scripts/build_drawio_lib.py
+python scripts/build_example_demo.py
+python src -i example\fig1.drawio example\fig2.drawio -o example\out --library drawio-lib\drawclock.xml
+python reload -i example\fig1.drawio --library drawio-lib\drawclock.xml -o example\out\fig1-reloaded.drawio
+python reload -i example\fig2.drawio --library drawio-lib\drawclock.xml -o example\out\fig2-reloaded.drawio
 ```
 
-第二次 encode 得到的 `clock-tree.json` 与 `drawio-layout.json` 应与第一次一致。
+上游（库或示例图）变更后，须从对应步骤起重新执行并检查输出。
 
-## 输出
+**改 `fig1.drawio` / `fig2.drawio` 或示例生成脚本后，必须跑完整 `example.bat`**（含第 4 步 **reload** 与第 5 步 **pytest**）。reload 是 example 的下一环，不可只跑 `src` 或只改图不验收 reload。
+
+仅跑 reload 相关测试：
+
+```bat
+pytest tests\test_reload.py -q
+```
+
+## 输入图
 
 | 文件 | 内容 |
 | --- | --- |
-| `example/out/clock-tree.json` | 逻辑连接：器件名、类型、source/target、mux 多路 source、wire 的 connections |
-| `example/out/drawio-layout.json` | 坐标、尺寸、边样式、航点、对象属性（与配置 JSON 配套供 decode） |
+| `fig1.drawio` | **source** `xtal` 输出接到跨图 **wire** `bus_xtal`（右端悬空） |
+| `fig2.drawio` | 两条同名 `bus_xtal` **wire** 分别驱动 `gate0`、`div0`；**pll_main** 同时驱动 `gate0` 与 `div0`；`gate0→inv0→clk_a`、`div0→dto0→clk_b`；**mux2** 标签 `0`/`1` |
 
-## 图内容（demo.drawio）
+**wire** 仅用于**跨图**同名接续；单图内器件直连。`clock-tree.json` 中**不出现** `wire`。
 
-- **主链**（wire 串联）：`pll_main` → `gate0` → `div0` → `inv0` → `dto0` → `clk_sys`（100 MHz）
-- **mux2～mux6**：各路独立 PLL 接入对应 mux 输入，经 wire 接到各档时钟终端（200～600 MHz）
-- 覆盖图形库类型：`pll`、`gate`、`div`、`inv`、`dto`、`wire`、`clock`、`mux2`～`mux6`
+## pll_main 连线航点（手改参考）
 
-在 draw.io 中打开 `demo.drawio` 前，请先导入 `drawio-lib/drawclock.xml`（见 [drawio-lib/README.md](../drawio-lib/README.md)）。
+权威坐标见 **`refs/pll_main_fanout_waypoints.json`**（来自用户手改 fig2）。生成脚本与之对齐：
+
+| 边 id | 航点 |
+| --- | --- |
+| 25 | `(170,140)` → `(170,80)` → gate0 |
+| 26 | `(170,140)` → `(170,200)` → div0 |
+
+在 draw.io：**选中 pll_main→gate0 或 →div0**，可见 **2 个蓝色菱形** 与竖直汇流柱。Agent 规范：`~/.cursor/skills/drawio-edge-waypoints/SKILL.md`。
+
+## 输出
+
+| 文件 | 说明 |
+| --- | --- |
+| `example/out/clock-tree.json` | `src` 合并两图后的样例 |
+| `example/out/fig1-reloaded.drawio` | reload 刷新图 1 |
+| `example/out/fig2-reloaded.drawio` | reload 刷新图 2 |
+
+## JSON 要点（本示例）
+
+- `xtal.targets`: `gate0`、`div0`（跨图 `bus_xtal` 折叠）
+- `pll_main.targets`: `["gate0", "div0"]`
+- `mux2.source`: `{"0": "pll_m2a", "1": "pll_m2b"}`
+- 无 `kind: "wire"` 条目

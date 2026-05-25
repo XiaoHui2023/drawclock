@@ -15,4 +15,15 @@ def test_main_help_exits_zero() -> None:
         check=False,
     )
     assert proc.returncode == 0
-    assert "encode" in proc.stdout.lower() and "decode" in proc.stdout.lower()
+    assert "clock-tree" in proc.stdout.lower() or "draw.io" in proc.stdout
+
+
+def test_reload_help_exits_zero() -> None:
+    proc = subprocess.run(
+        [sys.executable, str(ROOT / "reload"), "--help"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0
+    assert "library" in proc.stdout.lower()

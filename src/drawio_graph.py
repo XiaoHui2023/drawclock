@@ -51,6 +51,21 @@ def merge_diagrams(parts: list[ParsedDiagram]) -> ParsedDiagram:
     return ParsedDiagram(cells=merged)
 
 
+def validate_diagram_library(diagram: ParsedDiagram, library_path: str | Path) -> None:
+    from drawio_library import load_library_titles
+
+    known = load_library_titles(library_path)
+    unknown = sorted(
+        {
+            cell.drawclock_type
+            for cell in diagram.cells.values()
+            if not cell.is_edge and cell.drawclock_type and cell.drawclock_type not in known
+        }
+    )
+    if unknown:
+        raise ValueError(f"图中器件类型不在器件库中: {', '.join(unknown)}")
+
+
 def _collect_cells(root_el: ET.Element, out: dict[str, GraphCell], *, id_prefix: str) -> None:
     for child in root_el:
         if child.tag == "object":

@@ -1,0 +1,9 @@
+{
+  "hediet.vscode-drawio.customLibraries": [
+    {
+      "entryId": "drawclock",
+      "libName": "drawclock",
+      "file": "${workspaceFolder}/drawio-lib/drawclock.xml"
+    }
+  ]
+}

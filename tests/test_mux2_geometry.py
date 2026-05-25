@@ -57,7 +57,7 @@ def test_label_uses_non_scaling_layers() -> None:
     g = mux2.G
     assert g.in0.trap.label_y == round(g.in0.trap.trap_y)
     html = mux2.label_html()
-    assert 'viewBox="0 0 80 106"' in html
+    assert 'viewBox="0 0 120 106"' in html
     assert 'preserveAspectRatio="none"' in html
     assert "transform:scale(" not in html
     assert "width:100%" in html

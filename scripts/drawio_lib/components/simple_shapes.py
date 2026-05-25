@@ -133,13 +133,46 @@ def pll_body(g: geom.SimpleGeometry) -> str:
     )
 
 
+SOURCE_CX = geom.DESIGN_W / 2
+SOURCE_R = 14
+SOURCE_PORT_X = int(SOURCE_CX + SOURCE_R)
+SOURCE_WAVE_PERIODS = 1.5
+SOURCE_WAVE_AMP = 5
+SOURCE_WAVE_INSET = 6
+
+
+def source_body(g: geom.SimpleGeometry) -> str:
+    """Clock source: circle with sine wave; output on the right."""
+    mid = _mid(g)
+    cx = _dx(g, SOURCE_CX)
+    r = SOURCE_R
+    left = cx - r + SOURCE_WAVE_INSET
+    right = cx + r - SOURCE_WAVE_INSET
+    span = right - left
+    amp = SOURCE_WAVE_AMP
+    steps = 12
+    pts = [f"M {left:.1f} {mid:.1f}"]
+    for i in range(1, steps + 1):
+        t = i / steps
+        x = left + t * span
+        y = mid + amp * math.sin(t * math.pi * 2 * SOURCE_WAVE_PERIODS)
+        pts.append(f"L {x:.1f} {y:.1f}")
+    wave = " ".join(pts)
+    return (
+        f'<circle cx="{cx:.1f}" cy="{mid}" r="{r}" fill="{FILL}" stroke="{STROKE}" '
+        f'stroke-width="{SW}"/>'
+        f'<path d="{wave}" fill="{FILL}" stroke="{STROKE}" stroke-width="1.5" '
+        f'stroke-linecap="round" stroke-linejoin="round"/>'
+    )
+
+
 CLOCK_WAVE_PERIODS = 4
 CLOCK_WAVE_AMP = 6
 CLOCK_SW = 1.5
 CLOCK_BODY_MARGIN_X = 2
 CLOCK_GRAPHIC_W = geom.DESIGN_W
 CLOCK_RIGHT_PAD = CLOCK_FREQ_GAP_PX + CLOCK_FREQ_TEXT_RESERVE_PX
-CLOCK_LEFT_PAD = 60
+CLOCK_LEFT_PAD = 80
 CLOCK_CELL_W = CLOCK_LEFT_PAD + CLOCK_GRAPHIC_W + CLOCK_RIGHT_PAD
 CLOCK_WAVE_W = CLOCK_GRAPHIC_W - 2 * CLOCK_BODY_MARGIN_X
 

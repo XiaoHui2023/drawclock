@@ -1,58 +1,58 @@
 # drawclock
 
-从 draw.io 时钟树图生成时钟树相关输出的本地命令行工具。
+从 draw.io 时钟树图生成时钟树逻辑 JSON，或用新器件库刷新旧图。
 
 ## 目录
 
 | 路径 | 说明 |
 | --- | --- |
+| `src/` | 主功能：draw.io → `clock-tree.json`（仅器件库图形参与逻辑与校验） |
+| `reload/` | 旧 draw.io + 新器件库 XML → 新 draw.io（刷新样式，保留坐标与非器件库内容） |
 | `drawio-lib/` | draw.io 自定义组件库；用法见 [drawio-lib/README.md](drawio-lib/README.md) |
 | `example/` | 可运行示例；说明见 [example/README.md](example/README.md) |
+| `docs/clock-tree-json.md` | **`clock-tree.json` 数据结构**（各 `kind` 记录字段） |
 
-## 命令行参数
+## src：提取 clock-tree.json
 
-运行：`python src <子命令> …`
-
-### encode（draw.io → JSON）
+运行：`python src -i <文件>… [-o 目录] [--library drawio-lib/drawclock.xml]`
 
 | 长参数 | 短参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
-| `--input` | `-i` | 文件路径（可多次指定） | 必填 | 一个或多个 `.drawio.svg` / `.drawio` 源文件，多文件合并解析 |
-| `--output` | `-o` | 目录 | | 输出目录；写入 `clock-tree.json`；未指定时仅配置 JSON 打印到标准输出 |
-| `--layout` | | 开关 | 关 | 同时写入 `drawio-layout.json`（节点坐标与尺寸、连线样式、航点、对象属性、`mxCell` 样式）；使用本开关时必须指定 `-o` |
+| `--input` | `-i` | 文件路径（可多次） | 必填 | 一个或多个 `.drawio.svg` / `.drawio` |
+| `--output` | `-o` | 目录 | | 写入 `clock-tree.json`；未指定时打印到标准输出 |
+| `--library` | | 文件 | `drawio-lib/drawclock.xml` | 器件库，用于校验 `drawclockType` |
 
-`clock-tree.json`：时钟树逻辑（`name`、`kind`、`source` / `target`、`connections` 等）。  
-`drawio-layout.json`：画布几何与 draw.io 编辑数据，与配置 JSON 配套供 decode 还原图形。
+行为说明：
 
-### decode（JSON → draw.io）
+- 仅带 **`drawclockType`** 的器件库图形参与连线逻辑与 JSON；文本框等其它图形**忽略**。
+- 同名 **wire** 多段图形在 JSON 中**合并**为一条（`source` 左端 + `targets` 右端列表）；左端至多一个，合并后仍须满足校验。
+- 输出文件名为 **`clock-tree.json`**。记录字段见 [docs/clock-tree-json.md](docs/clock-tree-json.md)；导出规则见项目 design-notes skill。
 
-| 长参数 | 类型 | 说明 |
-| --- | --- | --- |
-| `--config` | 文件 | `clock-tree.json` |
-| `--layout` | 文件 | `drawio-layout.json` |
-| `--library` | 文件 | `drawio-lib/drawclock.xml` |
-| `--output` / `-o` | 文件 | 输出的 `.drawio` 路径 |
+## reload：刷新器件库样式
 
-decode 会校验配置与布局中的器件名、类型一致，并确认布局中的 `drawclockType` 均存在于器件库。
+运行：`python reload -i <旧图> --library <新库.xml> -o <新图.drawio>`
+
+| 参数 | 说明 |
+| --- | --- |
+| `-i` / `--input` | 旧 `.drawio` / `.drawio.svg` |
+| `--library` | 新器件库 `drawclock.xml`（默认 `drawio-lib/drawclock.xml`） |
+| `-o` / `--output` | 输出的 `.drawio` |
+
+- 器件库图形：换成新库的 **style / label**，**保留** `mxGeometry` 与 `name`、`freq`、`in*_label` 等对象属性。
+- 非器件库图形与连线：**原样保留**。
+- 两端均为器件库的连线：按新库连接点刷新 `exitX` / `entryX` 等。
 
 ## 示例
 
-仓库根目录执行 `example.bat`，读取 `example/demo.drawio`，在 `example/out/` 生成 `clock-tree.json` 与 `drawio-layout.json`。
+仓库根目录执行 `example.bat`（五步：建库 → 生成 fig1/fig2 → `src` → **reload** → **pytest**）。说明见 [example/README.md](example/README.md)。
 
-往返还原：
-
-```bat
-python src decode --config example\out\clock-tree.json --layout example\out\drawio-layout.json --library drawio-lib\drawclock.xml -o example\out\restored.drawio
-python src encode -i example\out\restored.drawio -o example\out --layout
-```
-
-第二次 encode 得到的两个 JSON 应与第一次一致（无损往返）。
+改 `example/` 下图或生成脚本后，须跑完整 `example.bat`（reload 为必验环节）。
 
 ## 开发与测试
 
 | 操作 | 命令 |
 | --- | --- |
 | 安装依赖 | `update.bat` |
-| 运行示例 | `example.bat` |
-| 运行测试 | `test.bat` |
-| 打包单文件 CLI | `pack.bat`（产物 `dist/drawclock.exe`；说明见 [PACKAGING.md](PACKAGING.md)） |
+| 运行示例（含 reload 与 reload 测试） | `example.bat` |
+| 运行全量测试 | `test.bat` |
+| 打包 CLI | `pack.bat`（产物 `dist/drawclock.exe`；说明见 [PACKAGING.md](PACKAGING.md)） |

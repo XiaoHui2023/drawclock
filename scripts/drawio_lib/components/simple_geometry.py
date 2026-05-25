@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 DESIGN_W = 40
-W = 80
+W = 120
 BODY_MARGIN_X = 8
 BODY_Y = 6
 BODY_H = 48

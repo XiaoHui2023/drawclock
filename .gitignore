@@ -14,8 +14,12 @@ build/
 # 测试与本地临时输出
 tests/_tmp_cli/
 tests/_tmp_roundtrip/
+tests/_tmp_cli/
+tests/_tmp_cli_src/
 example/out/roundtrip/
 example/out/restored.drawio
+example/out/drawio-layout.json
+example/out/from-reloaded/
 
 # 本地试画图（非示例）
 test.drawio.svg

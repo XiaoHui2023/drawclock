@@ -42,7 +42,7 @@ def port_anchors(style: str, drawclock_type: str) -> dict[str, tuple[float, floa
     """Map port keys to relative (x, y) anchors from mxCell style points."""
     pts = _parse_points(style)
     if not pts:
-        if drawclock_type == "pll":
+        if drawclock_type in ("pll", "source"):
             return {"right": (1.0, 0.5)}
         if drawclock_type == "clock":
             return {"left": (0.0, 0.5)}
@@ -56,7 +56,7 @@ def port_anchors(style: str, drawclock_type: str) -> dict[str, tuple[float, floa
         anchors["out"] = (pts[-1][0], pts[-1][1])
         return anchors
 
-    if drawclock_type == "pll":
+    if drawclock_type in ("pll", "source"):
         return {"right": (pts[0][0], pts[0][1])}
     if drawclock_type == "clock":
         return {"left": (pts[0][0], pts[0][1])}

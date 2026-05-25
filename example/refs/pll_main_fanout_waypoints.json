@@ -1,0 +1,20 @@
+{
+  "source": "用户手改 example/fig2.drawio（pll_main 一分二）",
+  "layout_note": "pll_main mxGeometry x=-80 y=110；gate0 x=180 y=50；div0 x=180 y=170",
+  "stub_x": 170,
+  "pll_right_port_abs": [76, 140],
+  "edges": {
+    "pll_main_to_gate0": {
+      "mx_cell_id": "25",
+      "source_id": "14",
+      "target_id": "12",
+      "waypoints": [[170, 140], [170, 80]]
+    },
+    "pll_main_to_div0": {
+      "mx_cell_id": "26",
+      "source_id": "14",
+      "target_id": "13",
+      "waypoints": [[170, 140], [170, 200]]
+    }
+  }
+}

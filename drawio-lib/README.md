@@ -6,11 +6,12 @@
 
 ## 使用
 
-1. 在 VS Code 安装 draw.io 插件，打开任意 `.drawio.svg` 文件。  
-2. **文件 → 导入**，选择 `drawclock.xml`。  
-3. 在左侧形状库的 **drawclock** 条目中，将器件拖到画布。  
-4. **双击**器件改属性；弹出框中 **Placeholders** 必须勾选，再点 **应用**。  
-5. 从器件**端口**（形状边缘连接点）拖线到其它器件端口。
+1. 在 VS Code / Cursor 安装 [Draw.io Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) 插件，在本仓库中打开任意 `.drawio` / `.drawio.svg` 文件。  
+2. 工作区已配置 `hediet.vscode-drawio.customLibraries`，**每次打开图表**都会从 `drawio-lib/drawclock.xml` 加载 **drawclock** 形状库（改库后重新打开该图即可看到新器件）。  
+3. 若在其它目录单独用 draw.io，仍须 **文件 → 导入** 选择 `drawclock.xml`。  
+4. 在左侧形状库的 **drawclock** 条目中，将器件拖到画布。  
+5. **双击**器件改属性；弹出框中 **Placeholders** 必须勾选，再点 **应用**。  
+6. 从器件**端口**（形状边缘连接点）拖线到其它器件端口。
 
 ## 通用属性
 
@@ -96,6 +97,18 @@
 | `name` | 图形下方实例名；留空不显示 | 与库名相同 |
 
 端口：左侧入，右侧出。
+
+### source
+
+时钟源（晶振、外部参考时钟等）
+
+![source 示意](images/source.svg)
+
+| 属性 | 说明 | 默认 |
+| --- | --- | --- |
+| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
+
+图形为圆内正弦波，无库内固定中心文字。端口：**仅右侧**输出。
 
 ### pll
 

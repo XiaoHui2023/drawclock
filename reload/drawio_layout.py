@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from drawio_graph import GraphCell, ParsedDiagram
+from drawio_graph import ParsedDiagram
 from drawio_library import canonical_object_attrs, canonical_vertex_style
 from drawio_ports import resolve_edge_style
 

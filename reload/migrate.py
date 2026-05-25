@@ -1,0 +1,147 @@
+from __future__ import annotations
+
+import re
+import xml.etree.ElementTree as ET
+from pathlib import Path
+
+from drawio_decode import extract_mxfile_xml
+from drawio_library import (
+    LABEL_PLACEHOLDER_RE,
+    canonical_object_attrs,
+    load_library_shapes,
+    load_library_titles,
+)
+from drawio_ports import finalize_edge_style
+
+DRAWCLOCK_TYPE_RE = re.compile(r"drawclockType=([^;]+)")
+
+
+def reload_drawio_file(
+    input_path: str | Path,
+    library_path: str | Path,
+    output_path: str | Path,
+) -> Path:
+    """Upgrade library cell styles/labels; preserve geometry and non-library cells."""
+    lib = Path(library_path)
+    inp = Path(input_path)
+    out = Path(output_path)
+    mxfile = extract_mxfile_xml(str(inp))
+    migrated = migrate_mxfile_xml(mxfile, lib)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(migrated, encoding="utf-8")
+    return out
+
+
+def migrate_mxfile_xml(mxfile_xml: str, library_path: str | Path) -> str:
+    root = ET.fromstring(mxfile_xml)
+    shapes = load_library_shapes(library_path)
+    known = load_library_titles(library_path)
+    for diagram in root.findall("diagram"):
+        model = diagram.find("mxGraphModel")
+        if model is None:
+            payload = (diagram.text or "").strip()
+            if not payload:
+                continue
+            if not payload.startswith("<"):
+                raise ValueError(
+                    "压缩 diagram 暂不支持 reload；请在 draw.io 中另存为未压缩 XML"
+                )
+            model = ET.fromstring(payload)
+            diagram.text = None
+            diagram.append(model)
+        root_el = model.find("root")
+        if root_el is None:
+            continue
+        _migrate_root(root_el, shapes, known, library_path)
+    ET.indent(root, space="  ")
+    return ET.tostring(root, encoding="unicode") + "\n"
+
+
+def _migrate_root(
+    root_el: ET.Element,
+    shapes: dict,
+    known: set[str],
+    library_path: str | Path,
+) -> None:
+    id_to_type: dict[str, str] = {}
+
+    for child in list(root_el):
+        parsed = _parse_library_vertex(child)
+        if parsed is None:
+            continue
+        cell_id, dtype, obj, mxcell = parsed
+        if dtype not in known:
+            raise ValueError(f"图中器件类型不在新器件库中: {dtype}")
+        _upgrade_library_vertex(obj, mxcell, dtype, library_path)
+        id_to_type[cell_id] = dtype
+
+    for child in list(root_el):
+        if child.tag != "mxCell" or child.get("edge") != "1":
+            continue
+        src_id = child.get("source")
+        tgt_id = child.get("target")
+        if not src_id or not tgt_id:
+            continue
+        if src_id not in id_to_type or tgt_id not in id_to_type:
+            continue
+        child.set("style", finalize_edge_style(child.get("style") or ""))
+
+
+def _parse_library_vertex(
+    child: ET.Element,
+) -> tuple[str, str, ET.Element, ET.Element] | None:
+    if child.tag == "object":
+        obj = child
+        mxcell = obj.find("mxCell")
+        if mxcell is None or mxcell.get("vertex") != "1":
+            return None
+        dtype = _style_dtype(mxcell.get("style") or "")
+        if not dtype:
+            return None
+        cell_id = obj.get("id") or mxcell.get("id")
+        if not cell_id:
+            return None
+        return cell_id, dtype, obj, mxcell
+    if child.tag == "mxCell" and child.get("vertex") == "1":
+        dtype = _style_dtype(child.get("style") or "")
+        if not dtype:
+            return None
+        cell_id = child.get("id")
+        if not cell_id:
+            return None
+        return cell_id, dtype, child, child
+    return None
+
+
+def _upgrade_library_vertex(
+    obj: ET.Element,
+    mxcell: ET.Element,
+    dtype: str,
+    library_path: str | Path,
+) -> None:
+    shape = load_library_shapes(library_path)[dtype]
+    if obj is mxcell:
+        mxcell.set("style", shape.style)
+        return
+    attrs = {key: obj.get(key) for key in obj.attrib if obj.get(key) is not None}
+    if "name" not in attrs and attrs.get("_name"):
+        attrs["name"] = attrs["_name"]
+    canonical = canonical_object_attrs(dtype, attrs, library_path=library_path)
+    style = shape.style
+    if canonical.get("placeholders") == "0":
+        style = style.replace("placeholders=1;", "placeholders=0;")
+    mxcell.set("style", style)
+    for key in ("label", "placeholders"):
+        if key in obj.attrib:
+            del obj.attrib[key]
+    for key, value in canonical.items():
+        if key == "id":
+            continue
+        obj.set(key, value)
+    if "label" in canonical and not LABEL_PLACEHOLDER_RE.search(canonical["label"]):
+        obj.set("placeholders", "0")
+
+
+def _style_dtype(style: str) -> str | None:
+    match = DRAWCLOCK_TYPE_RE.search(style)
+    return match.group(1) if match else None

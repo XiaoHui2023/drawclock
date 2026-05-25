@@ -17,7 +17,7 @@ def validate_layout_matches_config(
 
     for item in config:
         name = item["name"]
-        if "connections" in item:
+        if item.get("kind") == "wire":
             config_wire_names.add(name)
             continue
         config_device_names.add(name)
@@ -44,7 +44,7 @@ def validate_layout_matches_config(
         vertex = by_name.get(name)
         if vertex is None:
             continue
-        if "connections" in item:
+        if item.get("kind") == "wire":
             if vertex.drawclock_type != "wire":
                 errors.append(f"{name} 在配置中为连线，但布局类型为 {vertex.drawclock_type}")
             continue

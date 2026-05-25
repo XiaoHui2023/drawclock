@@ -37,16 +37,13 @@ if lib_dir.is_dir():
 
 hiddenimports = [
     "pipeline",
-    "drawio_build",
     "drawio_decode",
     "drawio_graph",
-    "drawio_layout",
     "drawio_library",
     "drawio_ports",
     "topology",
     "config_export",
     "device_model",
-    "layout_validate",
     "validate_config",
 ]
 

@@ -27,7 +27,8 @@ def test_edge_port_style_uses_library_points() -> None:
     pll = shapes["pll"]
     wire = shapes["wire"]
     style = edge_port_style(pll.style, "pll", wire.style, "wire")
-    assert "exitX=0.7" in style or "exitX=0.7000" in style
+    right = port_anchors(pll.style, "pll")["right"]
+    assert f"exitX={right[0]}" in style.replace(" ", "")
     left = port_anchors(wire.style, "wire")["left"]
     assert f"entryX={left[0]}" in style.replace(" ", "")
     assert "exitPerimeter=0" in style
