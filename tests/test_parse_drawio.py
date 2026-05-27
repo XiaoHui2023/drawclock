@@ -40,7 +40,7 @@ def test_mini_tree_drawio() -> None:
     assert config["gate0"]["source"] == "pll0"
     assert config["gate0"]["target"] == "clk0"
     assert config["clk0"]["source"] == "gate0"
-    assert config["clk0"]["freq"] == "100"
+    assert config["clk0"]["freq"] == 100
     for item in config.values():
         assert "kind" in item
         assert "name" not in item
@@ -115,6 +115,9 @@ def test_example_two_figs_cross_wire_no_wire_in_json() -> None:
     assert set(config["xtal"]["targets"]) == {"gate0", "div0"}
     assert set(config["pll_main"]["targets"]) == {"gate0", "div0"}
     assert config["mux2"]["source"] == {"0": "pll_m2a", "1": "pll_m2b"}
+    assert config["clk_a"]["freq"] == 100_000
+    assert config["clk_b"]["freq"] == 50_000_000
+    assert config["clk_mux"]["freq"] == 200_000_000
 
 
 def test_reload_restores_drawable_html_style(tmp_path: Path) -> None:

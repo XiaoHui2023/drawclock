@@ -364,7 +364,7 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         x_clk,
         _top_for_port(row_gate_a, clk_shape, "clock", "left"),
         clk_shape,
-        {"freq": "100"},
+        {"freq": "100k"},
     )
     clk_b = Placed(
         "clk_b",
@@ -373,7 +373,7 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         x_clk,
         _top_for_port(row_gate_b, clk_shape, "clock", "left"),
         clk_shape,
-        {"freq": "50"},
+        {"freq": "50M"},
     )
     placed["clk_a"] = clk_a
     placed["clk_b"] = clk_b
@@ -425,7 +425,7 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         mux.x + mux.shape.w + 40,
         _top_for_port(row_mux, clk_shape, "clock", "left"),
         clk_shape,
-        {"freq": "200"},
+        {"freq": "200m"},
     )
     placed["clk_mux"] = clk_mux
     _connect(edges, placed, "mux2", "clk_mux", src_port="out")

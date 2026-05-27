@@ -1,17 +1,17 @@
 {
   "clk_a": {
     "kind": "clock",
-    "freq": "100",
+    "freq": 100000,
     "source": "inv0"
   },
   "clk_b": {
     "kind": "clock",
-    "freq": "50",
+    "freq": 50000000,
     "source": "dto0"
   },
   "clk_mux": {
     "kind": "clock",
-    "freq": "200",
+    "freq": 200000000,
     "source": "mux2"
   },
   "div0": {
