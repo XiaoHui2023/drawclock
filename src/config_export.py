@@ -34,6 +34,17 @@ def devices_to_config(
     return entries
 
 
+def entries_to_clock_tree(entries: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """将带 name 的列表记录转为以 name 为键、值不含 name 的对象。"""
+    tree: dict[str, dict[str, Any]] = {}
+    for item in entries:
+        name = item["name"]
+        if name in tree:
+            raise ValueError(f"器件名 {name} 重复")
+        tree[name] = {k: v for k, v in item.items() if k != "name"}
+    return tree
+
+
 def _device_entry(
     state: DeviceState,
     *,

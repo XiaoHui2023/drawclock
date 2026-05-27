@@ -1,15 +1,18 @@
 # clock-tree.json
 
-JSON **数组**。每个元素为一条**记录**（对象）。
+JSON **对象**：**键**为器件 `name`（字符串），**值**为该器件记录（对象，**不含** `name` 字段）。
 
 样例：[example/out/clock-tree.json](../example/out/clock-tree.json)。
 
 ## 记录公共字段
 
+每条记录（对象值）至少包含：
+
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
-| `name` | string | 记录标识 |
 | `kind` | string | 记录类型，见各节 |
+
+对端连接字段中的器件名，须为**本文件顶层键**中已出现的名称。
 
 ## wire（仅图中，不进 JSON）
 
@@ -21,16 +24,16 @@ JSON **数组**。每个元素为一条**记录**（对象）。
 
 ```json
 {
-  "name": "gate0",
-  "kind": "gate",
-  "source": "w_pll_main_gate0",
-  "target": "w_gate0_div0"
+  "gate0": {
+    "kind": "gate",
+    "source": "w_pll_main_gate0",
+    "target": "w_gate0_div0"
+  }
 }
 ```
 
 | 字段 | 类型 | 出现 |
 | --- | --- | --- |
-| `name` | string | 必有 |
 | `kind` | `"gate"` | 必有 |
 | `source` | string | 必有 |
 | `target` | string | 必有 |
@@ -41,16 +44,16 @@ JSON **数组**。每个元素为一条**记录**（对象）。
 
 ```json
 {
-  "name": "div0",
-  "kind": "div",
-  "source": "w_gate0_div0",
-  "target": "w_div0_inv0"
+  "div0": {
+    "kind": "div",
+    "source": "w_gate0_div0",
+    "target": "w_div0_inv0"
+  }
 }
 ```
 
 | 字段 | 类型 | 出现 |
 | --- | --- | --- |
-| `name` | string | 必有 |
 | `kind` | `"div"` | 必有 |
 | `source` | string | 必有 |
 | `target` | string | 必有 |
@@ -61,16 +64,16 @@ JSON **数组**。每个元素为一条**记录**（对象）。
 
 ```json
 {
-  "name": "dto0",
-  "kind": "dto",
-  "source": "w_inv0_dto0",
-  "target": "w_dto0_clk_sys"
+  "dto0": {
+    "kind": "dto",
+    "source": "w_inv0_dto0",
+    "target": "w_dto0_clk_sys"
+  }
 }
 ```
 
 | 字段 | 类型 | 出现 |
 | --- | --- | --- |
-| `name` | string | 必有 |
 | `kind` | `"dto"` | 必有 |
 | `source` | string | 必有 |
 | `target` | string | 必有 |
@@ -81,16 +84,16 @@ JSON **数组**。每个元素为一条**记录**（对象）。
 
 ```json
 {
-  "name": "inv0",
-  "kind": "inv",
-  "source": "w_div0_inv0",
-  "target": "w_inv0_dto0"
+  "inv0": {
+    "kind": "inv",
+    "source": "w_div0_inv0",
+    "target": "w_inv0_dto0"
+  }
 }
 ```
 
 | 字段 | 类型 | 出现 |
 | --- | --- | --- |
-| `name` | string | 必有 |
 | `kind` | `"inv"` | 必有 |
 | `source` | string | 必有 |
 | `target` | string | 必有 |
@@ -101,15 +104,15 @@ JSON **数组**。每个元素为一条**记录**（对象）。
 
 ```json
 {
-  "name": "xtal",
-  "kind": "source",
-  "targets": ["gate0", "div0"]
+  "xtal": {
+    "kind": "source",
+    "targets": ["gate0", "div0"]
+  }
 }
 ```
 
 | 字段 | 类型 | 出现 |
 | --- | --- | --- |
-| `name` | string | 必有 |
 | `kind` | `"source"` | 必有 |
 | `targets` | string[] | 必有 |
 
@@ -119,15 +122,15 @@ JSON **数组**。每个元素为一条**记录**（对象）。
 
 ```json
 {
-  "name": "pll_main",
-  "kind": "pll",
-  "targets": ["gate0", "div0"]
+  "pll_main": {
+    "kind": "pll",
+    "targets": ["gate0", "div0"]
+  }
 }
 ```
 
 | 字段 | 类型 | 出现 |
 | --- | --- | --- |
-| `name` | string | 必有 |
 | `kind` | `"pll"` | 必有 |
 | `targets` | string[] | 必有 |
 
@@ -137,16 +140,16 @@ JSON **数组**。每个元素为一条**记录**（对象）。
 
 ```json
 {
-  "name": "clk_sys",
-  "kind": "clock",
-  "freq": "100",
-  "source": "w_dto0_clk_sys"
+  "clk_sys": {
+    "kind": "clock",
+    "freq": "100",
+    "source": "w_dto0_clk_sys"
+  }
 }
 ```
 
 | 字段 | 类型 | 出现 |
 | --- | --- | --- |
-| `name` | string | 必有 |
 | `kind` | `"clock"` | 必有 |
 | `freq` | string | 可选 |
 | `source` | string | 必有 |
@@ -157,19 +160,19 @@ JSON **数组**。每个元素为一条**记录**（对象）。
 
 ```json
 {
-  "name": "mux2",
-  "kind": "mux",
-  "source": {
-    "0": "pll_m2a",
-    "1": "pll_m2b"
-  },
-  "target": "clk_mux"
+  "mux2": {
+    "kind": "mux",
+    "source": {
+      "0": "pll_m2a",
+      "1": "pll_m2b"
+    },
+    "target": "clk_mux"
+  }
 }
 ```
 
 | 字段 | 类型 | 出现 |
 | --- | --- | --- |
-| `name` | string | 必有 |
 | `kind` | `"mux"` | 必有 |
 | `source` | object | 必有；键为标签字符串 → 对端器件名 |
 | `target` | string | 必有 |

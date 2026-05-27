@@ -44,6 +44,8 @@ hiddenimports = [
     "topology",
     "config_export",
     "device_model",
+    "device_attrs_validate",
+    "device_attrs_convert",
     "validate_config",
 ]
 

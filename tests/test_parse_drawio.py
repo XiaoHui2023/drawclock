@@ -35,15 +35,15 @@ def test_parse_points_reads_all_mux_ports() -> None:
 def test_mini_tree_drawio() -> None:
     path = ROOT / "tests" / "fixtures" / "mini-tree.drawio"
     config = parse_drawio_paths([path])
-    by_name = {item["name"]: item for item in config}
 
-    assert by_name["pll0"]["targets"] == ["gate0"]
-    assert by_name["gate0"]["source"] == "pll0"
-    assert by_name["gate0"]["target"] == "clk0"
-    assert by_name["clk0"]["source"] == "gate0"
-    assert by_name["clk0"]["freq"] == "100"
-    for item in config:
+    assert config["pll0"]["targets"] == ["gate0"]
+    assert config["gate0"]["source"] == "pll0"
+    assert config["gate0"]["target"] == "clk0"
+    assert config["clk0"]["source"] == "gate0"
+    assert config["clk0"]["freq"] == "100"
+    for item in config.values():
         assert "kind" in item
+        assert "name" not in item
 
 
 def test_mux_kind_exported_as_mux() -> None:
@@ -57,18 +57,16 @@ def test_mux_kind_exported_as_mux() -> None:
 def test_wire_folded_not_in_json() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-bridge.drawio"
     config = parse_drawio_paths([path])
-    by_name = {item["name"]: item for item in config}
-    assert "bus" not in by_name
-    assert by_name["pll0"]["targets"] == ["clk0"]
-    assert by_name["clk0"]["source"] == "pll0"
+    assert "bus" not in config
+    assert config["pll0"]["targets"] == ["clk0"]
+    assert config["clk0"]["source"] == "pll0"
 
 
 def test_wire_fanout_folded_to_pll_targets() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-fanout.drawio"
     config = parse_drawio_paths([path])
-    by_name = {item["name"]: item for item in config}
-    assert "bus" not in by_name
-    assert by_name["pll0"]["targets"] == ["clk_a", "clk_b"]
+    assert "bus" not in config
+    assert config["pll0"]["targets"] == ["clk_a", "clk_b"]
 
 
 def test_wire_left_port_duplicate_fails() -> None:
@@ -112,12 +110,11 @@ def test_example_two_figs_cross_wire_no_wire_in_json() -> None:
     if not fig1.is_file() or not fig2.is_file():
         pytest.skip("先运行 scripts/build_example_demo.py")
     config = parse_drawio_paths([fig1, fig2])
-    kinds = {item["kind"] for item in config}
+    kinds = {item["kind"] for item in config.values()}
     assert "wire" not in kinds
-    by_name = {item["name"]: item for item in config}
-    assert set(by_name["xtal"]["targets"]) == {"gate0", "div0"}
-    assert set(by_name["pll_main"]["targets"]) == {"gate0", "div0"}
-    assert by_name["mux2"]["source"] == {"0": "pll_m2a", "1": "pll_m2b"}
+    assert set(config["xtal"]["targets"]) == {"gate0", "div0"}
+    assert set(config["pll_main"]["targets"]) == {"gate0", "div0"}
+    assert config["mux2"]["source"] == {"0": "pll_m2a", "1": "pll_m2b"}
 
 
 def test_reload_restores_drawable_html_style(tmp_path: Path) -> None:

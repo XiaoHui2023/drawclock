@@ -29,4 +29,6 @@ def test_src_writes_clock_tree_only() -> None:
     assert proc.returncode == 0, proc.stderr
     assert out.is_file()
     config = json.loads(out.read_text(encoding="utf-8"))
-    assert any(item["name"] == "pll0" for item in config)
+    assert isinstance(config, dict)
+    assert "pll0" in config
+    assert config["pll0"]["kind"] == "pll"

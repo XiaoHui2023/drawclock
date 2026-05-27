@@ -2,26 +2,18 @@ from __future__ import annotations
 
 from typing import Any
 
+from device_attrs_validate import collect_device_attr_errors
 
-def validate_config(entries: list[dict[str, Any]]) -> None:
+
+def validate_config(config: dict[str, dict[str, Any]]) -> None:
     errors: list[str] = []
-    seen_devices: set[str] = set()
-    for item in entries:
-        name = item["name"]
+    errors.extend(collect_device_attr_errors(config))
+    device_names = set(config.keys())
+
+    for name, item in config.items():
         kind = item.get("kind")
         if kind == "wire":
             errors.append("clock-tree.json 不应包含 kind 为 wire 的记录")
-            continue
-        if name in seen_devices:
-            errors.append(f"器件名 {name} 重复")
-        else:
-            seen_devices.add(name)
-    device_names = seen_devices
-
-    for item in entries:
-        name = item["name"]
-        kind = item.get("kind")
-        if kind == "wire":
             continue
 
         refs = _referenced_peers(item)

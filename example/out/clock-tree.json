@@ -1,48 +1,40 @@
-[
-  {
-    "name": "clk_a",
+{
+  "clk_a": {
     "kind": "clock",
     "freq": "100",
     "source": "inv0"
   },
-  {
-    "name": "clk_b",
+  "clk_b": {
     "kind": "clock",
     "freq": "50",
     "source": "dto0"
   },
-  {
-    "name": "clk_mux",
+  "clk_mux": {
     "kind": "clock",
     "freq": "200",
     "source": "mux2"
   },
-  {
-    "name": "div0",
+  "div0": {
     "kind": "div",
     "source": "xtal",
     "target": "dto0"
   },
-  {
-    "name": "dto0",
+  "dto0": {
     "kind": "dto",
     "source": "div0",
     "target": "clk_b"
   },
-  {
-    "name": "gate0",
+  "gate0": {
     "kind": "gate",
     "source": "xtal",
     "target": "inv0"
   },
-  {
-    "name": "inv0",
+  "inv0": {
     "kind": "inv",
     "source": "gate0",
     "target": "clk_a"
   },
-  {
-    "name": "mux2",
+  "mux2": {
     "kind": "mux",
     "source": {
       "0": "pll_m2a",
@@ -50,34 +42,30 @@
     },
     "target": "clk_mux"
   },
-  {
-    "name": "pll_m2a",
+  "pll_m2a": {
     "kind": "pll",
     "targets": [
       "mux2"
     ]
   },
-  {
-    "name": "pll_m2b",
+  "pll_m2b": {
     "kind": "pll",
     "targets": [
       "mux2"
     ]
   },
-  {
-    "name": "pll_main",
+  "pll_main": {
     "kind": "pll",
     "targets": [
       "gate0",
       "div0"
     ]
   },
-  {
-    "name": "xtal",
+  "xtal": {
     "kind": "source",
     "targets": [
       "gate0",
       "div0"
     ]
   }
-]
+}

@@ -8,15 +8,14 @@ from drawio_layout import LayoutDocument, VertexLayout
 
 def validate_layout_matches_config(
     layout: LayoutDocument,
-    config: list[dict[str, Any]],
+    config: dict[str, dict[str, Any]],
 ) -> None:
     errors: list[str] = []
     layout_names = {vertex.name for vertex in layout.vertices}
     config_device_names: set[str] = set()
     config_wire_names: set[str] = set()
 
-    for item in config:
-        name = item["name"]
+    for name, item in config.items():
         if item.get("kind") == "wire":
             config_wire_names.add(name)
             continue
@@ -39,8 +38,7 @@ def validate_layout_matches_config(
             continue
         if prior is None:
             by_name[vertex.name] = vertex
-    for item in config:
-        name = item["name"]
+    for name, item in config.items():
         vertex = by_name.get(name)
         if vertex is None:
             continue
