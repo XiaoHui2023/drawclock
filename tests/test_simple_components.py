@@ -20,7 +20,7 @@ if str(SCRIPTS) not in sys.path:
         ("div", 2),
         ("dto", 2),
         ("inv", 2),
-        ("pll", 1),
+        ("pll", 2),
         ("source", 1),
         ("clock", 1),
         ("wire", 2),
@@ -33,12 +33,14 @@ def test_simple_verify_geometry(name: str, port_count: int) -> None:
     assert len(pts) == port_count
 
 
-def test_pll_only_right_point() -> None:
+def test_pll_left_right_points() -> None:
     pll = importlib.import_module("drawio_lib.components.pll")
     pts = pll._parse_points(pll.cell_style())
-    assert len(pts) == 1
+    assert len(pts) == 2
+    assert pll.G.left is not None
     assert pll.G.right is not None
-    assert isclose(pts[0][0], pll.G.right.anchor.x_rel, abs_tol=0.001)
+    assert isclose(pts[0][0], pll.G.left.anchor.x_rel, abs_tol=0.001)
+    assert isclose(pts[1][0], pll.G.right.anchor.x_rel, abs_tol=0.001)
 
 
 def test_source_only_right_point() -> None:

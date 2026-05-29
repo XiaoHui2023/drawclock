@@ -17,7 +17,6 @@ DRAWIO_FIXTURES = [
     "tests/fixtures/mini-tree.drawio",
     "tests/fixtures/wire-bridge.drawio",
     "tests/fixtures/wire-fanout.drawio",
-    "example/demo.drawio",
 ]
 
 

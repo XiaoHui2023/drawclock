@@ -38,6 +38,7 @@ def test_mini_tree_drawio() -> None:
 
     assert config["pll0"]["targets"] == ["gate0"]
     assert config["pll0"]["pll_kind"] == "sc"
+    assert config["pll0"]["source"] == "xtal0"
     assert config["gate0"]["source"] == "pll0"
     assert config["gate0"]["target"] == "clk0"
     assert config["clk0"]["source"] == "gate0"
@@ -113,9 +114,13 @@ def test_example_two_figs_cross_wire_no_wire_in_json() -> None:
     config = parse_drawio_paths([fig1, fig2])
     kinds = {item["kind"] for item in config.values()}
     assert "wire" not in kinds
-    assert set(config["xtal"]["targets"]) == {"gate0", "div0"}
+    assert config["pll_main"]["source"] == "xtal"
     assert set(config["pll_main"]["targets"]) == {"gate0", "div0"}
+    assert config["gate0"]["source"] == "pll_main"
+    assert config["div0"]["source"] == "pll_main"
     assert config["mux2"]["source"] == {"0": "pll_m2a", "1": "pll_m2b"}
+    assert config["pll_m2a"]["source"] == "osc_mux"
+    assert config["pll_m2b"]["source"] == "osc_mux"
     assert config["clk_a"]["freq"] == 100_000
     assert config["clk_b"]["freq"] == 50_000_000
     assert config["clk_mux"]["freq"] == 200_000_000

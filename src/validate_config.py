@@ -31,6 +31,8 @@ def validate_config(config: dict[str, dict[str, Any]]) -> None:
             targets = item.get("targets")
             if not isinstance(targets, list) or not targets:
                 errors.append(f"器件 {name} 的输出端口未连接")
+            if kind == "pll" and not item.get("source"):
+                errors.append(f"器件 {name} 的输入端口未连接")
             continue
 
         if "freq" in item:

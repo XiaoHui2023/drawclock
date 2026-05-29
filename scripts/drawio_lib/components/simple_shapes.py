@@ -111,8 +111,10 @@ def inv_body(g: geom.SimpleGeometry) -> str:
 
 
 PLL_LEFT_X = 2
-PLL_SHOULDER_X = 28
-PLL_TIP_X = 36
+PLL_SHOULDER_X = 30
+PLL_TIP_X = 38
+PLL_BODY_HALF_H = 14
+PLL_LEFT_NOTCH_HALF = 8
 PLL_LABEL_CX = (PLL_LEFT_X + PLL_SHOULDER_X) / 2
 
 
@@ -121,13 +123,18 @@ def pll_label_cx(g: geom.SimpleGeometry) -> float:
 
 
 def pll_body(g: geom.SimpleGeometry) -> str:
-    """PLL: right-pointing tag; open left, parallel top/bottom, tip on the right."""
+    """PLL: tag with left input notch, closed sides above/below notch, tip on the right."""
     mid = _mid(g)
-    top_y = mid - 10
-    bot_y = mid + 10
+    top_y = mid - PLL_BODY_HALF_H
+    bot_y = mid + PLL_BODY_HALF_H
+    lx = _dx(g, PLL_LEFT_X)
+    sx = _dx(g, PLL_SHOULDER_X)
+    tx = _dx(g, PLL_TIP_X)
+    notch_top = mid - PLL_LEFT_NOTCH_HALF
+    notch_bot = mid + PLL_LEFT_NOTCH_HALF
     return (
-        f'<path d="M {_dx(g, PLL_LEFT_X)} {top_y} L {_dx(g, PLL_SHOULDER_X)} {top_y} L {_dx(g, PLL_TIP_X)} {mid} '
-        f'L {_dx(g, PLL_SHOULDER_X)} {bot_y} L {_dx(g, PLL_LEFT_X)} {bot_y}" fill="{FILL}" '
+        f'<path d="M {lx} {top_y} L {sx} {top_y} L {tx} {mid} L {sx} {bot_y} L {lx} {bot_y} '
+        f"L {lx} {notch_bot} M {lx} {notch_top} L {lx} {top_y}\" fill=\"{FILL}\" "
         f'stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="round" '
         f'stroke-linecap="round"/>'
     )

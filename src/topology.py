@@ -105,7 +105,11 @@ def _bind_endpoint(
     port = resolve_port(cell, xy)
     if port is None:
         port = "right" if outgoing else "left"
-    if state.kind in ("pll", "source") and port == "right":
+    if state.kind == "source" and port == "right":
+        if peer_name not in state.out_targets:
+            state.out_targets.append(peer_name)
+        return
+    if state.kind == "pll" and port == "right":
         if peer_name not in state.out_targets:
             state.out_targets.append(peer_name)
         return
@@ -156,7 +160,11 @@ def port_key_for_index(cell: GraphCell, index: int) -> str:
         return "right"
     if kind == "clock":
         return "left"
-    if kind in ("pll", "source"):
+    if kind == "pll":
+        if index == 0:
+            return "left"
+        return "right"
+    if kind == "source":
         return "right"
     if index == 0:
         return "left"
@@ -183,7 +191,15 @@ def validate_topology(
         required = _required_ports(state.kind)
         missing = required - set(state.bindings)
         extra = set(state.bindings) - required
-        if state.kind in ("pll", "source"):
+        if state.kind == "pll":
+            if "left" not in state.bindings:
+                errors.append(f"器件 {state.name} 的输入端口未连接")
+            if not state.out_targets and not _output_blocked_by_open_wire(
+                state, wire_names, wire_endpoints
+            ):
+                errors.append(f"器件 {state.name} 的输出端口未连接")
+            extra = extra | (set(state.bindings) - required)
+        elif state.kind == "source":
             if not state.out_targets and not _output_blocked_by_open_wire(
                 state, wire_names, wire_endpoints
             ):
@@ -276,7 +292,9 @@ def _required_ports(kind: str) -> set[str]:
         return {*(f"in{i}" for i in range(n)), "out"}
     if kind == "clock":
         return {"left"}
-    if kind in ("pll", "source"):
+    if kind == "pll":
+        return {"left"}
+    if kind == "source":
         return set()
     if kind == "wire":
         return {"left", "right"}

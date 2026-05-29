@@ -318,18 +318,16 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
     )
     placed["gate0"] = gate0
     placed["div0"] = div0
-    _connect(edges, placed, "wire_a", "gate0", tgt_port="left", src_port="right")
-    _connect(edges, placed, "wire_b", "div0", tgt_port="left", src_port="right")
-
     pll = Placed(
         "pll_main",
         "pll_main",
         "pll",
-        X0 - 120,
+        x_dev - pll_shape.w - 24,
         _top_for_port((row_gate_a + row_gate_b) / 2, pll_shape, "pll", "right"),
         pll_shape,
     )
     placed["pll_main"] = pll
+    _connect(edges, placed, "wire_a", "pll_main", tgt_port="left", src_port="right")
     stub_x = placed["gate0"].x - 10
     _connect_pll_main_fanout(edges, placed, "gate0", stub_x=stub_x)
     _connect_pll_main_fanout(edges, placed, "div0", stub_x=stub_x)
@@ -390,11 +388,20 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         {"in0_label": "0", "in1_label": "1"},
     )
     placed["mux2"] = mux
+    osc_mux = Placed(
+        "osc_mux",
+        "osc_mux",
+        "source",
+        40,
+        _top_for_port(row_mux, shapes["source"], "source", "right"),
+        shapes["source"],
+    )
+    placed["osc_mux"] = osc_mux
     pll_m2a = Placed(
         "pll_m2a",
         "pll_m2a",
         "pll",
-        40,
+        osc_mux.x + osc_mux.shape.w + 24,
         _top_for_port(row_mux - 30, pll_shape, "pll", "right"),
         pll_shape,
     )
@@ -402,12 +409,14 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         "pll_m2b",
         "pll_m2b",
         "pll",
-        40,
+        osc_mux.x + osc_mux.shape.w + 24,
         _top_for_port(row_mux + 30, pll_shape, "pll", "right"),
         pll_shape,
     )
     placed["pll_m2a"] = pll_m2a
     placed["pll_m2b"] = pll_m2b
+    _connect(edges, placed, "osc_mux", "pll_m2a")
+    _connect(edges, placed, "osc_mux", "pll_m2b")
     for index, pll_key in enumerate(("pll_m2a", "pll_m2b")):
         _connect(
             edges,

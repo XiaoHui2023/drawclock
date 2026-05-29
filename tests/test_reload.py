@@ -179,7 +179,7 @@ def test_reload_preserves_geometry_and_upgrades_style(tmp_path: Path) -> None:
     assert "<mxGraphModel" not in text
     inner = _mxfile_searchable(text)
     assert 'name="pll_main"' in inner
-    assert 'x="-80"' in inner
+    assert 'x="36"' in inner
     assert "overflow=fill" in inner
     assert "html=1" in inner
     gate = re.search(

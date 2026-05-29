@@ -90,6 +90,14 @@ def _device_entry(
         if state.kind == "pll":
             raw_kind = state.pll_kind or DEFAULT_PLL_KIND
             entry["pll_kind"] = raw_kind.lower()
+            if "left" in state.bindings:
+                resolved = resolve_input_peer(
+                    state.bindings["left"],
+                    wire_names=wire_names,
+                    wire_endpoints=wire_endpoints,
+                )
+                if resolved:
+                    entry["source"] = resolved
         return entry
 
     if state.kind == "clock":
