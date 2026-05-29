@@ -30,8 +30,7 @@ def test_reload_object_attrs_adds_pll_kind_default_for_legacy_pll() -> None:
     lib = ROOT / "drawio-lib" / "drawclock.xml"
     out = reload_object_attrs("pll", {"name": "pll0"}, library_path=lib)
     assert out["pll_kind"] == "SC"
-    assert "%pll_kind%" not in out["label"]
-    assert "SC</span>" in out["label"] or ">SC<" in out["label"]
+    assert "%pll_kind%" in out["label"]
     kept = reload_object_attrs(
         "pll",
         {"name": "pll0", "pll_kind": "LC"},

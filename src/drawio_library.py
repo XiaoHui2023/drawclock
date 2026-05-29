@@ -214,10 +214,6 @@ def reload_object_attrs(
         key = f"in{index}_label"
         if f"%{key}%" in template and key not in out:
             out[key] = str(index)
-    label = template
-    # draw.io 对嵌套 HTML 内新建的 %pll_kind% 常不替换，画布会露出字面量；烘焙中心字，属性仍留 object 供编辑数据与 decode
-    if "%pll_kind%" in label:
-        label = label.replace("%pll_kind%", out.get("pll_kind", DEFAULT_PLL_KIND))
-    out["label"] = label
-    out["placeholders"] = "1" if LABEL_PLACEHOLDER_RE.search(label) else "0"
+    out["label"] = template
+    out["placeholders"] = "1"
     return out
