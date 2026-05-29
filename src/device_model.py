@@ -11,6 +11,7 @@ class DeviceState:
     kind: str
     name: str
     freq: str | None = None
+    pll_kind: str | None = None
     mux_labels: dict[str, str] = field(default_factory=dict)
     points: tuple[tuple[float, float], ...] = ()
     bindings: dict[str, str] = field(default_factory=dict)

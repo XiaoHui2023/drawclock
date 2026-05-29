@@ -200,6 +200,7 @@ def test_reload_keeps_placeholder_template_for_edit(tmp_path: Path) -> None:
     inner = html.unescape(_mxfile_searchable(out.read_text(encoding="utf-8")))
     assert 'placeholders="1"' in inner
     assert "%name%" in inner
+    assert "%pll_kind%" in inner
     assert 'name="pll0"' in inner
 
 

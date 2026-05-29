@@ -16,6 +16,7 @@ def build_device_states(diagram: ParsedDiagram) -> tuple[dict[str, DeviceState],
             kind=cell.drawclock_type,
             name=cell.name,
             freq=cell.freq,
+            pll_kind=cell.pll_kind,
             mux_labels=dict(cell.mux_labels),
             points=cell.points,
         )

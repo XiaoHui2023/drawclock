@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from device_model import DeviceState, MUX_KIND_RE
+from drawio_library import DEFAULT_PLL_KIND
 from wire_resolve import (
     build_wire_endpoints,
     mux_source_entry,
@@ -86,6 +87,9 @@ def _device_entry(
         )
         if targets:
             entry["targets"] = targets
+        if state.kind == "pll":
+            raw_kind = state.pll_kind or DEFAULT_PLL_KIND
+            entry["pll_kind"] = raw_kind.lower()
         return entry
 
     if state.kind == "clock":

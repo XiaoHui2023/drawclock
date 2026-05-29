@@ -18,6 +18,7 @@ class GraphCell:
     drawclock_type: str | None = None
     name: str = ""
     freq: str | None = None
+    pll_kind: str | None = None
     mux_labels: dict[str, str] = field(default_factory=dict)
     points: tuple[tuple[float, float], ...] = ()
     object_attrs: dict[str, str] = field(default_factory=dict)
@@ -127,6 +128,9 @@ def _add_mxcell(
     freq = merged.get("freq")
     if freq is not None:
         freq = freq.strip() or None
+    pll_kind = merged.get("pll_kind")
+    if pll_kind is not None:
+        pll_kind = pll_kind.strip() or None
     mux_labels = {
         key: merged[key].strip()
         for key in sorted(merged)
@@ -139,6 +143,7 @@ def _add_mxcell(
         drawclock_type=dtype,
         name=name or dtype,
         freq=freq,
+        pll_kind=pll_kind,
         mux_labels=mux_labels,
         points=_parse_points(style),
         object_attrs=object_attrs,

@@ -37,6 +37,7 @@ def test_mini_tree_drawio() -> None:
     config = parse_drawio_paths([path])
 
     assert config["pll0"]["targets"] == ["gate0"]
+    assert config["pll0"]["pll_kind"] == "sc"
     assert config["gate0"]["source"] == "pll0"
     assert config["gate0"]["target"] == "clk0"
     assert config["clk0"]["source"] == "gate0"

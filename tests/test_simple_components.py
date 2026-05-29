@@ -63,7 +63,16 @@ def test_pll_center_label_on_graphic() -> None:
 
     cx = sgeom.side_pad_x(pll.W) + PLL_LABEL_CX
     left_pct = cx / pll.W * 100
-    assert f"left:{left_pct}%" in pll.label_html()
+    html = pll.label_html()
+    assert f"left:{left_pct}%" in html
+    assert "%pll_kind%" in html
+
+
+def test_pll_library_object_carries_pll_kind_default() -> None:
+    pll = importlib.import_module("drawio_lib.components.pll")
+    frag = pll.cell_fragment("2")
+    assert 'pll_kind="SC"' in frag
+    assert "%pll_kind%" in frag
 
 
 @pytest.mark.parametrize("name", ["gate", "inv", "mux2"])

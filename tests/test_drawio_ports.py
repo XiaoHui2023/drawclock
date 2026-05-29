@@ -8,7 +8,11 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from drawio_library import bake_label_placeholders, load_library_shapes  # noqa: E402
+from drawio_library import (  # noqa: E402
+    bake_label_placeholders,
+    load_library_shapes,
+    reload_object_attrs,
+)
 from drawio_ports import edge_port_style, finalize_edge_style, port_anchors  # noqa: E402
 
 
@@ -20,6 +24,29 @@ def test_bake_label_replaces_name_and_freq() -> None:
     assert "clk0" in baked
     assert "(100hz)" in baked
     assert "%" not in baked
+
+
+def test_reload_object_attrs_adds_pll_kind_default_for_legacy_pll() -> None:
+    lib = ROOT / "drawio-lib" / "drawclock.xml"
+    out = reload_object_attrs("pll", {"name": "pll0"}, library_path=lib)
+    assert out["pll_kind"] == "SC"
+    assert "%pll_kind%" in out["label"]
+    kept = reload_object_attrs(
+        "pll",
+        {"name": "pll0", "pll_kind": "LC"},
+        library_path=lib,
+    )
+    assert kept["pll_kind"] == "LC"
+
+
+def test_bake_label_replaces_pll_kind_with_default() -> None:
+    baked = bake_label_placeholders("<span>%pll_kind%</span>", {"name": "p0"})
+    assert baked == "<span>SC</span>"
+    baked_lc = bake_label_placeholders(
+        "<span>%pll_kind%</span>",
+        {"name": "p0", "pll_kind": "LC"},
+    )
+    assert baked_lc == "<span>LC</span>"
 
 
 def test_edge_port_style_uses_library_points() -> None:

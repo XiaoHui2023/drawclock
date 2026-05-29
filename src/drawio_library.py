@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-LABEL_PLACEHOLDER_RE = re.compile(r"%(?:name|freq|in\d+_label)%")
+LABEL_PLACEHOLDER_RE = re.compile(r"%(?:name|freq|pll_kind|in\d+_label)%")
 
 from drawio_decode import decompress_diagram_payload
 
@@ -145,14 +145,19 @@ def canonical_vertex_style(
     return shape.style
 
 
+DEFAULT_PLL_KIND = "SC"
+
+
 def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
-    """Replace %name%, %freq%, %in0_label%… with object attribute values for draw.io display."""
+    """Replace %name%, %freq%, %pll_kind%, %in0_label%… with object attribute values for draw.io display."""
     baked = label
     name = attrs.get("name", "")
     if name:
         baked = baked.replace("%name%", name)
     if "%freq%" in baked:
         baked = baked.replace("%freq%", attrs.get("freq", ""))
+    if "%pll_kind%" in baked:
+        baked = baked.replace("%pll_kind%", attrs.get("pll_kind", DEFAULT_PLL_KIND))
     for index in range(6):
         key = f"in{index}_label"
         token = f"%{key}%"
@@ -203,6 +208,8 @@ def reload_object_attrs(
     template = shape.label
     if "%freq%" in template and "freq" not in out:
         out["freq"] = ""
+    if "%pll_kind%" in template and "pll_kind" not in out:
+        out["pll_kind"] = DEFAULT_PLL_KIND
     for index in range(6):
         key = f"in{index}_label"
         if f"%{key}%" in template and key not in out:
