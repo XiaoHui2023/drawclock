@@ -15,6 +15,7 @@ from drawio_lib.components import (
     mux5,
     mux6,
     pll,
+    pll2,
     wire,
 )
 
@@ -52,6 +53,7 @@ ALL: tuple[ComponentSpec, ...] = (
     ComponentSpec(dto),
     ComponentSpec(inv),
     ComponentSpec(pll),
+    ComponentSpec(pll2),
     ComponentSpec(source),
     ComponentSpec(clock),
     ComponentSpec(wire),

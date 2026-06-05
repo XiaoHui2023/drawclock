@@ -149,7 +149,7 @@ DEFAULT_PLL_KIND = "SC"
 
 
 def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
-    """Replace %name%, %freq%, %pll_kind%, %in0_label%… with object attribute values for draw.io display."""
+    """Replace editable placeholders with object attribute values for draw.io display."""
     baked = label
     name = attrs.get("name", "")
     if name:
@@ -162,7 +162,7 @@ def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
         key = f"in{index}_label"
         token = f"%{key}%"
         if token in baked:
-            baked = baked.replace(token, attrs.get(key, str(index)))
+            baked = baked.replace(token, str(index))
     return baked
 
 
@@ -193,7 +193,7 @@ def reload_object_attrs(
     *,
     library_path: str | Path | None = None,
 ) -> dict[str, str]:
-    """Apply library label template with placeholders=1; keep name/freq/in*_label for draw.io edit fields."""
+    """Apply library label template with placeholders=1 and current editable fields."""
     lib = str(library_path or DEFAULT_LIBRARY_PATH)
     shape = _cached_library_shapes(lib).get(drawclock_type)
     if shape is None:
@@ -201,7 +201,9 @@ def reload_object_attrs(
     out = {
         key: value
         for key, value in stored_attrs.items()
-        if key not in ("label", "placeholders") and value is not None
+        if key not in ("label", "placeholders")
+        and not (key.startswith("in") and key.endswith("_label"))
+        and value is not None
     }
     if not out.get("name"):
         out["name"] = drawclock_type
@@ -210,10 +212,6 @@ def reload_object_attrs(
         out["freq"] = ""
     if "%pll_kind%" in template and "pll_kind" not in out:
         out["pll_kind"] = DEFAULT_PLL_KIND
-    for index in range(6):
-        key = f"in{index}_label"
-        if f"%{key}%" in template and key not in out:
-            out[key] = str(index)
     out["label"] = template
     out["placeholders"] = "1"
     return out

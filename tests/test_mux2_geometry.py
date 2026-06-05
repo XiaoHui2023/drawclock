@@ -61,7 +61,9 @@ def test_label_uses_non_scaling_layers() -> None:
     assert 'preserveAspectRatio="none"' in html
     assert "transform:scale(" not in html
     assert "width:100%" in html
-    assert "%in0_label%" in html
+    assert ">0</span>" in html
+    assert ">1</span>" in html
+    assert "in0_label" not in html
 
 
 def test_edit_data_fields_and_type_in_style() -> None:
@@ -71,11 +73,12 @@ def test_edit_data_fields_and_type_in_style() -> None:
     assert "component_type=" not in mux2.cell_fragment("x")
     assert f"{mux2.DRAWCLOCK_TYPE_KEY}={mux2.DRAWCLOCK_TYPE_VALUE}" in mux2.cell_style()
     assert list(mux2.EDIT_DATA_ATTR_PREFIX) == [
-        "in0_label",
-        "in1_label",
         "name",
         "label",
     ]
+    fragment = mux2.cell_fragment("x")
+    assert "in0_label" not in fragment
+    assert "in1_label" not in fragment
 
 
 def test_verify_geometry_passes() -> None:

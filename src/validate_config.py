@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from device_attrs_validate import collect_device_attr_errors
+from wire_resolve import parse_source_ref
 
 
 def validate_config(config: dict[str, dict[str, Any]]) -> None:
@@ -21,8 +22,20 @@ def validate_config(config: dict[str, dict[str, Any]]) -> None:
 
         refs = _referenced_peers(item)
         for peer in refs:
-            if peer not in device_names:
+            base, index = parse_source_ref(peer)
+            if base not in device_names:
                 errors.append(f"器件 {name} 连接到未知器件 {peer}")
+                continue
+            if index is not None:
+                upstream = config[base]
+                if upstream.get("kind") != "pll":
+                    errors.append(f"器件 {name} 的 source {peer} 指向非 pll 器件 {base}")
+                    continue
+                output_count = upstream.get("output_count", 1)
+                if index >= output_count:
+                    errors.append(
+                        f"器件 {name} 的 source {peer} 超出 {base} 的 output_count={output_count}"
+                    )
 
         if isinstance(item.get("source"), dict):
             _validate_mux(name, item, errors)
@@ -34,6 +47,11 @@ def validate_config(config: dict[str, dict[str, Any]]) -> None:
         if kind == "pll":
             if not item.get("source"):
                 errors.append(f"器件 {name} 的输入端口未连接")
+            output_count = item.get("output_count")
+            if output_count is not None and (
+                not isinstance(output_count, int) or output_count <= 1
+            ):
+                errors.append(f"器件 {name} 的 output_count 须为大于 1 的整数")
             continue
 
         if "freq" in item or kind in ("gate", "div", "dto", "inv", "clock"):

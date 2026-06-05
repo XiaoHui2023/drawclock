@@ -46,6 +46,12 @@ def port_anchors(style: str, drawclock_type: str) -> dict[str, tuple[float, floa
             return {"right": (1.0, 0.5)}
         if drawclock_type == "pll":
             return {"left": (0.0, 0.5), "right": (1.0, 0.5)}
+        if drawclock_type == "pll2":
+            return {
+                "left": (0.0, 0.5),
+                "out0": (1.0, 1 / 3),
+                "out1": (1.0, 2 / 3),
+            }
         if drawclock_type == "clock":
             return {"left": (0.0, 0.5)}
         return {"left": (0.0, 0.5), "right": (1.0, 0.5)}
@@ -64,6 +70,12 @@ def port_anchors(style: str, drawclock_type: str) -> dict[str, tuple[float, floa
         return {
             "left": (pts[0][0], pts[0][1]),
             "right": (pts[1][0], pts[1][1]),
+        }
+    if drawclock_type == "pll2":
+        return {
+            "left": (pts[0][0], pts[0][1]),
+            "out0": (pts[1][0], pts[1][1]),
+            "out1": (pts[2][0], pts[2][1]),
         }
     if drawclock_type == "clock":
         return {"left": (pts[0][0], pts[0][1])}

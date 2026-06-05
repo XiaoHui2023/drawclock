@@ -32,10 +32,6 @@ ATTR_INSTANCE_NAME = ATTR_NAME
 DRAWCLOCK_TYPE_KEY = "drawclockType"
 
 
-def _in_label_attr(index: int) -> str:
-    return f"in{index}_label"
-
-
 @dataclass
 class MuxComponent:
     """One muxN library shape (N = num_inputs)."""
@@ -88,21 +84,11 @@ class MuxComponent:
 
     @property
     def edit_data_attr_prefix(self) -> tuple[str, ...]:
-        return (
-            *(_in_label_attr(i) for i in range(self.num_inputs)),
-            ATTR_NAME,
-            "label",
-        )
+        return (ATTR_NAME, "label")
 
     @property
     def required_object_attrs(self) -> tuple[str, ...]:
-        return (
-            *(_in_label_attr(i) for i in range(self.num_inputs)),
-            ATTR_NAME,
-        )
-
-    def default_input_labels(self) -> dict[str, str]:
-        return {_in_label_attr(i): str(i) for i in range(self.num_inputs)}
+        return (ATTR_NAME,)
 
     def label_html(self) -> str:
         poly = geom.trapezoid_cell_points(self._t)
@@ -112,7 +98,7 @@ class MuxComponent:
         )
         label_x = self._t.x + LABEL_INSET_X
         in_overlays = tuple(
-            (label_x, port.trap.cell_y, f"%{_in_label_attr(i)}%")
+            (label_x, port.trap.cell_y, str(i))
             for i, port in enumerate(self._g.inputs)
         )
         name_top = self._g.mux_h + geom.MUX_BODY_PAD_BOTTOM
@@ -173,26 +159,18 @@ class MuxComponent:
         cell_id: str,
         instance_name: str | None = None,
         *,
-        input_labels: dict[str, str] | None = None,
         x: int | None = None,
         y: int | None = None,
     ) -> str:
-        labels = input_labels or self.default_input_labels()
         style = self.cell_style()
         name = xml_attr(instance_name if instance_name is not None else self.title)
         label = xml_attr(self.label_html())
-        attrs = []
-        for i in range(self.num_inputs):
-            key = _in_label_attr(i)
-            attrs.append(f'{key}="{xml_attr(labels.get(key, str(i)))}"')
-        attrs.extend(
-            [
-                f'{ATTR_NAME}="{name}"',
-                f'label="{label}"',
-                'placeholders="1"',
-                f'id="{cell_id}"',
-            ]
-        )
+        attrs = [
+            f'{ATTR_NAME}="{name}"',
+            f'label="{label}"',
+            'placeholders="1"',
+            f'id="{cell_id}"',
+        ]
         if x is None and y is None:
             geom_xml = f'<mxGeometry width="{self.w}" height="{self.h}" as="geometry"/>'
         else:
@@ -289,8 +267,8 @@ class MuxComponent:
             raise ValueError(f"{self.title} body SVG must stretch with the shape (none)")
         if "<line " in html:
             raise ValueError(f"{self.title} label must not draw port stub lines")
-        if f"%in0_label%" not in html and self.num_inputs > 0:
-            raise ValueError(f"{self.title} input labels must use placeholders")
+        if "in0_label" in html:
+            raise ValueError(f"{self.title} input labels must be fixed text")
         style = self.cell_style()
         verify_label_overflow_policy(
             html,

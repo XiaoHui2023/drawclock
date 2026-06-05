@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 from drawio_graph import GraphCell, ParsedDiagram, edge_attachment
-from device_model import DeviceState, MUX_KIND_RE
+from device_model import (
+    DeviceState,
+    MUX_KIND_RE,
+    device_output_count,
+    out_port_index,
+)
 from wire_resolve import WireEndpoints, build_wire_endpoints
 
 
@@ -46,6 +51,9 @@ def build_device_states(diagram: ParsedDiagram) -> tuple[dict[str, DeviceState],
             continue
         exit_xy = edge_attachment(edge.style, end="exit")
         entry_xy = edge_attachment(edge.style, end="entry")
+        src_exit_port = resolve_port(src, exit_xy)
+        if src_exit_port is None and src.drawclock_type == "source":
+            src_exit_port = "right"
         _bind_endpoint(
             devices,
             wire_by_name,
@@ -63,6 +71,7 @@ def build_device_states(diagram: ParsedDiagram) -> tuple[dict[str, DeviceState],
             src.name,
             outgoing=False,
             wire_names=wire_names,
+            upstream_out_port=src_exit_port,
         )
 
     validate_topology(devices, wire_by_name)
@@ -78,6 +87,7 @@ def _bind_endpoint(
     *,
     outgoing: bool,
     wire_names: set[str],
+    upstream_out_port: str | None = None,
 ) -> None:
     if cell.drawclock_type == "wire":
         port = resolve_port(cell, xy)
@@ -94,6 +104,8 @@ def _bind_endpoint(
                     f"不能再接 {peer_name}"
                 )
             state.bindings["left"] = peer_name
+            if upstream_out_port:
+                state.wire_left_out_port = upstream_out_port
         else:
             if peer_name not in state.wire_targets:
                 state.wire_targets.append(peer_name)
@@ -105,9 +117,13 @@ def _bind_endpoint(
     port = resolve_port(cell, xy)
     if port is None:
         port = "right" if outgoing else "left"
-    if outgoing and port in ("right", "out"):
+    if outgoing and (port in ("right", "out") or port.startswith("out")):
         if peer_name not in state.out_targets:
             state.out_targets.append(peer_name)
+        if port.startswith("out"):
+            state.out_bindings.setdefault(port, [])
+            if peer_name not in state.out_bindings[port]:
+                state.out_bindings[port].append(peer_name)
         return
 
     if port in state.bindings:
@@ -118,11 +134,15 @@ def _bind_endpoint(
         ):
             if peer_name in wire_names:
                 state.bindings[port] = peer_name
+                if upstream_out_port:
+                    state.source_out_ports[port] = upstream_out_port
             return
         raise ValueError(
             f"器件 {state.name} 的端口 {port} 已有连接 {existing}，不能再接 {peer_name}"
         )
     state.bindings[port] = peer_name
+    if upstream_out_port:
+        state.source_out_ports[port] = upstream_out_port
 
 
 def resolve_port(cell: GraphCell, xy: tuple[float, float] | None) -> str | None:
@@ -160,6 +180,10 @@ def port_key_for_index(cell: GraphCell, index: int) -> str:
         if index == 0:
             return "left"
         return "right"
+    if kind == "pll2":
+        if index == 0:
+            return "left"
+        return f"out{index - 1}"
     if kind == "source":
         return "right"
     if index == 0:
@@ -194,6 +218,15 @@ def validate_topology(
                 state, wire_names, wire_endpoints
             ):
                 errors.append(f"器件 {state.name} 的输出端口未连接")
+            extra = extra | (set(state.bindings) - required)
+        elif state.kind == "pll2":
+            if "left" not in state.bindings:
+                errors.append(f"器件 {state.name} 的输入端口未连接")
+            for port in (f"out{i}" for i in range(device_output_count("pll2"))):
+                if not state.out_bindings.get(port) and not _output_blocked_by_open_wire(
+                    state, wire_names, wire_endpoints
+                ):
+                    errors.append(f"器件 {state.name} 的输出端口 {port} 未连接")
             extra = extra | (set(state.bindings) - required)
         elif state.kind == "source":
             if not state.out_targets and not _output_blocked_by_open_wire(
@@ -297,6 +330,8 @@ def _required_ports(kind: str) -> set[str]:
     if kind == "clock":
         return {"left"}
     if kind == "pll":
+        return {"left"}
+    if kind == "pll2":
         return {"left"}
     if kind == "source":
         return set()

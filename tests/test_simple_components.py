@@ -21,6 +21,7 @@ if str(SCRIPTS) not in sys.path:
         ("dto", 2),
         ("inv", 2),
         ("pll", 2),
+        ("pll2", 3),
         ("source", 1),
         ("clock", 1),
         ("wire", 2),
@@ -41,6 +42,56 @@ def test_pll_left_right_points() -> None:
     assert pll.G.right is not None
     assert isclose(pts[0][0], pll.G.left.anchor.x_rel, abs_tol=0.001)
     assert isclose(pts[1][0], pll.G.right.anchor.x_rel, abs_tol=0.001)
+
+
+def test_pll2_outputs_follow_right_chevron() -> None:
+    pll2 = importlib.import_module("drawio_lib.components.pll2")
+    pts = pll2._parse_points(pll2.cell_style())
+    assert len(pts) == 3
+
+    from drawio_lib.components import simple_geometry as sgeom
+    from drawio_lib.components.pll2_geometry import PLL2_SHOULDER_X
+    from drawio_lib.components.simple_shapes import PLL_BODY_HALF_H, PLL_TIP_X
+
+    pad = sgeom.side_pad_x(pll2.W)
+    shoulder_x = pad + PLL2_SHOULDER_X
+    tip_x = pad + PLL_TIP_X
+    mid_y = pll2.G.body_mid_y
+    top_y = mid_y - PLL_BODY_HALF_H
+    bottom_y = mid_y + PLL_BODY_HALF_H
+    expected = (
+        pll2.G.outputs[0].anchor,
+        pll2.G.outputs[1].anchor,
+    )
+    for pt, anchor in zip(pts[1:], expected):
+        assert isclose(pt[0], anchor.x_rel, abs_tol=0.001)
+        assert isclose(pt[1], anchor.y_rel, abs_tol=0.001)
+
+    assert shoulder_x < expected[0].cell_x < tip_x
+    assert shoulder_x < expected[1].cell_x < tip_x
+    assert mid_y - PLL_BODY_HALF_H < expected[0].cell_y < mid_y
+    assert mid_y < expected[1].cell_y < mid_y + PLL_BODY_HALF_H
+    assert isclose(
+        (expected[0].cell_y - top_y) / (mid_y - top_y),
+        (expected[0].cell_x - shoulder_x) / (tip_x - shoulder_x),
+    )
+    assert isclose(
+        (expected[1].cell_y - mid_y) / (bottom_y - mid_y),
+        (tip_x - expected[1].cell_x) / (tip_x - shoulder_x),
+    )
+
+
+def test_pll2_label_keeps_kind_left_and_adds_output_numbers() -> None:
+    pll2 = importlib.import_module("drawio_lib.components.pll2")
+    from drawio_lib.components import simple_geometry as sgeom
+    from drawio_lib.components.simple_shapes import PLL_LABEL_CX
+
+    cx = sgeom.side_pad_x(pll2.W) + PLL_LABEL_CX
+    html = pll2.label_html()
+    assert f"left:{cx / pll2.W * 100}%" in html
+    assert "%pll_kind%" in html
+    assert ">0</span>" in html
+    assert ">1</span>" in html
 
 
 def test_source_only_right_point() -> None:

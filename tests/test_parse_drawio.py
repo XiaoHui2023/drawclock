@@ -37,6 +37,7 @@ def test_mini_tree_drawio() -> None:
     config = parse_drawio_paths([path])
 
     assert config["pll0"]["pll_kind"] == "sc"
+    assert "output_count" not in config["pll0"]
     assert config["pll0"]["source"] == "xtal0"
     assert config["gate0"]["source"] == "pll0"
     assert config["clk0"]["source"] == "gate0"
@@ -53,6 +54,7 @@ def test_mux_kind_exported_as_mux() -> None:
 
     assert export_kind("mux2") == "mux"
     assert export_kind("mux6") == "mux"
+    assert export_kind("pll2") == "pll"
     assert export_kind("gate") == "gate"
 
 
@@ -82,6 +84,17 @@ def test_gate_right_port_fanout() -> None:
     assert "target" not in config["gate0"]
 
 
+def test_pll2_dual_output_source_suffix() -> None:
+    path = ROOT / "tests" / "fixtures" / "pll2-tree.drawio"
+    config = parse_drawio_paths([path])
+    assert config["pll2_0"]["kind"] == "pll"
+    assert config["pll2_0"]["output_count"] == 2
+    assert config["pll2_0"]["pll_kind"] == "sc"
+    assert config["pll2_0"]["source"] == "xtal0"
+    assert config["gate0"]["source"] == "pll2_0[0]"
+    assert config["div0"]["source"] == "pll2_0[1]"
+
+
 def test_wire_left_port_duplicate_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-too-many.drawio"
     with pytest.raises(ValueError, match="左端已有连接"):
@@ -97,6 +110,7 @@ def test_duplicate_device_name_fails() -> None:
 def test_library_styles_load() -> None:
     styles = load_library_cell_styles(DEFAULT_LIBRARY_PATH)
     assert "pll" in styles and "html=1" in styles["pll"]
+    assert "pll2" in styles
     assert "mux2" in styles
     shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
     assert "pll" in shapes and "<svg" in shapes["pll"].label

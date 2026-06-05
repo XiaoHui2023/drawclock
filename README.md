@@ -38,7 +38,7 @@
 | `--library` | `-l` | 文件 | 必填 | 新器件库 `drawclock.xml` |
 | `--output` | `-o` | 文件 | 必填 | 输出的 `.drawio` |
 
-- 器件库图形：换成新库的 **style** 与 **label 模板**（`%name%` 等占位符、`placeholders=1`，双击可编辑变量）；方框 **宽高** 为库默认；**保留** `x`/`y` 与 `name`、`freq`、`in*_label` 等属性值。
+- 器件库图形：换成新库的 **style** 与 **label 模板**（`%name%` 等占位符、`placeholders=1`，双击可编辑变量）；方框 **宽高** 为库默认；**保留** `x`/`y` 与 `name`、`freq` 等属性值。
 - 非器件库图形与连线：**原样保留**。
 - 两端均为器件库的连线：按新库 `points` 重算 `exitX` / `entryY` / `entryX` / `entryY`（方框变宽后仍贴在端口上）；**航点**（`mxGeometry` 内 `mxPoint`）原样保留。
 

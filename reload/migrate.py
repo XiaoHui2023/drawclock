@@ -156,7 +156,9 @@ def _upgrade_library_vertex(
         attrs["name"] = attrs["_name"]
     canonical = reload_object_attrs(dtype, attrs, library_path=library_path)
     mxcell.set("style", shape.style)
-    for key in ("label", "placeholders"):
+    for key in list(obj.attrib):
+        if key == "id":
+            continue
         if key in obj.attrib:
             del obj.attrib[key]
     for key, value in canonical.items():

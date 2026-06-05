@@ -385,7 +385,6 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         240,
         _top_for_port(row_mux, mux_shape, "mux2", "out"),
         mux_shape,
-        {"in0_label": "0", "in1_label": "1"},
     )
     placed["mux2"] = mux
     osc_mux = Placed(

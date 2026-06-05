@@ -30,8 +30,8 @@ class BodyRect:
 
 @dataclass(frozen=True)
 class Anchor:
-    cell_x: int
-    cell_y: int
+    cell_x: float
+    cell_y: float
     x_rel: float
     y_rel: float
 
@@ -39,10 +39,10 @@ class Anchor:
 @dataclass(frozen=True)
 class Port:
     anchor: Anchor
-    stub_x1: int
-    stub_y1: int
-    stub_x2: int
-    stub_y2: int
+    stub_x1: float
+    stub_y1: float
+    stub_x2: float
+    stub_y2: float
 
 
 @dataclass(frozen=True)
@@ -111,11 +111,11 @@ def clock_cell_h(body_height: int = BODY_H) -> int:
     )
 
 
-def cell_to_rel(cell_x: int, cell_y: int, *, w: int = W, h: int) -> tuple[float, float]:
+def cell_to_rel(cell_x: float, cell_y: float, *, w: int = W, h: int) -> tuple[float, float]:
     return cell_x / w, cell_y / h
 
 
-def make_anchor(cell_x: int, cell_y: int, *, cell_height: int, cell_w: int = W) -> Anchor:
+def make_anchor(cell_x: float, cell_y: float, *, cell_height: int, cell_w: int = W) -> Anchor:
     rx, ry = cell_to_rel(cell_x, cell_y, w=cell_w, h=cell_height)
     return Anchor(cell_x=cell_x, cell_y=cell_y, x_rel=rx, y_rel=ry)
 
@@ -130,8 +130,8 @@ def _stub_endpoints(
 
 
 def make_port(
-    cell_x: int,
-    cell_y: int,
+    cell_x: float,
+    cell_y: float,
     *,
     side: Literal["left", "right"],
     cell_height: int,
