@@ -36,12 +36,12 @@ def test_mini_tree_drawio() -> None:
     path = ROOT / "tests" / "fixtures" / "mini-tree.drawio"
     config = parse_drawio_paths([path])
 
-    assert config["pll0"]["targets"] == ["gate0"]
     assert config["pll0"]["pll_kind"] == "sc"
     assert config["pll0"]["source"] == "xtal0"
     assert config["gate0"]["source"] == "pll0"
-    assert config["gate0"]["target"] == "clk0"
     assert config["clk0"]["source"] == "gate0"
+    assert "target" not in config["gate0"]
+    assert "targets" not in config["pll0"]
     assert config["clk0"]["freq"] == 100
     for item in config.values():
         assert "kind" in item
@@ -60,15 +60,26 @@ def test_wire_folded_not_in_json() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-bridge.drawio"
     config = parse_drawio_paths([path])
     assert "bus" not in config
-    assert config["pll0"]["targets"] == ["clk0"]
     assert config["clk0"]["source"] == "pll0"
+    assert "targets" not in config["pll0"]
 
 
-def test_wire_fanout_folded_to_pll_targets() -> None:
+def test_wire_fanout_downstream_sources_only() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-fanout.drawio"
     config = parse_drawio_paths([path])
     assert "bus" not in config
-    assert config["pll0"]["targets"] == ["clk_a", "clk_b"]
+    assert config["clk_a"]["source"] == "pll0"
+    assert config["clk_b"]["source"] == "pll0"
+    assert "targets" not in config["pll0"]
+
+
+def test_gate_right_port_fanout() -> None:
+    path = ROOT / "tests" / "fixtures" / "gate-fanout.drawio"
+    config = parse_drawio_paths([path])
+    assert config["gate0"]["source"] == "src0"
+    assert config["clk_a"]["source"] == "gate0"
+    assert config["clk_b"]["source"] == "gate0"
+    assert "target" not in config["gate0"]
 
 
 def test_wire_left_port_duplicate_fails() -> None:
@@ -115,9 +126,10 @@ def test_example_two_figs_cross_wire_no_wire_in_json() -> None:
     kinds = {item["kind"] for item in config.values()}
     assert "wire" not in kinds
     assert config["pll_main"]["source"] == "xtal"
-    assert set(config["pll_main"]["targets"]) == {"gate0", "div0"}
     assert config["gate0"]["source"] == "pll_main"
     assert config["div0"]["source"] == "pll_main"
+    assert "targets" not in config["pll_main"]
+    assert "target" not in config["mux2"]
     assert config["mux2"]["source"] == {"0": "pll_m2a", "1": "pll_m2b"}
     assert config["pll_m2a"]["source"] == "osc_mux"
     assert config["pll_m2b"]["source"] == "osc_mux"

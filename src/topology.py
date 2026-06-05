@@ -105,11 +105,7 @@ def _bind_endpoint(
     port = resolve_port(cell, xy)
     if port is None:
         port = "right" if outgoing else "left"
-    if state.kind == "source" and port == "right":
-        if peer_name not in state.out_targets:
-            state.out_targets.append(peer_name)
-        return
-    if state.kind == "pll" and port == "right":
+    if outgoing and port in ("right", "out"):
         if peer_name not in state.out_targets:
             state.out_targets.append(peer_name)
         return
@@ -205,6 +201,14 @@ def validate_topology(
             ):
                 errors.append(f"器件 {state.name} 的输出端口未连接")
             extra = extra | (set(state.bindings) - required)
+        elif state.kind in ("gate", "div", "dto", "inv") or MUX_KIND_RE.match(state.kind):
+            if missing:
+                errors.append(f"器件 {state.name} 未连接的端口: {', '.join(sorted(missing))}")
+            if not state.out_targets and not _output_blocked_by_open_wire(
+                state, wire_names, wire_endpoints
+            ):
+                errors.append(f"器件 {state.name} 的输出端口未连接")
+            extra = extra | (set(state.bindings) - required)
         elif missing:
             errors.append(f"器件 {state.name} 未连接的端口: {', '.join(sorted(missing))}")
         if extra:
@@ -289,7 +293,7 @@ def _required_ports(kind: str) -> set[str]:
     mux_match = MUX_KIND_RE.match(kind)
     if mux_match:
         n = int(mux_match.group(1))
-        return {*(f"in{i}" for i in range(n)), "out"}
+        return {*(f"in{i}" for i in range(n))}
     if kind == "clock":
         return {"left"}
     if kind == "pll":
@@ -298,4 +302,4 @@ def _required_ports(kind: str) -> set[str]:
         return set()
     if kind == "wire":
         return {"left", "right"}
-    return {"left", "right"}
+    return {"left"}

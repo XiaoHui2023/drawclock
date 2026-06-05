@@ -8,7 +8,6 @@ from wire_resolve import (
     build_wire_endpoints,
     mux_source_entry,
     resolve_input_peer,
-    resolve_output_peers,
 )
 
 
@@ -68,25 +67,9 @@ def _device_entry(
                 or peer
                 for key, peer in sorted(raw_source.items())
             }
-        if "out" in state.bindings:
-            out_peer = state.bindings["out"]
-            resolved = resolve_output_peers(
-                [out_peer],
-                wire_names=wire_names,
-                wire_endpoints=wire_endpoints,
-            )
-            if len(resolved) == 1:
-                entry["target"] = resolved[0]
         return entry
 
     if state.kind in ("pll", "source"):
-        targets = resolve_output_peers(
-            list(state.out_targets),
-            wire_names=wire_names,
-            wire_endpoints=wire_endpoints,
-        )
-        if targets:
-            entry["targets"] = targets
         if state.kind == "pll":
             raw_kind = state.pll_kind or DEFAULT_PLL_KIND
             entry["pll_kind"] = raw_kind.lower()
@@ -119,12 +102,4 @@ def _device_entry(
         )
         if resolved:
             entry["source"] = resolved
-    if "right" in state.bindings:
-        resolved = resolve_output_peers(
-            [state.bindings["right"]],
-            wire_names=wire_names,
-            wire_endpoints=wire_endpoints,
-        )
-        if len(resolved) == 1:
-            entry["target"] = resolved[0]
     return entry

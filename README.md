@@ -25,7 +25,7 @@
 行为说明：
 
 - 仅带 **`drawclockType`** 的器件库图形参与连线逻辑与 JSON；文本框等其它图形**忽略**。
-- 同名 **wire** 多段图形在 JSON 中**合并**为一条（`source` 左端 + `targets` 右端列表）；左端至多一个，合并后仍须满足校验。
+- 同名 **wire** 多段图形**不进 JSON**；导出时折叠为下游器件的 **`source`**（图中左端至多一个上游）。
 - 记录字段见 [docs/clock-tree-json.md](docs/clock-tree-json.md)；导出规则见项目 design-notes skill。
 
 ## reload：刷新器件库样式

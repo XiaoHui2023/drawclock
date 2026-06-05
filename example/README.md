@@ -62,7 +62,6 @@ pytest tests\test_reload.py -q
 
 ## JSON 要点（本示例）
 
-- `xtal.targets`: `gate0`、`div0`（跨图 `bus_xtal` 折叠）
-- `pll_main.targets`: `["gate0", "div0"]`
-- `mux2.source`: `{"0": "pll_m2a", "1": "pll_m2b"}`
-- 无 `kind: "wire"` 条目
+- `gate0.source`、`div0.source` 均为 `pll_main`（跨图 wire 折叠后仍为器件名）
+- `mux2.source`: `{"0": "pll_m2a", "1": "pll_m2b"}`；`clk_mux.source` 为 `mux2`
+- 无 `target` / `targets`；无 `kind: "wire"` 条目

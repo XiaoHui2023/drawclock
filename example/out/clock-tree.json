@@ -16,68 +16,46 @@
   },
   "div0": {
     "kind": "div",
-    "source": "pll_main",
-    "target": "dto0"
+    "source": "pll_main"
   },
   "dto0": {
     "kind": "dto",
-    "source": "div0",
-    "target": "clk_b"
+    "source": "div0"
   },
   "gate0": {
     "kind": "gate",
-    "source": "pll_main",
-    "target": "inv0"
+    "source": "pll_main"
   },
   "inv0": {
     "kind": "inv",
-    "source": "gate0",
-    "target": "clk_a"
+    "source": "gate0"
   },
   "mux2": {
     "kind": "mux",
     "source": {
       "0": "pll_m2a",
       "1": "pll_m2b"
-    },
-    "target": "clk_mux"
+    }
   },
   "osc_mux": {
-    "kind": "source",
-    "targets": [
-      "pll_m2a",
-      "pll_m2b"
-    ]
+    "kind": "source"
   },
   "pll_m2a": {
     "kind": "pll",
-    "targets": [
-      "mux2"
-    ],
     "pll_kind": "sc",
     "source": "osc_mux"
   },
   "pll_m2b": {
     "kind": "pll",
-    "targets": [
-      "mux2"
-    ],
     "pll_kind": "sc",
     "source": "osc_mux"
   },
   "pll_main": {
     "kind": "pll",
-    "targets": [
-      "gate0",
-      "div0"
-    ],
     "pll_kind": "sc",
     "source": "xtal"
   },
   "xtal": {
-    "kind": "source",
-    "targets": [
-      "pll_main"
-    ]
+    "kind": "source"
   }
 }
