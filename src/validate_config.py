@@ -51,7 +51,7 @@ def validate_config(config: dict[str, dict[str, Any]]) -> None:
             if output_count is not None and (
                 not isinstance(output_count, int) or output_count <= 1
             ):
-                errors.append(f"器件 {name} 的 output_count 须为大于 1 的整数")
+                errors.append(f"器件 {name} 的 output_count 应为大于 1 的整数")
             continue
 
         if "freq" in item or kind in ("gate", "div", "dto", "inv", "clock"):

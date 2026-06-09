@@ -29,12 +29,12 @@ def _clock_freq_errors(name: str, freq: Any) -> list[str]:
     if isinstance(freq, (int, float)) and not isinstance(freq, bool):
         return []
     if not isinstance(freq, str):
-        return [f"器件 {name} 的 freq 须为字符串（数字，可选后缀 k/m/g）"]
+        return [f"器件 {name} 的 freq 应为字符串（数字，可选后缀 k/m/g）"]
     text = freq.strip()
     if not text:
         return []
     if not CLOCK_FREQ_RE.fullmatch(text):
         return [
-            f"器件 {name} 的 freq 格式无效：须为数字，可选后缀 k、m 或 g（大小写均可）"
+            f"器件 {name} 的 freq 格式无效：应为数字，可选后缀 k、m 或 g（大小写均可）"
         ]
     return []

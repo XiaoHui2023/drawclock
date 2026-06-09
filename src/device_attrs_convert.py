@@ -12,7 +12,7 @@ _FREQ_MULTIPLIER: dict[str, float] = {
 
 
 def clock_freq_to_number(freq: str) -> int | float:
-    """将 clock 的 freq 字符串转为赫兹数值（k→10³，m→10⁶，g→10⁹）。"""
+    """将 clock 的 freq 字符串转为 HZ 数值（k→10³，m→10⁶，g→10⁹）。"""
     text = freq.strip()
     match = CLOCK_FREQ_RE.fullmatch(text)
     if not match:
