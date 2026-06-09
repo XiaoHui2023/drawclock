@@ -2,34 +2,19 @@
 
 从左侧形状面板拖出器件，画时钟树示意图。只需导入 **`drawclock.xml`** 一个文件。
 
-改库或排查画布问题：Agent 见 **`.cursor/skills/drawclock-drawio-pitfalls/SKILL.md`**。
-
 ## 使用
 
-1. 在 VS Code / Cursor 安装 [Draw.io Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) 插件，在本仓库中打开任意 `.drawio` / `.drawio.svg` 文件。  
-2. 工作区已配置 `hediet.vscode-drawio.customLibraries`，**每次打开图表**都会从 `drawio-lib/drawclock.xml` 加载 **drawclock** 形状库（改库后重新打开该图即可看到新器件）。  
-3. 若在其它目录单独用 draw.io，仍须 **文件 → 导入** 选择 `drawclock.xml`。  
-4. 在左侧形状库的 **drawclock** 条目中，将器件拖到画布。  
-5. **双击**器件改属性；弹出框中 **Placeholders** 必须勾选，再点 **应用**。  
-6. 从器件**端口**（形状边缘连接点）拖线到其它器件端口。
-
-## 通用属性
-
-库中形状可自由拉宽拉高；**图案横纵随方框拉伸**（`overflow=fill` + 图案层 `100%×100%`、`preserveAspectRatio="none"`），端口与图形对齐。默认格已加宽（一般 **80px**、clock **160px**）以容纳较长实例名。
-
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
+1. 在 VS Code / Cursor 安装 **Draw.io Integration** 插件（`hediet.vscode-drawio`），在本仓库中打开任意 `.drawio` / `.drawio.svg` 文件。  
+2. **文件 → 导入**，选择 `drawclock.xml`。  
+3. 在左侧形状库的 **drawclock** 条目中，将器件拖到画布。  
+4. **双击**器件改属性；弹出框中 **Placeholders** 必须勾选，再点 **应用**。  
+5. 从器件**端口**拖线到其它器件端口。
 
 ## 器件
 
-库中形状名与下表 **库名** 一致。各器件在图形**下方**显示 **`name`** 实例名（默认与库名相同，留空不显示）。
-
 ### mux
 
-多路选择器
-
-![mux3 示意](images/mux3.svg)
+![mux3](images/mux3.svg)
 
 | 库名 | 输入路数 |
 | --- | --- |
@@ -39,125 +24,81 @@
 | mux5 | 5 |
 | mux6 | 6 |
 
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
-
-端口：左侧每路输入各一点，右侧一点输出；输入旁固定显示 0、1 …。
+| 属性 | 说明 |
+| --- | --- |
+| `name` | 实例名 |
 
 ### gate
 
-时钟门控单元
+![gate](images/gate.svg)
 
-![gate 示意](images/gate.svg)
-
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
-
-端口：左侧时钟入，右侧门控时钟出。
+| 属性 | 说明 |
+| --- | --- |
+| `name` | 实例名 |
 
 ### div
 
-时钟分频器
+![div](images/div.svg)
 
-![div 示意](images/div.svg)
-
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
-
-中心 **÷**、**DIV** 为固定小字号。
-
-端口：左侧入，右侧出。
+| 属性 | 说明 |
+| --- | --- |
+| `name` | 实例名 |
 
 ### dto
 
-占空比调整单元
+![dto](images/dto.svg)
 
-![dto 示意](images/dto.svg)
-
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
-
-中心 **DTO** 为固定约 7px。
-
-端口：左侧入，右侧出。
+| 属性 | 说明 |
+| --- | --- |
+| `name` | 实例名 |
 
 ### inv
 
-时钟反相器
+![inv](images/inv.svg)
 
-![inv 示意](images/inv.svg)
-
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
-
-端口：左侧入，右侧出。
+| 属性 | 说明 |
+| --- | --- |
+| `name` | 实例名 |
 
 ### source
 
-时钟源（晶振、外部参考时钟等）
+![source](images/source.svg)
 
-![source 示意](images/source.svg)
-
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
-
-图形为圆内正弦波，无库内固定中心文字。端口：**仅右侧**输出。
+| 属性 | 说明 |
+| --- | --- |
+| `name` | 实例名 |
 
 ### pll
 
-锁相环
+![pll](images/pll.svg)
 
-![pll 示意](images/pll.svg)
-
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `pll_kind` | 图形中央类型标签 | SC |
-| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
-
-端口：左侧输入、右侧输出。
+| 属性 | 说明 |
+| --- | --- |
+| `pll_kind` | PLL 类型 |
+| `name` | 实例名 |
 
 ### pll2
 
-两路独立输出的锁相环（外形同 pll）
+![pll2](images/pll2.svg)
 
-![pll2 示意](images/pll2.svg)
-
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `pll_kind` | 图形中央类型标签 | SC |
-| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
-
-端口：左侧输入；**右侧上下两个输出**（上为 0 号、下为 1 号）。导出 JSON 时 `kind` 仍为 `pll`，并带 `output_count: 2`；下游 `source` 写为 `名[0]` / `名[1]`。
+| 属性 | 说明 |
+| --- | --- |
+| `pll_kind` | PLL 类型 |
+| `name` | 实例名 |
 
 ### clock
 
-时钟终端
+![clock](images/clock.svg)
 
-![clock 示意](images/clock.svg)
-
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `name` | 图形下方实例名；留空不显示 | 与库名相同 |
-| `freq` | 右侧 **`(freq hz)`** 中频率部分；留空为 `(hz)` | （空） |
-
-波形与 `(freq hz)` 间距在库内固定 **60px**，无 `freq_gap` 属性。
-
-端口：**仅左侧**输入。
+| 属性 | 说明 |
+| --- | --- |
+| `name` | 实例名 |
+| `freq` | 频率 |
 
 ### wire
 
-时钟连线
+![wire](images/wire.svg)
 
-![wire 示意](images/wire.svg)
-
-| 属性 | 说明 | 默认 |
-| --- | --- | --- |
-| `name` | 波形下方实例名；留空不显示 | `wire` |
-
-端口：左、右各一点。
+| 属性 | 说明 |
+| --- | --- |
+| `name` | 实例名 |

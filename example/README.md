@@ -32,14 +32,12 @@ pytest tests\test_reload.py -q
 
 ## 输入图
 
-`scripts/build_example_demo.py` 生成的 `fig1.drawio` / `fig2.drawio` 使用 draw.io **压缩 diagram**（与 `.drawio.svg` 导出同类）；`reload` 产物同样保持压缩。
+`scripts/build_example_demo.py` 生成的 `fig1.drawio` / `fig2.drawio` 使用 draw.io **压缩 diagram**；`reload` 产物同样保持压缩。
 
 | 文件 | 内容 |
 | --- | --- |
 | `fig1.drawio` | **source** `xtal` 输出接到跨图 **wire** `bus_xtal`（右端悬空） |
 | `fig2.drawio` | 两条同名 `bus_xtal` **wire** 分别驱动 `gate0`、`div0`；**pll_main** 同时驱动 `gate0` 与 `div0`；`gate0→inv0→clk_a`、`div0→dto0→clk_b`；**mux2** 标签 `0`/`1` |
-
-**wire** 仅用于**跨图**同名接续；单图内器件直连。`clock-tree.json` 中**不出现** `wire`。
 
 ## pll_main 连线航点（手改参考）
 
@@ -50,18 +48,12 @@ pytest tests\test_reload.py -q
 | 25 | `(170,140)` → `(170,80)` → gate0 |
 | 26 | `(170,140)` → `(170,200)` → div0 |
 
-在 draw.io：**选中 pll_main→gate0 或 →div0**，可见 **2 个蓝色菱形** 与竖直汇流柱。Agent 规范：`~/.cursor/skills/drawio-edge-waypoints/SKILL.md`。
+在 draw.io：**选中 pll_main→gate0 或 →div0**，可见 **2 个蓝色菱形** 与竖直汇流柱。
 
 ## 输出
 
 | 文件 | 说明 |
 | --- | --- |
 | `example/out/clock-tree.json` | `src` 合并两图后的样例 |
-| `example/out/fig1-reloaded.drawio` | reload 刷新图 1（压缩 diagram） |
-| `example/out/fig2-reloaded.drawio` | reload 刷新图 2（压缩 diagram） |
-
-## JSON 要点（本示例）
-
-- `gate0.source`、`div0.source` 均为 `pll_main`（跨图 wire 折叠后仍为器件名）
-- `mux2.source`: `{"0": "pll_m2a", "1": "pll_m2b"}`；`clk_mux.source` 为 `mux2`
-- 无 `target` / `targets`；无 `kind: "wire"` 条目
+| `example/out/fig1-reloaded.drawio` | reload 刷新图 1 |
+| `example/out/fig2-reloaded.drawio` | reload 刷新图 2 |
