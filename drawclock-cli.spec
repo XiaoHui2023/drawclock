@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 """PyInstaller spec: drawclock CLI onefile (src/__main__.py).
 
-Build: ./tools/pack.sh  or  pack.bat (Windows).
+构建入口与平台差异见 tools/pack.sh、pack.bat 文件头注释。
 """
 from __future__ import annotations
 

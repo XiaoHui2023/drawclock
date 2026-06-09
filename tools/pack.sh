@@ -1,7 +1,29 @@
 #!/usr/bin/env bash
-# PyInstaller onefile for drawclock; Linux runs staticx after PyInstaller.
-# Usage (repo root): ./tools/pack.sh [all|src|reload]
-# Linux also needs patchelf (e.g. apt install patchelf).
+# 统一打包：仓库根 .venv，PyInstaller onefile；Linux 再 staticx 得自解压静态包。Windows 仅 PyInstaller。
+# 每次 pip 对项目与打包工具 --force-reinstall，避免 .venv 残留旧依赖。
+#
+# 用法（仓库根）：
+#   ./tools/pack.sh [all|src|reload]     Linux / macOS / Git Bash
+#   bash tools/pack.sh [all|src|reload]  同上
+# Windows 可在仓库根执行 pack.bat（一次构建全部，无 staticx）。
+#
+# 子命令与 dist/ 产物：
+#   all（默认）  drawclock、drawclock-reload（Windows 为 .exe），并生成发布压缩包
+#   src          drawclock / drawclock.exe
+#   reload       drawclock-reload / drawclock-reload.exe
+#
+# 发布压缩包（仅 all）：dist/drawclock-<version>-<platform>.zip（Windows）或 .tar.gz（其它）。
+# 内含可执行文件、README.md、json.md、drawio-lib/；不含 example/、tools/ 等；清单见 tools/bundle_release.py。
+#
+# Spec（仓库根）：drawclock-cli.spec → drawclock；drawclock-reload.spec → drawclock-reload。
+# 单文件内附带 drawio-lib/（含 drawclock.xml）；运行 CLI 须 -l / --library 指定器件库路径。
+#
+# 打包产物示例：
+#   dist/drawclock -i example/demo.drawio -l drawio-lib/drawclock.xml -o example/out/clock-tree.json
+#   dist/drawclock-reload -i example/fig1.drawio -l drawio-lib/drawclock.xml -o example/out/fig1-reloaded.drawio
+#
+# Linux staticx 另需系统 patchelf（如 sudo apt install patchelf）；macOS 跳过 staticx。
+# 兼容：单文件 ABI 取决于构建机 glibc；旧 Linux 须在目标机实测 staticx 产物。
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -67,7 +89,7 @@ apply_staticx_linux() {
     echo "错误: Linux 下 staticx 需要系统命令 patchelf（例如: sudo apt install patchelf）。" >&2
     exit 1
   fi
-  "${PYTHON_CMD[@]}" -m pip install -q staticx
+  "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall staticx
   local staticx="$ROOT/.venv/bin/staticx"
   if [[ ! -x "$staticx" ]]; then
     echo "错误: 未找到可执行的 .venv/bin/staticx。" >&2
@@ -111,8 +133,9 @@ build_target() {
 ensure_venv
 
 "${PYTHON_CMD[@]}" -m pip install -q -U pip setuptools wheel
-"${PYTHON_CMD[@]}" -m pip install -q -e ".[dev]" 2>/dev/null || "${PYTHON_CMD[@]}" -m pip install -q -e .
-"${PYTHON_CMD[@]}" -m pip install -q "pyinstaller>=6.0"
+"${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall -e ".[dev]" 2>/dev/null \
+  || "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall -e .
+"${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall "pyinstaller>=6.0"
 
 rm -rf "$ROOT/build" "$ROOT/dist"
 
@@ -121,6 +144,8 @@ case "$TARGET" in
     build_target src
     rm -rf "$ROOT/build"
     build_target reload
+    echo "==> 组装发布压缩包"
+    "${PYTHON_CMD[@]}" "$ROOT/tools/bundle_release.py"
     ;;
   src|reload)
     build_target "$TARGET"
