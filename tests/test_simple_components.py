@@ -18,6 +18,7 @@ if str(SCRIPTS) not in sys.path:
     [
         ("gate", 2),
         ("div", 2),
+        ("cell", 2),
         ("dto", 2),
         ("inv", 2),
         ("pll", 2),
@@ -107,6 +108,21 @@ def test_source_no_center_src_label() -> None:
     html = source.label_html()
     assert ">SRC</span>" not in html
     assert ">SRC<" not in html
+
+
+def test_inv_has_output_bubble() -> None:
+    inv = importlib.import_module("drawio_lib.components.inv")
+    html = inv.label_html()
+    assert "<circle " in html
+    assert 'fill="#ffffff"' in html
+
+
+def test_cell_is_single_light_gray_triangle() -> None:
+    cell = importlib.import_module("drawio_lib.components.cell")
+    html = cell.label_html()
+    assert "<polygon " in html
+    assert 'fill="#f2f2f2"' in html
+    assert "<circle " not in html
 
 
 def test_pll_center_label_on_graphic() -> None:

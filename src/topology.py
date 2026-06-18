@@ -234,7 +234,7 @@ def validate_topology(
             ):
                 errors.append(f"器件 {state.name} 的输出端口未连接")
             extra = extra | (set(state.bindings) - required)
-        elif state.kind in ("gate", "div", "dto", "inv") or MUX_KIND_RE.match(state.kind):
+        elif state.kind in ("gate", "div", "cell", "dto", "inv") or MUX_KIND_RE.match(state.kind):
             if missing:
                 errors.append(f"器件 {state.name} 未连接的端口: {', '.join(sorted(missing))}")
             if not state.out_targets and not _output_blocked_by_open_wire(

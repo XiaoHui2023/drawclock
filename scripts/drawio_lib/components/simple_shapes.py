@@ -76,6 +76,24 @@ def div_body(g: geom.SimpleGeometry) -> str:
     )
 
 
+CELL_FILL = "#f2f2f2"
+CELL_TRI_LEFT_X = 8
+CELL_TRI_TIP_X = 30
+CELL_TRI_HALF_H = 15
+
+
+def cell_body(g: geom.SimpleGeometry) -> str:
+    """Single light-gray triangle cell."""
+    cy = _mid(g)
+    left = _dx(g, CELL_TRI_LEFT_X)
+    tip = _dx(g, CELL_TRI_TIP_X)
+    return (
+        f'<polygon points="{left},{cy - CELL_TRI_HALF_H} {tip},{cy} '
+        f'{left},{cy + CELL_TRI_HALF_H}" fill="{CELL_FILL}" '
+        f'stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="round"/>'
+    )
+
+
 DTO_LABEL_Y_OFFSET = 16
 DTO_CENTER_FONT_PX = 7
 DTO_LABEL_FONT_PX = DTO_CENTER_FONT_PX
@@ -97,16 +115,21 @@ def dto_body(g: geom.SimpleGeometry) -> str:
 
 INV_PORT_LEFT_X = 8
 INV_TIP_X = 28
+INV_BUBBLE_R = 3
+INV_BUBBLE_CX = INV_TIP_X + INV_BUBBLE_R
+INV_RIGHT_PORT_X = INV_BUBBLE_CX + INV_BUBBLE_R
 
 
 def inv_body(g: geom.SimpleGeometry) -> str:
     mid = _mid(g)
     left = _dx(g, INV_PORT_LEFT_X)
     tip = _dx(g, INV_TIP_X)
+    bubble = _dx(g, INV_BUBBLE_CX)
     return (
         f'<polygon points="{left},{mid} {left},13 '
         f'{tip},{mid} {left},47" fill="{FILL}" '
         f'stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="round"/>'
+        f'{_inversion_bubble(bubble, mid, INV_BUBBLE_R)}'
     )
 
 

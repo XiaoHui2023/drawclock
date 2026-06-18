@@ -54,7 +54,7 @@ def validate_config(config: dict[str, dict[str, Any]]) -> None:
                 errors.append(f"器件 {name} 的 output_count 应为大于 1 的整数")
             continue
 
-        if "freq" in item or kind in ("gate", "div", "dto", "inv", "clock"):
+        if "freq" in item or kind in ("gate", "div", "cell", "dto", "inv", "clock"):
             if not item.get("source"):
                 errors.append(f"器件 {name} 的输入端口未连接")
 

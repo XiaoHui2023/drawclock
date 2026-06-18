@@ -1,8 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-"""PyInstaller spec: drawclock CLI onefile (src/__main__.py).
-
-构建入口与平台差异见 tools/pack.sh、pack.bat 文件头注释。
-"""
+"""PyInstaller spec: drawclock onefile."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -22,13 +19,15 @@ def _repo_root_from_spec() -> Path:
         pass
     for seed in seeds:
         for base in [seed, *seed.parents]:
-            if (base / "pyproject.toml").is_file() and (base / "src" / "__main__.py").is_file():
+            if (base / "pyproject.toml").is_file() and (
+                base / "src" / "drawclock.py"
+            ).is_file():
                 return base
     return spec.parent
 
 
 repo_root = _repo_root_from_spec()
-entry = repo_root / "src" / "__main__.py"
+entry = repo_root / "src" / "drawclock.py"
 lib_dir = repo_root / "drawio-lib"
 
 datas = []
@@ -36,6 +35,10 @@ if lib_dir.is_dir():
     datas.append((str(lib_dir), "drawio-lib"))
 
 hiddenimports = [
+    "migrate",
+    "drawio_layout",
+    "drawio_build",
+    "layout_validate",
     "pipeline",
     "drawio_decode",
     "drawio_graph",

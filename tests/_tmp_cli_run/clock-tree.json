@@ -1,0 +1,19 @@
+{
+  "clk0": {
+    "kind": "clock",
+    "freq": 100,
+    "source": "gate0"
+  },
+  "gate0": {
+    "kind": "gate",
+    "source": "pll0"
+  },
+  "pll0": {
+    "kind": "pll",
+    "pll_kind": "sc",
+    "source": "xtal0"
+  },
+  "xtal0": {
+    "kind": "source"
+  }
+}

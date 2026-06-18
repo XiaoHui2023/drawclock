@@ -4,6 +4,7 @@ import json
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
+from xml.sax.saxutils import quoteattr
 
 import pytest
 
@@ -18,6 +19,7 @@ from drawio_library import (  # noqa: E402
     load_library_cell_styles,
     load_library_shapes,
 )
+from drawio_ports import port_anchors  # noqa: E402
 from pipeline import parse_drawio_paths  # noqa: E402
 
 
@@ -82,6 +84,82 @@ def test_gate_right_port_fanout() -> None:
     assert config["clk_a"]["source"] == "gate0"
     assert config["clk_b"]["source"] == "gate0"
     assert "target" not in config["gate0"]
+
+
+def _attr(name: str, value: str) -> str:
+    return f"{name}={quoteattr(value)}"
+
+
+def _library_object(
+    cell_id: int,
+    name: str,
+    shape,
+    *,
+    extra: dict[str, str] | None = None,
+) -> str:
+    attrs = {"id": str(cell_id), "name": name, "label": "", "placeholders": "0"}
+    if extra:
+        attrs.update(extra)
+    attr_s = " ".join(_attr(key, value) for key, value in attrs.items())
+    return (
+        f"<object {attr_s}>"
+        f"<mxCell style={quoteattr(shape.style)} vertex=\"1\" parent=\"1\">"
+        f"<mxGeometry x=\"{cell_id * 120}\" y=\"40\" width=\"{shape.w}\" "
+        f"height=\"{shape.h}\" as=\"geometry\"/>"
+        f"</mxCell>"
+        f"</object>"
+    )
+
+
+def _edge(
+    cell_id: int,
+    source_id: int,
+    target_id: int,
+    source_shape,
+    source_kind: str,
+    source_port: str,
+    target_shape,
+    target_kind: str,
+    target_port: str,
+) -> str:
+    sx, sy = port_anchors(source_shape.style, source_kind)[source_port]
+    tx, ty = port_anchors(target_shape.style, target_kind)[target_port]
+    style = (
+        "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;"
+        f"exitX={sx};exitY={sy};entryX={tx};entryY={ty};"
+        "exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;"
+    )
+    return (
+        f"<mxCell id=\"{cell_id}\" style={quoteattr(style)} edge=\"1\" parent=\"1\" "
+        f"source=\"{source_id}\" target=\"{target_id}\">"
+        "<mxGeometry relative=\"1\" as=\"geometry\"/>"
+        "</mxCell>"
+    )
+
+
+def test_cell_drawio_exports_as_single_input_device(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    cell = shapes["cell"]
+    clock = shapes["clock"]
+    model = (
+        "<mxGraphModel><root>"
+        "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
+        f"{_library_object(10, 'src0', source)}"
+        f"{_library_object(11, 'cell0', cell)}"
+        f"{_library_object(12, 'clk0', clock, extra={'freq': '25M'})}"
+        f"{_edge(20, 10, 11, source, 'source', 'right', cell, 'cell', 'left')}"
+        f"{_edge(21, 11, 12, cell, 'cell', 'right', clock, 'clock', 'left')}"
+        "</root></mxGraphModel>"
+    )
+    path = tmp_path / "cell-tree.drawio"
+    path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
+
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    assert config["cell0"] == {"kind": "cell", "source": "src0"}
+    assert config["clk0"]["source"] == "cell0"
+    assert config["clk0"]["freq"] == 25_000_000
 
 
 def test_pll2_dual_output_source_suffix() -> None:
@@ -153,9 +231,6 @@ def test_example_two_figs_cross_wire_no_wire_in_json() -> None:
 
 
 def test_reload_restores_drawable_html_style(tmp_path: Path) -> None:
-    reload_dir = ROOT / "reload"
-    if str(reload_dir) not in sys.path:
-        sys.path.insert(0, str(reload_dir))
     from migrate import reload_drawio_file  # noqa: E402
 
     fixture = ROOT / "tests" / "fixtures" / "mini-tree.drawio"

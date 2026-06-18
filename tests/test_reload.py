@@ -10,10 +10,8 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
-RELOAD = ROOT / "reload"
-for path in (SRC, RELOAD):
-    if str(path) not in sys.path:
-        sys.path.insert(0, str(path))
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
 from drawio_decode import decompress_diagram_payload  # noqa: E402
 from drawio_library import bake_label_placeholders, load_library_shapes  # noqa: E402

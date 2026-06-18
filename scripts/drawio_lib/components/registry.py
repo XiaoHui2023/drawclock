@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from drawio_lib.components import (
+    cell,
     clock,
     source,
     div,
@@ -50,6 +51,7 @@ ALL: tuple[ComponentSpec, ...] = (
     ComponentSpec(mux6),
     ComponentSpec(gate),
     ComponentSpec(div),
+    ComponentSpec(cell),
     ComponentSpec(dto),
     ComponentSpec(inv),
     ComponentSpec(pll),

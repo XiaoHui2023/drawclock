@@ -10,13 +10,20 @@ import tomllib
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
-BINARY_NAMES = ("drawclock", "drawclock-reload")
+BINARY_NAMES = ("drawclock",)
 
 # 运行期随包资源与用户专档；不含 example/、tools/ 等开发/打包目录。
 RELEASE_PATHS = (
     "README.md",
     "json.md",
+    "pyproject.toml",
+    "rule.md",
     "drawio-lib",
+)
+
+SOURCE_DIR = "source"
+SOURCE_PATHS = (
+    ("src", "."),
 )
 
 
@@ -62,6 +69,22 @@ def main() -> int:
         dest = bundle_dir / rel
         if src.is_dir():
             shutil.copytree(src, dest)
+        else:
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dest)
+
+    for rel, dest_rel in SOURCE_PATHS:
+        src = ROOT / rel
+        if not src.exists():
+            print(f"错误: 未找到 {src}", file=sys.stderr)
+            return 1
+        dest = bundle_dir / SOURCE_DIR if dest_rel == "." else bundle_dir / SOURCE_DIR / dest_rel
+        if src.is_dir():
+            shutil.copytree(
+                src,
+                dest,
+                ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo"),
+            )
         else:
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dest)

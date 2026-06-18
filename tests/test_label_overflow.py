@@ -24,6 +24,7 @@ from drawio_lib.components.label_overflow import (
     [
         "gate",
         "div",
+        "cell",
         "dto",
         "inv",
         "pll",

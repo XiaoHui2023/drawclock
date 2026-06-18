@@ -44,6 +44,14 @@
 | --- | --- |
 | `name` | 实例名 |
 
+### cell
+
+![cell](images/cell.svg)
+
+| 属性 | 说明 |
+| --- | --- |
+| `name` | 实例名 |
+
 ### dto
 
 ![dto](images/dto.svg)
