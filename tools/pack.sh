@@ -73,7 +73,13 @@ if [[ -f "$ROOT/dist/drawclock.exe" ]]; then
   echo "done: $ROOT/dist/drawclock.exe"
 elif [[ -f "$ROOT/dist/drawclock" ]]; then
   case "$(uname -s 2>/dev/null || true)" in
-    Linux) apply_staticx_linux ;;
+    Linux)
+      if [[ "${PACK_LINUX_SKIP_STATICX:-}" == "1" ]]; then
+        echo "done: $ROOT/dist/drawclock (PACK_LINUX_SKIP_STATICX=1)"
+      else
+        apply_staticx_linux
+      fi
+      ;;
     *) echo "done: $ROOT/dist/drawclock" ;;
   esac
 else

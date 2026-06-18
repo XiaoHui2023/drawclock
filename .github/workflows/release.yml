@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-linux-ubuntu16:
+    name: Linux (Ubuntu 16.04, PyInstaller)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pack in Ubuntu 16.04
+        run: docker run --rm -v "$GITHUB_WORKSPACE:/work" -w /work ubuntu:16.04 bash tools/ci_pack_ubuntu16.sh
+
+      - name: Fix dist permissions
+        run: sudo chown -R "$(id -u):$(id -g)" dist
+
+      - name: Run frozen example
+        run: python3 tools/run_frozen_example.py dist/drawclock
+
+      - name: Upload Linux release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-release
+          path: |
+            dist/drawclock
+            dist/drawclock-*-linux.tar.gz
+          if-no-files-found: error
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: build-linux-ubuntu16
+    if: always() && needs.build-linux-ubuntu16.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: version
+        shell: python
+        run: |
+          import os
+          import pathlib
+          import re
+
+          text = pathlib.Path("pyproject.toml").read_text(encoding="utf-8")
+          match = re.search(r'(?m)^version\s*=\s*["\']([^"\']+)["\']', text)
+          if not match:
+              raise SystemExit("missing project version in pyproject.toml")
+          version = match.group(1)
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"version={version}\n")
+              output.write(f"tag=v{version}\n")
+
+      - name: Download release artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-release
+          path: release-assets
+
+      - name: Delete stale rolling release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release delete "${{ steps.version.outputs.tag }}" --yes || true
+
+      - name: Move rolling tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -fa "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}" --force
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          body: |
+            Rolling release: Ubuntu 16.04 PyInstaller build from the main commit that triggered this workflow.
+            The build job runs run + reload on example fig1/fig2 through dist/drawclock before publishing.
+          files: release-assets/**
+          fail_on_unmatched_files: true
+          generate_release_notes: false
