@@ -13,8 +13,8 @@ build/
 
 # 测试与本地临时输出
 tests/_tmp_cli/
+tests/_tmp_cli_run/
 tests/_tmp_roundtrip/
-tests/_tmp_cli/
 tests/_tmp_cli_src/
 example/out/roundtrip/
 example/out/restored.drawio
