@@ -5,10 +5,16 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from drawio_decode import extract_mxfile_xml, iter_diagram_models  # noqa: E402
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 FIG1 = ROOT / "example" / "fig1.drawio"
 FIG2 = ROOT / "example" / "fig2.drawio"
@@ -87,10 +93,17 @@ def _assert_reloaded(path: Path) -> None:
     if "<mxGraphModel" in text:
         print(f"reload output must stay compressed: {path}", file=sys.stderr)
         raise SystemExit(1)
+    model_xml = ET.tostring(
+        iter_diagram_models(extract_mxfile_xml(str(path)))[0],
+        encoding="unicode",
+    )
     for needle in ('label="', "exitPerimeter=0", "drawclockType="):
-        if needle not in text:
+        if needle not in model_xml:
             print(f"reload output missing {needle!r}: {path}", file=sys.stderr)
             raise SystemExit(1)
+    if "&lt;svg" not in model_xml and "<svg" not in model_xml:
+        print(f"reload output missing embedded svg labels: {path}", file=sys.stderr)
+        raise SystemExit(1)
 
 
 def main() -> int:
