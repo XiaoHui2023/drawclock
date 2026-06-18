@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 
+from device_model import DUAL_INPUT_GATE_KINDS, device_output_count
 from drawio_graph import _parse_points
 
 MUX_KIND_RE = re.compile(r"^mux([2-6])$")
@@ -46,12 +47,20 @@ def port_anchors(style: str, drawclock_type: str) -> dict[str, tuple[float, floa
             return {"right": (1.0, 0.5)}
         if drawclock_type == "pll":
             return {"left": (0.0, 0.5), "right": (1.0, 0.5)}
-        if drawclock_type == "pll2":
-            return {
-                "left": (0.0, 0.5),
-                "out0": (1.0, 1 / 3),
-                "out1": (1.0, 2 / 3),
-            }
+    if drawclock_type == "pll2":
+        return {
+            "left": (0.0, 0.5),
+            "out0": (1.0, 1 / 3),
+            "out1": (1.0, 2 / 3),
+        }
+    count = device_output_count(drawclock_type)
+    if count > 0:
+        return {
+            "left": (0.0, 0.5),
+            **{f"out{i}": (1.0, (i + 1) / (count + 1)) for i in range(count)},
+        }
+    if drawclock_type in DUAL_INPUT_GATE_KINDS:
+        return {"in0": (0.0, 1 / 3), "in1": (0.0, 2 / 3), "right": (1.0, 0.5)}
         if drawclock_type == "clock":
             return {"left": (0.0, 0.5)}
         return {"left": (0.0, 0.5), "right": (1.0, 0.5)}
@@ -76,6 +85,18 @@ def port_anchors(style: str, drawclock_type: str) -> dict[str, tuple[float, floa
             "left": (pts[0][0], pts[0][1]),
             "out0": (pts[1][0], pts[1][1]),
             "out1": (pts[2][0], pts[2][1]),
+        }
+    count = device_output_count(drawclock_type)
+    if count > 0:
+        anchors = {"left": (pts[0][0], pts[0][1])}
+        for index in range(count):
+            anchors[f"out{index}"] = (pts[index + 1][0], pts[index + 1][1])
+        return anchors
+    if drawclock_type in DUAL_INPUT_GATE_KINDS:
+        return {
+            "in0": (pts[0][0], pts[0][1]),
+            "in1": (pts[1][0], pts[1][1]),
+            "right": (pts[2][0], pts[2][1]),
         }
     if drawclock_type == "clock":
         return {"left": (pts[0][0], pts[0][1])}

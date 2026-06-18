@@ -3,8 +3,10 @@ from __future__ import annotations
 from typing import Any
 
 from device_attrs_validate import collect_device_attr_errors
+from device_model import DUAL_INPUT_GATE_KINDS, THROUGH_DEVICE_KINDS
 from wire_resolve import parse_source_ref
 
+_SOURCE_REQUIRED_KINDS = THROUGH_DEVICE_KINDS | DUAL_INPUT_GATE_KINDS | frozenset({"clock"})
 
 def validate_config(config: dict[str, dict[str, Any]]) -> None:
     errors: list[str] = []
@@ -28,10 +30,12 @@ def validate_config(config: dict[str, dict[str, Any]]) -> None:
                 continue
             if index is not None:
                 upstream = config[base]
-                if upstream.get("kind") != "pll":
-                    errors.append(f"器件 {name} 的 source {peer} 指向非 pll 器件 {base}")
-                    continue
                 output_count = upstream.get("output_count", 1)
+                if output_count <= 1:
+                    errors.append(
+                        f"器件 {name} 的 source {peer} 指向无多路输出的器件 {base}"
+                    )
+                    continue
                 if index >= output_count:
                     errors.append(
                         f"器件 {name} 的 source {peer} 超出 {base} 的 output_count={output_count}"
@@ -54,7 +58,15 @@ def validate_config(config: dict[str, dict[str, Any]]) -> None:
                 errors.append(f"器件 {name} 的 output_count 应为大于 1 的整数")
             continue
 
-        if "freq" in item or kind in ("gate", "div", "cell", "dto", "inv", "clock"):
+        output_count = item.get("output_count")
+        if output_count is not None:
+            if not item.get("source"):
+                errors.append(f"器件 {name} 的输入端口未连接")
+            if not isinstance(output_count, int) or output_count <= 1:
+                errors.append(f"器件 {name} 的 output_count 应为大于 1 的整数")
+            continue
+
+        if "freq" in item or item.get("kind") in _SOURCE_REQUIRED_KINDS:
             if not item.get("source"):
                 errors.append(f"器件 {name} 的输入端口未连接")
 

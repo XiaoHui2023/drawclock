@@ -160,4 +160,7 @@ def _device_entry(
         )
         if resolved:
             entry["source"] = resolved
+    count = device_output_count(state.kind)
+    if count > 1 and state.kind not in PLL_EXPORT_KINDS:
+        entry["output_count"] = count
     return entry

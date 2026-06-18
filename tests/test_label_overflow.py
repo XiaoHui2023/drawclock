@@ -24,9 +24,11 @@ from drawio_lib.components.label_overflow import (
     [
         "gate",
         "div",
-        "cell",
+        "div_n",
         "dto",
+        "dto_n",
         "inv",
+        "occ_clk_cell",
         "pll",
         "clock",
         "wire",

@@ -3,8 +3,11 @@ from __future__ import annotations
 from drawio_graph import GraphCell, ParsedDiagram, edge_attachment
 from device_model import (
     DeviceState,
+    DUAL_INPUT_GATE_KINDS,
     MUX_KIND_RE,
+    THROUGH_DEVICE_KINDS,
     device_output_count,
+    is_multi_output_kind,
     out_port_index,
 )
 from wire_resolve import WireEndpoints, build_wire_endpoints
@@ -180,10 +183,14 @@ def port_key_for_index(cell: GraphCell, index: int) -> str:
         if index == 0:
             return "left"
         return "right"
-    if kind == "pll2":
+    if kind == "pll2" or device_output_count(kind) > 0:
         if index == 0:
             return "left"
         return f"out{index - 1}"
+    if kind in DUAL_INPUT_GATE_KINDS:
+        if index < 2:
+            return f"in{index}"
+        return "right"
     if kind == "source":
         return "right"
     if index == 0:
@@ -219,24 +226,32 @@ def validate_topology(
             ):
                 errors.append(f"器件 {state.name} 的输出端口未连接")
             extra = extra | (set(state.bindings) - required)
-        elif state.kind == "pll2":
+        elif is_multi_output_kind(state.kind):
             if "left" not in state.bindings:
                 errors.append(f"器件 {state.name} 的输入端口未连接")
-            for port in (f"out{i}" for i in range(device_output_count("pll2"))):
+            for port in (f"out{i}" for i in range(device_output_count(state.kind))):
                 if not state.out_bindings.get(port) and not _output_blocked_by_open_wire(
                     state, wire_names, wire_endpoints
                 ):
                     errors.append(f"器件 {state.name} 的输出端口 {port} 未连接")
             extra = extra | (set(state.bindings) - required)
-        elif state.kind == "source":
+        elif state.kind in THROUGH_DEVICE_KINDS or MUX_KIND_RE.match(state.kind):
+            if missing:
+                errors.append(f"器件 {state.name} 未连接的端口: {', '.join(sorted(missing))}")
             if not state.out_targets and not _output_blocked_by_open_wire(
                 state, wire_names, wire_endpoints
             ):
                 errors.append(f"器件 {state.name} 的输出端口未连接")
             extra = extra | (set(state.bindings) - required)
-        elif state.kind in ("gate", "div", "cell", "dto", "inv") or MUX_KIND_RE.match(state.kind):
+        elif state.kind in DUAL_INPUT_GATE_KINDS:
             if missing:
                 errors.append(f"器件 {state.name} 未连接的端口: {', '.join(sorted(missing))}")
+            if not state.out_targets and not _output_blocked_by_open_wire(
+                state, wire_names, wire_endpoints
+            ):
+                errors.append(f"器件 {state.name} 的输出端口未连接")
+            extra = extra | (set(state.bindings) - required)
+        elif state.kind == "source":
             if not state.out_targets and not _output_blocked_by_open_wire(
                 state, wire_names, wire_endpoints
             ):
@@ -331,8 +346,10 @@ def _required_ports(kind: str) -> set[str]:
         return {"left"}
     if kind == "pll":
         return {"left"}
-    if kind == "pll2":
+    if kind == "pll2" or device_output_count(kind) > 0:
         return {"left"}
+    if kind in DUAL_INPUT_GATE_KINDS:
+        return {"in0", "in1"}
     if kind == "source":
         return set()
     if kind == "wire":

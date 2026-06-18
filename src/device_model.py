@@ -6,13 +6,35 @@ from dataclasses import dataclass, field
 MUX_KIND_RE = re.compile(r"^mux([2-6])$")
 PLL_EXPORT_KINDS = frozenset({"pll", "pll2"})
 
+MULTI_OUTPUT_COUNTS: dict[str, int] = {
+    "pll2": 2,
+    "div_gate": 3,
+    "clk_phase_sel": 3,
+    "inv_mux": 2,
+}
+
+DUAL_INPUT_GATE_KINDS = frozenset({"and", "nand", "or", "nor", "xor", "xnor"})
+
+THROUGH_DEVICE_KINDS = frozenset(
+    {
+        "gate",
+        "div",
+        "div_n",
+        "dto",
+        "dto_n",
+        "inv",
+        "async",
+        "occ_clk_cell",
+        "gen_cell",
+        "bist_clk_cell",
+        "occ_bist_clk_cell",
+        "buffer",
+    }
+)
+
 
 def device_output_count(kind: str) -> int:
-    if kind == "pll2":
-        return 2
-    if kind == "pll":
-        return 1
-    return 0
+    return MULTI_OUTPUT_COUNTS.get(kind, 0)
 
 
 def is_multi_output_kind(kind: str) -> bool:

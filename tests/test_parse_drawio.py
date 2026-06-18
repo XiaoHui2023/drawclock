@@ -137,27 +137,27 @@ def _edge(
     )
 
 
-def test_cell_drawio_exports_as_single_input_device(tmp_path: Path) -> None:
+def test_occ_clk_cell_drawio_exports_as_single_input_device(tmp_path: Path) -> None:
     shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
     source = shapes["source"]
-    cell = shapes["cell"]
+    occ_cell = shapes["occ_clk_cell"]
     clock = shapes["clock"]
     model = (
         "<mxGraphModel><root>"
         "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
         f"{_library_object(10, 'src0', source)}"
-        f"{_library_object(11, 'cell0', cell)}"
+        f"{_library_object(11, 'cell0', occ_cell)}"
         f"{_library_object(12, 'clk0', clock, extra={'freq': '25M'})}"
-        f"{_edge(20, 10, 11, source, 'source', 'right', cell, 'cell', 'left')}"
-        f"{_edge(21, 11, 12, cell, 'cell', 'right', clock, 'clock', 'left')}"
+        f"{_edge(20, 10, 11, source, 'source', 'right', occ_cell, 'occ_clk_cell', 'left')}"
+        f"{_edge(21, 11, 12, occ_cell, 'occ_clk_cell', 'right', clock, 'clock', 'left')}"
         "</root></mxGraphModel>"
     )
-    path = tmp_path / "cell-tree.drawio"
+    path = tmp_path / "occ-cell-tree.drawio"
     path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
 
     config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
 
-    assert config["cell0"] == {"kind": "cell", "source": "src0"}
+    assert config["cell0"] == {"kind": "occ_clk_cell", "source": "src0"}
     assert config["clk0"]["source"] == "cell0"
     assert config["clk0"]["freq"] == 25_000_000
 
