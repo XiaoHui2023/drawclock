@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 from dataclasses import dataclass
 
 from drawio_lib.components import (
@@ -31,10 +32,11 @@ from drawio_lib.components import (
     pll,
     pll2,
     source,
-    wire,
     xnor,
     xor_gate,
 )
+
+from_shape = importlib.import_module("drawio_lib.components.from")
 
 
 @dataclass(frozen=True)
@@ -90,5 +92,5 @@ ALL: tuple[ComponentSpec, ...] = (
     ComponentSpec(pll2),
     ComponentSpec(source),
     ComponentSpec(clock),
-    ComponentSpec(wire),
+    ComponentSpec(from_shape),
 )

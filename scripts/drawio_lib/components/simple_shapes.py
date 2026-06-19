@@ -3,7 +3,6 @@ from __future__ import annotations
 import math
 
 from drawio_lib.components import simple_geometry as geom
-from drawio_lib.components.label_attrs import CLOCK_FREQ_GAP_PX, CLOCK_FREQ_TEXT_RESERVE_PX
 
 STROKE = "#000000"
 FILL = "none"
@@ -704,10 +703,12 @@ CLOCK_WAVE_PERIODS = 4
 CLOCK_WAVE_AMP = 6
 CLOCK_SW = 1.5
 CLOCK_BODY_MARGIN_X = 2
+CLOCK_LEAD_EXT = 5
 CLOCK_GRAPHIC_W = geom.DESIGN_W
-CLOCK_RIGHT_PAD = CLOCK_FREQ_GAP_PX + CLOCK_FREQ_TEXT_RESERVE_PX
-CLOCK_LEFT_PAD = 80
-CLOCK_CELL_W = CLOCK_LEFT_PAD + CLOCK_GRAPHIC_W + CLOCK_RIGHT_PAD
+# 与标准格 W=120 对齐：左右留白供长实例名，中间为引线 + 方波
+CLOCK_NAME_SIDE_PAD = (geom.W - CLOCK_LEAD_EXT - CLOCK_GRAPHIC_W) // 2
+CLOCK_CELL_W = geom.W
+CLOCK_LEFT_PAD = CLOCK_NAME_SIDE_PAD + CLOCK_LEAD_EXT
 CLOCK_WAVE_W = CLOCK_GRAPHIC_W - 2 * CLOCK_BODY_MARGIN_X
 
 
@@ -718,7 +719,7 @@ def _clock_wave_pitch_bar(wave_w: int) -> tuple[int, int]:
 
 
 def clock_body(g: geom.SimpleGeometry) -> str:
-    """Clock terminal: 50% duty square wave only (text rendered outside this SVG)."""
+    """Clock terminal: square wave with left input lead on the wave bottom rail."""
     mid = g.body_mid_y
     rect = g.body
     wave_w = rect.w
@@ -726,14 +727,16 @@ def clock_body(g: geom.SimpleGeometry) -> str:
     amp = CLOCK_WAVE_AMP
     y_hi = mid - amp
     y_lo = mid + amp
-    x0 = rect.x
-    x = x0
-    segments = [f"M {x} {y_lo}"]
+    wave_left = rect.x
+    wave_right = rect.x + wave_w
+    lead_x = CLOCK_NAME_SIDE_PAD
+    segments = [f"M {lead_x} {y_lo} L {wave_left} {y_lo}", f"M {wave_right} {y_lo}"]
+    x = wave_right
     for _ in range(CLOCK_WAVE_PERIODS):
         segments.append(
-            f"L {x} {y_hi} L {x + bar} {y_hi} L {x + bar} {y_lo} L {x + pitch} {y_lo}"
+            f"L {x} {y_hi} L {x - bar} {y_hi} L {x - bar} {y_lo} L {x - pitch} {y_lo}"
         )
-        x += pitch
+        x -= pitch
     path = " ".join(segments)
     return (
         f'<path d="{path}" fill="{FILL}" stroke="{STROKE}" stroke-width="{CLOCK_SW}" '

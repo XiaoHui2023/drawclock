@@ -1,35 +1,30 @@
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
 
-from drawio_library import (  # noqa: E402
+from drawio_library import (
     bake_label_placeholders,
     load_library_shapes,
     reload_object_attrs,
 )
-from drawio_ports import edge_port_style, finalize_edge_style, port_anchors  # noqa: E402
+from drawio_ports import edge_port_style, finalize_edge_style, port_anchors
 
 
-def test_bake_label_replaces_name_and_freq() -> None:
+def test_bake_label_replaces_name() -> None:
     baked = bake_label_placeholders(
-        "<div>%name%</div><span>(%freq%hz)</span>",
-        {"name": "clk0", "freq": "100"},
+        "<div>%name%</div>",
+        {"name": "clk0"},
     )
     assert "clk0" in baked
-    assert "(100hz)" in baked
     assert "%" not in baked
 
 
-def test_reload_object_attrs_adds_pll_kind_default_for_legacy_pll() -> None:
+def test_reload_object_attrs_keeps_stored_fields_only() -> None:
     lib = ROOT / "drawio-lib" / "drawclock.xml"
     out = reload_object_attrs("pll", {"name": "pll0"}, library_path=lib)
-    assert out["pll_kind"] == "SC"
+    assert "pll_kind" not in out
     assert "%pll_kind%" in out["label"]
     kept = reload_object_attrs(
         "pll",
@@ -52,11 +47,12 @@ def test_bake_label_replaces_pll_kind_with_default() -> None:
 def test_edge_port_style_uses_library_points() -> None:
     shapes = load_library_shapes(ROOT / "drawio-lib" / "drawclock.xml")
     pll = shapes["pll"]
-    wire = shapes["wire"]
-    style = edge_port_style(pll.style, "pll", wire.style, "wire")
-    right = port_anchors(pll.style, "pll")["right"]
+    from_shape = shapes["from"]
+    gate = shapes["gate"]
+    style = edge_port_style(from_shape.style, "from", gate.style, "gate")
+    right = port_anchors(from_shape.style, "from")["right"]
     assert f"exitX={right[0]}" in style.replace(" ", "")
-    left = port_anchors(wire.style, "wire")["left"]
+    left = port_anchors(gate.style, "gate")["left"]
     assert f"entryX={left[0]}" in style.replace(" ", "")
     assert "exitPerimeter=0" in style
     assert "entryPerimeter=0" in style

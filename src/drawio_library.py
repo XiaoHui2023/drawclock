@@ -8,7 +8,9 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-LABEL_PLACEHOLDER_RE = re.compile(r"%(?:name|freq|pll_kind|in\d+_label)%")
+LABEL_PLACEHOLDER_RE = re.compile(
+    r"%(?:name|pll_kind|in\d+_label)%"
+)
 
 from drawio_decode import decompress_diagram_payload
 
@@ -154,8 +156,6 @@ def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
     name = attrs.get("name", "")
     if name:
         baked = baked.replace("%name%", name)
-    if "%freq%" in baked:
-        baked = baked.replace("%freq%", attrs.get("freq", ""))
     if "%pll_kind%" in baked:
         baked = baked.replace("%pll_kind%", attrs.get("pll_kind", DEFAULT_PLL_KIND))
     for index in range(6):
@@ -193,7 +193,7 @@ def reload_object_attrs(
     *,
     library_path: str | Path | None = None,
 ) -> dict[str, str]:
-    """Apply library label template with placeholders=1 and current editable fields."""
+    """Apply library label template with placeholders=1; keep diagram attrs as-is."""
     lib = str(library_path or DEFAULT_LIBRARY_PATH)
     shape = _cached_library_shapes(lib).get(drawclock_type)
     if shape is None:
@@ -201,17 +201,10 @@ def reload_object_attrs(
     out = {
         key: value
         for key, value in stored_attrs.items()
-        if key not in ("label", "placeholders")
-        and not (key.startswith("in") and key.endswith("_label"))
-        and value is not None
+        if key not in ("label", "placeholders") and value is not None
     }
     if not out.get("name"):
         out["name"] = drawclock_type
-    template = shape.label
-    if "%freq%" in template and "freq" not in out:
-        out["freq"] = ""
-    if "%pll_kind%" in template and "pll_kind" not in out:
-        out["pll_kind"] = DEFAULT_PLL_KIND
-    out["label"] = template
+    out["label"] = shape.label
     out["placeholders"] = "1"
     return out

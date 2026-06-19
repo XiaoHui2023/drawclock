@@ -8,7 +8,6 @@ import xml.etree.ElementTree as ET
 from drawio_lib.components import simple_geometry as geom
 from drawio_lib.components.label_attrs import (
     ATTR_NAME,
-    CLOCK_FREQ_GAP_PX,
     CLOCK_INSTANCE_NAME_GAP_PX,
     LABEL_FONT_PX,
     verify_label_placeholders,
@@ -30,17 +29,14 @@ from drawio_lib.components.simple_shapes import (
     clock_body,
 )
 
-ATTR_FREQ = "freq"
-
 
 @dataclass
 class ClockComponent(SimpleComponent):
-    """Clock terminal with (freq hz) label."""
+    """Clock terminal with square wave and instance name."""
 
     cell_w: int = CLOCK_CELL_W
     body_margin_x: int = CLOCK_BODY_MARGIN_X
     instance_name_gap_px: int = CLOCK_INSTANCE_NAME_GAP_PX
-    freq_gap_px: int = CLOCK_FREQ_GAP_PX
 
     def __post_init__(self) -> None:
         self._g = geom.compute_geometry(
@@ -59,17 +55,13 @@ class ClockComponent(SimpleComponent):
     @property
     def edit_data_attr_prefix(self) -> tuple[str, ...]:
         return (
-            ATTR_FREQ,
             ATTR_NAME,
             "label",
         )
 
     @property
     def required_object_attrs(self) -> tuple[str, ...]:
-        return (
-            ATTR_FREQ,
-            ATTR_NAME,
-        )
+        return (ATTR_NAME,)
 
     def _graphic_center_x(self) -> int:
         rect = self._g.body
@@ -80,21 +72,9 @@ class ClockComponent(SimpleComponent):
 
     def label_html(self) -> str:
         wave = clock_body(self._g)
-        rect = self._g.body
-        wave_right = rect.x + rect.w
-        row_h = self.h - geom.NAME_H - geom.MUX_BODY_PAD_BOTTOM
-        freq_left_pct = wave_right / self.w * 100
-        freq_top_pct = (row_h // 2) / self.h * 100
         return (
             f"{shell_open(self.w, self.h)}"
             f"{stretch_body_layer(wave, view_w=self.w, view_h=self.h)}"
-            f'<div style="position:absolute;left:{freq_left_pct}%;top:{freq_top_pct}%;'
-            f"display:flex;align-items:center;"
-            f'white-space:nowrap;transform:translateY(-50%);">'
-            f'<div style="flex:0 0 auto;width:{self.freq_gap_px}px;"></div>'
-            f'<span style="flex:0 0 auto;font-size:{LABEL_FONT_PX}px;line-height:1;'
-            f'white-space:nowrap;">(%freq%hz)</span>'
-            f"</div>"
             f"{name_block(self._instance_name_top_y(), design_cell_h=self.h, design_cell_w=self.w, center_x=self._graphic_center_x(), gap_px=self.instance_name_gap_px)}"
             f"{shell_close()}"
         )
@@ -111,7 +91,6 @@ class ClockComponent(SimpleComponent):
 
     def preview_svg(self) -> str:
         wave = clock_body(self._g)
-        cell_mid = self._g.body_mid_y
         port = self._ports()[0]
         a = port.anchor
         name_y = (
@@ -119,11 +98,8 @@ class ClockComponent(SimpleComponent):
             + self.instance_name_gap_px
             + geom.NAME_H // 2
         )
-        wave_right = self._g.body.x + self._g.body.w
-        freq_x = wave_right + self.freq_gap_px
         return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" viewBox="0 0 {self.w} {self.h}">
 {wave}
-<text x="{freq_x}" y="{cell_mid}" font-size="7" fill="{STROKE}" text-anchor="start" dominant-baseline="middle">(MHz)</text>
   <text x="{self._graphic_center_x()}" y="{name_y}" font-size="{LABEL_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{self.title}</text>
   <line x1="{port.stub_x1}" y1="{port.stub_y1}" x2="{port.stub_x2}" y2="{port.stub_y2}" stroke="#c00" stroke-width="1"/>
   <circle cx="{a.cell_x}" cy="{a.cell_y}" r="2.5" fill="#c00"/>
@@ -135,16 +111,13 @@ class ClockComponent(SimpleComponent):
         cell_id: str,
         instance_name: str | None = None,
         *,
-        freq: str = "",
         x: int | None = None,
         y: int | None = None,
     ) -> str:
         style = self.cell_style()
         name = xml_attr(instance_name if instance_name is not None else self.title)
-        freq_val = xml_attr(freq)
         label = xml_attr(self.label_html())
         attrs = [
-            f'{ATTR_FREQ}="{freq_val}"',
             f'{ATTR_NAME}="{name}"',
             f'label="{label}"',
             'placeholders="1"',
@@ -168,18 +141,10 @@ class ClockComponent(SimpleComponent):
     def verify_geometry(self) -> None:
         html = self.label_html()
         verify_label_placeholders(html, title="clock")
-        if f"%{ATTR_FREQ}%hz)" not in html:
-            raise ValueError("clock label must include (freq hz) placeholder")
-        if f"width:{self.freq_gap_px}px" not in html:
-            raise ValueError("clock label must include fixed freq gap spacer width")
-        if "width:%freq_gap%px" in html:
-            raise ValueError("clock label must not use editable freq_gap placeholder")
         if f'viewBox="0 0 {self.w} {self.h}"' not in html:
             raise ValueError("clock wave SVG viewBox must match cell width and height")
         if 'preserveAspectRatio="none"' not in html:
             raise ValueError("clock body SVG must stretch with the shape (none)")
-        if "white-space:nowrap" not in html:
-            raise ValueError("clock freq label must not wrap")
         style = self.cell_style()
         if "autosize=0" not in style:
             raise ValueError("clock style must use autosize=0")

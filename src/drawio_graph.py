@@ -17,7 +17,6 @@ class GraphCell:
     target_id: str | None = None
     drawclock_type: str | None = None
     name: str = ""
-    freq: str | None = None
     pll_kind: str | None = None
     mux_labels: dict[str, str] = field(default_factory=dict)
     points: tuple[tuple[float, float], ...] = ()
@@ -125,9 +124,6 @@ def _add_mxcell(
     }
     gx, gy, gw, gh = _parse_vertex_geometry(mxcell)
     name = merged.get("name", merged.get("_name", "")).strip()
-    freq = merged.get("freq")
-    if freq is not None:
-        freq = freq.strip() or None
     pll_kind = merged.get("pll_kind")
     if pll_kind is not None:
         pll_kind = pll_kind.strip() or None
@@ -142,7 +138,6 @@ def _add_mxcell(
         style=style,
         drawclock_type=dtype,
         name=name or dtype,
-        freq=freq,
         pll_kind=pll_kind,
         mux_labels=mux_labels,
         points=_parse_points(style),
@@ -152,6 +147,7 @@ def _add_mxcell(
         width=gw,
         height=gh,
     )
+
 
 
 def _parse_vertex_geometry(mxcell: ET.Element) -> tuple[float | None, float | None, float | None, float | None]:

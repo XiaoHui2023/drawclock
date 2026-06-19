@@ -15,9 +15,9 @@ example.bat
 ```bat
 python scripts/build_drawio_lib.py
 python scripts/build_example_demo.py
-python src -i example\fig1.drawio example\fig2.drawio -o example\out\clock-tree.json -l drawio-lib\drawclock.xml
-python reload -i example\fig1.drawio -l drawio-lib\drawclock.xml -o example\out\fig1-reloaded.drawio
-python reload -i example\fig2.drawio -l drawio-lib\drawclock.xml -o example\out\fig2-reloaded.drawio
+python src run -i example\fig1.drawio example\fig2.drawio -o example\out\clock-tree.json -l drawio-lib\drawclock.xml
+python src reload -i example\fig1.drawio -l drawio-lib\drawclock.xml -o example\out\fig1-reloaded.drawio
+python src reload -i example\fig2.drawio -l drawio-lib\drawclock.xml -o example\out\fig2-reloaded.drawio
 ```
 
 上游（库或示例图）变更后，须从对应步骤起重新执行并检查输出。
@@ -36,8 +36,8 @@ pytest tests\test_reload.py -q
 
 | 文件 | 内容 |
 | --- | --- |
-| `fig1.drawio` | **source** `xtal` 输出接到跨图 **wire** `bus_xtal`（右端悬空） |
-| `fig2.drawio` | 两条同名 `bus_xtal` **wire** 分别驱动 `gate0`、`div0`；**pll_main** 同时驱动 `gate0` 与 `div0`；`gate0→inv0→clk_a`、`div0→dto0→clk_b`；**mux2** 标签 `0`/`1` |
+| `fig1.drawio` | **source** `xtal` 接到跨图 **clock** `xtal_hub` |
+| `fig2.drawio` | 同名 **from** `xtal_hub` 驱动 **pll_main**；**pll_main** 同时驱动 `gate0` 与 `div0`；`gate0→inv0→clk_a`、`div0→dto0→clk_b`；**mux2** 标签 `0`/`1` |
 
 ## pll_main 连线航点（手改参考）
 

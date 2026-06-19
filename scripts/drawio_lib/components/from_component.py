@@ -13,12 +13,10 @@ from drawio_lib.components.label_html import name_block, shell_close, shell_open
 from drawio_lib.components.simple_component import SimpleComponent
 from drawio_lib.components.simple_shapes import wire_body
 
-WIRE_BAND_H = geom.WIRE_CELL_H
-
 
 @dataclass
-class WireComponent(SimpleComponent):
-    """Wire line; stroke and name do not stretch with the shape."""
+class FromComponent(SimpleComponent):
+    """Cross-sheet output stub; logical input follows the same-named clock."""
 
     def _instance_name_top_y(self) -> int:
         return geom.WIRE_STROKE_Y + 8
@@ -46,7 +44,7 @@ class WireComponent(SimpleComponent):
         body = wire_body(self._g)
         name_y = self._instance_name_top_y() + 6
         stub_lines = []
-        for port, color in zip(self._ports(), ("#c00", "#090")):
+        for port, color in zip(self._ports(), ("#090",)):
             stub_lines.append(
                 f'  <line x1="{port.stub_x1}" y1="{port.stub_y1}" '
                 f'x2="{port.stub_x2}" y2="{port.stub_y2}" stroke="{color}" '
@@ -66,31 +64,31 @@ class WireComponent(SimpleComponent):
 
     def verify_geometry(self) -> None:
         html = self.label_html()
-        verify_label_placeholders(html, title="wire")
+        verify_label_placeholders(html, title="from")
         if "width:100%" not in html or "height:100%" not in html:
-            raise ValueError("wire label shell must fill the shape (100%)")
+            raise ValueError("from label shell must fill the shape (100%)")
         if f'viewBox="0 0 {self.w} {self.h}"' not in html:
-            raise ValueError("wire viewBox must match cell width and height")
+            raise ValueError("from viewBox must match cell width and height")
         if 'preserveAspectRatio="none"' not in html:
-            raise ValueError("wire body SVG must stretch with the shape (none)")
+            raise ValueError("from body SVG must stretch with the shape (none)")
         style = self.cell_style()
         verify_label_overflow_policy(
             html,
             style,
-            title="wire",
+            title="from",
             design_cell_w=self.w,
             design_cell_h=self.h,
         )
 
         pts = self._parse_points(style)
-        if len(pts) != 2:
-            raise ValueError(f"wire expects 2 connection points, got {pts}")
-        left, right = self._ports()
-        for pt, port, which in zip(pts, (left, right), ("left", "right")):
-            a = port.anchor
-            if len(pt) != 5 or pt[2] != float(geom.POINT_FIXED):
-                raise ValueError(f"wire {which}: must use 5-value points [x,y,0,0,0]")
-            if not isclose(pt[0], a.x_rel, abs_tol=0.002):
-                raise ValueError(f"wire {which}: rel_x mismatch")
-            if not isclose(pt[1], a.y_rel, abs_tol=0.002):
-                raise ValueError(f"wire {which}: rel_y mismatch")
+        if len(pts) != 1:
+            raise ValueError(f"from expects 1 connection point, got {pts}")
+        right = self._ports()[0]
+        pt = pts[0]
+        a = right.anchor
+        if len(pt) != 5 or pt[2] != float(geom.POINT_FIXED):
+            raise ValueError("from right: must use 5-value points [x,y,0,0,0]")
+        if not isclose(pt[0], a.x_rel, abs_tol=0.002):
+            raise ValueError("from right: rel_x mismatch")
+        if not isclose(pt[1], a.y_rel, abs_tol=0.002):
+            raise ValueError("from right: rel_y mismatch")

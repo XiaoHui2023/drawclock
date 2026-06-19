@@ -48,8 +48,8 @@ class SimpleComponent:
     instance_name_gap_px: int = INSTANCE_NAME_GAP_PX
 
     def __post_init__(self) -> None:
-        if self.port_mode == "wire":
-            self._g = geom.compute_wire_geometry()
+        if self.port_mode == "from":
+            self._g = geom.compute_from_geometry()
         else:
             self._g = geom.compute_geometry(
                 self.port_mode,
@@ -91,7 +91,7 @@ class SimpleComponent:
         return tuple(out)
 
     def _instance_name_top_y(self) -> int:
-        if self.port_mode == "wire":
+        if self.port_mode == "from":
             return geom.WIRE_STROKE_Y + 8
         return geom.BODY_Y + self.body_height + geom.MUX_BODY_PAD_BOTTOM
 
@@ -253,7 +253,7 @@ class SimpleComponent:
             raise ValueError(f"{self.title} body SVG must stretch with the shape (none)")
         if 'width="100%"' not in html:
             raise ValueError(f"{self.title} label shell must size the SVG (100% width)")
-        if "<line " in html and self.port_mode != "wire":
+        if "<line " in html and self.port_mode != "from":
             raise ValueError(f"{self.title} label must not draw port stub lines")
         style = self.cell_style()
         if self.show_instance_name:

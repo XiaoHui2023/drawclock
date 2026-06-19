@@ -7,12 +7,12 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "src" / "drawclock.py"
+SRC_DIR = ROOT / "src"
 
 
-def test_main_help_exits_zero() -> None:
+def test_src_dir_help_exits_zero() -> None:
     proc = subprocess.run(
-        [sys.executable, str(SCRIPT), "--help"],
+        [sys.executable, str(SRC_DIR), "--help"],
         capture_output=True,
         text=True,
         check=False,
@@ -23,7 +23,7 @@ def test_main_help_exits_zero() -> None:
 
 def test_reload_help_exits_zero() -> None:
     proc = subprocess.run(
-        [sys.executable, str(SCRIPT), "reload", "--help"],
+        [sys.executable, str(SRC_DIR), "reload", "--help"],
         capture_output=True,
         text=True,
         check=False,
@@ -36,7 +36,7 @@ def test_reload_requires_library() -> None:
     proc = subprocess.run(
         [
             sys.executable,
-            str(SCRIPT),
+            str(SRC_DIR),
             "reload",
             "-i",
             str(ROOT / "tests" / "fixtures" / "mini-tree.drawio"),
@@ -71,7 +71,7 @@ def test_release_archive_source_layout(tmp_path: Path, monkeypatch) -> None:
         "[project]\nname = \"drawclock\"\nversion = \"1.2.3\"\n",
         encoding="utf-8",
     )
-    (project / "src" / "drawclock.py").write_text("print('ok')\n", encoding="utf-8")
+    (project / "src" / "__main__.py").write_text("print('ok')\n", encoding="utf-8")
 
     monkeypatch.setattr(bundle_release, "ROOT", project)
     monkeypatch.setattr(bundle_release.platform, "system", lambda: "Windows")
@@ -83,7 +83,7 @@ def test_release_archive_source_layout(tmp_path: Path, monkeypatch) -> None:
         names = set(zf.namelist())
     prefix = "drawclock-1.2.3-windows/"
     assert prefix + "pyproject.toml" in names
-    assert prefix + "source/drawclock.py" in names
+    assert prefix + "source/__main__.py" in names
     assert prefix + "source/pyproject.toml" not in names
-    assert prefix + "source/src/drawclock.py" not in names
+    assert prefix + "source/src/__main__.py" not in names
     assert prefix + "drawclock-reload.exe" not in names

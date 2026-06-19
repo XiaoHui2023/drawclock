@@ -17,7 +17,7 @@ NAME_H = 16
 MAX_INSTANCE_GAP = 16
 POINT_FIXED = 0
 
-PortMode = Literal["both", "left", "right", "wire"]
+PortMode = Literal["both", "left", "right", "from"]
 
 
 @dataclass(frozen=True)
@@ -60,13 +60,15 @@ def side_pad_x(cell_w: int = W) -> int:
 
 
 def clock_left_pad_x(cell_w: int) -> int:
-    return cell_w - DESIGN_W - clock_right_pad_x()
+    from drawio_lib.components.simple_shapes import CLOCK_LEFT_PAD
+
+    return CLOCK_LEFT_PAD
 
 
 def clock_right_pad_x() -> int:
-    from drawio_lib.components.label_attrs import CLOCK_FREQ_GAP_PX, CLOCK_FREQ_TEXT_RESERVE_PX
+    from drawio_lib.components.simple_shapes import CLOCK_CELL_W, CLOCK_LEFT_PAD, CLOCK_GRAPHIC_W
 
-    return CLOCK_FREQ_GAP_PX + CLOCK_FREQ_TEXT_RESERVE_PX
+    return CLOCK_CELL_W - CLOCK_LEFT_PAD - CLOCK_GRAPHIC_W
 
 
 def clock_body_rect(
@@ -143,16 +145,14 @@ def make_port(
     return Port(anchor=anchor, stub_x1=x1, stub_y1=y1, stub_x2=x2, stub_y2=y2)
 
 
-def compute_wire_geometry() -> SimpleGeometry:
+def compute_from_geometry() -> SimpleGeometry:
     height = WIRE_CELL_H
     pad = side_pad_x(W)
-    left_x = pad
     right_x = pad + DESIGN_W
-    left = make_port(left_x, WIRE_STROKE_Y, side="left", cell_height=height, cell_w=W)
     right = make_port(right_x, WIRE_STROKE_Y, side="right", cell_height=height, cell_w=W)
     return SimpleGeometry(
         body=BodyRect(x=pad, y=WIRE_BODY_Y, w=DESIGN_W, h=4),
-        left=left,
+        left=None,
         right=right,
         body_mid_y=WIRE_STROKE_Y,
         cell_h=height,
@@ -169,8 +169,8 @@ def compute_geometry(
     cell_w: int = W,
     asymmetric_clock: bool = False,
 ) -> SimpleGeometry:
-    if port_mode == "wire":
-        return compute_wire_geometry()
+    if port_mode == "from":
+        return compute_from_geometry()
 
     if asymmetric_clock:
         rect = clock_body_rect(height=body_height, margin_x=margin_x, cell_w=cell_w)

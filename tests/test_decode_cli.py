@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "src" / "drawclock.py"
+SRC_DIR = ROOT / "src"
 
 
 def test_run_writes_clock_tree_only() -> None:
@@ -15,7 +15,7 @@ def test_run_writes_clock_tree_only() -> None:
     proc = subprocess.run(
         [
             sys.executable,
-            str(SCRIPT),
+            str(SRC_DIR),
             "run",
             "-i",
             str(ROOT / "tests" / "fixtures" / "mini-tree.drawio"),

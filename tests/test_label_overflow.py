@@ -31,7 +31,7 @@ from drawio_lib.components.label_overflow import (
         "occ_clk_cell",
         "pll",
         "clock",
-        "wire",
+        "from",
         "mux2",
         "mux6",
     ],

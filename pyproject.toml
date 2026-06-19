@@ -14,7 +14,27 @@ dependencies = []
 dev = ["pytest>=8.0"]
 
 [tool.setuptools]
-packages = []
+package-dir = {"" = "src"}
+py-modules = [
+    "config_export",
+    "device_attrs_convert",
+    "device_attrs_validate",
+    "device_model",
+    "drawio_build",
+    "drawio_decode",
+    "drawio_graph",
+    "drawio_layout",
+    "drawio_library",
+    "drawio_ports",
+    "layout_validate",
+    "migrate",
+    "pipeline",
+    "topology",
+    "validate_config",
+    "from_resolve",
+    "library_ports",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]

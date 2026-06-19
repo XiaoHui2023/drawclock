@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from xml.sax.saxutils import quoteattr
@@ -9,18 +8,15 @@ from xml.sax.saxutils import quoteattr
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
 
-from drawio_graph import _parse_points  # noqa: E402
-from drawio_library import (  # noqa: E402
+from drawio_graph import _parse_points
+from drawio_library import (
     DEFAULT_LIBRARY_PATH,
     load_library_cell_styles,
     load_library_shapes,
 )
-from drawio_ports import port_anchors  # noqa: E402
-from pipeline import parse_drawio_paths  # noqa: E402
+from drawio_ports import port_anchors
+from pipeline import parse_drawio_paths
 
 
 def test_parse_points_reads_all_mux_ports() -> None:
@@ -38,43 +34,39 @@ def test_mini_tree_drawio() -> None:
     path = ROOT / "tests" / "fixtures" / "mini-tree.drawio"
     config = parse_drawio_paths([path])
 
-    assert config["pll0"]["pll_kind"] == "sc"
-    assert "output_count" not in config["pll0"]
     assert config["pll0"]["source"] == "xtal0"
+    assert config["pll0"]["gap"] == "4"
     assert config["gate0"]["source"] == "pll0"
     assert config["clk0"]["source"] == "gate0"
+    assert config["clk0"]["freq"] == "100"
     assert "target" not in config["gate0"]
     assert "targets" not in config["pll0"]
-    assert config["clk0"]["freq"] == 100
+    assert "freq" in config["clk0"]
     for item in config.values():
         assert "kind" in item
         assert "name" not in item
 
 
-def test_mux_kind_exported_as_mux() -> None:
-    from config_export import export_kind
-
-    assert export_kind("mux2") == "mux"
-    assert export_kind("mux6") == "mux"
-    assert export_kind("pll2") == "pll"
-    assert export_kind("gate") == "gate"
+def test_kind_matches_library_name() -> None:
+    path = ROOT / "tests" / "fixtures" / "pll2-tree.drawio"
+    config = parse_drawio_paths([path])
+    assert config["pll2_0"]["kind"] == "pll2"
+    assert config["gate0"]["kind"] == "gate"
 
 
-def test_wire_folded_not_in_json() -> None:
+def test_from_folded_not_in_json() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-bridge.drawio"
     config = parse_drawio_paths([path])
-    assert "bus" not in config
+    assert "clk0" in config
     assert config["clk0"]["source"] == "pll0"
-    assert "targets" not in config["pll0"]
+    assert "from" not in {item.get("kind") for item in config.values()}
 
 
-def test_wire_fanout_downstream_sources_only() -> None:
+def test_from_fanout_downstream_sources_only() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-fanout.drawio"
     config = parse_drawio_paths([path])
-    assert "bus" not in config
     assert config["clk_a"]["source"] == "pll0"
     assert config["clk_b"]["source"] == "pll0"
-    assert "targets" not in config["pll0"]
 
 
 def test_gate_right_port_fanout() -> None:
@@ -147,7 +139,7 @@ def test_occ_clk_cell_drawio_exports_as_single_input_device(tmp_path: Path) -> N
         "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
         f"{_library_object(10, 'src0', source)}"
         f"{_library_object(11, 'cell0', occ_cell)}"
-        f"{_library_object(12, 'clk0', clock, extra={'freq': '25M'})}"
+        f"{_library_object(12, 'clk0', clock)}"
         f"{_edge(20, 10, 11, source, 'source', 'right', occ_cell, 'occ_clk_cell', 'left')}"
         f"{_edge(21, 11, 12, occ_cell, 'occ_clk_cell', 'right', clock, 'clock', 'left')}"
         "</root></mxGraphModel>"
@@ -159,23 +151,22 @@ def test_occ_clk_cell_drawio_exports_as_single_input_device(tmp_path: Path) -> N
 
     assert config["cell0"] == {"kind": "occ_clk_cell", "source": "src0"}
     assert config["clk0"]["source"] == "cell0"
-    assert config["clk0"]["freq"] == 25_000_000
 
 
 def test_pll2_dual_output_source_suffix() -> None:
     path = ROOT / "tests" / "fixtures" / "pll2-tree.drawio"
     config = parse_drawio_paths([path])
-    assert config["pll2_0"]["kind"] == "pll"
-    assert config["pll2_0"]["output_count"] == 2
-    assert config["pll2_0"]["pll_kind"] == "sc"
+    assert config["pll2_0"]["kind"] == "pll2"
+    assert config["pll2_0"]["pll_kind"] == "SC"
     assert config["pll2_0"]["source"] == "xtal0"
+    assert config["pll2_0"]["target"] == {"0": "gate0", "1": "div0"}
     assert config["gate0"]["source"] == "pll2_0[0]"
     assert config["div0"]["source"] == "pll2_0[1]"
 
 
-def test_wire_left_port_duplicate_fails() -> None:
+def test_from_duplicate_input_binding_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-too-many.drawio"
-    with pytest.raises(ValueError, match="左端已有连接"):
+    with pytest.raises(ValueError, match="未连接"):
         parse_drawio_paths([path])
 
 
@@ -209,25 +200,23 @@ def test_example_fig1_embeds_library_labels() -> None:
     assert "drawclockType=source" in model_xml
 
 
-def test_example_two_figs_cross_wire_no_wire_in_json() -> None:
+def test_example_two_figs_cross_from_no_from_in_json() -> None:
     fig1 = ROOT / "example" / "fig1.drawio"
     fig2 = ROOT / "example" / "fig2.drawio"
     if not fig1.is_file() or not fig2.is_file():
         pytest.skip("先运行 scripts/build_example_demo.py")
     config = parse_drawio_paths([fig1, fig2])
     kinds = {item["kind"] for item in config.values()}
-    assert "wire" not in kinds
+    assert "from" not in kinds
     assert config["pll_main"]["source"] == "xtal"
     assert config["gate0"]["source"] == "pll_main"
     assert config["div0"]["source"] == "pll_main"
     assert "targets" not in config["pll_main"]
     assert "target" not in config["mux2"]
+    assert config["mux2"]["kind"] == "mux2"
     assert config["mux2"]["source"] == {"0": "pll_m2a", "1": "pll_m2b"}
     assert config["pll_m2a"]["source"] == "osc_mux"
     assert config["pll_m2b"]["source"] == "osc_mux"
-    assert config["clk_a"]["freq"] == 100_000
-    assert config["clk_b"]["freq"] == 50_000_000
-    assert config["clk_mux"]["freq"] == 200_000_000
 
 
 def test_reload_restores_drawable_html_style(tmp_path: Path) -> None:
@@ -242,23 +231,23 @@ def test_reload_restores_drawable_html_style(tmp_path: Path) -> None:
     assert 'label="' in text
 
 
-def test_wire_only_fixture_fails() -> None:
+def test_from_without_clock_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-only.drawio"
-    with pytest.raises(ValueError, match="两端均未连接器件"):
+    with pytest.raises(ValueError, match="未找到同名 clock"):
         parse_drawio_paths([path])
 
 
-def test_wire_open_left_reports_wire_not_device_input() -> None:
+def test_from_upstream_connect_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-open-left.drawio"
-    with pytest.raises(ValueError, match="连线 bus 左端未接上游器件") as exc:
+    with pytest.raises(ValueError, match="无输入端口") as exc:
         parse_drawio_paths([path])
     msg = str(exc.value)
-    assert "gate0" in msg
+    assert "clk0" in msg
     assert "输入端口未连接" not in msg
 
 
-def test_wire_open_right_reports_wire_not_pll_output() -> None:
+def test_from_open_output_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-open-right.drawio"
-    with pytest.raises(ValueError, match="连线 bus 左端接了器件 pll0，右端未连接") as exc:
+    with pytest.raises(ValueError, match="右端未连接任何器件") as exc:
         parse_drawio_paths([path])
     assert "输出端口未连接" not in str(exc.value)

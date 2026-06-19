@@ -41,7 +41,7 @@ if str(SCRIPTS) not in sys.path:
         ("pll2", 3),
         ("source", 1),
         ("clock", 1),
-        ("wire", 2),
+        ("from", 1),
     ],
 )
 def test_simple_verify_geometry(name: str, port_count: int) -> None:
@@ -332,13 +332,12 @@ def test_clk_phase_sel_ports_on_right_border() -> None:
         assert isclose(pt[1], cell_y / mod.H, abs_tol=0.001)
 
 
-def test_wire_ports_on_graphic() -> None:
-    wire = importlib.import_module("drawio_lib.components.wire")
-    pts = wire._parse_points(wire.cell_style())
-    assert len(pts) == 2
+def test_from_ports_on_graphic() -> None:
+    from_mod = importlib.import_module("drawio_lib.components.from")
+    pts = from_mod._parse_points(from_mod.cell_style())
+    assert len(pts) == 1
     pad = 40 / 120
-    assert isclose(pts[0][0], pad, abs_tol=0.02)
-    assert isclose(pts[1][0], 1.0 - pad, abs_tol=0.02)
+    assert isclose(pts[0][0], 1.0 - pad, abs_tol=0.02)
 
 
 def test_clock_instance_name_below_graphic() -> None:
@@ -357,13 +356,13 @@ def test_clock_only_left_point() -> None:
     clock = importlib.import_module("drawio_lib.components.clock")
     pts = clock._parse_points(clock.cell_style())
     assert len(pts) == 1
-    from drawio_lib.components.label_attrs import CLOCK_FREQ_GAP_PX
-    from drawio_lib.components.simple_shapes import CLOCK_BODY_MARGIN_X, CLOCK_LEFT_PAD, CLOCK_WAVE_W
+    from drawio_lib.components.simple_shapes import CLOCK_NAME_SIDE_PAD, CLOCK_WAVE_AMP, CLOCK_WAVE_W
 
-    wave_left_rel = (CLOCK_LEFT_PAD + CLOCK_BODY_MARGIN_X) / clock.W
-    assert isclose(pts[0][0], wave_left_rel, abs_tol=0.02)
-    assert clock.W == 260
+    assert isclose(pts[0][0], CLOCK_NAME_SIDE_PAD / clock.W, abs_tol=0.002)
+    y_lo = clock.G.body_mid_y + CLOCK_WAVE_AMP
+    assert isclose(pts[0][1], y_lo / clock.H, abs_tol=0.002)
+    assert clock.W == 120
     assert CLOCK_WAVE_W == 36
-    assert "%freq%hz)" in clock.label_html()
-    assert f"width:{CLOCK_FREQ_GAP_PX}px" in clock.label_html()
-    assert "width:%freq_gap%px" not in clock.label_html()
+    assert "%func_freq%" not in clock.label_html()
+    assert "%scan_freq%" not in clock.label_html()
+    assert "%bist_freq%" not in clock.label_html()

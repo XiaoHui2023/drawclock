@@ -9,12 +9,11 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
+from pathlib import Path
 
-from drawio_decode import extract_mxfile_xml, iter_diagram_models  # noqa: E402
+ROOT = Path(__file__).resolve().parents[1]
+
+from drawio_decode import extract_mxfile_xml, iter_diagram_models
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 FIG1 = ROOT / "example" / "fig1.drawio"
 FIG2 = ROOT / "example" / "fig2.drawio"
@@ -48,8 +47,8 @@ def _run(binary: Path, args: list[str], cwd: Path) -> None:
 
 def _assert_clock_tree(config: dict[str, object]) -> None:
     kinds = {item["kind"] for item in config.values() if isinstance(item, dict)}
-    if "wire" in kinds:
-        print("wire kind must not appear in exported JSON", file=sys.stderr)
+    if "from" in kinds:
+        print("from kind must not appear in exported JSON", file=sys.stderr)
         raise SystemExit(1)
 
     checks: list[tuple[str, object]] = [
@@ -59,9 +58,9 @@ def _assert_clock_tree(config: dict[str, object]) -> None:
         ("mux2.source", {"0": "pll_m2a", "1": "pll_m2b"}),
         ("pll_m2a.source", "osc_mux"),
         ("pll_m2b.source", "osc_mux"),
-        ("clk_a.freq", 100_000),
-        ("clk_b.freq", 50_000_000),
-        ("clk_mux.freq", 200_000_000),
+        ("clk_a.source", "inv0"),
+        ("clk_b.source", "dto0"),
+        ("clk_mux.source", "mux2"),
     ]
     for path, expected in checks:
         node_name, field = path.split(".", 1)

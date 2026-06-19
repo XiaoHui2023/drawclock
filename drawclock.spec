@@ -20,14 +20,14 @@ def _repo_root_from_spec() -> Path:
     for seed in seeds:
         for base in [seed, *seed.parents]:
             if (base / "pyproject.toml").is_file() and (
-                base / "src" / "drawclock.py"
+                base / "src" / "__main__.py"
             ).is_file():
                 return base
     return spec.parent
 
 
 repo_root = _repo_root_from_spec()
-entry = repo_root / "src" / "drawclock.py"
+entry = repo_root / "src" / "__main__.py"
 lib_dir = repo_root / "drawio-lib"
 
 datas = []

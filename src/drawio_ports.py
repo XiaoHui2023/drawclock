@@ -1,14 +1,8 @@
 from __future__ import annotations
 
-import re
+from library_ports import port_anchors as _port_anchors
+from library_ports import port_topology_from_style, resolve_port
 
-from device_model import DUAL_INPUT_GATE_KINDS, device_output_count
-from drawio_graph import _parse_points
-
-MUX_KIND_RE = re.compile(r"^mux([2-6])$")
-
-# edgeStyle=none: draw.io paints port-to-port lines correctly on first open.
-# orthogonalEdgeStyle without waypoints triggers auto-routing (false bends until relayout).
 EDGE_STRAIGHT_STYLE = (
     "edgeStyle=none;rounded=0;html=1;"
     "endArrow=none;startArrow=none;strokeColor=#000000;"
@@ -41,74 +35,8 @@ def finalize_edge_style(style: str) -> str:
 
 def port_anchors(style: str, drawclock_type: str) -> dict[str, tuple[float, float]]:
     """Map port keys to relative (x, y) anchors from mxCell style points."""
-    pts = _parse_points(style)
-    if not pts:
-        if drawclock_type == "source":
-            return {"right": (1.0, 0.5)}
-        if drawclock_type == "pll":
-            return {"left": (0.0, 0.5), "right": (1.0, 0.5)}
-    if drawclock_type == "pll2":
-        return {
-            "left": (0.0, 0.5),
-            "out0": (1.0, 1 / 3),
-            "out1": (1.0, 2 / 3),
-        }
-    count = device_output_count(drawclock_type)
-    if count > 0:
-        return {
-            "left": (0.0, 0.5),
-            **{f"out{i}": (1.0, (i + 1) / (count + 1)) for i in range(count)},
-        }
-    if drawclock_type in DUAL_INPUT_GATE_KINDS:
-        return {"in0": (0.0, 1 / 3), "in1": (0.0, 2 / 3), "right": (1.0, 0.5)}
-        if drawclock_type == "clock":
-            return {"left": (0.0, 0.5)}
-        return {"left": (0.0, 0.5), "right": (1.0, 0.5)}
-
-    mux_match = MUX_KIND_RE.match(drawclock_type)
-    if mux_match:
-        anchors: dict[str, tuple[float, float]] = {}
-        for index, point in enumerate(pts[:-1]):
-            anchors[f"in{index}"] = (point[0], point[1])
-        anchors["out"] = (pts[-1][0], pts[-1][1])
-        return anchors
-
-    if drawclock_type == "source":
-        return {"right": (pts[0][0], pts[0][1])}
-    if drawclock_type == "pll":
-        return {
-            "left": (pts[0][0], pts[0][1]),
-            "right": (pts[1][0], pts[1][1]),
-        }
-    if drawclock_type == "pll2":
-        return {
-            "left": (pts[0][0], pts[0][1]),
-            "out0": (pts[1][0], pts[1][1]),
-            "out1": (pts[2][0], pts[2][1]),
-        }
-    count = device_output_count(drawclock_type)
-    if count > 0:
-        anchors = {"left": (pts[0][0], pts[0][1])}
-        for index in range(count):
-            anchors[f"out{index}"] = (pts[index + 1][0], pts[index + 1][1])
-        return anchors
-    if drawclock_type in DUAL_INPUT_GATE_KINDS:
-        return {
-            "in0": (pts[0][0], pts[0][1]),
-            "in1": (pts[1][0], pts[1][1]),
-            "right": (pts[2][0], pts[2][1]),
-        }
-    if drawclock_type == "clock":
-        return {"left": (pts[0][0], pts[0][1])}
-    if drawclock_type == "wire":
-        return {
-            "left": (pts[0][0], pts[0][1]),
-            "right": (pts[-1][0], pts[-1][1]),
-        }
-    return {
-        "left": (pts[0][0], pts[0][1]),
-        "right": (pts[-1][0], pts[-1][1]),
-    }
+    _ = drawclock_type
+    return _port_anchors(style)
 
 
 def abs_port_xy(
@@ -156,10 +84,16 @@ def edge_port_style(
         if target_mux_input is not None:
             key = f"in{target_mux_input}"
             if key not in tgt_ports:
-                raise ValueError(f"mux input {key} missing")
+                raise ValueError(f"input {key} missing")
             entry_xy = tgt_ports[key]
         elif "left" in tgt_ports:
             entry_xy = tgt_ports["left"]
+        elif tgt_ports:
+            first_input = next(
+                (key for key in tgt_ports if key.startswith("in")),
+                next(iter(tgt_ports)),
+            )
+            entry_xy = tgt_ports[first_input]
         else:
             raise ValueError(f"no entry port for {target_type}")
     except ValueError:
@@ -192,13 +126,8 @@ def chain_edge_style(
     tgt_port: str = "left",
 ) -> str:
     """Straight connector along a shared horizontal bus between two ports."""
-    sx, sy = abs_port_xy(src_x, src_y, src_w, src_h, src_style, src_type, src_port)
-    tx, ty = abs_port_xy(tgt_x, tgt_y, tgt_w, tgt_h, tgt_style, tgt_type, tgt_port)
-    src_anchors = port_anchors(src_style, src_type)
-    tgt_anchors = port_anchors(tgt_style, tgt_type)
-    exit_xy = src_anchors[src_port]
-    entry_xy = tgt_anchors[tgt_port]
-    _ = (sx, sy, tx, ty)
+    exit_xy = port_anchors(src_style, src_type)[src_port]
+    entry_xy = port_anchors(tgt_style, tgt_type)[tgt_port]
     return (
         f"{EDGE_DRAW_STYLE}"
         f"exitX={exit_xy[0]};exitY={exit_xy[1]};"
@@ -293,9 +222,11 @@ def mux_fanin_edge_style(
     stub_x: float | None = None,
 ) -> tuple[str, tuple[tuple[float, float], ...]]:
     """Horizontal stub from PLL, vertical into mux input (orthogonal)."""
-    exit_xy = port_anchors(src_style, src_type)["right"]
+    src_ports = port_anchors(src_style, src_type)
+    exit_port = "right" if "right" in src_ports else "out"
+    exit_xy = src_ports[exit_port]
     entry_xy = port_anchors(tgt_style, tgt_type)[f"in{mux_input}"]
-    ex, ey = abs_port_xy(src_x, src_y, src_w, src_h, src_style, src_type, "right")
+    ex, ey = abs_port_xy(src_x, src_y, src_w, src_h, src_style, src_type, exit_port)
     ix, iy = abs_port_xy(
         tgt_x, tgt_y, tgt_w, tgt_h, tgt_style, tgt_type, f"in{mux_input}"
     )
@@ -315,21 +246,19 @@ def infer_mux_input_index(
     target_type: str,
     entry_xy: tuple[float, float] | None,
 ) -> int | None:
-    if entry_xy is None or MUX_KIND_RE.match(target_type) is None:
+    topology = port_topology_from_style(target_style)
+    if not topology.inputs:
         return None
-    ports = port_anchors(target_style, target_type)
-    best_idx: int | None = None
-    best_dist = float("inf")
-    for key, xy in ports.items():
-        if not key.startswith("in"):
-            continue
-        dist = (xy[0] - entry_xy[0]) ** 2 + (xy[1] - entry_xy[1]) ** 2
-        if dist < best_dist:
-            best_dist = dist
-            best_idx = int(key[2:])
-    if best_dist > 0.04:
+    port = resolve_port(_parse_points_from_style(target_style), entry_xy)
+    if port is None or not port.startswith("in"):
         return None
-    return best_idx
+    return int(port[2:])
+
+
+def _parse_points_from_style(style: str) -> tuple[tuple[float, float], ...]:
+    from drawio_graph import _parse_points
+
+    return _parse_points(style)
 
 
 def resolve_edge_style(

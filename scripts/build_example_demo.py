@@ -2,26 +2,20 @@
 
 from __future__ import annotations
 
-import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-RELOAD = ROOT / "reload"
-for path in (SRC, RELOAD):
-    if str(path) not in sys.path:
-        sys.path.insert(0, str(path))
 
-from drawio_build import xml_attr  # noqa: E402
-from drawio_decode import compress_diagram_payload  # noqa: E402
-from drawio_library import (  # noqa: E402
+from drawio_build import xml_attr
+from drawio_decode import compress_diagram_payload
+from drawio_library import (
     DEFAULT_LIBRARY_PATH,
     LibraryShape,
     bake_label_placeholders,
     load_library_shapes,
 )
-from drawio_ports import (  # noqa: E402
+from drawio_ports import (
     EDGE_DRAW_STYLE,
     abs_port_xy,
     chain_edge_route,
@@ -35,7 +29,7 @@ FIG2 = ROOT / "example" / "fig2.drawio"
 ROW_CY = 110
 X0 = 40
 STUB_X_OFFSET = 36
-BUS_WIRE_NAME = "bus_xtal"
+BUS_FROM_NAME = "xtal_hub"
 
 
 @dataclass
@@ -222,14 +216,14 @@ def _assemble(diagram_name: str, placed: list[Placed], edges: list[EdgeSpec]) ->
 
 
 def build_fig1(shapes: dict[str, LibraryShape]) -> str:
-    """图 1：仅 xtal 输出接到跨图 wire（右端悬空）。"""
+    """图 1：xtal 接到跨图 clock/from（from 右端悬空）。"""
     source_shape = shapes["source"]
-    wire_shape = shapes["wire"]
+    clk_shape = shapes["clock"]
     placed: dict[str, Placed] = {}
     edges: list[EdgeSpec] = []
 
     row_src = 60
-    row_wire = 120
+    row_clk = 120
     src = Placed(
         "xtal",
         "xtal",
@@ -240,31 +234,30 @@ def build_fig1(shapes: dict[str, LibraryShape]) -> str:
     )
     placed["xtal"] = src
 
-    wire_x = src.x + src.shape.w + 16
-    wire = Placed(
-        "bus_wire",
-        BUS_WIRE_NAME,
-        "wire",
-        wire_x,
-        _top_for_port(row_wire, wire_shape, "wire", "left"),
-        wire_shape,
+    clk_x = src.x + src.shape.w + 16
+    clk = Placed(
+        "xtal_hub_clk",
+        BUS_FROM_NAME,
+        "clock",
+        clk_x,
+        _top_for_port(row_clk, clk_shape, "clock", "left"),
+        clk_shape,
     )
-    placed["bus_wire"] = wire
-    # 折线 + 航点：跨图出口（源与 wire 错行，航点 Y 不同）
+    placed["xtal_hub_clk"] = clk
     _connect_elbow(
         edges,
         placed,
         "xtal",
-        "bus_wire",
-        bend_x=wire_x - 20,
+        "xtal_hub_clk",
+        bend_x=clk_x - 20,
     )
 
     return _assemble("fig1", list(placed.values()), edges)
 
 
 def build_fig2(shapes: dict[str, LibraryShape]) -> str:
-    """图 2：跨图 wire 一分二；pll 一分二；下游直连；mux 标签 0/1。"""
-    wire_shape = shapes["wire"]
+    """图 2：跨图 from 驱动 pll；pll 一分二；下游直连；mux 标签 0/1。"""
+    from_shape = shapes["from"]
     gate_shape = shapes["gate"]
     div_shape = shapes["div"]
     inv_shape = shapes["inv"]
@@ -274,32 +267,23 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
     placed: dict[str, Placed] = {}
     edges: list[EdgeSpec] = []
 
-    row_wire_a = 80
+    row_from_a = 80
     row_gate_a = 80
-    row_wire_b = 200
+    row_from_b = 200
     row_gate_b = 200
     row_mux = 340
 
-    wire_a = Placed(
-        "wire_a",
-        BUS_WIRE_NAME,
-        "wire",
+    from_a = Placed(
+        "from_a",
+        BUS_FROM_NAME,
+        "from",
         X0,
-        _top_for_port(row_wire_a, wire_shape, "wire", "right"),
-        wire_shape,
+        _top_for_port(row_from_a, from_shape, "from", "right"),
+        from_shape,
     )
-    wire_b = Placed(
-        "wire_b",
-        BUS_WIRE_NAME,
-        "wire",
-        X0,
-        _top_for_port(row_wire_b, wire_shape, "wire", "right"),
-        wire_shape,
-    )
-    placed["wire_a"] = wire_a
-    placed["wire_b"] = wire_b
+    placed["from_a"] = from_a
 
-    x_dev = X0 + wire_shape.w + 20
+    x_dev = X0 + from_shape.w + 20
     gate0 = Placed(
         "gate0",
         "gate0",
@@ -327,7 +311,7 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         pll_shape,
     )
     placed["pll_main"] = pll
-    _connect(edges, placed, "wire_a", "pll_main", tgt_port="left", src_port="right")
+    _connect(edges, placed, "from_a", "pll_main", tgt_port="left", src_port="right")
     stub_x = placed["gate0"].x - 10
     _connect_pll_main_fanout(edges, placed, "gate0", stub_x=stub_x)
     _connect_pll_main_fanout(edges, placed, "div0", stub_x=stub_x)
@@ -362,7 +346,6 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         x_clk,
         _top_for_port(row_gate_a, clk_shape, "clock", "left"),
         clk_shape,
-        {"freq": "100k"},
     )
     clk_b = Placed(
         "clk_b",
@@ -371,7 +354,6 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         x_clk,
         _top_for_port(row_gate_b, clk_shape, "clock", "left"),
         clk_shape,
-        {"freq": "50M"},
     )
     placed["clk_a"] = clk_a
     placed["clk_b"] = clk_b
@@ -433,7 +415,6 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         mux.x + mux.shape.w + 40,
         _top_for_port(row_mux, clk_shape, "clock", "left"),
         clk_shape,
-        {"freq": "200m"},
     )
     placed["clk_mux"] = clk_mux
     _connect(edges, placed, "mux2", "clk_mux", src_port="out")

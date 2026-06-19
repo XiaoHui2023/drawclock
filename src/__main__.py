@@ -5,12 +5,8 @@ import json
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
-
-from migrate import reload_drawio_file  # noqa: E402
-from pipeline import drawio_to_clock_tree, write_clock_tree_json  # noqa: E402
+from migrate import reload_drawio_file
+from pipeline import drawio_to_clock_tree, write_clock_tree_json
 
 
 def _add_library_arg(parser: argparse.ArgumentParser, help_text: str) -> None:

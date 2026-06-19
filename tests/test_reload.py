@@ -2,21 +2,17 @@ from __future__ import annotations
 
 import html
 import re
-import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
 
-from drawio_decode import decompress_diagram_payload  # noqa: E402
-from drawio_library import bake_label_placeholders, load_library_shapes  # noqa: E402
-from drawio_ports import port_anchors  # noqa: E402
-from migrate import migrate_mxfile_xml, reload_drawio_file  # noqa: E402
+from drawio_decode import decompress_diagram_payload
+from drawio_library import bake_label_placeholders, load_library_shapes
+from drawio_ports import port_anchors
+from migrate import migrate_mxfile_xml, reload_drawio_file
 
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 SHAPES = load_library_shapes(LIBRARY)
@@ -25,11 +21,11 @@ COMPRESSED_FIXTURE = ROOT / "tests" / "fixtures" / "mini-tree-compressed.drawio"
 
 @pytest.mark.parametrize(
     ("fig", "edge_id"),
-    [
-        ("fig1", "12"),
-        ("fig2", "25"),
-        ("fig2", "26"),
-    ],
+        [
+            ("fig1", "12"),
+            ("fig2", "24"),
+            ("fig2", "25"),
+        ],
 )
 def test_example_out_reload_preserves_input_waypoints(fig: str, edge_id: str) -> None:
     """example.bat 第 4 步产物须保留输入图航点；改 example 后须跑 example.bat 或本文件。"""
@@ -78,6 +74,9 @@ def test_reload_compressed_drawio_svg_output_stays_compressed(tmp_path: Path) ->
     source = ROOT / "test.drawio.svg"
     if not source.is_file():
         pytest.skip("需要仓库根目录 test.drawio.svg")
+    orig = source.read_text(encoding="utf-8")
+    if "drawclockType=" not in orig:
+        pytest.skip("test.drawio.svg 不含器件库图形")
     out = tmp_path / "reloaded.drawio"
     reload_drawio_file(source, LIBRARY, out)
     text = out.read_text(encoding="utf-8")
@@ -101,12 +100,12 @@ def test_reload_preserves_example_edge_waypoints(tmp_path: Path) -> None:
     reload_drawio_file(source, LIBRARY, out)
     orig = source.read_text(encoding="utf-8")
     text = out.read_text(encoding="utf-8")
-    for edge_id in ("25", "26"):
+    for edge_id in ("24", "25"):
         assert _edge_waypoints(orig, edge_id) == _edge_waypoints(text, edge_id)
         assert len(_edge_waypoints(orig, edge_id)) == 2, f"edge {edge_id} 应有 2 个航点（pll_main 汇流柱）"
-    assert _edge_waypoints(orig, "25") == ((170, 140), (170, 80))
-    assert _edge_waypoints(orig, "26") == ((170, 140), (170, 200))
-    assert "exitPerimeter=0" in _edge_style(text, "25")
+    assert _edge_waypoints(orig, "24") == ((170, 140), (170, 80))
+    assert _edge_waypoints(orig, "25") == ((170, 140), (170, 200))
+    assert "exitPerimeter=0" in _edge_style(text, "24")
 
 
 def test_reload_preserves_fig1_cross_wire_waypoints(tmp_path: Path) -> None:
@@ -199,7 +198,6 @@ def test_reload_keeps_placeholder_template_for_edit(tmp_path: Path) -> None:
     assert 'placeholders="1"' in inner
     assert "%name%" in inner
     assert "%pll_kind%" in inner
-    assert 'pll_kind="SC"' in inner
     assert 'name="pll0"' in inner
 
 

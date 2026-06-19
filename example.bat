@@ -21,19 +21,19 @@ if errorlevel 1 exit /b 1
 
 echo.
 echo === 3/5 run: fig1 + fig2 -^> clock-tree.json ===
-python src\drawclock.py run -i example\fig1.drawio example\fig2.drawio -o example\out\clock-tree.json -l drawio-lib\drawclock.xml
+python src run -i example\fig1.drawio example\fig2.drawio -o example\out\clock-tree.json -l drawio-lib\drawclock.xml
 if errorlevel 1 exit /b 1
 
 echo.
 echo === 4/5 reload fig1 + fig2 ===
-python src\drawclock.py reload -i example\fig1.drawio -l drawio-lib\drawclock.xml -o example\out\fig1-reloaded.drawio
+python src reload -i example\fig1.drawio -l drawio-lib\drawclock.xml -o example\out\fig1-reloaded.drawio
 if errorlevel 1 exit /b 1
-python src\drawclock.py reload -i example\fig2.drawio -l drawio-lib\drawclock.xml -o example\out\fig2-reloaded.drawio
+python src reload -i example\fig2.drawio -l drawio-lib\drawclock.xml -o example\out\fig2-reloaded.drawio
 if errorlevel 1 exit /b 1
 
 echo.
 echo === 5/5 pytest: reload + example ===
-pytest tests\test_reload.py tests\test_parse_drawio.py::test_example_fig1_embeds_library_labels tests\test_parse_drawio.py::test_example_two_figs_cross_wire_no_wire_in_json -q --tb=short
+pytest tests\test_reload.py tests\test_parse_drawio.py::test_example_fig1_embeds_library_labels tests\test_parse_drawio.py::test_example_two_figs_cross_from_no_from_in_json -q --tb=short
 if errorlevel 1 exit /b 1
 
 echo.

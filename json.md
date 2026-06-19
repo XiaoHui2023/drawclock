@@ -3,26 +3,28 @@
 以下为示范。
 
 ```json5
-// JSON 无 wire
-// freq：Hz；图上 100k、50M 等导出为数值
+// JSON 无 from；kind 与器件库名一致；属性原样来自图中 object
 {
   "xtal": {
     "kind": "source"
   },
   "pll_main": {
     "kind": "pll",
-    "pll_kind": "sc",
+    "pll_kind": "SC",
     "source": "xtal"
   },
   "pll_dual": {
-    "kind": "pll",
-    "pll_kind": "sc",
-    "output_count": 2,  // 图中 pll2
-    "source": "xtal"
+    "kind": "pll2",
+    "pll_kind": "SC",
+    "source": "xtal",
+    "target": {
+      "0": "gate0",  // 多路输出：target 为 dict，键为输出口序号
+      "1": "div0"
+    }
   },
   "gate0": {
     "kind": "gate",
-    "source": "pll_dual[0]"  // 多路 pll：名[序号]，从 0 起
+    "source": "pll_dual[0]"  // 接多路输出上游：名[序号]，从 0 起
   },
   "div0": {
     "kind": "div",
@@ -37,25 +39,25 @@
     "source": "gate0"
   },
   "mux2": {
-    "kind": "mux",  // 库 mux2…mux6 统一为 mux
+    "kind": "mux2",
     "source": {
-      "0": "pll_m2a",  // 键为输入标签 0、1…，与 inK_label 一致
+      "0": "pll_m2a",  // 多路输入：source 为 dict，键为输入口序号
       "1": "pll_m2b"
     }
   },
   "pll_m2a": {
     "kind": "pll",
-    "pll_kind": "sc",
+    "pll_kind": "SC",
     "source": "xtal"
   },
   "pll_m2b": {
     "kind": "pll",
-    "pll_kind": "sc",
+    "pll_kind": "SC",
     "source": "xtal"
   },
   "clk_mux": {
     "kind": "clock",
-    "freq": 200000000,
+    "freq": "100",  // 图中属性原样导出，不做数值换算
     "source": "mux2"
   }
 }

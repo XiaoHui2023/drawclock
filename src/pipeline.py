@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Any
 
 from config_export import devices_to_config, entries_to_clock_tree
-from device_attrs_convert import convert_config
 from drawio_decode import extract_mxfile_xml, iter_diagram_models
 from drawio_graph import ParsedDiagram, merge_diagrams, parse_models, validate_diagram_library
 from drawio_library import DEFAULT_LIBRARY_PATH
@@ -29,11 +28,12 @@ def drawio_to_clock_tree(
         parts.append(parse_models(models, id_prefix=prefix))
     diagram = merge_diagrams(parts)
     validate_diagram_library(diagram, lib)
-    devices, wire_by_name = build_device_states(diagram)
-    entries = devices_to_config(devices, wire_by_name)
+    lib_str = str(lib)
+    devices, from_by_name = build_device_states(diagram, library_path=lib_str)
+    entries = devices_to_config(devices, from_by_name, library_path=lib_str)
     config = entries_to_clock_tree(entries)
-    validate_config(config)
-    return convert_config(config)
+    validate_config(config, library_path=lib_str)
+    return config
 
 
 def parse_drawio_paths(
