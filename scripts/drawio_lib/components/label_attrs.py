@@ -2,9 +2,7 @@ from __future__ import annotations
 
 ATTR_NAME = "name"
 
-INSTANCE_NAME_GAP_PX = 4
-CLOCK_INSTANCE_NAME_GAP_PX = 16
-DTO_INSTANCE_NAME_GAP_PX = 16
+INSTANCE_NAME_GAP_PX = 0
 LABEL_FONT_PX = 11
 
 

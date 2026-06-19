@@ -57,10 +57,10 @@ def test_label_uses_non_scaling_layers() -> None:
     g = mux2.G
     assert g.in0.trap.label_y == round(g.in0.trap.trap_y)
     html = mux2.label_html()
-    assert 'viewBox="0 0 120 106"' in html
+    assert f'viewBox="0 0 {mux2.W} {mux2.H}"' in html
     assert 'preserveAspectRatio="none"' in html
     assert "transform:scale(" not in html
-    assert "width:100%" in html
+    assert "width:40px" in html
     assert ">0</span>" in html
     assert ">1</span>" in html
     assert "in0_label" not in html
@@ -87,8 +87,9 @@ def test_verify_geometry_passes() -> None:
 
 def test_style_points_on_trap_ports() -> None:
     style = mux2.cell_style()
-    assert "overflow=fill" in style
-    assert "overflow=visible" not in style
+    assert "overflow=visible" in style
+    assert "overflow=fill" not in style
+    assert "resizable=0" in style
     pts = mux2._parse_points(style)
     g = mux2.G
     assert isclose(pts[0][0], g.in0.trap.x_rel, abs_tol=0.001)

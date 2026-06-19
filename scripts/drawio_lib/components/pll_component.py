@@ -69,15 +69,27 @@ class PllComponent(SimpleComponent):
     def preview_svg(self) -> str:
         body = pll_body(self._g)
         mid = self._g.body_mid_y
-        port = self._ports()[0]
-        a = port.anchor
+        stub_lines = []
+        for port, color in zip(
+            self._ports(),
+            ("#c00", "#090") if len(self._ports()) == 2 else ("#c00",),
+        ):
+            stub_lines.append(
+                f'  <line x1="{port.stub_x1}" y1="{port.stub_y1}" '
+                f'x2="{port.stub_x2}" y2="{port.stub_y2}" stroke="{color}" '
+                f'stroke-width="1"/>'
+            )
+            a = port.anchor
+            stub_lines.append(
+                f'  <circle cx="{a.cell_x}" cy="{a.cell_y}" r="2.5" fill="{color}"/>'
+            )
+        stubs = "\n".join(stub_lines)
         name_y = self._instance_name_top_y() + geom.NAME_H // 2
         label_x = pll_label_cx(self._g)
         return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" viewBox="0 0 {self.w} {self.h}">
 {body}
   <text x="{label_x}" y="{mid}" font-size="{PLL_CENTER_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{DEFAULT_PLL_KIND}</text>
-  <line x1="{port.stub_x1}" y1="{port.stub_y1}" x2="{port.stub_x2}" y2="{port.stub_y2}" stroke="#c00" stroke-width="1"/>
-  <circle cx="{a.cell_x}" cy="{a.cell_y}" r="2.5" fill="#c00"/>
+{stubs}
   <text x="{self.w // 2}" y="{name_y}" font-size="11" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{self.title}</text>
 </svg>
 """

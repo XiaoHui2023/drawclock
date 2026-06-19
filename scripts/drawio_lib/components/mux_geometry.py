@@ -5,16 +5,18 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
-from drawio_lib.components.simple_geometry import W, side_pad_x
+from drawio_lib.components.simple_geometry import (
+    MAX_INSTANCE_GAP,
+    MUX_BODY_PAD_BOTTOM,
+    NAME_H,
+    W,
+    side_pad_x,
+)
 
 TRAP_MARGIN_X = 8
 TRAP_Y = 6
 TRAP_W = 24
 TRAP_RIGHT_MARGIN_Y = 10
-
-MUX_BODY_PAD_BOTTOM = 4
-NAME_H = 16
-MAX_INSTANCE_GAP = 16
 
 POINT_FIXED = 0
 

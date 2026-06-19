@@ -36,7 +36,6 @@ from drawio_lib.components.simple_shapes import (
 from drawio_lib.xml_io import graph_root, xml_attr
 
 DRAWCLOCK_TYPE_KEY = "drawclockType"
-OUTPUT_LABEL_OFFSET_X = 6
 
 
 def _svg_num(value: float) -> str:
@@ -105,15 +104,9 @@ class Pll2Component:
         mid = self._g.body_mid_y
         return ((pll_label_cx(self._body_g), mid, f"%{ATTR_PLL_KIND}%"),)
 
-    def _output_labels(self) -> tuple[tuple[float, float, str], ...]:
-        return tuple(
-            (port.anchor.cell_x - OUTPUT_LABEL_OFFSET_X, port.anchor.cell_y, str(index))
-            for index, port in enumerate(self._g.outputs)
-        )
-
     def label_html(self) -> str:
         body = pll2_body(self._body_g)
-        overlays = self._center_labels() + self._output_labels()
+        overlays = self._center_labels()
         return (
             f"{shell_open(self.w, self.h)}"
             f"{stretch_body_layer(body, view_w=self.w, view_h=self.h, overlays=overlays)}"
@@ -188,18 +181,11 @@ class Pll2Component:
                 f'r="2.5" fill="{color}"/>'
             )
         stubs = "\n".join(stub_lines)
-        output_texts = "\n".join(
-            f'  <text x="{_svg_num(port.anchor.cell_x - OUTPUT_LABEL_OFFSET_X)}" '
-            f'y="{_svg_num(port.anchor.cell_y)}" font-size="11" fill="{STROKE}" '
-            f'text-anchor="middle" dominant-baseline="middle">{index}</text>'
-            for index, port in enumerate(self._g.outputs)
-        )
         name_y = self._instance_name_top_y() + sgeom.NAME_H // 2
         label_x = pll_label_cx(self._body_g)
         return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" viewBox="0 0 {self.w} {self.h}">
 {body}
   <text x="{label_x}" y="{mid}" font-size="{PLL_CENTER_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{DEFAULT_PLL_KIND}</text>
-{output_texts}
 {stubs}
   <text x="{self.w // 2}" y="{name_y}" font-size="11" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{self.title}</text>
 </svg>

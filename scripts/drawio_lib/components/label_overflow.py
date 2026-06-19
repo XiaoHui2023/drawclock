@@ -2,14 +2,11 @@ from __future__ import annotations
 
 import re
 
-MXCELL_OVERFLOW_FILL = "overflow=fill"
+MXCELL_OVERFLOW_VISIBLE = "overflow=visible"
+MXCELL_RESIZABLE_OFF = "resizable=0"
 
 _PERCENT_HEIGHT_ONLY = re.compile(
     r"height:\s*(?!100(?:\.0+)?%)\d+(?:\.\d+)?%\s*;",
-    re.IGNORECASE,
-)
-_FIXED_SHELL_SIZE = re.compile(
-    r"width:\s*\d+px\s*;|height:\s*\d+px\s*;",
     re.IGNORECASE,
 )
 _ALLOWED_FIXED_PX = re.compile(
@@ -19,14 +16,15 @@ _ALLOWED_FIXED_PX = re.compile(
 
 
 def mxcell_overflow_style() -> str:
-    return f"{MXCELL_OVERFLOW_FILL};"
+    return f"{MXCELL_OVERFLOW_VISIBLE};"
 
 
 def mxcell_html_label_style_parts() -> str:
-    """Label fills mxGeometry so the graphic layer can use width/height 100%."""
+    """Keep labels visible outside the small fixed mxGeometry."""
     return (
         "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=1;"
         f"{mxcell_overflow_style()}"
+        f"{MXCELL_RESIZABLE_OFF};"
         "autosize=0;"
         "fillColor=none;strokeColor=none;"
         "spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;"
@@ -42,7 +40,7 @@ def verify_no_degenerate_label_tricks(html: str, *, title: str) -> None:
         )
     if 'preserveAspectRatio="meet"' in html or 'preserveAspectRatio="xMidYMid meet"' in html:
         raise ValueError(
-            f"{title}: body SVG must use preserveAspectRatio=none so ports track the graphic"
+            f"{title}: body SVG must use preserveAspectRatio=none inside the fixed cell"
         )
 
 
@@ -68,29 +66,25 @@ def verify_label_stretch_policy(
     design_cell_w: int,
     design_cell_h: int,
 ) -> None:
-    if "width:100%" not in html or "height:100%" not in html:
-        raise ValueError(f"{title}: label shell must use width/height 100%")
-    if f"min-width:{design_cell_w}px" in html or f"min-height:{design_cell_h}px" in html:
+    shell_size = f"width:{design_cell_w}px;height:{design_cell_h}px"
+    shell_part = html.split('><div style="position:absolute', 1)[0]
+    if shell_size not in shell_part:
         raise ValueError(
-            f"{title}: label shell must not set min-width/min-height to design px "
-            "(draw.io shrink-wraps to min size; ports drift from the graphic)"
+            f"{title}: label shell must use fixed {design_cell_w}x{design_cell_h}px"
         )
-    if 'position:absolute;left:0;top:0;width:100%;height:100%' not in html:
+    layer_size = (
+        f"position:absolute;left:0;top:0;width:{design_cell_w}px;"
+        f"height:{design_cell_h}px"
+    )
+    if layer_size not in html:
         raise ValueError(
-            f"{title}: graphic layer must pin to the full cell (absolute 100%×100%)"
-        )
-    shell_part = html.split('viewBox="0 0 ', 1)[0]
-    shell_part = _ALLOWED_FIXED_PX.sub("", shell_part)
-    if _FIXED_SHELL_SIZE.search(shell_part):
-        raise ValueError(
-            f"{title}: label shell must not use fixed px width/height "
-            "(pattern will not fill a stretched mxGeometry)"
+            f"{title}: graphic layer must pin to the fixed cell canvas"
         )
     if 'viewBox="0 0 ' not in html:
         raise ValueError(f"{title}: label must include a stretch SVG viewBox")
-    if 'width="100%"' not in html or 'height="100%"' not in html:
+    if f'width="{design_cell_w}"' not in html or f'height="{design_cell_h}"' not in html:
         raise ValueError(
-            f"{title}: pattern SVG must use width/height 100% or the graphic collapses"
+            f"{title}: pattern SVG must use fixed width/height matching the cell canvas"
         )
     if _PERCENT_HEIGHT_ONLY.search(html):
         raise ValueError(
@@ -108,15 +102,20 @@ def verify_label_overflow_policy(
     design_cell_w: int,
     design_cell_h: int,
 ) -> None:
-    if "overflow=visible" in style:
+    if "overflow=fill" in style:
         raise ValueError(
-            f"{title}: mxCell must not use overflow=visible "
-            "(draw.io shrink-wraps HTML labels to ~1px; the graphic disappears)"
+            f"{title}: mxCell must not use overflow=fill "
+            "(draw.io clips labels outside the selection box)"
         )
-    if MXCELL_OVERFLOW_FILL not in style:
+    if MXCELL_OVERFLOW_VISIBLE not in style:
         raise ValueError(
-            f"{title}: mxCell style must include {MXCELL_OVERFLOW_FILL} "
-            "so the label fills mxGeometry"
+            f"{title}: mxCell style must include {MXCELL_OVERFLOW_VISIBLE} "
+            "so text outside the selection box remains visible"
+        )
+    if MXCELL_RESIZABLE_OFF not in style:
+        raise ValueError(
+            f"{title}: mxCell style must include {MXCELL_RESIZABLE_OFF} "
+            "so fixed graphics, text, and ports cannot drift after stretching"
         )
     if "overflow:visible" not in html:
         raise ValueError(f"{title}: label shell must use overflow:visible")

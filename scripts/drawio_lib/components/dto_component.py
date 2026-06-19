@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from drawio_lib.components import simple_geometry as geom
-from drawio_lib.components.label_attrs import DTO_INSTANCE_NAME_GAP_PX
 from drawio_lib.components.simple_component import STROKE, SimpleComponent
 from drawio_lib.components.simple_shapes import (
     DTO_CENTER_FONT_PX,
@@ -15,8 +14,6 @@ from drawio_lib.components.simple_shapes import (
 @dataclass
 class DtoComponent(SimpleComponent):
     """DTO chip; center label does not stretch with the shape."""
-
-    instance_name_gap_px: int = DTO_INSTANCE_NAME_GAP_PX
 
     def _center_labels(self) -> tuple[tuple[float, float, str, int], ...]:
         cx = geom.W / 2

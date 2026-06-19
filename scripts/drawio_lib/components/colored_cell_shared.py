@@ -17,12 +17,13 @@ def register_colored_cell(
     body_svg: Callable[[geom.SimpleGeometry], str],
 ) -> None:
     mid = geom.BODY_Y + geom.BODY_H // 2
-    pad = geom.side_pad_x()
+    pad = geom.side_pad_x(geom.COLORED_CELL_W)
     component = SimpleComponent(
         title=title,
         tags=tags,
         port_mode="both",
         body_svg=body_svg,
+        cell_w=geom.COLORED_CELL_W,
         port_cells=(
             (pad + CELL_TRI_LEFT_X, mid),
             (pad + CELL_TRI_TIP_X, mid),

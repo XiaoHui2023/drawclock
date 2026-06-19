@@ -19,7 +19,7 @@ class FromComponent(SimpleComponent):
     """Cross-sheet output stub; logical input follows the same-named clock."""
 
     def _instance_name_top_y(self) -> int:
-        return geom.WIRE_STROKE_Y + 8
+        return geom.WIRE_STROKE_Y
 
     def label_html(self) -> str:
         body = wire_body(self._g)
@@ -42,7 +42,7 @@ class FromComponent(SimpleComponent):
 
     def preview_svg(self) -> str:
         body = wire_body(self._g)
-        name_y = self._instance_name_top_y() + 6
+        name_y = self._instance_name_top_y() + geom.NAME_H // 2
         stub_lines = []
         for port, color in zip(self._ports(), ("#090",)):
             stub_lines.append(
@@ -65,8 +65,8 @@ class FromComponent(SimpleComponent):
     def verify_geometry(self) -> None:
         html = self.label_html()
         verify_label_placeholders(html, title="from")
-        if "width:100%" not in html or "height:100%" not in html:
-            raise ValueError("from label shell must fill the shape (100%)")
+        if f"width:{self.w}px" not in html or f"height:{self.h}px" not in html:
+            raise ValueError("from label shell must use fixed px canvas")
         if f'viewBox="0 0 {self.w} {self.h}"' not in html:
             raise ValueError("from viewBox must match cell width and height")
         if 'preserveAspectRatio="none"' not in html:

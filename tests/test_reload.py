@@ -177,7 +177,8 @@ def test_reload_preserves_geometry_and_upgrades_style(tmp_path: Path) -> None:
     inner = _mxfile_searchable(text)
     assert 'name="pll_main"' in inner
     assert 'x="36"' in inner
-    assert "overflow=fill" in inner
+    assert "overflow=visible" in inner
+    assert "resizable=0" in inner
     assert "html=1" in inner
     gate = re.search(
         r'name="gate0"[^>]*>[\s\S]*?<mxGeometry x="(\d+)" y="(\d+)" width="(\d+)" height="(\d+)"',
@@ -203,7 +204,7 @@ def test_reload_keeps_placeholder_template_for_edit(tmp_path: Path) -> None:
 
 def test_reload_replaces_stale_baked_label_viewbox(tmp_path: Path) -> None:
     gate = SHAPES["gate"]
-    stale_w = max(gate.w - 40, 40)
+    stale_w = gate.w + 40
     stale_label = bake_label_placeholders(
         gate.label.replace(f"0 0 {gate.w} {gate.h}", f"0 0 {stale_w} {gate.h}"),
         {"name": "g1"},
@@ -287,7 +288,7 @@ def test_reload_realigns_edge_ports_after_geometry_change(tmp_path: Path) -> Non
 
 
 def test_reload_applies_library_width_from_narrow_fixture(tmp_path: Path) -> None:
-    narrow_w = max(SHAPES["gate"].w - 40, 40)
+    narrow_w = SHAPES["gate"].w + 40
     inp = tmp_path / "narrow.drawio"
     inp.write_text(
         f"""<mxfile><diagram><mxGraphModel><root>
@@ -310,7 +311,7 @@ def test_reload_applies_library_width_from_narrow_fixture(tmp_path: Path) -> Non
     assert geom is not None
     assert geom.group(1) == str(SHAPES["gate"].w)
     assert geom.group(2) == str(SHAPES["gate"].h)
-    assert int(geom.group(1)) > narrow_w
+    assert int(geom.group(1)) < narrow_w
 
 
 def test_reload_keeps_non_library_vertex(tmp_path: Path) -> None:
@@ -342,7 +343,8 @@ def test_reload_keeps_non_library_vertex(tmp_path: Path) -> None:
     text = out.read_text(encoding="utf-8")
     assert 'value="note"' in text
     assert 'x="200"' in text
-    assert "overflow=fill" in text
+    assert "overflow=visible" in text
+    assert "resizable=0" in text
 
 
 def test_migrate_rejects_unknown_library_type() -> None:

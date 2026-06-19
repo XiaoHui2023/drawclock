@@ -8,7 +8,6 @@ import xml.etree.ElementTree as ET
 from drawio_lib.components import simple_geometry as geom
 from drawio_lib.components.label_attrs import (
     ATTR_NAME,
-    CLOCK_INSTANCE_NAME_GAP_PX,
     LABEL_FONT_PX,
     verify_label_placeholders,
 )
@@ -36,7 +35,6 @@ class ClockComponent(SimpleComponent):
 
     cell_w: int = CLOCK_CELL_W
     body_margin_x: int = CLOCK_BODY_MARGIN_X
-    instance_name_gap_px: int = CLOCK_INSTANCE_NAME_GAP_PX
 
     def __post_init__(self) -> None:
         self._g = geom.compute_geometry(

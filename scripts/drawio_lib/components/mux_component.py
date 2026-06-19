@@ -101,7 +101,7 @@ class MuxComponent:
             (label_x, port.trap.cell_y, str(i))
             for i, port in enumerate(self._g.inputs)
         )
-        name_top = self._g.mux_h + geom.MUX_BODY_PAD_BOTTOM
+        name_top = self._g.mux_h
         return (
             f"{shell_open(self.w, self.h)}"
             f"{stretch_body_layer(body, view_w=self.w, view_h=self.h, overlays=in_overlays)}"
@@ -112,7 +112,7 @@ class MuxComponent:
     def preview_svg(self) -> str:
         poly = geom.trapezoid_cell_points(self._t)
         lx = self._t.x + LABEL_INSET_X
-        name_y = self._g.mux_h + DEFAULT_INSTANCE_GAP
+        name_y = self._g.mux_h + geom.NAME_H // 2
         stub_lines = []
         for port, color in (
             *[(p, "#c00") for p in self._g.inputs],
@@ -140,7 +140,7 @@ class MuxComponent:
   <polygon points="{poly}" fill="{FILL}" stroke="{STROKE}" stroke-width="2"/>
 {stubs}
 {text_block}
-  <text x="{self.w // 2}" y="{name_y + 12}" font-size="{LABEL_FONT_PX}" fill="{STROKE}"
+  <text x="{self.w // 2}" y="{name_y}" font-size="{LABEL_FONT_PX}" fill="{STROKE}"
     text-anchor="middle" dominant-baseline="middle">{self.title}</text>
 </svg>
 """

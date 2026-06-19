@@ -4,7 +4,8 @@ from dataclasses import dataclass
 from typing import Literal
 
 DESIGN_W = 40
-W = 120
+W = DESIGN_W
+COLORED_CELL_W = DESIGN_W
 BODY_MARGIN_X = 8
 BODY_Y = 6
 BODY_H = 48
@@ -12,9 +13,9 @@ WIRE_BODY_Y = 10
 WIRE_STROKE_Y = 14
 WIRE_CELL_H = 40
 
-MUX_BODY_PAD_BOTTOM = 4
+MUX_BODY_PAD_BOTTOM = 0
 NAME_H = 16
-MAX_INSTANCE_GAP = 16
+MAX_INSTANCE_GAP = 8
 POINT_FIXED = 0
 
 PortMode = Literal["both", "left", "right", "from"]
@@ -95,19 +96,24 @@ def body_mid_y(rect: BodyRect) -> int:
     return rect.y + rect.h // 2
 
 
-def cell_h_for_body(body_height: int) -> int:
-    return BODY_Y + body_height + MUX_BODY_PAD_BOTTOM + MAX_INSTANCE_GAP + NAME_H
+def cell_h_for_body(
+    body_height: int,
+    *,
+    body_pad_bottom: int = MUX_BODY_PAD_BOTTOM,
+    max_instance_gap: int = MAX_INSTANCE_GAP,
+) -> int:
+    return BODY_Y + body_height + body_pad_bottom + max_instance_gap + NAME_H
 
 
 def clock_cell_h(body_height: int = BODY_H) -> int:
     from drawio_lib.components.simple_shapes import CLOCK_WAVE_AMP
-    from drawio_lib.components.label_attrs import CLOCK_INSTANCE_NAME_GAP_PX
+    from drawio_lib.components.label_attrs import INSTANCE_NAME_GAP_PX
 
     mid = BODY_Y + body_height // 2
     return (
         mid
         + CLOCK_WAVE_AMP
-        + CLOCK_INSTANCE_NAME_GAP_PX
+        + INSTANCE_NAME_GAP_PX
         + NAME_H
         + MUX_BODY_PAD_BOTTOM
     )
@@ -168,6 +174,8 @@ def compute_geometry(
     port_cells: tuple[tuple[int, int], ...] | None = None,
     cell_w: int = W,
     asymmetric_clock: bool = False,
+    body_pad_bottom: int = MUX_BODY_PAD_BOTTOM,
+    max_instance_gap: int = MAX_INSTANCE_GAP,
 ) -> SimpleGeometry:
     if port_mode == "from":
         return compute_from_geometry()
@@ -177,7 +185,15 @@ def compute_geometry(
     else:
         rect = body_rect(height=body_height, margin_x=margin_x, cell_w=cell_w)
     mid = body_mid_y(rect)
-    height = clock_cell_h(body_height) if asymmetric_clock else cell_h_for_body(body_height)
+    height = (
+        clock_cell_h(body_height)
+        if asymmetric_clock
+        else cell_h_for_body(
+            body_height,
+            body_pad_bottom=body_pad_bottom,
+            max_instance_gap=max_instance_gap,
+        )
+    )
     left: Port | None = None
     right: Port | None = None
     if port_cells:

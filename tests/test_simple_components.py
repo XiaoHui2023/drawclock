@@ -62,6 +62,13 @@ def test_pll_left_right_points() -> None:
     assert isclose(pts[1][0], pll.G.right.anchor.x_rel, abs_tol=0.001)
 
 
+def test_pll_preview_shows_input_and_output() -> None:
+    pll = importlib.import_module("drawio_lib.components.pll")
+    svg = pll.preview_svg()
+    assert 'stroke="#c00"' in svg
+    assert 'stroke="#090"' in svg
+
+
 def test_pll2_outputs_follow_right_chevron() -> None:
     pll2 = importlib.import_module("drawio_lib.components.pll2")
     pts = pll2._parse_points(pll2.cell_style())
@@ -99,7 +106,7 @@ def test_pll2_outputs_follow_right_chevron() -> None:
     )
 
 
-def test_pll2_label_keeps_kind_left_and_adds_output_numbers() -> None:
+def test_pll2_label_keeps_kind_left() -> None:
     pll2 = importlib.import_module("drawio_lib.components.pll2")
     from drawio_lib.components import simple_geometry as sgeom
     from drawio_lib.components.simple_shapes import PLL_LABEL_CX
@@ -108,8 +115,8 @@ def test_pll2_label_keeps_kind_left_and_adds_output_numbers() -> None:
     html = pll2.label_html()
     assert f"left:{cx / pll2.W * 100}%" in html
     assert "%pll_kind%" in html
-    assert ">0</span>" in html
-    assert ">1</span>" in html
+    assert ">0</span>" not in html
+    assert ">1</span>" not in html
 
 
 def test_source_only_right_point() -> None:
@@ -268,7 +275,7 @@ def test_on_disk_drawclock_xml_or_shape() -> None:
     xml = decompress_drawio_xml(or_entry["xml"])
     assert "A 10 12" in xml
     assert "Q 54 30" not in xml
-    assert "M 48 18 L 58 18 A 12 12 0 1 1 58 42 L 48 42 A 10 12 0 0 0 48 18" in xml
+    assert "M 8 18 L 18 18 A 12 12 0 1 1 18 42 L 8 42 A 10 12 0 0 0 8 18" in xml
 
 
 def _logic_left_cell(mod) -> float:
@@ -313,10 +320,11 @@ def test_instance_name_not_in_svg(name: str) -> None:
     assert "transform:scale(" not in html
     assert "position:absolute" in html
     assert "overflow:visible" in html
-    assert "width:100%" in html
-    assert "height:100%" in html
-    assert "overflow=fill" in mod.cell_style()
-    assert "overflow=visible" not in mod.cell_style()
+    assert f"width:{mod.W}px" in html
+    assert f"height:{mod.H}px" in html
+    assert "overflow=visible" in mod.cell_style()
+    assert "overflow=fill" not in mod.cell_style()
+    assert "resizable=0" in mod.cell_style()
 
 
 def test_clk_phase_sel_ports_on_right_border() -> None:
@@ -345,8 +353,7 @@ def test_from_ports_on_graphic() -> None:
     from_mod = importlib.import_module("drawio_lib.components.from")
     pts = from_mod._parse_points(from_mod.cell_style())
     assert len(pts) == 1
-    pad = 40 / 120
-    assert isclose(pts[0][0], 1.0 - pad, abs_tol=0.02)
+    assert isclose(pts[0][0], 1.0, abs_tol=0.02)
 
 
 def test_clock_instance_name_below_graphic() -> None:
@@ -370,8 +377,8 @@ def test_clock_only_left_point() -> None:
     assert isclose(pts[0][0], CLOCK_NAME_SIDE_PAD / clock.W, abs_tol=0.002)
     y_lo = clock.G.body_mid_y + CLOCK_WAVE_AMP
     assert isclose(pts[0][1], y_lo / clock.H, abs_tol=0.002)
-    assert clock.W == 120
-    assert CLOCK_WAVE_W == 36
+    assert clock.W == 40
+    assert CLOCK_WAVE_W == 31
     assert "%func_freq%" not in clock.label_html()
     assert "%scan_freq%" not in clock.label_html()
     assert "%bist_freq%" not in clock.label_html()

@@ -6,10 +6,9 @@ LabelOverlay = tuple[float, float, str] | tuple[float, float, str, int]
 
 
 def shell_open(design_cell_w: int, design_cell_h: int) -> str:
-    _ = (design_cell_w, design_cell_h)
     return (
         f'<div style="position:relative;box-sizing:border-box;margin:0;padding:0;'
-        f"display:block;width:100%;height:100%;"
+        f"display:block;width:{design_cell_w}px;height:{design_cell_h}px;"
         f'overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;">'
     )
 
@@ -25,13 +24,13 @@ def stretch_body_layer(
     view_h: int,
     overlays: tuple[LabelOverlay, ...] = (),
 ) -> str:
-    """SVG fills the shape; stretches with mxGeometry so ports stay aligned."""
+    """Fixed SVG canvas anchored at the small mxGeometry origin."""
     overlay_html = "".join(
         _overlay_on_cell(item, view_w=view_w, view_h=view_h) for item in overlays
     )
     return (
-        f'<div style="position:absolute;left:0;top:0;width:100%;height:100%;">'
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" '
+        f'<div style="position:absolute;left:0;top:0;width:{view_w}px;height:{view_h}px;">'
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{view_w}" height="{view_h}" '
         f'viewBox="0 0 {view_w} {view_h}" preserveAspectRatio="none" '
         f'style="display:block;overflow:visible;">'
         f"{body}</svg>"

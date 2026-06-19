@@ -36,7 +36,7 @@ from drawio_lib.components.label_overflow import (
         "mux6",
     ],
 )
-def test_mxcell_uses_fill_overflow(module_name: str) -> None:
+def test_mxcell_uses_visible_overflow_and_fixed_size(module_name: str) -> None:
     mod = importlib.import_module(f"drawio_lib.components.{module_name}")
     style = mod.cell_style()
     html = mod.label_html()
@@ -58,11 +58,11 @@ def test_middle_vertical_align_rejected() -> None:
         verify_mxcell_label_style(bad, title="gate")
 
 
-def test_visible_overflow_rejected() -> None:
+def test_fill_overflow_rejected() -> None:
     gate = importlib.import_module("drawio_lib.components.gate")
     html = gate.label_html()
-    bad_style = gate.cell_style().replace("overflow=fill", "overflow=visible")
-    with pytest.raises(ValueError, match="overflow=visible"):
+    bad_style = gate.cell_style().replace("overflow=visible", "overflow=fill")
+    with pytest.raises(ValueError, match="overflow=fill"):
         verify_label_overflow_policy(
             html,
             bad_style,
@@ -72,13 +72,27 @@ def test_visible_overflow_rejected() -> None:
         )
 
 
-def test_min_width_shell_rejected() -> None:
+def test_resizable_required() -> None:
+    gate = importlib.import_module("drawio_lib.components.gate")
+    html = gate.label_html()
+    bad_style = gate.cell_style().replace("resizable=0;", "")
+    with pytest.raises(ValueError, match="resizable=0"):
+        verify_label_overflow_policy(
+            html,
+            bad_style,
+            title="gate",
+            design_cell_w=gate.W,
+            design_cell_h=gate.H,
+        )
+
+
+def test_percent_shell_rejected() -> None:
     gate = importlib.import_module("drawio_lib.components.gate")
     html = gate.label_html().replace(
+        f"display:block;width:{gate.W}px;height:{gate.H}px;",
         "display:block;width:100%;height:100%;",
-        f"display:block;width:100%;height:100%;min-width:{gate.W}px;min-height:{gate.H}px;",
     )
-    with pytest.raises(ValueError, match="min-width/min-height"):
+    with pytest.raises(ValueError, match="fixed"):
         verify_label_stretch_policy(
             html,
             title="gate",

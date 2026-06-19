@@ -46,6 +46,9 @@ class SimpleComponent:
     show_instance_name: bool = True
     port_cells: tuple[tuple[int, int], ...] | None = None
     instance_name_gap_px: int = INSTANCE_NAME_GAP_PX
+    cell_w: int = geom.W
+    body_pad_bottom: int = geom.MUX_BODY_PAD_BOTTOM
+    max_instance_gap: int = geom.MAX_INSTANCE_GAP
 
     def __post_init__(self) -> None:
         if self.port_mode == "from":
@@ -56,6 +59,9 @@ class SimpleComponent:
                 body_height=self.body_height,
                 margin_x=self.body_margin_x,
                 port_cells=self.port_cells,
+                cell_w=self.cell_w,
+                body_pad_bottom=self.body_pad_bottom,
+                max_instance_gap=self.max_instance_gap,
             )
 
     @property
@@ -64,7 +70,7 @@ class SimpleComponent:
 
     @property
     def w(self) -> int:
-        return geom.W
+        return self.cell_w
 
     @property
     def h(self) -> int:
@@ -93,7 +99,7 @@ class SimpleComponent:
     def _instance_name_top_y(self) -> int:
         if self.port_mode == "from":
             return geom.WIRE_STROKE_Y + 8
-        return geom.BODY_Y + self.body_height + geom.MUX_BODY_PAD_BOTTOM
+        return geom.BODY_Y + self.body_height + self.body_pad_bottom
 
     def _resolve_instance_name(self, instance_name: str | None) -> str:
         if instance_name is None:
@@ -251,8 +257,8 @@ class SimpleComponent:
             raise ValueError(f"{self.title} label must use cell viewBox")
         if 'preserveAspectRatio="none"' not in html:
             raise ValueError(f"{self.title} body SVG must stretch with the shape (none)")
-        if 'width="100%"' not in html:
-            raise ValueError(f"{self.title} label shell must size the SVG (100% width)")
+        if f'width="{self.w}"' not in html:
+            raise ValueError(f"{self.title} label shell must size the SVG ({self.w}px width)")
         if "<line " in html and self.port_mode != "from":
             raise ValueError(f"{self.title} label must not draw port stub lines")
         style = self.cell_style()
