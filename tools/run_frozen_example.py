@@ -12,8 +12,11 @@ from pathlib import Path
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
-from drawio_decode import extract_mxfile_xml, iter_diagram_models
+from drawio_decode import extract_mxfile_xml, iter_diagram_models  # noqa: E402
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 FIG1 = ROOT / "example" / "fig1.drawio"
 FIG2 = ROOT / "example" / "fig2.drawio"
