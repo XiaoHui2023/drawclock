@@ -44,6 +44,7 @@ class ClockComponent(SimpleComponent):
             port_cells=self.port_cells,
             cell_w=self.cell_w,
             asymmetric_clock=True,
+            instance_name_gap_px=self.instance_name_gap_px,
         )
 
     @property

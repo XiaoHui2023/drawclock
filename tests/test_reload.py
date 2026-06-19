@@ -287,6 +287,65 @@ def test_reload_realigns_edge_ports_after_geometry_change(tmp_path: Path) -> Non
     assert f"entryX={gate_in[0]}" in style or f"entryX={gate_in[0]:g}" in style
 
 
+def test_reload_realigns_edge_when_port_y_shifts(tmp_path: Path) -> None:
+    gate = SHAPES["gate"]
+    pll = SHAPES["pll"]
+    stale_y = 0.25
+    old_gate_style = gate.style.replace("0.3846", str(stale_y))
+    pll_out = port_anchors(pll.style, "pll")["right"]
+    gate_in = port_anchors(gate.style, "gate")["left"]
+    inp = tmp_path / "edge-y-shift.drawio"
+    inp.write_text(
+        f"""<mxfile><diagram><mxGraphModel><root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <object name="pll0" placeholders="0" id="10">
+          <mxCell style="{pll.style}" vertex="1" parent="1">
+            <mxGeometry x="40" y="40" width="{pll.w}" height="{pll.h}" as="geometry"/>
+          </mxCell>
+        </object>
+        <object name="gate0" placeholders="0" id="11">
+          <mxCell style="{old_gate_style}" vertex="1" parent="1">
+            <mxGeometry x="200" y="40" width="{gate.w}" height="{gate.h}" as="geometry"/>
+          </mxCell>
+        </object>
+        <mxCell id="20" style="exitX=1;exitY=0.5;entryX=0;entryY={stale_y};edgeStyle=none;html=1;" edge="1" parent="1" source="10" target="11">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        </root></mxGraphModel></diagram></mxfile>""",
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.drawio"
+    reload_drawio_file(inp, LIBRARY, out)
+    inner = html.unescape(_mxfile_searchable(out.read_text(encoding="utf-8")))
+    edge = re.search(r'id="20" style="([^"]*)"', inner)
+    assert edge is not None
+    style = edge.group(1).replace(" ", "")
+    assert f"exitX={pll_out[0]}" in style or f"exitX={pll_out[0]:g}" in style
+    assert f"entryY={gate_in[1]}" in style or f"entryY={gate_in[1]:g}" in style
+    assert f"entryY={stale_y:g}" not in style
+
+
+def test_reload_drops_removed_object_attrs(tmp_path: Path) -> None:
+    gate = SHAPES["gate"]
+    inp = tmp_path / "extra-attr.drawio"
+    inp.write_text(
+        f"""<mxfile><diagram><mxGraphModel><root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <object name="g" removed_field="x" placeholders="0" id="10">
+          <mxCell style="{gate.style}" vertex="1" parent="1">
+            <mxGeometry x="10" y="20" width="{gate.w}" height="{gate.h}" as="geometry"/>
+          </mxCell>
+        </object>
+        </root></mxGraphModel></diagram></mxfile>""",
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.drawio"
+    reload_drawio_file(inp, LIBRARY, out)
+    inner = _mxfile_searchable(out.read_text(encoding="utf-8"))
+    assert 'name="g"' in inner
+    assert "removed_field" not in inner
+
+
 def test_reload_applies_library_width_from_narrow_fixture(tmp_path: Path) -> None:
     narrow_w = SHAPES["gate"].w + 40
     inp = tmp_path / "narrow.drawio"

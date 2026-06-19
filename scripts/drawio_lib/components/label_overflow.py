@@ -5,6 +5,11 @@ import re
 MXCELL_OVERFLOW_VISIBLE = "overflow=visible"
 MXCELL_RESIZABLE_OFF = "resizable=0"
 
+# draw.io html=1 wraps label HTML in a 12px inline-block; export shows graphic
+# ~7px below and ~2px right of mxGeometry origin while points stay on the box.
+DRAWIO_HTML_LABEL_OFFSET_X = 2
+DRAWIO_HTML_LABEL_OFFSET_Y = 7
+
 _PERCENT_HEIGHT_ONLY = re.compile(
     r"height:\s*(?!100(?:\.0+)?%)\d+(?:\.\d+)?%\s*;",
     re.IGNORECASE,
@@ -13,6 +18,14 @@ _ALLOWED_FIXED_PX = re.compile(
     r"flex:0\s0\sauto;width:\d+px;?",
     re.IGNORECASE,
 )
+
+
+def graphic_layer_pin_css(*, view_w: int, view_h: int) -> str:
+    return (
+        f"position:absolute;left:{-DRAWIO_HTML_LABEL_OFFSET_X}px;"
+        f"top:{-DRAWIO_HTML_LABEL_OFFSET_Y}px;"
+        f"width:{view_w}px;height:{view_h}px"
+    )
 
 
 def mxcell_overflow_style() -> str:
@@ -72,10 +85,7 @@ def verify_label_stretch_policy(
         raise ValueError(
             f"{title}: label shell must use fixed {design_cell_w}x{design_cell_h}px"
         )
-    layer_size = (
-        f"position:absolute;left:0;top:0;width:{design_cell_w}px;"
-        f"height:{design_cell_h}px"
-    )
+    layer_size = graphic_layer_pin_css(view_w=design_cell_w, view_h=design_cell_h)
     if layer_size not in html:
         raise ValueError(
             f"{title}: graphic layer must pin to the fixed cell canvas"

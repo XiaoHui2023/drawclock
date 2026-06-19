@@ -27,7 +27,7 @@ class DtoComponent(SimpleComponent):
         body = dto_body(self._g)
         cx = geom.W / 2
         cy = self._g.body_mid_y + DTO_LABEL_Y_OFFSET
-        name_y = self._instance_name_top_y() + geom.NAME_H // 2
+        name_y = self._instance_name_top_y() + self.instance_name_gap_px + geom.NAME_H // 2
         stub_lines = []
         for port, color in zip(self._ports(), ("#c00", "#090")):
             stub_lines.append(

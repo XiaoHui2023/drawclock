@@ -3,6 +3,7 @@ from __future__ import annotations
 ATTR_NAME = "name"
 
 INSTANCE_NAME_GAP_PX = 0
+INSTANCE_NAME_GAP_LOOSE_PX = 4
 LABEL_FONT_PX = 11
 
 

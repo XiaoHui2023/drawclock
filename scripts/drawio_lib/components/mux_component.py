@@ -8,7 +8,7 @@ import xml.etree.ElementTree as ET
 from drawio_lib.components import mux_geometry as geom
 from drawio_lib.components.label_attrs import (
     ATTR_NAME,
-    INSTANCE_NAME_GAP_PX,
+    INSTANCE_NAME_GAP_LOOSE_PX,
     LABEL_FONT_PX,
     verify_label_placeholders,
 )
@@ -26,7 +26,7 @@ from drawio_lib.xml_io import graph_root, xml_attr
 
 STROKE = "#000000"
 FILL = "none"
-DEFAULT_INSTANCE_GAP = INSTANCE_NAME_GAP_PX
+DEFAULT_INSTANCE_GAP = INSTANCE_NAME_GAP_LOOSE_PX
 LABEL_INSET_X = 6
 ATTR_INSTANCE_NAME = ATTR_NAME
 DRAWCLOCK_TYPE_KEY = "drawclockType"
@@ -105,14 +105,14 @@ class MuxComponent:
         return (
             f"{shell_open(self.w, self.h)}"
             f"{stretch_body_layer(body, view_w=self.w, view_h=self.h, overlays=in_overlays)}"
-            f"{name_block(name_top, design_cell_h=self.h, gap_px=INSTANCE_NAME_GAP_PX)}"
+            f"{name_block(name_top, design_cell_h=self.h, gap_px=INSTANCE_NAME_GAP_LOOSE_PX)}"
             f"{shell_close()}"
         )
 
     def preview_svg(self) -> str:
         poly = geom.trapezoid_cell_points(self._t)
         lx = self._t.x + LABEL_INSET_X
-        name_y = self._g.mux_h + geom.NAME_H // 2
+        name_y = self._g.mux_h + INSTANCE_NAME_GAP_LOOSE_PX + geom.NAME_H // 2
         stub_lines = []
         for port, color in (
             *[(p, "#c00") for p in self._g.inputs],

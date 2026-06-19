@@ -34,6 +34,7 @@ class LibraryShape:
     label: str
     w: int
     h: int
+    object_defaults: dict[str, str]
 
 
 def load_library_titles(path: str | Path) -> set[str]:
@@ -83,13 +84,14 @@ def load_library_shapes(path: str | Path | None = None) -> dict[str, LibraryShap
         parsed = _parse_library_payload(str(payload))
         if parsed is None:
             continue
-        style, label = parsed
+        style, label, object_defaults = parsed
         shapes[str(title)] = LibraryShape(
             title=str(title),
             style=style,
             label=label,
             w=int(w),
             h=int(h),
+            object_defaults=object_defaults,
         )
     if not shapes:
         raise ValueError("器件库未解析到任何形状")
@@ -100,16 +102,22 @@ def load_library_cell_styles(path: str | Path | None = None) -> dict[str, str]:
     return {title: shape.style for title, shape in load_library_shapes(path).items()}
 
 
-def _parse_library_payload(payload: str) -> tuple[str, str] | None:
+def _parse_library_payload(payload: str) -> tuple[str, str, dict[str, str]] | None:
     xml_text = payload.strip()
     if not xml_text.startswith("<"):
         xml_text = decompress_diagram_payload(payload)
     root = ET.fromstring(xml_text)
     style: str | None = None
     label = ""
+    object_defaults: dict[str, str] = {}
     for obj in root.iter("object"):
         if obj.find("mxCell") is not None:
             label = obj.get("label") or ""
+            object_defaults = {
+                key: value
+                for key, value in obj.attrib.items()
+                if key not in ("id", "label") and value is not None
+            }
             break
     for mxcell in root.iter("mxCell"):
         if mxcell.get("vertex") == "1":
@@ -117,7 +125,7 @@ def _parse_library_payload(payload: str) -> tuple[str, str] | None:
             break
     if not style:
         return None
-    return style, label
+    return style, label, object_defaults
 
 
 @lru_cache(maxsize=4)
@@ -193,18 +201,20 @@ def reload_object_attrs(
     *,
     library_path: str | Path | None = None,
 ) -> dict[str, str]:
-    """Apply library label template with placeholders=1; keep diagram attrs as-is."""
+    """Apply library label template; merge stored values over library object defaults."""
     lib = str(library_path or DEFAULT_LIBRARY_PATH)
     shape = _cached_library_shapes(lib).get(drawclock_type)
     if shape is None:
         return canonical_object_attrs(drawclock_type, stored_attrs, library_path=lib)
-    out = {
-        key: value
-        for key, value in stored_attrs.items()
-        if key not in ("label", "placeholders") and value is not None
-    }
+    schema = dict(shape.object_defaults)
+    out = dict(schema)
+    for key, value in stored_attrs.items():
+        if key in ("label", "placeholders") or value is None:
+            continue
+        if key in schema:
+            out[key] = value
     if not out.get("name"):
-        out["name"] = drawclock_type
+        out["name"] = stored_attrs.get("name") or drawclock_type
     out["label"] = shape.label
     out["placeholders"] = "1"
     return out

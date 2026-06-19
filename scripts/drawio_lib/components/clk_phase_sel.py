@@ -2,6 +2,7 @@ import sys
 
 from drawio_lib.components import simple_geometry as geom
 from drawio_lib.components.fanout_component import FanoutComponent, bind_module
+from drawio_lib.components.label_attrs import INSTANCE_NAME_GAP_LOOSE_PX
 from drawio_lib.components.simple_shapes import (
     CLK_PHASE_SEL_BOX_HALF_H,
     CLK_PHASE_SEL_BOX_LEFT,
@@ -22,6 +23,7 @@ _COMPONENT = FanoutComponent(
     body_half_h=CLK_PHASE_SEL_BOX_HALF_H,
     label_output_indices=False,
     output_cells=clk_phase_sel_output_cell_positions(_pad, _mid),
+    instance_name_gap_px=INSTANCE_NAME_GAP_LOOSE_PX,
 )
 
 bind_module(sys.modules[__name__], _COMPONENT)

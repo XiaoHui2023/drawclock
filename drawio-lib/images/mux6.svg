@@ -20,6 +20,6 @@
   <text x="14" y="75" font-size="11" fill="#000000">3</text>
   <text x="14" y="92" font-size="11" fill="#000000">4</text>
   <text x="14" y="109" font-size="11" fill="#000000">5</text>
-  <text x="20" y="134" font-size="11" fill="#000000"
+  <text x="20" y="138" font-size="11" fill="#000000"
     text-anchor="middle" dominant-baseline="middle">mux6</text>
 </svg>

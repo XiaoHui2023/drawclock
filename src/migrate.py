@@ -15,7 +15,7 @@ from drawio_library import (
     load_library_titles,
     reload_object_attrs,
 )
-from drawio_ports import port_anchors, resolve_edge_style
+from drawio_ports import reload_edge_style
 
 DRAWCLOCK_TYPE_RE = re.compile(r"drawclockType=([^;]+)")
 DRAWCLOCK_TYPE_ALIASES = {"clksrc": "source"}
@@ -78,7 +78,7 @@ def _migrate_root(
     known: set[str],
     library_path: str | Path,
 ) -> None:
-    id_to_vertex: dict[str, tuple[str, str]] = {}
+    id_to_vertex: dict[str, tuple[str, str, str]] = {}
 
     for child in list(root_el):
         parsed = _parse_library_vertex(child)
@@ -88,8 +88,9 @@ def _migrate_root(
         dtype = DRAWCLOCK_TYPE_ALIASES.get(dtype, dtype)
         if dtype not in known:
             raise ValueError(f"图中器件类型不在新器件库中: {dtype}")
+        old_style = mxcell.get("style") or ""
         _upgrade_library_vertex(obj, mxcell, dtype, shapes[dtype], library_path)
-        id_to_vertex[cell_id] = (dtype, mxcell.get("style") or "")
+        id_to_vertex[cell_id] = (dtype, mxcell.get("style") or "", old_style)
 
     for child in list(root_el):
         if child.tag != "mxCell" or child.get("edge") != "1":
@@ -100,18 +101,21 @@ def _migrate_root(
             continue
         if src_id not in id_to_vertex or tgt_id not in id_to_vertex:
             continue
-        src_type, src_style = id_to_vertex[src_id]
-        tgt_type, tgt_style = id_to_vertex[tgt_id]
-        child.set(
-            "style",
-            resolve_edge_style(
-                src_style,
-                src_type,
-                tgt_style,
-                tgt_type,
-                child.get("style") or "",
-            ),
+        src_type, src_style, old_src_style = id_to_vertex[src_id]
+        tgt_type, tgt_style, old_tgt_style = id_to_vertex[tgt_id]
+        outcome = reload_edge_style(
+            old_src_style,
+            src_style,
+            src_type,
+            old_tgt_style,
+            tgt_style,
+            tgt_type,
+            child.get("style") or "",
         )
+        child.set("style", outcome.style)
+        if not outcome.connected:
+            child.attrib.pop("source", None)
+            child.attrib.pop("target", None)
 
 
 def _parse_library_vertex(

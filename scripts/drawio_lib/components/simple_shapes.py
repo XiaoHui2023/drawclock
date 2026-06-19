@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from typing import Literal
 
 from drawio_lib.components import simple_geometry as geom
 
@@ -62,13 +63,28 @@ DIV_LABEL_Y_OFFSET = 7
 DIV_SYMBOL_FONT_PX = 16
 DIV_CENTER_FONT_PX = 6
 DIV_LABEL_FONT_PX = DIV_CENTER_FONT_PX
+DIV_HEX_R = 15
+
+
+def div_hex_side_port_x(side: Literal["left", "right"]) -> float:
+    """Hex flat-side x at body mid_y (design cell coords, before side_pad_x)."""
+    cx = geom.DESIGN_W / 2
+    edge = DIV_HEX_R * math.cos(math.pi / 6)
+    return cx - edge if side == "left" else cx + edge
+
+
+def div_hex_port_cells(*, mid_y: int, pad: int = 0) -> tuple[tuple[float, int], tuple[float, int]]:
+    return (
+        (pad + div_hex_side_port_x("left"), mid_y),
+        (pad + div_hex_side_port_x("right"), mid_y),
+    )
 
 
 def div_body(g: geom.SimpleGeometry) -> str:
     """Hexagon divider (labels rendered as HTML overlay)."""
     cx = _dx(g, geom.DESIGN_W / 2)
     cy = _mid(g)
-    hex_pts = _hex_points(cx, cy, 15)
+    hex_pts = _hex_points(cx, cy, DIV_HEX_R)
     return (
         f'<polygon points="{hex_pts}" fill="{FILL}" stroke="{STROKE}" '
         f'stroke-width="{SW}" stroke-linejoin="round"/>'
@@ -545,6 +561,13 @@ DTO_CHIP_W = 32
 DTO_LABEL_Y_OFFSET = 16
 DTO_CENTER_FONT_PX = 7
 DTO_LABEL_FONT_PX = DTO_CENTER_FONT_PX
+
+
+def dto_chip_port_cells(*, mid_y: int, pad: int = 0) -> tuple[tuple[int, int], tuple[int, int]]:
+    return (
+        (pad + DTO_CHIP_LEFT, mid_y),
+        (pad + DTO_CHIP_LEFT + DTO_CHIP_W, mid_y),
+    )
 
 
 def dto_body(g: geom.SimpleGeometry) -> str:

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from library_ports import port_anchors as _port_anchors
 from library_ports import port_topology_from_style, resolve_port
 
@@ -20,6 +22,12 @@ _PORT_ATTACH_KEYS = (
     "exitPerimeter=0",
     "entryPerimeter=0",
 )
+
+
+@dataclass(frozen=True)
+class EdgeReloadOutcome:
+    style: str
+    connected: bool
 
 
 def finalize_edge_style(style: str) -> str:
@@ -67,6 +75,8 @@ def edge_port_style(
     target_style: str,
     target_type: str,
     *,
+    source_port: str | None = None,
+    target_port: str | None = None,
     target_mux_input: int | None = None,
     fallback: str = "",
 ) -> str:
@@ -74,14 +84,22 @@ def edge_port_style(
     try:
         src_ports = port_anchors(source_style, source_type)
         tgt_ports = port_anchors(target_style, target_type)
-        if "out" in src_ports:
+        if source_port is not None:
+            if source_port not in src_ports:
+                raise ValueError(f"exit port {source_port} missing on {source_type}")
+            exit_xy = src_ports[source_port]
+        elif "out" in src_ports:
             exit_xy = src_ports["out"]
         elif "right" in src_ports:
             exit_xy = src_ports["right"]
         else:
             raise ValueError(f"no exit port for {source_type}")
 
-        if target_mux_input is not None:
+        if target_port is not None:
+            if target_port not in tgt_ports:
+                raise ValueError(f"entry port {target_port} missing on {target_type}")
+            entry_xy = tgt_ports[target_port]
+        elif target_mux_input is not None:
             key = f"in{target_mux_input}"
             if key not in tgt_ports:
                 raise ValueError(f"input {key} missing")
@@ -255,6 +273,51 @@ def infer_mux_input_index(
     return int(port[2:])
 
 
+def infer_port_from_attachment(
+    shape_style: str,
+    stored_edge_style: str,
+    *,
+    end: str,
+) -> str | None:
+    from drawio_graph import edge_attachment
+
+    xy = edge_attachment(stored_edge_style, end=end)
+    return resolve_port(_parse_points_from_style(shape_style), xy)
+
+
+def reload_edge_style(
+    old_source_style: str,
+    new_source_style: str,
+    source_type: str,
+    old_target_style: str,
+    new_target_style: str,
+    target_type: str,
+    stored_style: str,
+) -> EdgeReloadOutcome:
+    """Re-attach edge to library ports; disconnect when a port was removed."""
+    exit_port = infer_port_from_attachment(old_source_style, stored_style, end="exit")
+    entry_port = infer_port_from_attachment(old_target_style, stored_style, end="entry")
+
+    new_src_ports = port_anchors(new_source_style, source_type)
+    new_tgt_ports = port_anchors(new_target_style, target_type)
+
+    if exit_port is not None and exit_port not in new_src_ports:
+        return EdgeReloadOutcome(style=finalize_edge_style(stored_style), connected=False)
+    if entry_port is not None and entry_port not in new_tgt_ports:
+        return EdgeReloadOutcome(style=finalize_edge_style(stored_style), connected=False)
+
+    style = edge_port_style(
+        new_source_style,
+        source_type,
+        new_target_style,
+        target_type,
+        source_port=exit_port,
+        target_port=entry_port,
+        fallback=stored_style,
+    )
+    return EdgeReloadOutcome(style=style, connected=True)
+
+
 def _parse_points_from_style(style: str) -> tuple[tuple[float, float], ...]:
     from drawio_graph import _parse_points
 
@@ -267,19 +330,17 @@ def resolve_edge_style(
     target_style: str,
     target_type: str,
     stored_style: str,
+    *,
+    old_source_style: str | None = None,
+    old_target_style: str | None = None,
 ) -> str:
-    from drawio_graph import edge_attachment
-
-    mux_in = infer_mux_input_index(
-        target_style, target_type, edge_attachment(stored_style, end="entry")
+    outcome = reload_edge_style(
+        old_source_style or source_style,
+        source_style,
+        source_type,
+        old_target_style or target_style,
+        target_style,
+        target_type,
+        stored_style,
     )
-    return finalize_edge_style(
-        edge_port_style(
-            source_style,
-            source_type,
-            target_style,
-            target_type,
-            target_mux_input=mux_in,
-            fallback=stored_style,
-        )
-    )
+    return outcome.style

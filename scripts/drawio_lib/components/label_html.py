@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from drawio_lib.components.label_attrs import ATTR_NAME, LABEL_FONT_PX
+from drawio_lib.components.label_overflow import graphic_layer_pin_css
 
 LabelOverlay = tuple[float, float, str] | tuple[float, float, str, int]
 
@@ -28,8 +29,9 @@ def stretch_body_layer(
     overlay_html = "".join(
         _overlay_on_cell(item, view_w=view_w, view_h=view_h) for item in overlays
     )
+    pin = graphic_layer_pin_css(view_w=view_w, view_h=view_h)
     return (
-        f'<div style="position:absolute;left:0;top:0;width:{view_w}px;height:{view_h}px;">'
+        f'<div style="{pin}">'
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{view_w}" height="{view_h}" '
         f'viewBox="0 0 {view_w} {view_h}" preserveAspectRatio="none" '
         f'style="display:block;overflow:visible;">'

@@ -42,7 +42,7 @@ class FromComponent(SimpleComponent):
 
     def preview_svg(self) -> str:
         body = wire_body(self._g)
-        name_y = self._instance_name_top_y() + geom.NAME_H // 2
+        name_y = self._instance_name_top_y() + self.instance_name_gap_px + geom.NAME_H // 2
         stub_lines = []
         for port, color in zip(self._ports(), ("#090",)):
             stub_lines.append(

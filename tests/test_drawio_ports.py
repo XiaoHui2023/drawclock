@@ -9,7 +9,7 @@ from drawio_library import (
     load_library_shapes,
     reload_object_attrs,
 )
-from drawio_ports import edge_port_style, finalize_edge_style, port_anchors
+from drawio_ports import edge_port_style, finalize_edge_style, port_anchors, reload_edge_style
 
 
 def test_bake_label_replaces_name() -> None:
@@ -24,7 +24,7 @@ def test_bake_label_replaces_name() -> None:
 def test_reload_object_attrs_keeps_stored_fields_only() -> None:
     lib = ROOT / "drawio-lib" / "drawclock.xml"
     out = reload_object_attrs("pll", {"name": "pll0"}, library_path=lib)
-    assert "pll_kind" not in out
+    assert out["pll_kind"] == "SC"
     assert "%pll_kind%" in out["label"]
     kept = reload_object_attrs(
         "pll",
@@ -65,3 +65,21 @@ def test_finalize_edge_style_adds_perimeter_off() -> None:
     fixed = finalize_edge_style(bare)
     assert "exitPerimeter=0" in fixed
     assert "entryPerimeter=0" in fixed
+
+
+def test_reload_edge_style_disconnects_removed_port() -> None:
+    shapes = load_library_shapes(ROOT / "drawio-lib" / "drawclock.xml")
+    mux3 = shapes["mux3"]
+    mux2 = shapes["mux2"]
+    pll = shapes["pll"]
+    in2 = port_anchors(mux3.style, "mux3")["in2"]
+    outcome = reload_edge_style(
+        pll.style,
+        pll.style,
+        "pll",
+        mux3.style,
+        mux2.style,
+        "mux3",
+        f"exitX=1;exitY=0.5;entryX={in2[0]};entryY={in2[1]};edgeStyle=none;html=1;",
+    )
+    assert outcome.connected is False

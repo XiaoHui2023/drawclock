@@ -44,6 +44,7 @@ class FanoutComponent:
     center_labels: tuple[tuple[float, float, str], ...] | tuple[tuple[float, float, str, int], ...] = ()
     label_output_indices: bool = True
     output_cells: tuple[tuple[float, float], ...] | None = None
+    instance_name_gap_px: int = INSTANCE_NAME_GAP_PX
 
     def __post_init__(self) -> None:
         rect = sgeom.body_rect()
@@ -100,7 +101,7 @@ class FanoutComponent:
         return (
             f"{shell_open(self.w, self.h)}"
             f"{stretch_body_layer(body, view_w=self.w, view_h=self.h, overlays=overlays)}"
-            f"{name_block(self._instance_name_top_y(), design_cell_h=self.h, gap_px=INSTANCE_NAME_GAP_PX)}"
+            f"{name_block(self._instance_name_top_y(), design_cell_h=self.h, gap_px=self.instance_name_gap_px)}"
             f"{shell_close()}"
         )
 
@@ -181,7 +182,11 @@ class FanoutComponent:
             f'text-anchor="middle" dominant-baseline="middle">{item[2]}</text>'
             for item in self.center_labels
         )
-        name_y = self._instance_name_top_y() + sgeom.NAME_H // 2
+        name_y = (
+            self._instance_name_top_y()
+            + self.instance_name_gap_px
+            + sgeom.NAME_H // 2
+        )
         return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" viewBox="0 0 {self.w} {self.h}">
 {body}
 {center_texts}

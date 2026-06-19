@@ -105,15 +105,21 @@ def cell_h_for_body(
     return BODY_Y + body_height + body_pad_bottom + max_instance_gap + NAME_H
 
 
-def clock_cell_h(body_height: int = BODY_H) -> int:
+def clock_cell_h(
+    body_height: int = BODY_H,
+    *,
+    instance_name_gap_px: int | None = None,
+) -> int:
     from drawio_lib.components.simple_shapes import CLOCK_WAVE_AMP
     from drawio_lib.components.label_attrs import INSTANCE_NAME_GAP_PX
 
+    if instance_name_gap_px is None:
+        instance_name_gap_px = INSTANCE_NAME_GAP_PX
     mid = BODY_Y + body_height // 2
     return (
         mid
         + CLOCK_WAVE_AMP
-        + INSTANCE_NAME_GAP_PX
+        + instance_name_gap_px
         + NAME_H
         + MUX_BODY_PAD_BOTTOM
     )
@@ -176,6 +182,7 @@ def compute_geometry(
     asymmetric_clock: bool = False,
     body_pad_bottom: int = MUX_BODY_PAD_BOTTOM,
     max_instance_gap: int = MAX_INSTANCE_GAP,
+    instance_name_gap_px: int | None = None,
 ) -> SimpleGeometry:
     if port_mode == "from":
         return compute_from_geometry()
@@ -186,7 +193,7 @@ def compute_geometry(
         rect = body_rect(height=body_height, margin_x=margin_x, cell_w=cell_w)
     mid = body_mid_y(rect)
     height = (
-        clock_cell_h(body_height)
+        clock_cell_h(body_height, instance_name_gap_px=instance_name_gap_px)
         if asymmetric_clock
         else cell_h_for_body(
             body_height,
