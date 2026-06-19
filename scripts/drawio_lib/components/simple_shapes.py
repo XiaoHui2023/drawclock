@@ -133,6 +133,10 @@ def colored_cell_body(g: geom.SimpleGeometry, fill: str) -> str:
     )
 
 
+def cell_body(g: geom.SimpleGeometry) -> str:
+    return colored_cell_body(g, FILL)
+
+
 def occ_clk_cell_body(g: geom.SimpleGeometry) -> str:
     return colored_cell_body(g, OCC_CLK_CELL_FILL)
 

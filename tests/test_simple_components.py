@@ -25,6 +25,7 @@ if str(SCRIPTS) not in sys.path:
         ("inv", 2),
         ("inv_mux", 3),
         ("clk_phase_sel", 4),
+        ("cell", 2),
         ("occ_clk_cell", 2),
         ("gen_cell", 2),
         ("bist_clk_cell", 2),
@@ -131,6 +132,14 @@ def test_inv_has_output_bubble() -> None:
     html = inv.label_html()
     assert "<circle " in html
     assert 'fill="#ffffff"' in html
+
+
+def test_cell_is_unfilled_triangle() -> None:
+    cell_mod = importlib.import_module("drawio_lib.components.cell")
+    html = cell_mod.label_html()
+    assert "<polygon " in html
+    assert 'fill="none"' in html
+    assert "<circle " not in html
 
 
 def test_occ_clk_cell_is_blue_triangle() -> None:

@@ -102,6 +102,7 @@
 
 | 库名 | 预览 |
 | --- | --- |
+| cell | ![cell](images/cell.svg) |
 | occ_clk_cell | ![occ_clk_cell](images/occ_clk_cell.svg) |
 | gen_cell | ![gen_cell](images/gen_cell.svg) |
 | bist_clk_cell | ![bist_clk_cell](images/bist_clk_cell.svg) |
