@@ -14,15 +14,13 @@
 
 ### mux
 
-![mux3](images/mux3.svg)
-
-| 库名 | 输入路数 |
+| 库名 | 预览 |
 | --- | --- |
-| mux2 | 2 |
-| mux3 | 3 |
-| mux4 | 4 |
-| mux5 | 5 |
-| mux6 | 6 |
+| mux2 | ![mux2](images/mux2.svg) |
+| mux3 | ![mux3](images/mux3.svg) |
+| mux4 | ![mux4](images/mux4.svg) |
+| mux5 | ![mux5](images/mux5.svg) |
+| mux6 | ![mux6](images/mux6.svg) |
 
 | 属性 | 说明 |
 | --- | --- |
@@ -100,35 +98,14 @@
 | --- | --- |
 | `name` | 实例名 |
 
-### cell（时钟单元）
+### cell
 
-#### occ_clk_cell
-
-![occ_clk_cell](images/occ_clk_cell.svg)
-
-| 属性 | 说明 |
+| 库名 | 预览 |
 | --- | --- |
-| `name` | 实例名 |
-
-#### gen_cell
-
-![gen_cell](images/gen_cell.svg)
-
-| 属性 | 说明 |
-| --- | --- |
-| `name` | 实例名 |
-
-#### bist_clk_cell
-
-![bist_clk_cell](images/bist_clk_cell.svg)
-
-| 属性 | 说明 |
-| --- | --- |
-| `name` | 实例名 |
-
-#### occ_bist_clk_cell
-
-![occ_bist_clk_cell](images/occ_bist_clk_cell.svg)
+| occ_clk_cell | ![occ_clk_cell](images/occ_clk_cell.svg) |
+| gen_cell | ![gen_cell](images/gen_cell.svg) |
+| bist_clk_cell | ![bist_clk_cell](images/bist_clk_cell.svg) |
+| occ_bist_clk_cell | ![occ_bist_clk_cell](images/occ_bist_clk_cell.svg) |
 
 | 属性 | 说明 |
 | --- | --- |
@@ -168,16 +145,10 @@
 
 ### pll
 
-![pll](images/pll.svg)
-
-| 属性 | 说明 |
+| 库名 | 预览 |
 | --- | --- |
-| `pll_kind` | PLL 类型 |
-| `name` | 实例名 |
-
-### pll2
-
-![pll2](images/pll2.svg)
+| pll | ![pll](images/pll.svg) |
+| pll2 | ![pll2](images/pll2.svg) |
 
 | 属性 | 说明 |
 | --- | --- |
