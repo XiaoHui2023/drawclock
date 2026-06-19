@@ -6,10 +6,10 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 ensure_venv() {
-  if [[ -f "$ROOT/.venv/Scripts/python.exe" ]]; then
-    PYTHON_CMD=("$ROOT/.venv/Scripts/python.exe")
-  elif [[ -f "$ROOT/.venv/bin/python" ]]; then
+  if [[ -f "$ROOT/.venv/bin/python" ]]; then
     PYTHON_CMD=("$ROOT/.venv/bin/python")
+  elif [[ -f "$ROOT/.venv/Scripts/python.exe" ]]; then
+    PYTHON_CMD=("$ROOT/.venv/Scripts/python.exe")
   else
     echo "Creating .venv..."
     case "$(uname -s 2>/dev/null || true)" in
@@ -43,7 +43,13 @@ apply_staticx_linux() {
     echo "error: Linux staticx requires patchelf, for example: sudo apt install patchelf" >&2
     exit 1
   fi
-  "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall staticx
+  local venv_bin
+  venv_bin="$(dirname "${PYTHON_CMD[0]}")"
+  export PATH="$venv_bin:$PATH"
+  # Build staticx from source on old Linux builders. The PyPI wheel can be
+  # mangled by old objcopy and produce an ELF that segfaults at startup.
+  "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall scons
+  "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall --no-cache-dir --no-build-isolation --no-binary=staticx staticx
   local staticx="$ROOT/.venv/bin/staticx"
   if [[ ! -x "$staticx" ]]; then
     echo "error: .venv/bin/staticx was not found" >&2
@@ -52,9 +58,22 @@ apply_staticx_linux() {
   local tmp_out="$ROOT/dist/.drawclock-staticx.tmp"
   rm -f "$tmp_out"
   echo "==> staticx: $pyi_out -> drawclock"
-  "$staticx" "$pyi_out" "$tmp_out"
+  if ! "$staticx" "$pyi_out" "$tmp_out"; then
+    rm -f "$tmp_out"
+    echo "==> staticx failed; retrying with --no-compress"
+    if ! "$staticx" --no-compress "$pyi_out" "$tmp_out"; then
+      echo "error: staticx and staticx --no-compress both failed; release must not skip staticx silently" >&2
+      exit 1
+    fi
+  fi
   mv -f "$tmp_out" "$pyi_out"
   chmod +x "$pyi_out"
+  local first_load_vaddr
+  first_load_vaddr="$(readelf -Wl "$pyi_out" | awk '$1 == "LOAD" { print $3; exit }')"
+  if [[ "$first_load_vaddr" == "0x0000000000000000" ]]; then
+    echo "error: staticx output ELF is corrupted: first LOAD VirtAddr is 0x0" >&2
+    exit 1
+  fi
 }
 
 ensure_venv

@@ -23,7 +23,7 @@ jobs:
         run: sudo chown -R "$(id -u):$(id -g)" dist
 
       - name: Run frozen example
-        run: pip install -e . && python3 tools/run_frozen_example.py dist/drawclock
+        run: python3 -m pip install -e . && python3 tools/run_frozen_example.py dist/drawclock
 
       - name: Upload Linux release artifacts
         uses: actions/upload-artifact@v4
