@@ -46,6 +46,7 @@ class SimpleComponent:
     show_instance_name: bool = True
     port_cells: tuple[tuple[int, int], ...] | None = None
     instance_name_gap_px: int = INSTANCE_NAME_GAP_PX
+    instance_name_pull_px: int = 0
     cell_w: int = geom.W
     body_pad_bottom: int = geom.MUX_BODY_PAD_BOTTOM
     max_instance_gap: int = geom.MAX_INSTANCE_GAP
@@ -99,7 +100,12 @@ class SimpleComponent:
     def _instance_name_top_y(self) -> int:
         if self.port_mode == "from":
             return geom.WIRE_STROKE_Y + 8
-        return geom.BODY_Y + self.body_height + self.body_pad_bottom
+        return (
+            geom.BODY_Y
+            + self.body_height
+            + self.body_pad_bottom
+            - self.instance_name_pull_px
+        )
 
     def _resolve_instance_name(self, instance_name: str | None) -> str:
         if instance_name is None:
@@ -154,7 +160,11 @@ class SimpleComponent:
         stubs = "\n".join(stub_lines)
         name_line = ""
         if self.show_instance_name:
-            name_y = self._instance_name_top_y() + geom.NAME_H // 2
+            name_y = (
+                self._instance_name_top_y()
+                + self.instance_name_gap_px
+                + geom.NAME_H // 2
+            )
             name_line = (
                 f'\n  <text x="{self.w // 2}" y="{name_y}" font-size="{LABEL_FONT_PX}" '
                 f'fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">'

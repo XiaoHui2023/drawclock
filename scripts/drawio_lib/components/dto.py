@@ -2,7 +2,7 @@ import sys
 
 from drawio_lib.components import simple_geometry as geom
 from drawio_lib.components.dto_component import DtoComponent
-from drawio_lib.components.label_attrs import INSTANCE_NAME_GAP_LOOSE_PX
+from drawio_lib.components.label_attrs import INSTANCE_NAME_PULL_COMPACT_PX
 from drawio_lib.components.simple_component import bind_module
 from drawio_lib.components.simple_shapes import dto_body, dto_chip_port_cells
 
@@ -15,7 +15,7 @@ _COMPONENT = DtoComponent(
     port_mode="both",
     body_svg=dto_body,
     port_cells=dto_chip_port_cells(mid_y=_mid, pad=_pad),
-    instance_name_gap_px=INSTANCE_NAME_GAP_LOOSE_PX,
+    instance_name_pull_px=INSTANCE_NAME_PULL_COMPACT_PX,
 )
 
 bind_module(sys.modules[__name__], _COMPONENT)
