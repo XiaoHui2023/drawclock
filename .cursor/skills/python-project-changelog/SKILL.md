@@ -10,7 +10,7 @@ description: >-
 
 ## 2026-06-20
 
-- **决议**：**div / div_n / dto / dto_n / source / 全部 cell** 实例名与图形间距收紧：新增 `INSTANCE_NAME_PULL_COMPACT_PX=4`，`name_block` 顶边上移 4px（`cell_h` 与端口不变）；dto 族取消原 `LOOSE` 4px padding。见 **drawclock-drawio-pitfalls**。
+- **决议**：**div / div_n / dto / dto_n / source / 全部 cell** 实例名与图形间距收紧：新增 `INSTANCE_NAME_PULL_COMPACT_PX=10`（累计上移 10px，`cell_h` 与端口不变）；dto 族取消原 `LOOSE` 4px padding。见 **drawclock-drawio-pitfalls**。
 
 ## 2026-06-19
 
