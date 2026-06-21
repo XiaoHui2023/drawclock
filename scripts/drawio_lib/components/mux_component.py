@@ -258,6 +258,11 @@ class MuxComponent:
         for i in range(len(g.inputs) - 1):
             if g.inputs[i].trap.cell_y >= g.inputs[i + 1].trap.cell_y:
                 raise ValueError(f"in{i} must be above in{i + 1}")
+            pitch = g.inputs[i + 1].trap.cell_y - g.inputs[i].trap.cell_y
+            if pitch != geom.INPUT_PITCH:
+                raise ValueError(
+                    f"in{i}..in{i + 1} pitch {pitch} != {geom.INPUT_PITCH}"
+                )
 
         html = self.label_html()
         verify_label_placeholders(html, title=self.title)

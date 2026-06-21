@@ -17,6 +17,7 @@ TRAP_MARGIN_X = 8
 TRAP_Y = 6
 TRAP_W = 24
 TRAP_RIGHT_MARGIN_Y = 10
+INPUT_PITCH = 16
 
 POINT_FIXED = 0
 
@@ -95,10 +96,22 @@ def cell_h(num_inputs: int) -> int:
     return mux_h(num_inputs) + MAX_INSTANCE_GAP + NAME_H
 
 
+def input_trap_y_positions(num_inputs: int, trap_height: int) -> tuple[float, ...]:
+    if num_inputs < 2:
+        raise ValueError(f"mux needs at least 2 inputs, got {num_inputs}")
+    span = (num_inputs - 1) * INPUT_PITCH
+    if span > trap_height:
+        raise ValueError(
+            f"mux{num_inputs} trap height {trap_height} too short for "
+            f"{num_inputs} inputs at pitch {INPUT_PITCH}"
+        )
+    y0 = (trap_height - span) / 2
+    return tuple(y0 + i * INPUT_PITCH for i in range(num_inputs))
+
+
 def input_fractions(num_inputs: int) -> tuple[float, ...]:
-    if num_inputs == 2:
-        return (0.25, 0.75)
-    return tuple((i + 1) / (num_inputs + 1) for i in range(num_inputs))
+    height = trap_h(num_inputs)
+    return tuple(y / height for y in input_trap_y_positions(num_inputs, height))
 
 
 def trap_left_point(fraction: float, *, trap_height: int) -> tuple[float, float]:

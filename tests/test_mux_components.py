@@ -41,3 +41,11 @@ def test_mux3_input_fractions() -> None:
     assert len(g.inputs) == 3
     for port, frac in zip(g.inputs, fracs):
         assert isclose(port.trap.trap_y, g.trap.h * frac, abs_tol=0.01)
+
+
+@pytest.mark.parametrize("num_inputs", [2, 3, 4, 5, 6])
+def test_mux_equal_input_label_pitch(num_inputs: int) -> None:
+    g = geom.compute_geometry(num_inputs)
+    for i in range(len(g.inputs) - 1):
+        pitch = g.inputs[i + 1].trap.cell_y - g.inputs[i].trap.cell_y
+        assert pitch == geom.INPUT_PITCH
