@@ -13,6 +13,7 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from drawio_lib.components import mux_geometry as geom
+from drawio_lib.components import simple_geometry as sgeom
 
 
 @pytest.mark.parametrize("num_inputs", [2, 3, 4, 5, 6])
@@ -49,3 +50,35 @@ def test_mux_equal_input_label_pitch(num_inputs: int) -> None:
     for i in range(len(g.inputs) - 1):
         pitch = g.inputs[i + 1].trap.cell_y - g.inputs[i].trap.cell_y
         assert pitch == geom.INPUT_PITCH
+
+
+def test_mux_input_pitch_matches_standard_row_pitch() -> None:
+    assert geom.INPUT_PITCH == sgeom.STANDARD_ROW_PITCH
+
+
+@pytest.mark.parametrize("num_inputs", [2, 3, 4, 5, 6])
+def test_mux_first_input_aligns_with_standard_port_row(num_inputs: int) -> None:
+    g = geom.compute_geometry(num_inputs)
+    standard_mid = sgeom.BODY_Y + sgeom.BODY_H // 2
+    assert g.inputs[0].trap.cell_y == standard_mid
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "gate",
+        "div",
+        "div_n",
+        "dto",
+        "dto_n",
+        "inv",
+        "occ_clk_cell",
+        "gen_cell",
+        "bist_clk_cell",
+        "occ_bist_clk_cell",
+    ],
+)
+def test_standard_body_components_share_cell_height(name: str) -> None:
+    mod = importlib.import_module(f"drawio_lib.components.{name}")
+    expected = sgeom.cell_h_for_body(sgeom.BODY_H)
+    assert mod.H == expected

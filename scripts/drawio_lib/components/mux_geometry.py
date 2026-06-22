@@ -6,9 +6,11 @@ from dataclasses import dataclass
 from typing import Literal
 
 from drawio_lib.components.simple_geometry import (
+    BODY_H,
     MAX_INSTANCE_GAP,
     MUX_BODY_PAD_BOTTOM,
     NAME_H,
+    STANDARD_ROW_PITCH,
     W,
     side_pad_x,
 )
@@ -17,7 +19,8 @@ TRAP_MARGIN_X = 8
 TRAP_Y = 6
 TRAP_W = 24
 TRAP_RIGHT_MARGIN_Y = 10
-INPUT_PITCH = 16
+INPUT_PITCH = STANDARD_ROW_PITCH
+TRAP_MIN_H = 64
 
 POINT_FIXED = 0
 
@@ -71,7 +74,9 @@ def trap_x() -> int:
 def trap_h(num_inputs: int) -> int:
     if num_inputs < 2:
         raise ValueError(f"mux needs at least 2 inputs, got {num_inputs}")
-    return max(64, 20 * num_inputs)
+    span = (num_inputs - 1) * INPUT_PITCH
+    port_anchor_margin = BODY_H // 2
+    return max(TRAP_MIN_H, span + 2 * port_anchor_margin)
 
 
 def trap_right_top_y(trap_height: int) -> int:

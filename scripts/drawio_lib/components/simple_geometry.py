@@ -3,6 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal
 
+from drawio_lib.components.label_attrs import (
+    INSTANCE_NAME_GAP_PX,
+    INSTANCE_NAME_PULL_COMPACT_PX,
+)
+
 DESIGN_W = 40
 W = DESIGN_W
 COLORED_CELL_W = DESIGN_W
@@ -17,6 +22,32 @@ MUX_BODY_PAD_BOTTOM = 0
 NAME_H = 16
 MAX_INSTANCE_GAP = 8
 POINT_FIXED = 0
+
+# div 参考行：图形顶 → 实例名底，略加留白；mux 输入标号间距等同此值。
+STANDARD_ROW_EXTRA_PAD = 2
+
+
+def standard_row_pitch_px(
+    *,
+    body_y: int = BODY_Y,
+    body_height: int = BODY_H,
+    body_pad_bottom: int = MUX_BODY_PAD_BOTTOM,
+    instance_name_pull_px: int = INSTANCE_NAME_PULL_COMPACT_PX,
+    instance_name_gap_px: int = INSTANCE_NAME_GAP_PX,
+    extra_pad_px: int = STANDARD_ROW_EXTRA_PAD,
+) -> int:
+    name_bottom = (
+        body_y
+        + body_height
+        + body_pad_bottom
+        - instance_name_pull_px
+        + instance_name_gap_px
+        + NAME_H
+    )
+    return name_bottom - body_y + extra_pad_px
+
+
+STANDARD_ROW_PITCH = standard_row_pitch_px()
 
 PortMode = Literal["both", "left", "right", "from"]
 
