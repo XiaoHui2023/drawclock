@@ -83,13 +83,7 @@ def output_body_y_positions(
 
 
 def module_cell_h(graphic_h: int) -> int:
-    return (
-        MODULE_BOX_Y
-        + graphic_h
-        + MUX_BODY_PAD_BOTTOM
-        + MAX_INSTANCE_GAP
-        + NAME_H
-    )
+    return MODULE_BOX_Y + graphic_h + MUX_BODY_PAD_BOTTOM
 
 
 def compute_module_geometry(output_labels: tuple[str, ...]) -> ModuleGeometry:

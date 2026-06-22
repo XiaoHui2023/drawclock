@@ -15,8 +15,12 @@ from drawio_lib.components.label_overflow import (
     verify_label_overflow_policy,
     verify_label_stretch_policy,
     verify_mxcell_label_style,
+    verify_name_outside_selection_box,
     verify_no_degenerate_label_tricks,
+    verify_selection_box_wraps_graphic,
 )
+from drawio_lib.components import registry
+from drawio_lib.components import simple_geometry as sgeom
 
 
 @pytest.mark.parametrize(
@@ -100,3 +104,64 @@ def test_percent_shell_rejected() -> None:
             design_cell_w=gate.W,
             design_cell_h=gate.H,
         )
+
+
+def _graphic_bottom_y(mod) -> int | None:
+    g = getattr(mod, "G", None)
+    if g is None:
+        return None
+    if hasattr(g, "mux_h"):
+        return g.mux_h
+    if hasattr(g, "graphic_h"):
+        from drawio_lib.components.module_geometry import MODULE_BOX_Y
+
+        return MODULE_BOX_Y + g.graphic_h + sgeom.MUX_BODY_PAD_BOTTOM
+    if hasattr(g, "trap"):
+        return g.trap.y + g.trap.h + sgeom.MUX_BODY_PAD_BOTTOM
+    if hasattr(g, "cell_h") and not hasattr(g, "body"):
+        return sgeom.BODY_Y + sgeom.BODY_H + sgeom.MUX_BODY_PAD_BOTTOM
+    if hasattr(g, "body"):
+        if mod.TITLE == "clock":
+            from drawio_lib.components.simple_shapes import CLOCK_WAVE_AMP
+
+            return g.body_mid_y + CLOCK_WAVE_AMP
+        if mod.TITLE == "from":
+            return mod.H
+        return g.body.y + g.body.h + sgeom.MUX_BODY_PAD_BOTTOM
+    return None
+
+
+def _name_top_y(mod) -> int | None:
+    import re
+
+    if not hasattr(mod, "label_html"):
+        return None
+    html = mod.label_html()
+    if "%name%" not in html:
+        return None
+    fn = getattr(mod, "_instance_name_top_y", None)
+    if callable(fn):
+        return int(fn())
+    before = html.split("%name%")[0]
+    tops = re.findall(r"top:(\d+(?:\.\d+)?)%", before)
+    if tops:
+        return round(float(tops[-1]) / 100 * mod.H)
+    return None
+
+
+@pytest.mark.parametrize("spec", registry.ALL, ids=lambda s: s.module.TITLE)
+def test_selection_box_wraps_graphic_not_name(spec) -> None:
+    mod = spec.module
+    if mod.TITLE == "async":
+        pytest.skip("async has no instance name")
+    graphic_bottom = _graphic_bottom_y(mod)
+    if graphic_bottom is None:
+        pytest.skip(f"{mod.TITLE}: no graphic bounds helper")
+    verify_selection_box_wraps_graphic(
+        graphic_bottom,
+        mod.H,
+        title=mod.TITLE,
+    )
+    name_top = _name_top_y(mod)
+    if name_top is not None:
+        verify_name_outside_selection_box(name_top, mod.H, title=mod.TITLE)

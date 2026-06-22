@@ -98,7 +98,7 @@ def mux_h(num_inputs: int) -> int:
 
 
 def cell_h(num_inputs: int) -> int:
-    return mux_h(num_inputs) + MAX_INSTANCE_GAP + NAME_H
+    return mux_h(num_inputs)
 
 
 def input_trap_y_positions(num_inputs: int, trap_height: int) -> tuple[float, ...]:

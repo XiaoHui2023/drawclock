@@ -16,7 +16,7 @@ BODY_Y = 6
 BODY_H = 48
 WIRE_BODY_Y = 10
 WIRE_STROKE_Y = 14
-WIRE_CELL_H = 40
+WIRE_CELL_H = WIRE_STROKE_Y
 
 MUX_BODY_PAD_BOTTOM = 0
 NAME_H = 16
@@ -133,7 +133,9 @@ def cell_h_for_body(
     body_pad_bottom: int = MUX_BODY_PAD_BOTTOM,
     max_instance_gap: int = MAX_INSTANCE_GAP,
 ) -> int:
-    return BODY_Y + body_height + body_pad_bottom + max_instance_gap + NAME_H
+    """Selection-box height: graphic band only (instance name sits below via overflow=visible)."""
+    _ = max_instance_gap
+    return BODY_Y + body_height + body_pad_bottom
 
 
 def clock_cell_h(
@@ -142,18 +144,10 @@ def clock_cell_h(
     instance_name_gap_px: int | None = None,
 ) -> int:
     from drawio_lib.components.simple_shapes import CLOCK_WAVE_AMP
-    from drawio_lib.components.label_attrs import INSTANCE_NAME_GAP_PX
 
-    if instance_name_gap_px is None:
-        instance_name_gap_px = INSTANCE_NAME_GAP_PX
+    _ = instance_name_gap_px
     mid = BODY_Y + body_height // 2
-    return (
-        mid
-        + CLOCK_WAVE_AMP
-        + instance_name_gap_px
-        + NAME_H
-        + MUX_BODY_PAD_BOTTOM
-    )
+    return mid + CLOCK_WAVE_AMP
 
 
 def cell_to_rel(cell_x: float, cell_y: float, *, w: int = W, h: int) -> tuple[float, float]:
