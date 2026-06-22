@@ -23,7 +23,7 @@ if str(SCRIPTS) not in sys.path:
         ("dto", 2),
         ("dto_n", 2),
         ("inv", 2),
-        ("inv_mux", 3),
+        ("inv_mux", 2),
         ("clk_phase_sel", 4),
         ("cell", 2),
         ("occ_clk_cell", 2),
@@ -41,6 +41,7 @@ if str(SCRIPTS) not in sys.path:
         ("pll", 2),
         ("pll2", 3),
         ("source", 1),
+        ("pad", 1),
         ("clock", 1),
         ("from", 1),
     ],
@@ -132,6 +133,15 @@ def test_source_no_center_src_label() -> None:
     html = source.label_html()
     assert ">SRC</span>" not in html
     assert ">SRC<" not in html
+
+
+def test_pad_is_hollow_and_output_labeled_c() -> None:
+    pad = importlib.import_module("drawio_lib.components.pad")
+    html = pad.label_html()
+    assert 'fill="none"' in html
+    assert ">C</span>" in html
+    svg = pad.preview_svg()
+    assert ">C</text>" in svg
 
 
 def test_inv_has_output_bubble() -> None:

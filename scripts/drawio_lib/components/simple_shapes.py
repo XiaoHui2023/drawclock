@@ -530,32 +530,6 @@ def clk_phase_sel_body(g: geom.SimpleGeometry) -> str:
     )
 
 
-INV_MUX_OUT_SPREAD = 9
-INV_MUX_TRI_HALF_H = 12
-INV_MUX_TRI_GAP = 4
-INV_MUX_INV_BUBBLE_FILL = "#d9d9d9"
-
-
-def inv_mux_body(g: geom.SimpleGeometry) -> str:
-    """Triangle inverter with upper direct and lower inverted outputs."""
-    mid = _mid(g)
-    left = _dx(g, INV_PORT_LEFT_X)
-    tip = _dx(g, INV_TIP_X)
-    top = mid - INV_MUX_TRI_HALF_H
-    bottom = mid + INV_MUX_TRI_HALF_H
-    (cx0, cy0), (cx1, cy1) = inv_mux_output_positions(mid)
-    out0_x = _dx(g, cx0)
-    out1_x = _dx(g, cx1)
-    return (
-        f'<polygon points="{left},{mid} {left},{top} {tip},{mid} {left},{bottom}" '
-        f'fill="{FILL}" stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="round"/>'
-        f'<circle cx="{out0_x:.1f}" cy="{cy0:.1f}" r="{INV_BUBBLE_R}" fill="{FILL}" '
-        f'stroke="{STROKE}" stroke-width="{SW}"/>'
-        f'<circle cx="{out1_x:.1f}" cy="{cy1:.1f}" r="{INV_BUBBLE_R}" fill="{INV_MUX_INV_BUBBLE_FILL}" '
-        f'stroke="{STROKE}" stroke-width="{SW}"/>'
-    )
-
-
 DTO_CHIP_LEFT = 4
 DTO_CHIP_W = 32
 DTO_LABEL_Y_OFFSET = 16
@@ -615,39 +589,7 @@ INV_BUBBLE_CX = INV_TIP_X + INV_BUBBLE_R
 INV_RIGHT_PORT_X = INV_BUBBLE_CX + INV_BUBBLE_R
 
 
-def _inv_mux_output_cx(cy: float, mid: float, *, upper: bool) -> float:
-    h = INV_MUX_TRI_HALF_H
-    lx = INV_PORT_LEFT_X
-    dx = INV_TIP_X - lx
-    reach = (INV_BUBBLE_R + INV_MUX_TRI_GAP) * math.hypot(dx, h)
-    if upper:
-        c = dx * (mid - h) - h * lx
-        return (reach + dx * cy - c) / h
-    c = -dx * (mid + h) - h * lx
-    return (reach - dx * cy - c) / h
-
-
-def inv_mux_output_positions(
-    mid: float,
-    spread: float = INV_MUX_OUT_SPREAD,
-) -> tuple[tuple[float, float], tuple[float, float]]:
-    """Bubble centers in design space, equidistant from both slant edges."""
-    cy0 = mid - spread
-    cy1 = mid + spread
-    return (
-        (_inv_mux_output_cx(cy0, mid, upper=True), cy0),
-        (_inv_mux_output_cx(cy1, mid, upper=False), cy1),
-    )
-
-
-def inv_mux_output_cell_positions(
-    pad: int,
-    mid: int,
-    spread: float = INV_MUX_OUT_SPREAD,
-) -> tuple[tuple[float, float], ...]:
-    return tuple(
-        (pad + cx, cy) for cx, cy in inv_mux_output_positions(mid, spread)
-    )
+INV_MUX_MARKER_HALF = INV_BUBBLE_R
 
 
 def inv_body(g: geom.SimpleGeometry) -> str:
@@ -660,6 +602,22 @@ def inv_body(g: geom.SimpleGeometry) -> str:
         f'{tip},{mid} {left},47" fill="{FILL}" '
         f'stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="round"/>'
         f'{_inversion_bubble(bubble, mid, INV_BUBBLE_R)}'
+    )
+
+
+def inv_mux_body(g: geom.SimpleGeometry) -> str:
+    """Triangle inverter with a single inverted output (hollow square marker)."""
+    mid = _mid(g)
+    left = _dx(g, INV_PORT_LEFT_X)
+    tip = _dx(g, INV_TIP_X)
+    marker_cx = _dx(g, INV_BUBBLE_CX)
+    half = INV_MUX_MARKER_HALF
+    return (
+        f'<polygon points="{left},{mid} {left},13 '
+        f'{tip},{mid} {left},47" fill="{FILL}" '
+        f'stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="round"/>'
+        f'<rect x="{marker_cx - half:.1f}" y="{mid - half:.1f}" width="{half * 2:.1f}" '
+        f'height="{half * 2:.1f}" fill="{FILL}" stroke="{STROKE}" stroke-width="{SW}"/>'
     )
 
 
@@ -699,6 +657,25 @@ SOURCE_PORT_X = int(SOURCE_CX + SOURCE_R)
 SOURCE_WAVE_PERIODS = 1.5
 SOURCE_WAVE_AMP = 5
 SOURCE_WAVE_INSET = 6
+
+
+PAD_LEFT_X = 10
+PAD_RIGHT_X = 30
+PAD_HALF_H = 12
+
+
+def pad_body(g: geom.SimpleGeometry) -> str:
+    """I/O pad: hollow block; output on the right."""
+    mid = _mid(g)
+    left = _dx(g, PAD_LEFT_X)
+    right = _dx(g, PAD_RIGHT_X)
+    top = mid - PAD_HALF_H
+    bottom = mid + PAD_HALF_H
+    return (
+        f'<rect x="{left:.1f}" y="{top}" width="{right - left:.1f}" '
+        f'height="{bottom - top}" rx="2" ry="2" fill="{FILL}" '
+        f'stroke="{STROKE}" stroke-width="{SW}"/>'
+    )
 
 
 def source_body(g: geom.SimpleGeometry) -> str:

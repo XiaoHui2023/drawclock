@@ -30,6 +30,7 @@ from drawio_lib.components import (
     occ_bist_clk_cell,
     occ_clk_cell,
     or_gate,
+    pad,
     pll,
     pll2,
     source,
@@ -93,6 +94,7 @@ ALL: tuple[ComponentSpec, ...] = (
     ComponentSpec(pll),
     ComponentSpec(pll2),
     ComponentSpec(source),
+    ComponentSpec(pad),
     ComponentSpec(clock),
     ComponentSpec(from_shape),
 )
