@@ -6,7 +6,7 @@ from drawio_lib.components.simple_shapes import occ_bist_clk_cell_body
 register_colored_cell(
     sys.modules[__name__],
     title="occ_bist_clk_cell",
-    fill="#66cc66",
+    fill="#228B22",
     tags="occ_bist_clk_cell cell clock drawclock",
     body_svg=occ_bist_clk_cell_body,
 )
