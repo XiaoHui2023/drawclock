@@ -18,6 +18,7 @@ from drawio_lib.components.label_html import (
     shell_open,
     stretch_body_layer,
 )
+from drawio_lib.components.internal_kind import kind_style_suffix
 from drawio_lib.components.label_overflow import (
     mxcell_html_label_style_parts,
     verify_label_overflow_policy,
@@ -151,6 +152,7 @@ class MuxComponent:
         return (
             f"{mxcell_html_label_style_parts()}"
             f"{DRAWCLOCK_TYPE_KEY}={self.drawclock_type};"
+            f"{kind_style_suffix(self.drawclock_type)}"
             f"points=[[{points_inner}]];"
         )
 

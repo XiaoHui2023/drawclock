@@ -326,24 +326,38 @@ def test_pll_library_object_carries_pll_kind_default() -> None:
     ("module_name", "inv_kind"),
     [("inv", "inv"), ("inv_mux", "inv_mux")],
 )
-def test_inv_library_object_carries_kind_attrs(module_name: str, inv_kind: str) -> None:
+def test_inv_library_object_carries_kind_in_style(module_name: str, inv_kind: str) -> None:
     mod = importlib.import_module(f"drawio_lib.components.{module_name}")
     frag = mod.cell_fragment("2")
-    assert 'kind="inv"' in frag
-    assert f'inv_kind="{inv_kind}"' in frag
+    style = mod.cell_style()
+    assert 'kind="' not in frag
+    assert 'inv_kind="' not in frag
+    assert f"drawclockKind=inv;" in style
+    assert f"drawclockInvKind={inv_kind};" in style
 
 
 @pytest.mark.parametrize(
     ("module_name", "source_kind"),
     [("source", "source"), ("pad", "pad")],
 )
-def test_clock_source_library_object_carries_kind_attrs(
+def test_clock_source_library_object_carries_kind_in_style(
     module_name: str, source_kind: str
 ) -> None:
     mod = importlib.import_module(f"drawio_lib.components.{module_name}")
     frag = mod.cell_fragment("2")
-    assert 'kind="source"' in frag
-    assert f'source_kind="{source_kind}"' in frag
+    style = mod.cell_style()
+    assert 'kind="' not in frag
+    assert 'source_kind="' not in frag
+    assert "drawclockKind=source;" in style
+    assert f"drawclockSourceKind={source_kind};" in style
+
+
+def test_gate_library_object_carries_kind_in_style() -> None:
+    gate = importlib.import_module("drawio_lib.components.gate")
+    frag = gate.cell_fragment("2")
+    style = gate.cell_style()
+    assert 'kind="' not in frag
+    assert "drawclockKind=gate;" in style
 
 
 @pytest.mark.parametrize("name", ["gate", "inv", "mux2"])

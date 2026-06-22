@@ -42,6 +42,18 @@ def _mxfile_from_svg(svg_text: str) -> str:
     return content
 
 
+def is_drawio_svg_path(path: str | Path) -> bool:
+    return str(path).lower().endswith(".drawio.svg")
+
+
+def replace_mxfile_in_drawio_svg(svg_text: str, mxfile_xml: str) -> str:
+    match = re.search(r'content="([^"]*)"', svg_text, flags=re.DOTALL)
+    if not match:
+        raise ValueError("SVG 中未找到 draw.io 的 content 属性")
+    escaped = html.escape(mxfile_xml, quote=True)
+    return svg_text[: match.start(1)] + escaped + svg_text[match.end(1) :]
+
+
 def _normalize_drawio_file(text: str) -> str:
     stripped = text.strip()
     if stripped.startswith("<?xml"):

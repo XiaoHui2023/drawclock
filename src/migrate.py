@@ -8,6 +8,8 @@ from drawio_decode import (
     compress_diagram_payload,
     decompress_diagram_payload,
     extract_mxfile_xml,
+    is_drawio_svg_path,
+    replace_mxfile_in_drawio_svg,
 )
 from drawio_library import (
     LibraryShape,
@@ -33,8 +35,35 @@ def reload_drawio_file(
     mxfile = extract_mxfile_xml(str(inp))
     migrated = migrate_mxfile_xml(mxfile, lib)
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(migrated, encoding="utf-8")
+    if is_drawio_svg_path(inp) and is_drawio_svg_path(out):
+        svg_text = inp.read_text(encoding="utf-8")
+        out.write_text(replace_mxfile_in_drawio_svg(svg_text, migrated), encoding="utf-8")
+    else:
+        out.write_text(migrated, encoding="utf-8")
     return out
+
+
+def reload_drawio_inputs(
+    input_path: str | Path,
+    library_path: str | Path,
+    output_path: str | Path,
+) -> list[Path]:
+    """Reload one draw.io file, or every ``*.drawio.svg`` in a directory."""
+    inp = Path(input_path)
+    out = Path(output_path)
+    if not inp.exists():
+        raise ValueError(f"输入路径不存在: {inp}")
+    if inp.is_dir():
+        if out.exists() and not out.is_dir():
+            raise ValueError("输入为目录时，输出必须是目录")
+        out.mkdir(parents=True, exist_ok=True)
+        sources = sorted(inp.glob("*.drawio.svg"))
+        if not sources:
+            raise ValueError(f"目录中未找到 .drawio.svg 文件: {inp}")
+        return [reload_drawio_file(src, library_path, out / src.name) for src in sources]
+    if out.exists() and out.is_dir():
+        raise ValueError("输入为文件时，输出不能是目录")
+    return [reload_drawio_file(inp, library_path, out)]
 
 
 def migrate_mxfile_xml(mxfile_xml: str, library_path: str | Path) -> str:

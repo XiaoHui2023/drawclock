@@ -8,6 +8,14 @@ description: >-
 
 （规则见 `~/.cursor/skills/agent-project-changelog/SKILL.md`。）
 
+## 2026-06-22
+
+- **决议**：**source** / **pad** 归为时钟源大类：库 **object** 写入 **kind=source**、**source_kind** 为 **source** 或 **pad**（不可编辑、仅内部）；**run** 原样导出。见 **json.md**、**drawio-lib/README.md**。
+
+## 2026-06-22
+
+- **决议**：**div_gate** 更名为 **cpu_gate**，外形改为**模块型矩形**（框内模块类型名 + 输出端口名 `hclk_en` / `hclk` / `clk_arm_core`）；归入 **分频器** 大类。通用约定写入用户根 **drawio-module-type-component**；`FanoutComponent` 增 `output_overlays`。
+
 ## 2026-06-20
 
 - **决议**：**div / div_n / dto / dto_n / source / 全部 cell** 实例名与图形间距收紧：新增 `INSTANCE_NAME_PULL_COMPACT_PX=10`（累计上移 10px，`cell_h` 与端口不变）；dto 族取消原 `LOOSE` 4px padding。见 **drawclock-drawio-pitfalls**。

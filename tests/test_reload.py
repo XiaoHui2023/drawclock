@@ -9,10 +9,10 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
-from drawio_decode import decompress_diagram_payload
+from drawio_decode import decompress_diagram_payload, extract_mxfile_xml
 from drawio_library import bake_label_placeholders, load_library_shapes
 from drawio_ports import port_anchors
-from migrate import migrate_mxfile_xml, reload_drawio_file
+from migrate import migrate_mxfile_xml, reload_drawio_file, reload_drawio_inputs
 
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 SHAPES = load_library_shapes(LIBRARY)
@@ -331,7 +331,7 @@ def test_reload_drops_removed_object_attrs(tmp_path: Path) -> None:
     inp.write_text(
         f"""<mxfile><diagram><mxGraphModel><root>
         <mxCell id="0"/><mxCell id="1" parent="0"/>
-        <object name="g" removed_field="x" placeholders="0" id="10">
+        <object name="g" removed_field="x" kind="gate" placeholders="0" id="10">
           <mxCell style="{gate.style}" vertex="1" parent="1">
             <mxGeometry x="10" y="20" width="{gate.w}" height="{gate.h}" as="geometry"/>
           </mxCell>
@@ -344,6 +344,7 @@ def test_reload_drops_removed_object_attrs(tmp_path: Path) -> None:
     inner = _mxfile_searchable(out.read_text(encoding="utf-8"))
     assert 'name="g"' in inner
     assert "removed_field" not in inner
+    assert 'kind="' not in inner
 
 
 def test_reload_applies_library_width_from_narrow_fixture(tmp_path: Path) -> None:
@@ -404,6 +405,69 @@ def test_reload_keeps_non_library_vertex(tmp_path: Path) -> None:
     assert 'x="200"' in text
     assert "overflow=visible" in text
     assert "resizable=0" in text
+
+
+def test_reload_batch_directory_preserves_filenames(tmp_path: Path) -> None:
+    source = ROOT / "test.drawio.svg"
+    if not source.is_file():
+        pytest.skip("需要仓库根目录 test.drawio.svg")
+    inp_dir = tmp_path / "in"
+    out_dir = tmp_path / "out"
+    inp_dir.mkdir()
+    for name in ("alpha.drawio.svg", "beta.drawio.svg"):
+        (inp_dir / name).write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    written = reload_drawio_inputs(inp_dir, LIBRARY, out_dir)
+    assert [path.name for path in written] == ["alpha.drawio.svg", "beta.drawio.svg"]
+    for name in ("alpha.drawio.svg", "beta.drawio.svg"):
+        out = out_dir / name
+        assert out.is_file()
+        text = out.read_text(encoding="utf-8")
+        assert text.startswith("<svg")
+        assert 'content="' in text
+        assert "drawclockType=" in _diagram_payload(extract_mxfile_xml(str(out)))
+
+
+def test_reload_batch_directory_empty_raises(tmp_path: Path) -> None:
+    inp_dir = tmp_path / "in"
+    out_dir = tmp_path / "out"
+    inp_dir.mkdir()
+    try:
+        reload_drawio_inputs(inp_dir, LIBRARY, out_dir)
+    except ValueError as exc:
+        assert "未找到 .drawio.svg" in str(exc)
+    else:
+        raise AssertionError("expected ValueError")
+
+
+def test_reload_dir_input_requires_dir_output(tmp_path: Path) -> None:
+    source = ROOT / "test.drawio.svg"
+    if not source.is_file():
+        pytest.skip("需要仓库根目录 test.drawio.svg")
+    inp_dir = tmp_path / "in"
+    inp_dir.mkdir()
+    (inp_dir / "only.drawio.svg").write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    bad_out = tmp_path / "out.drawio"
+    bad_out.write_text("x", encoding="utf-8")
+    try:
+        reload_drawio_inputs(inp_dir, LIBRARY, bad_out)
+    except ValueError as exc:
+        assert "输出必须是目录" in str(exc)
+    else:
+        raise AssertionError("expected ValueError")
+
+
+def test_reload_drawio_svg_to_drawio_svg_keeps_svg_wrapper(tmp_path: Path) -> None:
+    source = ROOT / "test.drawio.svg"
+    if not source.is_file():
+        pytest.skip("需要仓库根目录 test.drawio.svg")
+    inp = tmp_path / "tree.drawio.svg"
+    out = tmp_path / "tree-reloaded.drawio.svg"
+    inp.write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    reload_drawio_file(inp, LIBRARY, out)
+    text = out.read_text(encoding="utf-8")
+    assert text.startswith("<svg")
+    assert 'content="' in text
+    assert "drawclockType=" in _diagram_payload(extract_mxfile_xml(str(out)))
 
 
 def test_migrate_rejects_unknown_library_type() -> None:

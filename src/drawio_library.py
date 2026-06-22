@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
+from internal_kind import INTERNAL_OBJECT_KEYS
+
 LABEL_PLACEHOLDER_RE = re.compile(
     r"%(?:name|pll_kind|in\d+_label)%"
 )
@@ -207,12 +209,18 @@ def reload_object_attrs(
     if shape is None:
         return canonical_object_attrs(drawclock_type, stored_attrs, library_path=lib)
     schema = dict(shape.object_defaults)
+    for key in INTERNAL_OBJECT_KEYS:
+        schema.pop(key, None)
     out = dict(schema)
     for key, value in stored_attrs.items():
         if key in ("label", "placeholders") or value is None:
             continue
+        if key in INTERNAL_OBJECT_KEYS:
+            continue
         if key in schema:
             out[key] = value
+    for key in INTERNAL_OBJECT_KEYS:
+        out.pop(key, None)
     if not out.get("name"):
         out["name"] = stored_attrs.get("name") or drawclock_type
     out["label"] = shape.label

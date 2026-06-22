@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 
 from drawio_lib.components import simple_geometry as geom
 from drawio_lib.components.label_html import shell_close, shell_open, stretch_body_layer
+from drawio_lib.components.internal_kind import kind_style_suffix
 from drawio_lib.components.label_overflow import mxcell_html_label_style_parts
 from drawio_lib.components.simple_component import verify_label_placeholders
 from drawio_lib.components.simple_shapes import (
@@ -122,6 +123,7 @@ class AsyncMarkerComponent:
         return (
             f"{mxcell_html_label_style_parts()}"
             f"{DRAWCLOCK_TYPE_KEY}={self.drawclock_type};"
+            f"{kind_style_suffix(self.drawclock_type)}"
             f"points=[[{points_inner}]];"
         )
 

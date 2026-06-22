@@ -51,6 +51,35 @@ def test_reload_requires_library() -> None:
     assert "library" in (proc.stderr + proc.stdout).lower()
 
 
+def test_reload_batch_directory_cli(tmp_path: Path) -> None:
+    source = ROOT / "test.drawio.svg"
+    if not source.is_file():
+        pytest.skip("需要仓库根目录 test.drawio.svg")
+    inp_dir = tmp_path / "in"
+    out_dir = tmp_path / "out"
+    inp_dir.mkdir()
+    (inp_dir / "one.drawio.svg").write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(SRC_DIR),
+            "reload",
+            "-i",
+            str(inp_dir),
+            "-l",
+            str(ROOT / "drawio-lib" / "drawclock.xml"),
+            "-o",
+            str(out_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert (out_dir / "one.drawio.svg").is_file()
+    assert "已写入" in proc.stderr
+
+
 def test_release_archive_source_layout(tmp_path: Path, monkeypatch) -> None:
     spec = importlib.util.spec_from_file_location(
         "bundle_release", ROOT / "tools" / "bundle_release.py"

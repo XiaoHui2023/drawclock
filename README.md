@@ -14,6 +14,6 @@
 
 | 长参数 | 短参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
-| `--input` | `-i` | 文件 | 必填 | `.drawio` / `.drawio.svg` |
+| `--input` | `-i` | 文件或目录 | 必填 | 支持 `.drawio` / `.drawio.svg` 格式 |
 | `--library` | `-l` | 文件 | 必填 | `drawclock.xml` |
-| `--output` | `-o` | 文件 | 必填 | `.drawio` |
+| `--output` | `-o` | 文件或目录 | 必填 | 单文件输出路径，或批量输出目录 |

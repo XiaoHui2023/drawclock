@@ -4,6 +4,8 @@ import re
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 
+from internal_kind import INTERNAL_OBJECT_KEYS, STYLE_KEY_TO_JSON
+
 DRAWCLOCK_TYPE_RE = re.compile(r"drawclockType=([^;]+)")
 STYLE_XY_RE = re.compile(r"(exit|entry)(X|Y)=([0-9.]+)")
 
@@ -117,11 +119,17 @@ def _add_mxcell(
     if not dtype:
         return
     merged = {**attrs, **mxcell.attrib}
+    internal_from_style = _internal_attrs_from_style(style)
+    for key in INTERNAL_OBJECT_KEYS:
+        legacy = attrs.get(key)
+        if key not in internal_from_style and legacy is not None and str(legacy).strip():
+            internal_from_style[key] = str(legacy).strip()
     object_attrs = {
         key: value
         for key, value in attrs.items()
-        if key not in ("id",) and value is not None
+        if key not in ("id",) and value is not None and key not in INTERNAL_OBJECT_KEYS
     }
+    object_attrs.update(internal_from_style)
     gx, gy, gw, gh = _parse_vertex_geometry(mxcell)
     name = merged.get("name", merged.get("_name", "")).strip()
     pll_kind = merged.get("pll_kind")
@@ -188,6 +196,15 @@ def _prefixed(cell_id: str | None, prefix: str) -> str | None:
 def _style_value(style: str, pattern: re.Pattern[str]) -> str | None:
     match = pattern.search(style)
     return match.group(1) if match else None
+
+
+def _internal_attrs_from_style(style: str) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for style_key, json_key in STYLE_KEY_TO_JSON.items():
+        value = _style_value(style, re.compile(rf"{re.escape(style_key)}=([^;]+)"))
+        if value:
+            out[json_key] = value.strip()
+    return out
 
 
 def _parse_points(style: str) -> tuple[tuple[float, float], ...]:

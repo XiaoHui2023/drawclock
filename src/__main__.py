@@ -5,7 +5,7 @@ import json
 import sys
 from pathlib import Path
 
-from migrate import reload_drawio_file
+from migrate import reload_drawio_inputs
 from pipeline import drawio_to_clock_tree, write_clock_tree_json
 
 
@@ -56,18 +56,18 @@ def _add_reload_parser(subparsers: argparse._SubParsersAction[argparse.ArgumentP
         "-i",
         "--input",
         type=str,
-        metavar="FILE",
+        metavar="PATH",
         required=True,
-        help="旧 .drawio / .drawio.svg",
+        help="旧 .drawio / .drawio.svg，或含 *.drawio.svg 的目录",
     )
     _add_library_arg(parser, "新器件库 drawclock.xml")
     parser.add_argument(
         "-o",
         "--output",
         type=str,
-        metavar="FILE",
+        metavar="PATH",
         required=True,
-        help="输出 .drawio 路径",
+        help="输出 .drawio / .drawio.svg 路径，或批量输出目录",
     )
     parser.set_defaults(command=_reload)
 
@@ -105,11 +105,12 @@ def _run(args: argparse.Namespace) -> int:
 
 def _reload(args: argparse.Namespace) -> int:
     try:
-        out_path = reload_drawio_file(args.input, args.library, args.output)
+        written = reload_drawio_inputs(args.input, args.library, args.output)
     except (ValueError, OSError) as exc:
         print(str(exc), file=sys.stderr)
         return 1
-    print(f"已写入 {out_path}", file=sys.stderr)
+    for out_path in written:
+        print(f"已写入 {out_path}", file=sys.stderr)
     return 0
 
 

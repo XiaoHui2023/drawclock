@@ -162,7 +162,7 @@ def test_inv_mux_exports_major_and_minor_kind(tmp_path: Path) -> None:
         "<mxGraphModel><root>"
         "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
         f"{_library_object(10, 'src0', source)}"
-        f"{_library_object(11, 'inv0', inv_mux, extra={'kind': 'inv', 'inv_kind': 'inv_mux'})}"
+        f"{_library_object(11, 'inv0', inv_mux)}"
         f"{_library_object(12, 'clk0', clock)}"
         f"{_edge(20, 10, 11, source, 'source', 'right', inv_mux, 'inv_mux', 'left')}"
         f"{_edge(21, 11, 12, inv_mux, 'inv_mux', 'right', clock, 'clock', 'left')}"
@@ -189,7 +189,7 @@ def test_source_exports_major_and_minor_kind(tmp_path: Path) -> None:
     model = (
         "<mxGraphModel><root>"
         "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
-        f"{_library_object(10, 'xtal', source, extra={'kind': 'source', 'source_kind': 'source'})}"
+        f"{_library_object(10, 'xtal', source)}"
         f"{_library_object(11, 'pll0', pll)}"
         f"{_library_object(12, 'clk0', clock)}"
         f"{_edge(20, 10, 11, source, 'source', 'right', pll, 'pll', 'left')}"
