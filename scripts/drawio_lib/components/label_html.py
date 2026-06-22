@@ -1,9 +1,17 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from drawio_lib.components.label_attrs import ATTR_NAME, LABEL_FONT_PX
 from drawio_lib.components.label_overflow import graphic_layer_pin_css
 
-LabelOverlay = tuple[float, float, str] | tuple[float, float, str, int]
+OverlayAnchor = Literal["center", "left", "right"]
+
+LabelOverlay = (
+    tuple[float, float, str]
+    | tuple[float, float, str, int]
+    | tuple[float, float, str, int, OverlayAnchor]
+)
 
 
 def shell_open(design_cell_w: int, design_cell_h: int) -> str:
@@ -41,18 +49,43 @@ def stretch_body_layer(
     )
 
 
+def _overlay_transform(anchor: OverlayAnchor) -> str:
+    if anchor == "left":
+        return "translate(0,-50%)"
+    if anchor == "right":
+        return "translate(-100%,-50%)"
+    return "translate(-50%,-50%)"
+
+
+def overlay_anchor(item: LabelOverlay) -> OverlayAnchor:
+    if len(item) >= 5:
+        return item[4]
+    return "center"
+
+
+def overlay_font_px(item: LabelOverlay) -> int:
+    if len(item) >= 4:
+        return item[3]
+    return LABEL_FONT_PX
+
+
 def _overlay_on_cell(item: LabelOverlay, *, view_w: int, view_h: int) -> str:
     if len(item) == 3:
         cell_x, cell_y, text = item
         font_px = LABEL_FONT_PX
-    else:
+        anchor: OverlayAnchor = "center"
+    elif len(item) == 4:
         cell_x, cell_y, text, font_px = item
+        anchor = "center"
+    else:
+        cell_x, cell_y, text, font_px, anchor = item
     left_pct = cell_x / view_w * 100
     top_pct = cell_y / view_h * 100
+    transform = _overlay_transform(anchor)
     return (
         f'<span style="position:absolute;left:{left_pct}%;top:{top_pct}%;'
         f"font-size:{font_px}px;line-height:1;white-space:nowrap;"
-        f'transform:translate(-50%,-50%);">{text}</span>'
+        f'transform:{transform};">{text}</span>'
     )
 
 

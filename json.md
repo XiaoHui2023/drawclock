@@ -3,10 +3,11 @@
 以下为示范。
 
 ```json5
-// JSON 无 from；kind 与器件库名一致；属性原样来自图中 object
+// JSON 无 from；属性原样来自图中 object；有归类的器件 kind 为大类、{大类}_kind 为小类（如 inv/inv_kind、source/source_kind；库内写入，不可编辑）
 {
   "xtal": {
-    "kind": "source"
+    "kind": "source",        // 时钟源大类
+    "source_kind": "source"  // 小类：source / pad
   },
   "pll_main": {
     "kind": "pll",
@@ -18,13 +19,13 @@
     "pll_kind": "SC",
     "source": "xtal",
     "target": {
-      "0": "gate0",  // 多路输出：target 为 dict，键为输出口序号
+      "0": "gate0",  // 多路输出：target 为 dict，键为 str（序号 "0"/"1" 或端口名）
       "1": "div0"
     }
   },
   "gate0": {
     "kind": "gate",
-    "source": "pll_dual[0]"  // 接多路输出上游：名[序号]，从 0 起
+    "source": "pll_dual[0]"  // 接多路输出上游：名[键]，键为 str
   },
   "div0": {
     "kind": "div",
@@ -36,12 +37,13 @@
   },
   "inv0": {
     "kind": "inv",
+    "inv_kind": "inv",
     "source": "gate0"
   },
   "mux2": {
     "kind": "mux2",
     "source": {
-      "0": "pll_m2a",  // 多路输入：source 为 dict，键为输入口序号
+      "0": "pll_m2a",  // 多路输入：source 为 dict，键为 str（序号或端口名）
       "1": "pll_m2b"
     }
   },

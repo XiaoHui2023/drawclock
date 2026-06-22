@@ -18,8 +18,9 @@ if str(SCRIPTS) not in sys.path:
     [
         ("gate", 2),
         ("div", 2),
+        ("div2", 2),
         ("div_n", 2),
-        ("div_gate", 4),
+        ("cpu_gate", 4),
         ("dto", 2),
         ("dto_n", 2),
         ("inv", 2),
@@ -159,11 +160,11 @@ def test_cell_is_unfilled_triangle() -> None:
     assert "<circle " not in html
 
 
-def test_occ_clk_cell_is_blue_triangle() -> None:
+def test_occ_clk_cell_is_cyan_triangle() -> None:
     occ = importlib.import_module("drawio_lib.components.occ_clk_cell")
     html = occ.label_html()
     assert "<polygon " in html
-    assert 'fill="#b3d9ff"' in html
+    assert 'fill="#b3ffff"' in html
     assert "<circle " not in html
 
 
@@ -321,6 +322,30 @@ def test_pll_library_object_carries_pll_kind_default() -> None:
     assert "%pll_kind%" in frag
 
 
+@pytest.mark.parametrize(
+    ("module_name", "inv_kind"),
+    [("inv", "inv"), ("inv_mux", "inv_mux")],
+)
+def test_inv_library_object_carries_kind_attrs(module_name: str, inv_kind: str) -> None:
+    mod = importlib.import_module(f"drawio_lib.components.{module_name}")
+    frag = mod.cell_fragment("2")
+    assert 'kind="inv"' in frag
+    assert f'inv_kind="{inv_kind}"' in frag
+
+
+@pytest.mark.parametrize(
+    ("module_name", "source_kind"),
+    [("source", "source"), ("pad", "pad")],
+)
+def test_clock_source_library_object_carries_kind_attrs(
+    module_name: str, source_kind: str
+) -> None:
+    mod = importlib.import_module(f"drawio_lib.components.{module_name}")
+    frag = mod.cell_fragment("2")
+    assert 'kind="source"' in frag
+    assert f'source_kind="{source_kind}"' in frag
+
+
 @pytest.mark.parametrize("name", ["gate", "inv", "mux2"])
 def test_instance_name_not_in_svg(name: str) -> None:
     mod = importlib.import_module(f"drawio_lib.components.{name}")
@@ -335,6 +360,30 @@ def test_instance_name_not_in_svg(name: str) -> None:
     assert "overflow=visible" in mod.cell_style()
     assert "overflow=fill" not in mod.cell_style()
     assert "resizable=0" in mod.cell_style()
+
+
+def test_cpu_gate_labels_module_and_outputs() -> None:
+    cpu_gate = importlib.import_module("drawio_lib.components.cpu_gate")
+    from drawio_lib.components import module_geometry as mgeom
+    from drawio_lib.components.simple_geometry import STANDARD_ROW_PITCH
+
+    html = cpu_gate.label_html()
+    g = cpu_gate.G
+    assert g.cell_w > 40
+    assert ">cpu_gate</span>" in html
+    for label in ("hclk_en", "hclk", "clk_arm_core"):
+        assert f">{label}</span>" in html
+    assert "<line " in html
+    assert "transform:translate(-100%,-50%)" in html
+
+    pts = cpu_gate._parse_points(cpu_gate.cell_style())
+    assert isclose(pts[0][0], g.box_left / cpu_gate.W, abs_tol=0.002)
+    assert isclose(pts[0][1], g.left.anchor.cell_y / cpu_gate.H, abs_tol=0.002)
+    assert pts[0][1] > g.header_bottom / cpu_gate.H
+    for index in range(len(g.outputs) - 1):
+        pitch = g.outputs[index + 1].anchor.cell_y - g.outputs[index].anchor.cell_y
+        assert pitch == STANDARD_ROW_PITCH
+        assert pitch == mgeom.OUTPUT_PITCH
 
 
 def test_clk_phase_sel_ports_on_right_border() -> None:

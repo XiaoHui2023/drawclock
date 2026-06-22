@@ -3,9 +3,9 @@ from dataclasses import dataclass
 
 from drawio_lib.components import simple_geometry as geom
 from drawio_lib.components.label_attrs import INSTANCE_NAME_PULL_COMPACT_PX, LABEL_FONT_PX
+from drawio_lib.components.clock_source_component import ClockSourceComponent
 from drawio_lib.components.simple_component import (
     STROKE,
-    SimpleComponent,
     bind_module,
 )
 from drawio_lib.components.simple_shapes import PAD_RIGHT_X, pad_body
@@ -16,7 +16,7 @@ OUTPUT_LABEL_OFFSET_X = 6
 
 
 @dataclass
-class PadComponent(SimpleComponent):
+class PadComponent(ClockSourceComponent):
     def _output_label_overlay(self) -> tuple[tuple[float, float, str], ...]:
         assert self._g.right is not None
         port = self._g.right

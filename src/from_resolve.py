@@ -8,7 +8,7 @@ import re
 from device_model import DeviceState
 from library_ports import out_port_index, topology_for_type
 
-SOURCE_REF_RE = re.compile(r"^(.+)\[(\d+)\]$")
+SOURCE_REF_RE = re.compile(r"^(.+)\[([^\]]+)\]$")
 
 
 @dataclass(frozen=True)
@@ -91,11 +91,11 @@ def from_input_out_ports(
   return {from_name: clock_out_ports.get(from_name) for from_name in from_by_name}
 
 
-def parse_source_ref(ref: str) -> tuple[str, int | None]:
+def parse_source_ref(ref: str) -> tuple[str, str | None]:
   match = SOURCE_REF_RE.match(ref)
   if not match:
     return ref, None
-  return match.group(1), int(match.group(2))
+  return match.group(1), match.group(2)
 
 
 def output_counts_by_name(
@@ -121,6 +121,7 @@ def format_upstream_source(
   from_endpoints: dict[str, FromEndpoints],
   from_out_ports: dict[str, str | None],
   output_counts: dict[str, int],
+  output_keys_by_name: dict[str, dict[str, str]],
 ) -> str | None:
   out_port = direct_out_port
   if _is_from(peer, from_names):
@@ -133,9 +134,15 @@ def format_upstream_source(
   if peer is None:
     return None
   count = output_counts.get(peer, 1)
-  index = out_port_index(out_port) if out_port else None
-  if count <= 1 or index is None:
+  port_keys = output_keys_by_name.get(peer, {})
+  if count <= 1:
     return peer
+  if out_port and out_port in port_keys:
+    return f"{peer}[{port_keys[out_port]}]"
+  index = out_port_index(out_port) if out_port else None
+  if index is None:
+    return peer
+  suffix = port_keys.get(out_port, str(index))
   if index >= count:
-    raise ValueError(f"上游器件 {peer} 的输出序号 [{index}] 超出输出路数 {count}")
-  return f"{peer}[{index}]"
+    raise ValueError(f"上游器件 {peer} 的输出 [{suffix}] 超出输出路数 {count}")
+  return f"{peer}[{suffix}]"

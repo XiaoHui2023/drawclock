@@ -153,6 +153,61 @@ def test_occ_clk_cell_drawio_exports_as_single_input_device(tmp_path: Path) -> N
     assert config["clk0"]["source"] == "cell0"
 
 
+def test_inv_mux_exports_major_and_minor_kind(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    inv_mux = shapes["inv_mux"]
+    clock = shapes["clock"]
+    model = (
+        "<mxGraphModel><root>"
+        "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
+        f"{_library_object(10, 'src0', source)}"
+        f"{_library_object(11, 'inv0', inv_mux, extra={'kind': 'inv', 'inv_kind': 'inv_mux'})}"
+        f"{_library_object(12, 'clk0', clock)}"
+        f"{_edge(20, 10, 11, source, 'source', 'right', inv_mux, 'inv_mux', 'left')}"
+        f"{_edge(21, 11, 12, inv_mux, 'inv_mux', 'right', clock, 'clock', 'left')}"
+        "</root></mxGraphModel>"
+    )
+    path = tmp_path / "inv-mux-tree.drawio"
+    path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
+
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    assert config["inv0"] == {
+        "kind": "inv",
+        "inv_kind": "inv_mux",
+        "source": "src0",
+    }
+    assert config["clk0"]["source"] == "inv0"
+
+
+def test_source_exports_major_and_minor_kind(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    pll = shapes["pll"]
+    clock = shapes["clock"]
+    model = (
+        "<mxGraphModel><root>"
+        "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
+        f"{_library_object(10, 'xtal', source, extra={'kind': 'source', 'source_kind': 'source'})}"
+        f"{_library_object(11, 'pll0', pll)}"
+        f"{_library_object(12, 'clk0', clock)}"
+        f"{_edge(20, 10, 11, source, 'source', 'right', pll, 'pll', 'left')}"
+        f"{_edge(21, 11, 12, pll, 'pll', 'right', clock, 'clock', 'left')}"
+        "</root></mxGraphModel>"
+    )
+    path = tmp_path / "source-tree.drawio"
+    path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
+
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    assert config["xtal"] == {
+        "kind": "source",
+        "source_kind": "source",
+    }
+    assert config["pll0"]["source"] == "xtal"
+
+
 def test_pll2_dual_output_source_suffix() -> None:
     path = ROOT / "tests" / "fixtures" / "pll2-tree.drawio"
     config = parse_drawio_paths([path])
@@ -162,6 +217,40 @@ def test_pll2_dual_output_source_suffix() -> None:
     assert config["pll2_0"]["target"] == {"0": "gate0", "1": "div0"}
     assert config["gate0"]["source"] == "pll2_0[0]"
     assert config["div0"]["source"] == "pll2_0[1]"
+
+
+def test_cpu_gate_named_output_keys(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    cpu_gate = shapes["cpu_gate"]
+    clock = shapes["clock"]
+    model = (
+        "<mxGraphModel><root>"
+        "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
+        f"{_library_object(10, 'src0', source)}"
+        f"{_library_object(11, 'cg0', cpu_gate)}"
+        f"{_library_object(12, 'clk_en', clock)}"
+        f"{_library_object(13, 'clk_main', clock)}"
+        f"{_library_object(14, 'clk_core', clock)}"
+        f"{_edge(20, 10, 11, source, 'source', 'right', cpu_gate, 'cpu_gate', 'left')}"
+        f"{_edge(21, 11, 12, cpu_gate, 'cpu_gate', 'out0', clock, 'clock', 'left')}"
+        f"{_edge(22, 11, 13, cpu_gate, 'cpu_gate', 'out1', clock, 'clock', 'left')}"
+        f"{_edge(23, 11, 14, cpu_gate, 'cpu_gate', 'out2', clock, 'clock', 'left')}"
+        "</root></mxGraphModel>"
+    )
+    path = tmp_path / "cpu-gate-tree.drawio"
+    path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
+
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    assert config["cg0"]["target"] == {
+        "hclk_en": "clk_en",
+        "hclk": "clk_main",
+        "clk_arm_core": "clk_core",
+    }
+    assert config["clk_en"]["source"] == "cg0[hclk_en]"
+    assert config["clk_main"]["source"] == "cg0[hclk]"
+    assert config["clk_core"]["source"] == "cg0[clk_arm_core]"
 
 
 def test_from_duplicate_input_binding_fails() -> None:

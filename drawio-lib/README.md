@@ -12,7 +12,7 @@
 
 ## 器件
 
-### mux
+### 选择器
 
 | 库名 | 预览 |
 | --- | --- |
@@ -34,41 +34,16 @@
 | --- | --- |
 | `name` | 实例名 |
 
-### div
+### 分频器
 
-![div](images/div.svg)
-
-| 属性 | 说明 |
+| 库名 | 预览 |
 | --- | --- |
-| `name` | 实例名 |
-
-### div_n
-
-![div_n](images/div_n.svg)
-
-| 属性 | 说明 |
-| --- | --- |
-| `name` | 实例名 |
-
-### div_gate
-
-![div_gate](images/div_gate.svg)
-
-| 属性 | 说明 |
-| --- | --- |
-| `name` | 实例名 |
-
-### dto
-
-![dto](images/dto.svg)
-
-| 属性 | 说明 |
-| --- | --- |
-| `name` | 实例名 |
-
-### dto_n
-
-![dto_n](images/dto_n.svg)
+| div | ![div](images/div.svg) |
+| div2 | ![div2](images/div2.svg) |
+| div_n | ![div_n](images/div_n.svg) |
+| dto | ![dto](images/dto.svg) |
+| dto_n | ![dto_n](images/dto_n.svg) |
+| cpu_gate | ![cpu_gate](images/cpu_gate.svg) |
 
 | 属性 | 说明 |
 | --- | --- |
@@ -82,17 +57,12 @@
 | --- | --- |
 | `name` | 实例名 |
 
-### inv_mux
+### 反相器
 
-![inv_mux](images/inv_mux.svg)
-
-| 属性 | 说明 |
+| 库名 | 预览 |
 | --- | --- |
-| `name` | 实例名 |
-
-### inv
-
-![inv](images/inv.svg)
+| inv | ![inv](images/inv.svg) |
+| inv_mux | ![inv_mux](images/inv_mux.svg) |
 
 | 属性 | 说明 |
 | --- | --- |
@@ -136,17 +106,12 @@
 | --- | --- |
 | `name` | 实例名 |
 
-### source
+### 时钟源
 
-![source](images/source.svg)
-
-| 属性 | 说明 |
+| 库名 | 预览 |
 | --- | --- |
-| `name` | 实例名 |
-
-### pad
-
-![pad](images/pad.svg)
+| source | ![source](images/source.svg) |
+| pad | ![pad](images/pad.svg) |
 
 | 属性 | 说明 |
 | --- | --- |

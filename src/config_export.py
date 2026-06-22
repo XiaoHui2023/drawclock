@@ -9,7 +9,13 @@ from from_resolve import (
   from_input_out_ports,
   output_counts_by_name,
 )
-from library_ports import PortTopology, connection_dict_key, topology_for_type
+from library_ports import (
+  PortTopology,
+  connection_key_for_port,
+  input_connection_keys,
+  output_connection_keys,
+  topology_for_type,
+)
 
 
 def devices_to_config(
@@ -24,6 +30,9 @@ def devices_to_config(
     devices, from_by_name, library_path=library_path
   )
   output_counts = output_counts_by_name(devices, library_path=library_path)
+  input_keys_by_kind = _connection_keys_by_kind(devices, input_connection_keys, library_path)
+  output_keys_by_kind = _connection_keys_by_kind(devices, output_connection_keys, library_path)
+  output_keys_by_name = _keys_by_device_name(devices, output_keys_by_kind)
   entries: list[dict[str, Any]] = []
 
   for state in devices.values():
@@ -37,6 +46,9 @@ def devices_to_config(
         from_endpoints=from_endpoints,
         from_out_ports=from_out_ports,
         output_counts=output_counts,
+        input_keys_by_kind=input_keys_by_kind,
+        output_keys_by_kind=output_keys_by_kind,
+        output_keys_by_name=output_keys_by_name,
       )
     )
 
@@ -54,6 +66,31 @@ def entries_to_clock_tree(entries: list[dict[str, Any]]) -> dict[str, dict[str, 
   return tree
 
 
+def _connection_keys_by_kind(
+  devices: dict[str, DeviceState],
+  loader,
+  library_path: str,
+) -> dict[str, dict[str, str]]:
+  by_kind: dict[str, dict[str, str]] = {}
+  for state in devices.values():
+    if state.kind == "from":
+      continue
+    if state.kind not in by_kind:
+      by_kind[state.kind] = loader(state.kind, library_path=library_path)
+  return by_kind
+
+
+def _keys_by_device_name(
+  devices: dict[str, DeviceState],
+  keys_by_kind: dict[str, dict[str, str]],
+) -> dict[str, dict[str, str]]:
+  return {
+    state.name: keys_by_kind[state.kind]
+    for state in devices.values()
+    if state.kind != "from"
+  }
+
+
 def _format_source(
   peer: str,
   *,
@@ -62,6 +99,7 @@ def _format_source(
   from_endpoints: dict,
   from_out_ports: dict[str, str | None],
   output_counts: dict[str, int],
+  output_keys_by_name: dict[str, dict[str, str]],
 ) -> str | None:
   return format_upstream_source(
     peer,
@@ -70,6 +108,7 @@ def _format_source(
     from_endpoints=from_endpoints,
     from_out_ports=from_out_ports,
     output_counts=output_counts,
+    output_keys_by_name=output_keys_by_name,
   )
 
 
@@ -81,22 +120,32 @@ def _device_entry(
   from_endpoints: dict,
   from_out_ports: dict[str, str | None],
   output_counts: dict[str, int],
+  input_keys_by_kind: dict[str, dict[str, str]],
+  output_keys_by_kind: dict[str, dict[str, str]],
+  output_keys_by_name: dict[str, dict[str, str]],
 ) -> dict[str, Any]:
   topology = topology_for_type(state.kind, library_path=library_path)
-  entry: dict[str, Any] = {"name": state.name, "kind": state.kind, **dict(state.object_attrs)}
+  entry: dict[str, Any] = {"name": state.name, **dict(state.object_attrs)}
+  if "kind" not in entry:
+    entry["kind"] = state.kind
+
+  input_keys = input_keys_by_kind.get(state.kind, {})
+  output_keys = output_keys_by_kind.get(state.kind, {})
 
   source = _source_field(
     state,
     topology,
+    input_keys=input_keys,
     from_names=from_names,
     from_endpoints=from_endpoints,
     from_out_ports=from_out_ports,
     output_counts=output_counts,
+    output_keys_by_name=output_keys_by_name,
   )
   if source is not None:
     entry["source"] = source
 
-  target = _target_field(state, topology)
+  target = _target_field(state, topology, output_keys=output_keys)
   if target is not None:
     entry["target"] = target
 
@@ -107,10 +156,12 @@ def _source_field(
   state: DeviceState,
   topology: PortTopology,
   *,
+  input_keys: dict[str, str],
   from_names: set[str],
   from_endpoints: dict,
   from_out_ports: dict[str, str | None],
   output_counts: dict[str, int],
+  output_keys_by_name: dict[str, dict[str, str]],
 ) -> str | dict[str, str] | None:
   if not topology.inputs:
     return None
@@ -127,19 +178,24 @@ def _source_field(
       from_endpoints=from_endpoints,
       from_out_ports=from_out_ports,
       output_counts=output_counts,
+      output_keys_by_name=output_keys_by_name,
     )
-    resolved[connection_dict_key(port)] = upstream or peer
+    key = connection_key_for_port(port, topology, port_keys=input_keys)
+    resolved[key] = upstream or peer
 
   if not resolved:
     return None
   if len(topology.inputs) == 1:
-    return resolved[connection_dict_key(topology.inputs[0])]
+    sole = topology.inputs[0]
+    return resolved[connection_key_for_port(sole, topology, port_keys=input_keys)]
   return resolved
 
 
 def _target_field(
   state: DeviceState,
   topology: PortTopology,
+  *,
+  output_keys: dict[str, str],
 ) -> dict[str, str] | None:
   if len(topology.outputs) <= 1:
     return None
@@ -148,6 +204,7 @@ def _target_field(
   for port in topology.outputs:
     peers = state.out_bindings.get(port, [])
     if peers:
-      resolved[connection_dict_key(port)] = peers[0]
+      key = connection_key_for_port(port, topology, port_keys=output_keys)
+      resolved[key] = peers[0]
 
   return resolved or None

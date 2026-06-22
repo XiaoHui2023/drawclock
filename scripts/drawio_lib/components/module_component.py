@@ -6,7 +6,7 @@ from math import isclose
 
 import xml.etree.ElementTree as ET
 
-from drawio_lib.components import fanout_geometry as fgeom
+from drawio_lib.components import module_geometry as mgeom
 from drawio_lib.components import simple_geometry as sgeom
 from drawio_lib.components.label_attrs import ATTR_NAME, INSTANCE_NAME_GAP_PX, LABEL_FONT_PX
 from drawio_lib.components.label_html import (
@@ -25,7 +25,6 @@ from drawio_lib.components.simple_component import STROKE, verify_label_placehol
 from drawio_lib.xml_io import graph_root, xml_attr
 
 DRAWCLOCK_TYPE_KEY = "drawclockType"
-OUTPUT_LABEL_OFFSET_X = 6
 
 
 def _svg_num(value: float) -> str:
@@ -33,38 +32,19 @@ def _svg_num(value: float) -> str:
 
 
 @dataclass
-class FanoutComponent:
-    """One input on the left and evenly spaced outputs on the right edge."""
+class ModuleComponent:
+    """Container module: header type name + pitched output port rows."""
 
     title: str
     tags: str
-    body_svg: Callable[[sgeom.SimpleGeometry], str]
-    output_count: int
-    left_port_x: float
-    left_port_y: float | None = None
-    body_half_h: int | None = None
-    center_labels: tuple[tuple[float, float, str], ...] | tuple[tuple[float, float, str, int], ...] = ()
-    output_overlays: tuple[tuple[float, float, str], ...] | tuple[tuple[float, float, str, int], ...] = ()
-    label_output_indices: bool = True
-    output_cells: tuple[tuple[float, float], ...] | None = None
+    output_labels: tuple[str, ...]
+    body_svg: Callable[[mgeom.ModuleGeometry], str] = mgeom.module_body_svg
     instance_name_gap_px: int = INSTANCE_NAME_GAP_PX
 
     def __post_init__(self) -> None:
-        rect = sgeom.body_rect()
-        mid = sgeom.body_mid_y(rect)
-        left_y = self.left_port_y if self.left_port_y is not None else mid
-        self._g = fgeom.compute_fanout_geometry(
-            left_x=self.left_port_x,
-            left_y=left_y,
-            output_count=self.output_count,
-            body_half_h=self.body_half_h,
-            output_cells=self.output_cells,
-        )
-        self._body_g = sgeom.compute_geometry(
-            "both",
-            margin_x=4,
-            port_cells=((self.left_port_x, left_y),),
-        )
+        if not self.output_labels:
+            raise ValueError(f"{self.title} needs at least one output label")
+        self._g = mgeom.compute_module_geometry(self.output_labels)
 
     @property
     def drawclock_type(self) -> str:
@@ -72,14 +52,14 @@ class FanoutComponent:
 
     @property
     def w(self) -> int:
-        return sgeom.W
+        return self._g.cell_w
 
     @property
     def h(self) -> int:
         return self._g.cell_h
 
     @property
-    def g(self) -> fgeom.FanoutGeometry:
+    def g(self) -> mgeom.ModuleGeometry:
         return self._g
 
     @property
@@ -90,17 +70,13 @@ class FanoutComponent:
     def required_object_attrs(self) -> tuple[str, ...]:
         return (ATTR_NAME,)
 
-    def _output_labels(self) -> tuple[tuple[float, float, str], ...]:
-        if not self.label_output_indices:
-            return ()
-        return tuple(
-            (port.anchor.cell_x - OUTPUT_LABEL_OFFSET_X, port.anchor.cell_y, str(index))
-            for index, port in enumerate(self._g.outputs)
-        )
+    def _center_labels(self) -> tuple[tuple[float, float, str, int], ...]:
+        cx, cy = self._g.type_label
+        return ((cx, cy, self.title, mgeom.MODULE_TYPE_FONT_PX),)
 
     def label_html(self) -> str:
-        body = self.body_svg(self._body_g)
-        overlays = self.center_labels + self.output_overlays + self._output_labels()
+        body = self.body_svg(self._g)
+        overlays = self._center_labels() + self._g.port_labels
         return (
             f"{shell_open(self.w, self.h)}"
             f"{stretch_body_layer(body, view_w=self.w, view_h=self.h, overlays=overlays)}"
@@ -109,11 +85,11 @@ class FanoutComponent:
         )
 
     def _instance_name_top_y(self) -> int:
-        return sgeom.BODY_Y + sgeom.BODY_H + sgeom.MUX_BODY_PAD_BOTTOM
+        return mgeom.MODULE_BOX_Y + self._g.graphic_h + sgeom.MUX_BODY_PAD_BOTTOM
 
     def cell_style(self) -> str:
-        bare = [fgeom.port_drawio_point(self._g.left)]
-        bare.extend(fgeom.port_drawio_point(port) for port in self._g.outputs)
+        bare = [mgeom.port_drawio_point(self._g.left)]
+        bare.extend(mgeom.port_drawio_point(port) for port in self._g.outputs)
         points_inner = "],[".join(bare)
         return (
             f"{mxcell_html_label_style_parts()}"
@@ -154,7 +130,15 @@ class FanoutComponent:
         )
 
     def preview_svg(self) -> str:
-        body = self.body_svg(self._body_g)
+        body = self.body_svg(self._g)
+        _anchor_to_svg = {"left": "start", "center": "middle", "right": "end"}
+        overlay_texts = "\n".join(
+            f'  <text x="{_svg_num(item[0])}" y="{_svg_num(item[1])}" '
+            f'font-size="{overlay_font_px(item)}" fill="{STROKE}" '
+            f'text-anchor="{_anchor_to_svg[overlay_anchor(item)]}" '
+            f'dominant-baseline="middle">{item[2]}</text>'
+            for item in (*self._center_labels(), *self._g.port_labels)
+        )
         stub_lines = []
         for port, color in (
             (self._g.left, "#c00"),
@@ -171,22 +155,6 @@ class FanoutComponent:
                 f'r="2.5" fill="{color}"/>'
             )
         stubs = "\n".join(stub_lines)
-        output_texts = ""
-        if self.label_output_indices:
-            output_texts = "\n".join(
-                f'  <text x="{_svg_num(port.anchor.cell_x - OUTPUT_LABEL_OFFSET_X)}" '
-                f'y="{_svg_num(port.anchor.cell_y)}" font-size="11" fill="{STROKE}" '
-                f'text-anchor="middle" dominant-baseline="middle">{index}</text>'
-                for index, port in enumerate(self._g.outputs)
-            )
-        _anchor_to_svg = {"left": "start", "center": "middle", "right": "end"}
-        overlay_texts = "\n".join(
-            f'  <text x="{_svg_num(item[0])}" y="{_svg_num(item[1])}" '
-            f'font-size="{overlay_font_px(item)}" fill="{STROKE}" '
-            f'text-anchor="{_anchor_to_svg[overlay_anchor(item)]}" '
-            f'dominant-baseline="middle">{item[2]}</text>'
-            for item in (*self.center_labels, *self.output_overlays)
-        )
         name_y = (
             self._instance_name_top_y()
             + self.instance_name_gap_px
@@ -195,7 +163,6 @@ class FanoutComponent:
         return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" viewBox="0 0 {self.w} {self.h}">
 {body}
 {overlay_texts}
-{output_texts}
 {stubs}
   <text x="{self.w // 2}" y="{name_y}" font-size="11" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{self.title}</text>
 </svg>
@@ -239,6 +206,7 @@ class FanoutComponent:
         return pairs
 
     def verify_geometry(self) -> None:
+        g = self._g
         html = self.label_html()
         verify_label_placeholders(html, title=self.title)
         if f'viewBox="0 0 {self.w} {self.h}"' not in html:
@@ -252,20 +220,41 @@ class FanoutComponent:
             design_cell_h=self.h,
         )
         points = self._parse_points(style)
-        expected = 1 + len(self._g.outputs)
+        expected = 1 + len(g.outputs)
         if len(points) != expected:
             raise ValueError(
                 f"{self.title} expects {expected} connection points, got {points}"
             )
-        ports = (self._g.left, *self._g.outputs)
+        ports = (g.left, *g.outputs)
         for point, port in zip(points, ports):
             anchor = port.anchor
-            if len(point) != 5 or point[2] != float(fgeom.POINT_FIXED):
+            if len(point) != 5 or point[2] != float(sgeom.POINT_FIXED):
                 raise ValueError(f"{self.title}: must use 5-value points [x,y,0,0,0]")
             if not isclose(point[0], anchor.x_rel, abs_tol=0.002):
                 raise ValueError(f"{self.title}: rel_x mismatch")
             if not isclose(point[1], anchor.y_rel, abs_tol=0.002):
                 raise ValueError(f"{self.title}: rel_y mismatch")
+
+        for index in range(len(g.outputs) - 1):
+            upper = g.outputs[index].anchor.cell_y
+            lower = g.outputs[index + 1].anchor.cell_y
+            if upper >= lower:
+                raise ValueError(f"out{index} must be above out{index + 1}")
+            pitch = lower - upper
+            if pitch != mgeom.OUTPUT_PITCH:
+                raise ValueError(
+                    f"out{index}..out{index + 1} pitch {pitch} != {mgeom.OUTPUT_PITCH}"
+                )
+
+        for label in g.output_labels:
+            if f">{label}</span>" not in html:
+                raise ValueError(f"{self.title} must label output {label!r}")
+        if f">{self.title}</span>" not in html:
+            raise ValueError(f"{self.title} module type must use HTML overlay")
+        if "transform:translate(-100%,-50%)" not in html:
+            raise ValueError(f"{self.title} port labels must be right-aligned")
+        if "<line " not in html:
+            raise ValueError(f"{self.title} must draw header divider")
 
     def verify_object(self, wrapper: ET.Element, *, context: str = "") -> None:
         prefix = f"{context}: " if context else ""
@@ -293,7 +282,7 @@ class FanoutComponent:
             raise ValueError(f"{self.title} library: missing object wrapper")
 
 
-def bind_module(module: object, component: FanoutComponent) -> None:
+def bind_module(module: object, component: ModuleComponent) -> None:
     mapping = {
         "TITLE": component.title,
         "TAGS": component.tags,

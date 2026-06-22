@@ -58,12 +58,26 @@ def gate_body(g: geom.SimpleGeometry) -> str:
     )
 
 
-DIV_SYMBOL_Y_OFFSET = -2
-DIV_LABEL_Y_OFFSET = 7
-DIV_SYMBOL_FONT_PX = 16
-DIV_CENTER_FONT_PX = 6
-DIV_LABEL_FONT_PX = DIV_CENTER_FONT_PX
-DIV_HEX_R = 15
+DIV_HEX_R = 12
+DIV_SYMBOL_HALF_W = 5.5
+DIV_SYMBOL_DOT_R = 1.4
+DIV_SYMBOL_DOT_OFFSET = 4.5
+
+
+def _div_symbol_markup(cx: float, cy: float, *, angle_deg: float = 0) -> str:
+    """Division sign drawn as line + dots (not text)."""
+    half_w = DIV_SYMBOL_HALF_W
+    dot_off = DIV_SYMBOL_DOT_OFFSET
+    r = DIV_SYMBOL_DOT_R
+    paths = (
+        f'<path d="M {cx - half_w:.1f} {cy:.1f} L {cx + half_w:.1f} {cy:.1f}" fill="none" '
+        f'stroke="{STROKE}" stroke-width="1.5" stroke-linecap="round"/>'
+        f'<circle cx="{cx:.1f}" cy="{cy - dot_off:.1f}" r="{r}" fill="{STROKE}"/>'
+        f'<circle cx="{cx:.1f}" cy="{cy + dot_off:.1f}" r="{r}" fill="{STROKE}"/>'
+    )
+    if angle_deg == 0:
+        return paths
+    return f'<g transform="rotate({angle_deg:.0f} {cx:.1f} {cy:.1f})">{paths}</g>'
 
 
 def div_hex_side_port_x(side: Literal["left", "right"]) -> float:
@@ -81,7 +95,19 @@ def div_hex_port_cells(*, mid_y: int, pad: int = 0) -> tuple[tuple[float, int], 
 
 
 def div_body(g: geom.SimpleGeometry) -> str:
-    """Hexagon divider (labels rendered as HTML overlay)."""
+    """Hexagon divider with horizontal division sign."""
+    cx = _dx(g, geom.DESIGN_W / 2)
+    cy = _mid(g)
+    hex_pts = _hex_points(cx, cy, DIV_HEX_R)
+    return (
+        f'<polygon points="{hex_pts}" fill="{FILL}" stroke="{STROKE}" '
+        f'stroke-width="{SW}" stroke-linejoin="round"/>'
+        f"{_div_symbol_markup(cx, cy)}"
+    )
+
+
+def div2_body(g: geom.SimpleGeometry) -> str:
+    """Hexagon divide-by-2; center ÷2 rendered as HTML overlay."""
     cx = _dx(g, geom.DESIGN_W / 2)
     cy = _mid(g)
     hex_pts = _hex_points(cx, cy, DIV_HEX_R)
@@ -91,14 +117,26 @@ def div_body(g: geom.SimpleGeometry) -> str:
     )
 
 
+def div_n_body(g: geom.SimpleGeometry) -> str:
+    """Programmable divider; division sign tilted 45° from div."""
+    cx = _dx(g, geom.DESIGN_W / 2)
+    cy = _mid(g)
+    hex_pts = _hex_points(cx, cy, DIV_HEX_R)
+    return (
+        f'<polygon points="{hex_pts}" fill="{FILL}" stroke="{STROKE}" '
+        f'stroke-width="{SW}" stroke-linejoin="round"/>'
+        f'{_div_symbol_markup(cx, cy, angle_deg=45)}'
+    )
+
+
 CELL_TRI_LEFT_X = 8
 CELL_TRI_TIP_X = 30
 CELL_TRI_HALF_H = 15
 
-OCC_CLK_CELL_FILL = "#b3d9ff"
+OCC_CLK_CELL_FILL = "#b3ffff"
 GEN_CELL_FILL = "#ffb3b3"
 BIST_CLK_CELL_FILL = "#b3ffb3"
-OCC_BIST_CLK_CELL_FILL = "#99e699"
+OCC_BIST_CLK_CELL_FILL = "#66cc66"
 
 ASYNC_STROKE = "#cc0000"
 ASYNC_CROSS_LEFT = 13
@@ -405,62 +443,6 @@ def _gate_path_only(g: geom.SimpleGeometry) -> str:
     )
 
 
-DIV_GATE_BODY_HALF_H = 14
-DIV_GATE_OUT_R = GATE_BUBBLE_R
-DIV_GATE_ARC_GAP = 4
-DIV_GATE_SYMBOL_CX = (GATE_LEFT_X + GATE_ARC_X + GATE_BODY_R) / 2
-
-
-def _div_gate_output_ys(mid: float, half_h: int) -> tuple[float, float, float]:
-    top = mid - half_h
-    bottom = mid + half_h
-    span = bottom - top
-    return tuple(top + span * (index + 1) / 4 for index in range(3))
-
-
-def _div_gate_arc_clearance_radius() -> float:
-    return GATE_BODY_R + DIV_GATE_OUT_R + DIV_GATE_ARC_GAP
-
-
-def div_gate_output_positions(
-    mid: float,
-    half_h: int = DIV_GATE_BODY_HALF_H,
-) -> tuple[tuple[float, float], ...]:
-    """Output circle centers in design space, equidistant from the D arc."""
-    arc_x = GATE_ARC_X
-    reach = _div_gate_arc_clearance_radius()
-    return tuple(
-        (arc_x + math.sqrt(max(reach * reach - (y - mid) ** 2, 0.0)), y)
-        for y in _div_gate_output_ys(mid, half_h)
-    )
-
-
-def div_gate_output_cell_positions(
-    pad: int,
-    mid: int,
-    half_h: int = DIV_GATE_BODY_HALF_H,
-) -> tuple[tuple[float, float], ...]:
-    return tuple((pad + cx, cy) for cx, cy in div_gate_output_positions(mid, half_h))
-
-
-def div_gate_symbol_cell(pad: int, mid: int) -> tuple[float, float]:
-    """Cell coordinates for ÷ at the horizontal center of the D-gate body."""
-    return (pad + DIV_GATE_SYMBOL_CX, mid + DIV_SYMBOL_Y_OFFSET)
-
-
-def div_gate_body(g: geom.SimpleGeometry) -> str:
-    """Clock gate with three output bubbles; ÷ is rendered as HTML overlay."""
-    mid = _mid(g)
-    parts = [_gate_path_only(g)]
-    for cx_design, y in div_gate_output_positions(mid, DIV_GATE_BODY_HALF_H):
-        out_x = _dx(g, cx_design)
-        parts.append(
-            f'<circle cx="{out_x:.1f}" cy="{y:.1f}" r="{DIV_GATE_OUT_R}" fill="#ffffff" '
-            f'stroke="{STROKE}" stroke-width="{SW}"/>'
-        )
-    return "".join(parts)
-
-
 CLK_PHASE_SEL_BOX_LEFT = 4
 CLK_PHASE_SEL_BOX_RIGHT = 36
 CLK_PHASE_SEL_BOX_HALF_H = 18
@@ -530,11 +512,13 @@ def clk_phase_sel_body(g: geom.SimpleGeometry) -> str:
     )
 
 
-DTO_CHIP_LEFT = 4
-DTO_CHIP_W = 32
-DTO_LABEL_Y_OFFSET = 16
-DTO_CENTER_FONT_PX = 7
-DTO_LABEL_FONT_PX = DTO_CENTER_FONT_PX
+DTO_CHIP_LEFT = 6
+DTO_CHIP_W = 28
+DTO_CHIP_H = 26
+
+
+def _dto_chip_top(mid: int) -> int:
+    return mid - DTO_CHIP_H // 2
 
 
 def dto_chip_port_cells(*, mid_y: int, pad: int = 0) -> tuple[tuple[int, int], tuple[int, int]]:
@@ -545,20 +529,21 @@ def dto_chip_port_cells(*, mid_y: int, pad: int = 0) -> tuple[tuple[int, int], t
 
 
 def dto_body(g: geom.SimpleGeometry) -> str:
-    """Rounded chip with duty waveform (DTO label rendered as HTML overlay)."""
+    """Rounded chip with duty waveform."""
     mid = _mid(g)
+    top = _dto_chip_top(mid)
     left = _dx(g, DTO_CHIP_LEFT)
     wave_left = _dx(g, DTO_CHIP_LEFT + 4)
     wave_mid_a = _dx(g, DTO_CHIP_LEFT + 9)
     wave_mid_b = _dx(g, DTO_CHIP_LEFT + 14)
     wave_right = _dx(g, DTO_CHIP_LEFT + DTO_CHIP_W - 4)
-    wave_top = mid - 10
-    wave_bot = mid + 2
+    wave_top = mid - 7
+    wave_bot = mid + 1
     return (
-        f'<rect x="{left}" y="11" width="{DTO_CHIP_W}" height="40" rx="5" ry="5" fill="{FILL}" '
+        f'<rect x="{left}" y="{top}" width="{DTO_CHIP_W}" height="{DTO_CHIP_H}" rx="5" ry="5" fill="{FILL}" '
         f'stroke="{STROKE}" stroke-width="{SW}"/>'
-        f'<path d="M {wave_left} {wave_bot} L {wave_left} {wave_top + 4} L {wave_mid_a} {wave_top + 4} '
-        f'L {wave_mid_a} {wave_bot - 3} L {wave_mid_b} {wave_bot - 3} L {wave_mid_b} {wave_top} L {wave_right} {wave_top}" '
+        f'<path d="M {wave_left} {wave_bot} L {wave_left} {wave_top + 3} L {wave_mid_a} {wave_top + 3} '
+        f'L {wave_mid_a} {wave_bot - 2} L {wave_mid_b} {wave_bot - 2} L {wave_mid_b} {wave_top} L {wave_right} {wave_top}" '
         f'fill="{FILL}" stroke="{STROKE}" stroke-width="1.5" stroke-linecap="square"/>'
     )
 
@@ -566,18 +551,19 @@ def dto_body(g: geom.SimpleGeometry) -> str:
 def dto_n_body(g: geom.SimpleGeometry) -> str:
     """DTO_N chip with vertically mirrored duty waveform."""
     mid = _mid(g)
+    top = _dto_chip_top(mid)
     left = _dx(g, DTO_CHIP_LEFT)
     wave_left = _dx(g, DTO_CHIP_LEFT + 4)
     wave_mid_a = _dx(g, DTO_CHIP_LEFT + 9)
     wave_mid_b = _dx(g, DTO_CHIP_LEFT + 14)
     wave_right = _dx(g, DTO_CHIP_LEFT + DTO_CHIP_W - 4)
-    wave_top = mid - 10
-    wave_bot = mid + 2
+    wave_top = mid - 7
+    wave_bot = mid + 1
     return (
-        f'<rect x="{left}" y="11" width="{DTO_CHIP_W}" height="40" rx="5" ry="5" fill="{FILL}" '
+        f'<rect x="{left}" y="{top}" width="{DTO_CHIP_W}" height="{DTO_CHIP_H}" rx="5" ry="5" fill="{FILL}" '
         f'stroke="{STROKE}" stroke-width="{SW}"/>'
-        f'<path d="M {wave_left} {wave_top} L {wave_left} {wave_bot - 4} L {wave_mid_a} {wave_bot - 4} '
-        f'L {wave_mid_a} {wave_top + 3} L {wave_mid_b} {wave_top + 3} L {wave_mid_b} {wave_bot} L {wave_right} {wave_bot}" '
+        f'<path d="M {wave_left} {wave_top} L {wave_left} {wave_bot - 3} L {wave_mid_a} {wave_bot - 3} '
+        f'L {wave_mid_a} {wave_top + 2} L {wave_mid_b} {wave_top + 2} L {wave_mid_b} {wave_bot} L {wave_right} {wave_bot}" '
         f'fill="{FILL}" stroke="{STROKE}" stroke-width="1.5" stroke-linecap="square"/>'
     )
 

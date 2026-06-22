@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+import html
+import re
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
 from drawio_graph import _parse_points
 from drawio_library import DEFAULT_LIBRARY_PATH, load_library_shapes
+
+_LABEL_SPAN_RE = re.compile(r'<span style="([^"]+)">([^<]+)</span>')
+_PLACEHOLDER_RE = re.compile(r"^%[^%]+%$")
+_LABEL_SIDE_THRESHOLD = 50.0
+_MODULE_BODY_LABEL_TOP_PCT_MIN = 28.0
 
 INPUT_X_MAX = 0.5
 
@@ -136,6 +143,122 @@ def connection_dict_key(port: str) -> str:
   if port in ("left", "right", "out"):
     return "0"
   return port
+
+
+def _parse_label_spans(label_html: str) -> list[tuple[float, float, str]]:
+  decoded = html.unescape(label_html)
+  spans: list[tuple[float, float, str]] = []
+  for style, text in _LABEL_SPAN_RE.findall(decoded):
+    text = text.strip()
+    if not text or _PLACEHOLDER_RE.match(text):
+      continue
+    left_m = re.search(r"left:([\d.]+)%", style)
+    top_m = re.search(r"top:([\d.]+)%", style)
+    if not left_m or not top_m:
+      continue
+    spans.append((float(left_m.group(1)), float(top_m.group(1)), text))
+  return spans
+
+
+def _match_labeled_ports(
+  ports: tuple[str, ...],
+  anchors: dict[str, tuple[float, float]],
+  spans: list[tuple[float, float, str]],
+  *,
+  side: str,
+) -> dict[str, str]:
+  if not ports:
+    return {}
+  if side == "input":
+    candidates = [
+      (left, top, text) for left, top, text in spans if left < _LABEL_SIDE_THRESHOLD
+    ]
+    if len(candidates) != len(ports):
+      return {port: connection_dict_key(port) for port in ports}
+    ports_sorted = sorted(ports, key=lambda port: anchors[port][1])
+    candidates.sort(key=lambda item: item[1])
+    return {
+      port: text
+      for port, (_, _, text) in zip(ports_sorted, candidates, strict=True)
+    }
+
+  right_candidates = [
+    (left, top, text) for left, top, text in spans if left > _LABEL_SIDE_THRESHOLD
+  ]
+  if len(right_candidates) == len(ports):
+    ports_sorted = sorted(ports, key=lambda port: anchors[port][1])
+    right_candidates.sort(key=lambda item: item[1])
+    return {
+      port: text
+      for port, (_, _, text) in zip(ports_sorted, right_candidates, strict=True)
+    }
+
+  body_candidates = [
+    (left, top, text)
+    for left, top, text in spans
+    if top > _MODULE_BODY_LABEL_TOP_PCT_MIN
+  ]
+  if len(body_candidates) == len(ports):
+    ports_sorted = sorted(ports, key=lambda port: anchors[port][1])
+    body_candidates.sort(key=lambda item: item[1])
+    return {
+      port: text
+      for port, (_, _, text) in zip(ports_sorted, body_candidates, strict=True)
+    }
+
+  return {port: connection_dict_key(port) for port in ports}
+
+
+@lru_cache(maxsize=8)
+def load_port_connection_keys(library_path: str) -> dict[str, tuple[dict[str, str], dict[str, str]]]:
+  shapes = load_library_shapes(library_path)
+  topologies = load_library_port_topologies(library_path)
+  out: dict[str, tuple[dict[str, str], dict[str, str]]] = {}
+  for title, shape in shapes.items():
+    topology = topologies[title]
+    anchors = port_anchors(shape.style)
+    spans = _parse_label_spans(shape.label)
+    input_keys = _match_labeled_ports(
+      topology.inputs, anchors, spans, side="input"
+    )
+    output_keys = _match_labeled_ports(
+      topology.outputs, anchors, spans, side="output"
+    )
+    out[title] = (input_keys, output_keys)
+  return out
+
+
+def input_connection_keys(
+  drawclock_type: str,
+  *,
+  library_path: str | Path | None = None,
+) -> dict[str, str]:
+  lib = str(library_path or DEFAULT_LIBRARY_PATH)
+  keys = load_port_connection_keys(lib).get(drawclock_type)
+  if keys is None:
+    raise KeyError(f"器件类型不在器件库中: {drawclock_type}")
+  return keys[0]
+
+
+def output_connection_keys(
+  drawclock_type: str,
+  *,
+  library_path: str | Path | None = None,
+) -> dict[str, str]:
+  lib = str(library_path or DEFAULT_LIBRARY_PATH)
+  keys = load_port_connection_keys(lib).get(drawclock_type)
+  if keys is None:
+    raise KeyError(f"器件类型不在器件库中: {drawclock_type}")
+  return keys[1]
+
+
+def connection_key_for_port(
+  port: str,
+  topology: PortTopology,
+  *,
+  port_keys: dict[str, str],
+) -> str:
+  return port_keys.get(port, connection_dict_key(port))
 
 
 def is_input_port(port: str, topology: PortTopology) -> bool:

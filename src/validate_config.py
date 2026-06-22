@@ -5,7 +5,7 @@ from typing import Any
 
 from device_attrs_validate import collect_device_attr_errors
 from from_resolve import parse_source_ref
-from library_ports import topology_for_type
+from library_ports import output_connection_keys
 
 
 def validate_config(
@@ -25,26 +25,21 @@ def validate_config(
 
     refs = _referenced_peers(item)
     for peer in refs:
-      base, index = parse_source_ref(peer)
+      base, suffix = parse_source_ref(peer)
       if base not in device_names:
         errors.append(f"器件 {name} 连接到未知器件 {peer}")
         continue
-      if index is not None:
+      if suffix is not None:
         upstream_kind = config[base].get("kind", "")
         try:
-          output_count = topology_for_type(
-            str(upstream_kind), library_path=library_path
-          ).output_count
-        except KeyError:
-          output_count = 1
-        if output_count <= 1:
-          errors.append(
-            f"器件 {name} 的 source {peer} 指向无多路输出的器件 {base}"
+          valid_suffixes = set(
+            output_connection_keys(str(upstream_kind), library_path=library_path).values()
           )
-          continue
-        if index >= output_count:
+        except KeyError:
+          valid_suffixes = set()
+        if suffix not in valid_suffixes:
           errors.append(
-            f"器件 {name} 的 source {peer} 超出 {base} 的输出路数 {output_count}"
+            f"器件 {name} 的 source {peer} 指向 {base} 的无效输出口 [{suffix}]"
           )
 
     if isinstance(item.get("source"), dict) and not item.get("source"):
