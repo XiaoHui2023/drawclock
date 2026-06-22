@@ -37,7 +37,9 @@ def reload_drawio_file(
     out.parent.mkdir(parents=True, exist_ok=True)
     if is_drawio_svg_path(inp) and is_drawio_svg_path(out):
         svg_text = inp.read_text(encoding="utf-8")
-        out.write_text(replace_mxfile_in_drawio_svg(svg_text, migrated), encoding="utf-8")
+        out.write_text(
+            replace_mxfile_in_drawio_svg(svg_text, migrated, str(inp)), encoding="utf-8"
+        )
     else:
         out.write_text(migrated, encoding="utf-8")
     return out

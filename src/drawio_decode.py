@@ -26,19 +26,19 @@ def extract_mxfile_xml(path: str) -> str:
     text = open(path, encoding="utf-8").read()
     lower = path.lower()
     if lower.endswith(".drawio.svg") or (lower.endswith(".svg") and "mxfile" in text):
-        return _mxfile_from_svg(text)
+        return _mxfile_from_svg(text, path)
     if lower.endswith(".drawio") or lower.endswith(".xml"):
-        return _normalize_drawio_file(text)
+        return _normalize_drawio_file(text, path)
     raise ValueError(f"不支持的输入格式: {path}")
 
 
-def _mxfile_from_svg(svg_text: str) -> str:
+def _mxfile_from_svg(svg_text: str, path: str) -> str:
     match = re.search(r'content="([^"]*)"', svg_text, flags=re.DOTALL)
     if not match:
-        raise ValueError("SVG 中未找到 draw.io 的 content 属性")
+        raise ValueError(f"SVG 中未找到 draw.io 的 content 属性: {path}")
     content = html.unescape(match.group(1))
     if "<mxfile" not in content:
-        raise ValueError("content 中不是 mxfile 结构")
+        raise ValueError(f"content 中不是 mxfile 结构: {path}")
     return content
 
 
@@ -46,15 +46,18 @@ def is_drawio_svg_path(path: str | Path) -> bool:
     return str(path).lower().endswith(".drawio.svg")
 
 
-def replace_mxfile_in_drawio_svg(svg_text: str, mxfile_xml: str) -> str:
+def replace_mxfile_in_drawio_svg(
+    svg_text: str, mxfile_xml: str, source_path: str | None = None
+) -> str:
     match = re.search(r'content="([^"]*)"', svg_text, flags=re.DOTALL)
     if not match:
-        raise ValueError("SVG 中未找到 draw.io 的 content 属性")
+        suffix = f": {source_path}" if source_path else ""
+        raise ValueError(f"SVG 中未找到 draw.io 的 content 属性{suffix}")
     escaped = html.escape(mxfile_xml, quote=True)
     return svg_text[: match.start(1)] + escaped + svg_text[match.end(1) :]
 
 
-def _normalize_drawio_file(text: str) -> str:
+def _normalize_drawio_file(text: str, path: str) -> str:
     stripped = text.strip()
     if stripped.startswith("<?xml"):
         end = stripped.find("?>")
@@ -64,7 +67,7 @@ def _normalize_drawio_file(text: str) -> str:
         return stripped
     if stripped.startswith("<mxGraphModel"):
         return f"<mxfile><diagram>{stripped}</diagram></mxfile>"
-    raise ValueError("文件不是 mxfile 或 mxGraphModel")
+    raise ValueError(f"文件不是 mxfile 或 mxGraphModel: {path}")
 
 
 def iter_diagram_models(mxfile_xml: str) -> list[ET.Element]:

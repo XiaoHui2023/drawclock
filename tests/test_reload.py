@@ -427,6 +427,20 @@ def test_reload_batch_directory_preserves_filenames(tmp_path: Path) -> None:
         assert "drawclockType=" in _diagram_payload(extract_mxfile_xml(str(out)))
 
 
+def test_reload_batch_directory_reports_bad_file(tmp_path: Path) -> None:
+    source = ROOT / "test.drawio.svg"
+    if not source.is_file():
+        pytest.skip("需要仓库根目录 test.drawio.svg")
+    inp_dir = tmp_path / "in"
+    out_dir = tmp_path / "out"
+    inp_dir.mkdir()
+    (inp_dir / "good.drawio.svg").write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
+    bad = inp_dir / "bad.drawio.svg"
+    bad.write_text("<svg xmlns='http://www.w3.org/2000/svg'></svg>", encoding="utf-8")
+    with pytest.raises(ValueError, match=r"bad\.drawio\.svg"):
+        reload_drawio_inputs(inp_dir, LIBRARY, out_dir)
+
+
 def test_reload_batch_directory_empty_raises(tmp_path: Path) -> None:
     inp_dir = tmp_path / "in"
     out_dir = tmp_path / "out"
