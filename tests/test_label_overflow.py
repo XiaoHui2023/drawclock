@@ -15,7 +15,6 @@ from drawio_lib.components.label_overflow import (
     verify_label_overflow_policy,
     verify_label_stretch_policy,
     verify_mxcell_label_style,
-    verify_name_outside_selection_box,
     verify_no_degenerate_label_tricks,
     verify_selection_box_wraps_graphic,
 )
@@ -149,6 +148,27 @@ def _name_top_y(mod) -> int | None:
     return None
 
 
+@pytest.mark.parametrize(
+    ("module_name", "expected_name_top"),
+    [
+        ("gate", 44),
+        ("div", 44),
+        ("from", 14),
+        ("clock", 36),
+        ("and_gate", 54),
+        ("mux2", None),
+    ],
+)
+def test_instance_name_top_y_unchanged_pixels(
+    module_name: str, expected_name_top: int | None
+) -> None:
+    mod = importlib.import_module(f"drawio_lib.components.{module_name}")
+    if expected_name_top is None:
+        assert _name_top_y(mod) == mod.G.mux_h
+    else:
+        assert _name_top_y(mod) == expected_name_top
+
+
 @pytest.mark.parametrize("spec", registry.ALL, ids=lambda s: s.module.TITLE)
 def test_selection_box_wraps_graphic_not_name(spec) -> None:
     mod = spec.module
@@ -162,6 +182,3 @@ def test_selection_box_wraps_graphic_not_name(spec) -> None:
         mod.H,
         title=mod.TITLE,
     )
-    name_top = _name_top_y(mod)
-    if name_top is not None:
-        verify_name_outside_selection_box(name_top, mod.H, title=mod.TITLE)

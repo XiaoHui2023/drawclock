@@ -104,11 +104,12 @@ class SimpleComponent:
 
     def _instance_name_top_y(self) -> int:
         if self.port_mode == "from":
-            return self.h
+            return geom.WIRE_STROKE_Y + 8
         return (
             geom.BODY_Y
             + self.body_height
             + self.body_pad_bottom
+            - self.instance_name_pull_px
         )
 
     def _resolve_instance_name(self, instance_name: str | None) -> str:

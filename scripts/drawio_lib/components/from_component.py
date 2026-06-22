@@ -19,7 +19,7 @@ class FromComponent(SimpleComponent):
     """Cross-sheet output stub; logical input follows the same-named clock."""
 
     def _instance_name_top_y(self) -> int:
-        return self.h
+        return geom.WIRE_STROKE_Y
 
     def label_html(self) -> str:
         body = wire_body(self._g)

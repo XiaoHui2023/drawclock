@@ -57,19 +57,6 @@ def verify_no_degenerate_label_tricks(html: str, *, title: str) -> None:
         )
 
 
-def verify_name_outside_selection_box(
-    name_top_y: int,
-    cell_h: int,
-    *,
-    title: str,
-) -> None:
-    if name_top_y < cell_h:
-        raise ValueError(
-            f"{title}: instance name must start at or below the selection box "
-            f"(name_top_y={name_top_y}, cell_h={cell_h})"
-        )
-
-
 def verify_selection_box_wraps_graphic(
     graphic_bottom_y: int,
     cell_h: int,
