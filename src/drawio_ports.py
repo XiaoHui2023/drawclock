@@ -23,6 +23,8 @@ _PORT_ATTACH_KEYS = (
     "entryPerimeter=0",
 )
 
+_PORT_COORD_KEYS = ("exitX", "exitY", "entryX", "entryY")
+
 
 @dataclass(frozen=True)
 class EdgeReloadOutcome:
@@ -39,6 +41,84 @@ def finalize_edge_style(style: str) -> str:
         if key not in out:
             out += f"{key};"
     return out
+
+
+def merge_port_attachment(
+    stored_style: str,
+    exit_xy: tuple[float, float],
+    entry_xy: tuple[float, float],
+) -> str:
+    """Update port coords on an existing edge style; keep routing and visual keys."""
+    base = stored_style.strip() or EDGE_DRAW_STYLE
+    pairs: list[tuple[str, str]] = []
+    for part in base.split(";"):
+        part = part.strip()
+        if not part or "=" not in part:
+            continue
+        key, value = part.split("=", 1)
+        if key in _PORT_COORD_KEYS:
+            continue
+        pairs.append((key, value))
+    pairs.extend(
+        (
+            ("exitX", _port_coord(exit_xy[0])),
+            ("exitY", _port_coord(exit_xy[1])),
+            ("entryX", _port_coord(entry_xy[0])),
+            ("entryY", _port_coord(entry_xy[1])),
+        )
+    )
+    return finalize_edge_style(";".join(f"{key}={value}" for key, value in pairs))
+
+
+def _port_coord(value: float) -> str:
+    if float(value).is_integer():
+        return str(int(value))
+    return f"{value:g}"
+
+
+def _resolve_edge_port_xy(
+    source_style: str,
+    source_type: str,
+    target_style: str,
+    target_type: str,
+    *,
+    source_port: str | None = None,
+    target_port: str | None = None,
+    target_mux_input: int | None = None,
+) -> tuple[tuple[float, float], tuple[float, float]]:
+    src_ports = port_anchors(source_style, source_type)
+    tgt_ports = port_anchors(target_style, target_type)
+    if source_port is not None:
+        if source_port not in src_ports:
+            raise ValueError(f"exit port {source_port} missing on {source_type}")
+        exit_xy = src_ports[source_port]
+    elif "out" in src_ports:
+        exit_xy = src_ports["out"]
+    elif "right" in src_ports:
+        exit_xy = src_ports["right"]
+    else:
+        raise ValueError(f"no exit port for {source_type}")
+
+    if target_port is not None:
+        if target_port not in tgt_ports:
+            raise ValueError(f"entry port {target_port} missing on {target_type}")
+        entry_xy = tgt_ports[target_port]
+    elif target_mux_input is not None:
+        key = f"in{target_mux_input}"
+        if key not in tgt_ports:
+            raise ValueError(f"input {key} missing")
+        entry_xy = tgt_ports[key]
+    elif "left" in tgt_ports:
+        entry_xy = tgt_ports["left"]
+    elif tgt_ports:
+        first_input = next(
+            (key for key in tgt_ports if key.startswith("in")),
+            next(iter(tgt_ports)),
+        )
+        entry_xy = tgt_ports[first_input]
+    else:
+        raise ValueError(f"no entry port for {target_type}")
+    return exit_xy, entry_xy
 
 
 def port_anchors(style: str, drawclock_type: str) -> dict[str, tuple[float, float]]:
@@ -82,38 +162,15 @@ def edge_port_style(
 ) -> str:
     """Build exitX/exitY/entryX/entryY so connectors meet shape ports."""
     try:
-        src_ports = port_anchors(source_style, source_type)
-        tgt_ports = port_anchors(target_style, target_type)
-        if source_port is not None:
-            if source_port not in src_ports:
-                raise ValueError(f"exit port {source_port} missing on {source_type}")
-            exit_xy = src_ports[source_port]
-        elif "out" in src_ports:
-            exit_xy = src_ports["out"]
-        elif "right" in src_ports:
-            exit_xy = src_ports["right"]
-        else:
-            raise ValueError(f"no exit port for {source_type}")
-
-        if target_port is not None:
-            if target_port not in tgt_ports:
-                raise ValueError(f"entry port {target_port} missing on {target_type}")
-            entry_xy = tgt_ports[target_port]
-        elif target_mux_input is not None:
-            key = f"in{target_mux_input}"
-            if key not in tgt_ports:
-                raise ValueError(f"input {key} missing")
-            entry_xy = tgt_ports[key]
-        elif "left" in tgt_ports:
-            entry_xy = tgt_ports["left"]
-        elif tgt_ports:
-            first_input = next(
-                (key for key in tgt_ports if key.startswith("in")),
-                next(iter(tgt_ports)),
-            )
-            entry_xy = tgt_ports[first_input]
-        else:
-            raise ValueError(f"no entry port for {target_type}")
+        exit_xy, entry_xy = _resolve_edge_port_xy(
+            source_style,
+            source_type,
+            target_style,
+            target_type,
+            source_port=source_port,
+            target_port=target_port,
+            target_mux_input=target_mux_input,
+        )
     except ValueError:
         return finalize_edge_style(
             fallback or "exitX=1;exitY=0.5;entryX=0;entryY=0.5;"
@@ -306,15 +363,19 @@ def reload_edge_style(
     if entry_port is not None and entry_port not in new_tgt_ports:
         return EdgeReloadOutcome(style=finalize_edge_style(stored_style), connected=False)
 
-    style = edge_port_style(
-        new_source_style,
-        source_type,
-        new_target_style,
-        target_type,
-        source_port=exit_port,
-        target_port=entry_port,
-        fallback=stored_style,
-    )
+    try:
+        exit_xy, entry_xy = _resolve_edge_port_xy(
+            new_source_style,
+            source_type,
+            new_target_style,
+            target_type,
+            source_port=exit_port,
+            target_port=entry_port,
+        )
+    except ValueError:
+        return EdgeReloadOutcome(style=finalize_edge_style(stored_style), connected=True)
+
+    style = merge_port_attachment(stored_style, exit_xy, entry_xy)
     return EdgeReloadOutcome(style=style, connected=True)
 
 

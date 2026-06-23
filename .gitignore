@@ -16,6 +16,7 @@ tests/_tmp_cli/
 tests/_tmp_cli_run/
 tests/_tmp_roundtrip/
 tests/_tmp_cli_src/
+tests/_tmp_*
 example/out/roundtrip/
 example/out/restored.drawio
 example/out/drawio-layout.json

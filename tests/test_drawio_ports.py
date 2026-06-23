@@ -9,7 +9,13 @@ from drawio_library import (
     load_library_shapes,
     reload_object_attrs,
 )
-from drawio_ports import edge_port_style, finalize_edge_style, port_anchors, reload_edge_style
+from drawio_ports import (
+    edge_port_style,
+    finalize_edge_style,
+    merge_port_attachment,
+    port_anchors,
+    reload_edge_style,
+)
 
 
 def test_bake_label_replaces_name() -> None:
@@ -123,3 +129,39 @@ def test_reload_edge_style_disconnects_removed_port() -> None:
         f"exitX=1;exitY=0.5;entryX={in2[0]};entryY={in2[1]};edgeStyle=none;html=1;",
     )
     assert outcome.connected is False
+
+
+def test_reload_edge_style_preserves_orthogonal_routing() -> None:
+    shapes = load_library_shapes(ROOT / "drawio-lib" / "drawclock.xml")
+    pll = shapes["pll"]
+    gate = shapes["gate"]
+    right = port_anchors(pll.style, "pll")["right"]
+    left = port_anchors(gate.style, "gate")["left"]
+    stored = (
+        "edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;jettySize=auto;orthogonalLoop=1;"
+        "exitX=0.9;exitY=0.5;entryX=0.1;entryY=0.5;strokeColor=#ff0000;"
+    )
+    outcome = reload_edge_style(
+        pll.style,
+        pll.style,
+        "pll",
+        gate.style,
+        gate.style,
+        "gate",
+        stored,
+    )
+    assert outcome.connected is True
+    assert "orthogonalEdgeStyle" in outcome.style
+    assert "edgeStyle=none" not in outcome.style
+    assert "strokeColor=#ff0000" in outcome.style
+    assert f"exitX={right[0]}" in outcome.style.replace(" ", "") or f"exitX={right[0]:g}" in outcome.style
+    assert f"entryX={left[0]}" in outcome.style.replace(" ", "") or f"entryX={left[0]:g}" in outcome.style
+
+
+def test_merge_port_attachment_keeps_routing_keys() -> None:
+    stored = "edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.25;entryX=0;entryY=0.75;"
+    merged = merge_port_attachment(stored, (0.8, 0.4), (0.2, 0.6))
+    assert "orthogonalEdgeStyle" in merged
+    assert "exitX=0.8" in merged
+    assert "entryY=0.6" in merged
+    assert "exitPerimeter=0" in merged
