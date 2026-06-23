@@ -8,6 +8,10 @@ description: >-
 
 （规则见 `~/.cursor/skills/agent-project-changelog/SKILL.md`。）
 
+## 2026-06-23
+
+- **决议**：**mux2～6** 移除 **`sel`** 属性与梯形顶中向上的选择信号竖线/文字；库 **object** 仅保留 **`name`** + **`label`**。旧图 **reload** 后 `sel` 不再写入模板 schema。
+
 ## 2026-06-22
 
 - **决议**：**source** / **pad** 归为时钟源大类：库 **object** 写入 **kind=source**、**source_kind** 为 **source** 或 **pad**（不可编辑、仅内部）；**run** 原样导出。见 **json.md**、**drawio-lib/README.md**。

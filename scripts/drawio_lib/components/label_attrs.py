@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 ATTR_NAME = "name"
-ATTR_SEL = "sel"
 
 INSTANCE_NAME_GAP_PX = 0
 INSTANCE_NAME_GAP_LOOSE_PX = 4

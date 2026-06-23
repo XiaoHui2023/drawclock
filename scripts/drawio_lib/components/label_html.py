@@ -7,15 +7,6 @@ from drawio_lib.components.label_overflow import graphic_layer_pin_css
 
 OverlayAnchor = Literal["center", "left", "right"]
 
-MUX_SEL_BLOCK_START = "<!--mux-sel-->"
-MUX_SEL_BLOCK_END = "<!--/mux-sel-->"
-MUX_SEL_LINE_HEIGHT_PX = 12
-_MUX_SEL_HIDE_STYLE = (
-    "<style>"
-    ".dc-mux-sel:not(:has(.dc-mux-sel-t:not(:empty))){display:none!important}"
-    "</style>"
-)
-
 LabelOverlay = (
     tuple[float, float, str]
     | tuple[float, float, str, int]
@@ -114,66 +105,6 @@ def text_overlay(
         f'<span style="position:absolute;left:{left_pct}%;top:{top_pct}%;'
         f"font-size:{font_px}px;line-height:1;white-space:nowrap;"
         f'transform:translate(-50%,-50%);">{text}</span>'
-    )
-
-
-def strip_mux_sel_block(html: str) -> str:
-    start = html.find(MUX_SEL_BLOCK_START)
-    if start < 0:
-        return html
-    end = html.find(MUX_SEL_BLOCK_END, start)
-    if end < 0:
-        return html
-    return html[:start] + html[end + len(MUX_SEL_BLOCK_END) :]
-
-
-def mux_sel_signal_block(
-    *,
-    anchor_x: float,
-    anchor_y: int,
-    design_cell_w: int,
-    design_cell_h: int,
-    attr: str = "sel",
-    line_height: int = MUX_SEL_LINE_HEIGHT_PX,
-    stroke: str = "#000000",
-) -> str:
-    """Vertical sel stub above the mux top center; hidden when ``attr`` is empty."""
-    left_pct = anchor_x / design_cell_w * 100
-    top_pct = anchor_y / design_cell_h * 100
-    return (
-        f"{MUX_SEL_BLOCK_START}"
-        f"{_MUX_SEL_HIDE_STYLE}"
-        f'<div class="dc-mux-sel" style="position:absolute;left:{left_pct}%;'
-        f"top:{top_pct}%;transform:translate(-50%,-100%);"
-        f'pointer-events:none;text-align:center;">'
-        f'<div style="display:flex;flex-direction:column;align-items:center;">'
-        f'<span class="dc-mux-sel-t" style="font-size:{LABEL_FONT_PX}px;'
-        f'line-height:1;white-space:nowrap;">%{attr}%</span>'
-        f'<div style="width:1px;height:{line_height}px;background:{stroke};'
-        f'flex-shrink:0;"></div>'
-        f"</div></div>"
-        f"{MUX_SEL_BLOCK_END}"
-    )
-
-
-def mux_sel_preview_svg(
-    *,
-    anchor_x: float,
-    anchor_y: int,
-    text: str = "sel",
-    line_height: int = MUX_SEL_LINE_HEIGHT_PX,
-    font_px: int = LABEL_FONT_PX,
-    stroke: str = "#000000",
-    text_gap_px: int = 2,
-) -> str:
-    """Documentation-only sel stub for ``preview_svg`` (not used in library shapes)."""
-    line_y1 = anchor_y - line_height
-    text_y = line_y1 - text_gap_px
-    return (
-        f'  <line x1="{anchor_x}" y1="{line_y1}" x2="{anchor_x}" y2="{anchor_y}" '
-        f'stroke="{stroke}" stroke-width="1"/>\n'
-        f'  <text x="{anchor_x}" y="{text_y}" font-size="{font_px}" fill="{stroke}" '
-        f'text-anchor="middle" dominant-baseline="auto">{text}</text>\n'
     )
 
 
