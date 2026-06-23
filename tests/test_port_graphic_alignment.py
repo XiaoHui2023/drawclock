@@ -75,7 +75,7 @@ def test_preview_stub_y_matches_graphic_lead(spec) -> None:
 
 def test_label_html_pins_graphic_layer_with_drawio_offset() -> None:
     gate = importlib.import_module("drawio_lib.components.gate")
-    pin = graphic_layer_pin_css(view_w=gate.W, view_h=gate.H)
+    pin = graphic_layer_pin_css(view_w=gate.W, view_h=gate.GRAPHIC_H)
     assert pin in gate.label_html()
     assert f"left:{-DRAWIO_HTML_LABEL_OFFSET_X}px" in pin
     assert f"top:{-DRAWIO_HTML_LABEL_OFFSET_Y}px" in pin

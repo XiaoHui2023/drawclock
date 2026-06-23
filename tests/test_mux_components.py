@@ -79,7 +79,8 @@ def test_mux_first_input_aligns_with_standard_port_row(num_inputs: int) -> None:
         "occ_bist_clk_cell",
     ],
 )
-def test_standard_body_components_share_cell_height(name: str) -> None:
+def test_standard_body_components_share_graphic_height(name: str) -> None:
     mod = importlib.import_module(f"drawio_lib.components.{name}")
-    expected = sgeom.cell_h_for_body(sgeom.BODY_H)
-    assert mod.H == expected
+    expected_graphic = sgeom.cell_h_for_body(sgeom.BODY_H)
+    assert mod.GRAPHIC_H == expected_graphic
+    assert mod.H > mod.GRAPHIC_H

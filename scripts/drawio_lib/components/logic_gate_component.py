@@ -41,6 +41,13 @@ class LogicGateComponent:
             with_bubble=self.with_bubble,
             buffer=self.buffer,
         )
+        self._graphic_h = self._g.cell_h
+        full_h = sgeom.cell_h_with_instance_name(
+            name_top_y=self._instance_name_top_y(),
+            instance_name_gap_px=INSTANCE_NAME_GAP_PX,
+        )
+        if full_h != self._g.cell_h:
+            self._g = lgeom.reheight_logic_gate_geometry(self._g, full_h)
         pad = sgeom.side_pad_x(sgeom.W)
         port_cells = [(port.anchor.cell_x, port.anchor.cell_y) for port in self._g.inputs]
         port_cells.append((self._g.output.anchor.cell_x, self._g.output.anchor.cell_y))
@@ -49,6 +56,10 @@ class LogicGateComponent:
             margin_x=4,
             port_cells=tuple(port_cells),
         )
+
+    @property
+    def graphic_h(self) -> int:
+        return self._graphic_h
 
     @property
     def drawclock_type(self) -> str:
@@ -78,7 +89,7 @@ class LogicGateComponent:
         body = self.body_svg(self._body_g)
         return (
             f"{shell_open(self.w, self.h)}"
-            f"{stretch_body_layer(body, view_w=self.w, view_h=self.h, overlays=())}"
+            f"{stretch_body_layer(body, view_w=self.w, view_h=self.graphic_h, overlays=())}"
             f"{name_block(self._instance_name_top_y(), design_cell_h=self.h, gap_px=INSTANCE_NAME_GAP_PX)}"
             f"{shell_close()}"
         )
@@ -194,8 +205,8 @@ class LogicGateComponent:
     def verify_geometry(self) -> None:
         html = self.label_html()
         verify_label_placeholders(html, title=self.title)
-        if f'viewBox="0 0 {self.w} {self.h}"' not in html:
-            raise ValueError(f"{self.title} label must use cell viewBox")
+        if f'viewBox="0 0 {self.w} {self.graphic_h}"' not in html:
+            raise ValueError(f"{self.title} label must use graphic viewBox")
         style = self.cell_style()
         verify_label_overflow_policy(
             html,
@@ -203,6 +214,7 @@ class LogicGateComponent:
             title=self.title,
             design_cell_w=self.w,
             design_cell_h=self.h,
+            graphic_cell_h=self.graphic_h,
         )
         points = self._parse_points(style)
         expected = len(self._g.inputs) + 1
@@ -252,6 +264,7 @@ def bind_module(module: object, component: LogicGateComponent) -> None:
         "TAGS": component.tags,
         "W": component.w,
         "H": component.h,
+        "GRAPHIC_H": component.graphic_h,
         "G": component.g,
         "label_html": component.label_html,
         "preview_svg": component.preview_svg,

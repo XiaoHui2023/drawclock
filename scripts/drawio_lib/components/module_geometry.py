@@ -150,6 +150,30 @@ def compute_module_geometry(output_labels: tuple[str, ...]) -> ModuleGeometry:
     )
 
 
+def reheight_module_geometry(g: ModuleGeometry, cell_h: int) -> ModuleGeometry:
+    left = geom.reanchor_port(g.left, cell_h=cell_h, cell_w=g.cell_w)
+    outputs = tuple(
+        geom.reanchor_port(port, cell_h=cell_h, cell_w=g.cell_w) for port in g.outputs
+    )
+    return ModuleGeometry(
+        output_labels=g.output_labels,
+        cell_w=g.cell_w,
+        cell_h=cell_h,
+        box_left=g.box_left,
+        box_right=g.box_right,
+        outer_top=g.outer_top,
+        header_bottom=g.header_bottom,
+        body_top=g.body_top,
+        body_bottom=g.body_bottom,
+        body_inner_h=g.body_inner_h,
+        graphic_h=g.graphic_h,
+        left=left,
+        outputs=outputs,
+        type_label=g.type_label,
+        port_labels=g.port_labels,
+    )
+
+
 def module_body_svg(g: ModuleGeometry) -> str:
     width = g.box_right - g.box_left
     height = g.body_bottom - g.outer_top

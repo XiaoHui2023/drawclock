@@ -70,12 +70,23 @@ class Pll2Component:
 
     def __post_init__(self) -> None:
         self._g = geom.compute_geometry()
+        self._graphic_h = self._g.cell_h
+        full_h = sgeom.cell_h_with_instance_name(
+            name_top_y=self._instance_name_top_y(),
+            instance_name_gap_px=INSTANCE_NAME_GAP_PX,
+        )
+        if full_h != self._g.cell_h:
+            self._g = geom.reheight_pll2_geometry(self._g, full_h)
         pad = sgeom.side_pad_x(sgeom.W) + PLL_LEFT_X
         self._body_g = sgeom.compute_geometry(
             "both",
             margin_x=4,
             port_cells=((pad, self._g.body_mid_y),),
         )
+
+    @property
+    def graphic_h(self) -> int:
+        return self._graphic_h
 
     @property
     def drawclock_type(self) -> str:
@@ -110,7 +121,7 @@ class Pll2Component:
         overlays = self._center_labels()
         return (
             f"{shell_open(self.w, self.h)}"
-            f"{stretch_body_layer(body, view_w=self.w, view_h=self.h, overlays=overlays)}"
+            f"{stretch_body_layer(body, view_w=self.w, view_h=self.graphic_h, overlays=overlays)}"
             f"{name_block(self._instance_name_top_y(), design_cell_h=self.h, gap_px=INSTANCE_NAME_GAP_PX)}"
             f"{shell_close()}"
         )
@@ -235,8 +246,8 @@ class Pll2Component:
         verify_label_placeholders(html, title=self.title)
         if f">%{ATTR_PLL_KIND}%</span>" not in html:
             raise ValueError("pll2 label must render pll_kind as non-scaling HTML overlay")
-        if f'viewBox="0 0 {self.w} {self.h}"' not in html:
-            raise ValueError(f"{self.title} label must use cell viewBox")
+        if f'viewBox="0 0 {self.w} {self.graphic_h}"' not in html:
+            raise ValueError(f"{self.title} label must use graphic viewBox")
         style = self.cell_style()
         verify_label_overflow_policy(
             html,
@@ -244,6 +255,7 @@ class Pll2Component:
             title=self.title,
             design_cell_w=self.w,
             design_cell_h=self.h,
+            graphic_cell_h=self.graphic_h,
         )
         pts = self._parse_points(style)
         expected = 1 + len(self._g.outputs)
@@ -292,6 +304,7 @@ def bind_module(module: object, component: Pll2Component) -> None:
         "TAGS": component.tags,
         "W": component.w,
         "H": component.h,
+        "GRAPHIC_H": component.graphic_h,
         "G": component.g,
         "label_html": component.label_html,
         "preview_svg": component.preview_svg,

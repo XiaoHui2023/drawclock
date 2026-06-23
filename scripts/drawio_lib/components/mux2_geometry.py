@@ -62,8 +62,9 @@ def compute_geometry() -> Mux2Geometry:
     )
 
 
-def cell_y_from_rel(y_rel: float) -> int:
-    return round(y_rel * cell_h(NUM_INPUTS))
+def cell_y_from_rel(y_rel: float, *, cell_height: int | None = None) -> int:
+    height = cell_height if cell_height is not None else cell_h(NUM_INPUTS)
+    return round(y_rel * height)
 
 
 shape_h = cell_h

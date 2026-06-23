@@ -46,6 +46,8 @@ class ClockComponent(SimpleComponent):
             asymmetric_clock=True,
             instance_name_gap_px=self.instance_name_gap_px,
         )
+        self._graphic_h = self._g.cell_h
+        self._expand_cell_h_for_instance_name()
 
     @property
     def w(self) -> int:
@@ -73,7 +75,7 @@ class ClockComponent(SimpleComponent):
         wave = clock_body(self._g)
         return (
             f"{shell_open(self.w, self.h)}"
-            f"{stretch_body_layer(wave, view_w=self.w, view_h=self.h)}"
+            f"{stretch_body_layer(wave, view_w=self.w, view_h=self.graphic_h)}"
             f"{name_block(self._instance_name_top_y(), design_cell_h=self.h, design_cell_w=self.w, center_x=self._graphic_center_x(), gap_px=self.instance_name_gap_px)}"
             f"{shell_close()}"
         )
@@ -140,8 +142,8 @@ class ClockComponent(SimpleComponent):
     def verify_geometry(self) -> None:
         html = self.label_html()
         verify_label_placeholders(html, title="clock")
-        if f'viewBox="0 0 {self.w} {self.h}"' not in html:
-            raise ValueError("clock wave SVG viewBox must match cell width and height")
+        if f'viewBox="0 0 {self.w} {self.graphic_h}"' not in html:
+            raise ValueError("clock wave SVG viewBox must match cell width and graphic height")
         if 'preserveAspectRatio="none"' not in html:
             raise ValueError("clock body SVG must stretch with the shape (none)")
         style = self.cell_style()
@@ -153,6 +155,7 @@ class ClockComponent(SimpleComponent):
             title="clock",
             design_cell_w=self.w,
             design_cell_h=self.h,
+            graphic_cell_h=self.graphic_h,
         )
 
         pts = self._parse_points(style)

@@ -22,7 +22,8 @@ def test_mux2_constants_match_geometry_module() -> None:
     assert mux2.TRAP_W == geom.TRAP_W
     assert mux2.TRAP_H == geom.trap_h(2)
     assert mux2.W == geom.W
-    assert mux2.H == geom.cell_h(2)
+    assert mux2.GRAPHIC_H == geom.mux_h(2)
+    assert mux2.H > mux2.GRAPHIC_H
 
 
 def test_left_inputs_on_trap_left_edge() -> None:
@@ -57,7 +58,8 @@ def test_label_uses_non_scaling_layers() -> None:
     g = mux2.G
     assert g.in0.trap.label_y == round(g.in0.trap.trap_y)
     html = mux2.label_html()
-    assert f'viewBox="0 0 {mux2.W} {mux2.H}"' in html
+    assert f'viewBox="0 0 {mux2.W} {mux2.GRAPHIC_H}"' in html
+    assert f"height:{mux2.H}px" in html
     assert 'preserveAspectRatio="none"' in html
     assert "transform:scale(" not in html
     assert "width:40px" in html
@@ -97,4 +99,4 @@ def test_style_points_on_trap_ports() -> None:
     assert isclose(pts[2][0], g.out.trap.x_rel, abs_tol=0.001)
     for pt, port in zip(pts, (g.in0, g.in1, g.out)):
         assert isclose(pt[1], port.trap.y_rel, abs_tol=0.001)
-        assert geom2.cell_y_from_rel(pt[1]) == port.trap.cell_y
+        assert geom2.cell_y_from_rel(pt[1], cell_height=mux2.H) == port.trap.cell_y

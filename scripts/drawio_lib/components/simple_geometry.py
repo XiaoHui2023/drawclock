@@ -6,6 +6,7 @@ from typing import Literal
 from drawio_lib.components.label_attrs import (
     INSTANCE_NAME_GAP_PX,
     INSTANCE_NAME_PULL_COMPACT_PX,
+    LABEL_FONT_PX,
 )
 
 DESIGN_W = 40
@@ -16,7 +17,8 @@ BODY_Y = 6
 BODY_H = 48
 WIRE_BODY_Y = 10
 WIRE_STROKE_Y = 14
-WIRE_CELL_H = WIRE_STROKE_Y
+WIRE_AMP = 5
+WIRE_CELL_H = WIRE_STROKE_Y + WIRE_AMP
 
 MUX_BODY_PAD_BOTTOM = 0
 NAME_H = 16
@@ -133,9 +135,42 @@ def cell_h_for_body(
     body_pad_bottom: int = MUX_BODY_PAD_BOTTOM,
     max_instance_gap: int = MAX_INSTANCE_GAP,
 ) -> int:
-    """Selection-box height: graphic band only (instance name sits below via overflow=visible)."""
+    """Graphic band height (SVG viewBox); instance name may extend below in full cell_h."""
     _ = max_instance_gap
     return BODY_Y + body_height + body_pad_bottom
+
+
+def cell_h_with_instance_name(
+    *,
+    name_top_y: int,
+    instance_name_gap_px: int = INSTANCE_NAME_GAP_PX,
+    name_h: int = LABEL_FONT_PX,
+) -> int:
+    """Full mxGeometry height: name anchor through instance-name bottom."""
+    return name_top_y + instance_name_gap_px + name_h
+
+
+def reanchor_port(port: Port, *, cell_h: int, cell_w: int = W) -> Port:
+    anchor = port.anchor
+    rx, ry = cell_to_rel(anchor.cell_x, anchor.cell_y, w=cell_w, h=cell_h)
+    return Port(
+        anchor=Anchor(anchor.cell_x, anchor.cell_y, rx, ry),
+        stub_x1=port.stub_x1,
+        stub_y1=port.stub_y1,
+        stub_x2=port.stub_x2,
+        stub_y2=port.stub_y2,
+    )
+
+
+def reanchor_geometry(g: SimpleGeometry, cell_h: int) -> SimpleGeometry:
+    return SimpleGeometry(
+        body=g.body,
+        left=reanchor_port(g.left, cell_h=cell_h, cell_w=g.cell_w) if g.left else None,
+        right=reanchor_port(g.right, cell_h=cell_h, cell_w=g.cell_w) if g.right else None,
+        body_mid_y=g.body_mid_y,
+        cell_h=cell_h,
+        cell_w=g.cell_w,
+    )
 
 
 def clock_cell_h(

@@ -72,6 +72,17 @@ def compute_logic_gate_geometry(
     )
 
 
+def reheight_logic_gate_geometry(g: LogicGateGeometry, cell_h: int) -> LogicGateGeometry:
+    inputs = tuple(geom.reanchor_port(port, cell_h=cell_h) for port in g.inputs)
+    output = geom.reanchor_port(g.output, cell_h=cell_h)
+    return LogicGateGeometry(
+        inputs=inputs,
+        output=output,
+        body_mid_y=g.body_mid_y,
+        cell_h=cell_h,
+    )
+
+
 def port_drawio_point(port: geom.Port) -> str:
     anchor = port.anchor
     return f"{anchor.x_rel:.4f},{anchor.y_rel:.4f},{POINT_FIXED},0,0"

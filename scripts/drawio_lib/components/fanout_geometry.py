@@ -81,6 +81,20 @@ def compute_fanout_geometry(
     )
 
 
+def reheight_fanout_geometry(g: FanoutGeometry, cell_h: int) -> FanoutGeometry:
+    left = geom.reanchor_port(g.left, cell_h=cell_h, cell_w=g.cell_w)
+    outputs = tuple(
+        geom.reanchor_port(port, cell_h=cell_h, cell_w=g.cell_w) for port in g.outputs
+    )
+    return FanoutGeometry(
+        left=left,
+        outputs=outputs,
+        body_mid_y=g.body_mid_y,
+        cell_h=cell_h,
+        cell_w=g.cell_w,
+    )
+
+
 def port_drawio_point(port: geom.Port) -> str:
     anchor = port.anchor
     return f"{anchor.x_rel:.4f},{anchor.y_rel:.4f},{POINT_FIXED},0,0"

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import re
 
+from drawio_lib.components.label_attrs import LABEL_FONT_PX
+
 MXCELL_OVERFLOW_VISIBLE = "overflow=visible"
 MXCELL_RESIZABLE_OFF = "resizable=0"
 
@@ -33,7 +35,7 @@ def mxcell_overflow_style() -> str:
 
 
 def mxcell_html_label_style_parts() -> str:
-    """Keep labels visible outside the small fixed mxGeometry."""
+    """Fixed-size html=1 label cell; overflow=visible for draw.io HTML wrapper quirks."""
     return (
         "rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=1;"
         f"{mxcell_overflow_style()}"
@@ -57,17 +59,20 @@ def verify_no_degenerate_label_tricks(html: str, *, title: str) -> None:
         )
 
 
-def verify_selection_box_wraps_graphic(
-    graphic_bottom_y: int,
+def verify_selection_box_matches_render_bounds(
     cell_h: int,
     *,
+    name_top_y: int,
+    instance_name_gap_px: int,
+    name_h: int = LABEL_FONT_PX,
     title: str,
     tolerance_px: int = 2,
 ) -> None:
-    if abs(cell_h - graphic_bottom_y) > tolerance_px:
+    expected = name_top_y + instance_name_gap_px + name_h
+    if abs(cell_h - expected) > tolerance_px:
         raise ValueError(
-            f"{title}: selection box height should match graphic bottom "
-            f"(cell_h={cell_h}, graphic_bottom={graphic_bottom_y})"
+            f"{title}: selection box height should match HTML render bounds "
+            f"(cell_h={cell_h}, expected={expected})"
         )
 
 
@@ -92,23 +97,25 @@ def verify_label_stretch_policy(
     title: str,
     design_cell_w: int,
     design_cell_h: int,
+    graphic_cell_h: int | None = None,
 ) -> None:
+    graphic_h = graphic_cell_h if graphic_cell_h is not None else design_cell_h
     shell_size = f"width:{design_cell_w}px;height:{design_cell_h}px"
     shell_part = html.split('><div style="position:absolute', 1)[0]
     if shell_size not in shell_part:
         raise ValueError(
             f"{title}: label shell must use fixed {design_cell_w}x{design_cell_h}px"
         )
-    layer_size = graphic_layer_pin_css(view_w=design_cell_w, view_h=design_cell_h)
+    layer_size = graphic_layer_pin_css(view_w=design_cell_w, view_h=graphic_h)
     if layer_size not in html:
         raise ValueError(
-            f"{title}: graphic layer must pin to the fixed cell canvas"
+            f"{title}: graphic layer must pin to the fixed graphic canvas"
         )
     if 'viewBox="0 0 ' not in html:
         raise ValueError(f"{title}: label must include a stretch SVG viewBox")
-    if f'width="{design_cell_w}"' not in html or f'height="{design_cell_h}"' not in html:
+    if f'width="{design_cell_w}"' not in html or f'height="{graphic_h}"' not in html:
         raise ValueError(
-            f"{title}: pattern SVG must use fixed width/height matching the cell canvas"
+            f"{title}: pattern SVG must use fixed width/height matching the graphic canvas"
         )
     if _PERCENT_HEIGHT_ONLY.search(html):
         raise ValueError(
@@ -125,6 +132,7 @@ def verify_label_overflow_policy(
     title: str,
     design_cell_w: int,
     design_cell_h: int,
+    graphic_cell_h: int | None = None,
 ) -> None:
     if "overflow=fill" in style:
         raise ValueError(
@@ -148,5 +156,6 @@ def verify_label_overflow_policy(
         title=title,
         design_cell_w=design_cell_w,
         design_cell_h=design_cell_h,
+        graphic_cell_h=graphic_cell_h,
     )
     verify_mxcell_label_style(style, title=title)

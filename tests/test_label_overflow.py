@@ -11,12 +11,13 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
+from drawio_lib.components.label_attrs import INSTANCE_NAME_GAP_PX, LABEL_FONT_PX
 from drawio_lib.components.label_overflow import (
     verify_label_overflow_policy,
     verify_label_stretch_policy,
     verify_mxcell_label_style,
     verify_no_degenerate_label_tricks,
-    verify_selection_box_wraps_graphic,
+    verify_selection_box_matches_render_bounds,
 )
 from drawio_lib.components import registry
 from drawio_lib.components import simple_geometry as sgeom
@@ -44,12 +45,14 @@ def test_mxcell_uses_visible_overflow_and_fixed_size(module_name: str) -> None:
     mod = importlib.import_module(f"drawio_lib.components.{module_name}")
     style = mod.cell_style()
     html = mod.label_html()
+    graphic_h = getattr(mod, "GRAPHIC_H", mod.H)
     verify_label_overflow_policy(
         html,
         style,
         title=module_name,
         design_cell_w=mod.W,
         design_cell_h=mod.H,
+        graphic_cell_h=graphic_h,
     )
     verify_mxcell_label_style(style, title=module_name)
     verify_no_degenerate_label_tricks(html, title=module_name)
@@ -73,6 +76,7 @@ def test_fill_overflow_rejected() -> None:
             title="gate",
             design_cell_w=gate.W,
             design_cell_h=gate.H,
+            graphic_cell_h=gate.GRAPHIC_H,
         )
 
 
@@ -87,6 +91,7 @@ def test_resizable_required() -> None:
             title="gate",
             design_cell_w=gate.W,
             design_cell_h=gate.H,
+            graphic_cell_h=gate.GRAPHIC_H,
         )
 
 
@@ -102,32 +107,8 @@ def test_percent_shell_rejected() -> None:
             title="gate",
             design_cell_w=gate.W,
             design_cell_h=gate.H,
+            graphic_cell_h=gate.GRAPHIC_H,
         )
-
-
-def _graphic_bottom_y(mod) -> int | None:
-    g = getattr(mod, "G", None)
-    if g is None:
-        return None
-    if hasattr(g, "mux_h"):
-        return g.mux_h
-    if hasattr(g, "graphic_h"):
-        from drawio_lib.components.module_geometry import MODULE_BOX_Y
-
-        return MODULE_BOX_Y + g.graphic_h + sgeom.MUX_BODY_PAD_BOTTOM
-    if hasattr(g, "trap"):
-        return g.trap.y + g.trap.h + sgeom.MUX_BODY_PAD_BOTTOM
-    if hasattr(g, "cell_h") and not hasattr(g, "body"):
-        return sgeom.BODY_Y + sgeom.BODY_H + sgeom.MUX_BODY_PAD_BOTTOM
-    if hasattr(g, "body"):
-        if mod.TITLE == "clock":
-            from drawio_lib.components.simple_shapes import CLOCK_WAVE_AMP
-
-            return g.body_mid_y + CLOCK_WAVE_AMP
-        if mod.TITLE == "from":
-            return mod.H
-        return g.body.y + g.body.h + sgeom.MUX_BODY_PAD_BOTTOM
-    return None
 
 
 def _name_top_y(mod) -> int | None:
@@ -146,6 +127,10 @@ def _name_top_y(mod) -> int | None:
     if tops:
         return round(float(tops[-1]) / 100 * mod.H)
     return None
+
+
+def _instance_name_gap_px(mod) -> int:
+    return int(getattr(mod, "DEFAULT_INSTANCE_GAP", INSTANCE_NAME_GAP_PX))
 
 
 @pytest.mark.parametrize(
@@ -170,15 +155,23 @@ def test_instance_name_top_y_unchanged_pixels(
 
 
 @pytest.mark.parametrize("spec", registry.ALL, ids=lambda s: s.module.TITLE)
-def test_selection_box_wraps_graphic_not_name(spec) -> None:
+def test_selection_box_matches_render_bounds(spec) -> None:
     mod = spec.module
     if mod.TITLE == "async":
-        pytest.skip("async has no instance name")
-    graphic_bottom = _graphic_bottom_y(mod)
-    if graphic_bottom is None:
-        pytest.skip(f"{mod.TITLE}: no graphic bounds helper")
-    verify_selection_box_wraps_graphic(
-        graphic_bottom,
+        verify_selection_box_matches_render_bounds(
+            mod.H,
+            name_top_y=mod.H,
+            instance_name_gap_px=0,
+            name_h=0,
+            title=mod.TITLE,
+        )
+        return
+    name_top = _name_top_y(mod)
+    assert name_top is not None, f"{mod.TITLE}: expected instance name in label"
+    verify_selection_box_matches_render_bounds(
         mod.H,
+        name_top_y=name_top,
+        instance_name_gap_px=_instance_name_gap_px(mod),
+        name_h=LABEL_FONT_PX,
         title=mod.TITLE,
     )

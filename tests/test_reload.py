@@ -242,9 +242,12 @@ def test_reload_replaces_stale_baked_label_viewbox(tmp_path: Path) -> None:
     out = tmp_path / "out.drawio"
     reload_drawio_file(inp, LIBRARY, out)
     inner = html.unescape(_mxfile_searchable(out.read_text(encoding="utf-8")))
-    assert f'viewBox="0 0 {gate.w} {gate.h}"' in inner
+    viewbox = re.search(r'viewBox="0 0 (\d+) (\d+)"', gate.label)
+    assert viewbox is not None
+    assert viewbox.group(0) in inner
     assert f'viewBox="0 0 {stale_w} {gate.h}"' not in inner
     assert f'width="{gate.w}"' in inner
+    assert f'height="{gate.h}"' in inner
     assert "%name%" in inner
     assert 'placeholders="1"' in inner
 

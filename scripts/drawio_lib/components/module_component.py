@@ -46,6 +46,17 @@ class ModuleComponent:
         if not self.output_labels:
             raise ValueError(f"{self.title} needs at least one output label")
         self._g = mgeom.compute_module_geometry(self.output_labels)
+        self._graphic_h = self._g.cell_h
+        full_h = sgeom.cell_h_with_instance_name(
+            name_top_y=self._instance_name_top_y(),
+            instance_name_gap_px=self.instance_name_gap_px,
+        )
+        if full_h != self._g.cell_h:
+            self._g = mgeom.reheight_module_geometry(self._g, full_h)
+
+    @property
+    def graphic_h(self) -> int:
+        return self._graphic_h
 
     @property
     def drawclock_type(self) -> str:
@@ -80,7 +91,7 @@ class ModuleComponent:
         overlays = self._center_labels() + self._g.port_labels
         return (
             f"{shell_open(self.w, self.h)}"
-            f"{stretch_body_layer(body, view_w=self.w, view_h=self.h, overlays=overlays)}"
+            f"{stretch_body_layer(body, view_w=self.w, view_h=self.graphic_h, overlays=overlays)}"
             f"{name_block(self._instance_name_top_y(), design_cell_h=self.h, gap_px=self.instance_name_gap_px)}"
             f"{shell_close()}"
         )
@@ -211,8 +222,8 @@ class ModuleComponent:
         g = self._g
         html = self.label_html()
         verify_label_placeholders(html, title=self.title)
-        if f'viewBox="0 0 {self.w} {self.h}"' not in html:
-            raise ValueError(f"{self.title} label must use cell viewBox")
+        if f'viewBox="0 0 {self.w} {self.graphic_h}"' not in html:
+            raise ValueError(f"{self.title} label must use graphic viewBox")
         style = self.cell_style()
         verify_label_overflow_policy(
             html,
@@ -220,6 +231,7 @@ class ModuleComponent:
             title=self.title,
             design_cell_w=self.w,
             design_cell_h=self.h,
+            graphic_cell_h=self.graphic_h,
         )
         points = self._parse_points(style)
         expected = 1 + len(g.outputs)
@@ -290,6 +302,7 @@ def bind_module(module: object, component: ModuleComponent) -> None:
         "TAGS": component.tags,
         "W": component.w,
         "H": component.h,
+        "GRAPHIC_H": component.graphic_h,
         "G": component.g,
         "label_html": component.label_html,
         "preview_svg": component.preview_svg,

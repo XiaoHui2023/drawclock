@@ -80,6 +80,17 @@ def compute_geometry() -> Pll2Geometry:
     )
 
 
+def reheight_pll2_geometry(g: Pll2Geometry, cell_h: int) -> Pll2Geometry:
+    left = geom.reanchor_port(g.left, cell_h=cell_h)
+    outputs = tuple(geom.reanchor_port(port, cell_h=cell_h) for port in g.outputs)
+    return Pll2Geometry(
+        left=left,
+        outputs=outputs,
+        body_mid_y=g.body_mid_y,
+        cell_h=cell_h,
+    )
+
+
 def port_drawio_point(port: geom.Port) -> str:
     a = port.anchor
     return f"{a.x_rel:.4f},{a.y_rel:.4f},{POINT_FIXED},0,0"

@@ -25,7 +25,7 @@ class FromComponent(SimpleComponent):
         body = wire_body(self._g)
         return (
             f"{shell_open(self.w, self.h)}"
-            f"{stretch_body_layer(body, view_w=self.w, view_h=self.h)}"
+            f"{stretch_body_layer(body, view_w=self.w, view_h=self.graphic_h)}"
             f"{name_block(self._instance_name_top_y(), design_cell_h=self.h, gap_px=self.instance_name_gap_px)}"
             f"{shell_close()}"
         )
@@ -67,8 +67,8 @@ class FromComponent(SimpleComponent):
         verify_label_placeholders(html, title="from")
         if f"width:{self.w}px" not in html or f"height:{self.h}px" not in html:
             raise ValueError("from label shell must use fixed px canvas")
-        if f'viewBox="0 0 {self.w} {self.h}"' not in html:
-            raise ValueError("from viewBox must match cell width and height")
+        if f'viewBox="0 0 {self.w} {self.graphic_h}"' not in html:
+            raise ValueError("from viewBox must match cell width and graphic height")
         if 'preserveAspectRatio="none"' not in html:
             raise ValueError("from body SVG must stretch with the shape (none)")
         style = self.cell_style()
@@ -78,6 +78,7 @@ class FromComponent(SimpleComponent):
             title="from",
             design_cell_w=self.w,
             design_cell_h=self.h,
+            graphic_cell_h=self.graphic_h,
         )
 
         pts = self._parse_points(style)

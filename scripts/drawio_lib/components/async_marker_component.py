@@ -84,6 +84,10 @@ class AsyncMarkerComponent:
     def required_object_attrs(self) -> tuple[str, ...]:
         return ()
 
+    @property
+    def graphic_h(self) -> int:
+        return self.h
+
     def label_html(self) -> str:
         body = _async_body(self._g)
         return (
@@ -236,6 +240,7 @@ def bind_module(module: object, component: AsyncMarkerComponent) -> None:
         "TAGS": component.tags,
         "W": component.w,
         "H": component.h,
+        "GRAPHIC_H": component.graphic_h,
         "G": component.g,
         "label_html": component.label_html,
         "preview_svg": component.preview_svg,

@@ -202,6 +202,41 @@ def make_port(
     )
 
 
+def reheight_mux_geometry(g: MuxGeometry, cell_height: int) -> MuxGeometry:
+    def reanchor(port: Port) -> Port:
+        trap = port.trap
+        rx, ry = cell_to_rel(trap.cell_x, trap.cell_y, h=cell_height)
+        new_trap = Anchor(
+            trap_x=trap.trap_x,
+            trap_y=trap.trap_y,
+            cell_x=trap.cell_x,
+            cell_y=trap.cell_y,
+            label_x=trap.label_x,
+            label_y=trap.label_y,
+            x_rel=rx,
+            y_rel=ry,
+        )
+        return Port(
+            trap=new_trap,
+            outline_cell_x=port.outline_cell_x,
+            outline_x_rel=port.outline_x_rel,
+            outline_y_rel=ry,
+            stub_x1=port.stub_x1,
+            stub_y1=port.stub_y1,
+            stub_x2=port.stub_x2,
+            stub_y2=port.stub_y2,
+        )
+
+    return MuxGeometry(
+        num_inputs=g.num_inputs,
+        trap=g.trap,
+        inputs=tuple(reanchor(port) for port in g.inputs),
+        out=reanchor(g.out),
+        mux_h=g.mux_h,
+        cell_h=cell_height,
+    )
+
+
 def compute_geometry(num_inputs: int) -> MuxGeometry:
     if num_inputs < 2:
         raise ValueError(f"mux needs at least 2 inputs, got {num_inputs}")

@@ -6,6 +6,7 @@ from math import isclose
 import xml.etree.ElementTree as ET
 
 from drawio_lib.components import mux_geometry as geom
+from drawio_lib.components import simple_geometry as sgeom
 from drawio_lib.components.label_attrs import (
     ATTR_NAME,
     INSTANCE_NAME_GAP_LOOSE_PX,
@@ -46,6 +47,17 @@ class MuxComponent:
             raise ValueError(f"mux needs at least 2 inputs, got {self.num_inputs}")
         self._g = geom.compute_geometry(self.num_inputs)
         self._t = self._g.trap
+        self._graphic_h = self._g.mux_h
+        full_h = sgeom.cell_h_with_instance_name(
+            name_top_y=self._g.mux_h,
+            instance_name_gap_px=INSTANCE_NAME_GAP_LOOSE_PX,
+        )
+        if full_h != self._g.cell_h:
+            self._g = geom.reheight_mux_geometry(self._g, full_h)
+
+    @property
+    def graphic_h(self) -> int:
+        return self._graphic_h
 
     @property
     def drawclock_type(self) -> str:
@@ -105,7 +117,7 @@ class MuxComponent:
         name_top = self._g.mux_h
         return (
             f"{shell_open(self.w, self.h)}"
-            f"{stretch_body_layer(body, view_w=self.w, view_h=self.h, overlays=in_overlays)}"
+            f"{stretch_body_layer(body, view_w=self.w, view_h=self.graphic_h, overlays=in_overlays)}"
             f"{name_block(name_top, design_cell_h=self.h, gap_px=INSTANCE_NAME_GAP_LOOSE_PX)}"
             f"{shell_close()}"
         )
@@ -227,8 +239,16 @@ class MuxComponent:
 
     def verify_geometry(self) -> None:
         g = geom.compute_geometry(self.num_inputs)
-        if g.cell_h != self._g.cell_h:
+        if g.mux_h != self._graphic_h:
             raise ValueError(f"{self.title} geometry cache out of sync")
+        if self._g.cell_h != geom.reheight_mux_geometry(
+            g,
+            sgeom.cell_h_with_instance_name(
+                name_top_y=g.mux_h,
+                instance_name_gap_px=INSTANCE_NAME_GAP_LOOSE_PX,
+            ),
+        ).cell_h:
+            raise ValueError(f"{self.title} full cell height out of sync")
 
         poly = geom.trapezoid_cell_points(g.trap)
         parts = [tuple(map(float, p.split(","))) for p in poly.split()]
@@ -268,8 +288,8 @@ class MuxComponent:
 
         html = self.label_html()
         verify_label_placeholders(html, title=self.title)
-        if f'viewBox="0 0 {self.w} {self.h}"' not in html:
-            raise ValueError(f"{self.title} label must use cell viewBox")
+        if f'viewBox="0 0 {self.w} {self.graphic_h}"' not in html:
+            raise ValueError(f"{self.title} label must use graphic viewBox")
         if 'preserveAspectRatio="none"' not in html:
             raise ValueError(f"{self.title} body SVG must stretch with the shape (none)")
         if "<line " in html:
@@ -283,17 +303,18 @@ class MuxComponent:
             title=self.title,
             design_cell_w=self.w,
             design_cell_h=self.h,
+            graphic_cell_h=self.graphic_h,
         )
         if f"{DRAWCLOCK_TYPE_KEY}={self.drawclock_type}" not in style:
             raise ValueError(f"{self.title} style must set {DRAWCLOCK_TYPE_KEY}")
 
         pts = self._parse_points(style)
-        expected = len(g.inputs) + 1
+        expected = len(self._g.inputs) + 1
         if len(pts) != expected:
             raise ValueError(f"{self.title} expects {expected} connection points, got {pts}")
         for pt, port, which in zip(
             pts,
-            (*g.inputs, g.out),
+            (*self._g.inputs, self._g.out),
             [*(f"in{i}" for i in range(self.num_inputs)), "out"],
         ):
             if len(pt) != 5 or pt[2] != float(geom.POINT_FIXED):
@@ -349,6 +370,7 @@ def bind_module(module: object, component: MuxComponent) -> None:
         "TAGS": component.tags,
         "W": component.w,
         "H": component.h,
+        "GRAPHIC_H": component.graphic_h,
         "G": g,
         "TRAP_X": component.trap_x,
         "TRAP_Y": component.trap_y,

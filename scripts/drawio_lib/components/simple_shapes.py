@@ -735,7 +735,7 @@ def clock_body(g: geom.SimpleGeometry) -> str:
 
 def wire_body(g: geom.SimpleGeometry) -> str:
     y = geom.WIRE_STROKE_Y
-    amp = 5
+    amp = geom.WIRE_AMP
     x0 = geom.side_pad_x(g.cell_w)
     x1 = x0 + geom.DESIGN_W
     return (

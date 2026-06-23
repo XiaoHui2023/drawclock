@@ -65,6 +65,22 @@ class SimpleComponent:
                 body_pad_bottom=self.body_pad_bottom,
                 max_instance_gap=self.max_instance_gap,
             )
+        self._graphic_h = self._g.cell_h
+        self._expand_cell_h_for_instance_name()
+
+    def _expand_cell_h_for_instance_name(self) -> None:
+        if not self.show_instance_name:
+            return
+        full_h = geom.cell_h_with_instance_name(
+            name_top_y=self._instance_name_top_y(),
+            instance_name_gap_px=self.instance_name_gap_px,
+        )
+        if full_h != self._g.cell_h:
+            self._g = geom.reanchor_geometry(self._g, full_h)
+
+    @property
+    def graphic_h(self) -> int:
+        return self._graphic_h
 
     @property
     def drawclock_type(self) -> str:
@@ -127,7 +143,7 @@ class SimpleComponent:
             stretch_body_layer(
                 body,
                 view_w=self.w,
-                view_h=self.h,
+                view_h=self.graphic_h,
                 overlays=overlays,
             ),
         ]
@@ -269,8 +285,8 @@ class SimpleComponent:
     def verify_geometry(self) -> None:
         html = self.label_html()
         verify_label_placeholders(html, title=self.title)
-        if f'viewBox="0 0 {self.w} {self.h}"' not in html:
-            raise ValueError(f"{self.title} label must use cell viewBox")
+        if f'viewBox="0 0 {self.w} {self.graphic_h}"' not in html:
+            raise ValueError(f"{self.title} label must use graphic viewBox")
         if 'preserveAspectRatio="none"' not in html:
             raise ValueError(f"{self.title} body SVG must stretch with the shape (none)")
         if f'width="{self.w}"' not in html:
@@ -285,6 +301,7 @@ class SimpleComponent:
                 title=self.title,
                 design_cell_w=self.w,
                 design_cell_h=self.h,
+                graphic_cell_h=self.graphic_h,
             )
         if f"{DRAWCLOCK_TYPE_KEY}={self.drawclock_type}" not in style:
             raise ValueError(f"{self.title} style must set {DRAWCLOCK_TYPE_KEY}")
@@ -336,8 +353,9 @@ def bind_module(module: object, component: SimpleComponent) -> None:
         "TAGS": component.tags,
         "W": component.w,
         "H": component.h,
+        "GRAPHIC_H": component.graphic_h,
         "G": component.g,
-        "DEFAULT_INSTANCE_GAP": DEFAULT_INSTANCE_GAP,
+        "DEFAULT_INSTANCE_GAP": component.instance_name_gap_px,
         "ATTR_INSTANCE_NAME": ATTR_INSTANCE_NAME,
         "LABEL_FONT_PX": LABEL_FONT_PX,
         "DRAWCLOCK_TYPE_KEY": DRAWCLOCK_TYPE_KEY,

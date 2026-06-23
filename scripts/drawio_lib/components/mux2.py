@@ -12,4 +12,17 @@ bind_module(sys.modules[__name__], _COMPONENT)
 
 from drawio_lib.components import mux2_geometry as _geom2
 
-G = _geom2.compute_geometry()
+
+def _live_geometry() -> _geom2.Mux2Geometry:
+    g = _COMPONENT.g
+    return _geom2.Mux2Geometry(
+        trap=g.trap,
+        in0=g.inputs[0],
+        in1=g.inputs[1],
+        out=g.out,
+        mux_h=g.mux_h,
+        cell_h=g.cell_h,
+    )
+
+
+G = _live_geometry()

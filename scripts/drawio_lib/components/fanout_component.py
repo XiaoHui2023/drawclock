@@ -61,11 +61,22 @@ class FanoutComponent:
             body_half_h=self.body_half_h,
             output_cells=self.output_cells,
         )
+        self._graphic_h = self._g.cell_h
+        full_h = sgeom.cell_h_with_instance_name(
+            name_top_y=self._instance_name_top_y(),
+            instance_name_gap_px=self.instance_name_gap_px,
+        )
+        if full_h != self._g.cell_h:
+            self._g = fgeom.reheight_fanout_geometry(self._g, full_h)
         self._body_g = sgeom.compute_geometry(
             "both",
             margin_x=4,
             port_cells=((self.left_port_x, left_y),),
         )
+
+    @property
+    def graphic_h(self) -> int:
+        return self._graphic_h
 
     @property
     def drawclock_type(self) -> str:
@@ -104,7 +115,7 @@ class FanoutComponent:
         overlays = self.center_labels + self.output_overlays + self._output_labels()
         return (
             f"{shell_open(self.w, self.h)}"
-            f"{stretch_body_layer(body, view_w=self.w, view_h=self.h, overlays=overlays)}"
+            f"{stretch_body_layer(body, view_w=self.w, view_h=self.graphic_h, overlays=overlays)}"
             f"{name_block(self._instance_name_top_y(), design_cell_h=self.h, gap_px=self.instance_name_gap_px)}"
             f"{shell_close()}"
         )
@@ -243,8 +254,8 @@ class FanoutComponent:
     def verify_geometry(self) -> None:
         html = self.label_html()
         verify_label_placeholders(html, title=self.title)
-        if f'viewBox="0 0 {self.w} {self.h}"' not in html:
-            raise ValueError(f"{self.title} label must use cell viewBox")
+        if f'viewBox="0 0 {self.w} {self.graphic_h}"' not in html:
+            raise ValueError(f"{self.title} label must use graphic viewBox")
         style = self.cell_style()
         verify_label_overflow_policy(
             html,
@@ -252,6 +263,7 @@ class FanoutComponent:
             title=self.title,
             design_cell_w=self.w,
             design_cell_h=self.h,
+            graphic_cell_h=self.graphic_h,
         )
         points = self._parse_points(style)
         expected = 1 + len(self._g.outputs)
@@ -301,6 +313,8 @@ def bind_module(module: object, component: FanoutComponent) -> None:
         "TAGS": component.tags,
         "W": component.w,
         "H": component.h,
+        "GRAPHIC_H": component.graphic_h,
+        "DEFAULT_INSTANCE_GAP": component.instance_name_gap_px,
         "G": component.g,
         "label_html": component.label_html,
         "preview_svg": component.preview_svg,
