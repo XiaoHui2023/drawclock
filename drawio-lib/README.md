@@ -109,10 +109,12 @@
 
 ### 时钟源
 
-| 库名 | 预览 |
-| --- | --- |
-| source | ![source](images/source.svg) |
-| pad | ![pad](images/pad.svg) |
+| 库名 | 预览 | 说明 |
+| --- | --- | --- |
+| source | ![source](images/source.svg) | 振荡源 |
+| vdd | ![vdd](images/vdd.svg) | 逻辑 1（电源） |
+| gnd | ![gnd](images/gnd.svg) | 逻辑 0（地） |
+| pad | ![pad](images/pad.svg) | I/O 输出 |
 
 | 属性 | 说明 |
 | --- | --- |

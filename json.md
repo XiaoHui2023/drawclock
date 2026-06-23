@@ -7,7 +7,7 @@
 {
   "xtal": {
     "kind": "source",        // 时钟源大类
-    "source_kind": "source"  // 小类：source / pad
+    "source_kind": "source"  // 小类：source / vdd / gnd / pad
   },
   "pll_main": {
     "kind": "pll",

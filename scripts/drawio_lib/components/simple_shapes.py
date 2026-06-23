@@ -690,6 +690,59 @@ def source_body(g: geom.SimpleGeometry) -> str:
     )
 
 
+VDD_BAR_LEFT = 10
+VDD_BAR_RIGHT = 28
+VDD_BAR_Y = 16
+VDD_STEM_X = 19
+VDD_PORT_X = SOURCE_PORT_X
+
+
+def vdd_port_cell(*, mid_y: int, pad: int = 0) -> tuple[tuple[float, int],]:
+    return ((pad + VDD_PORT_X, mid_y),)
+
+
+def vdd_body(g: geom.SimpleGeometry) -> str:
+    """Logic-1 / VDD: horizontal rail bar with vertical stem to output."""
+    mid = _mid(g)
+    bar_left = _dx(g, VDD_BAR_LEFT)
+    bar_right = _dx(g, VDD_BAR_RIGHT)
+    bar_y = VDD_BAR_Y
+    stem_x = _dx(g, VDD_STEM_X)
+    port_x = _dx(g, VDD_PORT_X)
+    return (
+        f'<path d="M {bar_left:.1f} {bar_y} L {bar_right:.1f} {bar_y} '
+        f'M {stem_x:.1f} {bar_y} L {stem_x:.1f} {mid} L {port_x:.1f} {mid}" '
+        f'fill="{FILL}" stroke="{STROKE}" stroke-width="{SW}" '
+        f'stroke-linecap="square" stroke-linejoin="miter"/>'
+    )
+
+
+GND_STEM_X = 19
+GND_PORT_X = SOURCE_PORT_X
+GND_LINE_Y = (34, 38, 42)
+GND_LINE_HALF_W = (8, 5, 3)
+
+
+def gnd_port_cell(*, mid_y: int, pad: int = 0) -> tuple[tuple[float, int],]:
+    return ((pad + GND_PORT_X, mid_y),)
+
+
+def gnd_body(g: geom.SimpleGeometry) -> str:
+    """Logic-0 / GND: output stem to three-line earth symbol."""
+    mid = _mid(g)
+    stem_x = _dx(g, GND_STEM_X)
+    port_x = _dx(g, GND_PORT_X)
+    segments = [
+        f"M {port_x:.1f} {mid} L {stem_x:.1f} {mid} L {stem_x:.1f} {GND_LINE_Y[0]}",
+    ]
+    for y, half_w in zip(GND_LINE_Y, GND_LINE_HALF_W):
+        segments.append(f"M {stem_x - half_w:.1f} {y} L {stem_x + half_w:.1f} {y}")
+    return (
+        f'<path d="{" ".join(segments)}" fill="{FILL}" stroke="{STROKE}" '
+        f'stroke-width="{SW}" stroke-linecap="square" stroke-linejoin="miter"/>'
+    )
+
+
 CLOCK_WAVE_PERIODS = 4
 CLOCK_WAVE_AMP = 6
 CLOCK_SW = 1.5

@@ -42,6 +42,8 @@ if str(SCRIPTS) not in sys.path:
         ("pll", 2),
         ("pll2", 3),
         ("source", 1),
+        ("vdd", 1),
+        ("gnd", 1),
         ("pad", 1),
         ("clock", 1),
         ("from", 1),
@@ -360,7 +362,7 @@ def test_inv_library_object_carries_kind_in_style(module_name: str, inv_kind: st
 
 @pytest.mark.parametrize(
     ("module_name", "source_kind"),
-    [("source", "source"), ("pad", "pad")],
+    [("source", "source"), ("vdd", "vdd"), ("gnd", "gnd"), ("pad", "pad")],
 )
 def test_clock_source_library_object_carries_kind_in_style(
     module_name: str, source_kind: str
