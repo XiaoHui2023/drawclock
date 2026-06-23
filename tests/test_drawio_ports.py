@@ -44,6 +44,46 @@ def test_bake_label_replaces_pll_kind_with_default() -> None:
     assert baked_lc == "<span>LC</span>"
 
 
+def test_bake_label_shrinks_div_r_ratio_font_for_long_values() -> None:
+    template = (
+        '<span style="font-size:11px;line-height:1;">÷</span>'
+        '<span style="font-size:8px;line-height:1;">%ratio%</span>'
+    )
+    baked = bake_label_placeholders(template, {"name": "d0", "ratio": "1234"})
+    assert "font-size:7px" in baked.split("÷</span>")[1]
+    short = bake_label_placeholders(template, {"name": "d0", "ratio": "2"})
+    assert "font-size:9px" in short.split("÷</span>")[1]
+
+
+def test_bake_label_mux_sel_empty_strips_stub() -> None:
+    from drawio_lib.components.label_html import mux_sel_signal_block
+
+    template = mux_sel_signal_block(
+        anchor_x=20,
+        anchor_y=6,
+        design_cell_w=40,
+        design_cell_h=80,
+    )
+    baked = bake_label_placeholders(template, {"name": "m0", "sel": ""})
+    assert "%sel%" not in baked
+    assert "dc-mux-sel" not in baked
+
+
+def test_bake_label_mux_sel_replaces_text() -> None:
+    from drawio_lib.components.label_html import mux_sel_signal_block
+
+    template = mux_sel_signal_block(
+        anchor_x=20,
+        anchor_y=6,
+        design_cell_w=40,
+        design_cell_h=80,
+    )
+    baked = bake_label_placeholders(template, {"name": "m0", "sel": "clk_sel"})
+    assert "clk_sel" in baked
+    assert "%sel%" not in baked
+    assert "dc-mux-sel" in baked
+
+
 def test_edge_port_style_uses_library_points() -> None:
     shapes = load_library_shapes(ROOT / "drawio-lib" / "drawclock.xml")
     pll = shapes["pll"]

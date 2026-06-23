@@ -66,6 +66,19 @@ def test_label_uses_non_scaling_layers() -> None:
     assert ">0</span>" in html
     assert ">1</span>" in html
     assert "in0_label" not in html
+    assert "%sel%" in html
+    assert "dc-mux-sel" in html
+
+
+def test_preview_svg_shows_sel_sample_but_library_label_does_not() -> None:
+    from drawio_lib.components.mux_component import PREVIEW_SEL_SAMPLE
+
+    preview = mux2.preview_svg()
+    assert PREVIEW_SEL_SAMPLE in preview
+    assert f'y2="{mux2.TRAP_Y}"' in preview
+    html = mux2.label_html()
+    assert "%sel%" in html
+    assert f">{PREVIEW_SEL_SAMPLE}</span>" not in html
 
 
 def test_edit_data_fields_and_type_in_style() -> None:
@@ -75,10 +88,12 @@ def test_edit_data_fields_and_type_in_style() -> None:
     assert "component_type=" not in mux2.cell_fragment("x")
     assert f"{mux2.DRAWCLOCK_TYPE_KEY}={mux2.DRAWCLOCK_TYPE_VALUE}" in mux2.cell_style()
     assert list(mux2.EDIT_DATA_ATTR_PREFIX) == [
+        "sel",
         "name",
         "label",
     ]
     fragment = mux2.cell_fragment("x")
+    assert 'sel=""' in fragment
     assert "in0_label" not in fragment
     assert "in1_label" not in fragment
 

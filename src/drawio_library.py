@@ -11,8 +11,11 @@ from pathlib import Path
 from internal_kind import INTERNAL_OBJECT_KEYS
 
 LABEL_PLACEHOLDER_RE = re.compile(
-    r"%(?:name|pll_kind|ratio|in\d+_label)%"
+    r"%(?:name|pll_kind|ratio|sel|in\d+_label)%"
 )
+
+_MUX_SEL_BLOCK_START = "<!--mux-sel-->"
+_MUX_SEL_BLOCK_END = "<!--/mux-sel-->"
 
 from drawio_decode import decompress_diagram_payload
 
@@ -161,6 +164,41 @@ DEFAULT_PLL_KIND = "SC"
 DEFAULT_DIV_RATIO = "2"
 
 
+def _div_r_ratio_font_px(digit_count: int) -> int:
+    if digit_count <= 2:
+        return 9
+    if digit_count <= 3:
+        return 8
+    if digit_count <= 4:
+        return 7
+    return 6
+
+
+def _patch_div_r_ratio_font(label: str, ratio: str) -> str:
+    """Shrink div_r ratio overlay font after bake (library template uses 3-digit default)."""
+    marker = ">÷</span>"
+    if marker not in label or ratio not in label:
+        return label
+    div_end = label.index(marker) + len(marker)
+    match = re.search(r"font-size:\d+px", label[div_end:])
+    if match is None:
+        return label
+    font_px = _div_r_ratio_font_px(len(ratio))
+    start = div_end + match.start()
+    end = div_end + match.end()
+    return label[:start] + f"font-size:{font_px}px" + label[end:]
+
+
+def _strip_mux_sel_block(html: str) -> str:
+    start = html.find(_MUX_SEL_BLOCK_START)
+    if start < 0:
+        return html
+    end = html.find(_MUX_SEL_BLOCK_END, start)
+    if end < 0:
+        return html
+    return html[:start] + html[end + len(_MUX_SEL_BLOCK_END) :]
+
+
 def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
     """Replace editable placeholders with object attribute values for draw.io display."""
     baked = label
@@ -170,7 +208,15 @@ def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
     if "%pll_kind%" in baked:
         baked = baked.replace("%pll_kind%", attrs.get("pll_kind", DEFAULT_PLL_KIND))
     if "%ratio%" in baked:
-        baked = baked.replace("%ratio%", attrs.get("ratio", DEFAULT_DIV_RATIO))
+        ratio = attrs.get("ratio", DEFAULT_DIV_RATIO)
+        baked = baked.replace("%ratio%", ratio)
+        baked = _patch_div_r_ratio_font(baked, ratio)
+    if "%sel%" in baked:
+        sel = attrs.get("sel", "").strip()
+        if sel:
+            baked = baked.replace("%sel%", sel)
+        else:
+            baked = _strip_mux_sel_block(baked)
     for index in range(6):
         key = f"in{index}_label"
         token = f"%{key}%"

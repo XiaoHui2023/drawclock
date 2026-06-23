@@ -321,10 +321,13 @@ def test_div_r_center_label_two_lines() -> None:
     assert ">÷</span>" in html
     assert "%ratio%" in html
     mid = div_r.G.body_mid_y
-    symbol_top = (mid - 5) / div_r.GRAPHIC_H * 100
-    ratio_top = (mid + 5) / div_r.GRAPHIC_H * 100
+    ratio_y = mid + 6 - 4 + 2
+    symbol_y = ratio_y - 9
+    symbol_top = symbol_y / div_r.GRAPHIC_H * 100
+    ratio_top = ratio_y / div_r.GRAPHIC_H * 100
     assert f"top:{symbol_top}%" in html
     assert f"top:{ratio_top}%" in html
+    assert "font-size:8px" in html
 
 
 def test_div_r_library_object_carries_ratio_default() -> None:

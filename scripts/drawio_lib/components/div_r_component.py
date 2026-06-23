@@ -5,13 +5,28 @@ from dataclasses import dataclass
 from drawio_lib.components import simple_geometry as geom
 from drawio_lib.components.label_attrs import ATTR_NAME, LABEL_FONT_PX
 from drawio_lib.components.simple_component import STROKE, SimpleComponent
-from drawio_lib.components.simple_shapes import div_r_body
+from drawio_lib.components.simple_shapes import DIV_HEX_FLAT_BOTTOM_Y_OFFSET, div_r_body
 from drawio_lib.xml_io import xml_attr
 
 ATTR_RATIO = "ratio"
 DEFAULT_RATIO = "2"
-DIV_SYMBOL_LINE_OFFSET = 5
-DIV_RATIO_LINE_OFFSET = 5
+# Hex inner width ~21px; 8px fits three digits with margin in the library template.
+DIV_RATIO_FONT_PX = 8
+# ÷ and ratio center-to-center spacing in the hex body.
+_DIV_R_LABEL_GAP = 9
+# Helvetica digits sit above the em-box bottom; nudge down to meet the hex flat edge.
+_DIV_R_DIGIT_BASELINE_NUDGE = 2
+
+
+def div_r_ratio_font_px(digit_count: int) -> int:
+    """Font size for ratio overlay; smaller when more digits (used at bake time)."""
+    if digit_count <= 2:
+        return 9
+    if digit_count <= 3:
+        return DIV_RATIO_FONT_PX
+    if digit_count <= 4:
+        return 7
+    return 6
 
 
 @dataclass
@@ -29,9 +44,16 @@ class DivRComponent(SimpleComponent):
     def _center_labels(self) -> tuple[tuple[float, float, str, int], ...]:
         cx = self.w / 2
         mid = self._g.body_mid_y
+        ratio_y = (
+            mid
+            + DIV_HEX_FLAT_BOTTOM_Y_OFFSET
+            - DIV_RATIO_FONT_PX / 2
+            + _DIV_R_DIGIT_BASELINE_NUDGE
+        )
+        symbol_y = ratio_y - _DIV_R_LABEL_GAP
         return (
-            (cx, mid - DIV_SYMBOL_LINE_OFFSET, "÷", LABEL_FONT_PX),
-            (cx, mid + DIV_RATIO_LINE_OFFSET, f"%{ATTR_RATIO}%", LABEL_FONT_PX),
+            (cx, symbol_y, "÷", LABEL_FONT_PX),
+            (cx, ratio_y, f"%{ATTR_RATIO}%", DIV_RATIO_FONT_PX),
         )
 
     def label_html(self) -> str:
@@ -100,12 +122,17 @@ class DivRComponent(SimpleComponent):
                 f'fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">'
                 f"{self.title}</text>"
             )
-        symbol_y = mid - DIV_SYMBOL_LINE_OFFSET
-        ratio_y = mid + DIV_RATIO_LINE_OFFSET
+        ratio_y = (
+            mid
+            + DIV_HEX_FLAT_BOTTOM_Y_OFFSET
+            - DIV_RATIO_FONT_PX / 2
+            + _DIV_R_DIGIT_BASELINE_NUDGE
+        )
+        symbol_y = ratio_y - _DIV_R_LABEL_GAP
         return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" viewBox="0 0 {self.w} {self.h}">
 {body}
   <text x="{cx}" y="{symbol_y}" font-size="{LABEL_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">÷</text>
-  <text x="{cx}" y="{ratio_y}" font-size="{LABEL_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{DEFAULT_RATIO}</text>
+  <text x="{cx}" y="{ratio_y}" font-size="{DIV_RATIO_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{DEFAULT_RATIO}</text>
 {stubs}{name_line}
 </svg>
 """

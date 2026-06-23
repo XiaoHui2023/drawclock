@@ -42,6 +42,7 @@
   },
   "mux2": {
     "kind": "mux2",
+    "sel": "clk_sel",  // 可选；图中填写则原样导出，未填则不出现在 JSON
     "source": {
       "0": "pll_m2a",  // 多路输入：source 为 dict，键为 str（序号或端口名）
       "1": "pll_m2b"

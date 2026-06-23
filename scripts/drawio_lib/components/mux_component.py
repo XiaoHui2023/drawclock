@@ -9,11 +9,16 @@ from drawio_lib.components import mux_geometry as geom
 from drawio_lib.components import simple_geometry as sgeom
 from drawio_lib.components.label_attrs import (
     ATTR_NAME,
+    ATTR_SEL,
     INSTANCE_NAME_GAP_LOOSE_PX,
     LABEL_FONT_PX,
     verify_label_placeholders,
 )
 from drawio_lib.components.label_html import (
+    MUX_SEL_BLOCK_START,
+    MUX_SEL_LINE_HEIGHT_PX,
+    mux_sel_preview_svg,
+    mux_sel_signal_block,
     name_block,
     shell_close,
     shell_open,
@@ -32,6 +37,8 @@ DEFAULT_INSTANCE_GAP = INSTANCE_NAME_GAP_LOOSE_PX
 LABEL_INSET_X = 6
 ATTR_INSTANCE_NAME = ATTR_NAME
 DRAWCLOCK_TYPE_KEY = "drawclockType"
+PREVIEW_SEL_SAMPLE = "sel"
+PREVIEW_SEL_PAD_TOP = MUX_SEL_LINE_HEIGHT_PX + LABEL_FONT_PX + 4
 
 
 @dataclass
@@ -97,11 +104,14 @@ class MuxComponent:
 
     @property
     def edit_data_attr_prefix(self) -> tuple[str, ...]:
-        return (ATTR_NAME, "label")
+        return (ATTR_SEL, ATTR_NAME, "label")
 
     @property
     def required_object_attrs(self) -> tuple[str, ...]:
-        return (ATTR_NAME,)
+        return (ATTR_SEL, ATTR_NAME)
+
+    def _sel_anchor(self) -> tuple[float, int]:
+        return self.w / 2, self._t.y
 
     def label_html(self) -> str:
         poly = geom.trapezoid_cell_points(self._t)
@@ -115,8 +125,10 @@ class MuxComponent:
             for i, port in enumerate(self._g.inputs)
         )
         name_top = self._g.mux_h
+        sel_x, sel_y = self._sel_anchor()
         return (
             f"{shell_open(self.w, self.h)}"
+            f"{mux_sel_signal_block(anchor_x=sel_x, anchor_y=sel_y, design_cell_w=self.w, design_cell_h=self.h, stroke=STROKE)}"
             f"{stretch_body_layer(body, view_w=self.w, view_h=self.graphic_h, overlays=in_overlays)}"
             f"{name_block(name_top, design_cell_h=self.h, gap_px=INSTANCE_NAME_GAP_LOOSE_PX)}"
             f"{shell_close()}"
@@ -149,8 +161,16 @@ class MuxComponent:
                 f"{i}</text>"
             )
         text_block = "\n".join(texts)
-        return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" viewBox="0 0 {self.w} {self.h}">
-  <polygon points="{poly}" fill="{FILL}" stroke="{STROKE}" stroke-width="2"/>
+        sel_x, sel_y = self._sel_anchor()
+        sel_preview = mux_sel_preview_svg(
+            anchor_x=sel_x,
+            anchor_y=sel_y,
+            text=PREVIEW_SEL_SAMPLE,
+            stroke=STROKE,
+        )
+        view_h = self.h + PREVIEW_SEL_PAD_TOP
+        return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{view_h}" viewBox="0 {-PREVIEW_SEL_PAD_TOP} {self.w} {view_h}">
+{sel_preview}  <polygon points="{poly}" fill="{FILL}" stroke="{STROKE}" stroke-width="2"/>
 {stubs}
 {text_block}
   <text x="{self.w // 2}" y="{name_y}" font-size="{LABEL_FONT_PX}" fill="{STROKE}"
@@ -173,13 +193,16 @@ class MuxComponent:
         cell_id: str,
         instance_name: str | None = None,
         *,
+        sel: str = "",
         x: int | None = None,
         y: int | None = None,
     ) -> str:
         style = self.cell_style()
         name = xml_attr(instance_name if instance_name is not None else self.title)
+        sel_val = xml_attr(sel)
         label = xml_attr(self.label_html())
         attrs = [
+            f'{ATTR_SEL}="{sel_val}"',
             f'{ATTR_NAME}="{name}"',
             f'label="{label}"',
             'placeholders="1"',
@@ -296,6 +319,10 @@ class MuxComponent:
             raise ValueError(f"{self.title} label must not draw port stub lines")
         if "in0_label" in html:
             raise ValueError(f"{self.title} input labels must be fixed text")
+        if f">%{ATTR_SEL}%</span>" not in html:
+            raise ValueError(f"{self.title} must render sel signal as HTML overlay")
+        if MUX_SEL_BLOCK_START not in html:
+            raise ValueError(f"{self.title} label must include mux sel stub block")
         style = self.cell_style()
         verify_label_overflow_policy(
             html,
@@ -380,9 +407,11 @@ def bind_module(module: object, component: MuxComponent) -> None:
         "DEFAULT_INSTANCE_GAP": DEFAULT_INSTANCE_GAP,
         "LABEL_INSET_X": LABEL_INSET_X,
         "ATTR_INSTANCE_NAME": ATTR_INSTANCE_NAME,
+        "ATTR_SEL": ATTR_SEL,
         "LABEL_FONT_PX": LABEL_FONT_PX,
         "DRAWCLOCK_TYPE_KEY": DRAWCLOCK_TYPE_KEY,
         "DRAWCLOCK_TYPE_VALUE": component.drawclock_type,
+        "PREVIEW_SEL_SAMPLE": PREVIEW_SEL_SAMPLE,
         "EDIT_DATA_ATTR_PREFIX": component.edit_data_attr_prefix,
         "REQUIRED_OBJECT_ATTRS": component.required_object_attrs,
         "label_html": component.label_html,

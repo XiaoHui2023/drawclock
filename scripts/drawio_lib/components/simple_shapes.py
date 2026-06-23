@@ -59,6 +59,7 @@ def gate_body(g: geom.SimpleGeometry) -> str:
 
 
 DIV_HEX_R = 12
+DIV_HEX_FLAT_BOTTOM_Y_OFFSET = round(DIV_HEX_R * math.sin(math.pi / 6))
 DIV_SYMBOL_HALF_W = 5.5
 DIV_SYMBOL_DOT_R = 1.4
 DIV_SYMBOL_DOT_OFFSET = 4.5
