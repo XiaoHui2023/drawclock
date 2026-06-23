@@ -28,7 +28,7 @@ from drawio_lib.components import simple_geometry as sgeom
     [
         "gate",
         "div",
-        "div2",
+        "div_r",
         "div_n",
         "dto",
         "dto_n",

@@ -20,7 +20,7 @@ from drawio_library import (
 from drawio_ports import reload_edge_style
 
 DRAWCLOCK_TYPE_RE = re.compile(r"drawclockType=([^;]+)")
-DRAWCLOCK_TYPE_ALIASES = {"clksrc": "source"}
+DRAWCLOCK_TYPE_ALIASES = {"clksrc": "source", "div2": "div_r"}
 
 
 def reload_drawio_file(

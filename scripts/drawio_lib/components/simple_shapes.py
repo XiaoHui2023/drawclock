@@ -106,8 +106,8 @@ def div_body(g: geom.SimpleGeometry) -> str:
     )
 
 
-def div2_body(g: geom.SimpleGeometry) -> str:
-    """Hexagon divide-by-2; center ÷2 rendered as HTML overlay."""
+def div_r_body(g: geom.SimpleGeometry) -> str:
+    """Hexagon for div_r; ÷ and ratio render as HTML overlays."""
     cx = _dx(g, geom.DESIGN_W / 2)
     cy = _mid(g)
     hex_pts = _hex_points(cx, cy, DIV_HEX_R)

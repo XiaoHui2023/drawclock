@@ -39,7 +39,7 @@
 | 库名 | 预览 |
 | --- | --- |
 | div | ![div](images/div.svg) |
-| div2 | ![div2](images/div2.svg) |
+| div_r | ![div_r](images/div_r.svg) |
 | div_n | ![div_n](images/div_n.svg) |
 | dto | ![dto](images/dto.svg) |
 | dto_n | ![dto_n](images/dto_n.svg) |
@@ -48,6 +48,7 @@
 | 属性 | 说明 |
 | --- | --- |
 | `name` | 实例名 |
+| `ratio` | 分频系数（仅 `div_r`，默认 `2`） |
 
 ### clk_phase_sel
 

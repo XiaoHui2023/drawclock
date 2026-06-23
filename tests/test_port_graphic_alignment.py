@@ -123,7 +123,7 @@ def test_dto_ports_on_chip_outline(module_name: str) -> None:
     assert rect is not None
 
 
-@pytest.mark.parametrize("module_name", ["div", "div2", "div_n"])
+@pytest.mark.parametrize("module_name", ["div", "div_r", "div_n"])
 def test_div_ports_on_hex_outline(module_name: str) -> None:
     mod = importlib.import_module(f"drawio_lib.components.{module_name}")
     mid = mod.G.body_mid_y

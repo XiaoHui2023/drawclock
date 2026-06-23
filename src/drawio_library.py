@@ -11,7 +11,7 @@ from pathlib import Path
 from internal_kind import INTERNAL_OBJECT_KEYS
 
 LABEL_PLACEHOLDER_RE = re.compile(
-    r"%(?:name|pll_kind|in\d+_label)%"
+    r"%(?:name|pll_kind|ratio|in\d+_label)%"
 )
 
 from drawio_decode import decompress_diagram_payload
@@ -158,6 +158,7 @@ def canonical_vertex_style(
 
 
 DEFAULT_PLL_KIND = "SC"
+DEFAULT_DIV_RATIO = "2"
 
 
 def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
@@ -168,6 +169,8 @@ def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
         baked = baked.replace("%name%", name)
     if "%pll_kind%" in baked:
         baked = baked.replace("%pll_kind%", attrs.get("pll_kind", DEFAULT_PLL_KIND))
+    if "%ratio%" in baked:
+        baked = baked.replace("%ratio%", attrs.get("ratio", DEFAULT_DIV_RATIO))
     for index in range(6):
         key = f"in{index}_label"
         token = f"%{key}%"

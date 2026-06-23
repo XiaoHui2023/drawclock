@@ -18,7 +18,7 @@ if str(SCRIPTS) not in sys.path:
     [
         ("gate", 2),
         ("div", 2),
-        ("div2", 2),
+        ("div_r", 2),
         ("div_n", 2),
         ("cpu_gate", 4),
         ("dto", 2),
@@ -313,6 +313,25 @@ def test_pll_center_label_on_graphic() -> None:
     html = pll.label_html()
     assert f"left:{left_pct}%" in html
     assert "%pll_kind%" in html
+
+
+def test_div_r_center_label_two_lines() -> None:
+    div_r = importlib.import_module("drawio_lib.components.div_r")
+    html = div_r.label_html()
+    assert ">÷</span>" in html
+    assert "%ratio%" in html
+    mid = div_r.G.body_mid_y
+    symbol_top = (mid - 5) / div_r.GRAPHIC_H * 100
+    ratio_top = (mid + 5) / div_r.GRAPHIC_H * 100
+    assert f"top:{symbol_top}%" in html
+    assert f"top:{ratio_top}%" in html
+
+
+def test_div_r_library_object_carries_ratio_default() -> None:
+    div_r = importlib.import_module("drawio_lib.components.div_r")
+    frag = div_r.cell_fragment("2")
+    assert 'ratio="2"' in frag
+    assert "%ratio%" in frag
 
 
 def test_pll_library_object_carries_pll_kind_default() -> None:

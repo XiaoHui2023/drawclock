@@ -68,7 +68,7 @@ def test_mux_first_input_aligns_with_standard_port_row(num_inputs: int) -> None:
     [
         "gate",
         "div",
-        "div2",
+        "div_r",
         "div_n",
         "dto",
         "dto_n",
