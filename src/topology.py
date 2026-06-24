@@ -285,6 +285,9 @@ def _diagnose_missing_inputs(
 ) -> list[str]:
   hints: list[str] = []
   topology = topology_for_type(state.kind, library_path=library_path)
+  missing_sorted = sorted(missing)
+  explained_ports: set[str] = set()
+  still_missing_noted: set[str] = set()
   incoming: list[GraphCell] = []
   outgoing: list[GraphCell] = []
 
@@ -296,8 +299,6 @@ def _diagnose_missing_inputs(
     elif edge.source_id == cell_id:
       outgoing.append(edge)
 
-  explained = False
-
   for edge in incoming:
     src, tgt = _edge_endpoints(edge, diagram)
     src_name = _peer_label(src, edge.source_id)
@@ -306,13 +307,11 @@ def _diagnose_missing_inputs(
 
     if src is None or tgt is None:
       hints.append(f"{prefix}：source 或 target 缺失，已忽略")
-      explained = True
       continue
 
     if not src.drawclock_type or not tgt.drawclock_type:
       bad = "source" if not src.drawclock_type else "target"
       hints.append(f"{prefix}：{bad} 端不是 drawclock 器件，已忽略")
-      explained = True
       continue
 
     entry_xy = edge_attachment(edge.style, end="entry")
@@ -320,29 +319,25 @@ def _diagnose_missing_inputs(
 
     if entry_xy is None:
       hints.append(f"{prefix}：缺少 entry 端口附着")
-      explained = True
       continue
 
     if resolved and is_output_port(resolved, topology):
       hints.append(
-        f"{prefix}：entry 落在输出口 {resolved}，不能作为输入；"
-        f"请改接到 {', '.join(sorted(missing))}"
+        f"{prefix}：entry 误接输出口 {resolved}，应接入 {', '.join(missing_sorted)}"
       )
-      explained = True
       continue
 
     if resolved and is_input_port(resolved, topology) and resolved not in missing:
       hints.append(
-        f"{prefix}：entry 落在 {resolved}，不是缺失的 {', '.join(sorted(missing))}"
+        f"{prefix}：{resolved} 已接入，尚缺 {', '.join(missing_sorted)}"
       )
-      explained = True
+      still_missing_noted.update(missing)
       continue
 
     if resolved is None:
       hints.append(
         f"{prefix}：entry 未对齐到器件端口；可 drawclock reload 或重画连线"
       )
-      explained = True
 
   for edge in outgoing:
     src, tgt = _edge_endpoints(edge, diagram)
@@ -353,12 +348,19 @@ def _diagnose_missing_inputs(
     resolved = resolve_port(state.points, exit_xy)
     if resolved and is_input_port(resolved, topology) and resolved in missing:
       hints.append(
-        f"  · 连线 {state.name}→{tgt_name}：方向反了（exit 在 {resolved}）；"
-        f"应改为 {tgt_name}→{state.name}"
+        f"  · {resolved}：连线 {state.name}→{tgt_name} 方向反了，"
+        f"应为 {tgt_name}→{state.name}"
       )
-      explained = True
+      explained_ports.add(resolved)
 
-  if not incoming and not explained:
+  for port in missing_sorted:
+    if port in explained_ports:
+      continue
+    if port in still_missing_noted and len(missing) == 1:
+      continue
+    hints.append(f"  · {port}：无入线指向 {state.name}")
+
+  if not incoming and not outgoing and not hints:
     hints.append(f"  · 未发现指向 {state.name} 的连线")
 
   return hints
