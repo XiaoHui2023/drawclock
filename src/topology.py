@@ -6,11 +6,8 @@ from device_model import DeviceState
 from drawio_graph import GraphCell, ParsedDiagram, edge_attachment
 from from_resolve import FromEndpoints, build_from_endpoints
 from library_ports import (
-  PORT_MATCH_MAX_DIST_SQ,
   is_input_port,
   is_output_port,
-  nearest_port,
-  port_topology_from_points,
   resolve_port,
   topology_for_type,
 )
@@ -210,11 +207,6 @@ def validate_topology(
             library_path=library_path,
           )
         )
-      else:
-        for port in sorted(missing_inputs):
-          block.append(
-            f"  · {port} 期望坐标约为 {_port_xy_hint(state.points, port)}"
-          )
       errors.append("\n".join(block))
 
   for state in devices.values():
@@ -240,8 +232,6 @@ def validate_topology(
               library_path=library_path,
             )
           )
-        else:
-          block.append(f"  · {port} 期望坐标约为 {_port_xy_hint(state.points, port)}")
         errors.append("\n".join(block))
       continue
     for port in topology.outputs:
@@ -260,8 +250,6 @@ def validate_topology(
               library_path=library_path,
             )
           )
-        else:
-          block.append(f"  · {port} 期望坐标约为 {_port_xy_hint(state.points, port)}")
         errors.append("\n".join(block))
 
   for state in devices.values():
@@ -285,24 +273,6 @@ def _name_to_cell_id(devices: dict[str, DeviceState]) -> dict[str, str]:
       continue
     mapping[state.name] = cell_id
   return mapping
-
-
-def _fmt_xy(xy: tuple[float, float] | None) -> str:
-  if xy is None:
-    return "（未设置 entryX/entryY 或 exitX/exitY）"
-  return f"({xy[0]:g},{xy[1]:g})"
-
-
-def _port_xy_hint(points: tuple[tuple[float, float], ...], port: str) -> str:
-  topology = port_topology_from_points(points)
-  anchors: dict[str, tuple[float, float]] = {}
-  for index, key in enumerate(topology.index_to_key):
-    if index < len(points):
-      anchors[key] = points[index]
-  xy = anchors.get(port)
-  if xy is None:
-    return "未知"
-  return _fmt_xy(xy)
 
 
 def _edge_endpoints(
@@ -351,7 +321,7 @@ def _diagnose_missing_inputs(
     src, tgt = _edge_endpoints(edge, diagram)
     src_name = _peer_label(src, edge.source_id)
     tgt_name = _peer_label(tgt, edge.target_id)
-    prefix = f"  · 连线 {src_name}→{tgt_name}（edge {edge.cell_id}）"
+    prefix = f"  · 连线 {src_name}→{tgt_name}"
 
     if src is None or tgt is None:
       hints.append(f"{prefix}：source 或 target 缺失，已忽略")
@@ -360,7 +330,7 @@ def _diagnose_missing_inputs(
 
     if not src.drawclock_type or not tgt.drawclock_type:
       bad = "source" if not src.drawclock_type else "target"
-      hints.append(f"{prefix}：{bad} 端不是 drawclock 器件（无 drawclockType），已忽略")
+      hints.append(f"{prefix}：{bad} 端不是 drawclock 器件，已忽略")
       explained = True
       continue
 
@@ -368,38 +338,28 @@ def _diagnose_missing_inputs(
     resolved = resolve_port(state.points, entry_xy)
 
     if entry_xy is None:
-      hints.append(f"{prefix}：缺少 entryX/entryY")
+      hints.append(f"{prefix}：缺少 entry 端口附着")
       explained = True
       continue
 
     if resolved and is_output_port(resolved, topology):
       hints.append(
-        f"{prefix}：entry 落在输出端口 {resolved}（坐标{_fmt_xy(entry_xy)}），"
-        f"不能作为输入；请改接到左侧输入 {', '.join(sorted(missing))}"
+        f"{prefix}：entry 落在输出口 {resolved}，不能作为输入；"
+        f"请改接到 {', '.join(sorted(missing))}"
       )
       explained = True
       continue
 
     if resolved and is_input_port(resolved, topology) and resolved not in missing:
       hints.append(
-        f"{prefix}：entry 落在输入端口 {resolved}（坐标{_fmt_xy(entry_xy)}），"
-        f"不是缺失的 {', '.join(sorted(missing))}"
+        f"{prefix}：entry 落在 {resolved}，不是缺失的 {', '.join(sorted(missing))}"
       )
       explained = True
       continue
 
     if resolved is None:
-      nearest, dist_sq = nearest_port(state.points, entry_xy)
-      fallback = topology.inputs[0] if topology.inputs else None
-      tail = (
-        f"；按规则应回退到 {fallback}，但仍缺 {', '.join(sorted(missing))}"
-        if fallback in missing
-        else ""
-      )
       hints.append(
-        f"{prefix}：entry 坐标{_fmt_xy(entry_xy)} 与各端口距离均超阈值"
-        f"（最近 {nearest}，距离²={dist_sq:.4g}，阈值={PORT_MATCH_MAX_DIST_SQ:g}）"
-        f"{tail}；可尝试 drawclock reload 同步端口坐标"
+        f"{prefix}：entry 未对齐到器件端口；可 drawclock reload 或重画连线"
       )
       explained = True
 
@@ -412,17 +372,13 @@ def _diagnose_missing_inputs(
     resolved = resolve_port(state.points, exit_xy)
     if resolved and is_input_port(resolved, topology) and resolved in missing:
       hints.append(
-        f"  · 连线 {state.name}→{tgt_name}（edge {edge.cell_id}）："
-        f"source/target 方向反了；exit 在输入口 {resolved}（坐标{_fmt_xy(exit_xy)}）。"
-        f"应从上游指向本器件（source={tgt_name}, target={state.name}）"
+        f"  · 连线 {state.name}→{tgt_name}：方向反了（exit 在 {resolved}）；"
+        f"应改为 {tgt_name}→{state.name}"
       )
       explained = True
 
   if not incoming and not explained:
-    hints.append(f"  · 未发现任何以 {state.name} 为 target 的连线")
-
-  for port in sorted(missing):
-    hints.append(f"  · {port} 在图中的期望坐标约为 {_port_xy_hint(state.points, port)}")
+    hints.append(f"  · 未发现指向 {state.name} 的连线")
 
   return hints
 
@@ -453,37 +409,33 @@ def _diagnose_missing_outputs(
   for edge in outgoing:
     src, tgt = _edge_endpoints(edge, diagram)
     tgt_name = _peer_label(tgt, edge.target_id)
-    prefix = f"  · 连线 {state.name}→{tgt_name}（edge {edge.cell_id}）"
+    prefix = f"  · 连线 {state.name}→{tgt_name}"
     exit_xy = edge_attachment(edge.style, end="exit")
     resolved = resolve_port(state.points, exit_xy)
 
     if exit_xy is None:
-      hints.append(f"{prefix}：缺少 exitX/exitY")
+      hints.append(f"{prefix}：缺少 exit 端口附着")
       explained = True
       continue
 
     if resolved and is_input_port(resolved, topology):
       hints.append(
-        f"{prefix}：exit 落在输入口 {resolved}（坐标{_fmt_xy(exit_xy)}），不会登记输出；"
-        f"输出应从本器件指向下游（source={state.name}, target=下游）"
+        f"{prefix}：exit 落在输入口 {resolved}，不会登记输出；"
+        f"应从 {state.name} 指向下游"
       )
       explained = True
       continue
 
     if resolved and is_output_port(resolved, topology) and resolved not in missing:
       hints.append(
-        f"{prefix}：exit 落在 {resolved}（坐标{_fmt_xy(exit_xy)}），"
-        f"不是缺失的 {', '.join(sorted(missing))}"
+        f"{prefix}：exit 落在 {resolved}，不是缺失的 {', '.join(sorted(missing))}"
       )
       explained = True
       continue
 
     if resolved is None:
-      nearest, dist_sq = nearest_port(state.points, exit_xy)
       hints.append(
-        f"{prefix}：exit 坐标{_fmt_xy(exit_xy)} 与各端口距离均超阈值"
-        f"（最近 {nearest}，距离²={dist_sq:.4g}，阈值={PORT_MATCH_MAX_DIST_SQ:g}）"
-        f"；可尝试 drawclock reload 同步端口坐标"
+        f"{prefix}：exit 未对齐到器件端口；可 drawclock reload 或重画连线"
       )
       explained = True
 
@@ -494,17 +446,13 @@ def _diagnose_missing_outputs(
     resolved = resolve_port(state.points, entry_xy)
     if resolved and is_output_port(resolved, topology) and resolved in missing:
       hints.append(
-        f"  · 连线 {src_name}→{state.name}（edge {edge.cell_id}）："
-        f"source/target 方向反了；entry 在输出口 {resolved}（坐标{_fmt_xy(entry_xy)}）。"
-        f"应从本器件指向下游（source={state.name}, target={src_name}）"
+        f"  · 连线 {src_name}→{state.name}：方向反了（entry 在 {resolved}）；"
+        f"应改为 {state.name}→{src_name}"
       )
       explained = True
 
   if not outgoing and not explained:
-    hints.append(f"  · 未发现任何以 {state.name} 为 source 的连线")
-
-  for port in sorted(missing):
-    hints.append(f"  · {port} 在图中的期望坐标约为 {_port_xy_hint(state.points, port)}")
+    hints.append(f"  · 未发现从 {state.name} 指出的连线")
 
   return hints
 

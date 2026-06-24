@@ -92,7 +92,7 @@ def test_mux_missing_in0_reports_reversed_edge(tmp_path: Path) -> None:
     assert "未连接的输入端口" in msg
     assert "in0" in msg
     assert "方向反了" in msg
-    assert "source=pll0, target=mux0" in msg
+    assert "pll0→mux0" in msg
 
 
 def test_mux_missing_in0_reports_entry_on_output(tmp_path: Path) -> None:
@@ -112,7 +112,7 @@ def test_mux_missing_in0_reports_entry_on_output(tmp_path: Path) -> None:
         parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
 
     msg = str(exc.value)
-    assert "entry 落在输出端口 out" in msg
+    assert "entry 落在输出口 out" in msg
     assert "in0" in msg
 
 
@@ -133,7 +133,7 @@ def test_mux_missing_in0_reports_wrong_input_port(tmp_path: Path) -> None:
         parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
 
     msg = str(exc.value)
-    assert "entry 落在输入端口 in1" in msg
+    assert "entry 落在 in1" in msg
     assert "不是缺失的 in0" in msg
 
 
@@ -154,5 +154,4 @@ def test_mux_missing_in0_reports_no_incoming_edge(tmp_path: Path) -> None:
         parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
 
     msg = str(exc.value)
-    assert "未发现任何以 mux0 为 target 的连线" in msg
-    assert "in0 在图中的期望坐标约为" in msg
+    assert "未发现指向 mux0 的连线" in msg
