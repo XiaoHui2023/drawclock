@@ -9,6 +9,7 @@ from internal_kind import INTERNAL_OBJECT_KEYS, STYLE_KEY_TO_JSON
 
 DRAWCLOCK_TYPE_RE = re.compile(r"drawclockType=([^;]+)")
 STYLE_XY_RE = re.compile(r"(exit|entry)(X|Y)=([0-9.]+)")
+STYLE_KV_RE = re.compile(r"(?:^|;)([^=;]+)=([^;]*)")
 
 
 @dataclass
@@ -230,6 +231,23 @@ def _parse_points(style: str) -> tuple[tuple[float, float], ...]:
             continue
         coords.append((float(parts[0]), float(parts[1])))
     return tuple(coords)
+
+
+def edge_style_value(style: str, key: str, *, default: str | None = None) -> str | None:
+    normalized = style.strip()
+    if not normalized:
+        return default
+    for match in STYLE_KV_RE.finditer(f";{normalized}"):
+        if match.group(1) == key:
+            return match.group(2)
+    return default
+
+
+def edge_is_undirected(style: str) -> bool:
+    """True when both ends have no arrow (draw.io default end arrow counts as directed)."""
+    start = edge_style_value(style, "startArrow", default="none")
+    end = edge_style_value(style, "endArrow", default="classic")
+    return start == "none" and end == "none"
 
 
 def edge_attachment(style: str, *, end: str) -> tuple[float, float] | None:

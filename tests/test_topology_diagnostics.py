@@ -72,18 +72,44 @@ def _write_model(tmp_path: Path, name: str, body: str) -> Path:
     return path
 
 
-def test_mux_missing_in0_reports_reversed_edge(tmp_path: Path) -> None:
+def test_reversed_undirected_edge_auto_orients(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    gate = shapes["gate"]
+    src_out = port_anchors(source.style, "source")["right"]
+    gate_in = port_anchors(gate.style, "gate")["left"]
+    body = (
+        f"{_library_object(10, 'src0', source)}"
+        f"{_library_object(11, 'gate0', gate)}"
+        f"{_edge_raw(20, 11, 10, exit_x=gate_in[0], exit_y=gate_in[1], entry_x=src_out[0], entry_y=src_out[1])}"
+    )
+    path = _write_model(tmp_path, "reversed-gate.drawio", body)
+
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+    assert config["gate0"]["kind"] == "gate"
+    assert config["gate0"]["source"] == "src0"
+
+
+def test_mux_missing_in0_reports_reversed_edge_when_directed(tmp_path: Path) -> None:
     shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
     pll = shapes["pll"]
     mux2 = shapes["mux2"]
     in0 = port_anchors(mux2.style, "mux2")["in0"]
     right = port_anchors(pll.style, "pll")["right"]
+    style = (
+        "edgeStyle=none;rounded=0;html=1;endArrow=classic;startArrow=none;"
+        f"exitX={in0[0]};exitY={in0[1]};entryX={right[0]};entryY={right[1]};"
+        "exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;"
+    )
     body = (
         f"{_library_object(10, 'pll0', pll)}"
         f"{_library_object(11, 'mux0', mux2)}"
-        f"{_edge_raw(20, 11, 10, exit_x=in0[0], exit_y=in0[1], entry_x=right[0], entry_y=right[1])}"
+        f"<mxCell id=\"20\" style={quoteattr(style)} edge=\"1\" parent=\"1\" "
+        f"source=\"11\" target=\"10\">"
+        "<mxGeometry relative=\"1\" as=\"geometry\"/>"
+        "</mxCell>"
     )
-    path = _write_model(tmp_path, "reversed-mux.drawio", body)
+    path = _write_model(tmp_path, "directed-reversed-mux.drawio", body)
 
     with pytest.raises(ValueError) as exc:
         parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
@@ -92,7 +118,6 @@ def test_mux_missing_in0_reports_reversed_edge(tmp_path: Path) -> None:
     assert "未连接的输入端口" in msg
     assert "in0" in msg
     assert "方向反了" in msg
-    assert "pll0→mux0" in msg or "应为 pll0→mux0" in msg
 
 
 def test_mux_missing_in0_reports_entry_on_output(tmp_path: Path) -> None:
@@ -137,7 +162,7 @@ def test_mux_missing_in0_reports_wrong_input_port(tmp_path: Path) -> None:
     assert "尚缺 in0" in msg
 
 
-def test_mux_in0_reversed_in1_missing_reports_both_ports(tmp_path: Path) -> None:
+def test_mux_in0_reversed_in1_missing_reports_open_in1_only(tmp_path: Path) -> None:
     shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
     pll = shapes["pll"]
     mux2 = shapes["mux2"]
@@ -154,9 +179,8 @@ def test_mux_in0_reversed_in1_missing_reports_both_ports(tmp_path: Path) -> None
         parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
 
     msg = str(exc.value)
-    assert "in0" in msg
     assert "in1" in msg
-    assert "方向反了" in msg
+    assert "方向反了" not in msg
     assert "in1：无入线指向 mux0" in msg
 
 

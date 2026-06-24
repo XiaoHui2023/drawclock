@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from device_model import DeviceState
-from drawio_graph import GraphCell, ParsedDiagram, edge_attachment
+from drawio_graph import GraphCell, ParsedDiagram, edge_attachment, edge_is_undirected
 from from_resolve import FromEndpoints, build_from_endpoints
 from library_ports import (
   PortTopology,
@@ -57,28 +57,58 @@ def build_device_states(
       continue
     exit_xy = edge_attachment(edge.style, end="exit")
     entry_xy = edge_attachment(edge.style, end="entry")
-    src_exit_port = resolve_port(src.points, exit_xy)
-    _bind_endpoint(
-      devices,
-      from_by_name,
-      src,
-      exit_xy,
-      tgt.name,
-      outgoing=True,
-      from_names=from_names,
-      library_path=library_path,
-    )
-    _bind_endpoint(
-      devices,
-      from_by_name,
-      tgt,
-      entry_xy,
-      src.name,
-      outgoing=False,
-      from_names=from_names,
-      upstream_out_port=src_exit_port,
-      library_path=library_path,
-    )
+    if (
+      edge_is_undirected(edge.style)
+      and _undirected_edge_orientation(
+        src, tgt, exit_xy, entry_xy, library_path=library_path
+      )
+      == "reversed"
+    ):
+      upstream_out_port = resolve_port(tgt.points, entry_xy)
+      _bind_endpoint(
+        devices,
+        from_by_name,
+        tgt,
+        entry_xy,
+        src.name,
+        outgoing=True,
+        from_names=from_names,
+        library_path=library_path,
+      )
+      _bind_endpoint(
+        devices,
+        from_by_name,
+        src,
+        exit_xy,
+        tgt.name,
+        outgoing=False,
+        from_names=from_names,
+        upstream_out_port=upstream_out_port,
+        library_path=library_path,
+      )
+    else:
+      src_exit_port = resolve_port(src.points, exit_xy)
+      _bind_endpoint(
+        devices,
+        from_by_name,
+        src,
+        exit_xy,
+        tgt.name,
+        outgoing=True,
+        from_names=from_names,
+        library_path=library_path,
+      )
+      _bind_endpoint(
+        devices,
+        from_by_name,
+        tgt,
+        entry_xy,
+        src.name,
+        outgoing=False,
+        from_names=from_names,
+        upstream_out_port=src_exit_port,
+        library_path=library_path,
+      )
 
   validate_topology(
     devices,
@@ -87,6 +117,29 @@ def build_device_states(
     diagram=diagram,
   )
   return devices, from_by_name
+
+
+def _undirected_edge_orientation(
+  src: GraphCell,
+  tgt: GraphCell,
+  exit_xy: tuple[float, float] | None,
+  entry_xy: tuple[float, float] | None,
+  *,
+  library_path: str | Path,
+) -> str | None:
+  if not src.drawclock_type or not tgt.drawclock_type:
+    return None
+  src_port = resolve_port(src.points, exit_xy)
+  tgt_port = resolve_port(tgt.points, entry_xy)
+  if src_port is None or tgt_port is None:
+    return None
+  src_topo = topology_for_type(src.drawclock_type, library_path=library_path)
+  tgt_topo = topology_for_type(tgt.drawclock_type, library_path=library_path)
+  if is_output_port(src_port, src_topo) and is_input_port(tgt_port, tgt_topo):
+    return "normal"
+  if is_input_port(src_port, src_topo) and is_output_port(tgt_port, tgt_topo):
+    return "reversed"
+  return None
 
 
 def _exportable_attrs(cell: GraphCell) -> dict[str, str]:
@@ -357,10 +410,23 @@ def _diagnose_missing_inputs(
     exit_xy = edge_attachment(edge.style, end="exit")
     resolved = resolve_port(state.points, exit_xy)
     if resolved and is_input_port(resolved, topology) and resolved in missing:
-      hints.append(
-        f"  · {resolved}：连线 {state.name}→{tgt_name} 方向反了，"
-        f"应为 {tgt_name}→{state.name}"
-      )
+      if not (
+        edge_is_undirected(edge.style)
+        and src is not None
+        and tgt is not None
+        and _undirected_edge_orientation(
+          src,
+          tgt,
+          exit_xy,
+          edge_attachment(edge.style, end="entry"),
+          library_path=library_path,
+        )
+        == "reversed"
+      ):
+        hints.append(
+          f"  · {resolved}：连线 {state.name}→{tgt_name} 方向反了，"
+          f"应为 {tgt_name}→{state.name}"
+        )
       explained_ports.add(resolved)
 
   for port in missing_sorted:
@@ -438,10 +504,23 @@ def _diagnose_missing_outputs(
     entry_xy = edge_attachment(edge.style, end="entry")
     resolved = resolve_port(state.points, entry_xy)
     if resolved and is_output_port(resolved, topology) and resolved in missing:
-      hints.append(
-        f"  · 连线 {src_name}→{state.name}：方向反了（entry 在 {resolved}）；"
-        f"应改为 {state.name}→{src_name}"
-      )
+      if not (
+        edge_is_undirected(edge.style)
+        and src is not None
+        and tgt is not None
+        and _undirected_edge_orientation(
+          src,
+          tgt,
+          edge_attachment(edge.style, end="exit"),
+          entry_xy,
+          library_path=library_path,
+        )
+        == "reversed"
+      ):
+        hints.append(
+          f"  · 连线 {src_name}→{state.name}：方向反了（entry 在 {resolved}）；"
+          f"应改为 {state.name}→{src_name}"
+        )
       explained = True
 
   if not outgoing and not explained:
