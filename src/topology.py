@@ -6,6 +6,7 @@ from device_model import DeviceState
 from drawio_graph import GraphCell, ParsedDiagram, edge_attachment
 from from_resolve import FromEndpoints, build_from_endpoints
 from library_ports import (
+  PortTopology,
   is_input_port,
   is_output_port,
   resolve_port,
@@ -213,44 +214,24 @@ def validate_topology(
     if state.kind == "from":
       continue
     topology = topology_for_type(state.kind, library_path=library_path)
-    if not topology.outputs:
+    if _total_port_count(topology) != 1 or not topology.outputs:
       continue
-    if topology.output_count == 1:
-      port = topology.outputs[0]
-      if not state.out_bindings.get(port) and not _output_blocked_by_open_from(
-        state, from_names, from_endpoints
-      ):
-        block = [f"器件 {state.name} 的输出端口 {port} 未连接"]
-        cell_id = name_to_cell.get(state.name)
-        if diagram is not None and cell_id is not None:
-          block.extend(
-            _diagnose_missing_outputs(
-              state,
-              cell_id,
-              {port},
-              diagram,
-              library_path=library_path,
-            )
-          )
-        errors.append("\n".join(block))
+    port = topology.outputs[0]
+    if state.out_bindings.get(port):
       continue
-    for port in topology.outputs:
-      if not state.out_bindings.get(port) and not _output_blocked_by_open_from(
-        state, from_names, from_endpoints
-      ):
-        block = [f"器件 {state.name} 的输出端口 {port} 未连接"]
-        cell_id = name_to_cell.get(state.name)
-        if diagram is not None and cell_id is not None:
-          block.extend(
-            _diagnose_missing_outputs(
-              state,
-              cell_id,
-              {port},
-              diagram,
-              library_path=library_path,
-            )
-          )
-        errors.append("\n".join(block))
+    block = [f"器件 {state.name} 的输出端口 {port} 未连接"]
+    cell_id = name_to_cell.get(state.name)
+    if diagram is not None and cell_id is not None:
+      block.extend(
+        _diagnose_missing_outputs(
+          state,
+          cell_id,
+          {port},
+          diagram,
+          library_path=library_path,
+        )
+      )
+    errors.append("\n".join(block))
 
   for state in devices.values():
     if state.kind == "from":
@@ -472,15 +453,8 @@ def _from_endpoint_errors(
   return errors
 
 
-def _output_blocked_by_open_from(
-  state: DeviceState,
-  from_names: set[str],
-  from_endpoints: dict[str, FromEndpoints],
-) -> bool:
-  for peer in state.out_targets:
-    if peer in from_names and not from_endpoints[peer].targets:
-      return True
-  return False
+def _total_port_count(topology: PortTopology) -> int:
+  return len(topology.inputs) + len(topology.outputs)
 
 
 def _duplicate_device_name_errors(devices: dict[str, DeviceState]) -> list[str]:

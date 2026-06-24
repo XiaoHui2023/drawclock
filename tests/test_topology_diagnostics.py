@@ -155,3 +155,33 @@ def test_mux_missing_in0_reports_no_incoming_edge(tmp_path: Path) -> None:
 
     msg = str(exc.value)
     assert "未发现指向 mux0 的连线" in msg
+
+
+def test_multi_port_device_allows_unconnected_output(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    pll = shapes["pll"]
+    src_out = port_anchors(source.style, "source")["right"]
+    pll_in = port_anchors(pll.style, "pll")["left"]
+    body = (
+        f"{_library_object(10, 'src0', source)}"
+        f"{_library_object(11, 'pll0', pll)}"
+        f"{_edge_raw(20, 10, 11, exit_x=src_out[0], exit_y=src_out[1], entry_x=pll_in[0], entry_y=pll_in[1])}"
+    )
+    path = _write_model(tmp_path, "pll-open-out.drawio", body)
+
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+    assert config["pll0"]["kind"] == "pll"
+    assert config["pll0"]["source"] == "src0"
+
+
+def test_single_port_output_device_requires_connection(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    body = f"{_library_object(10, 'src0', source)}"
+    path = _write_model(tmp_path, "source-open.drawio", body)
+
+    with pytest.raises(ValueError, match="输出端口.*未连接") as exc:
+        parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    assert "src0" in str(exc.value)
