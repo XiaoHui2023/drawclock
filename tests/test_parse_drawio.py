@@ -18,6 +18,13 @@ from drawio_library import (
 from drawio_ports import port_anchors
 from pipeline import parse_drawio_paths
 
+from kind_families import (
+    ALL_VARIANT_TYPES,
+    JSON_VARIANT_KEYS,
+    STYLE_VARIANT_KEYS,
+    VARIANT_FAMILIES,
+)
+
 
 def test_parse_points_reads_all_mux_ports() -> None:
     style = (
@@ -149,7 +156,11 @@ def test_occ_clk_cell_drawio_exports_as_single_input_device(tmp_path: Path) -> N
 
     config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
 
-    assert config["cell0"] == {"kind": "occ_clk_cell", "source": "src0"}
+    assert config["cell0"] == {
+        "kind": "cell",
+        "cell_kind": "occ_clk_cell",
+        "source": "src0",
+    }
     assert config["clk0"]["source"] == "cell0"
 
 
@@ -340,3 +351,79 @@ def test_from_open_output_fails() -> None:
     with pytest.raises(ValueError, match="右端未连接任何器件") as exc:
         parse_drawio_paths([path])
     assert "输出端口未连接" not in str(exc.value)
+
+
+def test_library_variant_styles_embed_major_and_minor_kind() -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    for major, variants in VARIANT_FAMILIES.items():
+        style_key = STYLE_VARIANT_KEYS[major]
+        for variant in variants:
+            style = shapes[variant].style
+            assert f"drawclockType={variant};" in style
+            assert f"drawclockKind={major};" in style
+            assert f"{style_key}={variant};" in style
+
+
+def test_library_single_kind_matches_drawclock_type() -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    variant_style_keys = set(STYLE_VARIANT_KEYS.values())
+    for title, shape in shapes.items():
+        if title == "from":
+            continue
+        if title in ALL_VARIANT_TYPES:
+            continue
+        style = shape.style
+        assert f"drawclockType={title};" in style, title
+        assert f"drawclockKind={title};" in style, title
+        for key in variant_style_keys:
+            assert f"{key}=" not in style, title
+
+
+@pytest.mark.parametrize(
+    ("major", "variant"),
+    [
+        (major, variant)
+        for major, variants in VARIANT_FAMILIES.items()
+        for variant in variants
+    ],
+)
+def test_variant_family_parse_exports_major_and_minor_kind(
+    major: str,
+    variant: str,
+    tmp_path: Path,
+) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    device = shapes[variant]
+    json_variant_key = JSON_VARIANT_KEYS[major]
+    name = "dev0"
+
+    if major == "source":
+        clock = shapes["clock"]
+        model = (
+            "<mxGraphModel><root>"
+            "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
+            f"{_library_object(10, name, device)}"
+            f"{_library_object(11, 'clk0', clock)}"
+            f"{_edge(20, 10, 11, device, variant, 'right', clock, 'clock', 'left')}"
+            "</root></mxGraphModel>"
+        )
+    else:
+        source = shapes["source"]
+        clock = shapes["clock"]
+        model = (
+            "<mxGraphModel><root>"
+            "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
+            f"{_library_object(10, 'src0', source)}"
+            f"{_library_object(11, name, device)}"
+            f"{_library_object(12, 'clk0', clock)}"
+            f"{_edge(20, 10, 11, source, 'source', 'right', device, variant, 'left')}"
+            f"{_edge(21, 11, 12, device, variant, 'right', clock, 'clock', 'left')}"
+            "</root></mxGraphModel>"
+        )
+
+    path = tmp_path / f"{variant}-kind.drawio"
+    path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    assert config[name]["kind"] == major
+    assert config[name][json_variant_key] == variant

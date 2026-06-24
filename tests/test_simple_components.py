@@ -385,6 +385,26 @@ def test_clock_source_library_object_carries_kind_in_style(
     assert f"drawclockSourceKind={source_kind};" in style
 
 
+@pytest.mark.parametrize(
+    ("module_name", "cell_kind"),
+    [
+        ("cell", "cell"),
+        ("occ_clk_cell", "occ_clk_cell"),
+        ("gen_cell", "gen_cell"),
+        ("bist_clk_cell", "bist_clk_cell"),
+        ("occ_bist_clk_cell", "occ_bist_clk_cell"),
+    ],
+)
+def test_cell_library_object_carries_kind_in_style(module_name: str, cell_kind: str) -> None:
+    mod = importlib.import_module(f"drawio_lib.components.{module_name}")
+    frag = mod.cell_fragment("2")
+    style = mod.cell_style()
+    assert 'kind="' not in frag
+    assert 'cell_kind="' not in frag
+    assert "drawclockKind=cell;" in style
+    assert f"drawclockCellKind={cell_kind};" in style
+
+
 def test_gate_library_object_carries_kind_in_style() -> None:
     gate = importlib.import_module("drawio_lib.components.gate")
     frag = gate.cell_fragment("2")

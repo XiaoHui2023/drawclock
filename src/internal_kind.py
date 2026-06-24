@@ -3,11 +3,13 @@ from __future__ import annotations
 STYLE_KIND = "drawclockKind"
 STYLE_SOURCE_KIND = "drawclockSourceKind"
 STYLE_INV_KIND = "drawclockInvKind"
+STYLE_CELL_KIND = "drawclockCellKind"
 
-INTERNAL_OBJECT_KEYS = frozenset({"kind", "source_kind", "inv_kind"})
+INTERNAL_OBJECT_KEYS = frozenset({"kind", "source_kind", "inv_kind", "cell_kind"})
 
 STYLE_KEY_TO_JSON: dict[str, str] = {
     STYLE_KIND: "kind",
     STYLE_SOURCE_KIND: "source_kind",
     STYLE_INV_KIND: "inv_kind",
+    STYLE_CELL_KIND: "cell_kind",
 }

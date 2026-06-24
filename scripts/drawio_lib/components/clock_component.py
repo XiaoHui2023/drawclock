@@ -12,6 +12,7 @@ from drawio_lib.components.label_attrs import (
     verify_label_placeholders,
 )
 from drawio_lib.components.label_html import name_block, shell_close, shell_open, stretch_body_layer
+from drawio_lib.components.internal_kind import kind_style_suffix
 from drawio_lib.components.label_overflow import (
     mxcell_html_label_style_parts,
     verify_label_overflow_policy,
@@ -87,6 +88,7 @@ class ClockComponent(SimpleComponent):
         return (
             f"{mxcell_html_label_style_parts()}"
             f"drawclockType={self.drawclock_type};"
+            f"{kind_style_suffix(self.drawclock_type)}"
             f"{points_clause}"
         )
 
