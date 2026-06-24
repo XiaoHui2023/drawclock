@@ -2,7 +2,7 @@
 
 以下为示范。
 
-`kind` 由器件库 style 中的 `drawclockKind` 导出（图中 object 不手写 `kind`）。有大类时 `kind` 统一为大类名；小类写在 `{大类}_kind`（如 `inv` / `inv_kind`）。`mux`、`pll` 仅统一大类，无 `mux_kind` / 路数小类——输入路数、输出路数体现在库图形端口，不在 `kind` 里。`pll_kind` 表示 PLL IP 类型（如 `SC`、`INNO`），与单/双输出无关。
+`kind` 由器件库 style 中的 `drawclockKind` 导出（图中 object 不手写 `kind`）。若某大类下存在小类区分，则该类下**每个**器件导出时须同时含 `kind`（大类）与 `{大类}_kind`（小类）；基础图形也算小类，如 `inv` / `inv_kind: inv`、`cell` / `cell_kind: cell`。`mux`、`pll` 仅统一大类，无 `mux_kind` / 路数小类——输入路数、输出路数体现在库图形端口，不在 `kind` 里。`pll_kind` 表示 PLL IP 类型（如 `SC`、`INNO`），与单/双输出无关。
 
 旧图若缺少 `drawclockKind`，导出可能仍用库类型名（如 `pll2`、`mux3`）；须重载器件库升级图形后再导出。
 
@@ -61,6 +61,11 @@
     "kind": "clock",
     "freq": "100",           // 图中属性原样导出，不做数值换算
     "source": "mux0"
+  },
+  "cell0": {
+    "kind": "cell",           // 时钟 cell 大类
+    "cell_kind": "cell",      // 小类：cell / occ_clk_cell / gen_cell / …
+    "source": "gate0"
   },
   "occ0": {
     "kind": "cell",
