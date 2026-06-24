@@ -1,0 +1,158 @@
+from __future__ import annotations
+
+from pathlib import Path
+from xml.sax.saxutils import quoteattr
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+
+from drawio_library import DEFAULT_LIBRARY_PATH, load_library_shapes
+from drawio_ports import port_anchors
+from pipeline import parse_drawio_paths
+
+
+def _attr(name: str, value: str) -> str:
+    return f"{name}={quoteattr(value)}"
+
+
+def _library_object(
+    cell_id: int,
+    name: str,
+    shape,
+    *,
+    extra: dict[str, str] | None = None,
+) -> str:
+    attrs = {"id": str(cell_id), "name": name, "label": "", "placeholders": "0"}
+    if extra:
+        attrs.update(extra)
+    attr_s = " ".join(_attr(key, value) for key, value in attrs.items())
+    return (
+        f"<object {attr_s}>"
+        f"<mxCell style={quoteattr(shape.style)} vertex=\"1\" parent=\"1\">"
+        f"<mxGeometry x=\"{cell_id * 120}\" y=\"40\" width=\"{shape.w}\" "
+        f"height=\"{shape.h}\" as=\"geometry\"/>"
+        f"</mxCell>"
+        f"</object>"
+    )
+
+
+def _edge_raw(
+    cell_id: int,
+    source_id: int,
+    target_id: int,
+  *,
+    exit_x: float,
+    exit_y: float,
+    entry_x: float,
+    entry_y: float,
+) -> str:
+    style = (
+        "edgeStyle=none;rounded=0;html=1;endArrow=none;startArrow=none;"
+        f"exitX={exit_x};exitY={exit_y};entryX={entry_x};entryY={entry_y};"
+        "exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;"
+    )
+    return (
+        f"<mxCell id=\"{cell_id}\" style={quoteattr(style)} edge=\"1\" parent=\"1\" "
+        f"source=\"{source_id}\" target=\"{target_id}\">"
+        "<mxGeometry relative=\"1\" as=\"geometry\"/>"
+        "</mxCell>"
+    )
+
+
+def _write_model(tmp_path: Path, name: str, body: str) -> Path:
+    path = tmp_path / name
+    path.write_text(
+        f"<mxfile><diagram><mxGraphModel><root>"
+        f"<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
+        f"{body}"
+        f"</root></mxGraphModel></diagram></mxfile>",
+        encoding="utf-8",
+    )
+    return path
+
+
+def test_mux_missing_in0_reports_reversed_edge(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    pll = shapes["pll"]
+    mux2 = shapes["mux2"]
+    in0 = port_anchors(mux2.style, "mux2")["in0"]
+    right = port_anchors(pll.style, "pll")["right"]
+    body = (
+        f"{_library_object(10, 'pll0', pll)}"
+        f"{_library_object(11, 'mux0', mux2)}"
+        f"{_edge_raw(20, 11, 10, exit_x=in0[0], exit_y=in0[1], entry_x=right[0], entry_y=right[1])}"
+    )
+    path = _write_model(tmp_path, "reversed-mux.drawio", body)
+
+    with pytest.raises(ValueError) as exc:
+        parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    msg = str(exc.value)
+    assert "未连接的输入端口" in msg
+    assert "in0" in msg
+    assert "方向反了" in msg
+    assert "source=pll0, target=mux0" in msg
+
+
+def test_mux_missing_in0_reports_entry_on_output(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    pll = shapes["pll"]
+    mux2 = shapes["mux2"]
+    out = port_anchors(mux2.style, "mux2")["out"]
+    right = port_anchors(pll.style, "pll")["right"]
+    body = (
+        f"{_library_object(10, 'pll0', pll)}"
+        f"{_library_object(11, 'mux0', mux2)}"
+        f"{_edge_raw(20, 10, 11, exit_x=right[0], exit_y=right[1], entry_x=out[0], entry_y=out[1])}"
+    )
+    path = _write_model(tmp_path, "mux-entry-out.drawio", body)
+
+    with pytest.raises(ValueError) as exc:
+        parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    msg = str(exc.value)
+    assert "entry 落在输出端口 out" in msg
+    assert "in0" in msg
+
+
+def test_mux_missing_in0_reports_wrong_input_port(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    pll = shapes["pll"]
+    mux2 = shapes["mux2"]
+    in1 = port_anchors(mux2.style, "mux2")["in1"]
+    right = port_anchors(pll.style, "pll")["right"]
+    body = (
+        f"{_library_object(10, 'pll0', pll)}"
+        f"{_library_object(11, 'mux0', mux2)}"
+        f"{_edge_raw(20, 10, 11, exit_x=right[0], exit_y=right[1], entry_x=in1[0], entry_y=in1[1])}"
+    )
+    path = _write_model(tmp_path, "mux-wrong-input.drawio", body)
+
+    with pytest.raises(ValueError) as exc:
+        parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    msg = str(exc.value)
+    assert "entry 落在输入端口 in1" in msg
+    assert "不是缺失的 in0" in msg
+
+
+def test_mux_missing_in0_reports_no_incoming_edge(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    mux2 = shapes["mux2"]
+    clock = shapes["clock"]
+    out = port_anchors(mux2.style, "mux2")["out"]
+    left = port_anchors(clock.style, "clock")["left"]
+    body = (
+        f"{_library_object(11, 'mux0', mux2)}"
+        f"{_library_object(12, 'clk0', clock)}"
+        f"{_edge_raw(20, 11, 12, exit_x=out[0], exit_y=out[1], entry_x=left[0], entry_y=left[1])}"
+    )
+    path = _write_model(tmp_path, "mux-no-input.drawio", body)
+
+    with pytest.raises(ValueError) as exc:
+        parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    msg = str(exc.value)
+    assert "未发现任何以 mux0 为 target 的连线" in msg
+    assert "in0 在图中的期望坐标约为" in msg

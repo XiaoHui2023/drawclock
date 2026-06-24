@@ -109,12 +109,16 @@ def port_key_for_index(
   return topology.index_to_key[index]
 
 
-def resolve_port(
+PORT_MATCH_MAX_DIST_SQ = 0.04
+
+
+def nearest_port(
   points: tuple[tuple[float, float], ...],
   xy: tuple[float, float] | None,
-) -> str | None:
+) -> tuple[str | None, float]:
+  """Return the closest port key and squared distance; xy may be None."""
   if not points or xy is None:
-    return None
+    return None, float("inf")
   best_idx = 0
   best_dist = float("inf")
   for idx, point in enumerate(points):
@@ -122,9 +126,17 @@ def resolve_port(
     if dist < best_dist:
       best_dist = dist
       best_idx = idx
-  if best_dist > 0.04:
+  return port_key_for_index(points, best_idx), best_dist
+
+
+def resolve_port(
+  points: tuple[tuple[float, float], ...],
+  xy: tuple[float, float] | None,
+) -> str | None:
+  port, best_dist = nearest_port(points, xy)
+  if port is None or best_dist > PORT_MATCH_MAX_DIST_SQ:
     return None
-  return port_key_for_index(points, best_idx)
+  return port
 
 
 def out_port_index(port: str) -> int | None:
