@@ -259,7 +259,13 @@ def validate_topology(
     topology = topology_for_type(state.kind, library_path=library_path)
     missing_inputs = set(topology.inputs) - set(state.bindings)
     if missing_inputs:
-      block = [f"器件 {state.name} 未连接的输入端口: {', '.join(sorted(missing_inputs))}"]
+      if len(topology.inputs) == 1:
+        block = [f"器件 {state.name} 输入端口未连接"]
+      else:
+        block = [
+          f"器件 {state.name} 未连接的输入端口: "
+          f"{', '.join(sorted(missing_inputs))}"
+        ]
       cell_id = name_to_cell.get(state.name)
       if diagram is not None and cell_id is not None:
         block.extend(
@@ -282,7 +288,7 @@ def validate_topology(
     port = topology.outputs[0]
     if state.out_bindings.get(port):
       continue
-    block = [f"器件 {state.name} 的输出端口 {port} 未连接"]
+    block = [f"器件 {state.name} 输出端口未连接"]
     cell_id = name_to_cell.get(state.name)
     if diagram is not None and cell_id is not None:
       block.extend(
@@ -338,6 +344,18 @@ def _peer_label(cell: GraphCell | None, fallback_id: str | None) -> str:
   return cell.name or cell.drawclock_type or cell.cell_id
 
 
+def _input_port_phrase(topology: PortTopology, ports: set[str] | list[str]) -> str:
+  if len(topology.inputs) == 1:
+    return "输入端口"
+  return ", ".join(sorted(ports))
+
+
+def _input_port_label(topology: PortTopology, port: str) -> str:
+  if len(topology.inputs) == 1:
+    return "输入端口"
+  return port
+
+
 def _diagnose_missing_inputs(
   state: DeviceState,
   cell_id: str,
@@ -386,13 +404,15 @@ def _diagnose_missing_inputs(
 
     if resolved and is_output_port(resolved, topology):
       hints.append(
-        f"{prefix}：entry 误接输出口 {resolved}，应接入 {', '.join(missing_sorted)}"
+        f"{prefix}：entry 误接输出口 {resolved}，"
+        f"应接入 {_input_port_phrase(topology, missing_sorted)}"
       )
       continue
 
     if resolved and is_input_port(resolved, topology) and resolved not in missing:
       hints.append(
-        f"{prefix}：{resolved} 已接入，尚缺 {', '.join(missing_sorted)}"
+        f"{prefix}：{_input_port_label(topology, resolved)} 已接入，"
+        f"尚缺 {_input_port_phrase(topology, missing_sorted)}"
       )
       still_missing_noted.update(missing)
       continue
@@ -424,7 +444,8 @@ def _diagnose_missing_inputs(
         == "reversed"
       ):
         hints.append(
-          f"  · {resolved}：连线 {state.name}→{tgt_name} 方向反了，"
+          f"  · {_input_port_label(topology, resolved)}："
+          f"连线 {state.name}→{tgt_name} 方向反了，"
           f"应为 {tgt_name}→{state.name}"
         )
       explained_ports.add(resolved)
@@ -434,7 +455,9 @@ def _diagnose_missing_inputs(
       continue
     if port in still_missing_noted and len(missing) == 1:
       continue
-    hints.append(f"  · {port}：无入线指向 {state.name}")
+    hints.append(
+      f"  · {_input_port_label(topology, port)}：无入线指向 {state.name}"
+    )
 
   if not incoming and not outgoing and not hints:
     hints.append(f"  · 未发现指向 {state.name} 的连线")

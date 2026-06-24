@@ -228,7 +228,22 @@ def test_single_port_output_device_requires_connection(tmp_path: Path) -> None:
     body = f"{_library_object(10, 'src0', source)}"
     path = _write_model(tmp_path, "source-open.drawio", body)
 
-    with pytest.raises(ValueError, match="输出端口.*未连接") as exc:
+    with pytest.raises(ValueError, match="输出端口未连接") as exc:
         parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
 
     assert "src0" in str(exc.value)
+    assert "right" not in str(exc.value)
+
+
+def test_single_input_device_reports_generic_message(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    gate = shapes["gate"]
+    body = f"{_library_object(10, 'gate0', gate)}"
+    path = _write_model(tmp_path, "gate-open-in.drawio", body)
+
+    with pytest.raises(ValueError, match="输入端口未连接") as exc:
+        parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    msg = str(exc.value)
+    assert "gate0" in msg
+    assert "left" not in msg
