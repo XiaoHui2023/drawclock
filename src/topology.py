@@ -112,13 +112,20 @@ def _bind_endpoint(
 ) -> None:
   if cell.drawclock_type == "from":
     if not outgoing:
-      raise ValueError(f"from {cell.name} 无输入端口，不能从 {peer_name} 接入")
+      raise ValueError(
+        f"连线方向错误：{peer_name} → from {cell.name}。"
+        f"from 只能向右连出到下游，不能接受连线；"
+        f"跨图时钟靠与 clock 同名对应，不是把其它器件连到 from"
+      )
     port = resolve_port(cell.points, xy)
     if port is None:
       port = "right"
     topology = topology_for_type("from", library_path=library_path)
     if port not in topology.outputs:
-      raise ValueError(f"from {cell.name} 仅有输出端口，不能从 {port} 引出")
+      raise ValueError(
+        f"from {cell.name} 只能从右侧（right）连出，"
+        f"当前连线挂在 {port} 侧"
+      )
     state = devices.setdefault(
       cell.cell_id,
       DeviceState(kind="from", name=cell.name, points=cell.points),
@@ -185,7 +192,10 @@ def validate_topology(
 
   for from_name in from_names:
     if from_name not in clock_names:
-      errors.append(f"from {from_name} 未找到同名 clock")
+      errors.append(
+        f"from {from_name} 未找到同名 clock"
+        f"（全部输入图中须有一个 name 相同的 clock 器件）"
+      )
 
   for from_name, endpoints in from_endpoints.items():
     errors.extend(_from_endpoint_errors(from_name, endpoints, device_names))
@@ -451,7 +461,10 @@ def _from_endpoint_errors(
     if peer not in device_names:
       errors.append(f"from {from_name} 连接到未知器件 {peer}")
   if not targets:
-    errors.append(f"from {from_name} 右端未连接任何器件")
+    errors.append(
+      f"from {from_name} 未连到任何下游器件"
+      f"（应从 from 向右拖线到目标器件；与 clock 的对应靠同名）"
+    )
   return errors
 
 

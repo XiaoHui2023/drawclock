@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from internal_kind import INTERNAL_OBJECT_KEYS, STYLE_KEY_TO_JSON
 
@@ -34,6 +35,7 @@ class GraphCell:
 @dataclass
 class ParsedDiagram:
     cells: dict[str, GraphCell]
+    cell_sources: dict[str, Path] = field(default_factory=dict)
 
 
 def parse_models(models: list[ET.Element], *, id_prefix: str = "") -> ParsedDiagram:
@@ -48,9 +50,11 @@ def parse_models(models: list[ET.Element], *, id_prefix: str = "") -> ParsedDiag
 
 def merge_diagrams(parts: list[ParsedDiagram]) -> ParsedDiagram:
     merged: dict[str, GraphCell] = {}
+    sources: dict[str, Path] = {}
     for part in parts:
         merged.update(part.cells)
-    return ParsedDiagram(cells=merged)
+        sources.update(part.cell_sources)
+    return ParsedDiagram(cells=merged, cell_sources=sources)
 
 
 def validate_diagram_library(diagram: ParsedDiagram, library_path: str | Path) -> None:

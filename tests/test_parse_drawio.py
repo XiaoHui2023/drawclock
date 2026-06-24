@@ -298,6 +298,18 @@ def test_example_fig1_embeds_library_labels() -> None:
     assert "drawclockType=source" in model_xml
 
 
+def test_multi_input_error_includes_source_image(tmp_path: Path) -> None:
+    good = ROOT / "tests" / "fixtures" / "mini-tree.drawio"
+    bad = ROOT / "tests" / "fixtures" / "wire-only.drawio"
+    bad_copy = tmp_path / "bad.drawio"
+    bad_copy.write_text(bad.read_text(encoding="utf-8"), encoding="utf-8")
+    with pytest.raises(ValueError, match="未找到同名 clock") as exc:
+        parse_drawio_paths([good, bad_copy], library_path=DEFAULT_LIBRARY_PATH)
+    msg = str(exc.value)
+    assert f"图片 {bad_copy}" in msg
+    assert "orphan" in msg
+
+
 def test_example_two_figs_cross_from_no_from_in_json() -> None:
     fig1 = ROOT / "example" / "fig1.drawio"
     fig2 = ROOT / "example" / "fig2.drawio"
@@ -329,6 +341,13 @@ def test_reload_restores_drawable_html_style(tmp_path: Path) -> None:
     assert 'label="' in text
 
 
+def test_multiple_from_stubs_share_clock_name() -> None:
+    path = ROOT / "tests" / "fixtures" / "two-from-one-clock.drawio"
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+    assert config["gate0"]["source"] == "pll0"
+    assert config["gate1"]["source"] == "pll0"
+
+
 def test_from_without_clock_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-only.drawio"
     with pytest.raises(ValueError, match="未找到同名 clock"):
@@ -337,16 +356,17 @@ def test_from_without_clock_fails() -> None:
 
 def test_from_upstream_connect_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-open-left.drawio"
-    with pytest.raises(ValueError, match="无输入端口") as exc:
+    with pytest.raises(ValueError, match="连线方向错误") as exc:
         parse_drawio_paths([path])
     msg = str(exc.value)
     assert "clk0" in msg
-    assert "输入端口未连接" not in msg
+    assert "src0" in msg
+    assert "未找到同名 clock" not in msg
 
 
 def test_from_open_output_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-open-right.drawio"
-    with pytest.raises(ValueError, match="右端未连接任何器件") as exc:
+    with pytest.raises(ValueError, match="未连到任何下游器件") as exc:
         parse_drawio_paths([path])
     assert "输出端口未连接" not in str(exc.value)
 
