@@ -19,8 +19,10 @@ from drawio_ports import port_anchors
 from pipeline import parse_drawio_paths
 
 from kind_families import (
+    ALL_MAJOR_KIND_ONLY_TYPES,
     ALL_VARIANT_TYPES,
     JSON_VARIANT_KEYS,
+    MAJOR_KIND_ONLY,
     STYLE_VARIANT_KEYS,
     VARIANT_FAMILIES,
 )
@@ -57,7 +59,7 @@ def test_mini_tree_drawio() -> None:
 def test_kind_matches_library_name() -> None:
     path = ROOT / "tests" / "fixtures" / "pll2-tree.drawio"
     config = parse_drawio_paths([path])
-    assert config["pll2_0"]["kind"] == "pll2"
+    assert config["pll2_0"]["kind"] == "pll"
     assert config["gate0"]["kind"] == "gate"
 
 
@@ -222,10 +224,10 @@ def test_source_exports_major_and_minor_kind(tmp_path: Path) -> None:
 def test_pll2_dual_output_source_suffix() -> None:
     path = ROOT / "tests" / "fixtures" / "pll2-tree.drawio"
     config = parse_drawio_paths([path])
-    assert config["pll2_0"]["kind"] == "pll2"
+    assert config["pll2_0"]["kind"] == "pll"
     assert config["pll2_0"]["pll_kind"] == "SC"
     assert config["pll2_0"]["source"] == "xtal0"
-    assert config["pll2_0"]["target"] == {"0": "gate0", "1": "div0"}
+    assert "target" not in config["pll2_0"]
     assert config["gate0"]["source"] == "pll2_0[0]"
     assert config["div0"]["source"] == "pll2_0[1]"
 
@@ -254,11 +256,7 @@ def test_cpu_gate_named_output_keys(tmp_path: Path) -> None:
 
     config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
 
-    assert config["cg0"]["target"] == {
-        "hclk_en": "clk_en",
-        "hclk": "clk_main",
-        "clk_arm_core": "clk_core",
-    }
+    assert "target" not in config["cg0"]
     assert config["clk_en"]["source"] == "cg0[hclk_en]"
     assert config["clk_main"]["source"] == "cg0[hclk]"
     assert config["clk_core"]["source"] == "cg0[clk_arm_core]"
@@ -313,7 +311,7 @@ def test_example_two_figs_cross_from_no_from_in_json() -> None:
     assert config["div0"]["source"] == "pll_main"
     assert "targets" not in config["pll_main"]
     assert "target" not in config["mux2"]
-    assert config["mux2"]["kind"] == "mux2"
+    assert config["mux2"]["kind"] == "mux"
     assert config["mux2"]["source"] == {"0": "pll_m2a", "1": "pll_m2b"}
     assert config["pll_m2a"]["source"] == "osc_mux"
     assert config["pll_m2b"]["source"] == "osc_mux"
@@ -372,11 +370,104 @@ def test_library_single_kind_matches_drawclock_type() -> None:
             continue
         if title in ALL_VARIANT_TYPES:
             continue
+        if title in ALL_MAJOR_KIND_ONLY_TYPES:
+            continue
         style = shape.style
         assert f"drawclockType={title};" in style, title
         assert f"drawclockKind={title};" in style, title
         for key in variant_style_keys:
             assert f"{key}=" not in style, title
+
+
+def test_library_major_kind_only_styles() -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    variant_style_keys = set(STYLE_VARIANT_KEYS.values())
+    for major, titles in MAJOR_KIND_ONLY.items():
+        for title in titles:
+            style = shapes[title].style
+            assert f"drawclockType={title};" in style
+            assert f"drawclockKind={major};" in style
+            for key in variant_style_keys:
+                assert f"{key}=" not in style, title
+
+
+@pytest.mark.parametrize("title", list(MAJOR_KIND_ONLY["pll"]))
+def test_pll_parse_exports_unified_kind(title: str, tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    pll = shapes[title]
+    clock = shapes["clock"]
+    out_port = "out0" if title == "pll2" else "right"
+    model = (
+        "<mxGraphModel><root>"
+        "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
+        f"{_library_object(10, 'src0', source)}"
+        f"{_library_object(11, 'pll0', pll, extra={'pll_kind': 'SC'})}"
+        f"{_library_object(12, 'clk0', clock)}"
+        f"{_edge(20, 10, 11, source, 'source', 'right', pll, title, 'left')}"
+        f"{_edge(21, 11, 12, pll, title, out_port, clock, 'clock', 'left')}"
+        "</root></mxGraphModel>"
+    )
+    path = tmp_path / f"{title}-kind.drawio"
+    path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+    entry = config["pll0"]
+    assert entry["kind"] == "pll"
+    assert entry.get("pll_kind") == "SC"
+
+
+@pytest.mark.parametrize("title", list(MAJOR_KIND_ONLY["mux"]))
+def test_mux_parse_exports_unified_kind(title: str, tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    mux = shapes[title]
+    clock = shapes["clock"]
+    input_ports = sorted(
+        port
+        for port in port_anchors(mux.style, title)
+        if port.startswith("in")
+    )
+    parts = [
+        "<mxGraphModel><root>",
+        "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>",
+    ]
+    src_ids: list[int] = []
+    cell_id = 10
+    for index in range(len(input_ports)):
+        parts.append(_library_object(cell_id, f"src{index}", source))
+        src_ids.append(cell_id)
+        cell_id += 1
+    mux_id = cell_id
+    cell_id += 1
+    clk_id = cell_id
+    parts.append(_library_object(mux_id, "mux0", mux))
+    parts.append(_library_object(clk_id, "clk0", clock))
+    edge_id = 20
+    for src_id, port in zip(src_ids, input_ports, strict=True):
+        parts.append(
+            _edge(
+                edge_id,
+                src_id,
+                mux_id,
+                source,
+                "source",
+                "right",
+                mux,
+                title,
+                port,
+            )
+        )
+        edge_id += 1
+    parts.append(
+        _edge(edge_id, mux_id, clk_id, mux, title, "out", clock, "clock", "left")
+    )
+    parts.append("</root></mxGraphModel>")
+    path = tmp_path / f"{title}-kind.drawio"
+    path.write_text(f"<mxfile><diagram>{''.join(parts)}</diagram></mxfile>", encoding="utf-8")
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+    entry = config["mux0"]
+    assert entry["kind"] == "mux"
+    assert "mux_kind" not in entry
 
 
 @pytest.mark.parametrize(

@@ -82,6 +82,7 @@ def test_edit_data_fields_and_type_in_style() -> None:
     assert "font-size:11px" in html
     assert "component_type=" not in mux2.cell_fragment("x")
     assert f"{mux2.DRAWCLOCK_TYPE_KEY}={mux2.DRAWCLOCK_TYPE_VALUE}" in mux2.cell_style()
+    assert "drawclockKind=mux;" in mux2.cell_style()
     assert list(mux2.EDIT_DATA_ATTR_PREFIX) == [
         "name",
         "label",

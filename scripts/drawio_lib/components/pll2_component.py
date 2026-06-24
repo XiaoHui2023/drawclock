@@ -12,6 +12,7 @@ from drawio_lib.components.pll_component import (
     ATTR_PLL_KIND,
     DEFAULT_PLL_KIND,
     PLL_CENTER_FONT_PX,
+    PLL_MAJOR_KIND,
 )
 from drawio_lib.components.label_html import (
     name_block,
@@ -93,6 +94,10 @@ class Pll2Component:
         return self.title
 
     @property
+    def json_kind(self) -> str:
+        return PLL_MAJOR_KIND
+
+    @property
     def w(self) -> int:
         return sgeom.W
 
@@ -136,7 +141,7 @@ class Pll2Component:
         return (
             f"{mxcell_html_label_style_parts()}"
             f"{DRAWCLOCK_TYPE_KEY}={self.drawclock_type};"
-            f"{kind_style_suffix(self.drawclock_type)}"
+            f"{kind_style_suffix(self.json_kind)}"
             f"points=[[{points_inner}]];"
         )
 

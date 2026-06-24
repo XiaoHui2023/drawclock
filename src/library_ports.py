@@ -16,6 +16,12 @@ _MODULE_BODY_LABEL_TOP_PCT_MIN = 28.0
 
 INPUT_X_MAX = 0.5
 
+# JSON kind unified across library drawclockType variants (no {kind}_kind field).
+CONFIG_KIND_LIBRARY_TYPES: dict[str, tuple[str, ...]] = {
+    "mux": ("mux2", "mux3", "mux4", "mux5", "mux6"),
+    "pll": ("pll", "pll2"),
+}
+
 
 @dataclass(frozen=True)
 class PortTopology:
@@ -262,6 +268,23 @@ def output_connection_keys(
   if keys is None:
     raise KeyError(f"器件类型不在器件库中: {drawclock_type}")
   return keys[1]
+
+
+def output_connection_key_suffixes(
+  config_kind: str,
+  *,
+  library_path: str | Path | None = None,
+) -> set[str]:
+  """Valid source-reference suffixes when config kind is a unified major kind."""
+  lib = str(library_path or DEFAULT_LIBRARY_PATH)
+  keys_map = load_port_connection_keys(lib)
+  titles = CONFIG_KIND_LIBRARY_TYPES.get(config_kind, (config_kind,))
+  suffixes: set[str] = set()
+  for title in titles:
+    entry = keys_map.get(title)
+    if entry is not None:
+      suffixes |= set(entry[1].values())
+  return suffixes
 
 
 def connection_key_for_port(

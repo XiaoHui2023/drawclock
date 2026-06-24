@@ -9,6 +9,7 @@ from drawio_lib.components.simple_shapes import pll_body, pll_label_cx
 
 ATTR_PLL_KIND = "pll_kind"
 DEFAULT_PLL_KIND = "SC"
+PLL_MAJOR_KIND = "pll"
 PLL_CENTER_FONT_PX = 9
 
 
@@ -23,6 +24,10 @@ class PllComponent(SimpleComponent):
     @property
     def required_object_attrs(self) -> tuple[str, ...]:
         return (ATTR_PLL_KIND, ATTR_NAME)
+
+    @property
+    def json_kind(self) -> str:
+        return PLL_MAJOR_KIND
 
     def _center_labels(self) -> tuple[tuple[float, float, str], ...]:
         mid = self._g.body_mid_y

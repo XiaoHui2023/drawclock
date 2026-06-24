@@ -2,52 +2,52 @@
   <diagram>
     <mxGraphModel>
       <root>
-        <mxCell id="0"/>
-        <mxCell id="1" parent="0"/>
-        <object name="xtal0" placeholders="1" id="9">
-          <mxCell style="drawclockType=source;points=[[1.0000,0.5000,0,0,0]];" vertex="1" parent="1">
-            <mxGeometry x="0" y="40" width="120" height="70" as="geometry"/>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <object id="9" name="xtal0" placeholders="1" label="&lt;div style=&quot;position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:55px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;&quot;&gt;&lt;div style=&quot;position:absolute;left:-2px;top:-7px;width:40px;height:54px&quot;&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;40&quot; height=&quot;54&quot; viewBox=&quot;0 0 40 54&quot; preserveAspectRatio=&quot;none&quot; style=&quot;display:block;overflow:visible;&quot;&gt;&lt;circle cx=&quot;20.0&quot; cy=&quot;30&quot; r=&quot;14&quot; fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-width=&quot;2&quot;/&gt;&lt;path d=&quot;M 12.0 30.0 L 13.3 33.5 L 14.7 35.0 L 16.0 33.5 L 17.3 30.0 L 18.7 26.5 L 20.0 25.0 L 21.3 26.5 L 22.7 30.0 L 24.0 33.5 L 25.3 35.0 L 26.7 33.5 L 28.0 30.0&quot; fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;div style=&quot;position:absolute;left:50%;top:80.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:0px;&quot;&gt;%name%&lt;/div&gt;&lt;/div&gt;">
+          <mxCell style="rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=1;overflow=visible;resizable=0;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=source;drawclockKind=source;points=[[0.8500,0.5455,0,0,0]];drawclockSourceKind=source;" vertex="1" parent="1">
+            <mxGeometry x="0" y="40" width="40" height="55" as="geometry" />
           </mxCell>
         </object>
-        <object pll_kind="SC" name="pll2_0" placeholders="1" id="10">
-          <mxCell style="drawclockType=pll2;points=[[0.3500,0.3333,0,0,0],[0.6500,0.3333,0,0,0],[0.6500,0.6667,0,0,0]];" vertex="1" parent="1">
-            <mxGeometry x="140" y="20" width="120" height="70" as="geometry"/>
+        <object id="10" pll_kind="SC" name="pll2_0" placeholders="1" label="&lt;div style=&quot;position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:65px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;&quot;&gt;&lt;div style=&quot;position:absolute;left:-2px;top:-7px;width:40px;height:54px&quot;&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;40&quot; height=&quot;54&quot; viewBox=&quot;0 0 40 54&quot; preserveAspectRatio=&quot;none&quot; style=&quot;display:block;overflow:visible;&quot;&gt;&lt;path d=&quot;M 2 16 L 34 16 L 38 30 L 34 44 L 2 44 L 2 38 M 2 22 L 2 16&quot; fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-width=&quot;2&quot; stroke-linejoin=&quot;round&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/svg&gt;&lt;span style=&quot;position:absolute;left:40.0%;top:55.55555555555556%;font-size:11px;line-height:1;white-space:nowrap;transform:translate(-50%,-50%);&quot;&gt;%pll_kind%&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;position:absolute;left:50%;top:83.07692307692308%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:0px;&quot;&gt;%name%&lt;/div&gt;&lt;/div&gt;">
+          <mxCell style="rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=1;overflow=visible;resizable=0;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=pll2;drawclockKind=pll;points=[[0.0500,0.4615,0,0,0],[0.9167,0.3897,0,0,0],[0.9167,0.5333,0,0,0]];" vertex="1" parent="1">
+            <mxGeometry x="140" y="20" width="40" height="65" as="geometry" />
           </mxCell>
         </object>
-        <object name="gate0" placeholders="1" id="11">
-          <mxCell style="drawclockType=gate;points=[[0.0000,0.5000,0,0,0],[1.0000,0.5000,0,0,0]];" vertex="1" parent="1">
-            <mxGeometry x="300" y="10" width="120" height="70" as="geometry"/>
+        <object id="11" name="gate0" placeholders="1" label="&lt;div style=&quot;position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:55px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;&quot;&gt;&lt;div style=&quot;position:absolute;left:-2px;top:-7px;width:40px;height:54px&quot;&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;40&quot; height=&quot;54&quot; viewBox=&quot;0 0 40 54&quot; preserveAspectRatio=&quot;none&quot; style=&quot;display:block;overflow:visible;&quot;&gt;&lt;path d=&quot;M 11 18 L 19 18 A 12 12 0 1 1 19 42 L 11 42 Z&quot; fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-width=&quot;2&quot; stroke-linejoin=&quot;miter&quot;/&gt;&lt;circle cx=&quot;39&quot; cy=&quot;30&quot; r=&quot;3&quot; fill=&quot;#ffffff&quot; stroke=&quot;#000000&quot; stroke-width=&quot;2&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;div style=&quot;position:absolute;left:50%;top:80.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:0px;&quot;&gt;%name%&lt;/div&gt;&lt;/div&gt;">
+          <mxCell style="rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=1;overflow=visible;resizable=0;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=gate;drawclockKind=gate;points=[[0.2750,0.5455,0,0,0],[0.9750,0.5455,0,0,0]];" vertex="1" parent="1">
+            <mxGeometry x="300" y="10" width="40" height="55" as="geometry" />
           </mxCell>
         </object>
-        <object name="div0" placeholders="1" id="12">
-          <mxCell style="drawclockType=div;points=[[0.0000,0.5000,0,0,0],[1.0000,0.5000,0,0,0]];" vertex="1" parent="1">
-            <mxGeometry x="300" y="60" width="120" height="70" as="geometry"/>
+        <object id="12" name="div0" placeholders="1" label="&lt;div style=&quot;position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:55px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;&quot;&gt;&lt;div style=&quot;position:absolute;left:-2px;top:-7px;width:40px;height:54px&quot;&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;40&quot; height=&quot;54&quot; viewBox=&quot;0 0 40 54&quot; preserveAspectRatio=&quot;none&quot; style=&quot;display:block;overflow:visible;&quot;&gt;&lt;polygon points=&quot;30.4,36.0 20.0,42.0 9.6,36.0 9.6,24.0 20.0,18.0 30.4,24.0&quot; fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-width=&quot;2&quot; stroke-linejoin=&quot;round&quot;/&gt;&lt;path d=&quot;M 14.5 30.0 L 25.5 30.0&quot; fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;circle cx=&quot;20.0&quot; cy=&quot;25.5&quot; r=&quot;1.4&quot; fill=&quot;#000000&quot;/&gt;&lt;circle cx=&quot;20.0&quot; cy=&quot;34.5&quot; r=&quot;1.4&quot; fill=&quot;#000000&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;div style=&quot;position:absolute;left:50%;top:80.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:0px;&quot;&gt;%name%&lt;/div&gt;&lt;/div&gt;">
+          <mxCell style="rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=1;overflow=visible;resizable=0;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=div;drawclockKind=div;points=[[0.2402,0.5455,0,0,0],[0.7598,0.5455,0,0,0]];" vertex="1" parent="1">
+            <mxGeometry x="300" y="60" width="40" height="55" as="geometry" />
           </mxCell>
         </object>
-        <object freq="100" name="clk_a" placeholders="1" id="13">
-          <mxCell style="drawclockType=clock;points=[[0.0000,0.5000,0,0,0]];" vertex="1" parent="1">
-            <mxGeometry x="460" y="10" width="260" height="70" as="geometry"/>
+        <object id="13" name="clk_a" placeholders="1" label="&lt;div style=&quot;position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:51px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;&quot;&gt;&lt;div style=&quot;position:absolute;left:-2px;top:-7px;width:40px;height:36px&quot;&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;40&quot; height=&quot;36&quot; viewBox=&quot;0 0 40 36&quot; preserveAspectRatio=&quot;none&quot; style=&quot;display:block;overflow:visible;&quot;&gt;&lt;path d=&quot;M 0 36 L 7 36 M 43 36 L 43 24 L 39 24 L 39 36 L 34 36 L 34 24 L 30 24 L 30 36 L 25 36 L 25 24 L 21 24 L 21 36 L 16 36 L 16 24 L 12 24 L 12 36 L 7 36&quot; fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;square&quot; stroke-linejoin=&quot;miter&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;div style=&quot;position:absolute;left:62.5%;top:70.58823529411765%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;&quot;&gt;%name%&lt;/div&gt;&lt;/div&gt;">
+          <mxCell style="rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=1;overflow=visible;resizable=0;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=clock;drawclockKind=clock;points=[[0.0000,0.7059,0,0,0]];" vertex="1" parent="1">
+            <mxGeometry x="460" y="10" width="40" height="51" as="geometry" />
           </mxCell>
         </object>
-        <object freq="200" name="clk_b" placeholders="1" id="14">
-          <mxCell style="drawclockType=clock;points=[[0.0000,0.5000,0,0,0]];" vertex="1" parent="1">
-            <mxGeometry x="460" y="60" width="260" height="70" as="geometry"/>
+        <object id="14" name="clk_b" placeholders="1" label="&lt;div style=&quot;position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:51px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;&quot;&gt;&lt;div style=&quot;position:absolute;left:-2px;top:-7px;width:40px;height:36px&quot;&gt;&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;40&quot; height=&quot;36&quot; viewBox=&quot;0 0 40 36&quot; preserveAspectRatio=&quot;none&quot; style=&quot;display:block;overflow:visible;&quot;&gt;&lt;path d=&quot;M 0 36 L 7 36 M 43 36 L 43 24 L 39 24 L 39 36 L 34 36 L 34 24 L 30 24 L 30 36 L 25 36 L 25 24 L 21 24 L 21 36 L 16 36 L 16 24 L 12 24 L 12 36 L 7 36&quot; fill=&quot;none&quot; stroke=&quot;#000000&quot; stroke-width=&quot;1.5&quot; stroke-linecap=&quot;square&quot; stroke-linejoin=&quot;miter&quot;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;div style=&quot;position:absolute;left:62.5%;top:70.58823529411765%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;&quot;&gt;%name%&lt;/div&gt;&lt;/div&gt;">
+          <mxCell style="rounded=0;whiteSpace=nowrap;html=1;metaEdit=1;placeholders=1;overflow=visible;resizable=0;autosize=0;fillColor=none;strokeColor=none;spacingTop=0;spacingBottom=0;spacingLeft=0;spacingRight=0;align=left;verticalAlign=top;drawclockType=clock;drawclockKind=clock;points=[[0.0000,0.7059,0,0,0]];" vertex="1" parent="1">
+            <mxGeometry x="460" y="60" width="40" height="51" as="geometry" />
           </mxCell>
         </object>
-        <mxCell id="19" style="exitX=1;exitY=0.5;entryX=0.35;entryY=0.3333;" edge="1" parent="1" source="9" target="10">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="19" style="exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.85;exitY=0.5455;entryX=0.05;entryY=0.4615;" edge="1" parent="1" source="9" target="10">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="20" style="exitX=0.65;exitY=0.3333;entryX=0;entryY=0.5;" edge="1" parent="1" source="10" target="11">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="20" style="exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.9167;exitY=0.3897;entryX=0.275;entryY=0.5455;" edge="1" parent="1" source="10" target="11">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="21" style="exitX=0.65;exitY=0.6667;entryX=0;entryY=0.5;" edge="1" parent="1" source="10" target="12">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="21" style="exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.9167;exitY=0.5333;entryX=0.2402;entryY=0.5455;" edge="1" parent="1" source="10" target="12">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="22" style="exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="11" target="13">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="22" style="exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.975;exitY=0.5455;entryX=0;entryY=0.7059;" edge="1" parent="1" source="11" target="13">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="23" style="exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="12" target="14">
-          <mxGeometry relative="1" as="geometry"/>
+        <mxCell id="23" style="exitDx=0;exitDy=0;entryDx=0;entryDy=0;exitPerimeter=0;entryPerimeter=0;exitX=0.7598;exitY=0.5455;entryX=0;entryY=0.7059;" edge="1" parent="1" source="12" target="14">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

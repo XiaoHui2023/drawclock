@@ -5,7 +5,7 @@ from typing import Any
 
 from device_attrs_validate import collect_device_attr_errors
 from from_resolve import parse_source_ref
-from library_ports import output_connection_keys
+from library_ports import output_connection_key_suffixes
 
 
 def validate_config(
@@ -29,14 +29,12 @@ def validate_config(
       if base not in device_names:
         errors.append(f"器件 {name} 连接到未知器件 {peer}")
         continue
-      if suffix is not None:
-        upstream_kind = config[base].get("kind", "")
-        try:
-          valid_suffixes = set(
-            output_connection_keys(str(upstream_kind), library_path=library_path).values()
+        if suffix is not None:
+          upstream_kind = config[base].get("kind", "")
+          valid_suffixes = output_connection_key_suffixes(
+            str(upstream_kind),
+            library_path=library_path,
           )
-        except KeyError:
-          valid_suffixes = set()
         if suffix not in valid_suffixes:
           errors.append(
             f"器件 {name} 的 source {peer} 指向 {base} 的无效输出口 [{suffix}]"
@@ -56,9 +54,4 @@ def _referenced_peers(item: dict[str, Any]) -> list[str]:
     peers.extend(v for v in source.values() if isinstance(v, str))
   elif isinstance(source, str):
     peers.append(source)
-  target = item.get("target")
-  if isinstance(target, dict):
-    peers.extend(v for v in target.values() if isinstance(v, str))
-  elif isinstance(target, str):
-    peers.append(target)
   return peers

@@ -46,9 +46,10 @@ def validate_layout_matches_config(
                 errors.append(f"{name} 在配置中为 from，但布局类型为 {vertex.drawclock_type}")
             continue
         expected_kind = item.get("kind", "")
-        if vertex.drawclock_type != expected_kind:
+        layout_kind = vertex.object_attrs.get("kind") or vertex.drawclock_type
+        if layout_kind != expected_kind:
             errors.append(
-                f"{name} 的类型不一致: 配置 {expected_kind}，布局 {vertex.drawclock_type}"
+                f"{name} 的类型不一致: 配置 {expected_kind}，布局 {layout_kind}"
             )
 
     if errors:

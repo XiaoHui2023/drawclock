@@ -17,11 +17,7 @@
   "pll_dual": {
     "kind": "pll2",
     "pll_kind": "SC",
-    "source": "xtal",
-    "target": {
-      "0": "gate0",  // 多路输出：target 为 dict，键为 str（序号 "0"/"1" 或端口名）
-      "1": "div0"
-    }
+    "source": "xtal"
   },
   "gate0": {
     "kind": "gate",

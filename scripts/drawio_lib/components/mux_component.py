@@ -32,6 +32,7 @@ DEFAULT_INSTANCE_GAP = INSTANCE_NAME_GAP_LOOSE_PX
 LABEL_INSET_X = 6
 ATTR_INSTANCE_NAME = ATTR_NAME
 DRAWCLOCK_TYPE_KEY = "drawclockType"
+MUX_MAJOR_KIND = "mux"
 
 
 @dataclass
@@ -62,6 +63,10 @@ class MuxComponent:
     @property
     def drawclock_type(self) -> str:
         return self.title
+
+    @property
+    def json_kind(self) -> str:
+        return MUX_MAJOR_KIND
 
     @property
     def w(self) -> int:
@@ -164,7 +169,7 @@ class MuxComponent:
         return (
             f"{mxcell_html_label_style_parts()}"
             f"{DRAWCLOCK_TYPE_KEY}={self.drawclock_type};"
-            f"{kind_style_suffix(self.drawclock_type)}"
+            f"{kind_style_suffix(self.json_kind)}"
             f"points=[[{points_inner}]];"
         )
 

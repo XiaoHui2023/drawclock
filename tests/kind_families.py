@@ -23,3 +23,13 @@ JSON_VARIANT_KEYS: dict[str, str] = {
 ALL_VARIANT_TYPES: frozenset[str] = frozenset(
     variant for variants in VARIANT_FAMILIES.values() for variant in variants
 )
+
+# JSON kind is unified; drawclockType stays muxN (port count). No {kind}_kind field.
+MAJOR_KIND_ONLY: dict[str, tuple[str, ...]] = {
+    "mux": ("mux2", "mux3", "mux4", "mux5", "mux6"),
+    "pll": ("pll", "pll2"),
+}
+
+ALL_MAJOR_KIND_ONLY_TYPES: frozenset[str] = frozenset(
+    title for titles in MAJOR_KIND_ONLY.values() for title in titles
+)

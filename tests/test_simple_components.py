@@ -353,6 +353,14 @@ def test_pll_library_object_carries_pll_kind_default() -> None:
     frag = pll.cell_fragment("2")
     assert 'pll_kind="SC"' in frag
     assert "%pll_kind%" in frag
+    assert "drawclockKind=pll;" in pll.cell_style()
+
+
+def test_pll2_library_object_carries_unified_kind_in_style() -> None:
+    pll2 = importlib.import_module("drawio_lib.components.pll2")
+    style = pll2.cell_style()
+    assert "drawclockType=pll2;" in style
+    assert "drawclockKind=pll;" in style
 
 
 @pytest.mark.parametrize(
@@ -411,6 +419,19 @@ def test_gate_library_object_carries_kind_in_style() -> None:
     style = gate.cell_style()
     assert 'kind="' not in frag
     assert "drawclockKind=gate;" in style
+
+
+@pytest.mark.parametrize(
+    "module_name",
+    ["mux2", "mux3", "mux4", "mux5", "mux6"],
+)
+def test_mux_library_object_carries_unified_kind_in_style(module_name: str) -> None:
+    mod = importlib.import_module(f"drawio_lib.components.{module_name}")
+    frag = mod.cell_fragment("2")
+    style = mod.cell_style()
+    assert 'kind="' not in frag
+    assert f"drawclockType={module_name};" in style
+    assert "drawclockKind=mux;" in style
 
 
 @pytest.mark.parametrize("name", ["gate", "inv", "mux2"])
