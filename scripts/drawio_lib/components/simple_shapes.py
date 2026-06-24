@@ -25,6 +25,14 @@ def _inversion_bubble(cx: float, cy: float, r: float) -> str:
     )
 
 
+def _inv_triangle_marker(left_x: float, tip_x: float, cy: float, half_h: float) -> str:
+    return (
+        f'<polygon points="{left_x},{cy - half_h} {tip_x},{cy} '
+        f'{left_x},{cy + half_h}" fill="#ffffff" stroke="{STROKE}" '
+        f'stroke-width="{SW}" stroke-linejoin="round"/>'
+    )
+
+
 def _hex_points(cx: float, cy: float, r: float) -> str:
     pts = []
     for i in range(6):
@@ -589,6 +597,26 @@ def inv_body(g: geom.SimpleGeometry) -> str:
         f'{tip},{mid} {left},47" fill="{FILL}" '
         f'stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="round"/>'
         f'{_inversion_bubble(bubble, mid, INV_BUBBLE_R)}'
+    )
+
+
+INV_CELL_MARKER_LEFT_X = INV_TIP_X
+INV_CELL_MARKER_TIP_X = INV_RIGHT_PORT_X
+INV_CELL_MARKER_HALF_H = INV_BUBBLE_R
+
+
+def inv_cell_body(g: geom.SimpleGeometry) -> str:
+    """Triangle inverter with a small output triangle marker (inv_cell)."""
+    mid = _mid(g)
+    left = _dx(g, INV_PORT_LEFT_X)
+    tip = _dx(g, INV_TIP_X)
+    marker_left = _dx(g, INV_CELL_MARKER_LEFT_X)
+    marker_tip = _dx(g, INV_CELL_MARKER_TIP_X)
+    return (
+        f'<polygon points="{left},{mid} {left},13 '
+        f'{tip},{mid} {left},47" fill="{FILL}" '
+        f'stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="round"/>'
+        f'{_inv_triangle_marker(marker_left, marker_tip, mid, INV_CELL_MARKER_HALF_H)}'
     )
 
 

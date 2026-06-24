@@ -24,6 +24,7 @@ if str(SCRIPTS) not in sys.path:
         ("dto", 2),
         ("dto_n", 2),
         ("inv", 2),
+        ("inv_cell", 2),
         ("inv_mux", 2),
         ("clk_phase_sel", 4),
         ("cell", 2),
@@ -151,6 +152,14 @@ def test_inv_has_output_bubble() -> None:
     inv = importlib.import_module("drawio_lib.components.inv")
     html = inv.label_html()
     assert "<circle " in html
+    assert 'fill="#ffffff"' in html
+
+
+def test_inv_cell_has_output_triangle() -> None:
+    inv_cell = importlib.import_module("drawio_lib.components.inv_cell")
+    html = inv_cell.label_html()
+    assert html.count("<polygon ") == 2
+    assert "<circle " not in html
     assert 'fill="#ffffff"' in html
 
 
@@ -348,7 +357,7 @@ def test_pll_library_object_carries_pll_kind_default() -> None:
 
 @pytest.mark.parametrize(
     ("module_name", "inv_kind"),
-    [("inv", "inv"), ("inv_mux", "inv_mux")],
+    [("inv", "inv"), ("inv_cell", "inv_cell"), ("inv_mux", "inv_mux")],
 )
 def test_inv_library_object_carries_kind_in_style(module_name: str, inv_kind: str) -> None:
     mod = importlib.import_module(f"drawio_lib.components.{module_name}")

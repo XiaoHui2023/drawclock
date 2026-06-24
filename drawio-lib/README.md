@@ -63,6 +63,7 @@
 | 库名 | 预览 |
 | --- | --- |
 | inv | ![inv](images/inv.svg) |
+| inv_cell | ![inv_cell](images/inv_cell.svg) |
 | inv_mux | ![inv_mux](images/inv_mux.svg) |
 
 | 属性 | 说明 |
