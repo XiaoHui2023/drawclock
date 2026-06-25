@@ -18,22 +18,29 @@ class FromEndpoints:
   targets: tuple[str, ...]
 
 
-def _clock_inputs(
+def _from_source_endpoints(
   devices: dict[str, DeviceState],
   *,
   library_path: str | Path,
 ) -> tuple[dict[str, str | None], dict[str, str | None]]:
-  inputs: dict[str, str | None] = {}
+  """Resolve from-stub left peer and out port from the named device."""
+  left_peers: dict[str, str | None] = {}
   out_ports: dict[str, str | None] = {}
   for state in devices.values():
-    if state.kind != "clock":
+    if state.kind == "from":
       continue
     topology = topology_for_type(state.kind, library_path=library_path)
-    for port in topology.inputs:
-      inputs[state.name] = state.bindings.get(port)
+    if topology.output_count > 1:
+      continue
+    if topology.outputs:
+      port = topology.outputs[0]
+      left_peers[state.name] = state.name
+      out_ports[state.name] = port
+    elif topology.inputs:
+      port = topology.inputs[0]
+      left_peers[state.name] = state.bindings.get(port)
       out_ports[state.name] = state.source_out_ports.get(port)
-      break
-  return inputs, out_ports
+  return left_peers, out_ports
 
 
 def build_from_endpoints(
@@ -43,7 +50,9 @@ def build_from_endpoints(
   library_path: str | Path,
 ) -> dict[str, FromEndpoints]:
   device_names = {s.name for s in devices.values() if s.kind != "from"}
-  clock_inputs, clock_out_ports = _clock_inputs(devices, library_path=library_path)
+  left_peers, source_out_ports = _from_source_endpoints(
+    devices, library_path=library_path
+  )
   out: dict[str, FromEndpoints] = {}
   for from_name, cell_ids in from_by_name.items():
     targets: list[str] = []
@@ -56,8 +65,8 @@ def build_from_endpoints(
           targets.append(peer)
     resolved_targets = tuple(peer for peer in targets if peer in device_names)
     out[from_name] = FromEndpoints(
-      left=clock_inputs.get(from_name),
-      left_out_port=clock_out_ports.get(from_name),
+      left=left_peers.get(from_name),
+      left_out_port=source_out_ports.get(from_name),
       targets=resolved_targets,
     )
   return out
@@ -87,8 +96,8 @@ def from_input_out_ports(
   *,
   library_path: str | Path,
 ) -> dict[str, str | None]:
-  _, clock_out_ports = _clock_inputs(devices, library_path=library_path)
-  return {from_name: clock_out_ports.get(from_name) for from_name in from_by_name}
+  _, source_out_ports = _from_source_endpoints(devices, library_path=library_path)
+  return {from_name: source_out_ports.get(from_name) for from_name in from_by_name}
 
 
 def parse_source_ref(ref: str) -> tuple[str, str | None]:

@@ -168,7 +168,7 @@ def _bind_endpoint(
       raise ValueError(
         f"连线方向错误：{peer_name} → from {cell.name}。"
         f"from 只能向右连出到下游，不能接受连线；"
-        f"跨图时钟靠与 clock 同名对应，不是把其它器件连到 from"
+        f"跨图连接靠与上游器件同名对应，不是把其它器件连到 from"
       )
     port = resolve_port(cell.points, xy)
     if port is None:
@@ -238,16 +238,28 @@ def validate_topology(
   errors: list[str] = []
   errors.extend(_duplicate_device_name_errors(devices))
   device_names = {s.name for s in devices.values() if s.kind != "from"}
-  clock_names = {s.name for s in devices.values() if s.kind == "clock"}
+  device_by_name = {
+    state.name: state
+    for state in devices.values()
+    if state.kind != "from"
+  }
   from_names = set(from_by_name.keys())
   from_endpoints = build_from_endpoints(devices, from_by_name, library_path=library_path)
   name_to_cell = _name_to_cell_id(devices)
 
   for from_name in from_names:
-    if from_name not in clock_names:
+    source = device_by_name.get(from_name)
+    if source is None:
       errors.append(
-        f"from {from_name} 未找到同名 clock"
-        f"（全部输入图中须有一个 name 相同的 clock 器件）"
+        f"from {from_name} 未找到同名器件"
+        f"（须与某张图中的某个器件同名）"
+      )
+      continue
+    topology = topology_for_type(source.kind, library_path=library_path)
+    if topology.output_count > 1:
+      errors.append(
+        f"from {from_name} 不能绑定多输出器件"
+        f"（{source.kind} 有 {topology.output_count} 路输出）"
       )
 
   for from_name, endpoints in from_endpoints.items():
@@ -565,7 +577,7 @@ def _from_endpoint_errors(
   if not targets:
     errors.append(
       f"from {from_name} 未连到任何下游器件"
-      f"（应从 from 向右拖线到目标器件；与 clock 的对应靠同名）"
+      f"（应从 from 向右拖线到目标器件；与上游器件的对应靠同名）"
     )
   return errors
 

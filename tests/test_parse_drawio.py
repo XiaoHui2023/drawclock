@@ -303,7 +303,7 @@ def test_multi_input_error_includes_source_image(tmp_path: Path) -> None:
     bad = ROOT / "tests" / "fixtures" / "wire-only.drawio"
     bad_copy = tmp_path / "bad.drawio"
     bad_copy.write_text(bad.read_text(encoding="utf-8"), encoding="utf-8")
-    with pytest.raises(ValueError, match="未找到同名 clock") as exc:
+    with pytest.raises(ValueError, match="未找到同名器件") as exc:
         parse_drawio_paths([good, bad_copy], library_path=DEFAULT_LIBRARY_PATH)
     msg = str(exc.value)
     assert f"图片 {bad_copy}" in msg
@@ -348,9 +348,9 @@ def test_multiple_from_stubs_share_clock_name() -> None:
     assert config["gate1"]["source"] == "pll0"
 
 
-def test_from_without_clock_fails() -> None:
+def test_from_without_source_device_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-only.drawio"
-    with pytest.raises(ValueError, match="未找到同名 clock"):
+    with pytest.raises(ValueError, match="未找到同名器件"):
         parse_drawio_paths([path])
 
 
@@ -361,7 +361,7 @@ def test_from_upstream_connect_fails() -> None:
     msg = str(exc.value)
     assert "clk0" in msg
     assert "src0" in msg
-    assert "未找到同名 clock" not in msg
+    assert "未找到同名器件" not in msg
 
 
 def test_from_open_output_fails() -> None:
