@@ -31,7 +31,7 @@ if str(SCRIPTS) not in sys.path:
         ("occ_clk_cell", 2),
         ("gen_cell", 2),
         ("bist_clk_cell", 2),
-        ("occ_bist_clk_cell", 2),
+        ("occ_bist_clk_cell", 1),
         ("async_marker", 2),
         ("and_gate", 3),
         ("nand", 3),

@@ -9,4 +9,5 @@ register_colored_cell(
     fill="#228B22",
     tags="occ_bist_clk_cell cell clock drawclock",
     body_svg=occ_bist_clk_cell_body,
+    port_mode="left",
 )
