@@ -16,6 +16,7 @@ from drawio_library import (
     load_library_shapes,
     load_library_titles,
     reload_object_attrs,
+    unknown_library_vertex_message,
 )
 from drawio_ports import reload_edge_style
 
@@ -33,7 +34,10 @@ def reload_drawio_file(
     inp = Path(input_path)
     out = Path(output_path)
     mxfile = extract_mxfile_xml(str(inp))
-    migrated = migrate_mxfile_xml(mxfile, lib)
+    try:
+        migrated = migrate_mxfile_xml(mxfile, lib)
+    except ValueError as exc:
+        raise ValueError(f"图片 {inp}:\n{exc}") from exc
     out.parent.mkdir(parents=True, exist_ok=True)
     if is_drawio_svg_path(inp) and is_drawio_svg_path(out):
         svg_text = inp.read_text(encoding="utf-8")
@@ -110,6 +114,7 @@ def _migrate_root(
     library_path: str | Path,
 ) -> None:
     id_to_vertex: dict[str, tuple[str, str, str]] = {}
+    unknown: list[tuple[str, str]] = []
 
     for child in list(root_el):
         parsed = _parse_library_vertex(child)
@@ -118,10 +123,14 @@ def _migrate_root(
         cell_id, dtype, obj, mxcell = parsed
         dtype = DRAWCLOCK_TYPE_ALIASES.get(dtype, dtype)
         if dtype not in known:
-            raise ValueError(f"图中器件类型不在新器件库中: {dtype}")
+            unknown.append((_vertex_instance_name(obj, dtype), dtype))
+            continue
         old_style = mxcell.get("style") or ""
         _upgrade_library_vertex(obj, mxcell, dtype, shapes[dtype], library_path)
         id_to_vertex[cell_id] = (dtype, mxcell.get("style") or "", old_style)
+
+    if unknown:
+        raise ValueError(unknown_library_vertex_message(unknown, reload=True))
 
     for child in list(root_el):
         if child.tag != "mxCell" or child.get("edge") != "1":
@@ -213,6 +222,11 @@ def _apply_library_geometry(mxcell: ET.Element, shape: LibraryShape) -> None:
         geom.set("y", "0")
     geom.set("width", str(shape.w))
     geom.set("height", str(shape.h))
+
+
+def _vertex_instance_name(obj: ET.Element, dtype: str) -> str:
+    name = (obj.get("name") or obj.get("_name") or "").strip()
+    return name or dtype
 
 
 def _style_dtype(style: str) -> str | None:

@@ -43,20 +43,11 @@
 | div_n | ![div_n](images/div_n.svg) |
 | dto | ![dto](images/dto.svg) |
 | dto_n | ![dto_n](images/dto_n.svg) |
-| cpu_gate | ![cpu_gate](images/cpu_gate.svg) |
 
 | 属性 | 说明 |
 | --- | --- |
 | `name` | 实例名 |
 | `ratio` | 分频系数（仅 `div_r`，默认 `2`） |
-
-### clk_phase_sel
-
-![clk_phase_sel](images/clk_phase_sel.svg)
-
-| 属性 | 说明 |
-| --- | --- |
-| `name` | 实例名 |
 
 ### 反相器
 
@@ -84,37 +75,11 @@
 | --- | --- |
 | `name` | 实例名 |
 
-### async
-
-![async](images/async.svg)
-
-| 属性 | 说明 |
-| --- | --- |
-| `name` | 实例名 |
-
-### 逻辑门
-
-| 库名 | 预览 |
-| --- | --- |
-| and | ![and](images/and.svg) |
-| nand | ![nand](images/nand.svg) |
-| or | ![or](images/or.svg) |
-| nor | ![nor](images/nor.svg) |
-| xor | ![xor](images/xor.svg) |
-| xnor | ![xnor](images/xnor.svg) |
-| buffer | ![buffer](images/buffer.svg) |
-
-| 属性 | 说明 |
-| --- | --- |
-| `name` | 实例名 |
-
 ### 时钟源
 
 | 库名 | 预览 | 说明 |
 | --- | --- | --- |
 | source | ![source](images/source.svg) | 振荡源 |
-| vdd | ![vdd](images/vdd.svg) | 逻辑 1（电源） |
-| gnd | ![gnd](images/gnd.svg) | 逻辑 0（地） |
 | pad | ![pad](images/pad.svg) | I/O 输出 |
 
 | 属性 | 说明 |

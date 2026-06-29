@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from device_model import DeviceState
-from drawio_graph import GraphCell, ParsedDiagram, edge_attachment, edge_is_undirected
+from drawio_graph import GraphCell, ParsedDiagram, edge_attachment, edge_is_undirected, is_library_cell
 from from_resolve import FromEndpoints, build_from_endpoints
 from library_ports import (
   PortTopology,
@@ -53,7 +53,7 @@ def build_device_states(
     tgt = diagram.cells.get(edge.target_id)
     if not src or not tgt or src.is_edge or tgt.is_edge:
       continue
-    if not src.drawclock_type or not tgt.drawclock_type:
+    if not is_library_cell(src) or not is_library_cell(tgt):
       continue
     exit_xy = edge_attachment(edge.style, end="exit")
     entry_xy = edge_attachment(edge.style, end="entry")
@@ -127,7 +127,7 @@ def _undirected_edge_orientation(
   *,
   library_path: str | Path,
 ) -> str | None:
-  if not src.drawclock_type or not tgt.drawclock_type:
+  if not is_library_cell(src) or not is_library_cell(tgt):
     return None
   src_port = resolve_port(src.points, exit_xy)
   tgt_port = resolve_port(tgt.points, entry_xy)
@@ -350,6 +350,14 @@ def _edge_endpoints(
   return src, tgt
 
 
+def _doodle_edge_hint(src: GraphCell | None, tgt: GraphCell | None) -> str | None:
+  if src is not None and not is_library_cell(src):
+    return "source 端为涂鸦"
+  if tgt is not None and not is_library_cell(tgt):
+    return "target 端为涂鸦"
+  return None
+
+
 def _peer_label(cell: GraphCell | None, fallback_id: str | None) -> str:
   if cell is None:
     return fallback_id or "?"
@@ -402,9 +410,9 @@ def _diagnose_missing_inputs(
       hints.append(f"{prefix}：source 或 target 缺失，已忽略")
       continue
 
-    if not src.drawclock_type or not tgt.drawclock_type:
-      bad = "source" if not src.drawclock_type else "target"
-      hints.append(f"{prefix}：{bad} 端不是 drawclock 器件，已忽略")
+    doodle_hint = _doodle_edge_hint(src, tgt)
+    if doodle_hint is not None:
+      hints.append(f"{prefix}：{doodle_hint}，已忽略")
       continue
 
     entry_xy = edge_attachment(edge.style, end="entry")
@@ -437,6 +445,8 @@ def _diagnose_missing_inputs(
   for edge in outgoing:
     src, tgt = _edge_endpoints(edge, diagram)
     if src is None or tgt is None:
+      continue
+    if _doodle_edge_hint(src, tgt) is not None:
       continue
     tgt_name = _peer_label(tgt, edge.target_id)
     exit_xy = edge_attachment(edge.style, end="exit")
@@ -502,6 +512,8 @@ def _diagnose_missing_outputs(
 
   for edge in outgoing:
     src, tgt = _edge_endpoints(edge, diagram)
+    if _doodle_edge_hint(src, tgt) is not None:
+      continue
     tgt_name = _peer_label(tgt, edge.target_id)
     prefix = f"  · 连线 {state.name}→{tgt_name}"
     exit_xy = edge_attachment(edge.style, end="exit")
@@ -535,6 +547,8 @@ def _diagnose_missing_outputs(
 
   for edge in incoming:
     src, tgt = _edge_endpoints(edge, diagram)
+    if _doodle_edge_hint(src, tgt) is not None:
+      continue
     src_name = _peer_label(src, edge.source_id)
     entry_xy = edge_attachment(edge.style, end="entry")
     resolved = resolve_port(state.points, entry_xy)

@@ -20,31 +20,19 @@ if str(SCRIPTS) not in sys.path:
         ("div", 2),
         ("div_r", 2),
         ("div_n", 2),
-        ("cpu_gate", 4),
         ("dto", 2),
         ("dto_n", 2),
         ("inv", 2),
         ("inv_cell", 2),
         ("inv_mux", 2),
-        ("clk_phase_sel", 4),
         ("cell", 2),
         ("occ_clk_cell", 2),
         ("gen_cell", 2),
         ("bist_clk_cell", 2),
         ("occ_bist_clk_cell", 1),
-        ("async_marker", 2),
-        ("and_gate", 3),
-        ("nand", 3),
-        ("buffer", 2),
-        ("or_gate", 3),
-        ("nor", 3),
-        ("xor_gate", 3),
-        ("xnor", 3),
         ("pll", 2),
         ("pll2", 3),
         ("source", 1),
-        ("vdd", 1),
-        ("gnd", 1),
         ("pad", 1),
         ("clock", 1),
         ("from", 1),
@@ -185,135 +173,6 @@ def test_gen_cell_is_red_triangle() -> None:
     assert 'fill="#ffb3b3"' in html
 
 
-def test_async_has_red_cross() -> None:
-    async_mod = importlib.import_module("drawio_lib.components.async_marker")
-    html = async_mod.label_html()
-    assert 'stroke="#cc0000"' in html
-
-
-def test_or_body_is_d_with_right_bulging_left_arc() -> None:
-    or_gate = importlib.import_module("drawio_lib.components.or_gate")
-    and_gate = importlib.import_module("drawio_lib.components.and_gate")
-    nor = importlib.import_module("drawio_lib.components.nor")
-    xor_gate = importlib.import_module("drawio_lib.components.xor_gate")
-    xnor = importlib.import_module("drawio_lib.components.xnor")
-    from drawio_lib.components.simple_shapes import (
-        LOGIC_GATE_ARC_X,
-        LOGIC_GATE_BODY_R,
-        LOGIC_GATE_LEFT_X,
-        LOGIC_OR_LEFT_ARC_RX,
-        LOGIC_OR_LEFT_ARC_RY,
-        LOGIC_XOR_EXTRA_X,
-    )
-    from drawio_lib.xml_io import decompress_drawio_xml
-
-    or_body = or_gate.label_html().split('fill="#d9d9d9"')[0]
-    and_body = and_gate.label_html().split('fill="#d9d9d9"')[0]
-    nor_body = nor.label_html().split('fill="#d9d9d9"')[0]
-    xor_html = xor_gate.label_html()
-    xnor_html = xnor.label_html()
-
-    assert LOGIC_OR_LEFT_ARC_RX == LOGIC_GATE_ARC_X - LOGIC_GATE_LEFT_X
-    assert LOGIC_OR_LEFT_ARC_RY == LOGIC_GATE_BODY_R
-    left = _logic_left_cell(or_gate)
-    arc = _logic_arc_cell(or_gate)
-    extra = _logic_left_cell(or_gate) - (LOGIC_GATE_LEFT_X - LOGIC_XOR_EXTRA_X)
-    top = or_gate.G.body_mid_y - LOGIC_GATE_BODY_R
-    arc_snippet = f"A {LOGIC_OR_LEFT_ARC_RX} {LOGIC_OR_LEFT_ARC_RY}"
-    and_top = f"M {left} {top} L {arc} {top}"
-    for body in (or_body, nor_body):
-        assert arc_snippet in body
-        assert " Q " not in body
-        assert and_top in body
-        assert f"A {LOGIC_OR_LEFT_ARC_RX} {LOGIC_OR_LEFT_ARC_RY} 0 0 0 {left} {top}" in body
-    for html in (xor_html, xnor_html):
-        assert html.count(arc_snippet) == 2
-        assert and_top in html
-        assert f"M {extra} {top} A" not in html
-    assert and_top in and_body
-    assert arc_snippet not in and_body
-
-    for mod in (or_gate, nor, xor_gate, xnor):
-        library_xml = decompress_drawio_xml(mod.library_entry()["xml"])
-        assert arc_snippet in library_xml
-        assert f"M {left} {top}" in library_xml
-        expected_arcs = 2 if mod in (xor_gate, xnor) else 1
-        assert library_xml.count(arc_snippet) == expected_arcs
-
-
-def test_xor_input_leads_meet_extra_arc() -> None:
-    """XOR/XNOR input stubs must end on the extra arc (same at_y rule as OR on main arc)."""
-    import re
-
-    from drawio_lib.components import simple_geometry as sgeom
-    from drawio_lib.components.simple_shapes import (
-        LOGIC_INPUT_BOTTOM_Y,
-        LOGIC_INPUT_TOP_Y,
-        LOGIC_XOR_EXTRA_X,
-        _or_left_arc_x_at_y,
-        xor_extra_input_arc_x_at_y,
-    )
-
-    xor_gate = importlib.import_module("drawio_lib.components.xor_gate")
-    xnor = importlib.import_module("drawio_lib.components.xnor")
-    pad = sgeom.side_pad_x(xor_gate.W)
-    extra_left = pad + LOGIC_XOR_EXTRA_X
-    main_left = _logic_left_cell(xor_gate)
-    mid = xor_gate.G.body_mid_y
-    for y in (LOGIC_INPUT_TOP_Y, LOGIC_INPUT_BOTTOM_Y):
-        expected = xor_extra_input_arc_x_at_y(extra_left=extra_left, mid=mid, y=y)
-        main_inner = _or_left_arc_x_at_y(body_left=main_left, mid=mid, y=y)
-        assert expected < main_inner, (
-            f"extra arc at_y={expected} must stay left of main body inner bulge={main_inner}"
-        )
-    for mod in (xor_gate, xnor):
-        html = mod.label_html()
-        for m in re.finditer(
-            r'<line x1="([\d.]+)" y1="([\d.]+)" x2="([\d.]+)" y2="\2"',
-            html,
-        ):
-            y = float(m.group(2))
-            if y not in (float(LOGIC_INPUT_TOP_Y), float(LOGIC_INPUT_BOTTOM_Y)):
-                continue
-            end_x = float(m.group(3))
-            expected = xor_extra_input_arc_x_at_y(extra_left=extra_left, mid=mid, y=y)
-            assert isclose(end_x, expected, abs_tol=0.02), (
-                f"{mod.TITLE} input at y={y}: end_x={end_x}, expected extra arc x={expected}"
-            )
-
-
-def test_on_disk_drawclock_xml_or_shape() -> None:
-    """drawio-lib/drawclock.xml on disk must match generated or gate body."""
-    import json
-    import re
-
-    from drawio_lib.xml_io import decompress_drawio_xml
-
-    raw = (ROOT / "drawio-lib" / "drawclock.xml").read_text(encoding="utf-8")
-    match = re.search(r"<mxlibrary>(.*)</mxlibrary>", raw, re.DOTALL)
-    assert match, "drawclock.xml must contain mxlibrary"
-    entries = json.loads(match.group(1))
-    or_entry = next(e for e in entries if e.get("title") == "or")
-    xml = decompress_drawio_xml(or_entry["xml"])
-    assert "A 10 12" in xml
-    assert "Q 54 30" not in xml
-    assert "M 8 18 L 18 18 A 12 12 0 1 1 18 42 L 8 42 A 10 12 0 0 0 8 18" in xml
-
-
-def _logic_left_cell(mod) -> float:
-    from drawio_lib.components import simple_geometry as sgeom
-    from drawio_lib.components.simple_shapes import LOGIC_GATE_LEFT_X
-
-    return sgeom.side_pad_x(mod.W) + LOGIC_GATE_LEFT_X
-
-
-def _logic_arc_cell(mod) -> float:
-    from drawio_lib.components import simple_geometry as sgeom
-    from drawio_lib.components.simple_shapes import LOGIC_GATE_ARC_X
-
-    return sgeom.side_pad_x(mod.W) + LOGIC_GATE_ARC_X
-
-
 def test_pll_center_label_on_graphic() -> None:
     pll = importlib.import_module("drawio_lib.components.pll")
     from drawio_lib.components import simple_geometry as sgeom
@@ -379,7 +238,7 @@ def test_inv_library_object_carries_kind_in_style(module_name: str, inv_kind: st
 
 @pytest.mark.parametrize(
     ("module_name", "source_kind"),
-    [("source", "source"), ("vdd", "vdd"), ("gnd", "gnd"), ("pad", "pad")],
+    [("source", "source"), ("pad", "pad")],
 )
 def test_clock_source_library_object_carries_kind_in_style(
     module_name: str, source_kind: str
@@ -448,52 +307,6 @@ def test_instance_name_not_in_svg(name: str) -> None:
     assert "overflow=visible" in mod.cell_style()
     assert "overflow=fill" not in mod.cell_style()
     assert "resizable=0" in mod.cell_style()
-
-
-def test_cpu_gate_labels_module_and_outputs() -> None:
-    cpu_gate = importlib.import_module("drawio_lib.components.cpu_gate")
-    from drawio_lib.components import module_geometry as mgeom
-    from drawio_lib.components.simple_geometry import STANDARD_ROW_PITCH
-
-    html = cpu_gate.label_html()
-    g = cpu_gate.G
-    assert g.cell_w > 40
-    assert ">cpu_gate</span>" in html
-    for label in ("hclk_en", "hclk", "clk_arm_core"):
-        assert f">{label}</span>" in html
-    assert "<line " in html
-    assert "transform:translate(-100%,-50%)" in html
-
-    pts = cpu_gate._parse_points(cpu_gate.cell_style())
-    assert isclose(pts[0][0], g.box_left / cpu_gate.W, abs_tol=0.002)
-    assert isclose(pts[0][1], g.left.anchor.cell_y / cpu_gate.H, abs_tol=0.002)
-    assert pts[0][1] > g.header_bottom / cpu_gate.H
-    for index in range(len(g.outputs) - 1):
-        pitch = g.outputs[index + 1].anchor.cell_y - g.outputs[index].anchor.cell_y
-        assert pitch == STANDARD_ROW_PITCH
-        assert pitch == mgeom.OUTPUT_PITCH
-
-
-def test_clk_phase_sel_ports_on_right_border() -> None:
-    mod = importlib.import_module("drawio_lib.components.clk_phase_sel")
-    from drawio_lib.components import simple_geometry as sgeom
-    from drawio_lib.components.simple_shapes import (
-        CLK_PHASE_SEL_BOX_LEFT,
-        CLK_PHASE_SEL_BOX_RIGHT,
-        clk_phase_sel_output_positions,
-    )
-
-    pts = mod._parse_points(mod.cell_style())
-    pad = sgeom.side_pad_x(mod.W)
-    mid = mod.G.body_mid_y
-    assert isclose(pts[0][0], (pad + CLK_PHASE_SEL_BOX_LEFT) / mod.W, abs_tol=0.001)
-    assert isclose(pts[0][1], mid / mod.H, abs_tol=0.001)
-    for pt, (design_x, cell_y) in zip(
-        pts[1:], clk_phase_sel_output_positions(mid), strict=True
-    ):
-        assert design_x == CLK_PHASE_SEL_BOX_RIGHT
-        assert isclose(pt[0], (pad + CLK_PHASE_SEL_BOX_RIGHT) / mod.W, abs_tol=0.001)
-        assert isclose(pt[1], cell_y / mod.H, abs_tol=0.001)
 
 
 def test_from_ports_on_graphic() -> None:

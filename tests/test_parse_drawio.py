@@ -232,36 +232,6 @@ def test_pll2_dual_output_source_suffix() -> None:
     assert config["div0"]["source"] == "pll2_0[1]"
 
 
-def test_cpu_gate_named_output_keys(tmp_path: Path) -> None:
-    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
-    source = shapes["source"]
-    cpu_gate = shapes["cpu_gate"]
-    clock = shapes["clock"]
-    model = (
-        "<mxGraphModel><root>"
-        "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
-        f"{_library_object(10, 'src0', source)}"
-        f"{_library_object(11, 'cg0', cpu_gate)}"
-        f"{_library_object(12, 'clk_en', clock)}"
-        f"{_library_object(13, 'clk_main', clock)}"
-        f"{_library_object(14, 'clk_core', clock)}"
-        f"{_edge(20, 10, 11, source, 'source', 'right', cpu_gate, 'cpu_gate', 'left')}"
-        f"{_edge(21, 11, 12, cpu_gate, 'cpu_gate', 'out0', clock, 'clock', 'left')}"
-        f"{_edge(22, 11, 13, cpu_gate, 'cpu_gate', 'out1', clock, 'clock', 'left')}"
-        f"{_edge(23, 11, 14, cpu_gate, 'cpu_gate', 'out2', clock, 'clock', 'left')}"
-        "</root></mxGraphModel>"
-    )
-    path = tmp_path / "cpu-gate-tree.drawio"
-    path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
-
-    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
-
-    assert "target" not in config["cg0"]
-    assert config["clk_en"]["source"] == "cg0[hclk_en]"
-    assert config["clk_main"]["source"] == "cg0[hclk]"
-    assert config["clk_core"]["source"] == "cg0[clk_arm_core]"
-
-
 def test_from_duplicate_input_binding_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-too-many.drawio"
     with pytest.raises(ValueError, match="未连接"):
@@ -346,6 +316,44 @@ def test_multiple_from_stubs_share_clock_name() -> None:
     config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
     assert config["gate0"]["source"] == "pll0"
     assert config["gate1"]["source"] == "pll0"
+
+
+def test_doodle_edges_to_library_devices_are_ignored(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    gate = shapes["gate"]
+    clock = shapes["clock"]
+    doodle = (
+        '<mxCell id="50" value="note" style="text;html=1;" vertex="1" parent="1">'
+        '<mxGeometry x="200" y="10" width="60" height="30" as="geometry"/>'
+        "</mxCell>"
+    )
+    model = (
+        "<mxGraphModel><root>"
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        f"{_library_object(10, 'src0', source)}"
+        f"{_library_object(11, 'gate0', gate)}"
+        f"{_library_object(12, 'clk0', clock)}"
+        f"{doodle}"
+        f"{_edge(20, 10, 11, source, 'source', 'right', gate, 'gate', 'left')}"
+        f"{_edge(21, 11, 12, gate, 'gate', 'right', clock, 'clock', 'left')}"
+        '<mxCell id="22" edge="1" parent="1" source="50" target="11" '
+        'style="endArrow=none;html=1;exitX=1;exitY=0.5;exitPerimeter=0;'
+        'entryX=0;entryY=0.5;entryPerimeter=0;">'
+        '<mxGeometry relative="1" as="geometry"/></mxCell>'
+        '<mxCell id="23" edge="1" parent="1" source="11" target="50" '
+        'style="endArrow=none;html=1;exitX=1;exitY=0.5;exitPerimeter=0;'
+        'entryX=0;entryY=0.5;entryPerimeter=0;">'
+        '<mxGeometry relative="1" as="geometry"/></mxCell>'
+        "</root></mxGraphModel>"
+    )
+    path = tmp_path / "doodle-edges.drawio"
+    path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
+
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    assert config["gate0"]["source"] == "src0"
+    assert config["clk0"]["source"] == "gate0"
 
 
 def test_from_without_source_device_fails() -> None:
@@ -526,11 +534,14 @@ def test_variant_family_parse_exports_major_and_minor_kind(
             "<mxCell id=\"0\"/><mxCell id=\"1\" parent=\"0\"/>"
             f"{_library_object(10, 'src0', source)}"
             f"{_library_object(11, name, device)}"
-            f"{_library_object(12, 'clk0', clock)}"
             f"{_edge(20, 10, 11, source, 'source', 'right', device, variant, 'left')}"
-            f"{_edge(21, 11, 12, device, variant, 'right', clock, 'clock', 'left')}"
-            "</root></mxGraphModel>"
         )
+        if variant != "occ_bist_clk_cell":
+            model += (
+                f"{_library_object(12, 'clk0', clock)}"
+                f"{_edge(21, 11, 12, device, variant, 'right', clock, 'clock', 'left')}"
+            )
+        model += "</root></mxGraphModel>"
 
     path = tmp_path / f"{variant}-kind.drawio"
     path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")

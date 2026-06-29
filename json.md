@@ -7,11 +7,11 @@
 旧图若缺少 `drawclockKind`，导出可能仍用库类型名（如 `pll2`、`mux3`）；须重载器件库升级图形后再导出。
 
 ```json5
-// JSON 无 from；其余属性原样来自图中 object
+// JSON 无 from；涂鸦与非器件库图形不进 JSON，连到涂鸦的边忽略、不报错；其余属性原样来自图中 object
 {
   "xtal": {
     "kind": "source",        // 时钟源大类
-    "source_kind": "source"  // 小类：source / vdd / gnd / pad
+    "source_kind": "source"  // 小类：source / pad
   },
   "pll_main": {
     "kind": "pll",

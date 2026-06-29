@@ -496,6 +496,27 @@ def test_migrate_rejects_unknown_library_type() -> None:
     try:
         migrate_mxfile_xml(bad, LIBRARY)
     except ValueError as exc:
-        assert "不在新器件库" in str(exc)
+        message = str(exc)
+        assert "不在新器件库" in message
+        assert "器件 x（类型 not_a_type）" in message
+    else:
+        raise AssertionError("expected ValueError")
+
+
+def test_reload_drawio_file_wraps_unknown_library_type_with_input_path(tmp_path: Path) -> None:
+    bad = """<mxfile><diagram><mxGraphModel><root>
+        <mxCell id="0"/><mxCell id="1" parent="0"/>
+        <object name="old_pll" id="2"><mxCell style="drawclockType=not_a_type;" vertex="1" parent="1">
+        <mxGeometry x="0" y="0" width="10" height="10" as="geometry"/></mxCell></object>
+        </root></mxGraphModel></diagram></mxfile>"""
+    inp = tmp_path / "fig.drawio"
+    out = tmp_path / "fig-reloaded.drawio"
+    inp.write_text(bad, encoding="utf-8")
+    try:
+        reload_drawio_file(inp, LIBRARY, out)
+    except ValueError as exc:
+        message = str(exc)
+        assert f"图片 {inp}:" in message
+        assert "器件 old_pll（类型 not_a_type）不在新器件库中" in message
     else:
         raise AssertionError("expected ValueError")

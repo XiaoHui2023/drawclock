@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 VARIANT_FAMILIES: dict[str, tuple[str, ...]] = {
-    "source": ("source", "vdd", "gnd", "pad"),
+    "source": ("source", "pad"),
     "inv": ("inv", "inv_cell", "inv_mux"),
     "cell": ("cell", "occ_clk_cell", "gen_cell", "bist_clk_cell", "occ_bist_clk_cell"),
 }

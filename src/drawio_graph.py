@@ -58,19 +58,23 @@ def merge_diagrams(parts: list[ParsedDiagram]) -> ParsedDiagram:
     return ParsedDiagram(cells=merged, cell_sources=sources)
 
 
+def is_library_cell(cell: GraphCell) -> bool:
+    """True for drawclock library vertices; doodles and edges are False."""
+    return not cell.is_edge and bool(cell.drawclock_type)
+
+
 def validate_diagram_library(diagram: ParsedDiagram, library_path: str | Path) -> None:
-    from drawio_library import load_library_titles
+    from drawio_library import load_library_titles, unknown_library_vertex_message
 
     known = load_library_titles(library_path)
-    unknown = sorted(
-        {
-            cell.drawclock_type
-            for cell in diagram.cells.values()
-            if not cell.is_edge and cell.drawclock_type and cell.drawclock_type not in known
-        }
-    )
+    unknown: list[tuple[str, str]] = []
+    for cell in diagram.cells.values():
+        if cell.is_edge or not cell.drawclock_type or cell.drawclock_type in known:
+            continue
+        name = (cell.name or cell.drawclock_type).strip()
+        unknown.append((name, cell.drawclock_type))
     if unknown:
-        raise ValueError(f"图中器件类型不在器件库中: {', '.join(unknown)}")
+        raise ValueError(unknown_library_vertex_message(unknown, reload=False))
 
 
 def _collect_cells(root_el: ET.Element, out: dict[str, GraphCell], *, id_prefix: str) -> None:
@@ -121,9 +125,21 @@ def _add_mxcell(
     if mxcell.get("vertex") != "1":
         return
     dtype = _style_value(style, DRAWCLOCK_TYPE_RE)
-    if not dtype:
-        return
     merged = {**attrs, **mxcell.attrib}
+    if not dtype:
+        gx, gy, gw, gh = _parse_vertex_geometry(mxcell)
+        out[cell_id] = GraphCell(
+            cell_id=cell_id,
+            is_edge=False,
+            style=style,
+            drawclock_type=None,
+            name=_doodle_label(merged),
+            x=gx,
+            y=gy,
+            width=gw,
+            height=gh,
+        )
+        return
     internal_from_style = _internal_attrs_from_style(style)
     for key in INTERNAL_OBJECT_KEYS:
         legacy = attrs.get(key)
@@ -196,6 +212,14 @@ def _prefixed(cell_id: str | None, prefix: str) -> str | None:
     if not cell_id:
         return None
     return f"{prefix}{cell_id}"
+
+
+def _doodle_label(merged: dict[str, str]) -> str:
+    for key in ("name", "_name", "value", "label"):
+        raw = merged.get(key)
+        if raw is not None and str(raw).strip():
+            return str(raw).strip()
+    return ""
 
 
 def _style_value(style: str, pattern: re.Pattern[str]) -> str | None:

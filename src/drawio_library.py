@@ -64,6 +64,19 @@ def validate_layout_types(layout_types: set[str], library_titles: set[str]) -> N
         raise ValueError(f"布局中的 drawclock 类型不在器件库中: {', '.join(missing)}")
 
 
+def unknown_library_vertex_message(
+    vertices: list[tuple[str, str]],
+    *,
+    reload: bool,
+) -> str:
+    suffix = "不在新器件库中" if reload else "不在器件库中"
+    lines = [
+        f"器件 {name}（类型 {dtype}）{suffix}"
+        for name, dtype in sorted(vertices, key=lambda item: (item[1], item[0]))
+    ]
+    return "\n".join(lines)
+
+
 def load_library_shapes(path: str | Path | None = None) -> dict[str, LibraryShape]:
     """Parse drawclock.xml: mxCell style, object label HTML, and default w/h per title."""
     lib_path = Path(path) if path is not None else DEFAULT_LIBRARY_PATH

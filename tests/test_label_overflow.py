@@ -140,7 +140,7 @@ def _instance_name_gap_px(mod) -> int:
         ("div", 44),
         ("from", 14),
         ("clock", 36),
-        ("and_gate", 54),
+        ("pll", 54),
         ("mux2", None),
     ],
 )
@@ -157,15 +157,6 @@ def test_instance_name_top_y_unchanged_pixels(
 @pytest.mark.parametrize("spec", registry.ALL, ids=lambda s: s.module.TITLE)
 def test_selection_box_matches_render_bounds(spec) -> None:
     mod = spec.module
-    if mod.TITLE == "async":
-        verify_selection_box_matches_render_bounds(
-            mod.H,
-            name_top_y=mod.H,
-            instance_name_gap_px=0,
-            name_h=0,
-            title=mod.TITLE,
-        )
-        return
     name_top = _name_top_y(mod)
     assert name_top is not None, f"{mod.TITLE}: expected instance name in label"
     verify_selection_box_matches_render_bounds(
