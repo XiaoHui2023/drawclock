@@ -269,7 +269,19 @@ def validate_topology(
     if state.kind == "from":
       continue
     topology = topology_for_type(state.kind, library_path=library_path)
-    missing_inputs = set(topology.inputs) - set(state.bindings)
+    cell_id = name_to_cell.get(state.name)
+    doodle_inputs: set[str] = set()
+    doodle_outputs: set[str] = set()
+    if diagram is not None and cell_id is not None:
+      doodle_inputs, doodle_outputs = _doodle_connected_ports(
+        state,
+        cell_id,
+        diagram,
+        library_path=library_path,
+      )
+    missing_inputs = (
+      set(topology.inputs) - set(state.bindings) - doodle_inputs
+    )
     if missing_inputs:
       if len(topology.inputs) == 1:
         block = [f"器件 {state.name} 输入端口未连接"]
@@ -278,7 +290,6 @@ def validate_topology(
           f"器件 {state.name} 未连接的输入端口: "
           f"{', '.join(sorted(missing_inputs))}"
         ]
-      cell_id = name_to_cell.get(state.name)
       if diagram is not None and cell_id is not None:
         block.extend(
           _diagnose_missing_inputs(
@@ -291,28 +302,21 @@ def validate_topology(
         )
       errors.append("\n".join(block))
 
-  for state in devices.values():
-    if state.kind == "from":
-      continue
-    topology = topology_for_type(state.kind, library_path=library_path)
-    if _total_port_count(topology) != 1 or not topology.outputs:
-      continue
-    port = topology.outputs[0]
-    if state.out_bindings.get(port):
-      continue
-    block = [f"器件 {state.name} 输出端口未连接"]
-    cell_id = name_to_cell.get(state.name)
-    if diagram is not None and cell_id is not None:
-      block.extend(
-        _diagnose_missing_outputs(
-          state,
-          cell_id,
-          {port},
-          diagram,
-          library_path=library_path,
-        )
-      )
-    errors.append("\n".join(block))
+    if _total_port_count(topology) == 1 and topology.outputs:
+      port = topology.outputs[0]
+      if not state.out_bindings.get(port) and port not in doodle_outputs:
+        block = [f"器件 {state.name} 输出端口未连接"]
+        if diagram is not None and cell_id is not None:
+          block.extend(
+            _diagnose_missing_outputs(
+              state,
+              cell_id,
+              {port},
+              diagram,
+              library_path=library_path,
+            )
+          )
+        errors.append("\n".join(block))
 
   for state in devices.values():
     if state.kind == "from":
@@ -356,6 +360,71 @@ def _doodle_edge_hint(src: GraphCell | None, tgt: GraphCell | None) -> str | Non
   if tgt is not None and not is_library_cell(tgt):
     return "target 端为涂鸦"
   return None
+
+
+def _doodle_edge_port(
+  state: DeviceState,
+  edge: GraphCell,
+  cell_id: str,
+  topology: PortTopology,
+) -> str | None:
+  if edge.source_id == cell_id:
+    xy = edge_attachment(edge.style, end="exit")
+    if xy is None:
+      return None
+    port = resolve_port(state.points, xy)
+    if port is not None:
+      return port
+    if topology.outputs:
+      return topology.outputs[0]
+    if topology.inputs:
+      return topology.inputs[0]
+    return None
+  if edge.target_id == cell_id:
+    xy = edge_attachment(edge.style, end="entry")
+    if xy is None:
+      return None
+    port = resolve_port(state.points, xy)
+    if port is not None:
+      return port
+    if topology.inputs:
+      return topology.inputs[0]
+    if topology.outputs:
+      return topology.outputs[0]
+    return None
+  return None
+
+
+def _doodle_connected_ports(
+  state: DeviceState,
+  cell_id: str,
+  diagram: ParsedDiagram,
+  *,
+  library_path: str | Path,
+) -> tuple[set[str], set[str]]:
+  input_ports: set[str] = set()
+  output_ports: set[str] = set()
+  topology = topology_for_type(state.kind, library_path=library_path)
+
+  for edge in diagram.cells.values():
+    if not edge.is_edge:
+      continue
+    if cell_id not in (edge.source_id, edge.target_id):
+      continue
+    src, tgt = _edge_endpoints(edge, diagram)
+    if src is None or tgt is None:
+      continue
+    if is_library_cell(src) == is_library_cell(tgt):
+      continue
+    port = _doodle_edge_port(state, edge, cell_id, topology)
+    if port is None:
+      continue
+    if is_input_port(port, topology):
+      input_ports.add(port)
+    if is_output_port(port, topology):
+      output_ports.add(port)
+
+  return input_ports, output_ports
 
 
 def _peer_label(cell: GraphCell | None, fallback_id: str | None) -> str:

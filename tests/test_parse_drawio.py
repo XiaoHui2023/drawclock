@@ -356,6 +356,71 @@ def test_doodle_edges_to_library_devices_are_ignored(tmp_path: Path) -> None:
     assert config["clk0"]["source"] == "gate0"
 
 
+def test_input_connected_to_doodle_not_reported_as_missing(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    gate = shapes["gate"]
+    gate_in = port_anchors(gate.style, "gate")["left"]
+    doodle = (
+        '<mxCell id="50" value="note" style="text;html=1;" vertex="1" parent="1">'
+        '<mxGeometry x="0" y="40" width="60" height="30" as="geometry"/>'
+        "</mxCell>"
+    )
+    doodle_edge = (
+        '<mxCell id="20" edge="1" parent="1" source="50" target="10" '
+        'style="endArrow=none;html=1;exitX=1;exitY=0.5;exitPerimeter=0;'
+        f'entryX={gate_in[0]};entryY={gate_in[1]};entryPerimeter=0;">'
+        '<mxGeometry relative="1" as="geometry"/></mxCell>'
+    )
+    model = (
+        "<mxGraphModel><root>"
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        f"{_library_object(10, 'gate0', gate)}"
+        f"{doodle}"
+        f"{doodle_edge}"
+        "</root></mxGraphModel>"
+    )
+    path = tmp_path / "gate-doodle-in.drawio"
+    path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
+
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    assert config["gate0"]["kind"] == "gate"
+    assert "source" not in config["gate0"]
+
+
+def test_output_connected_to_doodle_not_reported_as_missing(tmp_path: Path) -> None:
+    shapes = load_library_shapes(DEFAULT_LIBRARY_PATH)
+    source = shapes["source"]
+    src_out = port_anchors(source.style, "source")["right"]
+    doodle = (
+        '<mxCell id="50" value="note" style="text;html=1;" vertex="1" parent="1">'
+        '<mxGeometry x="200" y="40" width="60" height="30" as="geometry"/>'
+        "</mxCell>"
+    )
+    doodle_edge = (
+        '<mxCell id="20" edge="1" parent="1" source="10" target="50" '
+        'style="endArrow=none;html=1;'
+        f'exitX={src_out[0]};exitY={src_out[1]};exitPerimeter=0;'
+        'entryX=0;entryY=0.5;entryPerimeter=0;">'
+        '<mxGeometry relative="1" as="geometry"/></mxCell>'
+    )
+    model = (
+        "<mxGraphModel><root>"
+        '<mxCell id="0"/><mxCell id="1" parent="0"/>'
+        f"{_library_object(10, 'src0', source)}"
+        f"{doodle}"
+        f"{doodle_edge}"
+        "</root></mxGraphModel>"
+    )
+    path = tmp_path / "source-doodle-out.drawio"
+    path.write_text(f"<mxfile><diagram>{model}</diagram></mxfile>", encoding="utf-8")
+
+    config = parse_drawio_paths([path], library_path=DEFAULT_LIBRARY_PATH)
+
+    assert config["src0"]["kind"] == "source"
+    assert "source" not in config["src0"]
+
+
 def test_from_without_source_device_fails() -> None:
     path = ROOT / "tests" / "fixtures" / "wire-only.drawio"
     with pytest.raises(ValueError, match="未找到同名器件"):
