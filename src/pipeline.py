@@ -37,6 +37,8 @@ def _source_for_error_line(line: str, name_to_source: dict[str, Path]) -> Path |
     stripped = line.strip()
     if not stripped or stripped.startswith("·"):
         return None
+    if "（图片 " in stripped:
+        return None
     for pattern in (_DEVICE_NAME_RE, _DUPLICATE_NAME_RE, _UPSTREAM_PEER_RE):
         match = pattern.match(stripped)
         if match:

@@ -236,7 +236,7 @@ def validate_topology(
   diagram: ParsedDiagram | None = None,
 ) -> None:
   errors: list[str] = []
-  errors.extend(_duplicate_device_name_errors(devices))
+  errors.extend(_duplicate_device_name_errors(devices, diagram=diagram))
   device_names = {s.name for s in devices.values() if s.kind != "from"}
   device_by_name = {
     state.name: state
@@ -669,17 +669,34 @@ def _total_port_count(topology: PortTopology) -> int:
   return len(topology.inputs) + len(topology.outputs)
 
 
-def _duplicate_device_name_errors(devices: dict[str, DeviceState]) -> list[str]:
-  first_kind: dict[str, str] = {}
+def _device_source_suffix(cell_id: str, diagram: ParsedDiagram | None) -> str:
+  if diagram is None:
+    return ""
+  source = diagram.cell_sources.get(cell_id)
+  if source is None:
+    return ""
+  return f"（图片 {source}）"
+
+
+def _duplicate_device_name_errors(
+  devices: dict[str, DeviceState],
+  *,
+  diagram: ParsedDiagram | None = None,
+) -> list[str]:
+  first_seen: dict[str, tuple[str, str]] = {}
   errors: list[str] = []
-  for state in devices.values():
+  for cell_id, state in devices.items():
     if state.kind == "from":
       continue
-    prior = first_kind.get(state.name)
+    prior = first_seen.get(state.name)
     if prior is not None:
+      prior_kind, prior_cell_id = prior
       errors.append(
-        f"器件名 {state.name} 重复（{prior} 与 {state.kind}），除 from 外名称须唯一"
+        f"器件名 {state.name} 重复（"
+        f"{prior_kind}{_device_source_suffix(prior_cell_id, diagram)} 与 "
+        f"{state.kind}{_device_source_suffix(cell_id, diagram)}），"
+        f"除 from 外名称须唯一"
       )
     else:
-      first_kind[state.name] = state.kind
+      first_seen[state.name] = (state.kind, cell_id)
   return errors

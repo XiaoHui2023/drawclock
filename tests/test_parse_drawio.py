@@ -244,6 +244,52 @@ def test_duplicate_device_name_fails() -> None:
         parse_drawio_paths([path])
 
 
+def test_duplicate_device_name_across_images_reports_both_sources(tmp_path: Path) -> None:
+    gate_only = """<mxfile>
+  <diagram>
+    <mxGraphModel>
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <object gap="4" name="dup" placeholders="1" id="10">
+          <mxCell style="drawclockType=gate;points=[[0.0000,0.5000,0,0,0],[1.0000,0.5000,0,0,0]];" vertex="1" parent="1">
+            <mxGeometry x="40" y="40" width="40" height="70" as="geometry"/>
+          </mxCell>
+        </object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+"""
+    div_only = """<mxfile>
+  <diagram>
+    <mxGraphModel>
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <object gap="4" name="dup" placeholders="1" id="10">
+          <mxCell style="drawclockType=div;points=[[0.0000,0.5000,0,0,0],[1.0000,0.5000,0,0,0]];" vertex="1" parent="1">
+            <mxGeometry x="40" y="40" width="40" height="70" as="geometry"/>
+          </mxCell>
+        </object>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+"""
+    fig1 = tmp_path / "fig1.drawio"
+    fig2 = tmp_path / "fig2.drawio"
+    fig1.write_text(gate_only, encoding="utf-8")
+    fig2.write_text(div_only, encoding="utf-8")
+    with pytest.raises(ValueError, match="重复") as exc:
+        parse_drawio_paths([fig1, fig2], library_path=DEFAULT_LIBRARY_PATH)
+    msg = str(exc.value)
+    assert f"图片 {fig1}" in msg
+    assert f"图片 {fig2}" in msg
+    assert "gate" in msg
+    assert "div" in msg
+
+
 def test_library_styles_load() -> None:
     styles = load_library_cell_styles(DEFAULT_LIBRARY_PATH)
     assert "pll" in styles and "html=1" in styles["pll"]
