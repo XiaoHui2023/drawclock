@@ -5,17 +5,20 @@ from dataclasses import dataclass
 from drawio_lib.components import simple_geometry as geom
 from drawio_lib.components.label_attrs import ATTR_NAME, LABEL_FONT_PX
 from drawio_lib.components.simple_component import STROKE, SimpleComponent
-from drawio_lib.components.simple_shapes import DIV_HEX_FLAT_BOTTOM_Y_OFFSET, div_r_body
+from drawio_lib.components.simple_shapes import DIV_HEX_R, div_hex_half_width_at_y, div_ratio_body
 from drawio_lib.xml_io import xml_attr
 
 ATTR_RATIO = "ratio"
 DEFAULT_RATIO = "2"
-# Hex inner width ~21px; 8px fits three digits with margin in the library template.
-DIV_RATIO_FONT_PX = 8
-# ÷ and ratio center-to-center spacing in the hex body.
-_DIV_R_LABEL_GAP = 9
-# Helvetica digits sit above the em-box bottom; nudge down to meet the hex flat edge.
-_DIV_R_DIGIT_BASELINE_NUDGE = 2
+# Hex inner width ~21px; 9px keeps short values readable, then shrinks for long values.
+DIV_RATIO_FONT_PX = 9
+DIV_NUMERATOR_FONT_PX = 7
+DIV_R_BAR_Y_OFFSET = -3
+DIV_R_DENOMINATOR_Y = 34.0
+_DIV_R_NUMERATOR_OPTICAL_NUDGE = 0.5
+TEXT_DIGIT_WIDTH_FACTOR = 0.56
+TEXT_HEIGHT_FACTOR = 0.9
+TEXT_HEX_CLEARANCE_PX = 0.4
 
 
 def div_r_ratio_font_px(digit_count: int) -> int:
@@ -23,15 +26,19 @@ def div_r_ratio_font_px(digit_count: int) -> int:
     if digit_count <= 2:
         return 9
     if digit_count <= 3:
-        return DIV_RATIO_FONT_PX
+        return 7
     if digit_count <= 4:
         return 7
     return 6
 
 
+def div_ratio_font_px(digit_count: int) -> int:
+    return div_r_ratio_font_px(digit_count)
+
+
 @dataclass
 class DivRComponent(SimpleComponent):
-    """Hexagon divide-by-ratio; ÷ and ratio render as fixed-size HTML overlays."""
+    """Hexagon divide-by-ratio; numerator and ratio render as fixed-size HTML overlays."""
 
     @property
     def edit_data_attr_prefix(self) -> tuple[str, ...]:
@@ -44,20 +51,19 @@ class DivRComponent(SimpleComponent):
     def _center_labels(self) -> tuple[tuple[float, float, str, int], ...]:
         cx = self.w / 2
         mid = self._g.body_mid_y
-        ratio_y = (
-            mid
-            + DIV_HEX_FLAT_BOTTOM_Y_OFFSET
-            - DIV_RATIO_FONT_PX / 2
-            + _DIV_R_DIGIT_BASELINE_NUDGE
-        )
-        symbol_y = ratio_y - _DIV_R_LABEL_GAP
+        bar_y = mid + DIV_R_BAR_Y_OFFSET
+        top_y = mid - DIV_HEX_R
+        symbol_y = (top_y + bar_y) / 2 + _DIV_R_NUMERATOR_OPTICAL_NUDGE
         return (
-            (cx, symbol_y, "÷", LABEL_FONT_PX),
-            (cx, ratio_y, f"%{ATTR_RATIO}%", DIV_RATIO_FONT_PX),
+            (cx, symbol_y, "1", DIV_NUMERATOR_FONT_PX),
+            (cx, DIV_R_DENOMINATOR_Y, f"%{ATTR_RATIO}%", DIV_RATIO_FONT_PX),
         )
 
     def label_html(self) -> str:
-        return self._label_html_with_overlay(div_r_body(self._g), self._center_labels())
+        return self._label_html_with_overlay(
+            div_ratio_body(self._g, bar_y_offset=DIV_R_BAR_Y_OFFSET),
+            self._center_labels(),
+        )
 
     def cell_fragment(
         self,
@@ -95,7 +101,7 @@ class DivRComponent(SimpleComponent):
         )
 
     def preview_svg(self) -> str:
-        body = div_r_body(self._g)
+        body = div_ratio_body(self._g, bar_y_offset=DIV_R_BAR_Y_OFFSET)
         cx = self.w / 2
         mid = self._g.body_mid_y
         stub_lines = []
@@ -121,28 +127,47 @@ class DivRComponent(SimpleComponent):
                 f'\n  <text x="{self.w // 2}" y="{name_y}" font-size="{LABEL_FONT_PX}" '
                 f'fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">'
                 f"{self.title}</text>"
-            )
-        ratio_y = (
-            mid
-            + DIV_HEX_FLAT_BOTTOM_Y_OFFSET
-            - DIV_RATIO_FONT_PX / 2
-            + _DIV_R_DIGIT_BASELINE_NUDGE
         )
-        symbol_y = ratio_y - _DIV_R_LABEL_GAP
+        bar_y = mid + DIV_R_BAR_Y_OFFSET
+        top_y = mid - DIV_HEX_R
+        symbol_y = (top_y + bar_y) / 2 + _DIV_R_NUMERATOR_OPTICAL_NUDGE
         return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" viewBox="0 0 {self.w} {self.h}">
 {body}
-  <text x="{cx}" y="{symbol_y}" font-size="{LABEL_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">÷</text>
-  <text x="{cx}" y="{ratio_y}" font-size="{DIV_RATIO_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{DEFAULT_RATIO}</text>
+  <text x="{cx}" y="{symbol_y}" font-size="{DIV_NUMERATOR_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">1</text>
+  <text x="{cx}" y="{DIV_R_DENOMINATOR_Y}" font-size="{DIV_RATIO_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{DEFAULT_RATIO}</text>
 {stubs}{name_line}
 </svg>
 """
 
+
+def estimated_text_half_width(text: str, font_px: int) -> float:
+    return len(text) * font_px * TEXT_DIGIT_WIDTH_FACTOR / 2
+
+
+def estimated_text_half_height(font_px: int) -> float:
+    return font_px * TEXT_HEIGHT_FACTOR / 2
+
+
+def fits_centered_text_in_div_hex(
+    *,
+    text: str,
+    font_px: int,
+    text_center_y: float,
+    hex_center_y: float,
+) -> bool:
+    half_w = estimated_text_half_width(text, font_px) + TEXT_HEX_CLEARANCE_PX
+    bottom_y = text_center_y + estimated_text_half_height(font_px)
+    available = div_hex_half_width_at_y(center_y=hex_center_y, y=bottom_y)
+    return half_w <= available
+
     def verify_geometry(self) -> None:
         html = self.label_html()
-        if ">÷</span>" not in html:
-            raise ValueError("div_r center label must render ÷ as non-scaling HTML overlay")
+        if ">1</span>" not in html:
+            raise ValueError("div_r center label must render numerator as non-scaling HTML overlay")
         if f">%{ATTR_RATIO}%</span>" not in html:
             raise ValueError("div_r center label must render ratio as non-scaling HTML overlay")
-        if "÷</text>" in html:
+        if ">1</text>" in html:
             raise ValueError("div_r center label must not be SVG text inside the stretchable body")
+        if "stroke-linecap=\"round\"" not in html:
+            raise ValueError("div_r body must keep original horizontal bar")
         super().verify_geometry()

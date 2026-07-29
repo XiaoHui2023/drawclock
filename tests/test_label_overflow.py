@@ -28,10 +28,9 @@ from drawio_lib.components import simple_geometry as sgeom
     [
         "gate",
         "div",
+        "div_pow",
         "div_r",
-        "div_n",
         "dto",
-        "dto_n",
         "inv",
         "occ_clk_cell",
         "pll",

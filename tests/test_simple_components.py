@@ -18,10 +18,9 @@ if str(SCRIPTS) not in sys.path:
     [
         ("gate", 2),
         ("div", 2),
+        ("div_pow", 2),
         ("div_r", 2),
-        ("div_n", 2),
         ("dto", 2),
-        ("dto_n", 2),
         ("inv", 2),
         ("inv_cell", 2),
         ("inv_mux", 2),
@@ -188,17 +187,132 @@ def test_pll_center_label_on_graphic() -> None:
 def test_div_r_center_label_two_lines() -> None:
     div_r = importlib.import_module("drawio_lib.components.div_r")
     html = div_r.label_html()
-    assert ">÷</span>" in html
+    assert ">1</span>" in html
     assert "%ratio%" in html
     mid = div_r.G.body_mid_y
-    ratio_y = mid + 6 - 4 + 2
-    symbol_y = ratio_y - 9
+    from drawio_lib.components.simple_shapes import DIV_HEX_R
+    from drawio_lib.components.div_r_component import (
+        DIV_R_DENOMINATOR_Y,
+        DIV_R_BAR_Y_OFFSET,
+        _DIV_R_NUMERATOR_OPTICAL_NUDGE,
+    )
+
+    bar_y = mid + DIV_R_BAR_Y_OFFSET
+    symbol_y = (mid - DIV_HEX_R + bar_y) / 2 + _DIV_R_NUMERATOR_OPTICAL_NUDGE
+    ratio_y = DIV_R_DENOMINATOR_Y
     symbol_top = symbol_y / div_r.GRAPHIC_H * 100
     ratio_top = ratio_y / div_r.GRAPHIC_H * 100
     assert f"top:{symbol_top}%" in html
     assert f"top:{ratio_top}%" in html
-    assert "font-size:8px" in html
+    assert "font-size:9px" in html
 
+
+def test_div_r_text_sits_inside_fraction_chambers() -> None:
+    div_r = importlib.import_module("drawio_lib.components.div_r")
+    from drawio_lib.components.simple_shapes import DIV_HEX_R
+    from drawio_lib.components.div_r_component import DIV_R_BAR_Y_OFFSET
+
+    overlays = div_r._COMPONENT._center_labels()
+    mid = div_r.G.body_mid_y
+    bar_y = mid + DIV_R_BAR_Y_OFFSET
+    top_y = mid - DIV_HEX_R
+    bottom_y = mid + DIV_HEX_R
+    numerator_y = overlays[0][1]
+    denominator_y = overlays[1][1]
+    assert top_y < numerator_y < bar_y
+    assert bar_y < denominator_y < bottom_y
+    assert numerator_y - top_y >= 2
+    assert bar_y - numerator_y >= 1
+    assert denominator_y - bar_y >= 4
+    assert bottom_y - denominator_y >= 2.5
+
+
+def test_div_r_three_digit_ratio_remains_readable() -> None:
+    div_r = importlib.import_module("drawio_lib.components.div_r")
+    from drawio_lib.components.div_r_component import (
+        DIV_R_BAR_Y_OFFSET,
+        div_r_ratio_font_px,
+        fits_centered_text_in_div_hex,
+    )
+    from drawio_lib.components.simple_shapes import DIV_HEX_R
+
+    assert div_r_ratio_font_px(3) == 7
+    mid = div_r.G.body_mid_y
+    bar_y = mid + DIV_R_BAR_Y_OFFSET
+    bottom_y = mid + DIV_HEX_R
+    denominator_y = div_r._COMPONENT._center_labels()[1][1]
+    assert denominator_y - bar_y >= 4
+    assert bottom_y - denominator_y >= 2.5
+    assert fits_centered_text_in_div_hex(
+        text="888",
+        font_px=div_r_ratio_font_px(3),
+        text_center_y=denominator_y,
+        hex_center_y=mid,
+    )
+
+
+def test_div_uses_original_division_sign() -> None:
+    div = importlib.import_module("drawio_lib.components.div")
+    html = div.label_html()
+    assert ">2^</span>" not in html
+    assert "%div_width%" not in html
+    assert html.count("<circle ") >= 2
+    frag = div.cell_fragment("2")
+    assert 'div_width="6"' not in frag
+
+
+def test_div_pow_center_label_uses_width_exponent() -> None:
+    div = importlib.import_module("drawio_lib.components.div_pow")
+    html = div.label_html()
+    assert ">2^</span>" in html
+    assert ">%div_width%</span>" in html
+    assert "<circle " in html
+    assert "stroke-linecap=&quot;round&quot;" in html or "stroke-linecap=\"round\"" in html
+
+
+def test_div_pow_width_overlay_uses_graphic_layer_coordinate_space() -> None:
+    div = importlib.import_module("drawio_lib.components.div_pow")
+    from drawio_lib.components.label_overflow import graphic_layer_pin_css
+
+    html = div.label_html()
+    marker = html.index("%div_width%")
+    layer_start = html.rfind('<div style="', 0, marker)
+    assert graphic_layer_pin_css(view_w=div.W, view_h=div.GRAPHIC_H) in html[layer_start:marker]
+
+
+def test_div_pow_two_digit_text_clears_bar_and_hex_outline() -> None:
+    div = importlib.import_module("drawio_lib.components.div_pow")
+    from drawio_lib.components.div_component import (
+        DIV_POWER_BAR_Y_OFFSET,
+        DIV_POWER_MIN_BAR_GAP_PX,
+        DIV_POWER_VALUE_FONT_PX,
+        DIV_POWER_WIDTH_Y,
+    )
+    from drawio_lib.components.div_r_component import (
+        TEXT_HEX_CLEARANCE_PX,
+        estimated_text_half_height,
+        estimated_text_half_width,
+    )
+    from drawio_lib.components.simple_shapes import div_hex_half_width_at_y
+
+    text_top_y = DIV_POWER_WIDTH_Y - estimated_text_half_height(DIV_POWER_VALUE_FONT_PX)
+    bar_y = div.G.body_mid_y + DIV_POWER_BAR_Y_OFFSET
+    assert text_top_y - bar_y >= DIV_POWER_MIN_BAR_GAP_PX
+
+    text_bottom_y = DIV_POWER_WIDTH_Y + estimated_text_half_height(DIV_POWER_VALUE_FONT_PX)
+    text_half_w = (
+        estimated_text_half_width("2^", 5) * 2
+        + estimated_text_half_width("88", DIV_POWER_VALUE_FONT_PX) * 2
+    ) / 2 + TEXT_HEX_CLEARANCE_PX
+    available = div_hex_half_width_at_y(center_y=div.G.body_mid_y, y=text_bottom_y)
+    assert text_half_w <= available
+
+
+def test_div_pow_library_object_carries_width_default() -> None:
+    div = importlib.import_module("drawio_lib.components.div_pow")
+    frag = div.cell_fragment("2")
+    assert 'div_width="6"' in frag
+    assert "%div_width%" in frag
 
 def test_div_r_library_object_carries_ratio_default() -> None:
     div_r = importlib.import_module("drawio_lib.components.div_r")

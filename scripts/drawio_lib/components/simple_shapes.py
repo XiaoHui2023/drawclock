@@ -67,6 +67,7 @@ def gate_body(g: geom.SimpleGeometry) -> str:
 
 
 DIV_HEX_R = 12
+DIV_HEX_EDGE_HALF_W = DIV_HEX_R * math.cos(math.pi / 6)
 DIV_HEX_FLAT_BOTTOM_Y_OFFSET = round(DIV_HEX_R * math.sin(math.pi / 6))
 DIV_SYMBOL_HALF_W = 5.5
 DIV_SYMBOL_DOT_R = 1.4
@@ -87,6 +88,17 @@ def _div_symbol_markup(cx: float, cy: float, *, angle_deg: float = 0) -> str:
     if angle_deg == 0:
         return paths
     return f'<g transform="rotate({angle_deg:.0f} {cx:.1f} {cy:.1f})">{paths}</g>'
+
+
+def div_hex_half_width_at_y(*, center_y: float, y: float) -> float:
+    """Available half-width inside the pointy hexagon at a given y coordinate."""
+    dy = abs(y - center_y)
+    if dy > DIV_HEX_R:
+        return 0
+    if dy <= DIV_HEX_FLAT_BOTTOM_Y_OFFSET:
+        return DIV_HEX_EDGE_HALF_W
+    slope_span = DIV_HEX_R - DIV_HEX_FLAT_BOTTOM_Y_OFFSET
+    return DIV_HEX_EDGE_HALF_W * (DIV_HEX_R - dy) / slope_span
 
 
 def div_hex_side_port_x(side: Literal["left", "right"]) -> float:
@@ -115,6 +127,38 @@ def div_body(g: geom.SimpleGeometry) -> str:
     )
 
 
+def div_power_body(g: geom.SimpleGeometry, *, bar_y_offset: float = 0) -> str:
+    """Hexagon divider with the original top dot and horizontal bar only."""
+    cx = _dx(g, geom.DESIGN_W / 2)
+    hex_cy = _mid(g)
+    cy = hex_cy + bar_y_offset
+    hex_pts = _hex_points(cx, hex_cy, DIV_HEX_R)
+    return (
+        f'<polygon points="{hex_pts}" fill="{FILL}" stroke="{STROKE}" '
+        f'stroke-width="{SW}" stroke-linejoin="round"/>'
+        f'<path d="M {cx - DIV_SYMBOL_HALF_W:.1f} {cy:.1f} L '
+        f'{cx + DIV_SYMBOL_HALF_W:.1f} {cy:.1f}" fill="none" '
+        f'stroke="{STROKE}" stroke-width="1.5" stroke-linecap="round"/>'
+        f'<circle cx="{cx:.1f}" cy="{cy - DIV_SYMBOL_DOT_OFFSET:.1f}" '
+        f'r="{DIV_SYMBOL_DOT_R}" fill="{STROKE}"/>'
+    )
+
+
+def div_ratio_body(g: geom.SimpleGeometry, *, bar_y_offset: float = 0) -> str:
+    """Hexagon divider with the original horizontal bar; labels render as overlays."""
+    cx = _dx(g, geom.DESIGN_W / 2)
+    hex_cy = _mid(g)
+    cy = hex_cy + bar_y_offset
+    hex_pts = _hex_points(cx, hex_cy, DIV_HEX_R)
+    return (
+        f'<polygon points="{hex_pts}" fill="{FILL}" stroke="{STROKE}" '
+        f'stroke-width="{SW}" stroke-linejoin="round"/>'
+        f'<path d="M {cx - DIV_SYMBOL_HALF_W:.1f} {cy:.1f} L '
+        f'{cx + DIV_SYMBOL_HALF_W:.1f} {cy:.1f}" fill="none" '
+        f'stroke="{STROKE}" stroke-width="1.5" stroke-linecap="round"/>'
+    )
+
+
 def div_r_body(g: geom.SimpleGeometry) -> str:
     """Hexagon for div_r; ÷ and ratio render as HTML overlays."""
     cx = _dx(g, geom.DESIGN_W / 2)
@@ -123,18 +167,6 @@ def div_r_body(g: geom.SimpleGeometry) -> str:
     return (
         f'<polygon points="{hex_pts}" fill="{FILL}" stroke="{STROKE}" '
         f'stroke-width="{SW}" stroke-linejoin="round"/>'
-    )
-
-
-def div_n_body(g: geom.SimpleGeometry) -> str:
-    """Programmable divider; division sign tilted 45° from div."""
-    cx = _dx(g, geom.DESIGN_W / 2)
-    cy = _mid(g)
-    hex_pts = _hex_points(cx, cy, DIV_HEX_R)
-    return (
-        f'<polygon points="{hex_pts}" fill="{FILL}" stroke="{STROKE}" '
-        f'stroke-width="{SW}" stroke-linejoin="round"/>'
-        f'{_div_symbol_markup(cx, cy, angle_deg=45)}'
     )
 
 
@@ -553,26 +585,6 @@ def dto_body(g: geom.SimpleGeometry) -> str:
         f'stroke="{STROKE}" stroke-width="{SW}"/>'
         f'<path d="M {wave_left} {wave_bot} L {wave_left} {wave_top + 3} L {wave_mid_a} {wave_top + 3} '
         f'L {wave_mid_a} {wave_bot - 2} L {wave_mid_b} {wave_bot - 2} L {wave_mid_b} {wave_top} L {wave_right} {wave_top}" '
-        f'fill="{FILL}" stroke="{STROKE}" stroke-width="1.5" stroke-linecap="square"/>'
-    )
-
-
-def dto_n_body(g: geom.SimpleGeometry) -> str:
-    """DTO_N chip with vertically mirrored duty waveform."""
-    mid = _mid(g)
-    top = _dto_chip_top(mid)
-    left = _dx(g, DTO_CHIP_LEFT)
-    wave_left = _dx(g, DTO_CHIP_LEFT + 4)
-    wave_mid_a = _dx(g, DTO_CHIP_LEFT + 9)
-    wave_mid_b = _dx(g, DTO_CHIP_LEFT + 14)
-    wave_right = _dx(g, DTO_CHIP_LEFT + DTO_CHIP_W - 4)
-    wave_top = mid - 7
-    wave_bot = mid + 1
-    return (
-        f'<rect x="{left}" y="{top}" width="{DTO_CHIP_W}" height="{DTO_CHIP_H}" rx="5" ry="5" fill="{FILL}" '
-        f'stroke="{STROKE}" stroke-width="{SW}"/>'
-        f'<path d="M {wave_left} {wave_top} L {wave_left} {wave_bot - 3} L {wave_mid_a} {wave_bot - 3} '
-        f'L {wave_mid_a} {wave_top + 2} L {wave_mid_b} {wave_top + 2} L {wave_mid_b} {wave_bot} L {wave_right} {wave_bot}" '
         f'fill="{FILL}" stroke="{STROKE}" stroke-width="1.5" stroke-linecap="square"/>'
     )
 

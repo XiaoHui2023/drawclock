@@ -40,6 +40,13 @@ def test_reload_object_attrs_keeps_stored_fields_only() -> None:
     assert kept["pll_kind"] == "LC"
 
 
+def test_reload_div_pow_migrates_short_width_attr() -> None:
+    lib = ROOT / "drawio-lib" / "drawclock.xml"
+    out = reload_object_attrs("div_pow", {"name": "d0", "width": "7"}, library_path=lib)
+    assert out["div_width"] == "7"
+    assert "width" not in out
+
+
 def test_bake_label_replaces_pll_kind_with_default() -> None:
     baked = bake_label_placeholders("<span>%pll_kind%</span>", {"name": "p0"})
     assert baked == "<span>SC</span>"
@@ -52,13 +59,42 @@ def test_bake_label_replaces_pll_kind_with_default() -> None:
 
 def test_bake_label_shrinks_div_r_ratio_font_for_long_values() -> None:
     template = (
-        '<span style="font-size:11px;line-height:1;">÷</span>'
-        '<span style="font-size:8px;line-height:1;">%ratio%</span>'
+        '<span style="font-size:11px;line-height:1;">1</span>'
+        '<span style="font-size:9px;line-height:1;">%ratio%</span>'
     )
     baked = bake_label_placeholders(template, {"name": "d0", "ratio": "1234"})
-    assert "font-size:7px" in baked.split("÷</span>")[1]
+    assert "font-size:7px" in baked.split("1</span>")[1]
+    three = bake_label_placeholders(template, {"name": "d0", "ratio": "123"})
+    assert "font-size:7px" in three.split("1</span>")[1]
     short = bake_label_placeholders(template, {"name": "d0", "ratio": "2"})
-    assert "font-size:9px" in short.split("÷</span>")[1]
+    assert "font-size:9px" in short.split("1</span>")[1]
+
+
+def test_bake_label_replaces_div_pow_width_with_exponent() -> None:
+    template = (
+        '<span style="font-size:5px;line-height:1;">2^</span>'
+        '<span style="font-size:9px;line-height:1;">%div_width%</span>'
+    )
+    baked = bake_label_placeholders(template, {"name": "d0", "div_width": "6"})
+    assert ">2^</span>" in baked
+    assert ">6</span>" in baked
+    assert "%div_width%" not in baked
+
+
+def test_bake_label_shrinks_div_pow_two_digit_width() -> None:
+    template = (
+        '<span style="font-size:5px;line-height:1;">2^</span>'
+        '<span style="font-size:9px;line-height:1;">%div_width%</span>'
+    )
+    baked = bake_label_placeholders(template, {"name": "d0", "div_width": "12"})
+    assert ">12</span>" in baked
+    assert "font-size:8px" in baked.split("2^</span>")[1]
+
+
+def test_bake_label_accepts_short_width_attr() -> None:
+    template = '<span style="font-size:9px;line-height:1;">%div_width%</span>'
+    baked = bake_label_placeholders(template, {"name": "d0", "width": "7"})
+    assert ">7</span>" in baked
 
 
 def test_edge_port_style_uses_library_points() -> None:
