@@ -127,35 +127,19 @@ def div_body(g: geom.SimpleGeometry) -> str:
     )
 
 
-def div_power_body(g: geom.SimpleGeometry, *, bar_y_offset: float = 0) -> str:
-    """Hexagon divider with the original top dot and horizontal bar only."""
+def div_ratio_body(g: geom.SimpleGeometry) -> str:
+    """Hexagon divider with top dot and horizontal bar; bottom variable renders as overlay."""
     cx = _dx(g, geom.DESIGN_W / 2)
     hex_cy = _mid(g)
-    cy = hex_cy + bar_y_offset
     hex_pts = _hex_points(cx, hex_cy, DIV_HEX_R)
     return (
         f'<polygon points="{hex_pts}" fill="{FILL}" stroke="{STROKE}" '
         f'stroke-width="{SW}" stroke-linejoin="round"/>'
-        f'<path d="M {cx - DIV_SYMBOL_HALF_W:.1f} {cy:.1f} L '
-        f'{cx + DIV_SYMBOL_HALF_W:.1f} {cy:.1f}" fill="none" '
+        f'<path d="M {cx - DIV_SYMBOL_HALF_W:.1f} {hex_cy:.1f} L '
+        f'{cx + DIV_SYMBOL_HALF_W:.1f} {hex_cy:.1f}" fill="none" '
         f'stroke="{STROKE}" stroke-width="1.5" stroke-linecap="round"/>'
-        f'<circle cx="{cx:.1f}" cy="{cy - DIV_SYMBOL_DOT_OFFSET:.1f}" '
+        f'<circle cx="{cx:.1f}" cy="{hex_cy - DIV_SYMBOL_DOT_OFFSET:.1f}" '
         f'r="{DIV_SYMBOL_DOT_R}" fill="{STROKE}"/>'
-    )
-
-
-def div_ratio_body(g: geom.SimpleGeometry, *, bar_y_offset: float = 0) -> str:
-    """Hexagon divider with the original horizontal bar; labels render as overlays."""
-    cx = _dx(g, geom.DESIGN_W / 2)
-    hex_cy = _mid(g)
-    cy = hex_cy + bar_y_offset
-    hex_pts = _hex_points(cx, hex_cy, DIV_HEX_R)
-    return (
-        f'<polygon points="{hex_pts}" fill="{FILL}" stroke="{STROKE}" '
-        f'stroke-width="{SW}" stroke-linejoin="round"/>'
-        f'<path d="M {cx - DIV_SYMBOL_HALF_W:.1f} {cy:.1f} L '
-        f'{cx + DIV_SYMBOL_HALF_W:.1f} {cy:.1f}" fill="none" '
-        f'stroke="{STROKE}" stroke-width="1.5" stroke-linecap="round"/>'
     )
 
 

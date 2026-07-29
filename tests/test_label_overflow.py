@@ -28,7 +28,6 @@ from drawio_lib.components import simple_geometry as sgeom
     [
         "gate",
         "div",
-        "div_pow",
         "div_r",
         "dto",
         "inv",

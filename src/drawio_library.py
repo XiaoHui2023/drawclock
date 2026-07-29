@@ -11,7 +11,7 @@ from pathlib import Path
 from internal_kind import INTERNAL_OBJECT_KEYS
 
 LABEL_PLACEHOLDER_RE = re.compile(
-    r"%(?:name|pll_kind|ratio|div_width|width|in\d+_label)%"
+    r"%(?:name|pll_kind|ratio|in\d+_label)%"
 )
 
 from drawio_decode import decompress_diagram_payload
@@ -172,25 +172,11 @@ def canonical_vertex_style(
 
 DEFAULT_PLL_KIND = "SC"
 DEFAULT_DIV_RATIO = "2"
-DEFAULT_DIV_WIDTH = "6"
-
 
 def _div_r_ratio_font_px(digit_count: int) -> int:
-    if digit_count <= 2:
-        return 9
     if digit_count <= 3:
         return 7
     if digit_count <= 4:
-        return 7
-    return 6
-
-
-def _div_pow_width_font_px(digit_count: int) -> int:
-    if digit_count <= 1:
-        return 9
-    if digit_count <= 2:
-        return 8
-    if digit_count <= 3:
         return 7
     return 6
 
@@ -210,26 +196,6 @@ def _patch_div_r_ratio_font(label: str, ratio: str) -> str:
     return label[:start] + f"font-size:{font_px}px" + label[end:]
 
 
-def _patch_div_width_font(label: str, width: str) -> str:
-    """Shrink only the div variable span after bake; keep the 2^ prefix muted."""
-    marker = f">{width}</span>"
-    if marker not in label:
-        return label
-    marker_start = label.index(marker)
-    matches = list(re.finditer(r"font-size:\d+px", label[:marker_start]))
-    if not matches:
-        return label
-    match = matches[-1]
-    font_px = _div_pow_width_font_px(len(width))
-    start = match.start()
-    end = match.end()
-    return label[:start] + f"font-size:{font_px}px" + label[end:]
-
-
-def _div_width_attr(attrs: dict[str, str]) -> str:
-    return attrs.get("div_width") or attrs.get("width") or DEFAULT_DIV_WIDTH
-
-
 def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
     """Replace editable placeholders with object attribute values for draw.io display."""
     baked = label
@@ -242,14 +208,6 @@ def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
         ratio = attrs.get("ratio", DEFAULT_DIV_RATIO)
         baked = baked.replace("%ratio%", ratio)
         baked = _patch_div_r_ratio_font(baked, ratio)
-    if "%div_width%" in baked:
-        width = _div_width_attr(attrs)
-        baked = baked.replace("%div_width%", width)
-        baked = _patch_div_width_font(baked, width)
-    if "%width%" in baked:
-        width = _div_width_attr(attrs)
-        baked = baked.replace("%width%", width)
-        baked = _patch_div_width_font(baked, width)
     for index in range(6):
         key = f"in{index}_label"
         token = f"%{key}%"
@@ -301,10 +259,6 @@ def reload_object_attrs(
             continue
         if key in schema:
             out[key] = value
-    if drawclock_type == "div_pow" and "div_width" in schema and "div_width" not in stored_attrs:
-        legacy_width = stored_attrs.get("width")
-        if legacy_width:
-            out["div_width"] = legacy_width
     for key in INTERNAL_OBJECT_KEYS:
         out.pop(key, None)
     if not out.get("name"):

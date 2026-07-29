@@ -39,14 +39,12 @@
 | 库名 | 预览 |
 | --- | --- |
 | div | ![div](images/div.svg) |
-| div_pow | ![div_pow](images/div_pow.svg) |
 | div_r | ![div_r](images/div_r.svg) |
 | dto | ![dto](images/dto.svg) |
 
 | 属性 | 说明 |
 | --- | --- |
 | `name` | 实例名 |
-| `div_width` | 指数宽度（仅 `div_pow`，默认 `6`，图中显示 `2^div_width`） |
 | `ratio` | 分频变量（仅 `div_r`，默认 `2`，图中显示 `1/ratio`） |
 
 ### 反相器

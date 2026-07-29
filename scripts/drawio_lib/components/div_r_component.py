@@ -5,17 +5,19 @@ from dataclasses import dataclass
 from drawio_lib.components import simple_geometry as geom
 from drawio_lib.components.label_attrs import ATTR_NAME, LABEL_FONT_PX
 from drawio_lib.components.simple_component import STROKE, SimpleComponent
-from drawio_lib.components.simple_shapes import DIV_HEX_R, div_hex_half_width_at_y, div_ratio_body
+from drawio_lib.components.simple_shapes import (
+    DIV_HEX_R,
+    DIV_SYMBOL_DOT_OFFSET,
+    div_hex_half_width_at_y,
+    div_ratio_body,
+)
 from drawio_lib.xml_io import xml_attr
 
 ATTR_RATIO = "ratio"
 DEFAULT_RATIO = "2"
-# Hex inner width ~21px; 9px keeps short values readable, then shrinks for long values.
-DIV_RATIO_FONT_PX = 9
-DIV_NUMERATOR_FONT_PX = 7
-DIV_R_BAR_Y_OFFSET = -3
-DIV_R_DENOMINATOR_Y = 34.0
-_DIV_R_NUMERATOR_OPTICAL_NUDGE = 0.5
+# Small enough for 3 digits to fit where the bottom dot normally sits.
+DIV_RATIO_FONT_PX = 7
+DIV_R_DENOMINATOR_Y_OFFSET = DIV_SYMBOL_DOT_OFFSET
 TEXT_DIGIT_WIDTH_FACTOR = 0.56
 TEXT_HEIGHT_FACTOR = 0.9
 TEXT_HEX_CLEARANCE_PX = 0.4
@@ -23,12 +25,10 @@ TEXT_HEX_CLEARANCE_PX = 0.4
 
 def div_r_ratio_font_px(digit_count: int) -> int:
     """Font size for ratio overlay; smaller when more digits (used at bake time)."""
-    if digit_count <= 2:
-        return 9
     if digit_count <= 3:
         return 7
     if digit_count <= 4:
-        return 7
+        return 6
     return 6
 
 
@@ -51,19 +51,12 @@ class DivRComponent(SimpleComponent):
     def _center_labels(self) -> tuple[tuple[float, float, str, int], ...]:
         cx = self.w / 2
         mid = self._g.body_mid_y
-        bar_y = mid + DIV_R_BAR_Y_OFFSET
-        top_y = mid - DIV_HEX_R
-        symbol_y = (top_y + bar_y) / 2 + _DIV_R_NUMERATOR_OPTICAL_NUDGE
         return (
-            (cx, symbol_y, "1", DIV_NUMERATOR_FONT_PX),
-            (cx, DIV_R_DENOMINATOR_Y, f"%{ATTR_RATIO}%", DIV_RATIO_FONT_PX),
+            (cx, mid + DIV_R_DENOMINATOR_Y_OFFSET, f"%{ATTR_RATIO}%", DIV_RATIO_FONT_PX),
         )
 
     def label_html(self) -> str:
-        return self._label_html_with_overlay(
-            div_ratio_body(self._g, bar_y_offset=DIV_R_BAR_Y_OFFSET),
-            self._center_labels(),
-        )
+        return self._label_html_with_overlay(div_ratio_body(self._g), self._center_labels())
 
     def cell_fragment(
         self,
@@ -101,7 +94,7 @@ class DivRComponent(SimpleComponent):
         )
 
     def preview_svg(self) -> str:
-        body = div_ratio_body(self._g, bar_y_offset=DIV_R_BAR_Y_OFFSET)
+        body = div_ratio_body(self._g)
         cx = self.w / 2
         mid = self._g.body_mid_y
         stub_lines = []
@@ -128,16 +121,30 @@ class DivRComponent(SimpleComponent):
                 f'fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">'
                 f"{self.title}</text>"
         )
-        bar_y = mid + DIV_R_BAR_Y_OFFSET
-        top_y = mid - DIV_HEX_R
-        symbol_y = (top_y + bar_y) / 2 + _DIV_R_NUMERATOR_OPTICAL_NUDGE
+        ratio_y = mid + DIV_R_DENOMINATOR_Y_OFFSET
         return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{self.w}" height="{self.h}" viewBox="0 0 {self.w} {self.h}">
 {body}
-  <text x="{cx}" y="{symbol_y}" font-size="{DIV_NUMERATOR_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">1</text>
-  <text x="{cx}" y="{DIV_R_DENOMINATOR_Y}" font-size="{DIV_RATIO_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{DEFAULT_RATIO}</text>
+  <text x="{cx}" y="{ratio_y}" font-size="{DIV_RATIO_FONT_PX}" fill="{STROKE}" text-anchor="middle" dominant-baseline="middle">{DEFAULT_RATIO}</text>
 {stubs}{name_line}
 </svg>
 """
+
+    def verify_geometry(self) -> None:
+        html = self.label_html()
+        if f">%{ATTR_RATIO}%</span>" not in html:
+            raise ValueError("div_r center label must render ratio as non-scaling HTML overlay")
+        if ">1</span>" in html or ">1</text>" in html:
+            raise ValueError("div_r must use a top dot, not a numerator")
+        if "stroke-linecap=\"round\"" not in html or "<circle " not in html:
+            raise ValueError("div_r body must keep centered divider bar and top dot")
+        if not fits_centered_text_in_div_hex(
+            text="888",
+            font_px=div_r_ratio_font_px(3),
+            text_center_y=self._center_labels()[0][1],
+            hex_center_y=self._g.body_mid_y,
+        ):
+            raise ValueError("div_r ratio text must fit 3 digits inside the hexagon")
+        super().verify_geometry()
 
 
 def estimated_text_half_width(text: str, font_px: int) -> float:
@@ -159,15 +166,3 @@ def fits_centered_text_in_div_hex(
     bottom_y = text_center_y + estimated_text_half_height(font_px)
     available = div_hex_half_width_at_y(center_y=hex_center_y, y=bottom_y)
     return half_w <= available
-
-    def verify_geometry(self) -> None:
-        html = self.label_html()
-        if ">1</span>" not in html:
-            raise ValueError("div_r center label must render numerator as non-scaling HTML overlay")
-        if f">%{ATTR_RATIO}%</span>" not in html:
-            raise ValueError("div_r center label must render ratio as non-scaling HTML overlay")
-        if ">1</text>" in html:
-            raise ValueError("div_r center label must not be SVG text inside the stretchable body")
-        if "stroke-linecap=\"round\"" not in html:
-            raise ValueError("div_r body must keep original horizontal bar")
-        super().verify_geometry()
