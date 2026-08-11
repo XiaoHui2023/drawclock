@@ -1,0 +1,33 @@
+{
+  "xtal": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "pll_dual": {
+    "kind": "pll",
+    "pll_kind": "INNO",
+    "source": "xtal"
+  },
+  "gate_fast": {
+    "kind": "gate",
+    "source": "pll_dual[0]"
+  },
+  "div_slow": {
+    "kind": "div",
+    "source": "pll_dual[1]"
+  },
+  "dto_audio": {
+    "kind": "dto",
+    "source": "div_slow"
+  },
+  "clk_fast": {
+    "kind": "clock",
+    "freq": "800 MHz",
+    "source": "gate_fast"
+  },
+  "clk_audio": {
+    "kind": "clock",
+    "freq": "24.576 MHz",
+    "source": "dto_audio"
+  }
+}

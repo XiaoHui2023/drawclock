@@ -27,8 +27,11 @@ py-modules = [
     "drawio_library",
     "drawio_ports",
     "layout_validate",
+    "layout_preview",
     "migrate",
     "pipeline",
+    "auto_layout",
+    "elk_layout",
     "topology",
     "validate_config",
     "from_resolve",
@@ -37,4 +40,4 @@ py-modules = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "tests"]

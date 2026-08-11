@@ -158,7 +158,7 @@ def _object_xml(cell_id: int, item: Placed) -> str:
     return (
         f"        <object {attr_s}>\n"
         f'          <mxCell style="{xml_attr(item.shape.style)}" vertex="1" parent="1">\n'
-        f'            <mxGeometry x="{int(item.x)}" y="{int(item.y)}" width="{item.shape.w}" '
+        f'            <mxGeometry x="{int(round(item.x))}" y="{int(round(item.y))}" width="{item.shape.w}" '
         f'height="{item.shape.h}" as="geometry"/>\n'
         f"          </mxCell>\n"
         f"        </object>"
@@ -283,7 +283,9 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
     )
     placed["from_a"] = from_a
 
-    x_dev = X0 + from_shape.w + 20
+    # Keep the generated figure aligned with the approved hand-edited fig2
+    # geometry recorded in example/refs/pll_main_fanout_waypoints.json.
+    x_dev = 180
     gate0 = Placed(
         "gate0",
         "gate0",
@@ -306,7 +308,7 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
         "pll_main",
         "pll_main",
         "pll",
-        x_dev - pll_shape.w - 24,
+        36,
         _top_for_port((row_gate_a + row_gate_b) / 2, pll_shape, "pll", "right"),
         pll_shape,
     )
@@ -316,7 +318,7 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
     _connect_pll_main_fanout(edges, placed, "gate0", stub_x=stub_x)
     _connect_pll_main_fanout(edges, placed, "div0", stub_x=stub_x)
 
-    x_mid = x_dev + gate_shape.w + 40
+    x_mid = 340
     inv0 = Placed(
         "inv0",
         "inv0",
@@ -338,7 +340,7 @@ def build_fig2(shapes: dict[str, LibraryShape]) -> str:
     _connect(edges, placed, "gate0", "inv0")
     _connect(edges, placed, "div0", "dto0")
 
-    x_clk = x_dev + inv_shape.w + 40
+    x_clk = 340
     clk_a = Placed(
         "clk_a",
         "clk_a",

@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "Local JavaScript layout runtime for drawclock",
+  "dependencies": {
+    "elkjs": "0.11.1"
+  }
+}

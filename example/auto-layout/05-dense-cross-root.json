@@ -1,0 +1,113 @@
+{
+  "osc_a": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "osc_b": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "ref_pad": {
+    "kind": "source",
+    "source_kind": "pad"
+  },
+  "pll_a": {
+    "kind": "pll",
+    "pll_kind": "SC",
+    "source": "osc_a"
+  },
+  "pll_b": {
+    "kind": "pll",
+    "pll_kind": "SC",
+    "source": "osc_b"
+  },
+  "pll_dual": {
+    "kind": "pll",
+    "pll_kind": "INNO",
+    "source": "ref_pad"
+  },
+  "gate_a": {
+    "kind": "gate",
+    "source": "pll_a"
+  },
+  "div_a": {
+    "kind": "div",
+    "source": "pll_a"
+  },
+  "gate_b": {
+    "kind": "gate",
+    "source": "pll_b"
+  },
+  "div_b": {
+    "kind": "div_r",
+    "ratio": "8",
+    "source": "pll_b"
+  },
+  "mux_sys": {
+    "kind": "mux",
+    "source": {
+      "0": "gate_a",
+      "1": "gate_b",
+      "2": "pll_dual[0]"
+    }
+  },
+  "mux_periph": {
+    "kind": "mux",
+    "source": {
+      "0": "div_a",
+      "1": "pll_dual[1]"
+    }
+  },
+  "dto_sys": {
+    "kind": "dto",
+    "source": "mux_sys"
+  },
+  "inv_sys": {
+    "kind": "inv",
+    "inv_kind": "inv",
+    "source": "dto_sys"
+  },
+  "cell_cpu": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "inv_sys"
+  },
+  "div_periph": {
+    "kind": "div",
+    "source": "mux_periph"
+  },
+  "gate_periph": {
+    "kind": "gate",
+    "source": "div_periph"
+  },
+  "clk_cpu": {
+    "kind": "clock",
+    "freq": "1 GHz",
+    "source": "cell_cpu"
+  },
+  "clk_trace": {
+    "kind": "clock",
+    "freq": "250 MHz",
+    "source": "dto_sys"
+  },
+  "clk_uart": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "gate_periph"
+  },
+  "clk_spi": {
+    "kind": "clock",
+    "freq": "200 MHz",
+    "source": "gate_periph"
+  },
+  "clk_usb": {
+    "kind": "clock",
+    "freq": "48 MHz",
+    "source": "pll_dual[1]"
+  },
+  "clk_low": {
+    "kind": "clock",
+    "freq": "12.5 MHz",
+    "source": "div_b"
+  }
+}

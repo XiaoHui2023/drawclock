@@ -19,6 +19,22 @@ def test_src_dir_help_exits_zero() -> None:
     )
     assert proc.returncode == 0
     assert "clock-tree" in proc.stdout.lower() or "draw.io" in proc.stdout
+    assert "extract" in proc.stdout
+    assert "draw" in proc.stdout
+    assert "reload" in proc.stdout
+    assert "drawio-to-json" not in proc.stdout
+    assert "json-to-drawio" not in proc.stdout
+
+
+def test_legacy_conversion_aliases_still_parse() -> None:
+    for command in ("drawio-to-json", "run", "json-to-drawio"):
+        proc = subprocess.run(
+            [sys.executable, str(SRC_DIR), command, "--help"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert proc.returncode == 0, command
 
 
 def test_reload_help_exits_zero() -> None:

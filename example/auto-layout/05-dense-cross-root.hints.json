@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "strict": true,
+  "components": {
+    "pll_a": "pll",
+    "pll_b": "pll",
+    "pll_dual": "pll2"
+  }
+}

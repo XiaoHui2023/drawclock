@@ -15,14 +15,16 @@ example.bat
 ```bat
 python scripts/build_drawio_lib.py
 python scripts/build_example_demo.py
-python src run -i example\fig1.drawio example\fig2.drawio -o example\out\clock-tree.json -l drawio-lib\drawclock.xml
+python src extract -i example\fig1.drawio example\fig2.drawio -o example\out\clock-tree.json -l drawio-lib\drawclock.xml
 python src reload -i example\fig1.drawio -l drawio-lib\drawclock.xml -o example\out\fig1-reloaded.drawio
 python src reload -i example\fig2.drawio -l drawio-lib\drawclock.xml -o example\out\fig2-reloaded.drawio
 ```
 
 上游（库或示例图）变更后，须从对应步骤起重新执行并检查输出。
 
-**改 `fig1.drawio` / `fig2.drawio` 或示例生成脚本后，必须跑完整 `example.bat`**（含第 4 步 **reload** 与第 5 步 **pytest**）。reload 是 example 的下一环，不可只跑 `src` 或只改图不验收 reload。
+JSON 自动布局的五级示例位于 `auto-layout/`。运行 `python scripts/build_auto_layout_examples.py` 可生成对应 `.drawio`、SVG 预览和质量报告。
+
+**改 `fig1.drawio` / `fig2.drawio` 或示例生成脚本后，必须跑完整 `example.bat`**（含第 4 步 **reload**、第 5 步自动布局示例与第 6 步 **pytest**）。reload 是 example 的下一环，不可只跑 `src` 或只改图不验收 reload。
 
 仅跑 reload 相关测试：
 

@@ -1,0 +1,19 @@
+{
+  "xtal": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "gate_main": {
+    "kind": "gate",
+    "source": "xtal"
+  },
+  "div_main": {
+    "kind": "div",
+    "source": "gate_main"
+  },
+  "clk_core": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "div_main"
+  }
+}

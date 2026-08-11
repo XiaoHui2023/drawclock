@@ -1,0 +1,34 @@
+{
+  "xtal_main": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "xtal_backup": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "gate_main": {
+    "kind": "gate",
+    "source": "xtal_main"
+  },
+  "gate_backup": {
+    "kind": "gate",
+    "source": "xtal_backup"
+  },
+  "mux_safe": {
+    "kind": "mux",
+    "source": {
+      "0": "gate_main",
+      "1": "gate_backup"
+    }
+  },
+  "div_safe": {
+    "kind": "div",
+    "source": "mux_safe"
+  },
+  "clk_safe": {
+    "kind": "clock",
+    "freq": "25 MHz",
+    "source": "div_safe"
+  }
+}

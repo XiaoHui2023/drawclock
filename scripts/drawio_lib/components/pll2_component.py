@@ -30,6 +30,7 @@ from drawio_lib.components.simple_shapes import (
     FILL,
     PLL_BODY_HALF_H,
     PLL_LEFT_NOTCH_HALF,
+    PLL_INPUT_LEAD_LENGTH,
     PLL_LEFT_X,
     PLL_TIP_X,
     SW,
@@ -59,6 +60,8 @@ def pll2_body(g: sgeom.SimpleGeometry) -> str:
         f'L {lx} {bot_y} L {lx} {notch_bot} M {lx} {notch_top} L {lx} {top_y}" '
         f'fill="{FILL}" stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="round" '
         f'stroke-linecap="round"/>'
+        f'<path d="M {lx} {mid} L {lx + PLL_INPUT_LEAD_LENGTH} {mid}" fill="none" '
+        f'stroke="{STROKE}" stroke-width="{SW}" stroke-linecap="round"/>'
     )
 
 

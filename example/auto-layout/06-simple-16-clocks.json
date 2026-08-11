@@ -1,0 +1,198 @@
+{
+  "xtal_0": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "xtal_1": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "pll_0": {
+    "kind": "pll",
+    "pll_kind": "SC",
+    "source": "xtal_0"
+  },
+  "pll_1": {
+    "kind": "pll",
+    "pll_kind": "SC",
+    "source": "xtal_1"
+  },
+  "pll_2": {
+    "kind": "pll",
+    "pll_kind": "SC",
+    "source": "xtal_0"
+  },
+  "pll_3": {
+    "kind": "pll",
+    "pll_kind": "SC",
+    "source": "xtal_1"
+  },
+  "mux_d000": {
+    "kind": "mux",
+    "source": {
+      "0": "xtal_0",
+      "1": "pll_0",
+      "2": "pll_1"
+    }
+  },
+  "div_d000": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "mux_d000"
+  },
+  "gate_d000": {
+    "kind": "gate",
+    "source": "div_d000"
+  },
+  "cell_d000": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "gate_d000"
+  },
+  "clk_d000_0": {
+    "kind": "clock",
+    "freq": "25 MHz",
+    "source": "cell_d000"
+  },
+  "clk_d000_1": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "cell_d000"
+  },
+  "clk_d000_2": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "cell_d000"
+  },
+  "clk_d000_3": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "cell_d000"
+  },
+  "mux_d001": {
+    "kind": "mux",
+    "source": {
+      "0": "xtal_1",
+      "1": "pll_1",
+      "2": "pll_2"
+    }
+  },
+  "div_d001": {
+    "kind": "div",
+    "ratio": "4",
+    "source": "mux_d001"
+  },
+  "gate_d001": {
+    "kind": "gate",
+    "source": "div_d001"
+  },
+  "cell_d001": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "gate_d001"
+  },
+  "clk_d001_0": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "cell_d001"
+  },
+  "clk_d001_1": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "cell_d001"
+  },
+  "clk_d001_2": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "cell_d001"
+  },
+  "clk_d001_3": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "cell_d001"
+  },
+  "mux_d002": {
+    "kind": "mux",
+    "source": {
+      "0": "xtal_0",
+      "1": "pll_2",
+      "2": "pll_3"
+    }
+  },
+  "div_d002": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "mux_d002"
+  },
+  "gate_d002": {
+    "kind": "gate",
+    "source": "div_d002"
+  },
+  "cell_d002": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "gate_d002"
+  },
+  "clk_d002_0": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "cell_d002"
+  },
+  "clk_d002_1": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "cell_d002"
+  },
+  "clk_d002_2": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "cell_d002"
+  },
+  "clk_d002_3": {
+    "kind": "clock",
+    "freq": "150 MHz",
+    "source": "cell_d002"
+  },
+  "mux_d003": {
+    "kind": "mux",
+    "source": {
+      "0": "xtal_1",
+      "1": "pll_3",
+      "2": "pll_0"
+    }
+  },
+  "div_d003": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "mux_d003"
+  },
+  "gate_d003": {
+    "kind": "gate",
+    "source": "div_d003"
+  },
+  "cell_d003": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "gate_d003"
+  },
+  "clk_d003_0": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "cell_d003"
+  },
+  "clk_d003_1": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "cell_d003"
+  },
+  "clk_d003_2": {
+    "kind": "clock",
+    "freq": "150 MHz",
+    "source": "cell_d003"
+  },
+  "clk_d003_3": {
+    "kind": "clock",
+    "freq": "175 MHz",
+    "source": "cell_d003"
+  }
+}

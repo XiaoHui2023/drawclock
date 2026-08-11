@@ -1,0 +1,38 @@
+{
+  "xtal": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "gate_root": {
+    "kind": "gate",
+    "source": "xtal"
+  },
+  "div_cpu": {
+    "kind": "div",
+    "source": "gate_root"
+  },
+  "div_bus": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "gate_root"
+  },
+  "gate_dbg": {
+    "kind": "gate",
+    "source": "gate_root"
+  },
+  "clk_cpu": {
+    "kind": "clock",
+    "freq": "400 MHz",
+    "source": "div_cpu"
+  },
+  "clk_bus": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "div_bus"
+  },
+  "clk_dbg": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "gate_dbg"
+  }
+}

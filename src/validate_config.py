@@ -29,12 +29,12 @@ def validate_config(
       if base not in device_names:
         errors.append(f"器件 {name} 连接到未知器件 {peer}")
         continue
-        if suffix is not None:
-          upstream_kind = config[base].get("kind", "")
-          valid_suffixes = output_connection_key_suffixes(
-            str(upstream_kind),
-            library_path=library_path,
-          )
+      if suffix is not None:
+        upstream_kind = config[base].get("kind", "")
+        valid_suffixes = output_connection_key_suffixes(
+          str(upstream_kind),
+          library_path=library_path,
+        )
         if suffix not in valid_suffixes:
           errors.append(
             f"器件 {name} 的 source {peer} 指向 {base} 的无效输出口 [{suffix}]"

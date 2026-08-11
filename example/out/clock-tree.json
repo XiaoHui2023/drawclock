@@ -25,6 +25,7 @@
   },
   "inv0": {
     "kind": "inv",
+    "inv_kind": "inv",
     "source": "gate0"
   },
   "mux2": {
@@ -35,25 +36,24 @@
     }
   },
   "osc_mux": {
-    "kind": "source"
+    "kind": "source",
+    "source_kind": "source"
   },
   "pll_m2a": {
     "kind": "pll",
-    "pll_kind": "sc",
     "source": "osc_mux"
   },
   "pll_m2b": {
     "kind": "pll",
-    "pll_kind": "sc",
     "source": "osc_mux"
   },
   "pll_main": {
     "kind": "pll",
-    "pll_kind": "sc",
     "source": "xtal"
   },
   "xtal": {
-    "kind": "source"
+    "kind": "source",
+    "source_kind": "source"
   },
   "xtal_hub": {
     "kind": "clock",

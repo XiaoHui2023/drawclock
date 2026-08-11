@@ -44,9 +44,10 @@ def _hex_points(cx: float, cy: float, r: float) -> str:
 GATE_LEFT_X = 11
 GATE_ARC_X = 19
 GATE_BODY_R = 12
-GATE_BUBBLE_GAP = 5
+GATE_BUBBLE_GAP = 3
 GATE_BUBBLE_R = 3
 GATE_BUBBLE_X = GATE_ARC_X + GATE_BODY_R + GATE_BUBBLE_GAP + GATE_BUBBLE_R
+GATE_OUTPUT_X = GATE_BUBBLE_X + GATE_BUBBLE_R
 
 
 def gate_body(g: geom.SimpleGeometry) -> str:
@@ -57,11 +58,15 @@ def gate_body(g: geom.SimpleGeometry) -> str:
     left = _dx(g, GATE_LEFT_X)
     arc = _dx(g, GATE_ARC_X)
     bubble = _dx(g, GATE_BUBBLE_X)
+    body_right = arc + GATE_BODY_R
+    bubble_left = bubble - GATE_BUBBLE_R
     return (
         f'<path d="M {left} {top_y} L {arc} {top_y} '
         f'A {GATE_BODY_R} {GATE_BODY_R} 0 1 1 {arc} {bot_y} '
         f'L {left} {bot_y} Z" '
         f'fill="{FILL}" stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="miter"/>'
+        f'<path d="M {body_right} {mid} L {bubble_left} {mid}" fill="none" '
+        f'stroke="{STROKE}" stroke-width="{SW}"/>'
         f'{_inversion_bubble(bubble, mid, GATE_BUBBLE_R)}'
     )
 
@@ -637,6 +642,7 @@ PLL_SHOULDER_X = 30
 PLL_TIP_X = 38
 PLL_BODY_HALF_H = 14
 PLL_LEFT_NOTCH_HALF = 8
+PLL_INPUT_LEAD_LENGTH = 6
 PLL_LABEL_CX = (PLL_LEFT_X + PLL_SHOULDER_X) / 2
 
 
@@ -659,6 +665,8 @@ def pll_body(g: geom.SimpleGeometry) -> str:
         f"L {lx} {notch_bot} M {lx} {notch_top} L {lx} {top_y}\" fill=\"{FILL}\" "
         f'stroke="{STROKE}" stroke-width="{SW}" stroke-linejoin="round" '
         f'stroke-linecap="round"/>'
+        f'<path d="M {lx} {mid} L {lx + PLL_INPUT_LEAD_LENGTH} {mid}" fill="none" '
+        f'stroke="{STROKE}" stroke-width="{SW}" stroke-linecap="round"/>'
     )
 
 

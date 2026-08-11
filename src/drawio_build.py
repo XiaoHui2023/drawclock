@@ -8,6 +8,7 @@ from drawio_library import (
     canonical_vertex_style,
 )
 from drawio_ports import resolve_edge_style
+from drawio_graph import edge_attachment
 
 
 def xml_attr(text: str) -> str:
@@ -31,6 +32,8 @@ def build_drawio_xml(layout: LayoutDocument) -> str:
     by_id = {vertex.cell_id: vertex for vertex in layout.vertices}
     for vertex in layout.vertices:
         lines.append("        " + _vertex_xml(vertex))
+    for index, (x, y) in enumerate(junction_points(layout), 1):
+        lines.append("        " + _junction_xml(index, x, y))
     for edge in layout.edges:
         lines.append("        " + _edge_xml(edge, by_id))
     lines.extend(
@@ -42,6 +45,101 @@ def build_drawio_xml(layout: LayoutDocument) -> str:
         ]
     )
     return "\n".join(lines) + "\n"
+
+
+def junction_points(layout: LayoutDocument) -> list[tuple[float, float]]:
+    """Find same-source-port shared-prefix splits for decorative junction dots."""
+    by_id = {vertex.cell_id: vertex for vertex in layout.vertices}
+    groups: dict[tuple[str, tuple[float, float]], list[list[tuple[float, float]]]] = {}
+    for edge in layout.edges:
+        source = by_id.get(edge.source_id)
+        target = by_id.get(edge.target_id)
+        if source is None or target is None:
+            continue
+        exit_xy = edge_attachment(edge.style, end="exit")
+        entry_xy = edge_attachment(edge.style, end="entry")
+        if exit_xy is None or entry_xy is None:
+            continue
+        start = (
+            source.x + source.width * exit_xy[0],
+            source.y + source.height * exit_xy[1],
+        )
+        end = (
+            target.x + target.width * entry_xy[0],
+            target.y + target.height * entry_xy[1],
+        )
+        points = _simplify_points([start, *edge.waypoints, end])
+        groups.setdefault((edge.source_id, exit_xy), []).append(points)
+
+    junctions: set[tuple[float, float]] = set()
+    for paths in groups.values():
+        for index, first in enumerate(paths):
+            for second in paths[index + 1 :]:
+                split = _shared_prefix_split(first, second)
+                if split is not None and split != first[0]:
+                    junctions.add((round(split[0], 4), round(split[1], 4)))
+    return sorted(junctions, key=lambda point: (point[0], point[1]))
+
+
+def _shared_prefix_split(
+    first: list[tuple[float, float]],
+    second: list[tuple[float, float]],
+) -> tuple[float, float] | None:
+    if not first or not second or first[0] != second[0]:
+        return None
+    i = j = 0
+    current = first[0]
+    while i + 1 < len(first) and j + 1 < len(second):
+        a_end = first[i + 1]
+        b_end = second[j + 1]
+        a_dir = _direction(current, a_end)
+        b_dir = _direction(current, b_end)
+        if a_dir != b_dir:
+            return current
+        a_distance = abs(a_end[0] - current[0]) + abs(a_end[1] - current[1])
+        b_distance = abs(b_end[0] - current[0]) + abs(b_end[1] - current[1])
+        if a_distance < b_distance:
+            return a_end
+        if b_distance < a_distance:
+            return b_end
+        current = a_end
+        i += 1
+        j += 1
+        if current != b_end:
+            return current
+    return None
+
+
+def _direction(a: tuple[float, float], b: tuple[float, float]) -> tuple[int, int]:
+    return (
+        0 if a[0] == b[0] else (1 if b[0] > a[0] else -1),
+        0 if a[1] == b[1] else (1 if b[1] > a[1] else -1),
+    )
+
+
+def _simplify_points(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    out: list[tuple[float, float]] = []
+    for point in points:
+        if out and point == out[-1]:
+            continue
+        if len(out) >= 2 and (
+            out[-2][0] == out[-1][0] == point[0]
+            or out[-2][1] == out[-1][1] == point[1]
+        ):
+            out[-1] = point
+        else:
+            out.append(point)
+    return out
+
+
+def _junction_xml(index: int, x: float, y: float) -> str:
+    return (
+        f'<mxCell id="junction-{index}" '
+        'style="ellipse;aspect=fixed;fillColor=#000000;strokeColor=#000000;connectable=0;" '
+        'vertex="1" parent="1">'
+        f'<mxGeometry x="{_fmt(x - 3)}" y="{_fmt(y - 3)}" width="6" height="6" as="geometry"/>'
+        '</mxCell>'
+    )
 
 
 def _vertex_xml(vertex: VertexLayout) -> str:

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "strict": true,
+  "components": {
+    "pll_0": "pll",
+    "pll_1": "pll",
+    "pll_2": "pll",
+    "pll_3": "pll"
+  }
+}

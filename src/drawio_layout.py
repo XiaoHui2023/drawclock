@@ -8,6 +8,7 @@ from drawio_library import canonical_object_attrs, canonical_vertex_style
 from drawio_ports import resolve_edge_style
 
 LAYOUT_VERSION = 1
+CROSSING_STYLES = ("arc", "gap", "sharp", "none")
 
 
 @dataclass
@@ -40,7 +41,24 @@ class LayoutDocument:
     edges: list[EdgeLayout]
 
 
-def layout_from_diagram(diagram: ParsedDiagram) -> LayoutDocument:
+def apply_crossing_style(document: LayoutDocument, crossing_style: str) -> None:
+    """Apply one draw.io line-jump policy without changing route coordinates."""
+    if crossing_style not in CROSSING_STYLES:
+        raise ValueError(f"unsupported crossing style: {crossing_style}")
+    for edge in document.edges:
+        parts = [
+            part
+            for part in edge.style.split(";")
+            if part and not part.startswith(("jumpStyle=", "jumpSize="))
+        ]
+        if crossing_style != "none":
+            parts.extend((f"jumpStyle={crossing_style}", "jumpSize=6"))
+        edge.style = ";".join(parts) + ";"
+
+
+def layout_from_diagram(
+    diagram: ParsedDiagram, *, resolve_ports: bool = True
+) -> LayoutDocument:
     vertices: list[VertexLayout] = []
     edges: list[EdgeLayout] = []
     for cell in diagram.cells.values():
@@ -90,7 +108,7 @@ def layout_from_diagram(diagram: ParsedDiagram) -> LayoutDocument:
         src = by_id.get(edge.source_id)
         tgt = by_id.get(edge.target_id)
         style = edge.style
-        if src is not None and tgt is not None:
+        if resolve_ports and src is not None and tgt is not None:
             style = resolve_edge_style(
                 src.style,
                 src.drawclock_type,
