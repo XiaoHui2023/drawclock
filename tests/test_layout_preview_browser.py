@@ -47,3 +47,15 @@ def test_browser_path_discovers_bundled_headless_shell(
     monkeypatch.setattr(layout_preview.shutil, "which", lambda _name: None)
 
     assert layout_preview._browser_path() == browser
+
+
+def test_runtime_roots_use_original_staticx_program_path(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    installed = tmp_path / "installed" / "drawclock"
+    extracted = tmp_path / "staticx-bundle" / "drawclock"
+    monkeypatch.setenv("STATICX_PROG_PATH", str(installed))
+    monkeypatch.setattr(layout_preview.sys, "frozen", True, raising=False)
+    monkeypatch.setattr(layout_preview.sys, "executable", str(extracted))
+
+    assert layout_preview._runtime_roots()[0] == installed.parent / "runtime"

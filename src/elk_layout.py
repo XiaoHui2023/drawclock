@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import heapq
+import os
 import shutil
 import subprocess
 import sys
@@ -32,6 +33,9 @@ from validate_config import validate_config
 def _elk_runtime() -> tuple[str, Path, Path] | None:
     project_root = Path(__file__).resolve().parents[1]
     runtime_roots: list[Path] = []
+    staticx_program = os.environ.get("STATICX_PROG_PATH")
+    if staticx_program:
+        runtime_roots.append(Path(staticx_program).resolve().parent / "runtime")
     if getattr(sys, "frozen", False):
         runtime_roots.append(Path(sys.executable).resolve().parent / "runtime")
     runtime_roots.append(project_root / ".runtime")

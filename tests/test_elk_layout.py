@@ -52,6 +52,29 @@ def test_elk_runtime_discovers_bundled_node_and_module(
     assert elk_layout._elk_runtime() == (str(node), script, runtime / "elk")
 
 
+def test_elk_runtime_uses_original_staticx_program_path(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    installed = tmp_path / "installed"
+    runtime = installed / "runtime"
+    node = runtime / "node" / (
+        "node.exe" if sys.platform == "win32" else "bin/node"
+    )
+    script = runtime / "elk" / "elk_layout.mjs"
+    bundled = runtime / "elk" / "node_modules" / "elkjs" / "lib" / "elk.bundled.js"
+    for path in (node, script, bundled):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
+    monkeypatch.setenv("STATICX_PROG_PATH", str(installed / "drawclock"))
+    monkeypatch.setattr(elk_layout.sys, "frozen", True, raising=False)
+    monkeypatch.setattr(
+        elk_layout.sys, "executable", str(tmp_path / "staticx-bundle" / "drawclock")
+    )
+    monkeypatch.setattr(elk_layout.shutil, "which", lambda _name: None)
+
+    assert elk_layout._elk_runtime() == (str(node), script, runtime / "elk")
+
+
 @pytest.mark.skipif(not elk_layout_available(), reason="ELK Node.js dependency is unavailable")
 def test_elk_exact_ports_and_lines_are_deterministic() -> None:
     _, first, _, quality = _generate("06-simple-16-clocks")

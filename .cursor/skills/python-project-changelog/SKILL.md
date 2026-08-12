@@ -10,6 +10,7 @@ description: >-
 
 ## 2026-08-12
 
+- **修复**：Linux staticx 冻结程序查找同级 `runtime/` 时优先使用 `STATICX_PROG_PATH`；禁止使用指向临时解包目录的内层 `sys.executable` 作为发布根目录。
 - **修复**：运行时获取阶段不再要求当前 Chromium 在 Ubuntu 16.04 构建容器执行成功；该容器只负责旧 glibc Python/staticx 构建。探针结果写入 manifest，真正的 PNG 可执行性由发布 runner 上的解压后、隔离 PATH frozen smoke 阻断。
 - **决议**：发布附件只提供完整压缩包；压缩包内置固定版本 Chrome Headless Shell、Node.js 与 ELK，PNG 和质量布局不得依赖宿主机浏览器或 Node。发布门禁必须从压缩包解压，并隔离宿主 PATH 后运行冻结示例。
 - **决议**：原生 SVG 预览的 `foreignObject` 固定在 `mxGeometry` 原点，draw.io HTML `(2,7)` 内容偏移在视口内部施加，禁止把左侧端口移出视口。布局坐标统一按 4 位小数契约序列化，禁止 `g` 格式降低线端精度。

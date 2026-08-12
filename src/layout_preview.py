@@ -30,6 +30,9 @@ def _svg_num(value: float) -> str:
 
 def _runtime_roots() -> tuple[Path, ...]:
     roots: list[Path] = []
+    staticx_program = os.environ.get("STATICX_PROG_PATH")
+    if staticx_program:
+        roots.append(Path(staticx_program).resolve().parent / "runtime")
     if getattr(sys, "frozen", False):
         roots.append(Path(sys.executable).resolve().parent / "runtime")
     roots.append(Path(__file__).resolve().parents[1] / ".runtime")
