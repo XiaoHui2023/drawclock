@@ -343,7 +343,30 @@ def test_draw_rejects_output_suffix_before_reading_inputs(tmp_path: Path) -> Non
         check=False,
     )
     assert proc.returncode == 1
-    assert "支持：.drawio, .svg, .png" in proc.stderr
+    assert "支持：.svg, .png" in proc.stderr
+    assert not output.exists()
+
+
+def test_draw_rejects_editable_drawio_output(tmp_path: Path) -> None:
+    output = tmp_path / "clock-tree.drawio"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(SRC_DIR),
+            "draw",
+            "-i",
+            str(ROOT / "example" / "draw.json"),
+            "-l",
+            str(LIBRARY),
+            "-o",
+            str(output),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 1
+    assert "支持：.svg, .png" in proc.stderr
     assert not output.exists()
 
 
@@ -374,6 +397,7 @@ def test_layout_uses_kind_metadata_and_geometry_from_supplied_library(
     gate = next(vertex for vertex in document.vertices if vertex.name == "gate0")
     assert gate.drawclock_type == "custom_gate_symbol"
     assert (gate.width, gate.height) == (83, 91)
+    assert "gate0" in gate.object_attrs["label"]
     assert report["hard_pass"] is True
 
 

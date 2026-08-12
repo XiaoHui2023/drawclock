@@ -23,12 +23,12 @@ from drawio_decode import (  # noqa: E402
     extract_mxfile_xml,
     iter_diagram_models,
 )
-from pipeline import drawio_to_clock_tree  # noqa: E402
 from layout_preview import SUPPORTED_IMAGE_SUFFIXES  # noqa: E402
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 FIG1 = ROOT / "example" / "fig1.drawio"
 FIG2 = ROOT / "example" / "fig2.drawio"
 AUTO_LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
+AUTO_DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
 STRESS_512 = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
 DRAW_EXAMPLE = ROOT / "example" / "draw.json"
 SVG_NS = "http://www.w3.org/2000/svg"
@@ -313,7 +313,7 @@ def main() -> int:
         if not required_runtime.is_file():
             print(f"bundled runtime missing: {required_runtime}", file=sys.stderr)
             return 1
-    for required in (LIBRARY, FIG1, FIG2, AUTO_LINEAR, DRAW_EXAMPLE):
+    for required in (LIBRARY, FIG1, FIG2, AUTO_LINEAR, AUTO_DENSE, DRAW_EXAMPLE):
         if not required.is_file():
             print(f"example input missing: {required}", file=sys.stderr)
             return 1
@@ -323,15 +323,14 @@ def main() -> int:
     clock_tree = out_dir / "clock-tree-frozen-smoke.json"
     fig1_reloaded = out_dir / "fig1-frozen-smoke.drawio"
     fig2_reloaded = out_dir / "fig2-frozen-smoke.drawio"
-    generated_drawio = out_dir / "linear-frozen-smoke.drawio"
     generated_svg = out_dir / "linear-frozen-smoke.svg"
     generated_png = out_dir / "linear-frozen-smoke.png"
-    draw_example_output = out_dir / "draw-example-frozen-smoke.drawio"
     draw_example_svg = out_dir / "draw-example-frozen-smoke.svg"
     draw_example_png = out_dir / "draw-example-frozen-smoke.png"
     fanout_config = out_dir / "fanout-frozen-smoke.json"
     fanout_svg = out_dir / "fanout-frozen-smoke.svg"
     stress_svg = out_dir / "stress-512-frozen-smoke.svg"
+    default_arc_svg = out_dir / "default-arc-frozen-smoke.svg"
 
     _run(
         binary,
@@ -383,7 +382,7 @@ def main() -> int:
     _assert_reloaded(fig1_reloaded)
     _assert_reloaded(fig2_reloaded)
 
-    for output in (generated_drawio, generated_svg, generated_png):
+    for output in (generated_svg, generated_png):
         _run(
             binary,
             [
@@ -400,11 +399,6 @@ def main() -> int:
             ROOT,
             isolated_runtime=True,
         )
-    if drawio_to_clock_tree([generated_drawio], library_path=LIBRARY) != json.loads(
-        AUTO_LINEAR.read_text(encoding="utf-8")
-    ):
-        print("frozen draw output did not round-trip", file=sys.stderr)
-        return 1
     linear_config = json.loads(AUTO_LINEAR.read_text(encoding="utf-8"))
     linear_svg_size = _assert_svg_image(
         generated_svg,
@@ -413,47 +407,23 @@ def main() -> int:
     )
     _assert_png_image(generated_png, expected_size=linear_svg_size)
 
+    example_svg_text = draw_example_svg.read_text(encoding="utf-8")
+    for name in (
+        "osc", "external_clk", "clock_select", "pll_main", "divider",
+        "tuner", "inverter", "clock_cell", "clock_gate", "core_clock",
+    ):
+        if name not in example_svg_text:
+            print(f"frozen draw example omitted {name}", file=sys.stderr)
+            return 1
     _run(
         binary,
-        [
-            "draw",
-            "-i",
-            str(DRAW_EXAMPLE),
-            "-l",
-            str(LIBRARY),
-            "-o",
-            str(draw_example_output),
-        ],
+        ["draw", "-i", str(AUTO_DENSE), "-l", str(LIBRARY), "-o", str(default_arc_svg)],
         ROOT,
+        isolated_runtime=True,
     )
-    draw_model = iter_diagram_models(extract_mxfile_xml(str(draw_example_output)))[0]
-    default_edges = [cell for cell in draw_model.iter("mxCell") if cell.get("edge") == "1"]
-    if not default_edges or any(
-        "jumpStyle=arc;" not in cell.get("style", "") for cell in default_edges
-    ):
+    if "A 4 4" not in default_arc_svg.read_text(encoding="utf-8"):
         print("frozen draw default crossing style is not arc", file=sys.stderr)
         return 1
-    actual_components = {
-        obj.get("name"): (obj.find("mxCell").get("style", "") if obj.find("mxCell") is not None else "")
-        for obj in draw_model.iter("object")
-        if obj.get("name")
-    }
-    expected_components = {
-        "osc": "source",
-        "external_clk": "from",
-        "clock_select": "mux2",
-        "pll_main": "pll",
-        "divider": "div",
-        "tuner": "dto",
-        "inverter": "inv",
-        "clock_cell": "cell",
-        "clock_gate": "gate",
-        "core_clock": "clock",
-    }
-    for name, component in expected_components.items():
-        if f"drawclockType={component};" not in actual_components.get(name, ""):
-            print(f"frozen draw example omitted {name} as {component}", file=sys.stderr)
-            return 1
     _run_expect_failure(
         binary,
         [
@@ -466,7 +436,16 @@ def main() -> int:
             str(out_dir / "unsupported-frozen-smoke.bmp"),
         ],
         ROOT,
-        ".drawio, .svg, .png",
+        ".svg, .png",
+    )
+    _run_expect_failure(
+        binary,
+        [
+            "draw", "-i", str(AUTO_LINEAR), "-l", str(LIBRARY),
+            "-o", str(out_dir / "editable-frozen-smoke.drawio"),
+        ],
+        ROOT,
+        ".svg, .png",
     )
 
     format_samples = {
@@ -547,7 +526,7 @@ def main() -> int:
         "<mxlibrary>" + json.dumps(library_entries) + "</mxlibrary>",
         encoding="utf-8",
     )
-    custom_output = out_dir / "custom-library-frozen-smoke.drawio"
+    custom_output = out_dir / "custom-library-frozen-smoke.svg"
     custom_config = out_dir / "custom-library-frozen-smoke.json"
     custom_topology = json.loads(AUTO_LINEAR.read_text(encoding="utf-8"))
     custom_topology["gate_main"]["kind"] = "custom_gate_symbol"
@@ -565,20 +544,24 @@ def main() -> int:
         ],
         ROOT,
     )
-    model = iter_diagram_models(extract_mxfile_xml(str(custom_output)))[0]
+    custom_root = ET.parse(custom_output).getroot()
+    children = list(custom_root)
     custom_gate = next(
-        (obj for obj in model.iter("object") if obj.get("name") == "gate_main"),
+        (
+            child
+            for child in children
+            if child.tag == f"{{{SVG_NS}}}foreignObject"
+            and "gate_main" in "".join(child.itertext())
+        ),
         None,
     )
     if custom_gate is None:
         print("frozen draw omitted supplied-library component", file=sys.stderr)
         return 1
-    cell = custom_gate.find("mxCell")
-    if cell is None or "drawclockType=custom_gate_symbol;" not in cell.get("style", ""):
-        print("frozen draw ignored supplied-library kind metadata", file=sys.stderr)
-        return 1
-    geometry = cell.find("mxGeometry")
-    if geometry is None or (geometry.get("width"), geometry.get("height")) != ("83", "91"):
+    if (
+        custom_gate.get("width") != "85"
+        or custom_gate.get("height") != "98"
+    ):
         print("frozen draw ignored supplied-library geometry", file=sys.stderr)
         return 1
 

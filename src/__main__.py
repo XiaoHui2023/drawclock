@@ -8,7 +8,6 @@ from pathlib import Path
 from auto_layout import (
     generate_layout,
     load_clock_tree,
-    write_generated_drawio,
 )
 from drawio_layout import CROSSING_STYLES, apply_crossing_style
 from layout_preview import validate_image_output, write_preview
@@ -88,7 +87,7 @@ def _add_json_to_drawio_parser(
         "--output",
         required=True,
         metavar="FILE",
-        help="输出 .drawio、.svg 或 .png；格式由后缀决定",
+        help="输出 .svg 或 .png；格式由后缀决定",
     )
     _add_library_arg(parser, "drawclock 器件库 XML")
     parser.add_argument(
@@ -163,12 +162,7 @@ def _json_to_drawio(args: argparse.Namespace) -> int:
     output = Path(args.output)
     try:
         suffix = output.suffix.lower()
-        if suffix not in {".drawio", ".svg", ".png"}:
-            raise ValueError(
-                f"不支持输出格式 {suffix or '<无后缀>'}；支持：.drawio, .svg, .png"
-            )
-        if suffix in {".svg", ".png"}:
-            validate_image_output(output)
+        validate_image_output(output)
         config = load_clock_tree(args.input)
         if elk_layout_available():
             document, _ = generate_elk_layout(
@@ -181,15 +175,12 @@ def _json_to_drawio(args: argparse.Namespace) -> int:
                 library_path=args.library,
             )
         apply_crossing_style(document, args.crossing_style)
-        if suffix == ".drawio":
-            write_generated_drawio(document, output)
-        else:
-            write_preview(
-                document,
-                output,
-                title=Path(args.input).stem,
-                crossing_style=args.crossing_style,
-            )
+        write_preview(
+            document,
+            output,
+            title=Path(args.input).stem,
+            crossing_style=args.crossing_style,
+        )
     except (ValueError, OSError, KeyError) as exc:
         print(str(exc), file=sys.stderr)
         return 1

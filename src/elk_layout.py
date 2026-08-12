@@ -140,7 +140,9 @@ def select_layout_plan(nodes, logical_edges) -> LayoutPlan:
     )
 
 
-def _generate_scalable_layout(nodes, logical_edges, profile, started, plan=None):
+def _generate_scalable_layout(
+    nodes, logical_edges, profile, started, library_path, plan=None
+):
     """Linear layered layout for very large high-reuse clock networks."""
     rank = _ranks(nodes, logical_edges)
     max_rank = max(rank.values(), default=0)
@@ -359,7 +361,7 @@ def _generate_scalable_layout(nodes, logical_edges, profile, started, plan=None)
         )
     document = LayoutDocument(
         version=LAYOUT_VERSION,
-        vertices=_vertex_layouts(nodes, positions),
+        vertices=_vertex_layouts(nodes, positions, library_path),
         edges=layouts,
     )
     elapsed_ms = (time.perf_counter() - started) * 1000
@@ -405,7 +407,9 @@ def generate_elk_layout(
     profile = PROFILES[profile_name]
     plan = select_layout_plan(nodes, logical_edges)
     if plan.mode == "domain":
-        return _generate_scalable_layout(nodes, logical_edges, profile, started, plan)
+        return _generate_scalable_layout(
+            nodes, logical_edges, profile, started, library_path, plan
+        )
     graph: dict[str, Any] = {
         "layout": {
             "nodeSpacing": profile.node_spacing,
@@ -504,7 +508,7 @@ def generate_elk_layout(
         ))
     document = LayoutDocument(
         version=LAYOUT_VERSION,
-        vertices=_vertex_layouts(nodes, positions),
+        vertices=_vertex_layouts(nodes, positions, library_path),
         edges=edges,
     )
     report = assess_layout(document, logical_edges, (time.perf_counter() - started) * 1000)

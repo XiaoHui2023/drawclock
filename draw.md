@@ -1,6 +1,6 @@
 # draw
 
-`draw` 使用指定的 draw.io 器件库，将时钟拓扑配置生成一个图文件。
+`draw` 使用指定的 draw.io 器件库，将时钟拓扑配置生成一个成品图片。
 
 ## 命令
 
@@ -12,7 +12,7 @@ drawclock draw -i <配置文件> -l <器件库.xml> -o <输出文件> [--crossin
 | --- | --- | --- |
 | `-i, --input` | 是 | 配置文件。支持 `.json`、`.jsonc`、`.json5`、`.toml`、`.yaml`、`.yml`、`.ini`、`.conf`、`.config` |
 | `-l, --library` | 是 | 本次生图使用的 draw.io 器件库 XML |
-| `-o, --output` | 是 | 单个输出文件。支持 `.drawio`、`.svg`、`.png` |
+| `-o, --output` | 是 | 单个输出文件。支持 `.svg`、`.png` |
 | `--crossing-style` | 否 | 跨线风格：`arc`、`gap`、`sharp`、`none`；默认 `arc` |
 
 输出格式由 `--output` 后缀确定。不支持的后缀会在读取配置和计算布局前报错。发布压缩包已经包含 PNG 渲染运行时，无需另装浏览器；源码运行时也可用 `CHROME_PATH` 指定浏览器。
@@ -50,12 +50,6 @@ drawclock draw -i <配置文件> -l <器件库.xml> -o <输出文件> [--crossin
 
 ```text
 source + from → mux2 → pll → div → dto → inv → cell → gate → clock
-```
-
-生成 draw.io 文件：
-
-```text
-drawclock draw -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.drawio
 ```
 
 生成 SVG 或 PNG 时只需更换输出后缀：

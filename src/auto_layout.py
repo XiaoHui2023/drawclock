@@ -598,7 +598,9 @@ def _route_edges(
 
 
 def _vertex_layouts(
-    nodes: dict[str, ResolvedNode], positions: dict[str, tuple[float, float]]
+    nodes: dict[str, ResolvedNode],
+    positions: dict[str, tuple[float, float]],
+    library_path: str | Path,
 ) -> list[VertexLayout]:
     vertices: list[VertexLayout] = []
     for name, node in nodes.items():
@@ -608,7 +610,11 @@ def _vertex_layouts(
                 continue
             attrs[key] = str(value)
         attrs["name"] = name
-        attrs = canonical_object_attrs(node.shape.title, attrs)
+        attrs = canonical_object_attrs(
+            node.shape.title,
+            attrs,
+            library_path=library_path,
+        )
         x, y = positions[name]
         vertices.append(
             VertexLayout(
@@ -745,7 +751,7 @@ def generate_layout(
         edges, _ = _route_edges(nodes, positions, logical_edges, profile)
         doc = LayoutDocument(
             version=LAYOUT_VERSION,
-            vertices=_vertex_layouts(nodes, positions),
+            vertices=_vertex_layouts(nodes, positions, library_path),
             edges=edges,
         )
         elapsed_ms = (time.perf_counter() - started) * 1000
