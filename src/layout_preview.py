@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import math
+import os
+import re
 import shutil
 import subprocess
 import tempfile
-import math
-import re
 from pathlib import Path
 
 from drawio_graph import edge_attachment
@@ -23,12 +24,22 @@ SUPPORTED_IMAGE_SUFFIXES = (".svg", ".png")
 
 def _browser_path() -> Path | None:
     browser_candidates = (
+        os.environ.get("CHROME_PATH"),
         shutil.which("msedge"),
+        shutil.which("microsoft-edge"),
+        shutil.which("microsoft-edge-stable"),
         shutil.which("chrome"),
+        shutil.which("google-chrome"),
+        shutil.which("google-chrome-stable"),
+        shutil.which("chromium"),
+        shutil.which("chromium-browser"),
         r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
         r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
         "/usr/bin/microsoft-edge",
         "/usr/bin/google-chrome",
+        "/usr/bin/google-chrome-stable",
+        "/usr/bin/chromium",
+        "/usr/bin/chromium-browser",
     )
     return next(
         (Path(item) for item in browser_candidates if item and Path(item).is_file()),
@@ -43,7 +54,7 @@ def validate_image_output(output_path: str | Path) -> str:
         supported = ", ".join(SUPPORTED_IMAGE_SUFFIXES)
         raise ValueError(f"不支持输出格式 {suffix or '<无后缀>'}；支持：{supported}")
     if suffix == ".png" and _browser_path() is None:
-        raise ValueError("PNG 输出需要 Microsoft Edge 或 Google Chrome；也可输出 .svg")
+        raise ValueError("PNG 输出需要 Edge、Chrome 或 Chromium；也可输出 .svg")
     return suffix[1:]
 
 
@@ -184,16 +195,21 @@ def write_preview(
             + source,
             encoding="utf-8",
         )
+        browser_args = [
+            str(browser),
+            "--headless",
+            "--disable-gpu",
+            "--hide-scrollbars",
+            f"--window-size={target_width},{target_height}",
+            f"--screenshot={output}",
+            page_path.as_uri(),
+        ]
+        if os.name != "nt":
+            # Linux frozen binaries are commonly exercised in CI containers;
+            # Chrome's user-namespace sandbox is unavailable there.
+            browser_args.insert(1, "--no-sandbox")
         subprocess.run(
-            [
-                str(browser),
-                "--headless",
-                "--disable-gpu",
-                "--hide-scrollbars",
-                f"--window-size={target_width},{target_height}",
-                f"--screenshot={output}",
-                page_path.as_uri(),
-            ],
+            browser_args,
             check=True,
             capture_output=True,
             text=True,

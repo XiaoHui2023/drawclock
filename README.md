@@ -21,7 +21,7 @@ drawclock draw -i clock-tree.toml -l drawio-lib/drawclock.xml -o clock-tree.png 
 
 程序在读取输入和计算布局之前检查输出后缀。不支持的后缀会立即报错并列出兼容格式，不会产生半成品。
 
-PNG 使用 Microsoft Edge 或 Google Chrome 渲染器，以正确处理器件库中的 HTML/SVG 图形；机器没有兼容浏览器时会在布局开始前报错。SVG 是不依赖浏览器的矢量输出，适合超大规模图。
+PNG 使用 Microsoft Edge、Google Chrome 或 Chromium 渲染器，以正确处理器件库中的 HTML/SVG 图形；可通过 `CHROME_PATH` 指定兼容浏览器。机器没有兼容浏览器时会在布局开始前报错。SVG 是不依赖浏览器的矢量输出，适合超大规模图。
 
 ### 输入格式
 
