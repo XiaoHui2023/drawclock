@@ -1,4 +1,5 @@
 {
+  "name": "drawclock",
   "private": true,
   "description": "Local JavaScript layout runtime for drawclock",
   "dependencies": {

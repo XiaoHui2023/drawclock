@@ -127,6 +127,21 @@ def _copy_elk_runtime() -> None:
     )
 
 
+def _probe_version(executable: Path) -> dict[str, object]:
+    completed = subprocess.run(
+        [str(executable), "--version"],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    output = (completed.stdout or completed.stderr).strip().splitlines()
+    return {
+        "returncode": completed.returncode,
+        "output": output[-1] if output else "",
+    }
+
+
 def main() -> int:
     key = _platform_key()
     chrome_url, node_url = _asset_urls(key)
@@ -145,17 +160,20 @@ def main() -> int:
     if os.name != "nt":
         chrome.chmod(chrome.stat().st_mode | 0o111)
         node.chmod(node.stat().st_mode | 0o111)
-    chrome_version = subprocess.run(
-        [str(chrome), "--version"], check=True, capture_output=True, text=True, timeout=30
-    ).stdout.strip()
-    node_version = subprocess.run(
-        [str(node), "--version"], check=True, capture_output=True, text=True, timeout=30
-    ).stdout.strip()
+    # The Linux executable is intentionally built in an old-glibc container,
+    # while the bundled current Chromium is exercised after extraction on the
+    # release runner.  Record build-environment probes without confusing that
+    # compatibility boundary with the mandatory post-bundle functional smoke.
+    probes = {
+        "headless_shell": _probe_version(chrome),
+        "node": _probe_version(node),
+    }
     manifest = {
         "platform": key,
-        "chrome_version": chrome_version,
-        "node_version": node_version,
+        "chrome_version": CHROME_VERSION,
+        "node_version": NODE_VERSION,
         "elkjs_version": "0.11.1",
+        "build_environment_probes": probes,
         "downloads": downloads,
     }
     (RUNTIME_ROOT / "runtime-manifest.json").write_text(
