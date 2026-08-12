@@ -13,6 +13,10 @@ set PY=%CD%\.venv\Scripts\python.exe
 %PY% -m pip install -q --upgrade --force-reinstall -e ".[dev]" 2>nul
 if errorlevel 1 %PY% -m pip install -q --upgrade --force-reinstall -e .
 %PY% -m pip install -q --upgrade --force-reinstall "pyinstaller>=6.0"
+call npm install --ignore-scripts
+if errorlevel 1 exit /b 1
+%PY% tools\fetch_release_runtime.py
+if errorlevel 1 exit /b 1
 
 if exist build rmdir /s /q build
 if exist dist rmdir /s /q dist

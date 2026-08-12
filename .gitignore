@@ -9,6 +9,8 @@ dist/
 build/
 work/
 node_modules/
+.runtime/
+.runtime-cache/
 *.egg-info/
 .cursor/
 *.drawio.bak

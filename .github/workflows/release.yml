@@ -22,23 +22,19 @@ jobs:
       - name: Fix dist permissions
         run: sudo chown -R "$(id -u):$(id -g)" dist
 
-      - name: Verify PNG browser prerequisite
+      - name: Run extracted frozen example with bundled runtimes
         run: |
-          BROWSER="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || command -v chromium-browser || true)"
-          test -n "$BROWSER"
-          echo "CHROME_PATH=$BROWSER" >> "$GITHUB_ENV"
-          "$BROWSER" --version
-
-      - name: Run frozen example
-        run: python3 tools/run_frozen_example.py dist/drawclock
+          mkdir release-smoke
+          tar -xzf dist/drawclock-*-linux.tar.gz -C release-smoke
+          BINARY="$(find release-smoke -maxdepth 2 -type f -name drawclock -print -quit)"
+          test -n "$BINARY"
+          python3 tools/run_frozen_example.py "$BINARY"
 
       - name: Upload Linux release artifacts
         uses: actions/upload-artifact@v4
         with:
           name: linux-release
-          path: |
-            dist/drawclock
-            dist/drawclock-*-linux.tar.gz
+          path: dist/drawclock-*-linux.tar.gz
           if-no-files-found: error
 
   publish-release:
@@ -93,10 +89,11 @@ jobs:
           tag_name: ${{ steps.version.outputs.tag }}
           name: ${{ steps.version.outputs.tag }}
           body: |
-            Rolling release: Ubuntu 16.04 PyInstaller build from the main commit that triggered this workflow.
-            Before publishing, the build job exercises the frozen executable for extract, reload,
-            config-to-draw.io/SVG/PNG generation, editable-output topology round-trip, and early
-            rejection of unsupported output suffixes using an explicitly supplied component library.
+            Rolling release: self-contained Ubuntu 16.04 PyInstaller bundle from the main commit.
+            The archive includes pinned headless Chromium, Node.js, and ELK layout runtimes.
+            Before publishing, CI extracts the archive and exercises the frozen executable with the
+            host PATH isolated for extract, reload, draw.io/SVG/PNG generation, editable-output
+            topology round-trip, and early rejection of unsupported suffixes.
           files: release-assets/**
           fail_on_unmatched_files: true
           generate_release_notes: false

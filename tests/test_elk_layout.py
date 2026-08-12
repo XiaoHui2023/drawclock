@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import time
+import sys
 from pathlib import Path
 
 import pytest
 
+import elk_layout
 from auto_layout import load_clock_tree
 from elk_layout import elk_layout_available, generate_elk_layout
 from layout_quality import inspect_layout_quality
@@ -29,6 +31,25 @@ def _generate(name: str):
         tolerance=0.01,
     )
     return config, document, report, quality
+
+
+def test_elk_runtime_discovers_bundled_node_and_module(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    runtime = tmp_path / "runtime"
+    node = runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node")
+    script = runtime / "elk" / "elk_layout.mjs"
+    bundled = runtime / "elk" / "node_modules" / "elkjs" / "lib" / "elk.bundled.js"
+    for path in (node, script, bundled):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
+    binary = tmp_path / ("drawclock.exe" if sys.platform == "win32" else "drawclock")
+    binary.touch()
+    monkeypatch.setattr(elk_layout.sys, "frozen", True, raising=False)
+    monkeypatch.setattr(elk_layout.sys, "executable", str(binary))
+    monkeypatch.setattr(elk_layout.shutil, "which", lambda _name: None)
+
+    assert elk_layout._elk_runtime() == (str(node), script, runtime / "elk")
 
 
 @pytest.mark.skipif(not elk_layout_available(), reason="ELK Node.js dependency is unavailable")

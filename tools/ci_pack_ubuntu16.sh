@@ -10,7 +10,7 @@ rm -rf .venv build dist
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get -o Acquire::Retries=5 update
-apt-get install -o Acquire::Retries=5 -y --no-install-recommends ca-certificates wget bzip2 binutils patchelf build-essential musl-tools
+apt-get install -o Acquire::Retries=5 -y --no-install-recommends ca-certificates wget bzip2 xz-utils binutils patchelf build-essential musl-tools
 
 MINICONDA=Miniconda3-py310_23.5.2-0-Linux-x86_64.sh
 MINICONDA_URL="https://repo.anaconda.com/miniconda/${MINICONDA}"
@@ -25,6 +25,11 @@ done
 
 bash "/tmp/${MINICONDA}" -b -p /opt/conda
 export PATH="/opt/conda/bin:$PATH"
+
+NODE_ARCHIVE=node-v16.20.2-linux-x64.tar.xz
+wget --tries=5 -O "/tmp/${NODE_ARCHIVE}" "https://nodejs.org/dist/v16.20.2/${NODE_ARCHIVE}"
+tar -xJf "/tmp/${NODE_ARCHIVE}" -C /opt
+export PATH="/opt/node-v16.20.2-linux-x64/bin:$PATH"
 
 python -m venv .venv
 bash tools/pack.sh

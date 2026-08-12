@@ -15,15 +15,17 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from drawio_lib.components.registry import ALL
+from layout_preview import _browser_path
 
 
-EDGE = Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe")
+BROWSER = _browser_path()
 PORT_TOLERANCE_PX = 0.03
 
 
 def _edge_dump_dom(page: Path) -> str:
+    assert BROWSER is not None
     completed = subprocess.run(
-        [str(EDGE), "--headless", "--disable-gpu", "--dump-dom", page.as_uri()],
+        [str(BROWSER), "--headless", "--disable-gpu", "--dump-dom", page.as_uri()],
         check=True,
         capture_output=True,
         text=True,
@@ -92,7 +94,7 @@ def _probe_cards(
     return _result_json(_edge_dump_dom(page))
 
 
-@pytest.mark.skipif(not EDGE.is_file(), reason="Microsoft Edge is required")
+@pytest.mark.skipif(BROWSER is None, reason="headless browser is unavailable")
 def test_every_declared_port_hits_actual_visible_svg_geometry(tmp_path: Path) -> None:
     """Independent oracle: browser path geometry, not component port objects."""
     cards: list[str] = []
@@ -136,7 +138,7 @@ def test_every_declared_port_hits_actual_visible_svg_geometry(tmp_path: Path) ->
     assert checked == expected_port_count == 57
 
 
-@pytest.mark.skipif(not EDGE.is_file(), reason="Microsoft Edge is required")
+@pytest.mark.skipif(BROWSER is None, reason="headless browser is unavailable")
 def test_probe_rejects_historical_gate_center_anchor_fault(tmp_path: Path) -> None:
     """Seeded fault: the bubble centre is not its external wire contact."""
     gate = next(spec.module for spec in ALL if spec.module.TITLE == "gate")
@@ -154,7 +156,7 @@ def test_probe_rejects_historical_gate_center_anchor_fault(tmp_path: Path) -> No
     assert abs(port["contactX"] - port["x"]) > PORT_TOLERANCE_PX
 
 
-@pytest.mark.skipif(not EDGE.is_file(), reason="Microsoft Edge is required")
+@pytest.mark.skipif(BROWSER is None, reason="headless browser is unavailable")
 def test_probe_rejects_pll_input_without_visible_contact_lead(tmp_path: Path) -> None:
     """Seeded fault: a declared PLL input may not terminate in an empty notch."""
     pll = next(spec.module for spec in ALL if spec.module.TITLE == "pll")
@@ -174,13 +176,14 @@ def test_probe_rejects_pll_input_without_visible_contact_lead(tmp_path: Path) ->
     assert port["contactX"] is None or abs(port["contactX"] - port["x"]) > PORT_TOLERANCE_PX
 
 
-@pytest.mark.skipif(not EDGE.is_file(), reason="Microsoft Edge is required")
+@pytest.mark.skipif(BROWSER is None, reason="headless browser is unavailable")
+@pytest.mark.parametrize("target_title", ["pll", "clock"])
 def test_browser_ctm_maps_edge_endpoints_to_visible_gate_and_clock_contacts(
-    tmp_path: Path,
+    tmp_path: Path, target_title: str,
 ) -> None:
     """Final-render oracle: outer edge points and nested SVG contacts share screen CTM."""
     gate = next(spec.module for spec in ALL if spec.module.TITLE == "gate")
-    clock = next(spec.module for spec in ALL if spec.module.TITLE == "clock")
+    clock = next(spec.module for spec in ALL if spec.module.TITLE == target_title)
     gate_point = gate._parse_points(gate.cell_style())[-1]
     clock_point = clock._parse_points(clock.cell_style())[0]
     gate_x, gate_y = 100.0, 100.0
@@ -195,11 +198,11 @@ def test_browser_ctm_maps_edge_endpoints_to_visible_gate_and_clock_contacts(
         f'''<!doctype html><meta charset="utf-8">
 <svg id="outer" xmlns="http://www.w3.org/2000/svg" width="400" height="260">
   <polyline id="edge" points="{start_x},{start_y} {end_x},{end_y}" fill="none" stroke="black"/>
-  <foreignObject x="{gate_x + 2}" y="{gate_y + 7}" width="{gate.W}" height="{gate.H}" overflow="visible">
-    <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;overflow:visible">{gate.label_html()}</div>
+  <foreignObject x="{gate_x}" y="{gate_y}" width="{gate.W + 2}" height="{gate.H + 7}" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:{gate.W}px;height:{gate.H}px;overflow:visible">{gate.label_html()}</div>
   </foreignObject>
-  <foreignObject x="{clock_x + 2}" y="{clock_y + 7}" width="{clock.W}" height="{clock.H}" overflow="visible">
-    <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;overflow:visible">{clock.label_html()}</div>
+  <foreignObject x="{clock_x}" y="{clock_y}" width="{clock.W + 2}" height="{clock.H + 7}" overflow="visible">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:{clock.W}px;height:{clock.H}px;overflow:visible">{clock.label_html()}</div>
   </foreignObject>
 </svg>
 <script>

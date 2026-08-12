@@ -4,6 +4,7 @@ import json
 import heapq
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 from collections import defaultdict
@@ -28,9 +29,29 @@ from drawio_ports import abs_port_xy
 from validate_config import validate_config
 
 
-def elk_layout_available() -> bool:
+def _elk_runtime() -> tuple[str, Path, Path] | None:
     project_root = Path(__file__).resolve().parents[1]
-    return shutil.which("node") is not None and (project_root / "node_modules" / "elkjs").exists()
+    runtime_roots: list[Path] = []
+    if getattr(sys, "frozen", False):
+        runtime_roots.append(Path(sys.executable).resolve().parent / "runtime")
+    runtime_roots.append(project_root / ".runtime")
+    node_name = Path("node/node.exe") if sys.platform == "win32" else Path("node/bin/node")
+    for root in runtime_roots:
+        node = root / node_name
+        elk_root = root / "elk"
+        script = elk_root / "elk_layout.mjs"
+        bundled = elk_root / "node_modules" / "elkjs" / "lib" / "elk.bundled.js"
+        if node.is_file() and script.is_file() and bundled.is_file():
+            return str(node), script, elk_root
+    node = shutil.which("node")
+    script = project_root / "scripts" / "elk_layout.mjs"
+    if node and script.is_file() and (project_root / "node_modules" / "elkjs").is_dir():
+        return node, script, project_root
+    return None
+
+
+def elk_layout_available() -> bool:
+    return _elk_runtime() is not None
 
 
 @dataclass(frozen=True)
@@ -366,13 +387,10 @@ def generate_elk_layout(
     started = time.perf_counter()
     if profile_name not in PROFILES:
         raise ValueError(f"未知布局 profile: {profile_name}")
-    node_executable = shutil.which("node")
-    if node_executable is None:
-        raise ValueError("ELK 布局需要 Node.js；请先安装 Node.js 并运行 npm install")
-    project_root = Path(__file__).resolve().parents[1]
-    script = project_root / "scripts" / "elk_layout.mjs"
-    if not (project_root / "node_modules" / "elkjs").exists():
-        raise ValueError("ELK 布局依赖未安装；请在项目根目录运行 npm install")
+    runtime = _elk_runtime()
+    if runtime is None:
+        raise ValueError("ELK 布局运行时不可用；发布包应包含 runtime/node 与 runtime/elk")
+    node_executable, script, runtime_cwd = runtime
 
     validate_config(config, library_path=library_path)
     shapes = load_library_shapes(library_path)
@@ -435,7 +453,7 @@ def generate_elk_layout(
             input_path.write_text(json.dumps(graph), encoding="utf-8")
             completed = subprocess.run(
                 [node_executable, str(script), str(input_path), str(output_path)],
-                cwd=project_root,
+                cwd=runtime_cwd,
                 capture_output=True,
                 text=True,
                 timeout=120,

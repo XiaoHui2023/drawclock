@@ -5,7 +5,12 @@ from typing import Any
 
 def collect_device_attr_errors(config: dict[str, dict[str, Any]]) -> list[str]:
     """收集各器件属性格式问题，供 validate_config 合并上报。"""
-    return []
+    errors: list[str] = []
+    for name, item in config.items():
+        kind = item.get("kind")
+        if not isinstance(kind, str) or not kind.strip():
+            errors.append(f"器件 {name} 缺少 kind")
+    return errors
 
 
 def validate_device_attrs(config: dict[str, dict[str, Any]]) -> None:

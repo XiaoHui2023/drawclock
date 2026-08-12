@@ -82,6 +82,8 @@ ensure_venv
 "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall -e ".[dev]" 2>/dev/null \
   || "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall -e .
 "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall "pyinstaller>=6.0"
+npm install --ignore-scripts
+"${PYTHON_CMD[@]}" "$ROOT/tools/fetch_release_runtime.py"
 
 rm -rf "$ROOT/build" "$ROOT/dist"
 

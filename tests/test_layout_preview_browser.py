@@ -22,10 +22,28 @@ def test_browser_path_discovers_common_linux_chromium_name(
     browser = tmp_path / "chromium"
     browser.touch()
     monkeypatch.delenv("CHROME_PATH", raising=False)
+    monkeypatch.setattr(layout_preview, "_runtime_roots", lambda: ())
     monkeypatch.setattr(
         layout_preview.shutil,
         "which",
         lambda name: str(browser) if name == "chromium" else None,
     )
+
+    assert layout_preview._browser_path() == browser
+
+
+def test_browser_path_discovers_bundled_headless_shell(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    executable = (
+        "chrome-headless-shell.exe" if layout_preview.os.name == "nt"
+        else "chrome-headless-shell"
+    )
+    browser = tmp_path / "headless-shell" / executable
+    browser.parent.mkdir()
+    browser.touch()
+    monkeypatch.delenv("CHROME_PATH", raising=False)
+    monkeypatch.setattr(layout_preview, "_runtime_roots", lambda: (tmp_path,))
+    monkeypatch.setattr(layout_preview.shutil, "which", lambda _name: None)
 
     assert layout_preview._browser_path() == browser

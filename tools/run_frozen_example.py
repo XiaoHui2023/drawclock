@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -34,8 +35,17 @@ def _binary_path() -> Path:
     return ROOT / "dist" / name
 
 
-def _run(binary: Path, args: list[str], cwd: Path) -> None:
+def _run(
+    binary: Path, args: list[str], cwd: Path, *, isolated_runtime: bool = False
+) -> None:
     cmd = [str(binary), *args]
+    env = None
+    if isolated_runtime:
+        env = os.environ.copy()
+        env.pop("CHROME_PATH", None)
+        empty_path = cwd / "example" / "out" / "empty-path"
+        empty_path.mkdir(parents=True, exist_ok=True)
+        env["PATH"] = str(empty_path)
     completed = subprocess.run(
         cmd,
         cwd=cwd,
@@ -45,6 +55,7 @@ def _run(binary: Path, args: list[str], cwd: Path) -> None:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         check=False,
+        env=env,
     )
     if completed.returncode != 0:
         print(f"command failed: {' '.join(cmd)}", file=sys.stderr)
@@ -135,6 +146,23 @@ def main() -> int:
     if not binary.is_file():
         print(f"frozen executable not found: {binary}", file=sys.stderr)
         return 1
+    runtime = binary.parent / "runtime"
+    chrome = runtime / "headless-shell" / (
+        "chrome-headless-shell.exe" if sys.platform == "win32"
+        else "chrome-headless-shell"
+    )
+    node = runtime / "node" / ("node.exe" if sys.platform == "win32" else "bin/node")
+    runtime_files = (
+        runtime / "runtime-manifest.json",
+        chrome,
+        node,
+        runtime / "elk" / "elk_layout.mjs",
+        runtime / "elk" / "node_modules" / "elkjs" / "lib" / "elk.bundled.js",
+    )
+    for required_runtime in runtime_files:
+        if not required_runtime.is_file():
+            print(f"bundled runtime missing: {required_runtime}", file=sys.stderr)
+            return 1
     for required in (LIBRARY, FIG1, FIG2, AUTO_LINEAR, DRAW_EXAMPLE):
         if not required.is_file():
             print(f"example input missing: {required}", file=sys.stderr)
@@ -149,6 +177,7 @@ def main() -> int:
     generated_svg = out_dir / "linear-frozen-smoke.svg"
     generated_png = out_dir / "linear-frozen-smoke.png"
     draw_example_output = out_dir / "draw-example-frozen-smoke.drawio"
+    draw_example_png = out_dir / "draw-example-frozen-smoke.png"
 
     _run(
         binary,
@@ -164,6 +193,18 @@ def main() -> int:
         ],
         ROOT,
     )
+    _run(
+        binary,
+        [
+            "draw", "-i", str(DRAW_EXAMPLE), "-l", str(LIBRARY),
+            "-o", str(draw_example_png), "--crossing-style", "gap",
+        ],
+        ROOT,
+        isolated_runtime=True,
+    )
+    if not draw_example_png.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
+        print("frozen draw example PNG is invalid", file=sys.stderr)
+        return 1
     config = json.loads(clock_tree.read_text(encoding="utf-8"))
     _assert_clock_tree(config)
 
@@ -195,6 +236,7 @@ def main() -> int:
                 "gap",
             ],
             ROOT,
+            isolated_runtime=True,
         )
     if drawio_to_clock_tree([generated_drawio], library_path=LIBRARY) != json.loads(
         AUTO_LINEAR.read_text(encoding="utf-8")

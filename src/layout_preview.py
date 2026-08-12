@@ -5,6 +5,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -22,24 +23,38 @@ HTML_LABEL_CONTENT_OFFSET_Y = 7.0
 SUPPORTED_IMAGE_SUFFIXES = (".svg", ".png")
 
 
+def _svg_num(value: float) -> str:
+    """Serialize every layout coordinate without losing its 4-decimal contract."""
+    return f"{float(value):.4f}".rstrip("0").rstrip(".") or "0"
+
+
+def _runtime_roots() -> tuple[Path, ...]:
+    roots: list[Path] = []
+    if getattr(sys, "frozen", False):
+        roots.append(Path(sys.executable).resolve().parent / "runtime")
+    roots.append(Path(__file__).resolve().parents[1] / ".runtime")
+    return tuple(dict.fromkeys(roots))
+
+
 def _browser_path() -> Path | None:
-    browser_candidates = (
-        os.environ.get("CHROME_PATH"),
-        shutil.which("msedge"),
-        shutil.which("microsoft-edge"),
-        shutil.which("microsoft-edge-stable"),
-        shutil.which("chrome"),
-        shutil.which("google-chrome"),
-        shutil.which("google-chrome-stable"),
-        shutil.which("chromium"),
-        shutil.which("chromium-browser"),
-        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-        r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
-        "/usr/bin/microsoft-edge",
-        "/usr/bin/google-chrome",
-        "/usr/bin/google-chrome-stable",
-        "/usr/bin/chromium",
-        "/usr/bin/chromium-browser",
+    executable = (
+        "chrome-headless-shell.exe" if os.name == "nt" else "chrome-headless-shell"
+    )
+    browser_candidates = [os.environ.get("CHROME_PATH")]
+    browser_candidates.extend(
+        str(root / "headless-shell" / executable) for root in _runtime_roots()
+    )
+    browser_candidates.extend(
+        (
+            shutil.which("msedge"),
+            shutil.which("microsoft-edge"),
+            shutil.which("microsoft-edge-stable"),
+            shutil.which("chrome"),
+            shutil.which("google-chrome"),
+            shutil.which("google-chrome-stable"),
+            shutil.which("chromium"),
+            shutil.which("chromium-browser"),
+        )
     )
     return next(
         (Path(item) for item in browser_candidates if item and Path(item).is_file()),
@@ -54,7 +69,7 @@ def validate_image_output(output_path: str | Path) -> str:
         supported = ", ".join(SUPPORTED_IMAGE_SUFFIXES)
         raise ValueError(f"不支持输出格式 {suffix or '<无后缀>'}；支持：{supported}")
     if suffix == ".png" and _browser_path() is None:
-        raise ValueError("PNG 输出需要 Edge、Chrome 或 Chromium；也可输出 .svg")
+        raise ValueError("PNG 渲染运行时不可用；发布包应包含 runtime/headless-shell")
     return suffix[1:]
 
 
@@ -79,12 +94,15 @@ def build_preview_svg(
         (
             f'<svg xmlns="http://www.w3.org/2000/svg" '
             f'xmlns:xhtml="http://www.w3.org/1999/xhtml" '
-            f'viewBox="{min_x:g} {min_y:g} {width:g} {height:g}" '
-            f'width="{width:g}" height="{height:g}">'
+            f'viewBox="{_svg_num(min_x)} {_svg_num(min_y)} '
+            f'{_svg_num(width)} {_svg_num(height)}" '
+            f'width="{_svg_num(width)}" height="{_svg_num(height)}">'
         ),
         "<style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}</style>",
-        f'<rect x="{min_x:g}" y="{min_y:g}" width="{width:g}" height="{height:g}" fill="#ffffff"/>',
-        f'<text x="{min_x + 8:g}" y="{min_y + 18:g}" font-family="Arial,sans-serif" font-size="12" fill="#68707a">{_escape(title)}</text>',
+        f'<rect x="{_svg_num(min_x)}" y="{_svg_num(min_y)}" '
+        f'width="{_svg_num(width)}" height="{_svg_num(height)}" fill="#ffffff"/>',
+        f'<text x="{_svg_num(min_x + 8)}" y="{_svg_num(min_y + 18)}" '
+        f'font-family="Arial,sans-serif" font-size="12" fill="#68707a">{_escape(title)}</text>',
     ]
     for edge in document.edges:
         source = by_id[edge.source_id]
@@ -107,32 +125,45 @@ def build_preview_svg(
             target.y + target.height * entry_xy[1],
         )
         points = [start, *edge.waypoints, end]
-        serialized = " ".join(f"{x:g},{y:g}" for x, y in points)
+        serialized = " ".join(
+            f"{_svg_num(x)},{_svg_num(y)}" for x, y in points
+        )
         # Arc and sharp remain exact in draw.io.  The standalone renderer uses
         # an unambiguous break because it does not invoke draw.io's line router.
         if crossing_style != "none":
             lines.append(f'<polyline class="edge-gap" points="{serialized}"/>')
         lines.append(f'<polyline class="edge" points="{serialized}"/>')
     for x, y in junction_points(document):
-        lines.append(f'<circle cx="{x:g}" cy="{y:g}" r="3" fill="#000000"/>')
+        lines.append(
+            f'<circle cx="{_svg_num(x)}" cy="{_svg_num(y)}" '
+            'r="3" fill="#000000"/>'
+        )
     for vertex in document.vertices:
         label = vertex.object_attrs.get("label", "")
         if label:
-            label_x = vertex.x + HTML_LABEL_CONTENT_OFFSET_X
-            label_y = vertex.y + HTML_LABEL_CONTENT_OFFSET_Y
+            # Keep the viewport on mxGeometry. Moving it would leave the
+            # left-side contact outside the clip boundary. The HTML content
+            # offset belongs inside the viewport and cancels the graphic's
+            # inverse (-2,-7) offset exactly.
             lines.append(
-                f'<foreignObject x="{label_x:g}" y="{label_y:g}" '
-                f'width="{vertex.width:g}" height="{vertex.height:g}" overflow="visible">'
-                '<div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;overflow:visible">'
+                f'<foreignObject x="{_svg_num(vertex.x)}" y="{_svg_num(vertex.y)}" '
+                f'width="{_svg_num(vertex.width + HTML_LABEL_CONTENT_OFFSET_X)}" '
+                f'height="{_svg_num(vertex.height + HTML_LABEL_CONTENT_OFFSET_Y)}" overflow="visible">'
+                '<div xmlns="http://www.w3.org/1999/xhtml" '
+                f'style="position:relative;left:{HTML_LABEL_CONTENT_OFFSET_X:g}px;'
+                f'top:{HTML_LABEL_CONTENT_OFFSET_Y:g}px;width:{vertex.width:g}px;'
+                f'height:{vertex.height:g}px;overflow:visible">'
                 f"{label}</div></foreignObject>"
             )
         else:
             lines.append(
-                f'<rect x="{vertex.x:g}" y="{vertex.y:g}" width="{vertex.width:g}" '
-                f'height="{vertex.height:g}" fill="#f8fafc" stroke="#20252b"/>'
+                f'<rect x="{_svg_num(vertex.x)}" y="{_svg_num(vertex.y)}" '
+                f'width="{_svg_num(vertex.width)}" height="{_svg_num(vertex.height)}" '
+                'fill="#f8fafc" stroke="#20252b"/>'
             )
             lines.append(
-                f'<text x="{vertex.x + vertex.width / 2:g}" y="{vertex.y + vertex.height / 2:g}" '
+                f'<text x="{_svg_num(vertex.x + vertex.width / 2)}" '
+                f'y="{_svg_num(vertex.y + vertex.height / 2)}" '
                 'text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9">'
                 f'{_escape(vertex.name)}</text>'
             )

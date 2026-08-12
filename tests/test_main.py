@@ -109,6 +109,11 @@ def test_release_archive_source_layout(tmp_path: Path, monkeypatch) -> None:
     (project / "src").mkdir()
     (project / "drawio-lib").mkdir()
     (project / "example").mkdir()
+    (project / ".runtime" / "headless-shell").mkdir(parents=True)
+    (project / ".runtime" / "runtime-manifest.json").write_text(
+        "{}\n", encoding="utf-8"
+    )
+    (project / ".runtime" / "headless-shell" / "chrome-headless-shell.exe").touch()
     (project / "dist" / "drawclock.exe").write_text("", encoding="utf-8")
     (project / "README.md").write_text("", encoding="utf-8")
     (project / "draw.md").write_text("", encoding="utf-8")
@@ -133,6 +138,8 @@ def test_release_archive_source_layout(tmp_path: Path, monkeypatch) -> None:
     assert prefix + "pyproject.toml" in names
     assert prefix + "draw.md" in names
     assert prefix + "example/draw.json" in names
+    assert prefix + "runtime/runtime-manifest.json" in names
+    assert prefix + "runtime/headless-shell/chrome-headless-shell.exe" in names
     assert prefix + "source/__main__.py" in names
     assert prefix + "source/pyproject.toml" not in names
     assert prefix + "source/src/__main__.py" not in names

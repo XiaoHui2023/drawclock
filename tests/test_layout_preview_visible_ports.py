@@ -11,7 +11,7 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from drawio_layout import LayoutDocument, VertexLayout
+from drawio_layout import EdgeLayout, LayoutDocument, VertexLayout
 from layout_preview import (
     HTML_LABEL_CONTENT_OFFSET_X,
     HTML_LABEL_CONTENT_OFFSET_Y,
@@ -63,11 +63,16 @@ def test_native_preview_visible_graphic_origin_equals_geometry_origin(spec) -> N
     svg = build_preview_svg(LayoutDocument(version=1, vertices=[vertex], edges=[]))
     foreign = re.search(r'<foreignObject x="([^\"]+)" y="([^\"]+)"', svg)
     assert foreign is not None
-    content_x, content_y = (float(value) for value in foreign.groups())
+    viewport_x, viewport_y = (float(value) for value in foreign.groups())
+    content = re.search(
+        r'style="position:relative;left:([-\d.]+)px;top:([-\d.]+)px;', svg
+    )
+    assert content is not None
+    content_dx, content_dy = (float(value) for value in content.groups())
 
     drift_x, drift_y = _visible_drift(
-        content_x=content_x,
-        content_y=content_y,
+        content_x=viewport_x + content_dx,
+        content_y=viewport_y + content_dy,
         graphic_dx=graphic_dx,
         graphic_dy=graphic_dy,
         geometry_x=vertex.x,
@@ -75,6 +80,8 @@ def test_native_preview_visible_graphic_origin_equals_geometry_origin(spec) -> N
     )
     assert drift_x == pytest.approx(0.0, abs=1e-9)
     assert drift_y == pytest.approx(0.0, abs=1e-9)
+    assert viewport_x == vertex.x
+    assert viewport_y == vertex.y
 
 
 def test_native_preview_outer_and_inner_offsets_are_exact_inverses() -> None:
@@ -94,3 +101,37 @@ def test_fault_injection_uncompensated_compositor_reports_visible_drift() -> Non
         geometry_y=200.0,
     )
     assert drift == (-2.0, -7.0)
+
+
+def test_edge_endpoint_serialization_preserves_clock_contact_coordinate() -> None:
+    gate = next(spec.module for spec in ALL if spec.module.TITLE == "gate")
+    clock = next(spec.module for spec in ALL if spec.module.TITLE == "clock")
+    gate_port = gate._parse_points(gate.cell_style())[-1]
+    clock_port = clock._parse_points(clock.cell_style())[0]
+    source = VertexLayout(
+        name="gate", cell_id="v1", drawclock_type="gate",
+        x=1225.78, y=88.0016, width=gate.W, height=gate.H,
+        style=gate.cell_style(), object_attrs={"label": gate.label_html()},
+    )
+    target = VertexLayout(
+        name="clock", cell_id="v2", drawclock_type="clock",
+        x=1405.78, y=82.0016, width=clock.W, height=clock.H,
+        style=clock.cell_style(), object_attrs={"label": clock.label_html()},
+    )
+    edge = EdgeLayout(
+        cell_id="e1", source_id="v1", target_id="v2",
+        style=(
+            f"exitX={gate_port[0]};exitY={gate_port[1]};"
+            f"entryX={clock_port[0]};entryY={clock_port[1]};"
+        ),
+        waypoints=(),
+    )
+    svg = build_preview_svg(
+        LayoutDocument(version=1, vertices=[source, target], edges=[edge])
+    )
+    edge_points = re.search(r'<polyline class="edge" points="[^"]+ ([^"]+)"', svg)
+    assert edge_points is not None
+    actual_x, actual_y = (float(value) for value in edge_points.group(1).split(","))
+
+    assert actual_x == target.x + target.width * clock_port[0]
+    assert actual_y == target.y + target.height * clock_port[1]

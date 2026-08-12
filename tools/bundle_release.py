@@ -28,6 +28,8 @@ SOURCE_PATHS = (
     ("src", "."),
 )
 
+RUNTIME_PATH = ".runtime"
+
 
 def _project_version(root: pathlib.Path) -> str:
     text = (root / "pyproject.toml").read_text(encoding="utf-8")
@@ -94,6 +96,12 @@ def main() -> int:
         else:
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dest)
+
+    runtime = ROOT / RUNTIME_PATH
+    if not (runtime / "runtime-manifest.json").is_file():
+        print("错误: 发布运行时未准备完成。", file=sys.stderr)
+        return 1
+    shutil.copytree(runtime, bundle_dir / "runtime")
 
     archive_base = dist / tag
     fmt = "zip" if platform.system() == "Windows" else "gztar"

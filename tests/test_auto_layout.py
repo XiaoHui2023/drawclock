@@ -33,6 +33,8 @@ def _linear_config() -> dict[str, dict[str, str]]:
 
 def test_draw_example_covers_one_shape_per_component_kind() -> None:
     config = load_clock_tree(DRAW_EXAMPLE)
+    assert all(set(item) <= {"kind", "source"} for item in config.values())
+    assert all("kind" in item for item in config.values())
     document, report = generate_layout(config, library_path=LIBRARY)
 
     assert report["hard_pass"] is True
@@ -50,6 +52,13 @@ def test_draw_example_covers_one_shape_per_component_kind() -> None:
     }
     assert len(document.vertices) == 10
     assert len(document.edges) == 9
+
+
+def test_draw_requires_kind_even_with_explicit_component() -> None:
+    config = {"osc": {"component": "source"}}
+
+    with pytest.raises(ValueError, match="器件 osc 缺少 kind"):
+        generate_layout(config, library_path=LIBRARY)
 
 
 def test_linear_layout_is_deterministic_and_roundtrips(tmp_path: Path) -> None:
