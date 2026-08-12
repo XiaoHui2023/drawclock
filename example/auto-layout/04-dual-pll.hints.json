@@ -1,7 +1,0 @@
-{
-  "version": 1,
-  "strict": true,
-  "components": {
-    "pll_dual": "pll2"
-  }
-}

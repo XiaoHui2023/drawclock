@@ -8,12 +8,11 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "example" / "auto-layout"
 
 
-def build(domain_count: int) -> tuple[dict[str, dict[str, object]], dict[str, object]]:
+def build(domain_count: int) -> dict[str, dict[str, object]]:
     config: dict[str, dict[str, object]] = {
         "xtal_0": {"kind": "source", "source_kind": "source"},
         "xtal_1": {"kind": "source", "source_kind": "source"},
     }
-    hints: dict[str, str] = {}
     for pll_index in range(4):
         name = f"pll_{pll_index}"
         config[name] = {
@@ -21,7 +20,6 @@ def build(domain_count: int) -> tuple[dict[str, dict[str, object]], dict[str, ob
             "pll_kind": "SC",
             "source": f"xtal_{pll_index % 2}",
         }
-        hints[name] = "pll"
 
     output_cells = ("occ_clk_cell", "gen_cell", "bist_clk_cell")
     for domain in range(domain_count):
@@ -62,7 +60,7 @@ def build(domain_count: int) -> tuple[dict[str, dict[str, object]], dict[str, ob
                 "freq": f"{25 * (1 + (domain + leaf) % 16)} MHz",
                 "source": cell,
             }
-    return config, {"version": 1, "strict": True, "components": hints}
+    return config
 
 
 def main() -> int:
@@ -76,12 +74,9 @@ def main() -> int:
         ("11-stress-4096-clocks", 1024),
     )
     for name, domain_count in scenarios:
-        config, hints = build(domain_count)
+        config = build(domain_count)
         (OUTPUT / f"{name}.json").write_text(
             json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-        )
-        (OUTPUT / f"{name}.hints.json").write_text(
-            json.dumps(hints, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
         clocks = sum(item.get("kind") == "clock" for item in config.values())
         print(f"{name}: nodes={len(config)}, clocks={clocks}")

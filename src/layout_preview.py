@@ -18,6 +18,33 @@ from drawio_ports import abs_port_xy, port_anchors
 # otherwise the visible symbol and the mathematically routed ports diverge.
 HTML_LABEL_CONTENT_OFFSET_X = 2.0
 HTML_LABEL_CONTENT_OFFSET_Y = 7.0
+SUPPORTED_IMAGE_SUFFIXES = (".svg", ".png")
+
+
+def _browser_path() -> Path | None:
+    browser_candidates = (
+        shutil.which("msedge"),
+        shutil.which("chrome"),
+        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+        r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+        "/usr/bin/microsoft-edge",
+        "/usr/bin/google-chrome",
+    )
+    return next(
+        (Path(item) for item in browser_candidates if item and Path(item).is_file()),
+        None,
+    )
+
+
+def validate_image_output(output_path: str | Path) -> str:
+    """Validate the requested image format before layout work starts."""
+    suffix = Path(output_path).suffix.lower()
+    if suffix not in SUPPORTED_IMAGE_SUFFIXES:
+        supported = ", ".join(SUPPORTED_IMAGE_SUFFIXES)
+        raise ValueError(f"不支持输出格式 {suffix or '<无后缀>'}；支持：{supported}")
+    if suffix == ".png" and _browser_path() is None:
+        raise ValueError("PNG 输出需要 Microsoft Edge 或 Google Chrome；也可输出 .svg")
+    return suffix[1:]
 
 
 def build_preview_svg(
@@ -122,40 +149,18 @@ def write_preview(
     document: LayoutDocument,
     output_path: str | Path,
     *,
-    preview_format: str = "auto",
     title: str = "drawclock",
     crossing_style: str = "gap",
-    max_raster_size: int = 16384,
 ) -> Path:
     """Write SVG directly or rasterize it to PNG in a real browser."""
     output = Path(output_path)
-    resolved_format = preview_format
-    if resolved_format == "auto":
-        resolved_format = output.suffix.lower().lstrip(".")
-    if resolved_format not in {"svg", "png"}:
-        raise ValueError("preview format must be svg or png")
+    resolved_format = validate_image_output(output)
     if resolved_format == "svg":
         return write_preview_svg(
             document, output, title=title, crossing_style=crossing_style
         )
-    if output.suffix.lower() != ".png":
-        raise ValueError("PNG preview output must use a .png suffix")
-    if max_raster_size < 256:
-        raise ValueError("preview max size must be at least 256")
-    browser_candidates = (
-        shutil.which("msedge"),
-        shutil.which("chrome"),
-        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
-        r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
-        "/usr/bin/microsoft-edge",
-        "/usr/bin/google-chrome",
-    )
-    browser = next(
-        (Path(item) for item in browser_candidates if item and Path(item).is_file()),
-        None,
-    )
-    if browser is None:
-        raise ValueError("PNG preview requires Microsoft Edge or Google Chrome")
+    browser = _browser_path()
+    assert browser is not None
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix="drawclock-preview-") as temp_dir:
         svg_path = Path(temp_dir) / "preview.svg"
@@ -169,9 +174,8 @@ def write_preview(
         if size is None:
             raise ValueError("generated SVG is missing width/height")
         width, height = (float(value) for value in size.groups())
-        scale = min(1.0, max_raster_size / max(width, height))
-        target_width = max(1, math.ceil(width * scale))
-        target_height = max(1, math.ceil(height * scale))
+        target_width = max(1, math.ceil(width))
+        target_height = max(1, math.ceil(height))
         page_path = Path(temp_dir) / "preview.html"
         page_path.write_text(
             "<!doctype html><meta charset=utf-8>"

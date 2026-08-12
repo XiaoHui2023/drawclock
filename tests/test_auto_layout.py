@@ -9,8 +9,9 @@ from pathlib import Path
 
 import pytest
 
-from auto_layout import generate_layout, write_generated_drawio
+from auto_layout import generate_layout, load_clock_tree, write_generated_drawio
 from drawio_build import build_drawio_xml, junction_points
+from drawio_decode import compress_diagram_payload, decompress_diagram_payload
 from drawio_layout import apply_crossing_style
 from layout_quality import inspect_drawio_quality
 from pipeline import drawio_to_clock_tree
@@ -80,20 +81,13 @@ def test_same_port_fanout_gets_decorative_junctions_without_changing_topology(
     assert drawio_to_clock_tree([output], library_path=LIBRARY) == config
 
 
-def test_pll_requires_shape_hint() -> None:
+def test_pll_uses_smallest_compatible_library_shape() -> None:
     config = {
         "xtal": {"kind": "source", "source_kind": "source"},
         "pll0": {"kind": "pll", "pll_kind": "SC", "source": "xtal"},
         "clk0": {"kind": "clock", "source": "pll0"},
     }
-    with pytest.raises(ValueError, match="pll/pll2"):
-        generate_layout(config, library_path=LIBRARY)
-
-    document, report = generate_layout(
-        config,
-        library_path=LIBRARY,
-        component_hints={"pll0": "pll"},
-    )
+    document, report = generate_layout(config, library_path=LIBRARY)
     assert {vertex.name: vertex.drawclock_type for vertex in document.vertices}["pll0"] == "pll"
     assert report["hard_pass"] is True
 
@@ -104,19 +98,7 @@ def test_dense_example_meets_hard_gates_and_runtime_budget() -> None:
             encoding="utf-8"
         )
     )
-    hints = json.loads(
-        (
-            ROOT
-            / "example"
-            / "auto-layout"
-            / "05-dense-cross-root.hints.json"
-        ).read_text(encoding="utf-8")
-    )["components"]
-    _, report = generate_layout(
-        config,
-        library_path=LIBRARY,
-        component_hints=hints,
-    )
+    _, report = generate_layout(config, library_path=LIBRARY)
 
     assert report["hard_pass"] is True
     assert report["edge_node_intersections"] == 0
@@ -151,9 +133,8 @@ def test_95_node_tree_stays_within_bounded_runtime() -> None:
     assert report["runtime_ms"] < 15000
 
 
-def test_json_to_drawio_cli_writes_diagram_and_preview(tmp_path: Path) -> None:
-    output = tmp_path / "linear.drawio"
-    preview = tmp_path / "linear.svg"
+def test_draw_cli_writes_single_svg_output(tmp_path: Path) -> None:
+    output = tmp_path / "linear.svg"
     proc = subprocess.run(
         [
             sys.executable,
@@ -165,8 +146,6 @@ def test_json_to_drawio_cli_writes_diagram_and_preview(tmp_path: Path) -> None:
             str(LIBRARY),
             "-o",
             str(output),
-            "--preview",
-            str(preview),
         ],
         capture_output=True,
         text=True,
@@ -174,7 +153,7 @@ def test_json_to_drawio_cli_writes_diagram_and_preview(tmp_path: Path) -> None:
     )
     assert proc.returncode == 0, proc.stderr
     assert output.is_file()
-    assert preview.is_file()
+    assert output.read_text(encoding="utf-8").startswith("<?xml")
 
 
 @pytest.mark.parametrize("style", ["arc", "gap", "sharp", "none"])
@@ -195,8 +174,7 @@ def test_crossing_style_replaces_the_existing_jump_policy(style: str) -> None:
     reason="PNG integration requires Microsoft Edge",
 )
 def test_json_to_drawio_cli_writes_real_component_png(tmp_path: Path) -> None:
-    output = tmp_path / "linear.drawio"
-    preview = tmp_path / "linear.png"
+    output = tmp_path / "linear.png"
     proc = subprocess.run(
         [
             sys.executable,
@@ -210,10 +188,6 @@ def test_json_to_drawio_cli_writes_real_component_png(tmp_path: Path) -> None:
             str(output),
             "--crossing-style",
             "gap",
-            "--preview",
-            str(preview),
-            "--preview-format",
-            "png",
         ],
         capture_output=True,
         text=True,
@@ -221,8 +195,7 @@ def test_json_to_drawio_cli_writes_real_component_png(tmp_path: Path) -> None:
         timeout=60,
     )
     assert proc.returncode == 0, proc.stderr
-    assert preview.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
-    assert "jumpStyle=gap" in output.read_text(encoding="utf-8")
+    assert output.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
 
 
 def test_agent_quality_facilities_are_not_public_cli_features() -> None:
@@ -241,6 +214,86 @@ def test_agent_quality_facilities_are_not_public_cli_features() -> None:
 
     assert "quality-check" not in root_help
     assert "--report" not in generate_help
+    for removed in (
+        "--profile",
+        "--engine",
+        "--candidates",
+        "--hints",
+        "--preview",
+        "--preview-format",
+        "--preview-max-size",
+    ):
+        assert removed not in generate_help
+
+
+@pytest.mark.parametrize(
+    ("suffix", "content"),
+    [
+        (".json", '{"晶振":{"kind":"source","source_kind":"source"}}'),
+        (".jsonc", '{// clock source\n"晶振":{"kind":"source","source_kind":"source"}}'),
+        (".json5", "{'晶振':{kind:'source',source_kind:'source'}}"),
+        (".toml", '["晶振"]\nkind="source"\nsource_kind="source"\n'),
+        (".yaml", "晶振:\n  kind: source\n  source_kind: source\n"),
+        (".ini", "[晶振]\nkind=source\nsource_kind=source\n"),
+    ],
+)
+def test_clock_tree_input_formats(suffix: str, content: str, tmp_path: Path) -> None:
+    source = tmp_path / f"clock-tree{suffix}"
+    source.write_text(content, encoding="utf-8")
+    assert load_clock_tree(source) == {
+        "晶振": {"kind": "source", "source_kind": "source"}
+    }
+
+
+def test_draw_rejects_output_suffix_before_reading_inputs(tmp_path: Path) -> None:
+    output = tmp_path / "clock-tree.bmp"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(SRC_DIR),
+            "draw",
+            "-i",
+            str(tmp_path / "missing.json"),
+            "-l",
+            str(tmp_path / "missing.xml"),
+            "-o",
+            str(output),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 1
+    assert "支持：.drawio, .svg, .png" in proc.stderr
+    assert not output.exists()
+
+
+def test_layout_uses_kind_metadata_and_geometry_from_supplied_library(
+    tmp_path: Path,
+) -> None:
+    text = LIBRARY.read_text(encoding="utf-8").strip()
+    entries = json.loads(text[len("<mxlibrary>") : -len("</mxlibrary>")])
+    for entry in entries:
+        if entry.get("title") == "gate":
+            entry["title"] = "custom_gate_symbol"
+            entry["w"] = 83
+            entry["h"] = 91
+            graph_xml = decompress_diagram_payload(entry["xml"])
+            graph_xml = graph_xml.replace(
+                "drawclockType=gate;", "drawclockType=custom_gate_symbol;"
+            )
+            entry["xml"] = compress_diagram_payload(graph_xml)
+            break
+    custom_library = tmp_path / "custom.xml"
+    custom_library.write_text(
+        "<mxlibrary>" + json.dumps(entries) + "</mxlibrary>", encoding="utf-8"
+    )
+
+    document, report = generate_layout(_linear_config(), library_path=custom_library)
+    gate = next(vertex for vertex in document.vertices if vertex.name == "gate0")
+    assert gate.drawclock_type == "custom_gate_symbol"
+    assert (gate.width, gate.height) == (83, 91)
+    assert report["hard_pass"] is True
 
 
 def _generated_linear_artifact(tmp_path: Path) -> tuple[Path, Path]:

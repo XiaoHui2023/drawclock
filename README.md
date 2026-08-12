@@ -1,59 +1,84 @@
 # drawclock
 
-在 draw.io 时钟树图与逻辑 JSON 之间双向转换，支持自动布局，并可用新器件库刷新旧图。
+在 draw.io 时钟图与结构化时钟拓扑之间转换，也可以使用指定器件库自动生成从左到右的时钟图。
 
-## extract（图转 JSON）
+## draw：拓扑自动生图
+
+`draw` 每次只生成一个输出文件。输出格式完全由 `--output` 后缀决定：
+
+```powershell
+drawclock draw -i clock-tree.json -l drawio-lib/drawclock.xml -o clock-tree.drawio
+drawclock draw -i clock-tree.yaml -l drawio-lib/drawclock.xml -o clock-tree.svg
+drawclock draw -i clock-tree.toml -l drawio-lib/drawclock.xml -o clock-tree.png --crossing-style gap
+```
 
 | 长参数 | 短参数 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- | --- |
-| `--input` | `-i` | 文件路径（可多次） | 必填 | `.drawio.svg` / `.drawio` |
-| `--output` | `-o` | 文件 | | 未指定则标准输出 |
-| `--library` | `-l` | 文件 | 必填 | |
+| `--input` | `-i` | 文件 | 必填 | 时钟拓扑配置 |
+| `--library` | `-l` | 文件 | 必填 | 本次生成使用的 draw.io 器件库 XML |
+| `--output` | `-o` | 文件 | 必填 | `.drawio`、`.svg` 或 `.png` |
+| `--crossing-style` |  | 枚举 | `arc` | `arc`、`gap`、`sharp` 或 `none` |
 
-兼容别名为 `drawio-to-json` 和旧名称 `run`；新脚本和文档使用 `extract`。
+程序在读取输入和计算布局之前检查输出后缀。不支持的后缀会立即报错并列出兼容格式，不会产生半成品。
 
-## draw（JSON 自动布局成图）
+PNG 使用 Microsoft Edge 或 Google Chrome 渲染器，以正确处理器件库中的 HTML/SVG 图形；机器没有兼容浏览器时会在布局开始前报错。SVG 是不依赖浏览器的矢量输出，适合超大规模图。
+
+### 输入格式
+
+输入由 Python `config-library`（导入名 `configlib`）统一加载，支持：
+
+- `.json`、`.jsonc`、`.json5`
+- `.toml`
+- `.yaml`、`.yml`
+- `.ini`、`.conf`、`.config`
+
+无论文件格式如何，加载结果的顶层都必须是“器件名称 → 属性对象”。完整字段规则见 [json.md](json.md)。
+
+### 自动策略
+
+用户不需要选择 engine、profile、candidate、hints 或预览模式：
+
+- 程序根据图结构自动选择全局分层或高复用时钟域分解；ELK 运行环境可用时使用固定端口的 ELK Layered，否则使用内置确定性分层布局。
+- 内部比较确定性候选，并按正确性、交叉、重叠、折点、线长和面积依次选取结果。
+- 器件解析只使用当前 `--library` 中的类型元数据、子类型、端口数量、端口键、尺寸和样式，不写死某个器件库的坐标或尺寸。
+- JSON 中可用 `component` 明确指定当前库的 title；未指定时，程序选择满足类型和端口约束的最小兼容图形。
+- 节点数量没有产品参数上限；大规模高复用网络由结构特征触发分解，不按固定节点数量切换。
+
+## extract：图转拓扑
 
 ```powershell
-python src draw -i clock-tree.json -l drawio-lib/drawclock.xml `
-  -o clock-tree.drawio --crossing-style gap `
-  --preview clock-tree.png --preview-format png
+drawclock extract -i fig1.drawio fig2.drawio -l drawio-lib/drawclock.xml -o clock-tree.json
 ```
 
-`--crossing-style` 可选 `arc`、`gap`、`sharp`、`none`，默认 `arc`。draw.io
-文件保存对应的原生 jump style；独立 SVG/PNG 预览使用白色断口表达 `arc`、`gap`
-和 `sharp`，`none` 不处理跨线。
+| 长参数 | 短参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `--input` | `-i` | 文件路径（一个或多个） | 必填 | `.drawio.svg` 或 `.drawio` |
+| `--library` | `-l` | 文件 | 必填 | 解析时使用的器件库 |
+| `--output` | `-o` | 文件 | 标准输出 | 拓扑 JSON |
 
-`--preview-format` 可选 `auto`、`svg`、`png`。`auto` 根据 `--preview` 的
-`.svg`/`.png` 后缀判断；PNG 使用真实 Edge/Chrome 渲染 `foreignObject` 器件，
-并通过 `--preview-max-size` 控制最长边，默认 16384 px。SVG 保留完整矢量图，
-更适合查看 1024 个以上末端时钟的超长图。
+兼容别名为 `drawio-to-json` 和旧名称 `run`；新脚本使用 `extract`。
 
-推荐先在仓库根目录运行一次 `npm install --ignore-scripts`。`--engine auto`
-（默认）会优先使用 ELK Layered 的固定端口、从左到右、正交布局；依赖不可用时
-回退到纯 Python `native` 引擎。可用 `--engine elk` 强制要求 ELK，或用
-`--engine native` 明确选择原引擎。React Flow 是渲染/交互层，不是布局引擎，
-因此没有作为布局依赖引入。
+## reload：刷新旧图
 
-压力示例分为 16、64、512、1024、2048、4096 个末端 clock。自动策略不按
-节点总数硬切换，而是从扇出分布、跨层边负载和剩余连通域判断是否分解
-高复用 backbone，并在每个域内保持
-mux → 分频器 → gate → cell → clock 的横向链；所有坐标仍由拓扑、器件尺寸
-和端口一次计算得到。
+```powershell
+drawclock reload -i old.drawio -l drawio-lib/drawclock.xml -o refreshed.drawio
+```
+
+| 长参数 | 短参数 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- | --- |
+| `--input` | `-i` | 文件或目录 | 必填 | `.drawio` / `.drawio.svg` |
+| `--library` | `-l` | 文件 | 必填 | 新器件库 XML |
+| `--output` | `-o` | 文件或目录 | 必填 | 单文件输出或批量输出目录 |
+
+## 静态包
+
+`tools/pack.sh` 生成 PyInstaller + staticx Linux 可执行文件。发布流水线必须通过冻结后可执行文件的 `extract`、`reload`、JSON→draw.io、JSON→SVG、JSON→PNG、拓扑回环和非法后缀前置拒绝测试，才允许发布 Release。
+
+## 示例
+
+从简单链路到 4096 个末端时钟的输入位于 `example/auto-layout/`。生成脚本：
 
 ```powershell
 python scripts/build_stress_examples.py
 python scripts/build_auto_layout_examples.py
 ```
-
-布局使用器件库的真实尺寸和端口，执行从左到右分层、确定性候选排序和障碍感知正交布线。`pll`/`pll2` 等无法仅由拓扑唯一确定的形状必须通过 `--hints` 指定。完整的递增示例见 `example/auto-layout/README.md`。
-
-布局由当前 JSON 和器件库一次计算得到，不对生成后的示例图做坐标校准。器件尺寸、端口位置或连接关系变化时会重新计算全部约束。
-
-## reload
-
-| 长参数 | 短参数 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- | --- |
-| `--input` | `-i` | 文件或目录 | 必填 | 支持 `.drawio` / `.drawio.svg` 格式 |
-| `--library` | `-l` | 文件 | 必填 | `drawclock.xml` |
-| `--output` | `-o` | 文件或目录 | 必填 | 单文件输出路径，或批量输出目录 |

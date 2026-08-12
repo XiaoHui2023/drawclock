@@ -376,7 +376,9 @@ def generate_elk_layout(
 
     validate_config(config, library_path=library_path)
     shapes = load_library_shapes(library_path)
-    nodes = resolve_nodes(config, shapes, component_hints or {})
+    nodes = resolve_nodes(
+        config, shapes, component_hints or {}, library_path=library_path
+    )
     logical_edges = build_logical_edges(config, nodes, library_path)
     profile = PROFILES[profile_name]
     plan = select_layout_plan(nodes, logical_edges)

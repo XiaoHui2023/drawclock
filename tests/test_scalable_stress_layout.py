@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from auto_layout import load_clock_tree, load_component_hints
+from auto_layout import load_clock_tree
 from elk_layout import generate_elk_layout, select_layout_plan
 from auto_layout import LogicalEdge
 from layout_quality import inspect_layout_quality
@@ -46,12 +46,10 @@ def test_scalable_stress_generation_is_linear_and_complete(
     budget_seconds: float,
 ) -> None:
     config = load_clock_tree(EXAMPLES / f"{name}.json")
-    hints = load_component_hints(EXAMPLES / f"{name}.hints.json")
     started = time.perf_counter()
     document, report = generate_elk_layout(
         config,
         library_path=LIBRARY,
-        component_hints=hints,
     )
     elapsed = time.perf_counter() - started
     assert report["engine"] == "scalable-layered"
@@ -64,17 +62,14 @@ def test_scalable_stress_generation_is_linear_and_complete(
 def test_scalable_1024_hard_geometry_gate() -> None:
     name = "09-stress-1024-clocks"
     config = load_clock_tree(EXAMPLES / f"{name}.json")
-    hints = load_component_hints(EXAMPLES / f"{name}.hints.json")
     document, _ = generate_elk_layout(
         config,
         library_path=LIBRARY,
-        component_hints=hints,
     )
     quality = inspect_layout_quality(
         config,
         document,
         library_path=LIBRARY,
-        component_hints=hints,
         grid=0.0001,
         tolerance=0.01,
     )

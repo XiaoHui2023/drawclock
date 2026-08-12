@@ -1,5 +1,26 @@
 # JSON
 
+> 文件名沿用历史名称。`draw` 的拓扑输入实际由 `configlib` 加载，可使用
+> JSON/JSONC/JSON5、TOML、YAML 或 INI/CONF/CONFIG；加载后的数据结构必须符合本文。
+
+每个器件对象可以包含可选字段 `component`，其值是本次 `--library` 中的图形 title。
+当一个逻辑 `kind` 在库中存在多个外形且拓扑无法唯一证明具体外形时，推荐在拓扑内直接写
+`component`，不再使用独立 hints 文件。例如：
+
+```json
+{
+  "pll_dual": {
+    "kind": "pll",
+    "component": "pll2",
+    "pll_kind": "INNO",
+    "source": "xtal"
+  }
+}
+```
+
+没有 `component` 时，生成器根据当前库图形的 `drawclockKind`、子类型、输入/输出端口数量、
+端口连接键和尺寸选择最小兼容图形。这个选择不依赖内置库的固定名称或坐标。
+
 以下为示范。
 
 `kind` 由器件库 style 中的 `drawclockKind` 导出（图中 object 不手写 `kind`）。若某大类下存在小类区分，则该类下**每个**器件导出时须同时含 `kind`（大类）与 `{大类}_kind`（小类）；基础图形也算小类，如 `inv` / `inv_kind: inv`、`cell` / `cell_kind: cell`。`mux`、`pll` 仅统一大类，无 `mux_kind` / 路数小类——输入路数、输出路数体现在库图形端口，不在 `kind` 里。`pll_kind` 表示 PLL IP 类型（如 `SC`、`INNO`），与单/双输出无关。

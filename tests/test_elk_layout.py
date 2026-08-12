@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from auto_layout import load_clock_tree, load_component_hints
+from auto_layout import load_clock_tree
 from elk_layout import elk_layout_available, generate_elk_layout
 from layout_quality import inspect_layout_quality
 
@@ -17,17 +17,14 @@ EXAMPLES = ROOT / "example" / "auto-layout"
 
 def _generate(name: str):
     config = load_clock_tree(EXAMPLES / f"{name}.json")
-    hints = load_component_hints(EXAMPLES / f"{name}.hints.json")
     document, report = generate_elk_layout(
         config,
         library_path=LIBRARY,
-        component_hints=hints,
     )
     quality = inspect_layout_quality(
         config,
         document,
         library_path=LIBRARY,
-        component_hints=hints,
         grid=0.0001,
         tolerance=0.01,
     )
@@ -55,15 +52,12 @@ def test_elk_exact_ports_and_lines_are_deterministic() -> None:
 @pytest.mark.skipif(not elk_layout_available(), reason="ELK Node.js dependency is unavailable")
 def test_grouped_sweep_matches_exact_pair_oracle() -> None:
     config = load_clock_tree(EXAMPLES / "06-simple-16-clocks.json")
-    hints = load_component_hints(EXAMPLES / "06-simple-16-clocks.hints.json")
     document, _ = generate_elk_layout(
         config,
         library_path=LIBRARY,
-        component_hints=hints,
     )
     common = {
         "library_path": LIBRARY,
-        "component_hints": hints,
         "grid": 0.0001,
         "tolerance": 0.01,
     }

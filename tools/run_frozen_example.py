@@ -16,10 +16,17 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from drawio_decode import extract_mxfile_xml, iter_diagram_models  # noqa: E402
+from drawio_decode import (  # noqa: E402
+    compress_diagram_payload,
+    decompress_diagram_payload,
+    extract_mxfile_xml,
+    iter_diagram_models,
+)
+from pipeline import drawio_to_clock_tree  # noqa: E402
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 FIG1 = ROOT / "example" / "fig1.drawio"
 FIG2 = ROOT / "example" / "fig2.drawio"
+AUTO_LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
 
 
 def _binary_path() -> Path:
@@ -46,6 +53,23 @@ def _run(binary: Path, args: list[str], cwd: Path) -> None:
         print(completed.stdout, file=sys.stderr)
         print(completed.stderr, file=sys.stderr)
         raise SystemExit(completed.returncode)
+
+
+def _run_expect_failure(binary: Path, args: list[str], cwd: Path, needle: str) -> None:
+    completed = subprocess.run(
+        [str(binary), *args],
+        cwd=cwd,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+    if completed.returncode == 0 or needle not in completed.stderr:
+        print(f"command should fail with {needle!r}: {args}", file=sys.stderr)
+        print(completed.stderr, file=sys.stderr)
+        raise SystemExit(1)
 
 
 def _assert_clock_tree(config: dict[str, object]) -> None:
@@ -113,7 +137,7 @@ def main() -> int:
     if not binary.is_file():
         print(f"frozen executable not found: {binary}", file=sys.stderr)
         return 1
-    for required in (LIBRARY, FIG1, FIG2):
+    for required in (LIBRARY, FIG1, FIG2, AUTO_LINEAR):
         if not required.is_file():
             print(f"example input missing: {required}", file=sys.stderr)
             return 1
@@ -123,6 +147,9 @@ def main() -> int:
     clock_tree = out_dir / "clock-tree-frozen-smoke.json"
     fig1_reloaded = out_dir / "fig1-frozen-smoke.drawio"
     fig2_reloaded = out_dir / "fig2-frozen-smoke.drawio"
+    generated_drawio = out_dir / "linear-frozen-smoke.drawio"
+    generated_svg = out_dir / "linear-frozen-smoke.svg"
+    generated_png = out_dir / "linear-frozen-smoke.png"
 
     _run(
         binary,
@@ -153,6 +180,128 @@ def main() -> int:
     )
     _assert_reloaded(fig1_reloaded)
     _assert_reloaded(fig2_reloaded)
+
+    for output in (generated_drawio, generated_svg, generated_png):
+        _run(
+            binary,
+            [
+                "draw",
+                "-i",
+                str(AUTO_LINEAR),
+                "-l",
+                str(LIBRARY),
+                "-o",
+                str(output),
+                "--crossing-style",
+                "gap",
+            ],
+            ROOT,
+        )
+    if drawio_to_clock_tree([generated_drawio], library_path=LIBRARY) != json.loads(
+        AUTO_LINEAR.read_text(encoding="utf-8")
+    ):
+        print("frozen draw output did not round-trip", file=sys.stderr)
+        return 1
+    if not generated_svg.read_text(encoding="utf-8").startswith("<?xml"):
+        print("frozen SVG output is invalid", file=sys.stderr)
+        return 1
+    if not generated_png.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
+        print("frozen PNG output is invalid", file=sys.stderr)
+        return 1
+    _run_expect_failure(
+        binary,
+        [
+            "draw",
+            "-i",
+            str(AUTO_LINEAR),
+            "-l",
+            str(LIBRARY),
+            "-o",
+            str(out_dir / "unsupported-frozen-smoke.bmp"),
+        ],
+        ROOT,
+        ".drawio, .svg, .png",
+    )
+
+    format_samples = {
+        "json": '{"晶振":{"kind":"source","source_kind":"source"}}',
+        "jsonc": '{// source\n"晶振":{"kind":"source","source_kind":"source"}}',
+        "json5": "{'晶振':{kind:'source',source_kind:'source'}}",
+        "toml": '["晶振"]\nkind="source"\nsource_kind="source"\n',
+        "yaml": "晶振:\n  kind: source\n  source_kind: source\n",
+        "yml": "晶振:\n  kind: source\n  source_kind: source\n",
+        "ini": "[晶振]\nkind=source\nsource_kind=source\n",
+        "conf": "[晶振]\nkind=source\nsource_kind=source\n",
+        "config": "[晶振]\nkind=source\nsource_kind=source\n",
+    }
+    for suffix, content in format_samples.items():
+        config_path = out_dir / f"topology-{suffix}-frozen-smoke.{suffix}"
+        image_path = out_dir / f"topology-{suffix}-frozen-smoke.svg"
+        config_path.write_text(content, encoding="utf-8")
+        _run(
+            binary,
+            [
+                "draw",
+                "-i",
+                str(config_path),
+                "-l",
+                str(LIBRARY),
+                "-o",
+                str(image_path),
+            ],
+            ROOT,
+        )
+
+    library_text = LIBRARY.read_text(encoding="utf-8").strip()
+    library_entries = json.loads(
+        library_text[len("<mxlibrary>") : -len("</mxlibrary>")]
+    )
+    for entry in library_entries:
+        if entry.get("title") == "gate":
+            entry["title"] = "custom_gate_symbol"
+            entry["w"] = 83
+            entry["h"] = 91
+            graph_xml = decompress_diagram_payload(entry["xml"])
+            graph_xml = graph_xml.replace(
+                "drawclockType=gate;", "drawclockType=custom_gate_symbol;"
+            )
+            entry["xml"] = compress_diagram_payload(graph_xml)
+            break
+    custom_library = out_dir / "custom-library-frozen-smoke.xml"
+    custom_library.write_text(
+        "<mxlibrary>" + json.dumps(library_entries) + "</mxlibrary>",
+        encoding="utf-8",
+    )
+    custom_output = out_dir / "custom-library-frozen-smoke.drawio"
+    _run(
+        binary,
+        [
+            "draw",
+            "-i",
+            str(AUTO_LINEAR),
+            "-l",
+            str(custom_library),
+            "-o",
+            str(custom_output),
+        ],
+        ROOT,
+    )
+    model = iter_diagram_models(extract_mxfile_xml(str(custom_output)))[0]
+    custom_gate = next(
+        (obj for obj in model.iter("object") if obj.get("name") == "gate_main"),
+        None,
+    )
+    if custom_gate is None:
+        print("frozen draw omitted supplied-library component", file=sys.stderr)
+        return 1
+    cell = custom_gate.find("mxCell")
+    if cell is None or "drawclockType=custom_gate_symbol;" not in cell.get("style", ""):
+        print("frozen draw ignored supplied-library kind metadata", file=sys.stderr)
+        return 1
+    geometry = cell.find("mxGeometry")
+    if geometry is None or (geometry.get("width"), geometry.get("height")) != ("83", "91"):
+        print("frozen draw ignored supplied-library geometry", file=sys.stderr)
+        return 1
 
     print("frozen example passed")
     return 0

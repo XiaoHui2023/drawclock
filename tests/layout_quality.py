@@ -109,7 +109,9 @@ def inspect_layout_quality(
         raise ValueError("tolerance must not be negative")
 
     shapes = load_library_shapes(library_path)
-    resolved = resolve_nodes(config, shapes, component_hints or {})
+    resolved = resolve_nodes(
+        config, shapes, component_hints or {}, library_path=library_path
+    )
     logical_edges = build_logical_edges(config, resolved, library_path)
     ranks = _ranks(resolved, logical_edges)
     vertices_by_id = {vertex.cell_id: vertex for vertex in document.vertices}
