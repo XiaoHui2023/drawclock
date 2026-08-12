@@ -6,7 +6,7 @@
     "kind": "from"
   },
   "clock_select": {
-    "kind": "mux",
+    "kind": "mux2",
     "source": {
       "0": "osc",
       "1": "external_clk"

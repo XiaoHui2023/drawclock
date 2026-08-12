@@ -30,7 +30,7 @@ def build(domain_count: int) -> dict[str, dict[str, object]]:
         gate = f"gate_{prefix}"
         cell = f"cell_{prefix}"
         config[mux] = {
-            "kind": "mux",
+            "kind": "mux3",
             "source": {
                 "0": f"xtal_{bank % 2}",
                 "1": f"pll_{bank}",

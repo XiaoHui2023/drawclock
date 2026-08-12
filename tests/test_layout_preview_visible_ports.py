@@ -135,3 +135,56 @@ def test_edge_endpoint_serialization_preserves_clock_contact_coordinate() -> Non
 
     assert actual_x == target.x + target.width * clock_port[0]
     assert actual_y == target.y + target.height * clock_port[1]
+
+
+def test_preview_viewbox_contains_routes_below_all_nodes() -> None:
+    gate = next(spec.module for spec in ALL if spec.module.TITLE == "gate")
+    source = VertexLayout(
+        name="source", cell_id="v1", drawclock_type="gate",
+        x=100.0, y=100.0, width=gate.W, height=gate.H,
+        style=gate.cell_style(), object_attrs={"label": gate.label_html()},
+    )
+    target = VertexLayout(
+        name="target", cell_id="v2", drawclock_type="gate",
+        x=300.0, y=100.0, width=gate.W, height=gate.H,
+        style=gate.cell_style(), object_attrs={"label": gate.label_html()},
+    )
+    edge = EdgeLayout(
+        cell_id="e1", source_id="v1", target_id="v2",
+        style="exitX=1;exitY=0.5;entryX=0;entryY=0.5;",
+        waypoints=((180.0, 125.0), (180.0, 900.0), (260.0, 900.0), (260.0, 125.0)),
+    )
+
+    svg = build_preview_svg(
+        LayoutDocument(version=1, vertices=[source, target], edges=[edge])
+    )
+    viewbox = re.search(r'viewBox="([^"]+)"', svg)
+    assert viewbox is not None
+    _, min_y, _, height = (float(value) for value in viewbox.group(1).split())
+    assert min_y + height >= 945.0
+
+
+def test_preview_default_draws_real_arc_bridge_at_crossing() -> None:
+    style = "points=[[0,0.5,0,0,0],[1,0.5,0,0,0]];"
+    vertices = [
+        VertexLayout("left", "v1", "x", 0, 80, 40, 40, style),
+        VertexLayout("right", "v2", "x", 360, 80, 40, 40, style),
+        VertexLayout("top", "v3", "x", 100, 0, 40, 40, style),
+        VertexLayout("bottom", "v4", "x", 260, 180, 40, 40, style),
+    ]
+    edge_style = "exitX=1;exitY=0.5;entryX=0;entryY=0.5;"
+    edges = [
+        EdgeLayout("e1", "v1", "v2", edge_style),
+        EdgeLayout(
+            "e2", "v3", "v4", edge_style,
+            waypoints=((200, 20), (200, 200)),
+        ),
+    ]
+    document = LayoutDocument(version=1, vertices=vertices, edges=edges)
+
+    arc_svg = build_preview_svg(document)
+    gap_svg = build_preview_svg(document, crossing_style="gap")
+
+    assert re.search(r'<path class="edge" d="[^"]* A 4 4 ', arc_svg)
+    assert 'class="edge-gap"' not in arc_svg
+    assert 'class="edge-gap"' in gap_svg

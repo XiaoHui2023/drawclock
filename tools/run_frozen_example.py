@@ -29,6 +29,7 @@ LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 FIG1 = ROOT / "example" / "fig1.drawio"
 FIG2 = ROOT / "example" / "fig2.drawio"
 AUTO_LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
+STRESS_512 = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
 DRAW_EXAMPLE = ROOT / "example" / "draw.json"
 SVG_NS = "http://www.w3.org/2000/svg"
 
@@ -153,6 +154,9 @@ def _assert_svg_image(
         root = ET.parse(path).getroot()
         width = math.ceil(float(root.attrib["width"]))
         height = math.ceil(float(root.attrib["height"]))
+        viewbox = tuple(float(value) for value in root.attrib["viewBox"].split())
+        if len(viewbox) != 4:
+            raise ValueError("viewBox must contain four numbers")
     except (ET.ParseError, KeyError, ValueError) as exc:
         raise AssertionError(f"invalid frozen SVG {path}: {exc}") from exc
     nodes = root.findall(f".//{{{SVG_NS}}}foreignObject")
@@ -160,18 +164,34 @@ def _assert_svg_image(
         element for element in root.findall(f".//{{{SVG_NS}}}polyline")
         if element.attrib.get("class") == "edge"
     ]
+    edge_paths = [
+        element for element in root.findall(f".//{{{SVG_NS}}}path")
+        if element.attrib.get("class") == "edge"
+    ]
+    edges.extend(edge_paths)
     if len(nodes) != expected_nodes or len(edges) != expected_edges:
         raise AssertionError(
             f"unexpected SVG topology: nodes={len(nodes)}, edges={len(edges)}"
         )
     for edge in edges:
+        if edge.tag.endswith("path"):
+            if not edge.attrib.get("d", "").startswith("M "):
+                raise AssertionError("SVG edge path is missing its start point")
+            continue
         points = edge.attrib.get("points", "").split()
         if len(points) < 2:
             raise AssertionError("SVG edge has fewer than two endpoints")
         for point in points:
             x, y = point.split(",", 1)
-            float(x)
-            float(y)
+            px, py = float(x), float(y)
+            min_x, min_y, box_width, box_height = viewbox
+            if not (
+                min_x <= px <= min_x + box_width
+                and min_y <= py <= min_y + box_height
+            ):
+                raise AssertionError(
+                    f"SVG edge point outside viewBox: {px},{py} not in {viewbox}"
+                )
     if width <= 0 or height <= 0:
         raise AssertionError(f"invalid SVG dimensions: {width}x{height}")
     return width, height
@@ -309,6 +329,9 @@ def main() -> int:
     draw_example_output = out_dir / "draw-example-frozen-smoke.drawio"
     draw_example_svg = out_dir / "draw-example-frozen-smoke.svg"
     draw_example_png = out_dir / "draw-example-frozen-smoke.png"
+    fanout_config = out_dir / "fanout-frozen-smoke.json"
+    fanout_svg = out_dir / "fanout-frozen-smoke.svg"
+    stress_svg = out_dir / "stress-512-frozen-smoke.svg"
 
     _run(
         binary,
@@ -404,6 +427,12 @@ def main() -> int:
         ROOT,
     )
     draw_model = iter_diagram_models(extract_mxfile_xml(str(draw_example_output)))[0]
+    default_edges = [cell for cell in draw_model.iter("mxCell") if cell.get("edge") == "1"]
+    if not default_edges or any(
+        "jumpStyle=arc;" not in cell.get("style", "") for cell in default_edges
+    ):
+        print("frozen draw default crossing style is not arc", file=sys.stderr)
+        return 1
     actual_components = {
         obj.get("name"): (obj.find("mxCell").get("style", "") if obj.find("mxCell") is not None else "")
         for obj in draw_model.iter("object")
@@ -469,6 +498,35 @@ def main() -> int:
             ROOT,
         )
 
+    fanout = {"root": {"kind": "source"}}
+    fanout.update(
+        {
+            f"clock_{index:02d}": {"kind": "clock", "source": "root"}
+            for index in range(20)
+        }
+    )
+    fanout_config.write_text(json.dumps(fanout, indent=2), encoding="utf-8")
+    _run(
+        binary,
+        [
+            "draw", "-i", str(fanout_config), "-l", str(LIBRARY),
+            "-o", str(fanout_svg),
+        ],
+        ROOT,
+        isolated_runtime=True,
+    )
+    _assert_svg_image(fanout_svg, expected_nodes=21, expected_edges=20)
+    _run(
+        binary,
+        [
+            "draw", "-i", str(STRESS_512), "-l", str(LIBRARY),
+            "-o", str(stress_svg),
+        ],
+        ROOT,
+        isolated_runtime=True,
+    )
+    _assert_svg_image(stress_svg, expected_nodes=1046, expected_edges=1300)
+
     library_text = LIBRARY.read_text(encoding="utf-8").strip()
     library_entries = json.loads(
         library_text[len("<mxlibrary>") : -len("</mxlibrary>")]
@@ -490,12 +548,16 @@ def main() -> int:
         encoding="utf-8",
     )
     custom_output = out_dir / "custom-library-frozen-smoke.drawio"
+    custom_config = out_dir / "custom-library-frozen-smoke.json"
+    custom_topology = json.loads(AUTO_LINEAR.read_text(encoding="utf-8"))
+    custom_topology["gate_main"]["kind"] = "custom_gate_symbol"
+    custom_config.write_text(json.dumps(custom_topology), encoding="utf-8")
     _run(
         binary,
         [
             "draw",
             "-i",
-            str(AUTO_LINEAR),
+            str(custom_config),
             "-l",
             str(custom_library),
             "-o",

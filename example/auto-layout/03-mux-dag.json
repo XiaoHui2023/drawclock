@@ -16,7 +16,7 @@
     "source": "xtal_backup"
   },
   "mux_safe": {
-    "kind": "mux",
+    "kind": "mux2",
     "source": {
       "0": "gate_main",
       "1": "gate_backup"

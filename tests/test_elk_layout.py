@@ -94,6 +94,15 @@ def test_elk_exact_ports_and_lines_are_deterministic() -> None:
 
 
 @pytest.mark.skipif(not elk_layout_available(), reason="ELK Node.js dependency is unavailable")
+def test_same_source_port_uses_one_vertical_distribution_trunk() -> None:
+    config, document, _, quality = _generate("02-branch-tree")
+
+    assert quality["readability"]["fragmented_fanout_sources"] == {}
+    assert quality["line_integrity"]["ambiguous_overlaps"] == []
+    assert quality["passed"] is True
+
+
+@pytest.mark.skipif(not elk_layout_available(), reason="ELK Node.js dependency is unavailable")
 def test_grouped_sweep_matches_exact_pair_oracle() -> None:
     config = load_clock_tree(EXAMPLES / "06-simple-16-clocks.json")
     document, _ = generate_elk_layout(

@@ -22,7 +22,7 @@
     "source": "osc_b"
   },
   "pll_dual": {
-    "kind": "pll",
+    "kind": "pll2",
     "pll_kind": "INNO",
     "source": "ref_pad"
   },
@@ -44,7 +44,7 @@
     "source": "pll_b"
   },
   "mux_sys": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "gate_a",
       "1": "gate_b",
@@ -52,7 +52,7 @@
     }
   },
   "mux_periph": {
-    "kind": "mux",
+    "kind": "mux2",
     "source": {
       "0": "div_a",
       "1": "pll_dual[1]"

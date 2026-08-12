@@ -28,7 +28,7 @@
     "source": "xtal_1"
   },
   "mux_d000": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -70,7 +70,7 @@
     "source": "cell_d000"
   },
   "mux_d001": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -112,7 +112,7 @@
     "source": "cell_d001"
   },
   "mux_d002": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -154,7 +154,7 @@
     "source": "cell_d002"
   },
   "mux_d003": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -196,7 +196,7 @@
     "source": "cell_d003"
   },
   "mux_d004": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -238,7 +238,7 @@
     "source": "cell_d004"
   },
   "mux_d005": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -280,7 +280,7 @@
     "source": "cell_d005"
   },
   "mux_d006": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -322,7 +322,7 @@
     "source": "cell_d006"
   },
   "mux_d007": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -369,7 +369,7 @@
     "source": "cell_d007"
   },
   "mux_d008": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -411,7 +411,7 @@
     "source": "cell_d008"
   },
   "mux_d009": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -453,7 +453,7 @@
     "source": "cell_d009"
   },
   "mux_d010": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -495,7 +495,7 @@
     "source": "cell_d010"
   },
   "mux_d011": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -537,7 +537,7 @@
     "source": "cell_d011"
   },
   "mux_d012": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -579,7 +579,7 @@
     "source": "cell_d012"
   },
   "mux_d013": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -621,7 +621,7 @@
     "source": "cell_d013"
   },
   "mux_d014": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -663,7 +663,7 @@
     "source": "cell_d014"
   },
   "mux_d015": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -710,7 +710,7 @@
     "source": "cell_d015"
   },
   "mux_d016": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -752,7 +752,7 @@
     "source": "cell_d016"
   },
   "mux_d017": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -794,7 +794,7 @@
     "source": "cell_d017"
   },
   "mux_d018": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -836,7 +836,7 @@
     "source": "cell_d018"
   },
   "mux_d019": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -878,7 +878,7 @@
     "source": "cell_d019"
   },
   "mux_d020": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -920,7 +920,7 @@
     "source": "cell_d020"
   },
   "mux_d021": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -962,7 +962,7 @@
     "source": "cell_d021"
   },
   "mux_d022": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -1004,7 +1004,7 @@
     "source": "cell_d022"
   },
   "mux_d023": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -1051,7 +1051,7 @@
     "source": "cell_d023"
   },
   "mux_d024": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -1093,7 +1093,7 @@
     "source": "cell_d024"
   },
   "mux_d025": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -1135,7 +1135,7 @@
     "source": "cell_d025"
   },
   "mux_d026": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -1177,7 +1177,7 @@
     "source": "cell_d026"
   },
   "mux_d027": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -1219,7 +1219,7 @@
     "source": "cell_d027"
   },
   "mux_d028": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -1261,7 +1261,7 @@
     "source": "cell_d028"
   },
   "mux_d029": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -1303,7 +1303,7 @@
     "source": "cell_d029"
   },
   "mux_d030": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -1345,7 +1345,7 @@
     "source": "cell_d030"
   },
   "mux_d031": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -1392,7 +1392,7 @@
     "source": "cell_d031"
   },
   "mux_d032": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1434,7 +1434,7 @@
     "source": "cell_d032"
   },
   "mux_d033": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1476,7 +1476,7 @@
     "source": "cell_d033"
   },
   "mux_d034": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1518,7 +1518,7 @@
     "source": "cell_d034"
   },
   "mux_d035": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1560,7 +1560,7 @@
     "source": "cell_d035"
   },
   "mux_d036": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1602,7 +1602,7 @@
     "source": "cell_d036"
   },
   "mux_d037": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1644,7 +1644,7 @@
     "source": "cell_d037"
   },
   "mux_d038": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1686,7 +1686,7 @@
     "source": "cell_d038"
   },
   "mux_d039": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1733,7 +1733,7 @@
     "source": "cell_d039"
   },
   "mux_d040": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1775,7 +1775,7 @@
     "source": "cell_d040"
   },
   "mux_d041": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1817,7 +1817,7 @@
     "source": "cell_d041"
   },
   "mux_d042": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1859,7 +1859,7 @@
     "source": "cell_d042"
   },
   "mux_d043": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1901,7 +1901,7 @@
     "source": "cell_d043"
   },
   "mux_d044": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1943,7 +1943,7 @@
     "source": "cell_d044"
   },
   "mux_d045": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -1985,7 +1985,7 @@
     "source": "cell_d045"
   },
   "mux_d046": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2027,7 +2027,7 @@
     "source": "cell_d046"
   },
   "mux_d047": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2074,7 +2074,7 @@
     "source": "cell_d047"
   },
   "mux_d048": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2116,7 +2116,7 @@
     "source": "cell_d048"
   },
   "mux_d049": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2158,7 +2158,7 @@
     "source": "cell_d049"
   },
   "mux_d050": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2200,7 +2200,7 @@
     "source": "cell_d050"
   },
   "mux_d051": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2242,7 +2242,7 @@
     "source": "cell_d051"
   },
   "mux_d052": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2284,7 +2284,7 @@
     "source": "cell_d052"
   },
   "mux_d053": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2326,7 +2326,7 @@
     "source": "cell_d053"
   },
   "mux_d054": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2368,7 +2368,7 @@
     "source": "cell_d054"
   },
   "mux_d055": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2415,7 +2415,7 @@
     "source": "cell_d055"
   },
   "mux_d056": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2457,7 +2457,7 @@
     "source": "cell_d056"
   },
   "mux_d057": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2499,7 +2499,7 @@
     "source": "cell_d057"
   },
   "mux_d058": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2541,7 +2541,7 @@
     "source": "cell_d058"
   },
   "mux_d059": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2583,7 +2583,7 @@
     "source": "cell_d059"
   },
   "mux_d060": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2625,7 +2625,7 @@
     "source": "cell_d060"
   },
   "mux_d061": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2667,7 +2667,7 @@
     "source": "cell_d061"
   },
   "mux_d062": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2709,7 +2709,7 @@
     "source": "cell_d062"
   },
   "mux_d063": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -2756,7 +2756,7 @@
     "source": "cell_d063"
   },
   "mux_d064": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -2798,7 +2798,7 @@
     "source": "cell_d064"
   },
   "mux_d065": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -2840,7 +2840,7 @@
     "source": "cell_d065"
   },
   "mux_d066": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -2882,7 +2882,7 @@
     "source": "cell_d066"
   },
   "mux_d067": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -2924,7 +2924,7 @@
     "source": "cell_d067"
   },
   "mux_d068": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -2966,7 +2966,7 @@
     "source": "cell_d068"
   },
   "mux_d069": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3008,7 +3008,7 @@
     "source": "cell_d069"
   },
   "mux_d070": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3050,7 +3050,7 @@
     "source": "cell_d070"
   },
   "mux_d071": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3097,7 +3097,7 @@
     "source": "cell_d071"
   },
   "mux_d072": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3139,7 +3139,7 @@
     "source": "cell_d072"
   },
   "mux_d073": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3181,7 +3181,7 @@
     "source": "cell_d073"
   },
   "mux_d074": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3223,7 +3223,7 @@
     "source": "cell_d074"
   },
   "mux_d075": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3265,7 +3265,7 @@
     "source": "cell_d075"
   },
   "mux_d076": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3307,7 +3307,7 @@
     "source": "cell_d076"
   },
   "mux_d077": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3349,7 +3349,7 @@
     "source": "cell_d077"
   },
   "mux_d078": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3391,7 +3391,7 @@
     "source": "cell_d078"
   },
   "mux_d079": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3438,7 +3438,7 @@
     "source": "cell_d079"
   },
   "mux_d080": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3480,7 +3480,7 @@
     "source": "cell_d080"
   },
   "mux_d081": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3522,7 +3522,7 @@
     "source": "cell_d081"
   },
   "mux_d082": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3564,7 +3564,7 @@
     "source": "cell_d082"
   },
   "mux_d083": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3606,7 +3606,7 @@
     "source": "cell_d083"
   },
   "mux_d084": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3648,7 +3648,7 @@
     "source": "cell_d084"
   },
   "mux_d085": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3690,7 +3690,7 @@
     "source": "cell_d085"
   },
   "mux_d086": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3732,7 +3732,7 @@
     "source": "cell_d086"
   },
   "mux_d087": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3779,7 +3779,7 @@
     "source": "cell_d087"
   },
   "mux_d088": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3821,7 +3821,7 @@
     "source": "cell_d088"
   },
   "mux_d089": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3863,7 +3863,7 @@
     "source": "cell_d089"
   },
   "mux_d090": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3905,7 +3905,7 @@
     "source": "cell_d090"
   },
   "mux_d091": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3947,7 +3947,7 @@
     "source": "cell_d091"
   },
   "mux_d092": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -3989,7 +3989,7 @@
     "source": "cell_d092"
   },
   "mux_d093": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -4031,7 +4031,7 @@
     "source": "cell_d093"
   },
   "mux_d094": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -4073,7 +4073,7 @@
     "source": "cell_d094"
   },
   "mux_d095": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -4120,7 +4120,7 @@
     "source": "cell_d095"
   },
   "mux_d096": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4162,7 +4162,7 @@
     "source": "cell_d096"
   },
   "mux_d097": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4204,7 +4204,7 @@
     "source": "cell_d097"
   },
   "mux_d098": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4246,7 +4246,7 @@
     "source": "cell_d098"
   },
   "mux_d099": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4288,7 +4288,7 @@
     "source": "cell_d099"
   },
   "mux_d100": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4330,7 +4330,7 @@
     "source": "cell_d100"
   },
   "mux_d101": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4372,7 +4372,7 @@
     "source": "cell_d101"
   },
   "mux_d102": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4414,7 +4414,7 @@
     "source": "cell_d102"
   },
   "mux_d103": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4461,7 +4461,7 @@
     "source": "cell_d103"
   },
   "mux_d104": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4503,7 +4503,7 @@
     "source": "cell_d104"
   },
   "mux_d105": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4545,7 +4545,7 @@
     "source": "cell_d105"
   },
   "mux_d106": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4587,7 +4587,7 @@
     "source": "cell_d106"
   },
   "mux_d107": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4629,7 +4629,7 @@
     "source": "cell_d107"
   },
   "mux_d108": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4671,7 +4671,7 @@
     "source": "cell_d108"
   },
   "mux_d109": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4713,7 +4713,7 @@
     "source": "cell_d109"
   },
   "mux_d110": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4755,7 +4755,7 @@
     "source": "cell_d110"
   },
   "mux_d111": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4802,7 +4802,7 @@
     "source": "cell_d111"
   },
   "mux_d112": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4844,7 +4844,7 @@
     "source": "cell_d112"
   },
   "mux_d113": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4886,7 +4886,7 @@
     "source": "cell_d113"
   },
   "mux_d114": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4928,7 +4928,7 @@
     "source": "cell_d114"
   },
   "mux_d115": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -4970,7 +4970,7 @@
     "source": "cell_d115"
   },
   "mux_d116": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5012,7 +5012,7 @@
     "source": "cell_d116"
   },
   "mux_d117": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5054,7 +5054,7 @@
     "source": "cell_d117"
   },
   "mux_d118": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5096,7 +5096,7 @@
     "source": "cell_d118"
   },
   "mux_d119": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5143,7 +5143,7 @@
     "source": "cell_d119"
   },
   "mux_d120": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5185,7 +5185,7 @@
     "source": "cell_d120"
   },
   "mux_d121": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5227,7 +5227,7 @@
     "source": "cell_d121"
   },
   "mux_d122": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5269,7 +5269,7 @@
     "source": "cell_d122"
   },
   "mux_d123": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5311,7 +5311,7 @@
     "source": "cell_d123"
   },
   "mux_d124": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5353,7 +5353,7 @@
     "source": "cell_d124"
   },
   "mux_d125": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5395,7 +5395,7 @@
     "source": "cell_d125"
   },
   "mux_d126": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -5437,7 +5437,7 @@
     "source": "cell_d126"
   },
   "mux_d127": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",

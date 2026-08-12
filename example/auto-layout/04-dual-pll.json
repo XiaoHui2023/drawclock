@@ -4,7 +4,7 @@
     "source_kind": "source"
   },
   "pll_dual": {
-    "kind": "pll",
+    "kind": "pll2",
     "pll_kind": "INNO",
     "source": "xtal"
   },

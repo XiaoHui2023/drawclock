@@ -28,7 +28,7 @@
     "source": "xtal_1"
   },
   "mux_d000": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -70,7 +70,7 @@
     "source": "cell_d000"
   },
   "mux_d001": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -112,7 +112,7 @@
     "source": "cell_d001"
   },
   "mux_d002": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -154,7 +154,7 @@
     "source": "cell_d002"
   },
   "mux_d003": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",

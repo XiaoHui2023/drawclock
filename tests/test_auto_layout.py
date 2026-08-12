@@ -75,11 +75,21 @@ def test_linear_layout_is_deterministic_and_roundtrips(tmp_path: Path) -> None:
     assert drawio_to_clock_tree([output], library_path=LIBRARY) == config
 
 
-def test_mux_uses_inferred_variant_and_exact_input_ports() -> None:
+@pytest.mark.parametrize(
+    ("sources", "expected_entry_y"),
+    [
+        ({"0": "a"}, {"entryY=0.24"}),
+        ({"1": "b"}, {"entryY=0.688"}),
+        ({"0": "a", "1": "b"}, {"entryY=0.24", "entryY=0.688"}),
+    ],
+)
+def test_mux_kind_is_exact_and_unconnected_inputs_are_allowed(
+    sources: dict[str, str], expected_entry_y: set[str]
+) -> None:
     config = {
         "a": {"kind": "source", "source_kind": "source"},
         "b": {"kind": "source", "source_kind": "source"},
-        "m": {"kind": "mux", "source": {"0": "a", "1": "b"}},
+        "m": {"kind": "mux2", "source": sources},
         "clk": {"kind": "clock", "source": "m"},
     }
     document, report = generate_layout(config, library_path=LIBRARY)
@@ -87,12 +97,23 @@ def test_mux_uses_inferred_variant_and_exact_input_ports() -> None:
     types = {vertex.name: vertex.drawclock_type for vertex in document.vertices}
     assert types["m"] == "mux2"
     mux_edges = [edge for edge in document.edges if edge.target_id == "n4"]
-    assert {"entryY=0.24", "entryY=0.688"} <= {
+    assert expected_entry_y == {
         part
         for edge in mux_edges
         for part in edge.style.split(";")
+        if part.startswith("entryY=")
     }
     assert report["hard_pass"] is True
+
+
+def test_generic_mux_kind_is_not_guessed_from_connected_ports() -> None:
+    config = {
+        "a": {"kind": "source"},
+        "m": {"kind": "mux", "source": {"0": "a"}},
+    }
+
+    with pytest.raises(ValueError, match="kind=mux 不在当前器件库中"):
+        generate_layout(config, library_path=LIBRARY)
 
 
 def test_same_port_fanout_gets_decorative_junctions_without_changing_topology(
@@ -347,7 +368,9 @@ def test_layout_uses_kind_metadata_and_geometry_from_supplied_library(
         "<mxlibrary>" + json.dumps(entries) + "</mxlibrary>", encoding="utf-8"
     )
 
-    document, report = generate_layout(_linear_config(), library_path=custom_library)
+    config = _linear_config()
+    config["gate0"]["kind"] = "custom_gate_symbol"
+    document, report = generate_layout(config, library_path=custom_library)
     gate = next(vertex for vertex in document.vertices if vertex.name == "gate0")
     assert gate.drawclock_type == "custom_gate_symbol"
     assert (gate.width, gate.height) == (83, 91)

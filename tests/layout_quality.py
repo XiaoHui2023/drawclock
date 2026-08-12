@@ -215,8 +215,22 @@ def inspect_layout_quality(
             source_lead_non_horizontal.append(edge.cell_id)
         if len(points) >= 2 and abs(points[-1][1] - points[-2][1]) > tolerance:
             target_lead_non_horizontal.append(edge.cell_id)
-        if len(points) >= 2:
-            first_stub_x_by_net[(source.name, source_port)].add(round(points[1][0], 3))
+        # A fan-out trunk is the first vertical distribution segment after a
+        # source port.  A straight, already-aligned child has no trunk of its
+        # own and must not be misclassified as fragmentation.
+        first_vertical_x = next(
+            (
+                a[0]
+                for a, b in zip(points, points[1:])
+                if abs(a[0] - b[0]) <= tolerance
+                and abs(a[1] - b[1]) > tolerance
+            ),
+            None,
+        )
+        if first_vertical_x is not None:
+            first_stub_x_by_net[(source.name, source_port)].add(
+                round(first_vertical_x, 3)
+            )
         for index, (a, b) in enumerate(zip(points, points[1:])):
             dx, dy = b[0] - a[0], b[1] - a[1]
             segment_length = abs(dx) + abs(dy)

@@ -28,7 +28,7 @@
     "source": "xtal_1"
   },
   "mux_d000": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -70,7 +70,7 @@
     "source": "cell_d000"
   },
   "mux_d001": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -112,7 +112,7 @@
     "source": "cell_d001"
   },
   "mux_d002": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -154,7 +154,7 @@
     "source": "cell_d002"
   },
   "mux_d003": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_0",
@@ -196,7 +196,7 @@
     "source": "cell_d003"
   },
   "mux_d004": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -238,7 +238,7 @@
     "source": "cell_d004"
   },
   "mux_d005": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -280,7 +280,7 @@
     "source": "cell_d005"
   },
   "mux_d006": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -322,7 +322,7 @@
     "source": "cell_d006"
   },
   "mux_d007": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_1",
@@ -369,7 +369,7 @@
     "source": "cell_d007"
   },
   "mux_d008": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -411,7 +411,7 @@
     "source": "cell_d008"
   },
   "mux_d009": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -453,7 +453,7 @@
     "source": "cell_d009"
   },
   "mux_d010": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -495,7 +495,7 @@
     "source": "cell_d010"
   },
   "mux_d011": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_0",
       "1": "pll_2",
@@ -537,7 +537,7 @@
     "source": "cell_d011"
   },
   "mux_d012": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -579,7 +579,7 @@
     "source": "cell_d012"
   },
   "mux_d013": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -621,7 +621,7 @@
     "source": "cell_d013"
   },
   "mux_d014": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",
@@ -663,7 +663,7 @@
     "source": "cell_d014"
   },
   "mux_d015": {
-    "kind": "mux",
+    "kind": "mux3",
     "source": {
       "0": "xtal_1",
       "1": "pll_3",

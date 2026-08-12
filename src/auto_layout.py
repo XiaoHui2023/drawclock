@@ -14,7 +14,7 @@ from drawio_layout import EdgeLayout, LAYOUT_VERSION, LayoutDocument, VertexLayo
 from drawio_library import LibraryShape, canonical_object_attrs, load_library_shapes
 from drawio_ports import EDGE_DRAW_STYLE, abs_port_xy, port_anchors
 from from_resolve import parse_source_ref
-from internal_kind import INTERNAL_OBJECT_KEYS, STYLE_KEY_TO_JSON
+from internal_kind import INTERNAL_OBJECT_KEYS
 from library_ports import input_connection_keys, output_connection_keys, port_topology_from_style
 from validate_config import validate_config
 
@@ -112,77 +112,24 @@ def _shape_title(
     name: str,
     item: dict[str, Any],
     hints: dict[str, str],
-    selected_suffixes: dict[str, set[str]],
     shapes: dict[str, LibraryShape],
-    library_path: str | Path,
 ) -> str:
-    if name in hints:
-        return hints[name]
-    explicit = item.get("component")
-    if explicit:
-        return str(explicit)
     kind = str(item.get("kind", ""))
     if not kind:
         raise ValueError(f"器件 {name} 缺少 kind")
-
-    def style_fields(style: str) -> dict[str, str]:
-        fields: dict[str, str] = {}
-        for part in style.split(";"):
-            if "=" in part:
-                key, value = part.split("=", 1)
-                fields[key] = value
-        return fields
-
-    source = item.get("source")
-    input_keys = set(str(key) for key in source) if isinstance(source, dict) else set()
-    required_outputs = selected_suffixes.get(name, set())
-    compatible: list[tuple[tuple[int, int, int, str], str]] = []
-    for title, shape in shapes.items():
-        fields = style_fields(shape.style)
-        shape_kind = fields.get("drawclockKind", title)
-        if shape_kind != kind and title != kind:
-            continue
-        subtype_mismatch = False
-        for style_key, json_key in STYLE_KEY_TO_JSON.items():
-            if json_key == "kind" or json_key not in item:
-                continue
-            if fields.get(style_key, title) != str(item[json_key]):
-                subtype_mismatch = True
-                break
-        if subtype_mismatch:
-            continue
-        topology = port_topology_from_style(shape.style)
-        if isinstance(source, dict):
-            try:
-                available_inputs = set(
-                    input_connection_keys(title, library_path=library_path).values()
-                )
-            except (KeyError, ValueError):
-                continue
-            if input_keys != available_inputs:
-                continue
-        elif source is not None and len(topology.inputs) != 1:
-            continue
-        try:
-            available_outputs = set(
-                output_connection_keys(title, library_path=library_path).values()
+    overrides = [
+        ("component hints", hints.get(name)),
+        ("component", item.get("component")),
+    ]
+    for field, value in overrides:
+        if value is not None and str(value) != kind:
+            raise ValueError(
+                f"器件 {name} 的 {field}={value} 与 kind={kind} 不一致；"
+                "kind 必须直接填写器件库 title"
             )
-        except (KeyError, ValueError):
-            continue
-        if not required_outputs.issubset(available_outputs):
-            continue
-        exact_title = 0 if title == kind else 1
-        port_slack = len(topology.inputs) + len(topology.outputs)
-        compatible.append(((exact_title, port_slack, shape.w * shape.h, title), title))
-    if not compatible:
-        detail = f"kind={kind}"
-        if input_keys:
-            detail += f"、输入键={sorted(input_keys)}"
-        if required_outputs:
-            detail += f"、输出键={sorted(required_outputs)}"
-        raise ValueError(f"器件 {name} 在当前器件库中没有兼容图形（{detail}）")
-    compatible.sort()
-    return compatible[0][1]
+    if kind not in shapes:
+        raise ValueError(f"器件 {name} 的 kind={kind} 不在当前器件库中")
+    return kind
 
 
 def resolve_nodes(
@@ -195,20 +142,11 @@ def resolve_nodes(
     unknown_hints = sorted(set(hints) - set(config))
     if unknown_hints:
         raise ValueError(f"component hints 引用了未知器件: {', '.join(unknown_hints)}")
-    selected_suffixes: dict[str, set[str]] = defaultdict(set)
-    for item in config.values():
-        for _, raw in _source_values(item):
-            source, suffix = parse_source_ref(raw)
-            if suffix is not None:
-                selected_suffixes[source].add(suffix)
-
     nodes: dict[str, ResolvedNode] = {}
     errors: list[str] = []
     for index, (name, item) in enumerate(config.items(), 2):
         try:
-            title = _shape_title(
-                name, item, hints, selected_suffixes, shapes, library_path
-            )
+            title = _shape_title(name, item, hints, shapes)
             shape = shapes.get(title)
             if shape is None:
                 raise ValueError(f"器件库中不存在类型 {title}")
