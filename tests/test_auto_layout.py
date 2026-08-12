@@ -221,12 +221,11 @@ def test_crossing_style_replaces_the_existing_jump_policy(style: str) -> None:
             assert "jumpSize=6;" in edge.style
 
 
-@pytest.mark.skipif(
-    not Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe").is_file(),
-    reason="PNG integration requires Microsoft Edge",
-)
-def test_json_to_drawio_cli_writes_real_component_png(tmp_path: Path) -> None:
-    output = tmp_path / "linear.png"
+@pytest.mark.parametrize("filename", ["linear.svg", "linear.png", "linear.drawio", "linear"])
+def test_draw_always_writes_svg_regardless_of_output_suffix(
+    filename: str, tmp_path: Path
+) -> None:
+    output = tmp_path / filename
     proc = subprocess.run(
         [
             sys.executable,
@@ -247,14 +246,10 @@ def test_json_to_drawio_cli_writes_real_component_png(tmp_path: Path) -> None:
         timeout=60,
     )
     assert proc.returncode == 0, proc.stderr
-    assert output.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+    assert output.read_text(encoding="utf-8").startswith("<?xml")
 
 
-@pytest.mark.skipif(
-    not Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe").is_file(),
-    reason="PNG integration requires Microsoft Edge",
-)
-def test_draw_cli_writes_png_to_relative_output_path(tmp_path: Path) -> None:
+def test_draw_cli_writes_svg_to_relative_arbitrary_path(tmp_path: Path) -> None:
     proc = subprocess.run(
         [
             sys.executable,
@@ -265,7 +260,7 @@ def test_draw_cli_writes_png_to_relative_output_path(tmp_path: Path) -> None:
             "-l",
             str(LIBRARY),
             "-o",
-            "relative.png",
+            "relative.output",
         ],
         cwd=tmp_path,
         capture_output=True,
@@ -274,7 +269,9 @@ def test_draw_cli_writes_png_to_relative_output_path(tmp_path: Path) -> None:
         timeout=60,
     )
     assert proc.returncode == 0, proc.stderr
-    assert (tmp_path / "relative.png").read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+    assert (tmp_path / "relative.output").read_text(encoding="utf-8").startswith(
+        "<?xml"
+    )
 
 
 def test_agent_quality_facilities_are_not_public_cli_features() -> None:
@@ -322,52 +319,6 @@ def test_clock_tree_input_formats(suffix: str, content: str, tmp_path: Path) -> 
     assert load_clock_tree(source) == {
         "晶振": {"kind": "source", "source_kind": "source"}
     }
-
-
-def test_draw_rejects_output_suffix_before_reading_inputs(tmp_path: Path) -> None:
-    output = tmp_path / "clock-tree.bmp"
-    proc = subprocess.run(
-        [
-            sys.executable,
-            str(SRC_DIR),
-            "draw",
-            "-i",
-            str(tmp_path / "missing.json"),
-            "-l",
-            str(tmp_path / "missing.xml"),
-            "-o",
-            str(output),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert proc.returncode == 1
-    assert "支持：.svg, .png" in proc.stderr
-    assert not output.exists()
-
-
-def test_draw_rejects_editable_drawio_output(tmp_path: Path) -> None:
-    output = tmp_path / "clock-tree.drawio"
-    proc = subprocess.run(
-        [
-            sys.executable,
-            str(SRC_DIR),
-            "draw",
-            "-i",
-            str(ROOT / "example" / "draw.json"),
-            "-l",
-            str(LIBRARY),
-            "-o",
-            str(output),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert proc.returncode == 1
-    assert "支持：.svg, .png" in proc.stderr
-    assert not output.exists()
 
 
 def test_layout_uses_kind_metadata_and_geometry_from_supplied_library(

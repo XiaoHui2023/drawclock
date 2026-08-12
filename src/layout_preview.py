@@ -1,12 +1,5 @@
 from __future__ import annotations
 
-import math
-import os
-import re
-import shutil
-import subprocess
-import sys
-import tempfile
 from collections import defaultdict
 from pathlib import Path
 
@@ -21,7 +14,6 @@ from drawio_ports import abs_port_xy, port_anchors
 # otherwise the visible symbol and the mathematically routed ports diverge.
 HTML_LABEL_CONTENT_OFFSET_X = 2.0
 HTML_LABEL_CONTENT_OFFSET_Y = 7.0
-SUPPORTED_IMAGE_SUFFIXES = (".svg", ".png")
 
 
 def _svg_num(value: float) -> str:
@@ -109,54 +101,6 @@ def _edge_arc_path(
             last = after
         commands.append(f"L {_svg_num(end[0])} {_svg_num(end[1])}")
     return " ".join(commands)
-
-
-def _runtime_roots() -> tuple[Path, ...]:
-    roots: list[Path] = []
-    staticx_program = os.environ.get("STATICX_PROG_PATH")
-    if staticx_program:
-        roots.append(Path(staticx_program).resolve().parent / "runtime")
-    if getattr(sys, "frozen", False):
-        roots.append(Path(sys.executable).resolve().parent / "runtime")
-    roots.append(Path(__file__).resolve().parents[1] / ".runtime")
-    return tuple(dict.fromkeys(roots))
-
-
-def _browser_path() -> Path | None:
-    executable = (
-        "chrome-headless-shell.exe" if os.name == "nt" else "chrome-headless-shell"
-    )
-    browser_candidates = [os.environ.get("CHROME_PATH")]
-    browser_candidates.extend(
-        str(root / "headless-shell" / executable) for root in _runtime_roots()
-    )
-    browser_candidates.extend(
-        (
-            shutil.which("msedge"),
-            shutil.which("microsoft-edge"),
-            shutil.which("microsoft-edge-stable"),
-            shutil.which("chrome"),
-            shutil.which("google-chrome"),
-            shutil.which("google-chrome-stable"),
-            shutil.which("chromium"),
-            shutil.which("chromium-browser"),
-        )
-    )
-    return next(
-        (Path(item) for item in browser_candidates if item and Path(item).is_file()),
-        None,
-    )
-
-
-def validate_image_output(output_path: str | Path) -> str:
-    """Validate the requested image format before layout work starts."""
-    suffix = Path(output_path).suffix.lower()
-    if suffix not in SUPPORTED_IMAGE_SUFFIXES:
-        supported = ", ".join(SUPPORTED_IMAGE_SUFFIXES)
-        raise ValueError(f"不支持输出格式 {suffix or '<无后缀>'}；支持：{supported}")
-    if suffix == ".png" and _browser_path() is None:
-        raise ValueError("PNG 渲染运行时不可用；发布包应包含 runtime/headless-shell")
-    return suffix[1:]
 
 
 def build_preview_svg(
@@ -303,70 +247,6 @@ def write_preview_svg(
         build_preview_svg(document, title=title, crossing_style=crossing_style),
         encoding="utf-8",
     )
-    return output
-
-
-def write_preview(
-    document: LayoutDocument,
-    output_path: str | Path,
-    *,
-    title: str = "drawclock",
-    crossing_style: str = "arc",
-) -> Path:
-    """Write SVG directly or rasterize it to PNG in a real browser."""
-    output = Path(output_path)
-    resolved_format = validate_image_output(output)
-    if resolved_format == "svg":
-        return write_preview_svg(
-            document, output, title=title, crossing_style=crossing_style
-        )
-    browser = _browser_path()
-    assert browser is not None
-    output.parent.mkdir(parents=True, exist_ok=True)
-    screenshot_output = output.resolve()
-    with tempfile.TemporaryDirectory(prefix="drawclock-preview-") as temp_dir:
-        svg_path = Path(temp_dir) / "preview.svg"
-        write_preview_svg(
-            document, svg_path, title=title, crossing_style=crossing_style
-        )
-        source = svg_path.read_text(encoding="utf-8")
-        size = re.search(
-            r'<svg[^>]+width="([0-9.]+)"[^>]+height="([0-9.]+)"', source
-        )
-        if size is None:
-            raise ValueError("generated SVG is missing width/height")
-        width, height = (float(value) for value in size.groups())
-        target_width = max(1, math.ceil(width))
-        target_height = max(1, math.ceil(height))
-        page_path = Path(temp_dir) / "preview.html"
-        page_path.write_text(
-            "<!doctype html><meta charset=utf-8>"
-            "<style>html,body{margin:0;padding:0;overflow:hidden;background:white}"
-            f"body>svg{{display:block;width:{target_width}px;height:{target_height}px}}</style>"
-            + source,
-            encoding="utf-8",
-        )
-        browser_args = [
-            str(browser),
-            "--headless",
-            "--disable-gpu",
-            "--hide-scrollbars",
-            f"--window-size={target_width},{target_height}",
-            f"--screenshot={screenshot_output}",
-            page_path.as_uri(),
-        ]
-        if os.name != "nt":
-            # Linux frozen binaries are commonly exercised in CI containers;
-            # Chrome's user-namespace sandbox is unavailable there.
-            browser_args.insert(1, "--no-sandbox")
-        subprocess.run(
-            browser_args,
-            check=True,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            timeout=120,
-        )
     return output
 
 

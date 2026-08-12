@@ -10,6 +10,8 @@ description: >-
 
 ## 2026-08-12
 
+- **决议**：`draw` 固定写入 SVG XML，`--output` 后缀不再表示格式；移除 PNG 分支、Chrome Headless Shell、浏览器发现与 PNG 门禁。即使文件名是 `.png` / `.drawio` 或无后缀，内容仍必须是 SVG。
+- **闭环根因**：远程 Release 包在干净 Ubuntu 22.04 中的 SVG 成功而 PNG 失败；Chrome 151 缺少整组动态库，且安装 Ubuntu 16.04 库后仍要求 `GLIBC_2.25` / `NSS_3.30`。因此不再将数百 MiB 浏览器伪装成自包含图片依赖。
 - **决议**：`draw` 只公开输出 `.svg` / `.png` 成品图片；`.drawio` 是可编辑工程格式，不再属于 JSON 生图契约。源码与 frozen executable 均必须早期拒绝该后缀。
 - **修复**：器件顶点的 HTML 图形模板查找必须传递本次 `--library`；禁止自定义 title 只采用库尺寸却因回落默认库而渲染成矩形。
 - **修复**：SVG/PNG 画布范围按节点、全部线端/航点、分支点和 HTML label wrapper 的并集计算，禁止仅按节点矩形导致底部路由被裁切；冻结门禁新增 512-clock 坐标包含检查。

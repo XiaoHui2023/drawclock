@@ -21,7 +21,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 RUNTIME_ROOT = ROOT / ".runtime"
 CACHE_ROOT = ROOT / ".runtime-cache"
-CHROME_VERSION = "151.0.7922.138"
 NODE_VERSION = "16.20.2"
 
 
@@ -39,19 +38,14 @@ def _platform_key() -> str:
     raise SystemExit(f"unsupported release runtime platform: {system} {machine}")
 
 
-def _asset_urls(key: str) -> tuple[str, str]:
-    chrome = (
-        "https://storage.googleapis.com/chrome-for-testing-public/"
-        f"{CHROME_VERSION}/{key}/chrome-headless-shell-{key}.zip"
-    )
+def _asset_url(key: str) -> str:
     node_platform = {
         "win64": "win-x64.zip",
         "linux64": "linux-x64.tar.xz",
         "mac-arm64": "darwin-arm64.tar.gz",
         "mac-x64": "darwin-x64.tar.gz",
     }[key]
-    node = f"https://nodejs.org/dist/v{NODE_VERSION}/node-v{NODE_VERSION}-{node_platform}"
-    return chrome, node
+    return f"https://nodejs.org/dist/v{NODE_VERSION}/node-v{NODE_VERSION}-{node_platform}"
 
 
 def _download(url: str) -> tuple[Path, str, float]:
@@ -104,10 +98,9 @@ def _extract(archive: Path, destination: Path) -> None:
         shutil.copytree(source, destination)
 
 
-def _executables(key: str) -> tuple[Path, Path]:
-    chrome_name = "chrome-headless-shell.exe" if key == "win64" else "chrome-headless-shell"
+def _node_executable(key: str) -> Path:
     node_name = "node.exe" if key == "win64" else "bin/node"
-    return RUNTIME_ROOT / "headless-shell" / chrome_name, RUNTIME_ROOT / "node" / node_name
+    return RUNTIME_ROOT / "node" / node_name
 
 
 def _copy_elk_runtime() -> None:
@@ -144,36 +137,28 @@ def _probe_version(executable: Path) -> dict[str, object]:
 
 def main() -> int:
     key = _platform_key()
-    chrome_url, node_url = _asset_urls(key)
+    node_url = _asset_url(key)
     RUNTIME_ROOT.mkdir(parents=True, exist_ok=True)
     downloads = []
-    for name, url in (("headless-shell", chrome_url), ("node", node_url)):
-        archive, digest, duration_ms = _download(url)
-        _extract(archive, RUNTIME_ROOT / name)
-        downloads.append(
-            {"name": name, "url": url, "sha256": digest, "duration_ms": round(duration_ms, 3)}
-        )
+    stale_browser = RUNTIME_ROOT / "headless-shell"
+    if stale_browser.exists():
+        shutil.rmtree(stale_browser)
+    archive, digest, duration_ms = _download(node_url)
+    _extract(archive, RUNTIME_ROOT / "node")
+    downloads.append(
+        {"name": "node", "url": node_url, "sha256": digest, "duration_ms": round(duration_ms, 3)}
+    )
     _copy_elk_runtime()
-    chrome, node = _executables(key)
-    if not chrome.is_file() or not node.is_file():
+    node = _node_executable(key)
+    if not node.is_file():
         raise SystemExit("release runtime archive did not contain expected executables")
     if os.name != "nt":
-        chrome.chmod(chrome.stat().st_mode | 0o111)
         node.chmod(node.stat().st_mode | 0o111)
-    # The Linux executable is intentionally built in an old-glibc container,
-    # while the bundled current Chromium is exercised after extraction on the
-    # release runner.  Record build-environment probes without confusing that
-    # compatibility boundary with the mandatory post-bundle functional smoke.
-    probes = {
-        "headless_shell": _probe_version(chrome),
-        "node": _probe_version(node),
-    }
     manifest = {
         "platform": key,
-        "chrome_version": CHROME_VERSION,
         "node_version": NODE_VERSION,
         "elkjs_version": "0.11.1",
-        "build_environment_probes": probes,
+        "build_environment_probes": {"node": _probe_version(node)},
         "downloads": downloads,
     }
     (RUNTIME_ROOT / "runtime-manifest.json").write_text(

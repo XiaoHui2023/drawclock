@@ -5,11 +5,9 @@ from __future__ import annotations
 import json
 import math
 import os
-import struct
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
-import zlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,7 +21,6 @@ from drawio_decode import (  # noqa: E402
     extract_mxfile_xml,
     iter_diagram_models,
 )
-from layout_preview import SUPPORTED_IMAGE_SUFFIXES  # noqa: E402
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 FIG1 = ROOT / "example" / "fig1.drawio"
 FIG2 = ROOT / "example" / "fig2.drawio"
@@ -48,7 +45,6 @@ def _run(
     env = None
     if isolated_runtime:
         env = os.environ.copy()
-        env.pop("CHROME_PATH", None)
         empty_path = cwd / "example" / "out" / "empty-path"
         empty_path.mkdir(parents=True, exist_ok=True)
         env["PATH"] = str(empty_path)
@@ -68,23 +64,6 @@ def _run(
         print(completed.stdout, file=sys.stderr)
         print(completed.stderr, file=sys.stderr)
         raise SystemExit(completed.returncode)
-
-
-def _run_expect_failure(binary: Path, args: list[str], cwd: Path, needle: str) -> None:
-    completed = subprocess.run(
-        [str(binary), *args],
-        cwd=cwd,
-        text=True,
-        encoding="utf-8",
-        errors="replace",
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        check=False,
-    )
-    if completed.returncode == 0 or needle not in completed.stderr:
-        print(f"command should fail with {needle!r}: {args}", file=sys.stderr)
-        print(completed.stderr, file=sys.stderr)
-        raise SystemExit(1)
 
 
 def _assert_clock_tree(config: dict[str, object]) -> None:
@@ -197,114 +176,15 @@ def _assert_svg_image(
     return width, height
 
 
-def _paeth(left: int, up: int, upper_left: int) -> int:
-    prediction = left + up - upper_left
-    distances = (
-        abs(prediction - left), abs(prediction - up), abs(prediction - upper_left)
-    )
-    return (left, up, upper_left)[distances.index(min(distances))]
-
-
-def _png_metrics(path: Path) -> tuple[int, int, int]:
-    data = path.read_bytes()
-    if not data.startswith(b"\x89PNG\r\n\x1a\n"):
-        raise AssertionError(f"invalid PNG signature: {path}")
-    offset = 8
-    width = height = bit_depth = color_type = 0
-    compressed = bytearray()
-    saw_iend = False
-    while offset < len(data):
-        if offset + 12 > len(data):
-            raise AssertionError("truncated PNG chunk header")
-        length = struct.unpack(">I", data[offset : offset + 4])[0]
-        kind = data[offset + 4 : offset + 8]
-        payload = data[offset + 8 : offset + 8 + length]
-        checksum_offset = offset + 8 + length
-        if checksum_offset + 4 > len(data):
-            raise AssertionError(f"truncated PNG chunk: {kind!r}")
-        expected_crc = struct.unpack(">I", data[checksum_offset : checksum_offset + 4])[0]
-        if zlib.crc32(kind + payload) != expected_crc:
-            raise AssertionError(f"PNG chunk CRC mismatch: {kind!r}")
-        offset += length + 12
-        if kind == b"IHDR":
-            width, height, bit_depth, color_type = struct.unpack(">IIBB", payload[:10])
-        elif kind == b"IDAT":
-            compressed.extend(payload)
-        elif kind == b"IEND":
-            saw_iend = True
-            break
-    if not saw_iend or offset != len(data):
-        raise AssertionError("PNG does not end at a valid IEND chunk")
-    channels = {0: 1, 2: 3, 4: 2, 6: 4}.get(color_type)
-    if bit_depth != 8 or channels is None or width <= 0 or height <= 0:
-        raise AssertionError(
-            f"unsupported PNG raster contract: {width}x{height}, "
-            f"depth={bit_depth}, color={color_type}"
-        )
-    raw = zlib.decompress(bytes(compressed))
-    stride = width * channels
-    if len(raw) != (stride + 1) * height:
-        raise AssertionError("PNG scanline length does not match IHDR")
-    previous = bytearray(stride)
-    non_white = 0
-    cursor = 0
-    for _row in range(height):
-        filter_type = raw[cursor]
-        cursor += 1
-        scanline = bytearray(raw[cursor : cursor + stride])
-        cursor += stride
-        for index, value in enumerate(scanline):
-            left = scanline[index - channels] if index >= channels else 0
-            up = previous[index]
-            upper_left = previous[index - channels] if index >= channels else 0
-            if filter_type == 1:
-                scanline[index] = (value + left) & 0xFF
-            elif filter_type == 2:
-                scanline[index] = (value + up) & 0xFF
-            elif filter_type == 3:
-                scanline[index] = (value + ((left + up) // 2)) & 0xFF
-            elif filter_type == 4:
-                scanline[index] = (value + _paeth(left, up, upper_left)) & 0xFF
-            elif filter_type != 0:
-                raise AssertionError(f"unsupported PNG filter: {filter_type}")
-        for index in range(0, stride, channels):
-            if color_type in (0, 4):
-                rgb = (scanline[index],) * 3
-                alpha = scanline[index + 1] if color_type == 4 else 255
-            else:
-                rgb = tuple(scanline[index : index + 3])
-                alpha = scanline[index + 3] if color_type == 6 else 255
-            if alpha > 0 and min(rgb) < 250:
-                non_white += 1
-        previous = scanline
-    return width, height, non_white
-
-
-def _assert_png_image(path: Path, *, expected_size: tuple[int, int]) -> None:
-    width, height, non_white = _png_metrics(path)
-    if (width, height) != expected_size:
-        raise AssertionError(
-            f"PNG/SVG dimension mismatch: {width}x{height} != "
-            f"{expected_size[0]}x{expected_size[1]}"
-        )
-    if non_white < 100:
-        raise AssertionError(f"PNG is blank or nearly blank: {non_white} dark pixels")
-
-
 def main() -> int:
     binary = _binary_path()
     if not binary.is_file():
         print(f"frozen executable not found: {binary}", file=sys.stderr)
         return 1
     runtime = binary.parent / "runtime"
-    chrome = runtime / "headless-shell" / (
-        "chrome-headless-shell.exe" if sys.platform == "win32"
-        else "chrome-headless-shell"
-    )
     node = runtime / "node" / ("node.exe" if sys.platform == "win32" else "bin/node")
     runtime_files = (
         runtime / "runtime-manifest.json",
-        chrome,
         node,
         runtime / "elk" / "elk_layout.mjs",
         runtime / "elk" / "node_modules" / "elkjs" / "lib" / "elk.bundled.js",
@@ -324,9 +204,8 @@ def main() -> int:
     fig1_reloaded = out_dir / "fig1-frozen-smoke.drawio"
     fig2_reloaded = out_dir / "fig2-frozen-smoke.drawio"
     generated_svg = out_dir / "linear-frozen-smoke.svg"
-    generated_png = out_dir / "linear-frozen-smoke.png"
     draw_example_svg = out_dir / "draw-example-frozen-smoke.svg"
-    draw_example_png = out_dir / "draw-example-frozen-smoke.png"
+    arbitrary_suffix_svg = out_dir / "draw-example-frozen-smoke.output"
     fanout_config = out_dir / "fanout-frozen-smoke.json"
     fanout_svg = out_dir / "fanout-frozen-smoke.svg"
     stress_svg = out_dir / "stress-512-frozen-smoke.svg"
@@ -346,13 +225,7 @@ def main() -> int:
         ],
         ROOT,
     )
-    if set(SUPPORTED_IMAGE_SUFFIXES) != {".svg", ".png"}:
-        print(
-            f"frozen image-format matrix is stale: {SUPPORTED_IMAGE_SUFFIXES}",
-            file=sys.stderr,
-        )
-        return 1
-    for image_output in (draw_example_svg, draw_example_png):
+    for image_output in (draw_example_svg, arbitrary_suffix_svg):
         _run(
             binary,
             [
@@ -362,10 +235,10 @@ def main() -> int:
             ROOT,
             isolated_runtime=True,
         )
-    draw_svg_size = _assert_svg_image(
+    _assert_svg_image(
         draw_example_svg, expected_nodes=10, expected_edges=9
     )
-    _assert_png_image(draw_example_png, expected_size=draw_svg_size)
+    _assert_svg_image(arbitrary_suffix_svg, expected_nodes=10, expected_edges=9)
     config = json.loads(clock_tree.read_text(encoding="utf-8"))
     _assert_clock_tree(config)
 
@@ -382,7 +255,7 @@ def main() -> int:
     _assert_reloaded(fig1_reloaded)
     _assert_reloaded(fig2_reloaded)
 
-    for output in (generated_svg, generated_png):
+    for output in (generated_svg,):
         _run(
             binary,
             [
@@ -400,12 +273,11 @@ def main() -> int:
             isolated_runtime=True,
         )
     linear_config = json.loads(AUTO_LINEAR.read_text(encoding="utf-8"))
-    linear_svg_size = _assert_svg_image(
+    _assert_svg_image(
         generated_svg,
         expected_nodes=len(linear_config),
         expected_edges=sum("source" in item for item in linear_config.values()),
     )
-    _assert_png_image(generated_png, expected_size=linear_svg_size)
 
     example_svg_text = draw_example_svg.read_text(encoding="utf-8")
     for name in (
@@ -424,29 +296,26 @@ def main() -> int:
     if "A 4 4" not in default_arc_svg.read_text(encoding="utf-8"):
         print("frozen draw default crossing style is not arc", file=sys.stderr)
         return 1
-    _run_expect_failure(
-        binary,
-        [
-            "draw",
-            "-i",
-            str(AUTO_LINEAR),
-            "-l",
-            str(LIBRARY),
-            "-o",
-            str(out_dir / "unsupported-frozen-smoke.bmp"),
-        ],
-        ROOT,
-        ".svg, .png",
-    )
-    _run_expect_failure(
-        binary,
-        [
-            "draw", "-i", str(AUTO_LINEAR), "-l", str(LIBRARY),
-            "-o", str(out_dir / "editable-frozen-smoke.drawio"),
-        ],
-        ROOT,
-        ".svg, .png",
-    )
+    for arbitrary_name in (
+        "result-png-frozen-smoke.png",
+        "result-drawio-frozen-smoke.drawio",
+        "result-none-frozen-smoke.output",
+    ):
+        arbitrary_output = out_dir / arbitrary_name
+        _run(
+            binary,
+            [
+                "draw", "-i", str(AUTO_LINEAR), "-l", str(LIBRARY),
+                "-o", str(arbitrary_output),
+            ],
+            ROOT,
+            isolated_runtime=True,
+        )
+        _assert_svg_image(
+            arbitrary_output,
+            expected_nodes=len(linear_config),
+            expected_edges=sum("source" in item for item in linear_config.values()),
+        )
 
     format_samples = {
         "json": '{"晶振":{"kind":"source","source_kind":"source"}}',

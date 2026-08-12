@@ -38,7 +38,7 @@ drawclock reload -i old.drawio -l drawio-lib/drawclock.xml -o refreshed.drawio
 
 ## 静态包
 
-`tools/pack.sh` 生成 PyInstaller + staticx Linux 可执行文件。发布流水线必须通过冻结后可执行文件的 `extract`、`reload`、JSON→draw.io、JSON→SVG、JSON→PNG、拓扑回环和非法后缀前置拒绝测试，才允许发布 Release。
+`tools/pack.sh` 生成 PyInstaller + staticx Linux 可执行文件。发布流水线必须通过冻结后可执行文件的 `extract`、`reload`、固定 SVG 生成、任意输出后缀、自定义器件库和大图边界测试，才允许发布 Release。
 
 ## 示例
 

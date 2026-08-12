@@ -9,7 +9,7 @@ python src draw `
   -o example/generated/03-mux-dag.svg
 ```
 
-同一输入改用 `.png` 后缀即可得到 PNG，不需要预览或格式参数。`draw` 只输出 `.svg` 和 `.png` 成品图片。
+`draw` 固定写入 SVG，不需要格式参数；输出后缀不会改变文件内容。
 
 | 级别 | 输入 | 覆盖场景 |
 | --- | --- | --- |

@@ -12,10 +12,10 @@ drawclock draw -i <配置文件> -l <器件库.xml> -o <输出文件> [--crossin
 | --- | --- | --- |
 | `-i, --input` | 是 | 配置文件。支持 `.json`、`.jsonc`、`.json5`、`.toml`、`.yaml`、`.yml`、`.ini`、`.conf`、`.config` |
 | `-l, --library` | 是 | 本次生图使用的 draw.io 器件库 XML |
-| `-o, --output` | 是 | 单个输出文件。支持 `.svg`、`.png` |
+| `-o, --output` | 是 | 单个输出文件；内容始终是 SVG |
 | `--crossing-style` | 否 | 跨线风格：`arc`、`gap`、`sharp`、`none`；默认 `arc` |
 
-输出格式由 `--output` 后缀确定。不支持的后缀会在读取配置和计算布局前报错。发布压缩包已经包含 PNG 渲染运行时，无需另装浏览器；源码运行时也可用 `CHROME_PATH` 指定浏览器。
+`draw` 只会写入 SVG，不根据 `--output` 的后缀选择格式。例如输出名为 `clock.png`、`clock.drawio` 或没有后缀，文件内容仍然是 SVG XML。发布包不包含浏览器或 PNG 渲染运行时。
 
 ## 输入
 
@@ -52,9 +52,9 @@ drawclock draw -i <配置文件> -l <器件库.xml> -o <输出文件> [--crossin
 source + from → mux2 → pll → div → dto → inv → cell → gate → clock
 ```
 
-生成 SVG 或 PNG 时只需更换输出后缀：
+生成 SVG：
 
 ```text
 drawclock draw -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg
-drawclock draw -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.png --crossing-style gap
+drawclock draw -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg --crossing-style gap
 ```

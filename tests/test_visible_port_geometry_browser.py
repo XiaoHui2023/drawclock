@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import json
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -15,10 +16,20 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from drawio_lib.components.registry import ALL
-from layout_preview import _browser_path
-
-
-BROWSER = _browser_path()
+_BROWSER_CANDIDATES = [
+    shutil.which(name)
+    for name in ("msedge", "microsoft-edge", "google-chrome", "chromium")
+]
+_BROWSER_CANDIDATES.extend(
+    [
+        r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+        r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+    ]
+)
+BROWSER = next(
+    (Path(candidate) for candidate in _BROWSER_CANDIDATES if candidate and Path(candidate).is_file()),
+    None,
+)
 PORT_TOLERANCE_PX = 0.03
 
 

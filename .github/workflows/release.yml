@@ -90,10 +90,10 @@ jobs:
           name: ${{ steps.version.outputs.tag }}
           body: |
             Rolling release: self-contained Ubuntu 16.04 PyInstaller bundle from the main commit.
-            The archive includes pinned headless Chromium, Node.js, and ELK layout runtimes.
+            The archive includes pinned Node.js and ELK layout runtimes.
             Before publishing, CI extracts the archive and exercises the frozen executable with the
-            host PATH isolated for extract, reload, draw.io/SVG/PNG generation, editable-output
-            topology round-trip, and early rejection of unsupported suffixes.
+            host PATH isolated for extract, reload, fixed-SVG generation under arbitrary output
+            suffixes, supplied-library rendering, and large-layout bounds checks.
           files: release-assets/**
           fail_on_unmatched_files: true
           generate_release_notes: false
