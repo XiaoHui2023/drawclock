@@ -8,9 +8,6 @@ import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-
-from pathlib import Path
-
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
@@ -27,6 +24,7 @@ LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 FIG1 = ROOT / "example" / "fig1.drawio"
 FIG2 = ROOT / "example" / "fig2.drawio"
 AUTO_LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
+DRAW_EXAMPLE = ROOT / "example" / "draw.json"
 
 
 def _binary_path() -> Path:
@@ -137,7 +135,7 @@ def main() -> int:
     if not binary.is_file():
         print(f"frozen executable not found: {binary}", file=sys.stderr)
         return 1
-    for required in (LIBRARY, FIG1, FIG2, AUTO_LINEAR):
+    for required in (LIBRARY, FIG1, FIG2, AUTO_LINEAR, DRAW_EXAMPLE):
         if not required.is_file():
             print(f"example input missing: {required}", file=sys.stderr)
             return 1
@@ -150,6 +148,7 @@ def main() -> int:
     generated_drawio = out_dir / "linear-frozen-smoke.drawio"
     generated_svg = out_dir / "linear-frozen-smoke.svg"
     generated_png = out_dir / "linear-frozen-smoke.png"
+    draw_example_output = out_dir / "draw-example-frozen-smoke.drawio"
 
     _run(
         binary,
@@ -208,6 +207,42 @@ def main() -> int:
     if not generated_png.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
         print("frozen PNG output is invalid", file=sys.stderr)
         return 1
+
+    _run(
+        binary,
+        [
+            "draw",
+            "-i",
+            str(DRAW_EXAMPLE),
+            "-l",
+            str(LIBRARY),
+            "-o",
+            str(draw_example_output),
+        ],
+        ROOT,
+    )
+    draw_model = iter_diagram_models(extract_mxfile_xml(str(draw_example_output)))[0]
+    actual_components = {
+        obj.get("name"): (obj.find("mxCell").get("style", "") if obj.find("mxCell") is not None else "")
+        for obj in draw_model.iter("object")
+        if obj.get("name")
+    }
+    expected_components = {
+        "osc": "source",
+        "external_clk": "from",
+        "clock_select": "mux2",
+        "pll_main": "pll",
+        "divider": "div",
+        "tuner": "dto",
+        "inverter": "inv",
+        "clock_cell": "cell",
+        "clock_gate": "gate",
+        "core_clock": "clock",
+    }
+    for name, component in expected_components.items():
+        if f"drawclockType={component};" not in actual_components.get(name, ""):
+            print(f"frozen draw example omitted {name} as {component}", file=sys.stderr)
+            return 1
     _run_expect_failure(
         binary,
         [

@@ -1,25 +1,6 @@
-# JSON
+# extract 输出 JSON
 
-> 文件名沿用历史名称。`draw` 的拓扑输入实际由 `configlib` 加载，可使用
-> JSON/JSONC/JSON5、TOML、YAML 或 INI/CONF/CONFIG；加载后的数据结构必须符合本文。
-
-每个器件对象可以包含可选字段 `component`，其值是本次 `--library` 中的图形 title。
-当一个逻辑 `kind` 在库中存在多个外形且拓扑无法唯一证明具体外形时，推荐在拓扑内直接写
-`component`，不再使用独立 hints 文件。例如：
-
-```json
-{
-  "pll_dual": {
-    "kind": "pll",
-    "component": "pll2",
-    "pll_kind": "INNO",
-    "source": "xtal"
-  }
-}
-```
-
-没有 `component` 时，生成器根据当前库图形的 `drawclockKind`、子类型、输入/输出端口数量、
-端口连接键和尺寸选择最小兼容图形。这个选择不依赖内置库的固定名称或坐标。
+本文只说明 `extract` 从 draw.io 图导出的 JSON。`draw` 的输入规则见 [draw.md](draw.md)。
 
 以下为示范。
 
@@ -28,7 +9,7 @@
 旧图若缺少 `drawclockKind`，导出可能仍用库类型名（如 `pll2`、`mux3`）；须重载器件库升级图形后再导出。
 
 ```json5
-// JSON 无 from；涂鸦与非器件库图形不进 JSON，连到涂鸦的边忽略、不报错；其余属性原样来自图中 object
+// extract 合并跨图连接后不输出 from；涂鸦与非器件库图形不进 JSON
 {
   "xtal": {
     "kind": "source",        // 时钟源大类

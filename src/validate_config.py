@@ -19,10 +19,6 @@ def validate_config(
 
   for name, item in config.items():
     kind = item.get("kind")
-    if kind == "from":
-      errors.append("clock-tree.json 不应包含 kind 为 from 的记录")
-      continue
-
     refs = _referenced_peers(item)
     for peer in refs:
       base, suffix = parse_source_ref(peer)

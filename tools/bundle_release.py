@@ -15,10 +15,12 @@ BINARY_NAMES = ("drawclock",)
 # 运行期随包资源与用户专档；不含 example/、tools/ 等开发/打包目录。
 RELEASE_PATHS = (
     "README.md",
+    "draw.md",
     "json.md",
     "pyproject.toml",
     "rule.md",
     "drawio-lib",
+    "example/draw.json",
 )
 
 SOURCE_DIR = "source"

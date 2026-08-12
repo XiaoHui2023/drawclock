@@ -24,6 +24,7 @@ example/out/restored.drawio
 example/out/drawio-layout.json
 example/out/from-reloaded/
 example/out/*-frozen-smoke.*
+example/out/draw-example.*
 
 # CI / 本地 scratch 日志
 _ci_job.log

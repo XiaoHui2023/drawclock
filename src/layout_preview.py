@@ -173,6 +173,7 @@ def write_preview(
     browser = _browser_path()
     assert browser is not None
     output.parent.mkdir(parents=True, exist_ok=True)
+    screenshot_output = output.resolve()
     with tempfile.TemporaryDirectory(prefix="drawclock-preview-") as temp_dir:
         svg_path = Path(temp_dir) / "preview.svg"
         write_preview_svg(
@@ -201,7 +202,7 @@ def write_preview(
             "--disable-gpu",
             "--hide-scrollbars",
             f"--window-size={target_width},{target_height}",
-            f"--screenshot={output}",
+            f"--screenshot={screenshot_output}",
             page_path.as_uri(),
         ]
         if os.name != "nt":

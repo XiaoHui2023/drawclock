@@ -2,6 +2,8 @@
 
 演示完整工作流：**器件库 → 图 → src → JSON + reload 图**。
 
+`draw.json` 是随发布包提供的最小 `draw` 示例，覆盖 source、from、mux、PLL、分频器、dto、inv、cell、gate 和末端 clock。用法见根目录 `draw.md`。
+
 ## 运行
 
 仓库根目录：

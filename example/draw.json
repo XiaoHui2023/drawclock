@@ -1,0 +1,59 @@
+{
+  "osc": {
+    "kind": "source",
+    "source_kind": "source",
+    "component": "source"
+  },
+  "external_clk": {
+    "kind": "from",
+    "component": "from"
+  },
+  "clock_select": {
+    "kind": "mux",
+    "component": "mux2",
+    "source": {
+      "0": "osc",
+      "1": "external_clk"
+    }
+  },
+  "pll_main": {
+    "kind": "pll",
+    "component": "pll",
+    "pll_kind": "SC",
+    "source": "clock_select"
+  },
+  "divider": {
+    "kind": "div",
+    "component": "div",
+    "ratio": "2",
+    "source": "pll_main"
+  },
+  "tuner": {
+    "kind": "dto",
+    "component": "dto",
+    "source": "divider"
+  },
+  "inverter": {
+    "kind": "inv",
+    "inv_kind": "inv",
+    "component": "inv",
+    "source": "tuner"
+  },
+  "clock_cell": {
+    "kind": "cell",
+    "cell_kind": "cell",
+    "component": "cell",
+    "source": "inverter"
+  },
+  "clock_gate": {
+    "kind": "gate",
+    "component": "gate",
+    "source": "clock_cell"
+  },
+  "core_clock": {
+    "kind": "clock",
+    "component": "clock",
+    "freq": "100 MHz",
+    "source": "clock_gate"
+  }
+}

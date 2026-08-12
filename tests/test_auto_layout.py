@@ -20,6 +20,7 @@ from pipeline import drawio_to_clock_tree
 ROOT = Path(__file__).resolve().parents[1]
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 SRC_DIR = ROOT / "src"
+DRAW_EXAMPLE = ROOT / "example" / "draw.json"
 
 
 def _linear_config() -> dict[str, dict[str, str]]:
@@ -28,6 +29,27 @@ def _linear_config() -> dict[str, dict[str, str]]:
         "gate0": {"kind": "gate", "source": "xtal"},
         "clk0": {"kind": "clock", "source": "gate0"},
     }
+
+
+def test_draw_example_covers_one_shape_per_component_kind() -> None:
+    config = load_clock_tree(DRAW_EXAMPLE)
+    document, report = generate_layout(config, library_path=LIBRARY)
+
+    assert report["hard_pass"] is True
+    assert report["component_types"] == {
+        "clock_cell": "cell",
+        "clock_gate": "gate",
+        "clock_select": "mux2",
+        "core_clock": "clock",
+        "divider": "div",
+        "external_clk": "from",
+        "inverter": "inv",
+        "osc": "source",
+        "pll_main": "pll",
+        "tuner": "dto",
+    }
+    assert len(document.vertices) == 10
+    assert len(document.edges) == 9
 
 
 def test_linear_layout_is_deterministic_and_roundtrips(tmp_path: Path) -> None:
@@ -196,6 +218,33 @@ def test_json_to_drawio_cli_writes_real_component_png(tmp_path: Path) -> None:
     )
     assert proc.returncode == 0, proc.stderr
     assert output.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+
+
+@pytest.mark.skipif(
+    not Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe").is_file(),
+    reason="PNG integration requires Microsoft Edge",
+)
+def test_draw_cli_writes_png_to_relative_output_path(tmp_path: Path) -> None:
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(SRC_DIR),
+            "draw",
+            "-i",
+            str(DRAW_EXAMPLE),
+            "-l",
+            str(LIBRARY),
+            "-o",
+            "relative.png",
+        ],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=60,
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert (tmp_path / "relative.png").read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
 
 
 def test_agent_quality_facilities_are_not_public_cli_features() -> None:
