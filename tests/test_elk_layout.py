@@ -187,3 +187,125 @@ def test_quality_rejects_avoidable_global_bottom_detour() -> None:
 
     assert quality["passed"] is False
     assert quality["line_integrity"]["avoidable_outer_detours"] == [bad_edge.cell_id]
+
+
+def _two_parallel_chains(*, long_name: bool = False):
+    gate_a = (
+        "gate_with_an_intentionally_very_long_instance_name_for_label_clearance"
+        if long_name
+        else "gate_a"
+    )
+    config = {
+        "src_a": {"kind": "from"},
+        gate_a: {"kind": "gate", "source": "src_a"},
+        "clk_a": {"kind": "clock", "source": gate_a},
+        "src_b": {"kind": "from"},
+        "gate_b": {"kind": "gate", "source": "src_b"},
+        "clk_b": {"kind": "clock", "source": "gate_b"},
+    }
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    return config, document, gate_a
+
+
+def test_quality_fault_injection_rejects_avoidable_bends_and_crossing() -> None:
+    config, document, _ = _two_parallel_chains()
+    vertices = {vertex.cell_id: vertex for vertex in document.vertices}
+    by_name = {vertex.name: vertex for vertex in document.vertices}
+    edge = next(
+        edge
+        for edge in document.edges
+        if vertices[edge.source_id].name == "src_a"
+        and vertices[edge.target_id].name == "gate_a"
+    )
+    points = _points_for_edge(
+        edge, vertices[edge.source_id], vertices[edge.target_id]
+    )
+    start, end = points[0], points[-1]
+    lower_y = _points_for_edge(
+        next(
+            item
+            for item in document.edges
+            if vertices[item.source_id].name == "src_b"
+            and vertices[item.target_id].name == "gate_b"
+        ),
+        by_name["src_b"],
+        by_name["gate_b"],
+    )[0][1]
+    detour_y = lower_y + 30
+    edge.waypoints = (
+        (start[0] + 20, start[1]),
+        (start[0] + 20, detour_y),
+        (end[0] - 20, detour_y),
+        (end[0] - 20, end[1]),
+    )
+
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=10, tolerance=0.01
+    )
+    line = quality["line_integrity"]
+
+    assert quality["passed"] is False
+    assert line["avoidable_bend_edges"] == [edge.cell_id]
+    assert line["avoidable_crossing_edges"] == [edge.cell_id]
+    assert line["zigzag_edges"] == [edge.cell_id]
+
+
+def test_quality_fault_injection_rejects_vertical_departure_inside_source() -> None:
+    config, document, _ = _two_parallel_chains()
+    vertices = {vertex.cell_id: vertex for vertex in document.vertices}
+    edge = next(
+        edge
+        for edge in document.edges
+        if vertices[edge.source_id].name == "src_a"
+        and vertices[edge.target_id].name == "gate_a"
+    )
+    points = _points_for_edge(
+        edge, vertices[edge.source_id], vertices[edge.target_id]
+    )
+    edge.waypoints = (
+        (points[0][0], points[0][1] + 20),
+        (points[-1][0] - 20, points[0][1] + 20),
+        (points[-1][0] - 20, points[-1][1]),
+    )
+
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=10, tolerance=0.01
+    )
+
+    assert quality["passed"] is False
+    assert quality["line_integrity"]["source_lead_inside_visual"] == [
+        edge.cell_id
+    ]
+
+
+def test_quality_fault_injection_rejects_wire_through_label_overflow() -> None:
+    config, document, long_gate = _two_parallel_chains(long_name=True)
+    vertices = {vertex.cell_id: vertex for vertex in document.vertices}
+    by_name = {vertex.name: vertex for vertex in document.vertices}
+    edge = next(
+        edge
+        for edge in document.edges
+        if vertices[edge.source_id].name == "src_b"
+        and vertices[edge.target_id].name == "gate_b"
+    )
+    points = _points_for_edge(
+        edge, vertices[edge.source_id], vertices[edge.target_id]
+    )
+    obstacle = by_name[long_gate]
+    label_y = obstacle.y + obstacle.height - 2
+    label_left_x = obstacle.x - 30
+    edge.waypoints = (
+        (label_left_x, points[0][1]),
+        (label_left_x, label_y),
+        (obstacle.x - 1, label_y),
+        (obstacle.x - 1, points[-1][1]),
+    )
+
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=10, tolerance=0.01
+    )
+
+    assert quality["passed"] is False
+    assert f"{edge.cell_id}->{long_gate}" in quality["line_integrity"][
+        "edge_label_intersections"
+    ]

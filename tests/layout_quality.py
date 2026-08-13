@@ -25,9 +25,10 @@ from drawio_graph import edge_attachment, parse_models
 from drawio_layout import LayoutDocument, layout_from_diagram
 from drawio_library import load_library_shapes
 from drawio_ports import abs_port_xy, infer_port_from_attachment, port_anchors
+from visual_geometry import vertex_visual_box
 
 
-QUALITY_SCHEMA_VERSION = 3  # Test-only Agent artifact inspection schema.
+QUALITY_SCHEMA_VERSION = 4  # Test-only Agent artifact inspection schema.
 
 
 def _close(a: float, b: float, tolerance: float) -> bool:
@@ -102,11 +103,14 @@ def inspect_layout_quality(
     tolerance: float = 0.5,
     runtime_ms: float = 0.0,
     exact_pair_oracle: bool = False,
+    routing_clearance: float = 18.0,
 ) -> dict[str, Any]:
     if grid <= 0:
         raise ValueError("grid must be greater than zero")
     if tolerance < 0:
         raise ValueError("tolerance must not be negative")
+    if routing_clearance < 0:
+        raise ValueError("routing_clearance must not be negative")
 
     shapes = load_library_shapes(library_path)
     resolved = resolve_nodes(
@@ -116,6 +120,9 @@ def inspect_layout_quality(
     ranks = _ranks(resolved, logical_edges)
     vertices_by_id = {vertex.cell_id: vertex for vertex in document.vertices}
     vertices_by_name = {vertex.name: vertex for vertex in document.vertices}
+    visual_boxes = {
+        vertex.name: vertex_visual_box(vertex) for vertex in document.vertices
+    }
 
     duplicate_node_names = sorted(
         name for name, count in Counter(vertex.name for vertex in document.vertices).items() if count > 1
@@ -179,6 +186,10 @@ def inspect_layout_quality(
     micro_segments: list[str] = []
     source_lead_non_horizontal: list[str] = []
     target_lead_non_horizontal: list[str] = []
+    source_lead_inside_visual: list[str] = []
+    target_lead_inside_visual: list[str] = []
+    source_lead_clearance_short: list[str] = []
+    target_lead_clearance_short: list[str] = []
     first_stub_x_by_net: dict[tuple[str, str], set[float]] = defaultdict(set)
     edge_bends_by_key: dict[str, int] = {}
     observed_edge_ports: dict[str, tuple[str, str, str, str]] = {}
@@ -229,6 +240,48 @@ def inspect_layout_quality(
             source_lead_non_horizontal.append(edge.cell_id)
         if len(points) >= 2 and abs(points[-1][1] - points[-2][1]) > tolerance:
             target_lead_non_horizontal.append(edge.cell_id)
+        first_vertical = next(
+            (
+                (a, b)
+                for a, b in zip(points, points[1:])
+                if abs(a[0] - b[0]) <= tolerance
+                and abs(a[1] - b[1]) > tolerance
+            ),
+            None,
+        )
+        last_vertical = next(
+            (
+                (a, b)
+                for a, b in reversed(list(zip(points, points[1:])))
+                if abs(a[0] - b[0]) <= tolerance
+                and abs(a[1] - b[1]) > tolerance
+            ),
+            None,
+        )
+        if (
+            first_vertical is not None
+            and first_vertical[0][0]
+            < visual_boxes[source.name].right - tolerance
+        ):
+            source_lead_inside_visual.append(edge.cell_id)
+        if (
+            first_vertical is not None
+            and first_vertical[0][0]
+            < visual_boxes[source.name].right + routing_clearance - tolerance
+        ):
+            source_lead_clearance_short.append(edge.cell_id)
+        if (
+            last_vertical is not None
+            and last_vertical[0][0]
+            > visual_boxes[target.name].left + tolerance
+        ):
+            target_lead_inside_visual.append(edge.cell_id)
+        if (
+            last_vertical is not None
+            and last_vertical[0][0]
+            > visual_boxes[target.name].left - routing_clearance + tolerance
+        ):
+            target_lead_clearance_short.append(edge.cell_id)
         # A fan-out trunk is the first vertical distribution segment after a
         # source port.  A straight, already-aligned child has no trunk of its
         # own and must not be misclassified as fragmentation.
@@ -296,10 +349,11 @@ def inspect_layout_quality(
     spatial_size = 256.0
     node_buckets: dict[tuple[int, int], list[int]] = defaultdict(list)
     for index, vertex in enumerate(document.vertices):
-        x0 = math.floor(vertex.x / spatial_size)
-        x1 = math.floor((vertex.x + vertex.width) / spatial_size)
-        y0 = math.floor(vertex.y / spatial_size)
-        y1 = math.floor((vertex.y + vertex.height) / spatial_size)
+        box = visual_boxes[vertex.name].inflated(routing_clearance)
+        x0 = math.floor(box[0] / spatial_size)
+        x1 = math.floor(box[2] / spatial_size)
+        y0 = math.floor(box[1] / spatial_size)
+        y1 = math.floor(box[3] / spatial_size)
         for bx in range(x0, x1 + 1):
             for by in range(y0, y1 + 1):
                 node_buckets[(bx, by)].append(index)
@@ -316,6 +370,7 @@ def inspect_layout_quality(
     )
 
     edge_node_intersections: list[str] = []
+    edge_label_intersections: list[str] = []
     for edge_id, segments in edge_segments.items():
         endpoints = observed_edge_ports[edge_id]
         for segment in segments:
@@ -329,9 +384,20 @@ def inspect_layout_quality(
                 vertex = document.vertices[index]
                 if vertex.name in (endpoints[0], endpoints[2]):
                     continue
-                rect = (vertex.x, vertex.y, vertex.x + vertex.width, vertex.y + vertex.height)
+                box = visual_boxes[vertex.name]
+                rect = (box.left, box.top, box.right, box.bottom)
                 if _segment_hits_rect(segment.a, segment.b, rect):
                     edge_node_intersections.append(f"{edge_id}->{vertex.name}")
+                    body = (
+                        vertex.x,
+                        vertex.y,
+                        vertex.x + vertex.width,
+                        vertex.y + vertex.height,
+                    )
+                    if not _segment_hits_rect(segment.a, segment.b, body):
+                        edge_label_intersections.append(
+                            f"{edge_id}->{vertex.name}"
+                        )
 
     # An outer corridor is not intrinsically wrong: an obstacle can require
     # it.  It becomes a hard failure only when the already allocated x
@@ -352,7 +418,7 @@ def inspect_layout_quality(
     for edge_id, points in edge_points.items():
         if len(points) < 4:
             continue
-        source_name, _, target_name, _ = observed_edge_ports[edge_id]
+        source_name, source_port, target_name, _ = observed_edge_ports[edge_id]
         endpoint_low, endpoint_high = sorted((points[0][1], points[-1][1]))
         route_low = min(point[1] for point in points)
         route_high = max(point[1] for point in points)
@@ -370,20 +436,44 @@ def inspect_layout_quality(
         if x2 < x1 - tolerance:
             continue
         obstacles = [
-            vertex
+            vertex.name
             for rank in range(source_rank + 1, target_rank)
             for vertex in rank_nodes[rank]
             if vertex.name not in (source_name, target_name)
         ]
         candidate_lanes = {points[0][1], points[-1][1]}
-        for vertex in obstacles:
-            candidate_lanes.add(vertex.y - grid)
-            candidate_lanes.add(vertex.y + vertex.height + grid)
+        for name in obstacles:
+            box = visual_boxes[name]
+            candidate_lanes.add(box.top - routing_clearance)
+            candidate_lanes.add(box.bottom + routing_clearance)
         actual_length = sum(
             abs(b[0] - a[0]) + abs(b[1] - a[1])
             for a, b in zip(points, points[1:])
         )
-        best_local: tuple[float, float] | None = None
+        source_net = (source_name, source_port)
+        other_segments = [
+            segment
+            for other_id, segments in edge_segments.items()
+            if other_id != edge_id
+            for segment in segments
+            if segment.source_net != source_net
+        ]
+
+        def interaction_cost(segments: list[Segment]) -> tuple[int, int]:
+            overlaps = sum(
+                _overlap_length(segment, other) >= grid
+                for segment in segments
+                for other in other_segments
+            )
+            crossings = sum(
+                _proper_cross(segment, other)
+                for segment in segments
+                for other in other_segments
+            )
+            return overlaps, crossings
+
+        actual_interactions = interaction_cost(edge_segments[edge_id])
+        best_local: tuple[int, int, float, float] | None = None
         for lane in candidate_lanes:
             candidate = _canonical_orthogonal_points(
                 [points[0], (x1, points[0][1]), (x1, lane),
@@ -391,15 +481,18 @@ def inspect_layout_quality(
                 tolerance,
             )
             candidate_segments = [
-                Segment("candidate", (source_name, ""), a, b)
+                Segment("candidate", source_net, a, b)
                 for a, b in zip(candidate, candidate[1:])
                 if not (_close(a[0], b[0], tolerance) and _close(a[1], b[1], tolerance))
             ]
             if any(
-                _segment_hits_rect(segment.a, segment.b,
-                    (vertex.x, vertex.y, vertex.x + vertex.width, vertex.y + vertex.height))
+                _segment_hits_rect(
+                    segment.a,
+                    segment.b,
+                    visual_boxes[name].inflated(routing_clearance),
+                )
                 for segment in candidate_segments
-                for vertex in obstacles
+                for name in obstacles
             ):
                 continue
             local_outer = max(
@@ -409,7 +502,13 @@ def inspect_layout_quality(
                 abs(b[0] - a[0]) + abs(b[1] - a[1])
                 for a, b in zip(candidate, candidate[1:])
             )
-            score = (local_outer, local_length)
+            local_overlaps, local_crossings = interaction_cost(candidate_segments)
+            score = (
+                local_overlaps,
+                local_crossings,
+                local_outer,
+                local_length,
+            )
             if best_local is None or score < best_local:
                 best_local = score
         escaped_node_bounds = (
@@ -419,8 +518,10 @@ def inspect_layout_quality(
         if (
             escaped_node_bounds
             and best_local is not None
-            and best_local[0] < actual_outer - tolerance
-            and best_local[1] < actual_length - tolerance
+            and best_local[0] <= actual_interactions[0]
+            and best_local[1] <= actual_interactions[1]
+            and best_local[2] < actual_outer - tolerance
+            and best_local[3] < actual_length - tolerance
         ):
             avoidable_outer_detours.append(edge_id)
 
@@ -548,6 +649,157 @@ def inspect_layout_quality(
         ]
     untreated_crossings = sorted(set(untreated_crossings))
 
+    # Independently search the artifact's own visibility channels for a
+    # monotone H-V-H route.  A route is rejected only when that simpler route
+    # is obstacle-free and dominates the stored route without adding a
+    # different-net overlap or crossing.  This makes bend/crossing quality
+    # structural instead of tying it to a pixel threshold or fixture name.
+    avoidable_bend_edges: list[str] = []
+    avoidable_crossing_edges: list[str] = []
+    zigzag_edges: list[str] = []
+    segment_buckets: dict[tuple[int, int], list[int]] = defaultdict(list)
+    for index, segment in enumerate(all_segments):
+        min_x, max_x = sorted((segment.a[0], segment.b[0]))
+        min_y, max_y = sorted((segment.a[1], segment.b[1]))
+        for bx in range(
+            math.floor(min_x / spatial_size),
+            math.floor(max_x / spatial_size) + 1,
+        ):
+            for by in range(
+                math.floor(min_y / spatial_size),
+                math.floor(max_y / spatial_size) + 1,
+            ):
+                segment_buckets[(bx, by)].append(index)
+
+    def nearby_segment_indices(segments: list[Segment]) -> set[int]:
+        result: set[int] = set()
+        for segment in segments:
+            min_x, max_x = sorted((segment.a[0], segment.b[0]))
+            min_y, max_y = sorted((segment.a[1], segment.b[1]))
+            for bx in range(
+                math.floor(min_x / spatial_size),
+                math.floor(max_x / spatial_size) + 1,
+            ):
+                for by in range(
+                    math.floor(min_y / spatial_size),
+                    math.floor(max_y / spatial_size) + 1,
+                ):
+                    result.update(segment_buckets.get((bx, by), ()))
+        return result
+
+    for edge_id, points in edge_points.items():
+        actual_bends = max(0, len(points) - 2)
+        if actual_bends < 4:
+            continue
+        source_name, source_port, target_name, _ = observed_edge_ports[edge_id]
+        net = (source_name, source_port)
+        own_segments = edge_segments[edge_id]
+
+        def route_cost(segments: list[Segment], bends: int) -> tuple[int, int, int, int, float]:
+            nearby_node_indices: set[int] = set()
+            for segment in segments:
+                min_x, max_x = sorted((segment.a[0], segment.b[0]))
+                min_y, max_y = sorted((segment.a[1], segment.b[1]))
+                for bx in range(
+                    math.floor(min_x / spatial_size),
+                    math.floor(max_x / spatial_size) + 1,
+                ):
+                    for by in range(
+                        math.floor(min_y / spatial_size),
+                        math.floor(max_y / spatial_size) + 1,
+                    ):
+                        nearby_node_indices.update(
+                            node_buckets.get((bx, by), ())
+                        )
+            hits = sum(
+                _segment_hits_rect(
+                    segment.a,
+                    segment.b,
+                    box.inflated(routing_clearance),
+                )
+                for segment in segments
+                for index in nearby_node_indices
+                for name in (document.vertices[index].name,)
+                for box in (visual_boxes[name],)
+                if name not in (source_name, target_name)
+            )
+            other_segments = [
+                all_segments[index]
+                for index in nearby_segment_indices(segments)
+                if all_segments[index].edge_key != own_segments[0].edge_key
+                and all_segments[index].source_net != net
+            ] if own_segments else []
+            overlaps = sum(
+                _overlap_length(segment, other) >= 10.0
+                for segment in segments
+                for other in other_segments
+            )
+            crossing_count = sum(
+                _proper_cross(segment, other)
+                for segment in segments
+                for other in other_segments
+            )
+            length = sum(
+                abs(segment.b[0] - segment.a[0])
+                + abs(segment.b[1] - segment.a[1])
+                for segment in segments
+            )
+            return hits, overlaps, crossing_count, bends, length
+
+        actual_cost = route_cost(own_segments, actual_bends)
+        source_right = visual_boxes[source_name].right
+        target_left = visual_boxes[target_name].left
+        candidate_xs = {
+            point[0]
+            for point in points[1:-1]
+            if source_right - tolerance <= point[0] <= target_left + tolerance
+        }
+        if source_right <= target_left:
+            candidate_xs.add((source_right + target_left) / 2.0)
+        best_cost: tuple[int, int, int, int, float] | None = None
+        for x in candidate_xs:
+            candidate_points = _canonical_orthogonal_points(
+                [points[0], (x, points[0][1]), (x, points[-1][1]), points[-1]],
+                tolerance,
+            )
+            candidate_points = [
+                point
+                for index, point in enumerate(candidate_points)
+                if index == 0
+                or not (
+                    _close(point[0], candidate_points[index - 1][0], tolerance)
+                    and _close(point[1], candidate_points[index - 1][1], tolerance)
+                )
+            ]
+            candidate_segments = [
+                Segment(edge_id, net, a, b)
+                for a, b in zip(candidate_points, candidate_points[1:])
+                if not (
+                    _close(a[0], b[0], tolerance)
+                    and _close(a[1], b[1], tolerance)
+                )
+            ]
+            candidate_bends = max(0, len(candidate_points) - 2)
+            cost = route_cost(candidate_segments, candidate_bends)
+            if cost[0] == 0 and (best_cost is None or cost < best_cost):
+                best_cost = cost
+        if best_cost is None:
+            continue
+        if (
+            best_cost[1] <= actual_cost[1]
+            and best_cost[2] <= actual_cost[2]
+            and best_cost[3] < actual_cost[3]
+        ):
+            avoidable_bend_edges.append(edge_id)
+            if actual_bends >= 4:
+                zigzag_edges.append(edge_id)
+        if (
+            best_cost[1] <= actual_cost[1]
+            and best_cost[2] < actual_cost[2]
+            and best_cost[3] <= actual_cost[3]
+        ):
+            avoidable_crossing_edges.append(edge_id)
+
     direction_violations = sorted(
         edge_id
         for edge_id, (source_name, _, target_name, _) in observed_edge_ports.items()
@@ -622,7 +874,13 @@ def inspect_layout_quality(
         dangling_edges + unresolved_port_edges + missing_edges + extra_edges + duplicate_edges
         + non_orthogonal_segments + zero_length_segments + redundant_waypoints
         + micro_segments + source_lead_non_horizontal + target_lead_non_horizontal
+        + [f"source-lead-inside-visual:{edge_id}" for edge_id in source_lead_inside_visual]
+        + [f"target-lead-inside-visual:{edge_id}" for edge_id in target_lead_inside_visual]
+        + [f"source-lead-clearance-short:{edge_id}" for edge_id in source_lead_clearance_short]
+        + [f"target-lead-clearance-short:{edge_id}" for edge_id in target_lead_clearance_short]
         + backtracking_edges + edge_node_intersections
+        + [f"avoidable-bends:{edge_id}" for edge_id in avoidable_bend_edges]
+        + [f"avoidable-crossing:{edge_id}" for edge_id in avoidable_crossing_edges]
         + [f"avoidable-outer-detour:{edge_id}" for edge_id in avoidable_outer_detours]
         + [f"overlap:{a}/{b}" for a, b in ambiguous_overlaps]
         + [f"unbridged:{a}/{b}" for a, b in untreated_crossings]
@@ -666,11 +924,19 @@ def inspect_layout_quality(
             "micro_segments": micro_segments,
             "source_lead_non_horizontal": sorted(set(source_lead_non_horizontal)),
             "target_lead_non_horizontal": sorted(set(target_lead_non_horizontal)),
+            "source_lead_inside_visual": sorted(set(source_lead_inside_visual)),
+            "target_lead_inside_visual": sorted(set(target_lead_inside_visual)),
+            "source_lead_clearance_short": sorted(set(source_lead_clearance_short)),
+            "target_lead_clearance_short": sorted(set(target_lead_clearance_short)),
             "zero_length_segments": zero_length_segments,
             "redundant_waypoint_edges": sorted(set(redundant_waypoints)),
             "backtracking_edges": sorted(set(backtracking_edges)),
             "edge_node_intersections": sorted(set(edge_node_intersections)),
+            "edge_label_intersections": sorted(set(edge_label_intersections)),
             "avoidable_outer_detours": sorted(set(avoidable_outer_detours)),
+            "avoidable_bend_edges": sorted(set(avoidable_bend_edges)),
+            "avoidable_crossing_edges": sorted(set(avoidable_crossing_edges)),
+            "zigzag_edges": sorted(set(zigzag_edges)),
             "ambiguous_overlaps": [list(pair) for pair in ambiguous_overlaps],
             "crossings": crossing_pair_intersections,
             "distinct_crossing_points": len(crossing_points),

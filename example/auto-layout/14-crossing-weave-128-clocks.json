@@ -1,0 +1,2854 @@
+{
+  "ref_0": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "ref_1": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "ref_2": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "ref_3": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "pll_dual_0": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "ref_0"
+  },
+  "pll_dual_1": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "ref_3"
+  },
+  "pll_dual_2": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "ref_2"
+  },
+  "pll_dual_3": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "ref_1"
+  },
+  "select_primary_domain_000": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_000": {
+    "kind": "gate",
+    "source": "select_primary_domain_000"
+  },
+  "divide_primary_domain_000": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "gate_primary_domain_000"
+  },
+  "select_reconvergent_domain_000": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_000",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_000": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_000"
+  },
+  "cell_output_domain_000": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_000"
+  },
+  "clock_domain_000_00": {
+    "kind": "clock",
+    "freq": "25 MHz",
+    "source": "cell_output_domain_000"
+  },
+  "clock_domain_000_01": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "cell_output_domain_000"
+  },
+  "select_primary_domain_001": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_001": {
+    "kind": "gate",
+    "source": "select_primary_domain_001"
+  },
+  "divide_primary_domain_001": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "gate_primary_domain_001"
+  },
+  "select_reconvergent_domain_001": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_001",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_001": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_001"
+  },
+  "cell_output_domain_001": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_001"
+  },
+  "clock_domain_001_00": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "cell_output_domain_001"
+  },
+  "clock_domain_001_01": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "cell_output_domain_001"
+  },
+  "select_primary_domain_002": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_002": {
+    "kind": "gate",
+    "source": "select_primary_domain_002"
+  },
+  "divide_primary_domain_002": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "gate_primary_domain_002"
+  },
+  "select_reconvergent_domain_002": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_002",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_002": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_002"
+  },
+  "cell_output_domain_002": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_002"
+  },
+  "clock_domain_002_00": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "cell_output_domain_002"
+  },
+  "clock_domain_002_01": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "cell_output_domain_002"
+  },
+  "select_primary_domain_003": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_003": {
+    "kind": "gate",
+    "source": "select_primary_domain_003"
+  },
+  "divide_primary_domain_003": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "gate_primary_domain_003"
+  },
+  "select_reconvergent_domain_003": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_003",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_003": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_003"
+  },
+  "cell_output_domain_003": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_003"
+  },
+  "clock_domain_003_00": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "cell_output_domain_003"
+  },
+  "clock_domain_003_01": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "cell_output_domain_003"
+  },
+  "select_primary_domain_004": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_004": {
+    "kind": "gate",
+    "source": "select_primary_domain_004"
+  },
+  "divide_primary_domain_004": {
+    "kind": "div",
+    "ratio": "32",
+    "source": "gate_primary_domain_004"
+  },
+  "select_reconvergent_domain_004": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_004",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_004": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_004"
+  },
+  "cell_output_domain_004": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_004"
+  },
+  "clock_domain_004_00": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "cell_output_domain_004"
+  },
+  "clock_domain_004_01": {
+    "kind": "clock",
+    "freq": "150 MHz",
+    "source": "cell_output_domain_004"
+  },
+  "select_primary_domain_005": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_005": {
+    "kind": "gate",
+    "source": "select_primary_domain_005"
+  },
+  "divide_primary_domain_005": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "gate_primary_domain_005"
+  },
+  "select_reconvergent_domain_005": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_005",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_005": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_005"
+  },
+  "cell_output_domain_005": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_005"
+  },
+  "clock_domain_005_00": {
+    "kind": "clock",
+    "freq": "150 MHz",
+    "source": "cell_output_domain_005"
+  },
+  "clock_domain_005_01": {
+    "kind": "clock",
+    "freq": "175 MHz",
+    "source": "cell_output_domain_005"
+  },
+  "select_primary_domain_006": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_006": {
+    "kind": "gate",
+    "source": "select_primary_domain_006"
+  },
+  "divide_primary_domain_006": {
+    "kind": "div",
+    "ratio": "4",
+    "source": "gate_primary_domain_006"
+  },
+  "select_reconvergent_domain_006": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_006",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_006": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_006"
+  },
+  "cell_output_domain_006": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_006"
+  },
+  "clock_domain_006_00": {
+    "kind": "clock",
+    "freq": "175 MHz",
+    "source": "cell_output_domain_006"
+  },
+  "clock_domain_006_01": {
+    "kind": "clock",
+    "freq": "200 MHz",
+    "source": "cell_output_domain_006"
+  },
+  "select_primary_domain_007": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_007": {
+    "kind": "gate",
+    "source": "select_primary_domain_007"
+  },
+  "divide_primary_domain_007": {
+    "kind": "div_r",
+    "ratio": "8",
+    "source": "gate_primary_domain_007"
+  },
+  "select_reconvergent_domain_007": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_007",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_007": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_007"
+  },
+  "cell_output_domain_007": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_007"
+  },
+  "clock_domain_007_00": {
+    "kind": "clock",
+    "freq": "200 MHz",
+    "source": "cell_output_domain_007"
+  },
+  "clock_domain_007_01": {
+    "kind": "clock",
+    "freq": "225 MHz",
+    "source": "cell_output_domain_007"
+  },
+  "select_primary_domain_008": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_008": {
+    "kind": "gate",
+    "source": "select_primary_domain_008"
+  },
+  "divide_primary_domain_008": {
+    "kind": "div",
+    "ratio": "16",
+    "source": "gate_primary_domain_008"
+  },
+  "select_reconvergent_domain_008": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_008",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_008": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_008"
+  },
+  "cell_output_domain_008": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_008"
+  },
+  "clock_domain_008_00": {
+    "kind": "clock",
+    "freq": "225 MHz",
+    "source": "cell_output_domain_008"
+  },
+  "clock_domain_008_01": {
+    "kind": "clock",
+    "freq": "250 MHz",
+    "source": "cell_output_domain_008"
+  },
+  "select_primary_domain_009": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_009": {
+    "kind": "gate",
+    "source": "select_primary_domain_009"
+  },
+  "divide_primary_domain_009": {
+    "kind": "div_r",
+    "ratio": "32",
+    "source": "gate_primary_domain_009"
+  },
+  "select_reconvergent_domain_009": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_009",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_009": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_009"
+  },
+  "cell_output_domain_009": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_009"
+  },
+  "clock_domain_009_00": {
+    "kind": "clock",
+    "freq": "250 MHz",
+    "source": "cell_output_domain_009"
+  },
+  "clock_domain_009_01": {
+    "kind": "clock",
+    "freq": "275 MHz",
+    "source": "cell_output_domain_009"
+  },
+  "select_primary_domain_010": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_010": {
+    "kind": "gate",
+    "source": "select_primary_domain_010"
+  },
+  "divide_primary_domain_010": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "gate_primary_domain_010"
+  },
+  "select_reconvergent_domain_010": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_010",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_010": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_010"
+  },
+  "cell_output_domain_010": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_010"
+  },
+  "clock_domain_010_00": {
+    "kind": "clock",
+    "freq": "275 MHz",
+    "source": "cell_output_domain_010"
+  },
+  "clock_domain_010_01": {
+    "kind": "clock",
+    "freq": "300 MHz",
+    "source": "cell_output_domain_010"
+  },
+  "select_primary_domain_011": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_011": {
+    "kind": "gate",
+    "source": "select_primary_domain_011"
+  },
+  "divide_primary_domain_011": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "gate_primary_domain_011"
+  },
+  "select_reconvergent_domain_011": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_011",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_011": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_011"
+  },
+  "cell_output_domain_011": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_011"
+  },
+  "clock_domain_011_00": {
+    "kind": "clock",
+    "freq": "300 MHz",
+    "source": "cell_output_domain_011"
+  },
+  "clock_domain_011_01": {
+    "kind": "clock",
+    "freq": "325 MHz",
+    "source": "cell_output_domain_011"
+  },
+  "select_primary_domain_012": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_012": {
+    "kind": "gate",
+    "source": "select_primary_domain_012"
+  },
+  "divide_primary_domain_012": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "gate_primary_domain_012"
+  },
+  "select_reconvergent_domain_012": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_012",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_012": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_012"
+  },
+  "cell_output_domain_012": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_012"
+  },
+  "clock_domain_012_00": {
+    "kind": "clock",
+    "freq": "325 MHz",
+    "source": "cell_output_domain_012"
+  },
+  "clock_domain_012_01": {
+    "kind": "clock",
+    "freq": "350 MHz",
+    "source": "cell_output_domain_012"
+  },
+  "select_primary_domain_013": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_013": {
+    "kind": "gate",
+    "source": "select_primary_domain_013"
+  },
+  "divide_primary_domain_013": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "gate_primary_domain_013"
+  },
+  "select_reconvergent_domain_013": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_013",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_013": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_013"
+  },
+  "cell_output_domain_013": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_013"
+  },
+  "clock_domain_013_00": {
+    "kind": "clock",
+    "freq": "350 MHz",
+    "source": "cell_output_domain_013"
+  },
+  "clock_domain_013_01": {
+    "kind": "clock",
+    "freq": "375 MHz",
+    "source": "cell_output_domain_013"
+  },
+  "select_primary_domain_014": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_014": {
+    "kind": "gate",
+    "source": "select_primary_domain_014"
+  },
+  "divide_primary_domain_014": {
+    "kind": "div",
+    "ratio": "32",
+    "source": "gate_primary_domain_014"
+  },
+  "select_reconvergent_domain_014": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_014",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_014": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_014"
+  },
+  "cell_output_domain_014": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_014"
+  },
+  "clock_domain_014_00": {
+    "kind": "clock",
+    "freq": "375 MHz",
+    "source": "cell_output_domain_014"
+  },
+  "clock_domain_014_01": {
+    "kind": "clock",
+    "freq": "400 MHz",
+    "source": "cell_output_domain_014"
+  },
+  "select_primary_domain_015": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_015": {
+    "kind": "gate",
+    "source": "select_primary_domain_015"
+  },
+  "divide_primary_domain_015": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "gate_primary_domain_015"
+  },
+  "select_reconvergent_domain_015": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_015",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_015": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_015"
+  },
+  "cell_output_domain_015": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_015"
+  },
+  "clock_domain_015_00": {
+    "kind": "clock",
+    "freq": "400 MHz",
+    "source": "cell_output_domain_015"
+  },
+  "clock_domain_015_01": {
+    "kind": "clock",
+    "freq": "425 MHz",
+    "source": "cell_output_domain_015"
+  },
+  "select_primary_domain_016": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_016": {
+    "kind": "gate",
+    "source": "select_primary_domain_016"
+  },
+  "divide_primary_domain_016": {
+    "kind": "div",
+    "ratio": "4",
+    "source": "gate_primary_domain_016"
+  },
+  "select_reconvergent_domain_016": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_016",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_016": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_016"
+  },
+  "cell_output_domain_016": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_016"
+  },
+  "clock_domain_016_00": {
+    "kind": "clock",
+    "freq": "425 MHz",
+    "source": "cell_output_domain_016"
+  },
+  "clock_domain_016_01": {
+    "kind": "clock",
+    "freq": "450 MHz",
+    "source": "cell_output_domain_016"
+  },
+  "select_primary_domain_017": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_017": {
+    "kind": "gate",
+    "source": "select_primary_domain_017"
+  },
+  "divide_primary_domain_017": {
+    "kind": "div_r",
+    "ratio": "8",
+    "source": "gate_primary_domain_017"
+  },
+  "select_reconvergent_domain_017": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_017",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_017": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_017"
+  },
+  "cell_output_domain_017": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_017"
+  },
+  "clock_domain_017_00": {
+    "kind": "clock",
+    "freq": "450 MHz",
+    "source": "cell_output_domain_017"
+  },
+  "clock_domain_017_01": {
+    "kind": "clock",
+    "freq": "475 MHz",
+    "source": "cell_output_domain_017"
+  },
+  "select_primary_domain_018": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_018": {
+    "kind": "gate",
+    "source": "select_primary_domain_018"
+  },
+  "divide_primary_domain_018": {
+    "kind": "div",
+    "ratio": "16",
+    "source": "gate_primary_domain_018"
+  },
+  "select_reconvergent_domain_018": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_018",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_018": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_018"
+  },
+  "cell_output_domain_018": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_018"
+  },
+  "clock_domain_018_00": {
+    "kind": "clock",
+    "freq": "475 MHz",
+    "source": "cell_output_domain_018"
+  },
+  "clock_domain_018_01": {
+    "kind": "clock",
+    "freq": "500 MHz",
+    "source": "cell_output_domain_018"
+  },
+  "select_primary_domain_019": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_019": {
+    "kind": "gate",
+    "source": "select_primary_domain_019"
+  },
+  "divide_primary_domain_019": {
+    "kind": "div_r",
+    "ratio": "32",
+    "source": "gate_primary_domain_019"
+  },
+  "select_reconvergent_domain_019": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_019",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_019": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_019"
+  },
+  "cell_output_domain_019": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_019"
+  },
+  "clock_domain_019_00": {
+    "kind": "clock",
+    "freq": "500 MHz",
+    "source": "cell_output_domain_019"
+  },
+  "clock_domain_019_01": {
+    "kind": "clock",
+    "freq": "525 MHz",
+    "source": "cell_output_domain_019"
+  },
+  "select_primary_domain_020": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_020": {
+    "kind": "gate",
+    "source": "select_primary_domain_020"
+  },
+  "divide_primary_domain_020": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "gate_primary_domain_020"
+  },
+  "select_reconvergent_domain_020": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_020",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_020": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_020"
+  },
+  "cell_output_domain_020": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_020"
+  },
+  "clock_domain_020_00": {
+    "kind": "clock",
+    "freq": "525 MHz",
+    "source": "cell_output_domain_020"
+  },
+  "clock_domain_020_01": {
+    "kind": "clock",
+    "freq": "550 MHz",
+    "source": "cell_output_domain_020"
+  },
+  "select_primary_domain_021": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_021": {
+    "kind": "gate",
+    "source": "select_primary_domain_021"
+  },
+  "divide_primary_domain_021": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "gate_primary_domain_021"
+  },
+  "select_reconvergent_domain_021": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_021",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_021": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_021"
+  },
+  "cell_output_domain_021": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_021"
+  },
+  "clock_domain_021_00": {
+    "kind": "clock",
+    "freq": "550 MHz",
+    "source": "cell_output_domain_021"
+  },
+  "clock_domain_021_01": {
+    "kind": "clock",
+    "freq": "575 MHz",
+    "source": "cell_output_domain_021"
+  },
+  "select_primary_domain_022": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_022": {
+    "kind": "gate",
+    "source": "select_primary_domain_022"
+  },
+  "divide_primary_domain_022": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "gate_primary_domain_022"
+  },
+  "select_reconvergent_domain_022": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_022",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_022": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_022"
+  },
+  "cell_output_domain_022": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_022"
+  },
+  "clock_domain_022_00": {
+    "kind": "clock",
+    "freq": "575 MHz",
+    "source": "cell_output_domain_022"
+  },
+  "clock_domain_022_01": {
+    "kind": "clock",
+    "freq": "600 MHz",
+    "source": "cell_output_domain_022"
+  },
+  "select_primary_domain_023": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_023": {
+    "kind": "gate",
+    "source": "select_primary_domain_023"
+  },
+  "divide_primary_domain_023": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "gate_primary_domain_023"
+  },
+  "select_reconvergent_domain_023": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_023",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_023": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_023"
+  },
+  "cell_output_domain_023": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_023"
+  },
+  "clock_domain_023_00": {
+    "kind": "clock",
+    "freq": "600 MHz",
+    "source": "cell_output_domain_023"
+  },
+  "clock_domain_023_01": {
+    "kind": "clock",
+    "freq": "625 MHz",
+    "source": "cell_output_domain_023"
+  },
+  "select_primary_domain_024": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_024": {
+    "kind": "gate",
+    "source": "select_primary_domain_024"
+  },
+  "divide_primary_domain_024": {
+    "kind": "div",
+    "ratio": "32",
+    "source": "gate_primary_domain_024"
+  },
+  "select_reconvergent_domain_024": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_024",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_024": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_024"
+  },
+  "cell_output_domain_024": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_024"
+  },
+  "clock_domain_024_00": {
+    "kind": "clock",
+    "freq": "625 MHz",
+    "source": "cell_output_domain_024"
+  },
+  "clock_domain_024_01": {
+    "kind": "clock",
+    "freq": "650 MHz",
+    "source": "cell_output_domain_024"
+  },
+  "select_primary_domain_025": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_025": {
+    "kind": "gate",
+    "source": "select_primary_domain_025"
+  },
+  "divide_primary_domain_025": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "gate_primary_domain_025"
+  },
+  "select_reconvergent_domain_025": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_025",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_025": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_025"
+  },
+  "cell_output_domain_025": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_025"
+  },
+  "clock_domain_025_00": {
+    "kind": "clock",
+    "freq": "650 MHz",
+    "source": "cell_output_domain_025"
+  },
+  "clock_domain_025_01": {
+    "kind": "clock",
+    "freq": "675 MHz",
+    "source": "cell_output_domain_025"
+  },
+  "select_primary_domain_026": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_026": {
+    "kind": "gate",
+    "source": "select_primary_domain_026"
+  },
+  "divide_primary_domain_026": {
+    "kind": "div",
+    "ratio": "4",
+    "source": "gate_primary_domain_026"
+  },
+  "select_reconvergent_domain_026": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_026",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_026": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_026"
+  },
+  "cell_output_domain_026": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_026"
+  },
+  "clock_domain_026_00": {
+    "kind": "clock",
+    "freq": "675 MHz",
+    "source": "cell_output_domain_026"
+  },
+  "clock_domain_026_01": {
+    "kind": "clock",
+    "freq": "700 MHz",
+    "source": "cell_output_domain_026"
+  },
+  "select_primary_domain_027": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_027": {
+    "kind": "gate",
+    "source": "select_primary_domain_027"
+  },
+  "divide_primary_domain_027": {
+    "kind": "div_r",
+    "ratio": "8",
+    "source": "gate_primary_domain_027"
+  },
+  "select_reconvergent_domain_027": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_027",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_027": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_027"
+  },
+  "cell_output_domain_027": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_027"
+  },
+  "clock_domain_027_00": {
+    "kind": "clock",
+    "freq": "700 MHz",
+    "source": "cell_output_domain_027"
+  },
+  "clock_domain_027_01": {
+    "kind": "clock",
+    "freq": "725 MHz",
+    "source": "cell_output_domain_027"
+  },
+  "select_primary_domain_028": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_028": {
+    "kind": "gate",
+    "source": "select_primary_domain_028"
+  },
+  "divide_primary_domain_028": {
+    "kind": "div",
+    "ratio": "16",
+    "source": "gate_primary_domain_028"
+  },
+  "select_reconvergent_domain_028": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_028",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_028": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_028"
+  },
+  "cell_output_domain_028": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_028"
+  },
+  "clock_domain_028_00": {
+    "kind": "clock",
+    "freq": "725 MHz",
+    "source": "cell_output_domain_028"
+  },
+  "clock_domain_028_01": {
+    "kind": "clock",
+    "freq": "750 MHz",
+    "source": "cell_output_domain_028"
+  },
+  "select_primary_domain_029": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_029": {
+    "kind": "gate",
+    "source": "select_primary_domain_029"
+  },
+  "divide_primary_domain_029": {
+    "kind": "div_r",
+    "ratio": "32",
+    "source": "gate_primary_domain_029"
+  },
+  "select_reconvergent_domain_029": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_029",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_029": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_029"
+  },
+  "cell_output_domain_029": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_029"
+  },
+  "clock_domain_029_00": {
+    "kind": "clock",
+    "freq": "750 MHz",
+    "source": "cell_output_domain_029"
+  },
+  "clock_domain_029_01": {
+    "kind": "clock",
+    "freq": "775 MHz",
+    "source": "cell_output_domain_029"
+  },
+  "select_primary_domain_030": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_030": {
+    "kind": "gate",
+    "source": "select_primary_domain_030"
+  },
+  "divide_primary_domain_030": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "gate_primary_domain_030"
+  },
+  "select_reconvergent_domain_030": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_030",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_030": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_030"
+  },
+  "cell_output_domain_030": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_030"
+  },
+  "clock_domain_030_00": {
+    "kind": "clock",
+    "freq": "775 MHz",
+    "source": "cell_output_domain_030"
+  },
+  "clock_domain_030_01": {
+    "kind": "clock",
+    "freq": "800 MHz",
+    "source": "cell_output_domain_030"
+  },
+  "select_primary_domain_031": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_031": {
+    "kind": "gate",
+    "source": "select_primary_domain_031"
+  },
+  "divide_primary_domain_031": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "gate_primary_domain_031"
+  },
+  "select_reconvergent_domain_031": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_031",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_031": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_031"
+  },
+  "cell_output_domain_031": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_031"
+  },
+  "clock_domain_031_00": {
+    "kind": "clock",
+    "freq": "800 MHz",
+    "source": "cell_output_domain_031"
+  },
+  "clock_domain_031_01": {
+    "kind": "clock",
+    "freq": "25 MHz",
+    "source": "cell_output_domain_031"
+  },
+  "select_primary_domain_032": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_032": {
+    "kind": "gate",
+    "source": "select_primary_domain_032"
+  },
+  "divide_primary_domain_032": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "gate_primary_domain_032"
+  },
+  "select_reconvergent_domain_032": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_032",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_032": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_032"
+  },
+  "cell_output_domain_032": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_032"
+  },
+  "clock_domain_032_00": {
+    "kind": "clock",
+    "freq": "25 MHz",
+    "source": "cell_output_domain_032"
+  },
+  "clock_domain_032_01": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "cell_output_domain_032"
+  },
+  "select_primary_domain_033": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_033": {
+    "kind": "gate",
+    "source": "select_primary_domain_033"
+  },
+  "divide_primary_domain_033": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "gate_primary_domain_033"
+  },
+  "select_reconvergent_domain_033": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_033",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_033": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_033"
+  },
+  "cell_output_domain_033": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_033"
+  },
+  "clock_domain_033_00": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "cell_output_domain_033"
+  },
+  "clock_domain_033_01": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "cell_output_domain_033"
+  },
+  "select_primary_domain_034": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_034": {
+    "kind": "gate",
+    "source": "select_primary_domain_034"
+  },
+  "divide_primary_domain_034": {
+    "kind": "div",
+    "ratio": "32",
+    "source": "gate_primary_domain_034"
+  },
+  "select_reconvergent_domain_034": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_034",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_034": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_034"
+  },
+  "cell_output_domain_034": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_034"
+  },
+  "clock_domain_034_00": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "cell_output_domain_034"
+  },
+  "clock_domain_034_01": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "cell_output_domain_034"
+  },
+  "select_primary_domain_035": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_035": {
+    "kind": "gate",
+    "source": "select_primary_domain_035"
+  },
+  "divide_primary_domain_035": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "gate_primary_domain_035"
+  },
+  "select_reconvergent_domain_035": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_035",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_035": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_035"
+  },
+  "cell_output_domain_035": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_035"
+  },
+  "clock_domain_035_00": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "cell_output_domain_035"
+  },
+  "clock_domain_035_01": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "cell_output_domain_035"
+  },
+  "select_primary_domain_036": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_036": {
+    "kind": "gate",
+    "source": "select_primary_domain_036"
+  },
+  "divide_primary_domain_036": {
+    "kind": "div",
+    "ratio": "4",
+    "source": "gate_primary_domain_036"
+  },
+  "select_reconvergent_domain_036": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_036",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_036": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_036"
+  },
+  "cell_output_domain_036": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_036"
+  },
+  "clock_domain_036_00": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "cell_output_domain_036"
+  },
+  "clock_domain_036_01": {
+    "kind": "clock",
+    "freq": "150 MHz",
+    "source": "cell_output_domain_036"
+  },
+  "select_primary_domain_037": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_037": {
+    "kind": "gate",
+    "source": "select_primary_domain_037"
+  },
+  "divide_primary_domain_037": {
+    "kind": "div_r",
+    "ratio": "8",
+    "source": "gate_primary_domain_037"
+  },
+  "select_reconvergent_domain_037": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_037",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_037": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_037"
+  },
+  "cell_output_domain_037": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_037"
+  },
+  "clock_domain_037_00": {
+    "kind": "clock",
+    "freq": "150 MHz",
+    "source": "cell_output_domain_037"
+  },
+  "clock_domain_037_01": {
+    "kind": "clock",
+    "freq": "175 MHz",
+    "source": "cell_output_domain_037"
+  },
+  "select_primary_domain_038": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_038": {
+    "kind": "gate",
+    "source": "select_primary_domain_038"
+  },
+  "divide_primary_domain_038": {
+    "kind": "div",
+    "ratio": "16",
+    "source": "gate_primary_domain_038"
+  },
+  "select_reconvergent_domain_038": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_038",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_038": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_038"
+  },
+  "cell_output_domain_038": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_038"
+  },
+  "clock_domain_038_00": {
+    "kind": "clock",
+    "freq": "175 MHz",
+    "source": "cell_output_domain_038"
+  },
+  "clock_domain_038_01": {
+    "kind": "clock",
+    "freq": "200 MHz",
+    "source": "cell_output_domain_038"
+  },
+  "select_primary_domain_039": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_039": {
+    "kind": "gate",
+    "source": "select_primary_domain_039"
+  },
+  "divide_primary_domain_039": {
+    "kind": "div_r",
+    "ratio": "32",
+    "source": "gate_primary_domain_039"
+  },
+  "select_reconvergent_domain_039": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_039",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_039": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_039"
+  },
+  "cell_output_domain_039": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_039"
+  },
+  "clock_domain_039_00": {
+    "kind": "clock",
+    "freq": "200 MHz",
+    "source": "cell_output_domain_039"
+  },
+  "clock_domain_039_01": {
+    "kind": "clock",
+    "freq": "225 MHz",
+    "source": "cell_output_domain_039"
+  },
+  "select_primary_domain_040": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_040": {
+    "kind": "gate",
+    "source": "select_primary_domain_040"
+  },
+  "divide_primary_domain_040": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "gate_primary_domain_040"
+  },
+  "select_reconvergent_domain_040": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_040",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_040": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_040"
+  },
+  "cell_output_domain_040": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_040"
+  },
+  "clock_domain_040_00": {
+    "kind": "clock",
+    "freq": "225 MHz",
+    "source": "cell_output_domain_040"
+  },
+  "clock_domain_040_01": {
+    "kind": "clock",
+    "freq": "250 MHz",
+    "source": "cell_output_domain_040"
+  },
+  "select_primary_domain_041": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_041": {
+    "kind": "gate",
+    "source": "select_primary_domain_041"
+  },
+  "divide_primary_domain_041": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "gate_primary_domain_041"
+  },
+  "select_reconvergent_domain_041": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_041",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_041": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_041"
+  },
+  "cell_output_domain_041": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_041"
+  },
+  "clock_domain_041_00": {
+    "kind": "clock",
+    "freq": "250 MHz",
+    "source": "cell_output_domain_041"
+  },
+  "clock_domain_041_01": {
+    "kind": "clock",
+    "freq": "275 MHz",
+    "source": "cell_output_domain_041"
+  },
+  "select_primary_domain_042": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_042": {
+    "kind": "gate",
+    "source": "select_primary_domain_042"
+  },
+  "divide_primary_domain_042": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "gate_primary_domain_042"
+  },
+  "select_reconvergent_domain_042": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_042",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_042": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_042"
+  },
+  "cell_output_domain_042": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_042"
+  },
+  "clock_domain_042_00": {
+    "kind": "clock",
+    "freq": "275 MHz",
+    "source": "cell_output_domain_042"
+  },
+  "clock_domain_042_01": {
+    "kind": "clock",
+    "freq": "300 MHz",
+    "source": "cell_output_domain_042"
+  },
+  "select_primary_domain_043": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_043": {
+    "kind": "gate",
+    "source": "select_primary_domain_043"
+  },
+  "divide_primary_domain_043": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "gate_primary_domain_043"
+  },
+  "select_reconvergent_domain_043": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_043",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_043": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_043"
+  },
+  "cell_output_domain_043": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_043"
+  },
+  "clock_domain_043_00": {
+    "kind": "clock",
+    "freq": "300 MHz",
+    "source": "cell_output_domain_043"
+  },
+  "clock_domain_043_01": {
+    "kind": "clock",
+    "freq": "325 MHz",
+    "source": "cell_output_domain_043"
+  },
+  "select_primary_domain_044": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_044": {
+    "kind": "gate",
+    "source": "select_primary_domain_044"
+  },
+  "divide_primary_domain_044": {
+    "kind": "div",
+    "ratio": "32",
+    "source": "gate_primary_domain_044"
+  },
+  "select_reconvergent_domain_044": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_044",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_044": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_044"
+  },
+  "cell_output_domain_044": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_044"
+  },
+  "clock_domain_044_00": {
+    "kind": "clock",
+    "freq": "325 MHz",
+    "source": "cell_output_domain_044"
+  },
+  "clock_domain_044_01": {
+    "kind": "clock",
+    "freq": "350 MHz",
+    "source": "cell_output_domain_044"
+  },
+  "select_primary_domain_045": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_045": {
+    "kind": "gate",
+    "source": "select_primary_domain_045"
+  },
+  "divide_primary_domain_045": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "gate_primary_domain_045"
+  },
+  "select_reconvergent_domain_045": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_045",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_045": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_045"
+  },
+  "cell_output_domain_045": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_045"
+  },
+  "clock_domain_045_00": {
+    "kind": "clock",
+    "freq": "350 MHz",
+    "source": "cell_output_domain_045"
+  },
+  "clock_domain_045_01": {
+    "kind": "clock",
+    "freq": "375 MHz",
+    "source": "cell_output_domain_045"
+  },
+  "select_primary_domain_046": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_046": {
+    "kind": "gate",
+    "source": "select_primary_domain_046"
+  },
+  "divide_primary_domain_046": {
+    "kind": "div",
+    "ratio": "4",
+    "source": "gate_primary_domain_046"
+  },
+  "select_reconvergent_domain_046": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_046",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_046": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_046"
+  },
+  "cell_output_domain_046": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_046"
+  },
+  "clock_domain_046_00": {
+    "kind": "clock",
+    "freq": "375 MHz",
+    "source": "cell_output_domain_046"
+  },
+  "clock_domain_046_01": {
+    "kind": "clock",
+    "freq": "400 MHz",
+    "source": "cell_output_domain_046"
+  },
+  "select_primary_domain_047": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_047": {
+    "kind": "gate",
+    "source": "select_primary_domain_047"
+  },
+  "divide_primary_domain_047": {
+    "kind": "div_r",
+    "ratio": "8",
+    "source": "gate_primary_domain_047"
+  },
+  "select_reconvergent_domain_047": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_047",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_047": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_047"
+  },
+  "cell_output_domain_047": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_047"
+  },
+  "clock_domain_047_00": {
+    "kind": "clock",
+    "freq": "400 MHz",
+    "source": "cell_output_domain_047"
+  },
+  "clock_domain_047_01": {
+    "kind": "clock",
+    "freq": "425 MHz",
+    "source": "cell_output_domain_047"
+  },
+  "select_primary_domain_048": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_048": {
+    "kind": "gate",
+    "source": "select_primary_domain_048"
+  },
+  "divide_primary_domain_048": {
+    "kind": "div",
+    "ratio": "16",
+    "source": "gate_primary_domain_048"
+  },
+  "select_reconvergent_domain_048": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_048",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_048": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_048"
+  },
+  "cell_output_domain_048": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_048"
+  },
+  "clock_domain_048_00": {
+    "kind": "clock",
+    "freq": "425 MHz",
+    "source": "cell_output_domain_048"
+  },
+  "clock_domain_048_01": {
+    "kind": "clock",
+    "freq": "450 MHz",
+    "source": "cell_output_domain_048"
+  },
+  "select_primary_domain_049": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_049": {
+    "kind": "gate",
+    "source": "select_primary_domain_049"
+  },
+  "divide_primary_domain_049": {
+    "kind": "div_r",
+    "ratio": "32",
+    "source": "gate_primary_domain_049"
+  },
+  "select_reconvergent_domain_049": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_049",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_049": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_049"
+  },
+  "cell_output_domain_049": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_049"
+  },
+  "clock_domain_049_00": {
+    "kind": "clock",
+    "freq": "450 MHz",
+    "source": "cell_output_domain_049"
+  },
+  "clock_domain_049_01": {
+    "kind": "clock",
+    "freq": "475 MHz",
+    "source": "cell_output_domain_049"
+  },
+  "select_primary_domain_050": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_050": {
+    "kind": "gate",
+    "source": "select_primary_domain_050"
+  },
+  "divide_primary_domain_050": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "gate_primary_domain_050"
+  },
+  "select_reconvergent_domain_050": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_050",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_050": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_050"
+  },
+  "cell_output_domain_050": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_050"
+  },
+  "clock_domain_050_00": {
+    "kind": "clock",
+    "freq": "475 MHz",
+    "source": "cell_output_domain_050"
+  },
+  "clock_domain_050_01": {
+    "kind": "clock",
+    "freq": "500 MHz",
+    "source": "cell_output_domain_050"
+  },
+  "select_primary_domain_051": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_051": {
+    "kind": "gate",
+    "source": "select_primary_domain_051"
+  },
+  "divide_primary_domain_051": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "gate_primary_domain_051"
+  },
+  "select_reconvergent_domain_051": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_051",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_051": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_051"
+  },
+  "cell_output_domain_051": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_051"
+  },
+  "clock_domain_051_00": {
+    "kind": "clock",
+    "freq": "500 MHz",
+    "source": "cell_output_domain_051"
+  },
+  "clock_domain_051_01": {
+    "kind": "clock",
+    "freq": "525 MHz",
+    "source": "cell_output_domain_051"
+  },
+  "select_primary_domain_052": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_052": {
+    "kind": "gate",
+    "source": "select_primary_domain_052"
+  },
+  "divide_primary_domain_052": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "gate_primary_domain_052"
+  },
+  "select_reconvergent_domain_052": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_052",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_052": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_052"
+  },
+  "cell_output_domain_052": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_052"
+  },
+  "clock_domain_052_00": {
+    "kind": "clock",
+    "freq": "525 MHz",
+    "source": "cell_output_domain_052"
+  },
+  "clock_domain_052_01": {
+    "kind": "clock",
+    "freq": "550 MHz",
+    "source": "cell_output_domain_052"
+  },
+  "select_primary_domain_053": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_053": {
+    "kind": "gate",
+    "source": "select_primary_domain_053"
+  },
+  "divide_primary_domain_053": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "gate_primary_domain_053"
+  },
+  "select_reconvergent_domain_053": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_053",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_053": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_053"
+  },
+  "cell_output_domain_053": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_053"
+  },
+  "clock_domain_053_00": {
+    "kind": "clock",
+    "freq": "550 MHz",
+    "source": "cell_output_domain_053"
+  },
+  "clock_domain_053_01": {
+    "kind": "clock",
+    "freq": "575 MHz",
+    "source": "cell_output_domain_053"
+  },
+  "select_primary_domain_054": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_054": {
+    "kind": "gate",
+    "source": "select_primary_domain_054"
+  },
+  "divide_primary_domain_054": {
+    "kind": "div",
+    "ratio": "32",
+    "source": "gate_primary_domain_054"
+  },
+  "select_reconvergent_domain_054": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_054",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_054": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_054"
+  },
+  "cell_output_domain_054": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_054"
+  },
+  "clock_domain_054_00": {
+    "kind": "clock",
+    "freq": "575 MHz",
+    "source": "cell_output_domain_054"
+  },
+  "clock_domain_054_01": {
+    "kind": "clock",
+    "freq": "600 MHz",
+    "source": "cell_output_domain_054"
+  },
+  "select_primary_domain_055": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_055": {
+    "kind": "gate",
+    "source": "select_primary_domain_055"
+  },
+  "divide_primary_domain_055": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "gate_primary_domain_055"
+  },
+  "select_reconvergent_domain_055": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_055",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_055": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_055"
+  },
+  "cell_output_domain_055": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_055"
+  },
+  "clock_domain_055_00": {
+    "kind": "clock",
+    "freq": "600 MHz",
+    "source": "cell_output_domain_055"
+  },
+  "clock_domain_055_01": {
+    "kind": "clock",
+    "freq": "625 MHz",
+    "source": "cell_output_domain_055"
+  },
+  "select_primary_domain_056": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_056": {
+    "kind": "gate",
+    "source": "select_primary_domain_056"
+  },
+  "divide_primary_domain_056": {
+    "kind": "div",
+    "ratio": "4",
+    "source": "gate_primary_domain_056"
+  },
+  "select_reconvergent_domain_056": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_056",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_056": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_056"
+  },
+  "cell_output_domain_056": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_056"
+  },
+  "clock_domain_056_00": {
+    "kind": "clock",
+    "freq": "625 MHz",
+    "source": "cell_output_domain_056"
+  },
+  "clock_domain_056_01": {
+    "kind": "clock",
+    "freq": "650 MHz",
+    "source": "cell_output_domain_056"
+  },
+  "select_primary_domain_057": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_057": {
+    "kind": "gate",
+    "source": "select_primary_domain_057"
+  },
+  "divide_primary_domain_057": {
+    "kind": "div_r",
+    "ratio": "8",
+    "source": "gate_primary_domain_057"
+  },
+  "select_reconvergent_domain_057": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_057",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_057": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_057"
+  },
+  "cell_output_domain_057": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_057"
+  },
+  "clock_domain_057_00": {
+    "kind": "clock",
+    "freq": "650 MHz",
+    "source": "cell_output_domain_057"
+  },
+  "clock_domain_057_01": {
+    "kind": "clock",
+    "freq": "675 MHz",
+    "source": "cell_output_domain_057"
+  },
+  "select_primary_domain_058": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_058": {
+    "kind": "gate",
+    "source": "select_primary_domain_058"
+  },
+  "divide_primary_domain_058": {
+    "kind": "div",
+    "ratio": "16",
+    "source": "gate_primary_domain_058"
+  },
+  "select_reconvergent_domain_058": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_058",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_058": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_058"
+  },
+  "cell_output_domain_058": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_058"
+  },
+  "clock_domain_058_00": {
+    "kind": "clock",
+    "freq": "675 MHz",
+    "source": "cell_output_domain_058"
+  },
+  "clock_domain_058_01": {
+    "kind": "clock",
+    "freq": "700 MHz",
+    "source": "cell_output_domain_058"
+  },
+  "select_primary_domain_059": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_059": {
+    "kind": "gate",
+    "source": "select_primary_domain_059"
+  },
+  "divide_primary_domain_059": {
+    "kind": "div_r",
+    "ratio": "32",
+    "source": "gate_primary_domain_059"
+  },
+  "select_reconvergent_domain_059": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_059",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_059": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_059"
+  },
+  "cell_output_domain_059": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_059"
+  },
+  "clock_domain_059_00": {
+    "kind": "clock",
+    "freq": "700 MHz",
+    "source": "cell_output_domain_059"
+  },
+  "clock_domain_059_01": {
+    "kind": "clock",
+    "freq": "725 MHz",
+    "source": "cell_output_domain_059"
+  },
+  "select_primary_domain_060": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_domain_060": {
+    "kind": "gate",
+    "source": "select_primary_domain_060"
+  },
+  "divide_primary_domain_060": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "gate_primary_domain_060"
+  },
+  "select_reconvergent_domain_060": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_060",
+      "1": "ref_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_domain_060": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_060"
+  },
+  "cell_output_domain_060": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_060"
+  },
+  "clock_domain_060_00": {
+    "kind": "clock",
+    "freq": "725 MHz",
+    "source": "cell_output_domain_060"
+  },
+  "clock_domain_060_01": {
+    "kind": "clock",
+    "freq": "750 MHz",
+    "source": "cell_output_domain_060"
+  },
+  "select_primary_domain_061": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_domain_061": {
+    "kind": "gate",
+    "source": "select_primary_domain_061"
+  },
+  "divide_primary_domain_061": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "gate_primary_domain_061"
+  },
+  "select_reconvergent_domain_061": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_061",
+      "1": "ref_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_domain_061": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_061"
+  },
+  "cell_output_domain_061": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_domain_061"
+  },
+  "clock_domain_061_00": {
+    "kind": "clock",
+    "freq": "750 MHz",
+    "source": "cell_output_domain_061"
+  },
+  "clock_domain_061_01": {
+    "kind": "clock",
+    "freq": "775 MHz",
+    "source": "cell_output_domain_061"
+  },
+  "select_primary_domain_062": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_domain_062": {
+    "kind": "gate",
+    "source": "select_primary_domain_062"
+  },
+  "divide_primary_domain_062": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "gate_primary_domain_062"
+  },
+  "select_reconvergent_domain_062": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_062",
+      "1": "ref_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_domain_062": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_062"
+  },
+  "cell_output_domain_062": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_domain_062"
+  },
+  "clock_domain_062_00": {
+    "kind": "clock",
+    "freq": "775 MHz",
+    "source": "cell_output_domain_062"
+  },
+  "clock_domain_062_01": {
+    "kind": "clock",
+    "freq": "800 MHz",
+    "source": "cell_output_domain_062"
+  },
+  "select_primary_domain_063": {
+    "kind": "mux3",
+    "source": {
+      "0": "ref_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_domain_063": {
+    "kind": "gate",
+    "source": "select_primary_domain_063"
+  },
+  "divide_primary_domain_063": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "gate_primary_domain_063"
+  },
+  "select_reconvergent_domain_063": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_domain_063",
+      "1": "ref_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_domain_063": {
+    "kind": "dto",
+    "source": "select_reconvergent_domain_063"
+  },
+  "cell_output_domain_063": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_domain_063"
+  },
+  "clock_domain_063_00": {
+    "kind": "clock",
+    "freq": "800 MHz",
+    "source": "cell_output_domain_063"
+  },
+  "clock_domain_063_01": {
+    "kind": "clock",
+    "freq": "25 MHz",
+    "source": "cell_output_domain_063"
+  }
+}

@@ -95,6 +95,86 @@ def build_dual_from_reuse(branch_count: int = 16) -> dict[str, dict[str, object]
     return config
 
 
+def build_adversarial_weave(
+    domain_count: int,
+    *,
+    clocks_per_domain: int,
+    long_names: bool = False,
+) -> dict[str, dict[str, object]]:
+    """Cross-root, multi-stage mux network with deliberately permuted reuse."""
+    root_names = [
+        (
+            f"reference_clock_source_with_long_instance_name_{index}"
+            if long_names
+            else f"ref_{index}"
+        )
+        for index in range(4)
+    ]
+    config: dict[str, dict[str, object]] = {
+        name: {"kind": "source", "source_kind": "source"}
+        for name in root_names
+    }
+    pll_names: list[str] = []
+    for index in range(4):
+        name = f"pll_dual_{index}"
+        pll_names.append(name)
+        config[name] = {
+            "kind": "pll2",
+            "pll_kind": "INNO",
+            "source": root_names[(index * 3) % len(root_names)],
+        }
+
+    cell_kinds = ("occ_clk_cell", "gen_cell", "bist_clk_cell")
+    for domain in range(domain_count):
+        suffix = f"{domain:03d}"
+        label = (
+            f"subsystem_clock_domain_with_long_instance_name_{suffix}"
+            if long_names
+            else f"domain_{suffix}"
+        )
+        select_a = f"select_primary_{label}"
+        gate_a = f"gate_primary_{label}"
+        divide = f"divide_primary_{label}"
+        select_b = f"select_reconvergent_{label}"
+        dto = f"dto_trim_{label}"
+        cell = f"cell_output_{label}"
+        config[select_a] = {
+            "kind": "mux3",
+            "source": {
+                "0": root_names[(domain * 3) % 4],
+                "1": f"{pll_names[(domain + 1) % 4]}[0]",
+                "2": f"{pll_names[(domain * 3 + 2) % 4]}[1]",
+            },
+        }
+        config[gate_a] = {"kind": "gate", "source": select_a}
+        config[divide] = {
+            "kind": "div_r" if domain % 2 else "div",
+            "ratio": str(2 ** (1 + domain % 5)),
+            "source": gate_a,
+        }
+        config[select_b] = {
+            "kind": "mux3",
+            "source": {
+                "0": divide,
+                "1": root_names[(domain + 2) % 4],
+                "2": f"{pll_names[(domain * 5 + 3) % 4]}[{domain % 2}]",
+            },
+        }
+        config[dto] = {"kind": "dto", "source": select_b}
+        config[cell] = {
+            "kind": "cell",
+            "cell_kind": cell_kinds[domain % len(cell_kinds)],
+            "source": dto,
+        }
+        for leaf in range(clocks_per_domain):
+            config[f"clock_{label}_{leaf:02d}"] = {
+                "kind": "clock",
+                "freq": f"{25 * (1 + (domain + leaf) % 32)} MHz",
+                "source": cell,
+            }
+    return config
+
+
 def main() -> int:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     scenarios = (
@@ -119,6 +199,23 @@ def main() -> int:
         encoding="utf-8",
     )
     print(f"{name}: nodes={len(dual_from)}, clocks={16}")
+    adversarial = (
+        ("13-label-clearance-weave", 16, 2, True),
+        ("14-crossing-weave-128-clocks", 64, 2, False),
+        ("15-routing-torture-512-clocks", 128, 4, True),
+    )
+    for name, domains, clocks_per_domain, long_names in adversarial:
+        config = build_adversarial_weave(
+            domains,
+            clocks_per_domain=clocks_per_domain,
+            long_names=long_names,
+        )
+        (OUTPUT / f"{name}.json").write_text(
+            json.dumps(config, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        clocks = sum(item.get("kind") == "clock" for item in config.values())
+        print(f"{name}: nodes={len(config)}, clocks={clocks}")
     return 0
 
 

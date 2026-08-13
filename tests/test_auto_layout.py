@@ -10,10 +10,11 @@ from pathlib import Path
 import pytest
 
 from auto_layout import generate_layout, load_clock_tree, write_generated_drawio
+from elk_layout import generate_elk_layout
 from drawio_build import build_drawio_xml, junction_points
 from drawio_decode import compress_diagram_payload, decompress_diagram_payload
 from drawio_layout import apply_crossing_style
-from layout_quality import inspect_drawio_quality
+from layout_quality import inspect_drawio_quality, inspect_layout_quality
 from pipeline import drawio_to_clock_tree
 
 
@@ -350,6 +351,19 @@ def test_layout_uses_kind_metadata_and_geometry_from_supplied_library(
     assert (gate.width, gate.height) == (83, 91)
     assert "gate0" in gate.object_attrs["label"]
     assert report["hard_pass"] is True
+    production_document, _ = generate_elk_layout(
+        config,
+        library_path=custom_library,
+    )
+    quality = inspect_layout_quality(
+        config,
+        production_document,
+        library_path=custom_library,
+        grid=0.0001,
+        tolerance=0.01,
+    )
+    assert quality["passed"] is True
+    assert quality["alignment"]["port_alignment_error_max_px"] == 0
 
 
 def _generated_linear_artifact(tmp_path: Path) -> tuple[Path, Path]:

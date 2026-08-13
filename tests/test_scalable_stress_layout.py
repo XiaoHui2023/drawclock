@@ -11,6 +11,7 @@ from elk_layout import generate_elk_layout, select_layout_plan
 from auto_layout import LogicalEdge
 from layout_quality import inspect_layout_quality
 from scripts.build_stress_examples import build_dual_from_reuse
+from scripts.build_stress_examples import build_adversarial_weave
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -111,3 +112,43 @@ def test_dual_from_reuse_has_no_avoidable_outer_detours() -> None:
     assert quality["readability"]["chain_axis_dogleg_edges"] == []
     assert quality["readability"]["local_axis_offset_max_px"] <= 8.5
     assert quality["passed"] is True
+
+
+@pytest.mark.parametrize(
+    ("domains", "clocks_per_domain", "long_names", "clock_count"),
+    [
+        (16, 2, True, 32),
+        (64, 2, False, 128),
+        (128, 4, True, 512),
+    ],
+)
+def test_adversarial_weave_quality_corpus(
+    domains: int,
+    clocks_per_domain: int,
+    long_names: bool,
+    clock_count: int,
+) -> None:
+    config = build_adversarial_weave(
+        domains,
+        clocks_per_domain=clocks_per_domain,
+        long_names=long_names,
+    )
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config,
+        document,
+        library_path=LIBRARY,
+        grid=0.0001,
+        tolerance=0.01,
+    )
+    line = quality["line_integrity"]
+
+    assert sum(item.get("kind") == "clock" for item in config.values()) == clock_count
+    assert quality["passed"] is True
+    assert line["edge_node_intersections"] == []
+    assert line["edge_label_intersections"] == []
+    assert line["source_lead_inside_visual"] == []
+    assert line["target_lead_inside_visual"] == []
+    assert line["avoidable_bend_edges"] == []
+    assert line["avoidable_crossing_edges"] == []
+    assert line["bends_max_per_edge"] <= 4

@@ -27,6 +27,9 @@ EXAMPLES = (
     "10-stress-2048-clocks",
     "11-stress-4096-clocks",
     "12-dual-from-reuse",
+    "13-label-clearance-weave",
+    "14-crossing-weave-128-clocks",
+    "15-routing-torture-512-clocks",
 )
 
 

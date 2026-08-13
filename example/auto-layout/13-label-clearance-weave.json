@@ -1,0 +1,742 @@
+{
+  "reference_clock_source_with_long_instance_name_0": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "reference_clock_source_with_long_instance_name_1": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "reference_clock_source_with_long_instance_name_2": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "reference_clock_source_with_long_instance_name_3": {
+    "kind": "source",
+    "source_kind": "source"
+  },
+  "pll_dual_0": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "reference_clock_source_with_long_instance_name_0"
+  },
+  "pll_dual_1": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "reference_clock_source_with_long_instance_name_3"
+  },
+  "pll_dual_2": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "reference_clock_source_with_long_instance_name_2"
+  },
+  "pll_dual_3": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "reference_clock_source_with_long_instance_name_1"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_000": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_000": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_000"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_000": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_000"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_000": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_000",
+      "1": "reference_clock_source_with_long_instance_name_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_000": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_000"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_000": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_000"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_000_00": {
+    "kind": "clock",
+    "freq": "25 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_000"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_000_01": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_000"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_001": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_001": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_001"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_001": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_001"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_001": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_001",
+      "1": "reference_clock_source_with_long_instance_name_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_001": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_001"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_001": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_001"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_001_00": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_001"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_001_01": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_001"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_002": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_002": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_002"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_002": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_002"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_002": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_002",
+      "1": "reference_clock_source_with_long_instance_name_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_002": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_002"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_002": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_002"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_002_00": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_002"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_002_01": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_002"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_003": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_003": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_003"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_003": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_003"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_003": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_003",
+      "1": "reference_clock_source_with_long_instance_name_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_003": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_003"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_003": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_003"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_003_00": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_003"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_003_01": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_003"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_004": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_004": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_004"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_004": {
+    "kind": "div",
+    "ratio": "32",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_004"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_004": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_004",
+      "1": "reference_clock_source_with_long_instance_name_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_004": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_004"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_004": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_004"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_004_00": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_004"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_004_01": {
+    "kind": "clock",
+    "freq": "150 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_004"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_005": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_005": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_005"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_005": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_005"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_005": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_005",
+      "1": "reference_clock_source_with_long_instance_name_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_005": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_005"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_005": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_005"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_005_00": {
+    "kind": "clock",
+    "freq": "150 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_005"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_005_01": {
+    "kind": "clock",
+    "freq": "175 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_005"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_006": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_006": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_006"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_006": {
+    "kind": "div",
+    "ratio": "4",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_006"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_006": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_006",
+      "1": "reference_clock_source_with_long_instance_name_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_006": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_006"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_006": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_006"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_006_00": {
+    "kind": "clock",
+    "freq": "175 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_006"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_006_01": {
+    "kind": "clock",
+    "freq": "200 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_006"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_007": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_007": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_007"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_007": {
+    "kind": "div_r",
+    "ratio": "8",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_007"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_007": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_007",
+      "1": "reference_clock_source_with_long_instance_name_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_007": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_007"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_007": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_007"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_007_00": {
+    "kind": "clock",
+    "freq": "200 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_007"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_007_01": {
+    "kind": "clock",
+    "freq": "225 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_007"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_008": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_008": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_008"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_008": {
+    "kind": "div",
+    "ratio": "16",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_008"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_008": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_008",
+      "1": "reference_clock_source_with_long_instance_name_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_008": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_008"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_008": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_008"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_008_00": {
+    "kind": "clock",
+    "freq": "225 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_008"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_008_01": {
+    "kind": "clock",
+    "freq": "250 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_008"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_009": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_009": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_009"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_009": {
+    "kind": "div_r",
+    "ratio": "32",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_009"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_009": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_009",
+      "1": "reference_clock_source_with_long_instance_name_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_009": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_009"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_009": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_009"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_009_00": {
+    "kind": "clock",
+    "freq": "250 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_009"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_009_01": {
+    "kind": "clock",
+    "freq": "275 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_009"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_010": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_010": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_010"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_010": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_010"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_010": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_010",
+      "1": "reference_clock_source_with_long_instance_name_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_010": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_010"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_010": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_010"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_010_00": {
+    "kind": "clock",
+    "freq": "275 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_010"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_010_01": {
+    "kind": "clock",
+    "freq": "300 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_010"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_011": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_011": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_011"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_011": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_011"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_011": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_011",
+      "1": "reference_clock_source_with_long_instance_name_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_011": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_011"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_011": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_011"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_011_00": {
+    "kind": "clock",
+    "freq": "300 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_011"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_011_01": {
+    "kind": "clock",
+    "freq": "325 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_011"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_012": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_0",
+      "1": "pll_dual_1[0]",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_012": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_012"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_012": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_012"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_012": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_012",
+      "1": "reference_clock_source_with_long_instance_name_2",
+      "2": "pll_dual_3[0]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_012": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_012"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_012": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_012"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_012_00": {
+    "kind": "clock",
+    "freq": "325 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_012"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_012_01": {
+    "kind": "clock",
+    "freq": "350 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_012"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_013": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_3",
+      "1": "pll_dual_2[0]",
+      "2": "pll_dual_1[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_013": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_013"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_013": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_013"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_013": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_013",
+      "1": "reference_clock_source_with_long_instance_name_3",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_013": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_013"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_013": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_013"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_013_00": {
+    "kind": "clock",
+    "freq": "350 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_013"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_013_01": {
+    "kind": "clock",
+    "freq": "375 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_013"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_014": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_2",
+      "1": "pll_dual_3[0]",
+      "2": "pll_dual_0[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_014": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_014"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_014": {
+    "kind": "div",
+    "ratio": "32",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_014"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_014": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_014",
+      "1": "reference_clock_source_with_long_instance_name_0",
+      "2": "pll_dual_1[0]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_014": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_014"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_014": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_014"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_014_00": {
+    "kind": "clock",
+    "freq": "375 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_014"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_014_01": {
+    "kind": "clock",
+    "freq": "400 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_014"
+  },
+  "select_primary_subsystem_clock_domain_with_long_instance_name_015": {
+    "kind": "mux3",
+    "source": {
+      "0": "reference_clock_source_with_long_instance_name_1",
+      "1": "pll_dual_0[0]",
+      "2": "pll_dual_3[1]"
+    }
+  },
+  "gate_primary_subsystem_clock_domain_with_long_instance_name_015": {
+    "kind": "gate",
+    "source": "select_primary_subsystem_clock_domain_with_long_instance_name_015"
+  },
+  "divide_primary_subsystem_clock_domain_with_long_instance_name_015": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "gate_primary_subsystem_clock_domain_with_long_instance_name_015"
+  },
+  "select_reconvergent_subsystem_clock_domain_with_long_instance_name_015": {
+    "kind": "mux3",
+    "source": {
+      "0": "divide_primary_subsystem_clock_domain_with_long_instance_name_015",
+      "1": "reference_clock_source_with_long_instance_name_1",
+      "2": "pll_dual_2[1]"
+    }
+  },
+  "dto_trim_subsystem_clock_domain_with_long_instance_name_015": {
+    "kind": "dto",
+    "source": "select_reconvergent_subsystem_clock_domain_with_long_instance_name_015"
+  },
+  "cell_output_subsystem_clock_domain_with_long_instance_name_015": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "dto_trim_subsystem_clock_domain_with_long_instance_name_015"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_015_00": {
+    "kind": "clock",
+    "freq": "400 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_015"
+  },
+  "clock_subsystem_clock_domain_with_long_instance_name_015_01": {
+    "kind": "clock",
+    "freq": "425 MHz",
+    "source": "cell_output_subsystem_clock_domain_with_long_instance_name_015"
+  }
+}

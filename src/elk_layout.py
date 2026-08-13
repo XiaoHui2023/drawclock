@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import json
 import heapq
+import math
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
 import time
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 from statistics import median
@@ -18,16 +19,21 @@ from auto_layout import (
     PROFILES,
     _simplify,
     _ranks,
+    _overlap_length,
+    _proper_cross,
+    _segment_hits_rect,
     _vertex_layouts,
     assess_layout,
     build_logical_edges,
     resolve_nodes,
+    Segment,
 )
 from drawio_layout import EdgeLayout, LAYOUT_VERSION, LayoutDocument
 from drawio_library import load_library_shapes
 from drawio_ports import EDGE_DRAW_STYLE, port_anchors
 from drawio_ports import abs_port_xy
 from validate_config import validate_config
+from visual_geometry import estimated_label_width, visual_box
 
 
 def _elk_runtime() -> tuple[str, Path, Path] | None:
@@ -157,10 +163,33 @@ def _generate_scalable_layout(
         level: max((nodes[name].shape.w for name in by_rank[level]), default=0)
         for level in range(max_rank + 1)
     }
-    rank_x: dict[int, float] = {0: profile.margin}
+    label_overflow = {
+        name: max(
+            0.0,
+            (
+                estimated_label_width(
+                    name,
+                    node.shape.label,
+                    node.shape.w,
+                )
+                - node.shape.w
+            )
+            / 2.0,
+        )
+        for name, node in nodes.items()
+    }
+    rank_overflow = {
+        level: max((label_overflow[name] for name in by_rank[level]), default=0.0)
+        for level in range(max_rank + 1)
+    }
+    rank_x: dict[int, float] = {0: profile.margin + rank_overflow[0]}
     for level in range(1, max_rank + 1):
         rank_x[level] = (
-            rank_x[level - 1] + rank_width[level - 1] + profile.layer_spacing
+            rank_x[level - 1]
+            + rank_width[level - 1]
+            + rank_overflow[level - 1]
+            + profile.layer_spacing
+            + rank_overflow[level]
         )
 
     backbone_band = max(
@@ -221,7 +250,12 @@ def _generate_scalable_layout(
         component_by_rank: dict[int, list[str]] = defaultdict(list)
         for name in component:
             component_by_rank[rank[name]].append(name)
-        local_spacing = profile.route_clearance
+        # A mux's fixed input pitch can be smaller than the generic routing
+        # clearance.  Node boxes must not overlap, but forcing the full edge
+        # clearance between siblings makes two otherwise aligned mux inputs
+        # acquire needless doglegs.  Routing clearance belongs to channels,
+        # not to vertical node packing.
+        local_spacing = max(1.0, profile.grid / 10.0)
         sequence: dict[str, int] = {}
         for level in sorted(component_by_rank, reverse=True):
             names = component_by_rank[level]
@@ -319,8 +353,12 @@ def _generate_scalable_layout(
     }
 
     horizontal_lane_occupancy: dict[
-        float, list[tuple[int, int, tuple[str, str]]]
+        int, list[tuple[int, int, tuple[str, str]]]
     ] = defaultdict(list)
+
+    def horizontal_lane_key(y: float) -> int:
+        """Canonicalise a corridor using the routing grid, not float identity."""
+        return round(y / profile.grid)
 
     def local_long_lane(edge, sy: float, ty: float) -> float:
         """Choose a collision-free y corridor near this edge's own domain."""
@@ -360,6 +398,13 @@ def _generate_scalable_layout(
                 low, high = rect_vertical[name]
                 candidates.extend((low, high))
 
+        base_candidates = tuple(dict.fromkeys(candidates))
+        candidates = [
+            lane + offset * profile.grid
+            for lane in base_candidates
+            for offset in (0, -1, 1, -2, 2)
+        ]
+
         endpoint_low, endpoint_high = sorted((sy, ty))
         best = None
         for lane in dict.fromkeys(candidates):
@@ -376,9 +421,13 @@ def _generate_scalable_layout(
             net = (edge.source, edge.source_port)
             lane_overlaps = sum(
                 other_net != net
-                and max(source_rank, other_start) < min(target_rank, other_end)
+                # Rank intervals are closed here: two long horizontal routes
+                # can still share physical x-space when their logical spans
+                # merely meet at a rank boundary (the node/port escape zones
+                # extend to either side of that boundary).
+                and max(source_rank, other_start) <= min(target_rank, other_end)
                 for other_start, other_end, other_net
-                in horizontal_lane_occupancy[lane]
+                in horizontal_lane_occupancy[horizontal_lane_key(lane)]
             )
             score = (
                 hits,
@@ -391,7 +440,7 @@ def _generate_scalable_layout(
                 best = (score, lane)
         assert best is not None
         lane = best[1]
-        horizontal_lane_occupancy[lane].append((
+        horizontal_lane_occupancy[horizontal_lane_key(lane)].append((
             source_rank, target_rank, (edge.source, edge.source_port)
         ))
         return lane
@@ -415,7 +464,21 @@ def _generate_scalable_layout(
             max(hi, previous[1]) if previous else hi,
         )
 
-    for edge in logical_edges:
+    # Allocation and routing must use the same deterministic order.  Otherwise
+    # a compact candidate can take a corridor reserved by an edge that is
+    # routed later, despite both passes being individually collision-aware.
+    routing_order = sorted(
+        logical_edges,
+        key=lambda edge: (
+            rank[edge.target] - rank[edge.source],
+            edge.source,
+            edge.source_port,
+            edge.target,
+            edge.target_port,
+        ),
+    )
+
+    for edge in routing_order:
         source = nodes[edge.source]
         target = nodes[edge.target]
         source_anchor = port_anchors(source.shape.style, source.shape.title)[edge.source_port]
@@ -428,8 +491,16 @@ def _generate_scalable_layout(
         if target_rank - source_rank > 1:
             lane_y = local_long_lane(edge, sy, ty)
             long_lanes[edge.key] = lane_y
-            add_interval(source_rank + 1, key, sy, lane_y)
-            add_interval(target_rank, key, lane_y, ty)
+            # Either endpoint channel may be selected for the simplified
+            # H-V-H candidate, so both channels must reserve the candidate's
+            # complete vertical span.  Reserving only the four-bend fallback
+            # span lets different nets become collinear after simplification.
+            reserved_low = min(sy, ty, lane_y)
+            reserved_high = max(sy, ty, lane_y)
+            add_interval(
+                source_rank + 1, key, reserved_low, reserved_high
+            )
+            add_interval(target_rank, key, reserved_low, reserved_high)
         else:
             add_interval(target_rank, key, sy, ty)
 
@@ -452,25 +523,168 @@ def _generate_scalable_layout(
             heapq.heappush(active, (hi, lane))
         lane_count[gap] = next_lane
 
-    rank_x = {0: profile.margin}
+    rank_x = {0: profile.margin + rank_overflow[0]}
     for level in range(1, max_rank + 1):
         gap_width = max(
             profile.layer_spacing,
-            (lane_count.get(level, 0) + 2) * profile.grid,
+            2 * profile.route_clearance
+            + (lane_count.get(level, 0) + 1) * profile.grid,
         )
-        rank_x[level] = rank_x[level - 1] + rank_width[level - 1] + gap_width
+        rank_x[level] = (
+            rank_x[level - 1]
+            + rank_width[level - 1]
+            + rank_overflow[level - 1]
+            + gap_width
+            + rank_overflow[level]
+        )
     positions = {
         name: (rank_x[rank[name]], y)
         for name, (_, y) in positions.items()
     }
 
     def lane_x(gap: int, key: tuple[str, str]) -> float:
-        left = rank_x[gap - 1] + rank_width[gap - 1]
-        return left + profile.grid * (lane_index[(gap, *key)] + 1)
+        left = (
+            rank_x[gap - 1]
+            + rank_width[gap - 1]
+            + rank_overflow[gap - 1]
+        )
+        return (
+            left
+            + profile.route_clearance
+            + profile.grid * lane_index[(gap, *key)]
+        )
+
+    visible_rects = {
+        name: visual_box(
+            name=name,
+            label=node.shape.label,
+            x=positions[name][0],
+            y=positions[name][1],
+            width=node.shape.w,
+            height=node.shape.h,
+        ).inflated(profile.route_clearance)
+        for name, node in nodes.items()
+    }
+
+    routed_segments: list[Any] = []
+    routed_horizontal_occupancy: dict[
+        float, list[tuple[float, float, tuple[str, str]]]
+    ] = defaultdict(list)
+    logical_fanout = Counter(
+        (edge.source, edge.source_port) for edge in logical_edges
+    )
+    route_bucket_size = 256.0
+    routed_buckets: dict[tuple[int, int], list[int]] = defaultdict(list)
+    visible_buckets: dict[tuple[int, int], list[str]] = defaultdict(list)
+
+    def segment_bucket_keys(a, b):
+        min_x, max_x = sorted((a[0], b[0]))
+        min_y, max_y = sorted((a[1], b[1]))
+        for bx in range(
+            math.floor(min_x / route_bucket_size),
+            math.floor(max_x / route_bucket_size) + 1,
+        ):
+            for by in range(
+                math.floor(min_y / route_bucket_size),
+                math.floor(max_y / route_bucket_size) + 1,
+            ):
+                yield bx, by
+
+    for name, rect in visible_rects.items():
+        for bucket in segment_bucket_keys(
+            (rect[0], rect[1]), (rect[2], rect[3])
+        ):
+            visible_buckets[bucket].append(name)
+
+    def nearby_routed(segments):
+        indices: set[int] = set()
+        for a, b in segments:
+            for bucket in segment_bucket_keys(a, b):
+                indices.update(routed_buckets.get(bucket, ()))
+        return [routed_segments[index] for index in indices]
+
+    def candidate_obstacle_hits(edge, points):
+        segments = [
+            (a, b)
+            for a, b in zip(points, points[1:])
+            if a != b
+        ]
+        nearby_names: set[str] = set()
+        for a, b in segments:
+            for bucket in segment_bucket_keys(a, b):
+                nearby_names.update(visible_buckets.get(bucket, ()))
+        return {
+            name
+            for name in nearby_names
+            for rect in (visible_rects[name],)
+            if name not in (edge.source, edge.target)
+            if any(
+                _segment_hits_rect(a, b, rect)
+                for a, b in segments
+            )
+        }
+
+    def candidate_score(edge, points):
+        segments = [
+            (a, b)
+            for a, b in zip(points, points[1:])
+            if a != b
+        ]
+        hits = len(candidate_obstacle_hits(edge, points))
+        net = (edge.source, edge.source_port)
+        # A high-fanout source is one visual distribution net.  Counting every
+        # logical branch against all earlier branches repeats the same bus
+        # geometry quadratically and can even penalize the intended shared
+        # trunk.  Its channel colouring already prevents distinct-net vertical
+        # overlap; candidate choice here therefore needs only visible-box and
+        # locality costs.
+        local_prior = (
+            [] if logical_fanout[net] > 1 else nearby_routed(segments)
+        )
+        crossings = sum(
+            _proper_cross(
+                Segment(edge.key, net, a, b), prior
+            )
+            for a, b in segments
+            for prior in local_prior
+            if prior.source_net != net
+        )
+        overlaps = sum(
+            _overlap_length(
+                Segment(edge.key, net, a, b), prior
+            ) >= profile.grid
+            for a, b in segments
+            for prior in local_prior
+            if prior.source_net != net
+        )
+        overlaps += sum(
+            other_net != net
+            and min(max(a[0], b[0]), other_high)
+            - max(min(a[0], b[0]), other_low)
+            >= profile.grid
+            for a, b in segments
+            if a[1] == b[1]
+            for other_low, other_high, other_net
+            in routed_horizontal_occupancy[a[1]]
+        )
+        bends = max(0, len(points) - 2)
+        endpoint_low, endpoint_high = sorted((points[0][1], points[-1][1]))
+        outer_excursion = max(
+            0.0,
+            endpoint_low - min(point[1] for point in points),
+            max(point[1] for point in points) - endpoint_high,
+        )
+        length = sum(
+            abs(b[0] - a[0]) + abs(b[1] - a[1])
+            for a, b in segments
+        )
+        # Correctness/readability dominates compactness: never accept a
+        # collinear overlap or avoidable crossing merely to save excursion.
+        return hits, overlaps, crossings, bends, outer_excursion, length
 
     edge_ids = {edge.key: f"e{index}" for index, edge in enumerate(logical_edges, 1)}
     layouts: list[EdgeLayout] = []
-    for edge in logical_edges:
+    for edge in routing_order:
         source = nodes[edge.source]
         target = nodes[edge.target]
         sx, sy = abs_port_xy(
@@ -484,21 +698,79 @@ def _generate_scalable_layout(
         source_rank = rank[edge.source]
         target_rank = rank[edge.target]
         source_key = (edge.source, edge.source_port)
+        candidates: list[list[tuple[float, float]]] = []
         if target_rank - source_rank > 1:
             first_x = lane_x(source_rank + 1, source_key)
             last_x = lane_x(target_rank, source_key)
             lane_y = long_lanes[edge.key]
-            points = _simplify(
+            candidates.append(_simplify(
                 [(sx, sy), (first_x, sy), (first_x, lane_y),
                  (last_x, lane_y), (last_x, ty), (tx, ty)]
-            )
+            ))
+            # A two-bend route is preferred whenever either endpoint channel
+            # can cross the intermediate ranks without hitting visible boxes.
+            candidates.append(_simplify(
+                [(sx, sy), (first_x, sy), (first_x, ty), (tx, ty)]
+            ))
+            if last_x != first_x:
+                candidates.append(_simplify(
+                    [(sx, sy), (last_x, sy), (last_x, ty), (tx, ty)]
+                ))
+            # Expand the local visibility graph only around obstacles that an
+            # initial route actually hits.  This discovers cross-domain label
+            # and node boundaries without scanning every node for every edge.
+            known = {tuple(candidate) for candidate in candidates}
+            for _ in range(4):
+                hit_names = {
+                    name
+                    for candidate in candidates
+                    for name in candidate_obstacle_hits(edge, candidate)
+                }
+                added = False
+                for name in sorted(hit_names):
+                    rect = visible_rects[name]
+                    for lane_y in (rect[1], rect[3]):
+                        candidate = _simplify([
+                            (sx, sy),
+                            (first_x, sy),
+                            (first_x, lane_y),
+                            (last_x, lane_y),
+                            (last_x, ty),
+                            (tx, ty),
+                        ])
+                        key = tuple(candidate)
+                        if key not in known:
+                            known.add(key)
+                            candidates.append(candidate)
+                            added = True
+                if not added or any(
+                    not candidate_obstacle_hits(edge, candidate)
+                    for candidate in candidates
+                ):
+                    break
         else:
             edge_lane_x = lane_x(target_rank, source_key)
             if abs(sy - ty) <= 0.01:
-                points = [(sx, sy), (tx, ty)]
+                candidates.append([(sx, sy), (tx, ty)])
             else:
-                points = _simplify(
+                candidates.append(_simplify(
                     [(sx, sy), (edge_lane_x, sy), (edge_lane_x, ty), (tx, ty)]
+                ))
+        points = min(candidates, key=lambda item: candidate_score(edge, item))
+        new_segments = [
+            Segment(edge.key, source_key, a, b)
+            for a, b in zip(points, points[1:])
+            if a != b
+        ]
+        for segment in new_segments:
+            index = len(routed_segments)
+            routed_segments.append(segment)
+            for bucket in segment_bucket_keys(segment.a, segment.b):
+                routed_buckets[bucket].append(index)
+            if segment.a[1] == segment.b[1]:
+                x0, x1 = sorted((segment.a[0], segment.b[0]))
+                routed_horizontal_occupancy[segment.a[1]].append(
+                    (x0, x1, source_key)
                 )
         source_anchor = port_anchors(source.shape.style, source.shape.title)[edge.source_port]
         target_anchor = port_anchors(target.shape.style, target.shape.title)[edge.target_port]
@@ -516,6 +788,120 @@ def _generate_scalable_layout(
                 waypoints=tuple(points[1:-1]),
             )
         )
+    layouts.sort(key=lambda item: int(item.cell_id[1:]))
+
+    # Deterministic rip-up/refine pass.  Online routing can only see earlier
+    # edges; later long edges may make an earlier four-bend choice dominated.
+    # Re-evaluate only such suspect routes against the complete route set and
+    # replace them solely with an obstacle-free H-V-H route that has no more
+    # overlaps/crossings and fewer bends.  This is part of route computation,
+    # not an artifact-coordinate repair stage.
+    logical_by_id = {
+        edge_ids[edge.key]: edge for edge in logical_edges
+    }
+
+    def layout_points(layout, logical):
+        source = nodes[logical.source]
+        target = nodes[logical.target]
+        start = abs_port_xy(
+            *positions[logical.source], source.shape.w, source.shape.h,
+            source.shape.style, source.shape.title, logical.source_port,
+        )
+        end = abs_port_xy(
+            *positions[logical.target], target.shape.w, target.shape.h,
+            target.shape.style, target.shape.title, logical.target_port,
+        )
+        return [start, *layout.waypoints, end]
+
+    for _ in range(2):
+        complete_segments: list[Segment] = []
+        for layout in layouts:
+            logical = logical_by_id[layout.cell_id]
+            net = (logical.source, logical.source_port)
+            points = layout_points(layout, logical)
+            complete_segments.extend(
+                Segment(logical.key, net, a, b)
+                for a, b in zip(points, points[1:])
+                if a != b
+            )
+        changed = False
+        for layout in layouts:
+            logical = logical_by_id[layout.cell_id]
+            points = layout_points(layout, logical)
+            actual_bends = max(0, len(points) - 2)
+            if actual_bends < 4:
+                continue
+            net = (logical.source, logical.source_port)
+            other_segments = [
+                segment
+                for segment in complete_segments
+                if segment.edge_key != logical.key
+                and segment.source_net != net
+            ]
+
+            def full_cost(candidate_points):
+                segments = [
+                    Segment(logical.key, net, a, b)
+                    for a, b in zip(candidate_points, candidate_points[1:])
+                    if a != b
+                ]
+                hits = sum(
+                    _segment_hits_rect(segment.a, segment.b, rect)
+                    for segment in segments
+                    for name, rect in visible_rects.items()
+                    if name not in (logical.source, logical.target)
+                )
+                overlaps = sum(
+                    _overlap_length(segment, other) >= profile.grid
+                    for segment in segments
+                    for other in other_segments
+                )
+                crossings = sum(
+                    _proper_cross(segment, other)
+                    for segment in segments
+                    for other in other_segments
+                )
+                bends = max(0, len(candidate_points) - 2)
+                length = sum(
+                    abs(b[0] - a[0]) + abs(b[1] - a[1])
+                    for a, b in zip(candidate_points, candidate_points[1:])
+                )
+                return hits, overlaps, crossings, bends, length
+
+            actual_cost = full_cost(points)
+            source_right = visible_rects[logical.source][2]
+            target_left = visible_rects[logical.target][0]
+            candidate_xs = {
+                point[0]
+                for point in points[1:-1]
+                if source_right <= point[0] <= target_left
+            }
+            candidates = [
+                _simplify([
+                    points[0],
+                    (x, points[0][1]),
+                    (x, points[-1][1]),
+                    points[-1],
+                ])
+                for x in sorted(candidate_xs)
+            ]
+            viable = [
+                (full_cost(candidate), candidate)
+                for candidate in candidates
+                if full_cost(candidate)[0] == 0
+            ]
+            if not viable:
+                continue
+            best_cost, best_points = min(viable, key=lambda item: item[0])
+            if (
+                best_cost[1] <= actual_cost[1]
+                and best_cost[2] <= actual_cost[2]
+                and best_cost[3] < actual_cost[3]
+            ):
+                layout.waypoints = tuple(best_points[1:-1])
+                changed = True
+        if not changed:
+            break
     document = LayoutDocument(
         version=LAYOUT_VERSION,
         vertices=_vertex_layouts(nodes, positions, library_path),
