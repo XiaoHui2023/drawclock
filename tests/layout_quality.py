@@ -28,7 +28,7 @@ from drawio_ports import abs_port_xy, infer_port_from_attachment, port_anchors
 from visual_geometry import vertex_visual_box
 
 
-QUALITY_SCHEMA_VERSION = 4  # Test-only Agent artifact inspection schema.
+QUALITY_SCHEMA_VERSION = 5  # Test-only Agent artifact inspection schema.
 
 
 def _close(a: float, b: float, tolerance: float) -> bool:
@@ -433,8 +433,13 @@ def inspect_layout_quality(
         if target_rank <= source_rank + 1:
             continue
         x1, x2 = points[1][0], points[-2][0]
-        if x2 < x1 - tolerance:
-            continue
+        reversed_channels = x2 < x1 - tolerance
+        channel_pairs = {(x1, x2)}
+        if reversed_channels:
+            midpoint_x = (points[0][0] + points[-1][0]) / 2
+            channel_pairs.update({
+                (x1, x1), (x2, x2), (midpoint_x, midpoint_x)
+            })
         obstacles = [
             vertex.name
             for rank in range(source_rank + 1, target_rank)
@@ -474,43 +479,55 @@ def inspect_layout_quality(
 
         actual_interactions = interaction_cost(edge_segments[edge_id])
         best_local: tuple[int, int, float, float] | None = None
-        for lane in candidate_lanes:
-            candidate = _canonical_orthogonal_points(
-                [points[0], (x1, points[0][1]), (x1, lane),
-                 (x2, lane), (x2, points[-1][1]), points[-1]],
-                tolerance,
-            )
-            candidate_segments = [
-                Segment("candidate", source_net, a, b)
-                for a, b in zip(candidate, candidate[1:])
-                if not (_close(a[0], b[0], tolerance) and _close(a[1], b[1], tolerance))
-            ]
-            if any(
-                _segment_hits_rect(
-                    segment.a,
-                    segment.b,
-                    visual_boxes[name].inflated(routing_clearance),
+        for candidate_x1, candidate_x2 in channel_pairs:
+            for lane in candidate_lanes:
+                candidate = _canonical_orthogonal_points(
+                    [points[0], (candidate_x1, points[0][1]),
+                     (candidate_x1, lane), (candidate_x2, lane),
+                     (candidate_x2, points[-1][1]), points[-1]],
+                    tolerance,
                 )
-                for segment in candidate_segments
-                for name in obstacles
-            ):
-                continue
-            local_outer = max(
-                0.0, endpoint_low - lane, lane - endpoint_high
-            )
-            local_length = sum(
-                abs(b[0] - a[0]) + abs(b[1] - a[1])
-                for a, b in zip(candidate, candidate[1:])
-            )
-            local_overlaps, local_crossings = interaction_cost(candidate_segments)
-            score = (
-                local_overlaps,
-                local_crossings,
-                local_outer,
-                local_length,
-            )
-            if best_local is None or score < best_local:
-                best_local = score
+                candidate_segments = [
+                    Segment("candidate", source_net, a, b)
+                    for a, b in zip(candidate, candidate[1:])
+                    if not (
+                        _close(a[0], b[0], tolerance)
+                        and _close(a[1], b[1], tolerance)
+                    )
+                ]
+                if any(
+                    _segment_hits_rect(
+                        segment.a,
+                        segment.b,
+                        (
+                            visual_boxes[name].left,
+                            visual_boxes[name].top,
+                            visual_boxes[name].right,
+                            visual_boxes[name].bottom,
+                        ),
+                    )
+                    for segment in candidate_segments
+                    for name in obstacles
+                ):
+                    continue
+                local_outer = max(
+                    0.0, endpoint_low - lane, lane - endpoint_high
+                )
+                local_length = sum(
+                    abs(b[0] - a[0]) + abs(b[1] - a[1])
+                    for a, b in zip(candidate, candidate[1:])
+                )
+                local_overlaps, local_crossings = interaction_cost(
+                    candidate_segments
+                )
+                score = (
+                    local_overlaps,
+                    local_crossings,
+                    local_outer,
+                    local_length,
+                )
+                if best_local is None or score < best_local:
+                    best_local = score
         escaped_node_bounds = (
             route_low < node_top - tolerance
             or route_high > node_bottom + tolerance
@@ -528,12 +545,16 @@ def inspect_layout_quality(
     crossings: list[tuple[str, str]] = []
     crossing_pair_intersections = 0
     crossing_points: set[tuple[float, float]] = set()
+    source_crossing_points: set[tuple[float, float]] = set()
     same_net_junctions: list[tuple[str, str]] = []
     same_net_junction_intersections = 0
     ambiguous_overlaps: list[tuple[str, str]] = []
     untreated_crossings: list[tuple[str, str]] = []
     segment_owner = {
         id(segment): edge_id for edge_id, segments in edge_segments.items() for segment in segments
+    }
+    root_names = {
+        name for name in resolved if logical_indegree[name] == 0
     }
     if exact_pair_oracle:
         for index, a in enumerate(all_segments):
@@ -548,7 +569,13 @@ def inspect_layout_quality(
                     else:
                         crossings.append(pair)
                         vertical, horizontal = (a, b) if a.a[0] == a.b[0] else (b, a)
-                        crossing_points.add((round(vertical.a[0], 3), round(horizontal.a[1], 3)))
+                        point = (round(vertical.a[0], 3), round(horizontal.a[1], 3))
+                        crossing_points.add(point)
+                        if (
+                            observed_edge_ports[edge_a][0] in root_names
+                            or observed_edge_ports[edge_b][0] in root_names
+                        ):
+                            source_crossing_points.add(point)
                 if _overlap_length(a, b) >= grid and a.source_net != b.source_net:
                     ambiguous_overlaps.append(tuple(sorted((edge_a, edge_b))))
     else:
@@ -601,7 +628,13 @@ def inspect_layout_quality(
                         same_net_junction_intersections += pair_count
                     elif pair_count:
                         crossing_pair_intersections += pair_count
-                        crossing_points.add((round(x, 3), round(y, 3)))
+                        point = (round(x, 3), round(y, 3))
+                        crossing_points.add(point)
+                        if any(
+                            observed_edge_ports[edge_id][0] in root_names
+                            for edge_id in vertical_owners | horizontal_owners
+                        ):
+                            source_crossing_points.add(point)
                         untreated_crossings.extend(
                             tuple(sorted((edge_a, edge_b)))
                             for edge_a in vertical_owners
@@ -854,10 +887,10 @@ def inspect_layout_quality(
     vertical_gaps: list[float] = []
     for rank in sorted(set(ranks.values())):
         items = sorted(
-            (vertices_by_name[name] for name in ranks if ranks[name] == rank and name in vertices_by_name),
-            key=lambda item: item.y,
+            (visual_boxes[name] for name in ranks if ranks[name] == rank and name in vertices_by_name),
+            key=lambda item: item.top,
         )
-        vertical_gaps.extend(b.y - (a.y + a.height) for a, b in zip(items, items[1:]))
+        vertical_gaps.extend(b.top - a.bottom for a, b in zip(items, items[1:]))
     gap_mean = sum(vertical_gaps) / len(vertical_gaps) if vertical_gaps else 0.0
     gap_cv = (
         math.sqrt(sum((gap - gap_mean) ** 2 for gap in vertical_gaps) / len(vertical_gaps)) / gap_mean
@@ -888,13 +921,51 @@ def inspect_layout_quality(
     # A source-order inversion at a fixed-port mux is a readability cost, not
     # a correctness failure: crossings are explicitly permitted and the port
     # mapping remains exact.
+    rank_levels = sorted(set(ranks.values()))
+    inter_rank_gaps: list[dict[str, float | int]] = []
+    for left_rank, right_rank in zip(rank_levels, rank_levels[1:]):
+        left_edge = max(
+            visual_boxes[name].right
+            for name in ranks
+            if ranks[name] == left_rank and name in vertices_by_name
+        )
+        right_edge = min(
+            visual_boxes[name].left
+            for name in ranks
+            if ranks[name] == right_rank and name in vertices_by_name
+        )
+        lane_xs = sorted({
+            round(segment.a[0], 6)
+            for segment in all_segments
+            if abs(segment.a[0] - segment.b[0]) <= tolerance
+            and left_edge < segment.a[0] < right_edge
+        })
+        required = 2 * routing_clearance
+        if lane_xs:
+            required += lane_xs[-1] - lane_xs[0]
+        actual = right_edge - left_edge
+        inter_rank_gaps.append({
+            "left_rank": left_rank,
+            "right_rank": right_rank,
+            "actual_px": round(actual, 3),
+            "required_by_routes_px": round(required, 3),
+            "avoidable_px": round(max(0.0, actual - required), 3),
+        })
+    avoidable_inter_rank_gap = sum(
+        float(item["avoidable_px"]) for item in inter_rank_gaps
+    )
     order_failures = node_overlaps + direction_violations
     hard_failures = sorted(set(alignment_failures + line_failures + order_failures))
 
-    min_x = min((vertex.x for vertex in document.vertices), default=0.0)
-    min_y = min((vertex.y for vertex in document.vertices), default=0.0)
-    max_x = max((vertex.x + vertex.width for vertex in document.vertices), default=0.0)
-    max_y = max((vertex.y + vertex.height for vertex in document.vertices), default=0.0)
+    min_x = min((box.left for box in visual_boxes.values()), default=0.0)
+    min_y = min((box.top for box in visual_boxes.values()), default=0.0)
+    max_x = max((box.right for box in visual_boxes.values()), default=0.0)
+    max_y = max((box.bottom for box in visual_boxes.values()), default=0.0)
+    bounding_area = max(0.0, max_x - min_x) * max(0.0, max_y - min_y)
+    visible_area = sum(
+        (box.right - box.left) * (box.bottom - box.top)
+        for box in visual_boxes.values()
+    )
     return {
         "quality_schema_version": QUALITY_SCHEMA_VERSION,
         "passed": not hard_failures,
@@ -940,6 +1011,7 @@ def inspect_layout_quality(
             "ambiguous_overlaps": [list(pair) for pair in ambiguous_overlaps],
             "crossings": crossing_pair_intersections,
             "distinct_crossing_points": len(crossing_points),
+            "source_induced_crossing_points": len(source_crossing_points),
             "same_net_junctions": same_net_junction_intersections,
             "untreated_crossings": [list(pair) for pair in untreated_crossings],
             "bends_total": bends_total,
@@ -975,6 +1047,11 @@ def inspect_layout_quality(
             "mux_input_order_inversions": mux_input_order_inversions,
             "vertical_gap_min_px": round(min(vertical_gaps), 3) if vertical_gaps else None,
             "vertical_gap_cv": round(gap_cv, 4),
+            "visible_footprint_area_px2": round(visible_area, 2),
+            "visible_whitespace_area_px2": round(max(0.0, bounding_area - visible_area), 2),
+            "visible_fill_ratio": round(visible_area / bounding_area, 6) if bounding_area else 1.0,
+            "inter_rank_gaps": inter_rank_gaps,
+            "avoidable_inter_rank_gap_total_px": round(avoidable_inter_rank_gap, 3),
             "width_px": round(max_x - min_x, 2),
             "height_px": round(max_y - min_y, 2),
         },

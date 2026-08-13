@@ -95,6 +95,43 @@ def build_dual_from_reuse(branch_count: int = 16) -> dict[str, dict[str, object]
     return config
 
 
+def build_multi_from_clusters(
+    cluster_count: int = 4, branches_per_cluster: int = 6
+) -> dict[str, dict[str, object]]:
+    """Shared ``from`` roots whose consumers occupy distinct vertical bands."""
+    roots = [f"from_{index}" for index in range(cluster_count)]
+    config: dict[str, dict[str, object]] = {
+        name: {"kind": "from"} for name in roots
+    }
+    for cluster in range(cluster_count):
+        for branch in range(branches_per_cluster):
+            suffix = f"{cluster}_{branch:02d}"
+            config[f"gate_primary_{suffix}"] = {
+                "kind": "gate", "source": roots[cluster]
+            }
+            config[f"div_{suffix}"] = {
+                "kind": "div", "source": f"gate_primary_{suffix}"
+            }
+            config[f"gate_backup_{suffix}"] = {
+                "kind": "gate",
+                "source": roots[(cluster + 1) % cluster_count],
+            }
+            config[f"sel_{suffix}"] = {
+                "kind": "mux2",
+                "source": {
+                    "0": f"div_{suffix}",
+                    "1": f"gate_backup_{suffix}",
+                },
+            }
+            config[f"cell_{suffix}"] = {
+                "kind": "cell", "source": f"sel_{suffix}"
+            }
+            config[f"clk_{suffix}"] = {
+                "kind": "clock", "source": f"cell_{suffix}"
+            }
+    return config
+
+
 def build_adversarial_weave(
     domain_count: int,
     *,
@@ -199,6 +236,13 @@ def main() -> int:
         encoding="utf-8",
     )
     print(f"{name}: nodes={len(dual_from)}, clocks={16}")
+    multi_from = build_multi_from_clusters()
+    name = "16-multi-from-clusters"
+    (OUTPUT / f"{name}.json").write_text(
+        json.dumps(multi_from, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(f"{name}: nodes={len(multi_from)}, clocks={24}")
     adversarial = (
         ("13-label-clearance-weave", 16, 2, True),
         ("14-crossing-weave-128-clocks", 64, 2, False),

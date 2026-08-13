@@ -30,6 +30,7 @@ EXAMPLES = (
     "13-label-clearance-weave",
     "14-crossing-weave-128-clocks",
     "15-routing-torture-512-clocks",
+    "16-multi-from-clusters",
 )
 
 

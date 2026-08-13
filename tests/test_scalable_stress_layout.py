@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import time
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from auto_layout import LogicalEdge
 from layout_quality import inspect_layout_quality
 from scripts.build_stress_examples import build_dual_from_reuse
 from scripts.build_stress_examples import build_adversarial_weave
+from scripts.build_stress_examples import build_multi_from_clusters
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -152,3 +154,69 @@ def test_adversarial_weave_quality_corpus(
     assert line["avoidable_bend_edges"] == []
     assert line["avoidable_crossing_edges"] == []
     assert line["bends_max_per_edge"] <= 4
+
+
+def test_multiple_source_placement_selects_best_valid_candidate() -> None:
+    config = build_adversarial_weave(64, clocks_per_domain=2, long_names=False)
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    candidates = report["selection"]["source_position_candidates"]
+    valid = [
+        item for item in candidates
+        if item["route_overlaps"] == 0
+    ]
+
+    assert quality["passed"] is True
+    assert valid
+    assert report["selection"]["source_crossing_points"] == min(
+        item["source_crossing_points"] for item in valid
+    )
+    assert quality["line_integrity"]["source_induced_crossing_points"] == report["selection"]["source_crossing_points"]
+
+
+def test_multi_from_roots_are_distributed_by_their_consumers() -> None:
+    config = build_multi_from_clusters()
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    source_tops = [
+        vertex.y for vertex in document.vertices if vertex.name.startswith("from_")
+    ]
+
+    assert quality["passed"] is True
+    assert report["selection"]["source_position_mode"] == "consumer-median"
+    assert len(set(source_tops)) == 4
+    assert max(source_tops) - min(source_tops) > max(
+        vertex.height
+        for vertex in document.vertices
+        if vertex.name.startswith("from_")
+    )
+
+
+def test_quality_gate_rejects_unused_inter_rank_whitespace() -> None:
+    config = build_dual_from_reuse(4)
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    edges = build_logical_edges(config, nodes, LIBRARY)
+    ranks = _ranks(nodes, edges)
+    widened = copy.deepcopy(document)
+    boundary = min(
+        vertex.x for vertex in widened.vertices if ranks[vertex.name] == 2
+    )
+    for vertex in widened.vertices:
+        if ranks[vertex.name] >= 2:
+            vertex.x += 40
+    for edge in widened.edges:
+        edge.waypoints = tuple(
+            (x + 40 if x >= boundary else x, y)
+            for x, y in edge.waypoints
+        )
+    quality = inspect_layout_quality(
+        config, widened, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert quality["layout_order"]["avoidable_inter_rank_gap_total_px"] >= 40

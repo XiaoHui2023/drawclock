@@ -67,3 +67,9 @@ source + from → mux2 → pll → div → dto → inv → cell → gate → clo
 drawclock draw -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg
 drawclock draw -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg --crossing-style gap
 ```
+
+## 自动布局约束
+
+- 层间距由器件与实例文字的可见边界、端口净空和实际使用的布线路轨共同计算；未被最终连线使用的预留路轨会在布局求解阶段压缩。
+- 多个根输入不会固定堆放在左上角。布局器按下游端口的中位位置分布输入源；仅当该方案无法消除异网重叠时，才计算顶部对齐候选，并按重叠、输入源引起的交叉、拐弯数和有效面积择优。
+- `example/auto-layout/16-multi-from-clusters.json` 演示四个共享 `from` 输入按下游消费者分布到不同纵向区域。
