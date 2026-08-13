@@ -132,6 +132,73 @@ def build_multi_from_clusters(
     return config
 
 
+def build_terminal_fanout_crossing() -> dict[str, dict[str, object]]:
+    """Minimal A-B-A sink ordering trap: one branch fans out, one does not."""
+    return {
+        "root": {"kind": "from"},
+        "gate_a": {"kind": "gate", "source": "root"},
+        "gate_b": {"kind": "gate", "source": "root"},
+        "clock_a": {"kind": "clock", "source": "gate_a"},
+        "clock_m": {"kind": "clock", "source": "gate_b"},
+        "clock_z": {"kind": "clock", "source": "gate_a"},
+    }
+
+
+def build_asymmetric_merge_columns(
+    domain_count: int = 8,
+) -> dict[str, dict[str, object]]:
+    """Equivalent reconvergences with complementary pre/post-merge depth."""
+    config: dict[str, dict[str, object]] = {
+        "root_a": {"kind": "from"},
+        "root_b": {"kind": "from"},
+    }
+    for domain in range(domain_count):
+        suffix = f"{domain:02d}"
+        config[f"gate_a_{suffix}"] = {"kind": "gate", "source": "root_a"}
+        config[f"gate_b_{suffix}"] = {"kind": "gate", "source": "root_b"}
+        left = f"gate_a_{suffix}"
+        if domain % 2 == 0:
+            config[f"div_pre_{suffix}"] = {"kind": "div", "source": left}
+            left = f"div_pre_{suffix}"
+        config[f"merge_{suffix}"] = {
+            "kind": "mux2",
+            "source": {"0": left, "1": f"gate_b_{suffix}"},
+        }
+        tail = f"merge_{suffix}"
+        if domain % 2 == 1:
+            config[f"div_post_{suffix}"] = {"kind": "div", "source": tail}
+            tail = f"div_post_{suffix}"
+        config[f"cell_{suffix}"] = {"kind": "cell", "source": tail}
+        config[f"clock_{suffix}"] = {"kind": "clock", "source": f"cell_{suffix}"}
+    return config
+
+
+def build_dispersed_root_fanout(
+    middle_domains: int = 10,
+) -> dict[str, dict[str, object]]:
+    """One root serves two distant consumer bands around unrelated domains."""
+    config: dict[str, dict[str, object]] = {
+        "wide_root": {"kind": "from"},
+        "local_root": {"kind": "from"},
+    }
+    for band in ("top",):
+        for index in range(3):
+            suffix = f"{band}_{index}"
+            config[f"wide_gate_{suffix}"] = {"kind": "gate", "source": "wide_root"}
+            config[f"wide_clock_{suffix}"] = {"kind": "clock", "source": f"wide_gate_{suffix}"}
+    for index in range(middle_domains):
+        suffix = f"middle_{index:02d}"
+        config[f"local_gate_{suffix}"] = {"kind": "gate", "source": "local_root"}
+        config[f"local_div_{suffix}"] = {"kind": "div", "source": f"local_gate_{suffix}"}
+        config[f"local_clock_{suffix}"] = {"kind": "clock", "source": f"local_div_{suffix}"}
+    for band in ("bottom",):
+        for index in range(3):
+            suffix = f"{band}_{index}"
+            config[f"wide_gate_{suffix}"] = {"kind": "gate", "source": "wide_root"}
+            config[f"wide_clock_{suffix}"] = {"kind": "clock", "source": f"wide_gate_{suffix}"}
+    return config
+
+
 def build_adversarial_weave(
     domain_count: int,
     *,
@@ -243,6 +310,18 @@ def main() -> int:
         encoding="utf-8",
     )
     print(f"{name}: nodes={len(multi_from)}, clocks={24}")
+    structural = (
+        ("17-terminal-fanout-order", build_terminal_fanout_crossing()),
+        ("18-asymmetric-merge-columns", build_asymmetric_merge_columns()),
+        ("19-dispersed-root-fanout", build_dispersed_root_fanout()),
+    )
+    for name, config in structural:
+        (OUTPUT / f"{name}.json").write_text(
+            json.dumps(config, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        clocks = sum(item.get("kind") == "clock" for item in config.values())
+        print(f"{name}: nodes={len(config)}, clocks={clocks}")
     adversarial = (
         ("13-label-clearance-weave", 16, 2, True),
         ("14-crossing-weave-128-clocks", 64, 2, False),

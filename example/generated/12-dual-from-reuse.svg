@@ -3,15 +3,15 @@
 <style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}</style>
 <rect x="20.96" y="15" width="619.34" height="2877.04" fill="#ffffff"/>
 <text x="28.96" y="33" font-family="Arial,sans-serif" font-size="12" fill="#68707a">12-dual-from-reuse</text>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,90.0025 175.11,90.0025"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,323.005 283.49,323.005"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,2624.0375 283.49,2624.0375"/>
+<polyline class="edge" points="105.96,90.0025 175.11,90.0025"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,323.005 283.49,323.005"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,2624.0375 283.49,2624.0375"/>
 <polyline class="edge" points="302.882,2568.0375 378.64,2568.0375"/>
 <polyline class="edge" points="312.49,2624.0375 378.64,2624.0375"/>
 <polyline class="edge" points="402.64,2596.0375 469.97,2596.0375"/>
 <polyline class="edge" points="491.97,2596.0375 553.3,2596.0375"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,2745.04 175.11,2745.04"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,2801.04 283.49,2801.04"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,2745.04 175.11,2745.04"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,2801.04 283.49,2801.04"/>
 <polyline class="edge" points="302.882,2745.04 378.64,2745.04"/>
 <polyline class="edge" points="302.882,267.005 378.64,267.005"/>
 <polyline class="edge" points="312.49,2801.04 378.64,2801.04"/>
@@ -20,86 +20,86 @@
 <polyline class="edge" points="312.49,323.005 378.64,323.005"/>
 <polyline class="edge" points="402.64,295.005 469.97,295.005"/>
 <polyline class="edge" points="491.97,295.005 553.3,295.005"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,444.0075 175.11,444.0075"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,500.0075 283.49,500.0075"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,444.0075 175.11,444.0075"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,500.0075 283.49,500.0075"/>
 <polyline class="edge" points="302.882,444.0075 378.64,444.0075"/>
 <polyline class="edge" points="312.49,500.0075 378.64,500.0075"/>
 <polyline class="edge" points="204.11,90.0025 282.098,90.0025"/>
 <polyline class="edge" points="402.64,472.0075 469.97,472.0075"/>
 <polyline class="edge" points="491.97,472.0075 553.3,472.0075"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,621.01 175.11,621.01"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,677.01 283.49,677.01"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,621.01 175.11,621.01"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,677.01 283.49,677.01"/>
 <polyline class="edge" points="302.882,621.01 378.64,621.01"/>
 <polyline class="edge" points="312.49,677.01 378.64,677.01"/>
 <polyline class="edge" points="402.64,649.01 469.97,649.01"/>
 <polyline class="edge" points="491.97,649.01 553.3,649.01"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,798.0125 175.11,798.0125"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,146.0025 283.49,146.0025"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,854.0125 283.49,854.0125"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,798.0125 175.11,798.0125"/>
+<polyline class="edge" points="204.11,146.0025 283.49,146.0025"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,854.0125 283.49,854.0125"/>
 <polyline class="edge" points="302.882,798.0125 378.64,798.0125"/>
 <polyline class="edge" points="312.49,854.0125 378.64,854.0125"/>
 <polyline class="edge" points="402.64,826.0125 469.97,826.0125"/>
 <polyline class="edge" points="491.97,826.0125 553.3,826.0125"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,975.015 175.11,975.015"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,1031.015 283.49,1031.015"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,975.015 175.11,975.015"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,1031.015 283.49,1031.015"/>
 <polyline class="edge" points="302.882,975.015 378.64,975.015"/>
 <polyline class="edge" points="302.882,90.0025 378.64,90.0025"/>
 <polyline class="edge" points="312.49,1031.015 378.64,1031.015"/>
 <polyline class="edge" points="402.64,1003.015 469.97,1003.015"/>
 <polyline class="edge" points="491.97,1003.015 553.3,1003.015"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,1152.0175 175.11,1152.0175"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,1208.0175 283.49,1208.0175"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,1152.0175 175.11,1152.0175"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,1208.0175 283.49,1208.0175"/>
 <polyline class="edge" points="302.882,1152.0175 378.64,1152.0175"/>
 <polyline class="edge" points="312.49,1208.0175 378.64,1208.0175"/>
 <polyline class="edge" points="402.64,1180.0175 469.97,1180.0175"/>
 <polyline class="edge" points="491.97,1180.0175 553.3,1180.0175"/>
 <polyline class="edge" points="312.49,146.0025 378.64,146.0025"/>
-<polyline class="edge" points="105.96,1329.02 175.11,1329.02"/>
-<polyline class="edge" points="204.11,1385.02 283.49,1385.02"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,1329.02 175.11,1329.02"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,1385.02 283.49,1385.02"/>
 <polyline class="edge" points="302.882,1329.02 378.64,1329.02"/>
 <polyline class="edge" points="312.49,1385.02 378.64,1385.02"/>
 <polyline class="edge" points="402.64,1357.02 469.97,1357.02"/>
 <polyline class="edge" points="491.97,1357.02 553.3,1357.02"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,1506.0225 175.11,1506.0225"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,1562.0225 283.49,1562.0225"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,1506.0225 175.11,1506.0225"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,1562.0225 283.49,1562.0225"/>
 <polyline class="edge" points="402.64,118.0025 469.97,118.0025"/>
 <polyline class="edge" points="302.882,1506.0225 378.64,1506.0225"/>
 <polyline class="edge" points="312.49,1562.0225 378.64,1562.0225"/>
 <polyline class="edge" points="402.64,1534.0225 469.97,1534.0225"/>
 <polyline class="edge" points="491.97,1534.0225 553.3,1534.0225"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,1683.025 175.11,1683.025"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,1739.025 283.49,1739.025"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,1683.025 175.11,1683.025"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,1739.025 283.49,1739.025"/>
 <polyline class="edge" points="302.882,1683.025 378.64,1683.025"/>
 <polyline class="edge" points="312.49,1739.025 378.64,1739.025"/>
 <polyline class="edge" points="402.64,1711.025 469.97,1711.025"/>
 <polyline class="edge" points="491.97,118.0025 553.3,118.0025"/>
 <polyline class="edge" points="491.97,1711.025 553.3,1711.025"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,1860.0275 175.11,1860.0275"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,1916.0275 283.49,1916.0275"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,1860.0275 175.11,1860.0275"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,1916.0275 283.49,1916.0275"/>
 <polyline class="edge" points="302.882,1860.0275 378.64,1860.0275"/>
 <polyline class="edge" points="312.49,1916.0275 378.64,1916.0275"/>
 <polyline class="edge" points="402.64,1888.0275 469.97,1888.0275"/>
 <polyline class="edge" points="491.97,1888.0275 553.3,1888.0275"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,2037.03 175.11,2037.03"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,267.005 175.11,267.005"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,2093.03 283.49,2093.03"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,2037.03 175.11,2037.03"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,267.005 175.11,267.005"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,2093.03 283.49,2093.03"/>
 <polyline class="edge" points="302.882,2037.03 378.64,2037.03"/>
 <polyline class="edge" points="312.49,2093.03 378.64,2093.03"/>
 <polyline class="edge" points="402.64,2065.03 469.97,2065.03"/>
 <polyline class="edge" points="491.97,2065.03 553.3,2065.03"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,2214.0325 175.11,2214.0325"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,2270.0325 283.49,2270.0325"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,2214.0325 175.11,2214.0325"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,2270.0325 283.49,2270.0325"/>
 <polyline class="edge" points="302.882,2214.0325 378.64,2214.0325"/>
 <polyline class="edge" points="312.49,2270.0325 378.64,2270.0325"/>
 <polyline class="edge" points="402.64,2242.0325 469.97,2242.0325"/>
 <polyline class="edge" points="491.97,2242.0325 553.3,2242.0325"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,2391.035 175.11,2391.035"/>
-<polyline class="edge" points="204.11,1385.02 238.3,1385.02 238.3,2447.035 283.49,2447.035"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,2391.035 175.11,2391.035"/>
+<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,2447.035 283.49,2447.035"/>
 <polyline class="edge" points="302.882,2391.035 378.64,2391.035"/>
 <polyline class="edge" points="312.49,2447.035 378.64,2447.035"/>
 <polyline class="edge" points="402.64,2419.035 469.97,2419.035"/>
 <polyline class="edge" points="491.97,2419.035 553.3,2419.035"/>
-<polyline class="edge" points="105.96,1329.02 129.92,1329.02 129.92,2568.0375 175.11,2568.0375"/>
+<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,2568.0375 175.11,2568.0375"/>
 <path class="edge" d="M 204.11 2568.0375 L 234.3 2568.0375 A 4 4 0 0 0 242.3 2568.0375 L 282.098 2568.0375"/>
 <path class="edge" d="M 204.11 2745.04 L 234.3 2745.04 A 4 4 0 0 0 242.3 2745.04 L 282.098 2745.04"/>
 <path class="edge" d="M 204.11 444.0075 L 234.3 444.0075 A 4 4 0 0 0 242.3 444.0075 L 282.098 444.0075"/>
@@ -115,6 +115,7 @@
 <path class="edge" d="M 204.11 2214.0325 L 234.3 2214.0325 A 4 4 0 0 0 242.3 2214.0325 L 282.098 2214.0325"/>
 <path class="edge" d="M 204.11 267.005 L 234.3 267.005 A 4 4 0 0 0 242.3 267.005 L 282.098 267.005"/>
 <path class="edge" d="M 204.11 2391.035 L 234.3 2391.035 A 4 4 0 0 0 242.3 2391.035 L 282.098 2391.035"/>
+<circle cx="129.92" cy="90.0025" r="3" fill="#000000"/>
 <circle cx="129.92" cy="267.005" r="3" fill="#000000"/>
 <circle cx="129.92" cy="444.0075" r="3" fill="#000000"/>
 <circle cx="129.92" cy="621.01" r="3" fill="#000000"/>
@@ -129,6 +130,7 @@
 <circle cx="129.92" cy="2214.0325" r="3" fill="#000000"/>
 <circle cx="129.92" cy="2391.035" r="3" fill="#000000"/>
 <circle cx="129.92" cy="2568.0375" r="3" fill="#000000"/>
+<circle cx="238.3" cy="146.0025" r="3" fill="#000000"/>
 <circle cx="238.3" cy="323.005" r="3" fill="#000000"/>
 <circle cx="238.3" cy="500.0075" r="3" fill="#000000"/>
 <circle cx="238.3" cy="677.01" r="3" fill="#000000"/>
@@ -191,8 +193,8 @@
 <foreignObject x="272.49" y="2361.0325" width="42" height="62" overflow="visible"><div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:40px;height:55px;overflow:visible"><div style="position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:55px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;"><div style="position:absolute;left:-2px;top:-7px;width:40px;height:54px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;"><polygon points="30.4,36.0 20.0,42.0 9.6,36.0 9.6,24.0 20.0,18.0 30.4,24.0" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round"/><path d="M 14.5 30.0 L 25.5 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round"/><circle cx="20.0" cy="25.5" r="1.4" fill="#000000"/><circle cx="20.0" cy="34.5" r="1.4" fill="#000000"/></svg></div><div style="position:absolute;left:50%;top:80.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:0px;">div_13</div></div></div></foreignObject>
 <foreignObject x="272.49" y="2538.035" width="42" height="62" overflow="visible"><div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:40px;height:55px;overflow:visible"><div style="position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:55px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;"><div style="position:absolute;left:-2px;top:-7px;width:40px;height:54px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;"><polygon points="30.4,36.0 20.0,42.0 9.6,36.0 9.6,24.0 20.0,18.0 30.4,24.0" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round"/><path d="M 14.5 30.0 L 25.5 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round"/><circle cx="20.0" cy="25.5" r="1.4" fill="#000000"/><circle cx="20.0" cy="34.5" r="1.4" fill="#000000"/></svg></div><div style="position:absolute;left:50%;top:80.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:0px;">div_14</div></div></div></foreignObject>
 <foreignObject x="272.49" y="2715.0375" width="42" height="62" overflow="visible"><div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:40px;height:55px;overflow:visible"><div style="position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:55px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;"><div style="position:absolute;left:-2px;top:-7px;width:40px;height:54px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;"><polygon points="30.4,36.0 20.0,42.0 9.6,36.0 9.6,24.0 20.0,18.0 30.4,24.0" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round"/><path d="M 14.5 30.0 L 25.5 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round"/><circle cx="20.0" cy="25.5" r="1.4" fill="#000000"/><circle cx="20.0" cy="34.5" r="1.4" fill="#000000"/></svg></div><div style="position:absolute;left:50%;top:80.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:0px;">div_15</div></div></div></foreignObject>
-<foreignObject x="65.96" y="1315.0188" width="42" height="36" overflow="visible"><div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:40px;height:29px;overflow:visible"><div style="position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:29px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;"><div style="position:absolute;left:-2px;top:-7px;width:40px;height:19px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="position:absolute;left:50%;top:48.275862068965516%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;">from_a</div></div></div></foreignObject>
-<foreignObject x="164.11" y="1371.0188" width="42" height="36" overflow="visible"><div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:40px;height:29px;overflow:visible"><div style="position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:29px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;"><div style="position:absolute;left:-2px;top:-7px;width:40px;height:19px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="position:absolute;left:50%;top:48.275862068965516%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;">from_b</div></div></div></foreignObject>
+<foreignObject x="65.96" y="76.0013" width="42" height="36" overflow="visible"><div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:40px;height:29px;overflow:visible"><div style="position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:29px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;"><div style="position:absolute;left:-2px;top:-7px;width:40px;height:19px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="position:absolute;left:50%;top:48.275862068965516%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;">from_a</div></div></div></foreignObject>
+<foreignObject x="164.11" y="132.0013" width="42" height="36" overflow="visible"><div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:40px;height:29px;overflow:visible"><div style="position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:29px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;"><div style="position:absolute;left:-2px;top:-7px;width:40px;height:19px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div style="position:absolute;left:50%;top:48.275862068965516%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:4px;">from_b</div></div></div></foreignObject>
 <foreignObject x="164.11" y="60" width="42" height="62" overflow="visible"><div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:40px;height:55px;overflow:visible"><div style="position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:55px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;"><div style="position:absolute;left:-2px;top:-7px;width:40px;height:54px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;"><path d="M 11 18 L 19 18 A 12 12 0 1 1 19 42 L 11 42 Z" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="miter"/><path d="M 31 30 L 34 30" fill="none" stroke="#000000" stroke-width="2"/><circle cx="37" cy="30" r="3" fill="#ffffff" stroke="#000000" stroke-width="2"/></svg></div><div style="position:absolute;left:50%;top:80.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:0px;">gate_a_00</div></div></div></foreignObject>
 <foreignObject x="164.11" y="237.0025" width="42" height="62" overflow="visible"><div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:40px;height:55px;overflow:visible"><div style="position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:55px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;"><div style="position:absolute;left:-2px;top:-7px;width:40px;height:54px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;"><path d="M 11 18 L 19 18 A 12 12 0 1 1 19 42 L 11 42 Z" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="miter"/><path d="M 31 30 L 34 30" fill="none" stroke="#000000" stroke-width="2"/><circle cx="37" cy="30" r="3" fill="#ffffff" stroke="#000000" stroke-width="2"/></svg></div><div style="position:absolute;left:50%;top:80.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:0px;">gate_a_01</div></div></div></foreignObject>
 <foreignObject x="164.11" y="414.005" width="42" height="62" overflow="visible"><div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:40px;height:55px;overflow:visible"><div style="position:relative;box-sizing:border-box;margin:0;padding:0;display:block;width:40px;height:55px;overflow:visible;white-space:nowrap;font-family:Helvetica,Arial,sans-serif;"><div style="position:absolute;left:-2px;top:-7px;width:40px;height:54px"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;"><path d="M 11 18 L 19 18 A 12 12 0 1 1 19 42 L 11 42 Z" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="miter"/><path d="M 31 30 L 34 30" fill="none" stroke="#000000" stroke-width="2"/><circle cx="37" cy="30" r="3" fill="#ffffff" stroke="#000000" stroke-width="2"/></svg></div><div style="position:absolute;left:50%;top:80.0%;transform:translateX(-50%);text-align:center;font-size:11px;line-height:1;white-space:nowrap;padding-top:0px;">gate_a_02</div></div></div></foreignObject>

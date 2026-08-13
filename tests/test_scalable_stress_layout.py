@@ -14,6 +14,10 @@ from layout_quality import inspect_layout_quality
 from scripts.build_stress_examples import build_dual_from_reuse
 from scripts.build_stress_examples import build_adversarial_weave
 from scripts.build_stress_examples import build_multi_from_clusters
+from scripts.build_stress_examples import build_terminal_fanout_crossing
+from scripts.build_stress_examples import build_asymmetric_merge_columns
+from scripts.build_stress_examples import build_dispersed_root_fanout
+from drawio_ports import abs_port_xy, infer_port_from_attachment
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -187,13 +191,82 @@ def test_multi_from_roots_are_distributed_by_their_consumers() -> None:
     ]
 
     assert quality["passed"] is True
-    assert report["selection"]["source_position_mode"] == "consumer-median"
+    assert report["selection"]["source_position_mode"] == "adaptive-span"
     assert len(set(source_tops)) == 4
     assert max(source_tops) - min(source_tops) > max(
         vertex.height
         for vertex in document.vertices
         if vertex.name.startswith("from_")
     )
+
+
+def test_terminal_fanout_order_removes_avoidable_last_gap_crossing() -> None:
+    config = build_terminal_fanout_crossing()
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert quality["passed"] is True
+    assert quality["layout_order"]["terminal_order_inversions"] == 0
+    assert quality["layout_order"]["avoidable_terminal_crossings"] == 0
+    assert quality["line_integrity"]["distinct_crossing_points"] == 0
+    assert report["selection"]["bends_total"] <= 8
+
+
+def test_equivalent_merge_cohorts_share_one_constraint_derived_column() -> None:
+    config = build_asymmetric_merge_columns()
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    edges = build_logical_edges(config, nodes, LIBRARY)
+    ranks = _ranks(nodes, edges)
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    merge_names = [name for name in config if name.startswith("merge_")]
+    merge_x = {
+        round(vertex.x, 6) for vertex in document.vertices if vertex.name in merge_names
+    }
+
+    assert len({ranks[name] for name in merge_names}) == 1
+    assert len(merge_x) == 1
+    assert quality["passed"] is True
+
+
+def test_dispersed_root_uses_top_entry_and_justified_local_trunks() -> None:
+    config = build_dispersed_root_fanout()
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    vertices = {vertex.name: vertex for vertex in document.vertices}
+    root = vertices["wide_root"]
+    wide_targets = [
+        vertex for name, vertex in vertices.items() if name.startswith("wide_gate_")
+    ]
+    root_axis = abs_port_xy(
+        root.x, root.y, root.width, root.height,
+        root.style, root.drawclock_type, "right",
+    )[1]
+    target_axes = []
+    for target in wide_targets:
+        edge = next(
+            edge for edge in document.edges
+            if edge.target_id == target.cell_id and edge.source_id == root.cell_id
+        )
+        port = infer_port_from_attachment(target.style, edge.style, end="entry")
+        assert port is not None
+        target_axes.append(abs_port_xy(
+            target.x, target.y, target.width, target.height,
+            target.style, target.drawclock_type, port,
+        )[1])
+
+    assert quality["passed"] is True
+    assert report["selection"]["boundary_placed_roots"] >= 1
+    assert abs(root_axis - min(target_axes)) <= 0.02
+    assert quality["readability"]["fragmented_fanout_sources"] == {}
+    assert quality["readability"]["root_consumer_interleavings"]["wide_root"] == 0
 
 
 def test_quality_gate_rejects_unused_inter_rank_whitespace() -> None:

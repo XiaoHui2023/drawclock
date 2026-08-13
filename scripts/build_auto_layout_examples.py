@@ -31,6 +31,9 @@ EXAMPLES = (
     "14-crossing-weave-128-clocks",
     "15-routing-torture-512-clocks",
     "16-multi-from-clusters",
+    "17-terminal-fanout-order",
+    "18-asymmetric-merge-columns",
+    "19-dispersed-root-fanout",
 )
 
 

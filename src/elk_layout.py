@@ -17,6 +17,7 @@ from typing import Any
 
 from auto_layout import (
     PROFILES,
+    _mean,
     _simplify,
     _ranks,
     _overlap_length,
@@ -199,7 +200,12 @@ def _generate_scalable_layout(
     regular_top = profile.margin
     positions: dict[str, tuple[float, float]] = {}
 
+    def weighted_median(values: list[float]) -> float:
+        ordered = sorted(values)
+        return ordered[(len(ordered) - 1) // 2]
+
     regular_names = [name for name in nodes if name not in backbone]
+    separable_backbone_domains = len(backbone) <= 1
     adjacency: dict[str, list[str]] = defaultdict(list)
     for edge in logical_edges:
         if edge.source in backbone or edge.target in backbone:
@@ -222,6 +228,74 @@ def _generate_scalable_layout(
                     unseen.remove(neighbour)
                     stack.append(neighbour)
         components.append(component)
+
+    # Order residual domains by their shared-backbone incidence before
+    # assigning vertical bands.  Alternating medians are the two-layer
+    # crossing-minimisation step from Sugiyama layouts; the complete incidence
+    # signature is a deterministic tie-breaker that keeps domains fed by the
+    # same roots contiguous.  This replaces input-file insertion order, which
+    # could put two groups of one source above and below many unrelated groups
+    # and force a needless full-height trunk through them.
+    if len(components) > 1 and backbone:
+        component_of = {
+            name: index
+            for index, component in enumerate(components)
+            for name in component
+        }
+        roots_by_component: dict[int, set[str]] = defaultdict(set)
+        components_by_root: dict[str, set[int]] = defaultdict(set)
+        for edge in logical_edges:
+            if edge.source in backbone and edge.target in component_of:
+                index = component_of[edge.target]
+                roots_by_component[index].add(edge.source)
+                components_by_root[edge.source].add(index)
+            elif edge.target in backbone and edge.source in component_of:
+                index = component_of[edge.source]
+                roots_by_component[index].add(edge.target)
+                components_by_root[edge.target].add(index)
+        signatures = sorted({
+            frozenset(roots) for roots in roots_by_component.values() if roots
+        }, key=lambda item: tuple(sorted(item)))
+        # Disjoint signatures can be grouped without trading one shared-root
+        # crossing for another.  Overlapping non-identical signatures form a
+        # true weave (for example A+B, B+C, C+D); keep their already stable
+        # domain order instead of applying a locally attractive but globally
+        # regressive sort.
+        safely_separable = all(
+            not (left & right)
+            for index, left in enumerate(signatures)
+            for right in signatures[index + 1:]
+        )
+        separable_backbone_domains = safely_separable
+        if safely_separable:
+            component_ids = list(range(len(components)))
+            component_position = {index: index for index in component_ids}
+            for _ in range(8):
+                root_position = {
+                    root: weighted_median([
+                        float(component_position[index]) for index in indices
+                    ])
+                    for root, indices in components_by_root.items()
+                }
+                ordered_ids = sorted(component_ids, key=lambda index: (
+                    weighted_median([
+                        root_position[root] for root in roots_by_component[index]
+                    ]) if roots_by_component[index] else float(component_position[index]),
+                    tuple(sorted(
+                        root_position[root] for root in roots_by_component[index]
+                    )),
+                    tuple(sorted(roots_by_component[index])),
+                    component_position[index],
+                ))
+                new_position = {
+                    index: position for position, index in enumerate(ordered_ids)
+                }
+                if new_position == component_position:
+                    break
+                component_position = new_position
+            components = [components[index] for index in sorted(
+                component_ids, key=component_position.__getitem__
+            )]
 
     incoming_internal: dict[str, list[Any]] = defaultdict(list)
     outgoing_internal: dict[str, list[Any]] = defaultdict(list)
@@ -259,6 +333,44 @@ def _generate_scalable_layout(
                 name,
             ))
             sequence.update({name: index for index, name in enumerate(names)})
+
+        # Sugiyama-style alternating barycentric sweeps.  The previous
+        # right-to-left seed is useful for chains, but a terminal layer sorted
+        # by instance name can interleave A-B-A when A fans out twice and B
+        # once.  Reordering by adjacent-layer topology keeps siblings
+        # contiguous and removes the avoidable last-gap crossing before any
+        # route is computed.
+        levels_ascending = sorted(component_by_rank)
+        for _ in range(4):
+            order_index = {
+                name: index
+                for names in component_by_rank.values()
+                for index, name in enumerate(names)
+            }
+            for level in levels_ascending[1:]:
+                names = component_by_rank[level]
+                names.sort(key=lambda name: (
+                    _mean(
+                        order_index[edge.source]
+                        for edge in incoming_internal[name]
+                        if edge.source in order_index
+                    ),
+                    order_index[name],
+                    name,
+                ))
+                order_index.update({name: index for index, name in enumerate(names)})
+            for level in reversed(levels_ascending[:-1]):
+                names = component_by_rank[level]
+                names.sort(key=lambda name: (
+                    _mean(
+                        order_index[edge.target]
+                        for edge in outgoing_internal[name]
+                        if edge.target in order_index
+                    ),
+                    order_index[name],
+                    name,
+                ))
+                order_index.update({name: index for index, name in enumerate(names)})
         band_height = max(
             sum(nodes[name].shape.h for name in names)
             + local_spacing * max(0, len(names) - 1)
@@ -321,6 +433,46 @@ def _generate_scalable_layout(
                 for name, top in zip(names, packed):
                     positions[name] = (positions[name][0], top + translation)
 
+        # Projection translates a whole rank to minimize aggregate error and
+        # can leave a one-parent terminal a fraction of a track off-axis.  A
+        # final constraint projection moves such a sink to its exact parent
+        # port axis whenever the non-overlap inequalities remain satisfied.
+        # This prevents tiny H-V-H stubs without changing any port geometry.
+        for level, names in component_by_rank.items():
+            ordered_names = sorted(names, key=lambda item: positions[item][1])
+            for index, name in enumerate(ordered_names):
+                incoming_edges = incoming_internal[name]
+                if len(incoming_edges) != 1 or outgoing_internal[name]:
+                    continue
+                edge = incoming_edges[0]
+                source = nodes[edge.source]
+                target = nodes[name]
+                source_anchor = port_anchors(
+                    source.shape.style, source.shape.title
+                )[edge.source_port][1]
+                target_anchor = port_anchors(
+                    target.shape.style, target.shape.title
+                )[edge.target_port][1]
+                wanted_top = (
+                    positions[edge.source][1]
+                    + source.shape.h * source_anchor
+                    - target.shape.h * target_anchor
+                )
+                previous = ordered_names[index - 1] if index else None
+                following = (
+                    ordered_names[index + 1]
+                    if index + 1 < len(ordered_names) else None
+                )
+                if (
+                    previous is None
+                    or wanted_top
+                    >= positions[previous][1] + nodes[previous].shape.h
+                ) and (
+                    following is None
+                    or wanted_top + target.shape.h <= positions[following][1]
+                ):
+                    positions[name] = (positions[name][0], wanted_top)
+
         actual_top = min(positions[name][1] for name in component)
         shift = band_top - actual_top
         for name in component:
@@ -345,21 +497,18 @@ def _generate_scalable_layout(
     for edge in logical_edges:
         outgoing_all[edge.source].append(edge)
 
-    def weighted_median(values: list[float]) -> float:
-        ordered = sorted(values)
-        return ordered[(len(ordered) - 1) // 2]
-
     def nearest_free_top(
         wanted: float,
         height: float,
         occupied: list[tuple[float, float]],
         spacing: float,
+        minimum_top: float = profile.margin,
     ) -> float:
         """Place a movable node in the nearest legal vertical slot."""
-        candidates = {max(profile.margin, wanted)}
+        candidates = {max(minimum_top, wanted)}
         for low, high in occupied:
-            candidates.add(max(profile.margin, low - spacing - height))
-            candidates.add(max(profile.margin, high + spacing))
+            candidates.add(max(minimum_top, low - spacing - height))
+            candidates.add(max(minimum_top, high + spacing))
         legal = [
             top
             for top in candidates
@@ -371,24 +520,30 @@ def _generate_scalable_layout(
         ]
         if legal:
             return min(legal, key=lambda top: (abs(top - wanted), top))
-        top = max(profile.margin, wanted)
+        top = max(minimum_top, wanted)
         for low, high in sorted(occupied):
             if top + height + spacing > low and top < high + spacing:
                 top = high + spacing
         return top
 
     # Place shared roots/hubs from right to left, once every child position is
-    # known.  The median minimizes total vertical lead length and ordering by
-    # consumer position removes the structural "all sources at top" bias.
+    # known.  The median minimizes total vertical lead length.  A unique root
+    # whose consumers span the drawing and include the top route is instead
+    # attached at that top boundary: the distribution trunk has the same span
+    # either way, while the conventional top entry avoids an arbitrary source
+    # floating in the middle of its own bus.  This decision uses only topology
+    # and consumer geometry, never a component kind or instance name.
     backbone_by_rank: dict[int, list[str]] = defaultdict(list)
     for name in backbone:
         backbone_by_rank[rank[name]].append(name)
     source_spacing = max(1.0, profile.grid / 10.0)
+    boundary_placed_roots: set[str] = set()
     for level in range(max_rank, -1, -1):
         names = backbone_by_rank[level]
         if not names:
             continue
         desired: dict[str, float] = {}
+        target_axes_by_name: dict[str, list[float]] = {}
         for name in names:
             source = nodes[name]
             target_axes = []
@@ -405,10 +560,46 @@ def _generate_scalable_layout(
                     + target.shape.h * target_anchor
                     - source.shape.h * source_anchor
                 )
+            target_axes_by_name[name] = target_axes
             desired[name] = (
                 weighted_median(target_axes)
                 if target_axes else profile.margin
             )
+        spans = {
+            name: (
+                max(axes) - min(axes) if len(axes) > 1 else 0.0
+            )
+            for name, axes in target_axes_by_name.items()
+        }
+        span_values = list(spans.values()) or [0.0]
+        span_median = float(median(span_values))
+        span_mad = float(median(
+            abs(value - span_median) for value in span_values
+        ))
+        global_top_axis = min(
+            (axis for axes in target_axes_by_name.values() for axis in axes),
+            default=profile.margin,
+        )
+        ordered_spans = sorted(spans.values(), reverse=True)
+        dominant_span = ordered_spans[0] if ordered_spans else 0.0
+        runner_up_span = ordered_spans[1] if len(ordered_spans) > 1 else 0.0
+        boundary_roots = {
+            name
+            for name, axes in target_axes_by_name.items()
+            if len(axes) > 1
+            and spans[name] > 0
+            and separable_backbone_domains
+            and min(axes) <= global_top_axis + source_spacing
+            and (
+                len(names) == 1
+                or spans[name] > span_median + max(source_spacing, span_mad)
+                or (
+                    spans[name] == dominant_span
+                    and dominant_span > runner_up_span + source_spacing
+                )
+            )
+        }
+        boundary_placed_roots.update(boundary_roots)
         occupied = sorted(
             (positions[name][1], positions[name][1] + nodes[name].shape.h)
             for name in by_rank[level]
@@ -418,13 +609,19 @@ def _generate_scalable_layout(
         for source_index, name in enumerate(ordered_names):
             node = nodes[name]
             wanted = (
-                desired[name]
-                if source_position_mode == "consumer-median"
-                else profile.margin
-                + source_index * (node.shape.h + source_spacing)
+                min(target_axes_by_name[name])
+                if source_position_mode == "adaptive-span"
+                and name in boundary_roots
+                else desired[name]
+                if source_position_mode in {"consumer-median", "adaptive-span"}
+                else profile.margin + source_index * (node.shape.h + source_spacing)
             )
             top = nearest_free_top(
-                wanted, node.shape.h, occupied, source_spacing
+                wanted,
+                node.shape.h,
+                occupied,
+                source_spacing,
+                profile.margin - profile.route_clearance,
             )
             positions[name] = (rank_x[level], top)
             occupied.append((top, top + node.shape.h))
@@ -539,15 +736,53 @@ def _generate_scalable_layout(
 
     long_lanes: dict[str, float] = {}
 
-    # Colour vertical occupancy intervals in each inter-rank gap.  Different
-    # nets share an x lane only when their y intervals do not overlap; all
-    # branches from one source port deliberately remain one visual trunk.
+    # Colour vertical occupancy intervals in each inter-rank gap.  A compact
+    # fanout remains one visual trunk.  If its target axes contain a genuine
+    # geometric gap (larger than both the ordinary target pitch and two
+    # routable node clearances), split the same electrical net into local
+    # distribution trunks.  This avoids dragging one vertical line through a
+    # large unrelated region while retaining a shared prefix and junctions.
+    edges_by_net: dict[tuple[str, str], list[Any]] = defaultdict(list)
+    target_axis_by_edge: dict[str, float] = {}
+    for edge in logical_edges:
+        target = nodes[edge.target]
+        anchor = port_anchors(
+            target.shape.style, target.shape.title
+        )[edge.target_port][1]
+        axis = positions[edge.target][1] + target.shape.h * anchor
+        target_axis_by_edge[edge.key] = axis
+        edges_by_net[(edge.source, edge.source_port)].append(edge)
+    route_lane_key: dict[str, tuple[str, str, int]] = {}
+    fanout_trunk_clusters: dict[tuple[str, str], int] = {}
+    for net, net_edges in edges_by_net.items():
+        ordered = sorted(
+            net_edges,
+            key=lambda edge: (target_axis_by_edge[edge.key], edge.target, edge.target_port),
+        )
+        axes = [target_axis_by_edge[edge.key] for edge in ordered]
+        gaps = [right - left for left, right in zip(axes, axes[1:])]
+        positive_gaps = [gap for gap in gaps if gap > 1e-6]
+        ordinary_pitch = float(median(positive_gaps)) if positive_gaps else 0.0
+        target_height = float(median(
+            [nodes[edge.target].shape.h for edge in ordered]
+        ))
+        geometric_clearance = (
+            target_height + 2 * profile.route_clearance + profile.grid
+        )
+        split_threshold = max(2 * ordinary_pitch, geometric_clearance)
+        cluster = 0
+        for index, edge in enumerate(ordered):
+            if index and gaps[index - 1] > split_threshold:
+                cluster += 1
+            route_lane_key[edge.key] = (*net, cluster)
+        fanout_trunk_clusters[net] = cluster + 1
+
     intervals_by_gap: dict[
-        int, dict[tuple[str, str], tuple[float, float]]
+        int, dict[tuple[str, str, int], tuple[float, float]]
     ] = defaultdict(dict)
 
     def add_interval(
-        gap: int, key: tuple[str, str], y0: float, y1: float
+        gap: int, key: tuple[str, str, int], y0: float, y1: float
     ) -> None:
         lo, hi = sorted((y0, y1))
         previous = intervals_by_gap[gap].get(key)
@@ -579,7 +814,7 @@ def _generate_scalable_layout(
         ty = positions[edge.target][1] + target.shape.h * target_anchor[1]
         source_rank = rank[edge.source]
         target_rank = rank[edge.target]
-        key = (edge.source, edge.source_port)
+        key = route_lane_key[edge.key]
         if target_rank - source_rank > 1:
             lane_y = local_long_lane(edge, sy, ty)
             long_lanes[edge.key] = lane_y
@@ -596,13 +831,13 @@ def _generate_scalable_layout(
         else:
             add_interval(target_rank, key, sy, ty)
 
-    lane_index: dict[tuple[int, str, str], int] = {}
+    lane_index: dict[tuple[int, str, str, int], int] = {}
     lane_count: dict[int, int] = {}
     for gap, grouped in intervals_by_gap.items():
         active: list[tuple[float, int]] = []
         free: list[int] = []
         next_lane = 0
-        for (source, port), (lo, hi) in sorted(
+        for (source, port, cluster), (lo, hi) in sorted(
             grouped.items(), key=lambda item: (item[1][0], item[1][1], item[0])
         ):
             while active and active[0][0] <= lo:
@@ -611,7 +846,7 @@ def _generate_scalable_layout(
             lane = heapq.heappop(free) if free else next_lane
             if lane == next_lane:
                 next_lane += 1
-            lane_index[(gap, source, port)] = lane
+            lane_index[(gap, source, port, cluster)] = lane
             heapq.heappush(active, (hi, lane))
         lane_count[gap] = next_lane
 
@@ -634,7 +869,7 @@ def _generate_scalable_layout(
         for name, (_, y) in positions.items()
     }
 
-    def lane_x(gap: int, key: tuple[str, str]) -> float:
+    def lane_x(gap: int, key: tuple[str, str, int]) -> float:
         left = (
             rank_x[gap - 1]
             + rank_width[gap - 1]
@@ -812,10 +1047,11 @@ def _generate_scalable_layout(
         source_rank = rank[edge.source]
         target_rank = rank[edge.target]
         source_key = (edge.source, edge.source_port)
+        edge_lane_key = route_lane_key[edge.key]
         candidates: list[list[tuple[float, float]]] = []
         if target_rank - source_rank > 1:
-            first_x = lane_x(source_rank + 1, source_key)
-            last_x = lane_x(target_rank, source_key)
+            first_x = lane_x(source_rank + 1, edge_lane_key)
+            last_x = lane_x(target_rank, edge_lane_key)
             lane_y = long_lanes[edge.key]
             candidates.append(_simplify(
                 [(sx, sy), (first_x, sy), (first_x, lane_y),
@@ -863,7 +1099,7 @@ def _generate_scalable_layout(
                 ):
                     break
         else:
-            edge_lane_x = lane_x(target_rank, source_key)
+            edge_lane_x = lane_x(target_rank, edge_lane_key)
             if abs(sy - ty) <= 0.01:
                 candidates.append([(sx, sy), (tx, ty)])
             else:
@@ -994,6 +1230,12 @@ def _generate_scalable_layout(
                 for point in points[1:-1]
                 if source_right <= point[0] <= target_left
             }
+            if source_right <= target_left:
+                candidate_xs.update((
+                    source_right,
+                    (source_right + target_left) / 2.0,
+                    target_left,
+                ))
             candidates = [
                 _simplify([
                     points[0],
@@ -1012,9 +1254,10 @@ def _generate_scalable_layout(
                 continue
             best_cost, best_points = min(viable, key=lambda item: item[0])
             if (
-                best_cost[1] <= actual_cost[1]
+                best_cost < actual_cost
+                and best_cost[1] <= actual_cost[1]
                 and best_cost[2] <= actual_cost[2]
-                and best_cost[3] < actual_cost[3]
+                and best_cost[3] <= actual_cost[3]
             ):
                 layout.waypoints = tuple(best_points[1:-1])
                 changed = True
@@ -1292,6 +1535,13 @@ def _generate_scalable_layout(
             "edge_span_load": plan.edge_span_load,
             "gap_pair_work": plan.gap_pair_work,
             "source_position_mode": source_position_mode,
+            "boundary_placed_roots": len(boundary_placed_roots),
+            "fanout_nets_with_local_trunks": sum(
+                count > 1 for count in fanout_trunk_clusters.values()
+            ),
+            "fanout_trunk_clusters_max": max(
+                fanout_trunk_clusters.values(), default=0
+            ),
             "source_crossing_points": len(source_crossing_points),
             "route_overlaps": len(route_overlap_pairs),
             "bends_total": bend_total,
@@ -1323,7 +1573,7 @@ def generate_elk_layout(
     for edge in logical_edges:
         indegree[edge.target] += 1
     root_count = sum(degree == 0 for degree in indegree.values())
-    source_modes = ["consumer-median"]
+    source_modes = ["adaptive-span"]
     candidates = []
     for source_mode in source_modes:
         document, report = _generate_scalable_layout(

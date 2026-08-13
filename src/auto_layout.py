@@ -208,9 +208,11 @@ def build_logical_edges(
 
 def _ranks(names: Iterable[str], edges: list[LogicalEdge]) -> dict[str, int]:
     outgoing: dict[str, list[str]] = defaultdict(list)
+    incoming: dict[str, list[str]] = defaultdict(list)
     indegree = {name: 0 for name in names}
     for edge in edges:
         outgoing[edge.source].append(edge.target)
+        incoming[edge.target].append(edge.source)
         indegree[edge.target] += 1
     queue = deque(name for name in names if indegree[name] == 0)
     earliest = {name: 0 for name in names}
@@ -227,18 +229,75 @@ def _ranks(names: Iterable[str], edges: list[LogicalEdge]) -> dict[str, int]:
         cyclic = sorted(name for name, degree in indegree.items() if degree > 0)
         raise ValueError(f"clock-tree 包含环路: {', '.join(cyclic)}")
 
+    # Repeated reconvergence is easier to scan when equivalent merge points
+    # share a column.  Build cohorts from topology only: the complete set of
+    # root ancestors plus the number of merge points already traversed.  The
+    # latter keeps two causally ordered reconvergences out of the same cohort.
+    # Cohorts move left only inside their common ASAP/ALAP feasibility window;
+    # predecessors are then pulled left as required, so every edge still
+    # advances by at least one layer.
+    root_ancestors: dict[str, frozenset[str]] = {}
+    merge_generation: dict[str, int] = {}
+    for name in visited:
+        parents = incoming[name]
+        if not parents:
+            root_ancestors[name] = frozenset((name,))
+            merge_generation[name] = 0
+            continue
+        root_ancestors[name] = frozenset().union(
+            *(root_ancestors[parent] for parent in parents)
+        )
+        merge_generation[name] = max(
+            merge_generation[parent] for parent in parents
+        ) + int(len(parents) > 1)
+    cohorts: dict[tuple[frozenset[str], int], list[str]] = defaultdict(list)
+    for name in visited:
+        if len(incoming[name]) > 1:
+            cohorts[(root_ancestors[name], merge_generation[name])].append(name)
+
+    downstream_depth: dict[str, int] = {}
+    for name in reversed(visited):
+        downstream_depth[name] = max(
+            (downstream_depth[child] + 1 for child in outgoing[name]),
+            default=0,
+        )
+
     # Align every terminal on the rightmost layer, then schedule each
-    # predecessor as late as its earliest consumer permits.  This is the
-    # standard ASAP/ALAP layering pair: long logical paths retain their depth,
-    # while roots of shorter paths may move into an interior layer instead of
-    # creating avoidable long edges from a mandatory left margin.
+    # predecessor as late as its earliest consumer permits.  Equivalent merge
+    # cohorts may need slack when one branch is longer before the merge and a
+    # different branch is longer after it.  Add exactly that constraint-derived
+    # slack; this is not a node-count or component-kind threshold.
     last_layer = max(earliest.values(), default=0)
+    for cohort in cohorts.values():
+        if len(cohort) > 1:
+            last_layer = max(
+                last_layer,
+                max(earliest[name] for name in cohort)
+                + max(downstream_depth[name] for name in cohort),
+            )
     latest = {name: last_layer for name in earliest}
     for name in reversed(visited):
         children = outgoing[name]
         if children:
             latest[name] = min(latest[child] - 1 for child in children)
-    return latest
+
+    anchored = dict(latest)
+    for cohort in cohorts.values():
+        if len(cohort) < 2:
+            continue
+        lower = max(earliest[name] for name in cohort)
+        upper = min(latest[name] for name in cohort)
+        if lower <= upper:
+            target = max(lower, min(latest[name] for name in cohort))
+            for name in cohort:
+                anchored[name] = target
+    for name in reversed(visited):
+        children = outgoing[name]
+        if children:
+            anchored[name] = min(
+                anchored[name], min(anchored[child] - 1 for child in children)
+            )
+    return anchored
 
 
 def _candidate_orders(

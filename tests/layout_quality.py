@@ -6,6 +6,7 @@ import time
 from bisect import bisect_left, bisect_right
 from collections import Counter, defaultdict
 from pathlib import Path
+from statistics import median
 from typing import Any
 
 from auto_layout import (
@@ -28,7 +29,7 @@ from drawio_ports import abs_port_xy, infer_port_from_attachment, port_anchors
 from visual_geometry import vertex_visual_box
 
 
-QUALITY_SCHEMA_VERSION = 5  # Test-only Agent artifact inspection schema.
+QUALITY_SCHEMA_VERSION = 6  # Test-only Agent artifact inspection schema.
 
 
 def _close(a: float, b: float, tolerance: float) -> bool:
@@ -877,11 +878,103 @@ def inspect_layout_quality(
     terminal_path_bends = [
         path_bends(name) for name, item in config.items() if item.get("kind") == "clock"
     ]
+    # Multiple local trunks are justified only when target axes have natural
+    # geometric clusters.  This is evaluated from the final artifact and
+    # library boxes, independently of the production router's bookkeeping.
+    target_axes_by_net: dict[tuple[str, str], list[tuple[float, float]]] = defaultdict(list)
+    for source_name, source_port, target_name, target_port in observed_edge_ports.values():
+        target = vertices_by_name[target_name]
+        target_y = abs_port_xy(
+            target.x, target.y, target.width, target.height,
+            target.style, target.drawclock_type, target_port,
+        )[1]
+        target_axes_by_net[(source_name, source_port)].append(
+            (target_y, target.height)
+        )
+    justified_trunk_counts: dict[tuple[str, str], int] = {}
+    for net, targets in target_axes_by_net.items():
+        ordered_targets = sorted(targets)
+        axes = [axis for axis, _ in ordered_targets]
+        gaps = [right - left for left, right in zip(axes, axes[1:])]
+        positive_gaps = [gap for gap in gaps if gap > tolerance]
+        ordinary_pitch = float(median(positive_gaps)) if positive_gaps else 0.0
+        ordinary_height = float(median(height for _, height in ordered_targets))
+        split_threshold = max(
+            2 * ordinary_pitch,
+            ordinary_height + 2 * routing_clearance + grid,
+        )
+        justified_trunk_counts[net] = 1 + sum(
+            gap > split_threshold for gap in gaps
+        )
+    fanout_trunk_clusters = {
+        f"{name}:{port}": len(xs)
+        for (name, port), xs in first_stub_x_by_net.items()
+        if logical_fanout[(name, port)] > 1 and len(xs) > 1
+    }
     fragmented_fanouts = {
         f"{name}:{port}": len(xs)
         for (name, port), xs in first_stub_x_by_net.items()
         if logical_fanout[(name, port)] > 1
-        and len(xs) > 1
+        and len(xs) > justified_trunk_counts.get((name, port), 1)
+    }
+
+    # A sink-layer order inversion is an avoidable crossing: terminal nodes
+    # have no successors constraining their vertical order, so swapping them
+    # can remove the inversion without changing topology or port correctness.
+    logical_outdegree = Counter(edge.source for edge in logical_edges)
+    terminal_edges: list[tuple[str, float, float, tuple[str, str]]] = []
+    rightmost_rank = max(ranks.values(), default=0)
+    for edge_id, (source_name, source_port, target_name, target_port) in observed_edge_ports.items():
+        if (
+            logical_outdegree[target_name] != 0
+            or ranks.get(target_name) != rightmost_rank
+        ):
+            continue
+        source = vertices_by_name[source_name]
+        target = vertices_by_name[target_name]
+        source_y = abs_port_xy(
+            source.x, source.y, source.width, source.height,
+            source.style, source.drawclock_type, source_port,
+        )[1]
+        target_y = abs_port_xy(
+            target.x, target.y, target.width, target.height,
+            target.style, target.drawclock_type, target_port,
+        )[1]
+        terminal_edges.append((edge_id, source_y, target_y, (source_name, source_port)))
+    terminal_order_inversions = sum(
+        source_net_a != source_net_b
+        and (source_y_a - source_y_b) * (target_y_a - target_y_b) < -(tolerance ** 2)
+        for index, (_, source_y_a, target_y_a, source_net_a) in enumerate(terminal_edges)
+        for _, source_y_b, target_y_b, source_net_b in terminal_edges[index + 1:]
+    )
+    terminal_edge_ids = {edge_id for edge_id, *_ in terminal_edges}
+    avoidable_terminal_crossings = sum(
+        left in terminal_edge_ids and right in terminal_edge_ids
+        for left, right in crossings
+    )
+    logical_indegree_by_name = Counter(edge.target for edge in logical_edges)
+    root_names = {
+        name for name in config if logical_indegree_by_name[name] == 0
+    }
+    direct_axes_by_root: dict[str, list[float]] = defaultdict(list)
+    for source_name, _, target_name, target_port in observed_edge_ports.values():
+        if source_name not in root_names:
+            continue
+        target = vertices_by_name[target_name]
+        direct_axes_by_root[source_name].append(abs_port_xy(
+            target.x, target.y, target.width, target.height,
+            target.style, target.drawclock_type, target_port,
+        )[1])
+    root_consumer_interleavings = {
+        root: sum(
+            low + tolerance < axis < high - tolerance
+            for other_root, other_axes in direct_axes_by_root.items()
+            if other_root != root
+            for axis in other_axes
+        )
+        for root, axes in direct_axes_by_root.items()
+        if len(axes) > 1
+        for low, high in [(min(axes), max(axes))]
     }
 
     vertical_gaps: list[float] = []
@@ -954,7 +1047,11 @@ def inspect_layout_quality(
     avoidable_inter_rank_gap = sum(
         float(item["avoidable_px"]) for item in inter_rank_gaps
     )
-    order_failures = node_overlaps + direction_violations
+    order_failures = (
+        node_overlaps
+        + direction_violations
+        + (["avoidable-terminal-crossing"] if avoidable_terminal_crossings else [])
+    )
     hard_failures = sorted(set(alignment_failures + line_failures + order_failures))
 
     min_x = min((box.left for box in visual_boxes.values()), default=0.0)
@@ -1037,6 +1134,8 @@ def inspect_layout_quality(
             ),
             "chain_axis_dogleg_edges": sorted(set(chain_axis_doglegs)),
             "fragmented_fanout_sources": fragmented_fanouts,
+            "fanout_trunk_clusters": fanout_trunk_clusters,
+            "root_consumer_interleavings": root_consumer_interleavings,
             "terminal_path_bends_mean": round(sum(terminal_path_bends) / max(1, len(terminal_path_bends)), 3),
             "terminal_path_bends_max": max(terminal_path_bends, default=0),
         },
@@ -1045,6 +1144,8 @@ def inspect_layout_quality(
             "node_overlaps": node_overlaps,
             "direction_violations": direction_violations,
             "mux_input_order_inversions": mux_input_order_inversions,
+            "terminal_order_inversions": terminal_order_inversions,
+            "avoidable_terminal_crossings": avoidable_terminal_crossings,
             "vertical_gap_min_px": round(min(vertical_gaps), 3) if vertical_gaps else None,
             "vertical_gap_cv": round(gap_cv, 4),
             "visible_footprint_area_px2": round(visible_area, 2),

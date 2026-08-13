@@ -1,0 +1,25 @@
+{
+  "root": {
+    "kind": "from"
+  },
+  "gate_a": {
+    "kind": "gate",
+    "source": "root"
+  },
+  "gate_b": {
+    "kind": "gate",
+    "source": "root"
+  },
+  "clock_a": {
+    "kind": "clock",
+    "source": "gate_a"
+  },
+  "clock_m": {
+    "kind": "clock",
+    "source": "gate_b"
+  },
+  "clock_z": {
+    "kind": "clock",
+    "source": "gate_a"
+  }
+}
