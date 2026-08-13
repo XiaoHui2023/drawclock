@@ -5,13 +5,10 @@ import json
 import sys
 from pathlib import Path
 
-from auto_layout import (
-    generate_layout,
-    load_clock_tree,
-)
+from auto_layout import load_clock_tree
 from drawio_layout import CROSSING_STYLES, apply_crossing_style
 from layout_preview import write_preview_svg
-from elk_layout import elk_layout_available, generate_elk_layout
+from elk_layout import generate_elk_layout
 from migrate import reload_drawio_inputs
 from pipeline import drawio_to_clock_tree, write_clock_tree_json
 
@@ -162,16 +159,10 @@ def _json_to_drawio(args: argparse.Namespace) -> int:
     output = Path(args.output)
     try:
         config = load_clock_tree(args.input)
-        if elk_layout_available():
-            document, _ = generate_elk_layout(
-                config,
-                library_path=args.library,
-            )
-        else:
-            document, _ = generate_layout(
-                config,
-                library_path=args.library,
-            )
+        document, _ = generate_elk_layout(
+            config,
+            library_path=args.library,
+        )
         apply_crossing_style(document, args.crossing_style)
         write_preview_svg(
             document,

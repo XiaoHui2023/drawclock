@@ -9,7 +9,7 @@ import pytest
 import elk_layout
 from auto_layout import load_clock_tree
 from elk_layout import elk_layout_available, generate_elk_layout
-from layout_quality import inspect_layout_quality
+from layout_quality import _points_for_edge, inspect_layout_quality
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -137,7 +137,7 @@ def test_elk_512_clock_stress_budget_and_integrity() -> None:
     assert sum(item.get("kind") == "clock" for item in config.values()) == 512
     assert len(document.vertices) == 1046
     assert len(document.edges) == 1300
-    assert report["engine"] == "scalable-layered"
+    assert report["engine"] == "constraint-layered"
     assert report["selection"]["basis"] == "graph-structure"
     assert report["selection"]["backbone_nodes"] > 0
     assert line["missing_edges"] == []
@@ -149,3 +149,41 @@ def test_elk_512_clock_stress_budget_and_integrity() -> None:
     assert line["edge_node_intersections"] == []
     assert line["ambiguous_overlaps"] == []
     assert elapsed < 30
+
+
+def test_quality_rejects_avoidable_global_bottom_detour() -> None:
+    config = {
+        "src": {"kind": "from"},
+        "gate": {"kind": "gate", "source": "src"},
+        "div": {"kind": "div", "source": "gate"},
+        "sel": {
+            "kind": "mux2",
+            "source": {"0": "div", "1": "src"},
+        },
+        "cell": {"kind": "cell", "source": "sel"},
+        "clk": {"kind": "clock", "source": "cell"},
+    }
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    vertices = {vertex.cell_id: vertex for vertex in document.vertices}
+    bad_edge = next(
+        edge for edge in document.edges
+        if vertices[edge.source_id].name == "src"
+        and vertices[edge.target_id].name == "sel"
+    )
+    points = _points_for_edge(
+        bad_edge, vertices[bad_edge.source_id], vertices[bad_edge.target_id]
+    )
+    bottom = max(vertex.y + vertex.height for vertex in document.vertices) + 1000
+    bad_edge.waypoints = (
+        (points[0][0] + 20, points[0][1]),
+        (points[0][0] + 20, bottom),
+        (points[-1][0] - 20, bottom),
+        (points[-1][0] - 20, points[-1][1]),
+    )
+
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=10, tolerance=0.01
+    )
+
+    assert quality["passed"] is False
+    assert quality["line_integrity"]["avoidable_outer_detours"] == [bad_edge.cell_id]

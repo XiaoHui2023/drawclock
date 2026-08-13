@@ -213,20 +213,32 @@ def _ranks(names: Iterable[str], edges: list[LogicalEdge]) -> dict[str, int]:
         outgoing[edge.source].append(edge.target)
         indegree[edge.target] += 1
     queue = deque(name for name in names if indegree[name] == 0)
-    rank = {name: 0 for name in names}
+    earliest = {name: 0 for name in names}
     visited: list[str] = []
     while queue:
         name = queue.popleft()
         visited.append(name)
         for child in outgoing[name]:
-            rank[child] = max(rank[child], rank[name] + 1)
+            earliest[child] = max(earliest[child], earliest[name] + 1)
             indegree[child] -= 1
             if indegree[child] == 0:
                 queue.append(child)
     if len(visited) != len(indegree):
         cyclic = sorted(name for name, degree in indegree.items() if degree > 0)
         raise ValueError(f"clock-tree 包含环路: {', '.join(cyclic)}")
-    return rank
+
+    # Align every terminal on the rightmost layer, then schedule each
+    # predecessor as late as its earliest consumer permits.  This is the
+    # standard ASAP/ALAP layering pair: long logical paths retain their depth,
+    # while roots of shorter paths may move into an interior layer instead of
+    # creating avoidable long edges from a mandatory left margin.
+    last_layer = max(earliest.values(), default=0)
+    latest = {name: last_layer for name in earliest}
+    for name in reversed(visited):
+        children = outgoing[name]
+        if children:
+            latest[name] = min(latest[child] - 1 for child in children)
+    return latest
 
 
 def _candidate_orders(
@@ -447,13 +459,17 @@ def _overlap_length(a: Segment, b: Segment) -> float:
 
 
 def _simplify(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    tolerance = 0.01
     out: list[tuple[float, float]] = []
     for point in points:
-        if out and point == out[-1]:
+        if out and all(abs(a - b) <= tolerance for a, b in zip(point, out[-1])):
             continue
         if len(out) >= 2:
             a, b = out[-2], out[-1]
-            if (a[0] == b[0] == point[0]) or (a[1] == b[1] == point[1]):
+            if (
+                max(a[0], b[0], point[0]) - min(a[0], b[0], point[0]) <= tolerance
+                or max(a[1], b[1], point[1]) - min(a[1], b[1], point[1]) <= tolerance
+            ):
                 out[-1] = point
                 continue
         out.append(point)
@@ -545,7 +561,10 @@ def _route_edges(
             )
         best: tuple[tuple[float, ...], list[tuple[float, float]], list[Segment]] | None = None
         for lane in sorted(lane_values):
-            points = _simplify([(sx, sy), (x1, sy), (x1, lane), (x2, lane), (x2, ty), (tx, ty)])
+            points = _simplify([
+                (sx, sy), (x1, sy), (x1, lane),
+                (x2, lane), (x2, ty), (tx, ty),
+            ])
             candidate_segments = _segments(points, edge)
             obstacle_hits = 0
             for segment in candidate_segments:

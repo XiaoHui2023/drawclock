@@ -63,6 +63,38 @@ def build(domain_count: int) -> dict[str, dict[str, object]]:
     return config
 
 
+def build_dual_from_reuse(branch_count: int = 16) -> dict[str, dict[str, object]]:
+    """Two shared roots feeding asymmetric, repeated mux domains."""
+    config: dict[str, dict[str, object]] = {
+        "from_a": {"kind": "from"},
+        "from_b": {"kind": "from"},
+    }
+    for branch in range(branch_count):
+        suffix = f"{branch:02d}"
+        config[f"gate_a_{suffix}"] = {"kind": "gate", "source": "from_a"}
+        config[f"div_{suffix}"] = {
+            "kind": "div",
+            "source": f"gate_a_{suffix}",
+        }
+        config[f"gate_b_{suffix}"] = {"kind": "gate", "source": "from_b"}
+        config[f"sel_{suffix}"] = {
+            "kind": "mux2",
+            "source": {
+                "0": f"div_{suffix}",
+                "1": f"gate_b_{suffix}",
+            },
+        }
+        config[f"cell_{suffix}"] = {
+            "kind": "cell",
+            "source": f"sel_{suffix}",
+        }
+        config[f"clk_{suffix}"] = {
+            "kind": "clock",
+            "source": f"cell_{suffix}",
+        }
+    return config
+
+
 def main() -> int:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     scenarios = (
@@ -80,6 +112,13 @@ def main() -> int:
         )
         clocks = sum(item.get("kind") == "clock" for item in config.values())
         print(f"{name}: nodes={len(config)}, clocks={clocks}")
+    dual_from = build_dual_from_reuse()
+    name = "12-dual-from-reuse"
+    (OUTPUT / f"{name}.json").write_text(
+        json.dumps(dual_from, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    print(f"{name}: nodes={len(dual_from)}, clocks={16}")
     return 0
 
 

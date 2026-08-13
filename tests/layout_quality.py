@@ -27,7 +27,7 @@ from drawio_library import load_library_shapes
 from drawio_ports import abs_port_xy, infer_port_from_attachment, port_anchors
 
 
-QUALITY_SCHEMA_VERSION = 2  # Test-only Agent artifact inspection schema.
+QUALITY_SCHEMA_VERSION = 3  # Test-only Agent artifact inspection schema.
 
 
 def _close(a: float, b: float, tolerance: float) -> bool:
@@ -156,6 +156,10 @@ def inspect_layout_quality(
     rank_x_spread_max = max(rank_spreads.values(), default=0.0)
 
     expected_counter = Counter(edge.key for edge in logical_edges)
+    logical_fanout = Counter(
+        (edge.source, edge.source_port) for edge in logical_edges
+    )
+    logical_indegree = Counter(edge.target for edge in logical_edges)
     observed_counter: Counter[str] = Counter()
     dangling_edges: list[str] = []
     unresolved_port_edges: list[str] = []
@@ -165,6 +169,7 @@ def inspect_layout_quality(
     backtracking_edges: list[str] = []
     all_segments: list[Segment] = []
     edge_segments: dict[str, list[Segment]] = {}
+    edge_points: dict[str, list[tuple[float, float]]] = {}
     crossing_capable: dict[str, bool] = {}
     bends_total = 0
     bends_max = 0
@@ -177,6 +182,9 @@ def inspect_layout_quality(
     first_stub_x_by_net: dict[tuple[str, str], set[float]] = defaultdict(set)
     edge_bends_by_key: dict[str, int] = {}
     observed_edge_ports: dict[str, tuple[str, str, str, str]] = {}
+    local_axis_offsets: list[float] = []
+    straight_local_edges = 0
+    chain_axis_doglegs: list[str] = []
 
     for edge in document.edges:
         source = vertices_by_id.get(edge.source_id)
@@ -210,6 +218,12 @@ def inspect_layout_quality(
         if not points:
             unresolved_port_edges.append(edge.cell_id)
             continue
+        axis_offset = abs(points[-1][1] - points[0][1])
+        if logical_fanout[(source.name, source_port)] == 1:
+            local_axis_offsets.append(axis_offset)
+            straight_local_edges += int(axis_offset <= tolerance)
+            if logical_indegree[target.name] == 1 and axis_offset > tolerance:
+                chain_axis_doglegs.append(edge.cell_id)
         redundant = False
         if len(points) >= 2 and abs(points[1][1] - points[0][1]) > tolerance:
             source_lead_non_horizontal.append(edge.cell_id)
@@ -271,6 +285,7 @@ def inspect_layout_quality(
             if not (_close(a[0], b[0], tolerance) and _close(a[1], b[1], tolerance))
         ]
         edge_segments[edge.cell_id] = segments
+        edge_points[edge.cell_id] = points
         all_segments.extend(segments)
         crossing_capable[edge.cell_id] = _style_value(edge.style, "jumpStyle") in {"arc", "gap", "sharp"}
 
@@ -317,6 +332,97 @@ def inspect_layout_quality(
                 rect = (vertex.x, vertex.y, vertex.x + vertex.width, vertex.y + vertex.height)
                 if _segment_hits_rect(segment.a, segment.b, rect):
                     edge_node_intersections.append(f"{edge_id}->{vertex.name}")
+
+    # An outer corridor is not intrinsically wrong: an obstacle can require
+    # it.  It becomes a hard failure only when the already allocated x
+    # channels admit a strictly shorter collision-free orthogonal route closer
+    # to the endpoint band.  This catches the historical global-bottom-lane
+    # failure without applying a graph-size or absolute-distance threshold.
+    outer_detour_edges: list[str] = []
+    avoidable_outer_detours: list[str] = []
+    outer_excursions: list[float] = []
+    rank_nodes: dict[int, list[Any]] = defaultdict(list)
+    for name, rank in ranks.items():
+        if name in vertices_by_name:
+            rank_nodes[rank].append(vertices_by_name[name])
+    node_top = min((vertex.y for vertex in document.vertices), default=0.0)
+    node_bottom = max(
+        (vertex.y + vertex.height for vertex in document.vertices), default=0.0
+    )
+    for edge_id, points in edge_points.items():
+        if len(points) < 4:
+            continue
+        source_name, _, target_name, _ = observed_edge_ports[edge_id]
+        endpoint_low, endpoint_high = sorted((points[0][1], points[-1][1]))
+        route_low = min(point[1] for point in points)
+        route_high = max(point[1] for point in points)
+        actual_outer = max(
+            0.0, endpoint_low - route_low, route_high - endpoint_high
+        )
+        if actual_outer <= tolerance:
+            continue
+        outer_detour_edges.append(edge_id)
+        outer_excursions.append(actual_outer)
+        source_rank, target_rank = ranks[source_name], ranks[target_name]
+        if target_rank <= source_rank + 1:
+            continue
+        x1, x2 = points[1][0], points[-2][0]
+        if x2 < x1 - tolerance:
+            continue
+        obstacles = [
+            vertex
+            for rank in range(source_rank + 1, target_rank)
+            for vertex in rank_nodes[rank]
+            if vertex.name not in (source_name, target_name)
+        ]
+        candidate_lanes = {points[0][1], points[-1][1]}
+        for vertex in obstacles:
+            candidate_lanes.add(vertex.y - grid)
+            candidate_lanes.add(vertex.y + vertex.height + grid)
+        actual_length = sum(
+            abs(b[0] - a[0]) + abs(b[1] - a[1])
+            for a, b in zip(points, points[1:])
+        )
+        best_local: tuple[float, float] | None = None
+        for lane in candidate_lanes:
+            candidate = _canonical_orthogonal_points(
+                [points[0], (x1, points[0][1]), (x1, lane),
+                 (x2, lane), (x2, points[-1][1]), points[-1]],
+                tolerance,
+            )
+            candidate_segments = [
+                Segment("candidate", (source_name, ""), a, b)
+                for a, b in zip(candidate, candidate[1:])
+                if not (_close(a[0], b[0], tolerance) and _close(a[1], b[1], tolerance))
+            ]
+            if any(
+                _segment_hits_rect(segment.a, segment.b,
+                    (vertex.x, vertex.y, vertex.x + vertex.width, vertex.y + vertex.height))
+                for segment in candidate_segments
+                for vertex in obstacles
+            ):
+                continue
+            local_outer = max(
+                0.0, endpoint_low - lane, lane - endpoint_high
+            )
+            local_length = sum(
+                abs(b[0] - a[0]) + abs(b[1] - a[1])
+                for a, b in zip(candidate, candidate[1:])
+            )
+            score = (local_outer, local_length)
+            if best_local is None or score < best_local:
+                best_local = score
+        escaped_node_bounds = (
+            route_low < node_top - tolerance
+            or route_high > node_bottom + tolerance
+        )
+        if (
+            escaped_node_bounds
+            and best_local is not None
+            and best_local[0] < actual_outer - tolerance
+            and best_local[1] < actual_length - tolerance
+        ):
+            avoidable_outer_detours.append(edge_id)
 
     crossings: list[tuple[str, str]] = []
     crossing_pair_intersections = 0
@@ -486,9 +592,6 @@ def inspect_layout_quality(
     terminal_path_bends = [
         path_bends(name) for name, item in config.items() if item.get("kind") == "clock"
     ]
-    logical_fanout = Counter(
-        (edge.source, edge.source_port) for edge in logical_edges
-    )
     fragmented_fanouts = {
         f"{name}:{port}": len(xs)
         for (name, port), xs in first_stub_x_by_net.items()
@@ -520,6 +623,7 @@ def inspect_layout_quality(
         + non_orthogonal_segments + zero_length_segments + redundant_waypoints
         + micro_segments + source_lead_non_horizontal + target_lead_non_horizontal
         + backtracking_edges + edge_node_intersections
+        + [f"avoidable-outer-detour:{edge_id}" for edge_id in avoidable_outer_detours]
         + [f"overlap:{a}/{b}" for a, b in ambiguous_overlaps]
         + [f"unbridged:{a}/{b}" for a, b in untreated_crossings]
     )
@@ -566,6 +670,7 @@ def inspect_layout_quality(
             "redundant_waypoint_edges": sorted(set(redundant_waypoints)),
             "backtracking_edges": sorted(set(backtracking_edges)),
             "edge_node_intersections": sorted(set(edge_node_intersections)),
+            "avoidable_outer_detours": sorted(set(avoidable_outer_detours)),
             "ambiguous_overlaps": [list(pair) for pair in ambiguous_overlaps],
             "crossings": crossing_pair_intersections,
             "distinct_crossing_points": len(crossing_points),
@@ -581,6 +686,18 @@ def inspect_layout_quality(
             "route_inefficiency_max": round(max(route_inefficiencies, default=1.0), 4),
             "vertical_segment_max_px": round(max(vertical_lengths, default=0.0), 3),
             "vertical_segments_over_300px": sum(length > 300 for length in vertical_lengths),
+            "outer_detour_edges": sorted(set(outer_detour_edges)),
+            "outer_excursion_max_px": round(max(outer_excursions, default=0.0), 3),
+            "straight_local_edge_ratio": round(
+                straight_local_edges / max(1, len(local_axis_offsets)), 4
+            ),
+            "local_axis_offset_mean_px": round(
+                sum(local_axis_offsets) / max(1, len(local_axis_offsets)), 3
+            ),
+            "local_axis_offset_max_px": round(
+                max(local_axis_offsets, default=0.0), 3
+            ),
+            "chain_axis_dogleg_edges": sorted(set(chain_axis_doglegs)),
             "fragmented_fanout_sources": fragmented_fanouts,
             "terminal_path_bends_mean": round(sum(terminal_path_bends) / max(1, len(terminal_path_bends)), 3),
             "terminal_path_bends_max": max(terminal_path_bends, default=0),

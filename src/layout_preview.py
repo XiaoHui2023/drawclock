@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from bisect import bisect_left, bisect_right, insort
 from collections import defaultdict
 from pathlib import Path
 
@@ -54,23 +55,66 @@ def _arc_crossings(
             edge.source_id,
             edge_attachment(edge.style, end="exit"),
         )
-    jumps: dict[str, dict[int, list[float]]] = defaultdict(lambda: defaultdict(list))
-    for edge_index, first in enumerate(document.edges):
-        first_points = edge_points[first.cell_id]
-        for second in document.edges[edge_index + 1 :]:
-            if nets[first.cell_id] == nets[second.cell_id]:
-                continue
-            second_points = edge_points[second.cell_id]
-            for first_segment, (a, b) in enumerate(zip(first_points, first_points[1:])):
-                for second_segment, (c, d) in enumerate(zip(second_points, second_points[1:])):
-                    crossing = _proper_orthogonal_crossing(a, b, c, d)
-                    if crossing is None:
-                        continue
-                    if a[1] == b[1]:
-                        jumps[first.cell_id][first_segment].append(crossing[0])
-                    else:
-                        jumps[second.cell_id][second_segment].append(crossing[0])
-    return jumps
+    horizontal_by_id: dict[int, tuple[str, int, float, tuple[str, tuple[float, float] | None]]] = {}
+    events: list[tuple[float, int, int]] = []
+    verticals: list[tuple[str, int, float, float, float, tuple[str, tuple[float, float] | None]]] = []
+    serial = 0
+    for edge in document.edges:
+        points = edge_points[edge.cell_id]
+        for segment_index, (a, b) in enumerate(zip(points, points[1:])):
+            if a[1] == b[1] and a[0] != b[0]:
+                x0, x1 = sorted((a[0], b[0]))
+                horizontal_by_id[serial] = (
+                    edge.cell_id, segment_index, a[1], nets[edge.cell_id]
+                )
+                # At the same x, remove endings before a vertical query and
+                # add beginnings afterwards so endpoint touches are excluded.
+                events.append((x0, 2, serial))
+                events.append((x1, 0, serial))
+                serial += 1
+            elif a[0] == b[0] and a[1] != b[1]:
+                y0, y1 = sorted((a[1], b[1]))
+                verticals.append((
+                    edge.cell_id, segment_index, a[0], y0, y1,
+                    nets[edge.cell_id],
+                ))
+    for index, vertical in enumerate(verticals):
+        events.append((vertical[2], 1, index))
+    events.sort(key=lambda event: (event[0], event[1]))
+
+    active_by_y: dict[float, set[int]] = defaultdict(set)
+    active_ys: list[float] = []
+    jump_sets: dict[str, dict[int, set[float]]] = defaultdict(
+        lambda: defaultdict(set)
+    )
+    for x, event_type, identifier in events:
+        if event_type == 0:
+            y = horizontal_by_id[identifier][2]
+            active_by_y[y].remove(identifier)
+            if not active_by_y[y]:
+                del active_by_y[y]
+                active_ys.pop(bisect_left(active_ys, y))
+            continue
+        if event_type == 2:
+            y = horizontal_by_id[identifier][2]
+            if y not in active_by_y:
+                insort(active_ys, y)
+            active_by_y[y].add(identifier)
+            continue
+        vertical_edge, _, _, y0, y1, vertical_net = verticals[identifier]
+        for y in active_ys[bisect_right(active_ys, y0):bisect_left(active_ys, y1)]:
+            for horizontal_id in active_by_y[y]:
+                horizontal_edge, segment_index, _, horizontal_net = horizontal_by_id[horizontal_id]
+                if horizontal_edge == vertical_edge or horizontal_net == vertical_net:
+                    continue
+                jump_sets[horizontal_edge][segment_index].add(x)
+    return {
+        edge_id: {
+            segment_index: sorted(xs)
+            for segment_index, xs in segments.items()
+        }
+        for edge_id, segments in jump_sets.items()
+    }
 
 
 def _edge_arc_path(
@@ -151,7 +195,8 @@ def build_preview_svg(
     for points in edge_points.values():
         all_x.extend(x for x, _ in points)
         all_y.extend(y for _, y in points)
-    for x, y in junction_points(document):
+    junctions = junction_points(document)
+    for x, y in junctions:
         all_x.extend((x - 3.0, x + 3.0))
         all_y.extend((y - 3.0, y + 3.0))
     pad = 45.0
@@ -196,7 +241,7 @@ def build_preview_svg(
             lines.append(f'<path class="edge" d="{path}"/>')
         else:
             lines.append(f'<polyline class="edge" points="{serialized}"/>')
-    for x, y in junction_points(document):
+    for x, y in junctions:
         lines.append(
             f'<circle cx="{_svg_num(x)}" cy="{_svg_num(y)}" '
             'r="3" fill="#000000"/>'

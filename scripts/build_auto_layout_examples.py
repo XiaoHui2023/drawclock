@@ -9,11 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from auto_layout import (  # noqa: E402
-    generate_layout,
-    load_clock_tree,
-    write_generated_drawio,
-)
+from auto_layout import load_clock_tree  # noqa: E402
 from elk_layout import generate_elk_layout  # noqa: E402
 from layout_preview import write_preview_svg  # noqa: E402
 
@@ -30,6 +26,7 @@ EXAMPLES = (
     "09-stress-1024-clocks",
     "10-stress-2048-clocks",
     "11-stress-4096-clocks",
+    "12-dual-from-reuse",
 )
 
 
@@ -54,22 +51,12 @@ def main(argv: list[str] | None = None) -> int:
         config_path = source_dir / f"{name}.json"
         config = load_clock_tree(config_path)
         started = time.perf_counter()
-        if name.startswith(("06-", "07-", "08-", "09-", "10-", "11-")):
-            document, report = generate_elk_layout(
-                config,
-                library_path=library,
-                profile_name=args.profile,
-            )
-        else:
-            document, report = generate_layout(
-                config,
-                library_path=library,
-                profile_name=args.profile,
-            )
-        generated = time.perf_counter()
-        write_generated_drawio(
-            document, args.output_dir / f"{name}.drawio"
+        document, report = generate_elk_layout(
+            config,
+            library_path=library,
+            profile_name=args.profile,
         )
+        generated = time.perf_counter()
         write_preview_svg(
             document,
             args.output_dir / f"{name}.svg",

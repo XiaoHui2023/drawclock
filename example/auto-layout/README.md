@@ -24,6 +24,7 @@ python src draw `
 | 大规模 | `09-stress-1024-clocks.json` | 2086 nodes / 1024 clocks |
 | 超大规模 | `10-stress-2048-clocks.json` | 4166 nodes / 2048 clocks |
 | 极限规模 | `11-stress-4096-clocks.json` | 8326 nodes / 4096 clocks |
+| 复用回归 | `12-dual-from-reuse.json` | 两个共享 `from` / 16 条非对称 mux 分支；检查中间源分层与局部布线 |
 
 压力示例包含少量晶振和 PLL、大量复用的 mux、分频器、gate、多类 clock cell 和末端 clock。坐标由输入拓扑以及当前器件库的尺寸和端口一次计算得到，不进行成图后的坐标校准。
 

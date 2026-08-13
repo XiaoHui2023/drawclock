@@ -206,41 +206,197 @@ def _generate_scalable_layout(
                     stack.append(neighbour)
         components.append(component)
 
+    incoming_internal: dict[str, list[Any]] = defaultdict(list)
+    outgoing_internal: dict[str, list[Any]] = defaultdict(list)
+    for edge in logical_edges:
+        if edge.source in backbone or edge.target in backbone:
+            continue
+        incoming_internal[edge.target].append(edge)
+        outgoing_internal[edge.source].append(edge)
+
     band_top = regular_top
-    for component in components:
+    component_index: dict[str, int] = {}
+    component_bounds: dict[int, tuple[float, float]] = {}
+    for component_number, component in enumerate(components):
         component_by_rank: dict[int, list[str]] = defaultdict(list)
         for name in component:
             component_by_rank[rank[name]].append(name)
+        local_spacing = profile.route_clearance
+        sequence: dict[str, int] = {}
+        for level in sorted(component_by_rank, reverse=True):
+            names = component_by_rank[level]
+            names.sort(key=lambda name: (
+                sum(
+                    sequence.get(edge.target, 0)
+                    + port_anchors(
+                        nodes[edge.target].shape.style,
+                        nodes[edge.target].shape.title,
+                    )[edge.target_port][1]
+                    for edge in outgoing_internal[name]
+                ),
+                name,
+            ))
+            sequence.update({name: index for index, name in enumerate(names)})
         band_height = max(
             sum(nodes[name].shape.h for name in names)
-            + profile.node_spacing * max(0, len(names) - 1)
+            + local_spacing * max(0, len(names) - 1)
             for names in component_by_rank.values()
         )
         for level, names in component_by_rank.items():
             total = (
                 sum(nodes[name].shape.h for name in names)
-                + profile.node_spacing * max(0, len(names) - 1)
+                + local_spacing * max(0, len(names) - 1)
             )
             cursor = band_top + (band_height - total) / 2
-            for name in sorted(names):
+            for name in names:
                 positions[name] = (rank_x[level], cursor)
-                cursor += nodes[name].shape.h + profile.node_spacing
-        band_top += band_height + profile.node_spacing
+                component_index[name] = component_number
+                cursor += nodes[name].shape.h + local_spacing
 
-    diagram_bottom = max(
-        y + nodes[name].shape.h for name, (_, y) in positions.items()
-    )
-    long_source_keys = sorted(
-        {
-            (edge.source, edge.source_port)
-            for edge in logical_edges
-            if rank[edge.target] - rank[edge.source] > 1
-        }
-    )
-    bottom_lanes = {
-        key: diagram_bottom + profile.node_spacing + index * profile.grid * 2
-        for index, key in enumerate(long_source_keys)
+        # Port-axis coordinate assignment.  Alternate forward and backward
+        # sweeps, then project each rank onto the non-overlap constraints.  A
+        # whole rank may translate, but component geometry and port anchors are
+        # never changed.
+        for forward in (True, False, True, False):
+            levels = sorted(component_by_rank, reverse=not forward)
+            for level in levels:
+                names = component_by_rank[level]
+                desired: list[float] = []
+                for name in names:
+                    related = incoming_internal[name] if forward else outgoing_internal[name]
+                    candidates: list[float] = []
+                    for edge in related:
+                        source = nodes[edge.source]
+                        target = nodes[edge.target]
+                        source_y = port_anchors(source.shape.style, source.shape.title)[edge.source_port][1]
+                        target_y = port_anchors(target.shape.style, target.shape.title)[edge.target_port][1]
+                        if forward:
+                            candidates.append(
+                                positions[edge.source][1]
+                                + source.shape.h * source_y
+                                - target.shape.h * target_y
+                            )
+                        else:
+                            candidates.append(
+                                positions[edge.target][1]
+                                + target.shape.h * target_y
+                                - source.shape.h * source_y
+                            )
+                    desired.append(
+                        sum(candidates) / len(candidates)
+                        if candidates else positions[name][1]
+                    )
+                packed: list[float] = []
+                for index, name in enumerate(names):
+                    minimum = (
+                        packed[-1] + nodes[names[index - 1]].shape.h + local_spacing
+                        if packed else -float("inf")
+                    )
+                    packed.append(max(minimum, desired[index]))
+                translation = sum(
+                    wanted - actual for wanted, actual in zip(desired, packed)
+                ) / len(packed)
+                for name, top in zip(names, packed):
+                    positions[name] = (positions[name][0], top + translation)
+
+        actual_top = min(positions[name][1] for name in component)
+        shift = band_top - actual_top
+        for name in component:
+            x, y = positions[name]
+            positions[name] = (x, y + shift)
+        actual_bottom = max(
+            positions[name][1] + nodes[name].shape.h for name in component
+        )
+        component_bounds[component_number] = (band_top, actual_bottom)
+        band_top = actual_bottom + profile.node_spacing
+
+    rect_vertical = {
+        name: (
+            positions[name][1] - profile.route_clearance,
+            positions[name][1] + node.shape.h + profile.route_clearance,
+        )
+        for name, node in nodes.items()
     }
+
+    horizontal_lane_occupancy: dict[
+        float, list[tuple[int, int, tuple[str, str]]]
+    ] = defaultdict(list)
+
+    def local_long_lane(edge, sy: float, ty: float) -> float:
+        """Choose a collision-free y corridor near this edge's own domain."""
+        source_rank = rank[edge.source]
+        target_rank = rank[edge.target]
+        midpoint = round(((sy + ty) / 2) / profile.grid) * profile.grid
+        candidates = [sy, ty, midpoint]
+        component = component_index.get(edge.target, component_index.get(edge.source))
+        local_by_rank = (
+            {
+                level: [
+                    name for name in components[component] if rank[name] == level
+                ]
+                for level in range(source_rank + 1, target_rank)
+            }
+            if component is not None
+            else {
+                level: [name for name in by_rank[level] if name in backbone]
+                for level in range(source_rank + 1, target_rank)
+            }
+        )
+        if component is not None:
+            top, bottom = component_bounds[component]
+            candidates.extend((
+                top - profile.route_clearance - profile.grid,
+                bottom + profile.route_clearance + profile.grid,
+            ))
+        else:
+            candidates.extend((
+                profile.margin - profile.route_clearance - profile.grid,
+                regular_top - profile.route_clearance - profile.grid,
+            ))
+        for level in range(source_rank + 1, target_rank):
+            for name in local_by_rank[level]:
+                if name in (edge.source, edge.target):
+                    continue
+                low, high = rect_vertical[name]
+                candidates.extend((low, high))
+
+        endpoint_low, endpoint_high = sorted((sy, ty))
+        best = None
+        for lane in dict.fromkeys(candidates):
+            hits = sum(
+                low < lane < high
+                for level in range(source_rank + 1, target_rank)
+                for name in local_by_rank[level]
+                if name not in (edge.source, edge.target)
+                for low, high in (rect_vertical[name],)
+            )
+            outer_excursion = max(
+                0.0, endpoint_low - lane, lane - endpoint_high
+            )
+            net = (edge.source, edge.source_port)
+            lane_overlaps = sum(
+                other_net != net
+                and max(source_rank, other_start) < min(target_rank, other_end)
+                for other_start, other_end, other_net
+                in horizontal_lane_occupancy[lane]
+            )
+            score = (
+                hits,
+                lane_overlaps,
+                outer_excursion,
+                abs(lane - sy) + abs(lane - ty),
+                abs(lane - midpoint),
+            )
+            if best is None or score < best[0]:
+                best = (score, lane)
+        assert best is not None
+        lane = best[1]
+        horizontal_lane_occupancy[lane].append((
+            source_rank, target_rank, (edge.source, edge.source_port)
+        ))
+        return lane
+
+    long_lanes: dict[str, float] = {}
 
     # Colour vertical occupancy intervals in each inter-rank gap.  Different
     # nets share an x lane only when their y intervals do not overlap; all
@@ -270,7 +426,8 @@ def _generate_scalable_layout(
         target_rank = rank[edge.target]
         key = (edge.source, edge.source_port)
         if target_rank - source_rank > 1:
-            lane_y = bottom_lanes[key]
+            lane_y = local_long_lane(edge, sy, ty)
+            long_lanes[edge.key] = lane_y
             add_interval(source_rank + 1, key, sy, lane_y)
             add_interval(target_rank, key, lane_y, ty)
         else:
@@ -330,7 +487,7 @@ def _generate_scalable_layout(
         if target_rank - source_rank > 1:
             first_x = lane_x(source_rank + 1, source_key)
             last_x = lane_x(target_rank, source_key)
-            lane_y = bottom_lanes[source_key]
+            lane_y = long_lanes[edge.key]
             points = _simplify(
                 [(sx, sy), (first_x, sy), (first_x, lane_y),
                  (last_x, lane_y), (last_x, ty), (tx, ty)]
@@ -366,8 +523,12 @@ def _generate_scalable_layout(
     )
     elapsed_ms = (time.perf_counter() - started) * 1000
     return document, {
-        "engine": "scalable-layered",
-        "mode": "adaptive-domain-decomposition",
+        "engine": "constraint-layered",
+        "mode": (
+            "adaptive-domain-decomposition"
+            if plan.mode == "domain"
+            else "global-port-axis"
+        ),
         "runtime_ms": round(elapsed_ms, 3),
         "nodes": len(nodes),
         "edges": len(logical_edges),
@@ -383,6 +544,30 @@ def _generate_scalable_layout(
 
 
 def generate_elk_layout(
+    config: dict[str, dict[str, Any]],
+    *,
+    library_path: str | Path,
+    component_hints: dict[str, str] | None = None,
+    profile_name: str = "readable",
+) -> tuple[LayoutDocument, dict[str, Any]]:
+    """Compute exact-rank, exact-port layout with one deterministic policy."""
+    started = time.perf_counter()
+    if profile_name not in PROFILES:
+        raise ValueError(f"未知布局 profile: {profile_name}")
+    validate_config(config, library_path=library_path)
+    shapes = load_library_shapes(library_path)
+    nodes = resolve_nodes(
+        config, shapes, component_hints or {}, library_path=library_path
+    )
+    logical_edges = build_logical_edges(config, nodes, library_path)
+    profile = PROFILES[profile_name]
+    plan = select_layout_plan(nodes, logical_edges)
+    return _generate_scalable_layout(
+        nodes, logical_edges, profile, started, library_path, plan
+    )
+
+
+def _generate_elk_reference_layout(
     config: dict[str, dict[str, Any]],
     *,
     library_path: str | Path,
@@ -406,6 +591,7 @@ def generate_elk_layout(
     logical_edges = build_logical_edges(config, nodes, library_path)
     profile = PROFILES[profile_name]
     plan = select_layout_plan(nodes, logical_edges)
+    rank = _ranks(nodes, logical_edges)
     if plan.mode == "domain":
         return _generate_scalable_layout(
             nodes, logical_edges, profile, started, library_path, plan
@@ -433,6 +619,7 @@ def generate_elk_layout(
         left_insets[name] = left_inset
         graph["nodes"].append({
             "id": name,
+            "rank": rank[name],
             "layoutWidth": right_boundary - left_inset,
             "height": float(node.shape.h),
             "ports": [

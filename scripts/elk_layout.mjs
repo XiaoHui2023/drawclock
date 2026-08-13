@@ -11,6 +11,7 @@ const graph = {
     "elk.algorithm": "layered",
     "elk.direction": "RIGHT",
     "elk.edgeRouting": "ORTHOGONAL",
+    "elk.partitioning.activate": "true",
     "elk.layered.layering.strategy": scalable ? "LONGEST_PATH" : "NETWORK_SIMPLEX",
     "elk.layered.crossingMinimization.strategy": scalable ? "NONE" : "LAYER_SWEEP",
     "elk.layered.crossingMinimization.greedySwitch.type": scalable ? "OFF" : "TWO_SIDED",
@@ -32,7 +33,10 @@ const graph = {
     id: node.id,
     width: node.layoutWidth,
     height: node.height,
-    layoutOptions: { "elk.portConstraints": "FIXED_POS" },
+    layoutOptions: {
+      "elk.portConstraints": "FIXED_POS",
+      "elk.partitioning.partition": String(node.rank)
+    },
     ports: node.ports.map(port => ({
       id: `${node.id}:${port.id}`,
       x: port.x,
