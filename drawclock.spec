@@ -35,20 +35,20 @@ if lib_dir.is_dir():
     datas.append((str(lib_dir), "drawio-lib"))
 
 hiddenimports = [
-    "migrate",
+    "config_input",
+    "auto_layout",
+    "elk_layout",
     "drawio_layout",
-    "drawio_build",
+    "layout_preview",
     "layout_validate",
-    "pipeline",
-    "drawio_decode",
-    "drawio_graph",
+    "library_payload",
     "drawio_library",
     "drawio_ports",
-    "topology",
-    "config_export",
-    "device_model",
+    "library_ports",
+    "source_reference",
+    "visual_geometry",
+    "internal_kind",
     "device_attrs_validate",
-    "device_attrs_convert",
     "validate_config",
 ]
 

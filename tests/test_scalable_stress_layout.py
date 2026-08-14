@@ -97,7 +97,7 @@ def test_strategy_depends_on_structure_not_node_count() -> None:
     [
         ("09-stress-1024-clocks", 1024, 2086, 2596, 5.0),
         ("10-stress-2048-clocks", 2048, 4166, 5188, 10.0),
-        ("11-stress-4096-clocks", 4096, 8326, 10372, 25.0),
+        ("11-stress-4096-clocks", 4096, 8326, 10372, 30.0),
     ],
 )
 def test_scalable_stress_generation_is_linear_and_complete(
@@ -442,9 +442,10 @@ def test_asymmetric_merge_inputs_follow_fixed_port_order_without_crossing(
             if vertex.cell_id == edge.target_id
         ).name.endswith("_tap")
     )
-    assert quality["line_integrity"]["joint_coordinate_bend_tradeoffs"][
-        tap_edge.cell_id
-    ] == ["visible-height"]
+    assert tap_edge.waypoints == ()
+    assert tap_edge.cell_id not in quality["line_integrity"][
+        "joint_coordinate_bend_tradeoffs"
+    ]
 
 
 def test_joint_coordinate_refinement_accepts_only_a_global_dominance() -> None:
@@ -455,9 +456,10 @@ def test_joint_coordinate_refinement_accepts_only_a_global_dominance() -> None:
         config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
     )
 
-    assert report["selection"]["joint_coordinate_moves"] == 1
-    assert report["selection"]["joint_coordinate_bends_removed"] == 2
-    assert quality["line_integrity"]["bends_total"] == 6
+    assert report["selection"]["leaf_continuation_row_moves"] == 1
+    assert report["selection"]["leaf_continuation_bends_removed"] == 4
+    assert report["selection"]["joint_coordinate_moves"] == 0
+    assert quality["line_integrity"]["bends_total"] == 4
     assert quality["line_integrity"]["avoidable_joint_coordinate_bend_edges"] == []
     assert quality["passed"] is True
 

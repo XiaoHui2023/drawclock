@@ -1735,6 +1735,258 @@ def _visible_layout_signature(
     return overlaps, hits, max_x - min_x, max_y - min_y
 
 
+def _refine_leaf_continuation_rows(
+    document: LayoutDocument,
+    logical_edges,
+    *,
+    route_clearance: float,
+) -> tuple[LayoutDocument, dict[str, Any]]:
+    """Move an exclusive source-to-leaf branch as a unit to remove doglegs.
+
+    A leaf continuation can be straight only when its source port and sink
+    port share a free horizontal row.  Moving either endpoint alone is not a
+    complete search: the source may belong to an otherwise exclusive upstream
+    chain.  This pass derives that movable chain from indegree/outdegree,
+    considers obstacle-boundary rows, and accepts only a strict global bend
+    improvement with every hard geometry metric non-regressing.
+    """
+    accepted = copy.deepcopy(document)
+    indegree: Counter[str] = Counter(edge.target for edge in logical_edges)
+    outdegree: Counter[str] = Counter(edge.source for edge in logical_edges)
+    incoming: dict[str, list[int]] = defaultdict(list)
+    outgoing_indices: dict[str, list[int]] = defaultdict(list)
+    incident: dict[str, list[int]] = defaultdict(list)
+    for index, logical in enumerate(logical_edges, 1):
+        incoming[logical.target].append(index)
+        outgoing_indices[logical.source].append(index)
+        incident[logical.source].append(index)
+        incident[logical.target].append(index)
+
+    accepted_moves = 0
+    bends_removed = 0
+    blockers: Counter[str] = Counter()
+
+    while True:
+        by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+        by_name = {
+            vertex.logical_name or vertex.name: vertex
+            for vertex in accepted.vertices
+        }
+        edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+
+        def edge_points(edge_index: int, doc_by_id=by_id, doc_edges=edge_by_id):
+            logical = logical_edges[edge_index - 1]
+            edge = doc_edges[f"e{edge_index}"]
+            source = doc_by_id[edge.source_id]
+            target = doc_by_id[edge.target_id]
+            start = abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            )
+            end = abs_port_xy(
+                target.x, target.y, target.width, target.height,
+                target.style, target.drawclock_type, logical.target_port,
+            )
+            return _simplify([start, *edge.waypoints, end])
+
+        column_xs = sorted({vertex.x for vertex in accepted.vertices})
+        leaf_candidates = [
+            (edge_index, logical)
+            for edge_index, logical in enumerate(logical_edges, 1)
+            if indegree[logical.target] == 1
+            and outdegree[logical.target] == 0
+            and outdegree[logical.source] > 1
+            and indegree[logical.source] > 0
+            and any(
+                outdegree[logical_edges[other_index - 1].target] > 0
+                for other_index in outgoing_indices[logical.source]
+                if other_index != edge_index
+            )
+            and any(
+                by_name[logical.source].x + by_name[logical.source].width + 1e-6
+                < column_x
+                < by_name[logical.target].x - 1e-6
+                for column_x in column_xs
+            )
+            and max(0, len(edge_points(edge_index)) - 2) >= 2
+        ]
+        if not leaf_candidates:
+            break
+        base_report = assess_layout(accepted, logical_edges, 0.0)
+        base_visible = _visible_layout_signature(accepted, logical_edges)
+        improved = False
+
+        for leaf_edge_index, logical in leaf_candidates:
+
+            chain = {logical.source}
+            cursor = logical.source
+            while indegree[cursor] == 1:
+                parent_edge = logical_edges[incoming[cursor][0] - 1]
+                if outdegree[parent_edge.source] != 1:
+                    break
+                chain.add(parent_edge.source)
+                cursor = parent_edge.source
+            moved_names = chain | {logical.target}
+            moved_ids = {by_name[name].cell_id for name in moved_names}
+            source = by_name[logical.source]
+            target = by_name[logical.target]
+            source_anchor = port_anchors(
+                source.style, source.drawclock_type
+            )[logical.source_port][1]
+            target_anchor = port_anchors(
+                target.style, target.drawclock_type
+            )[logical.target_port][1]
+            source_axis = source.y + source.height * source_anchor
+
+            left = min(source.x + source.width, target.x)
+            right = max(source.x + source.width, target.x)
+            axes: set[float] = set()
+            for vertex in accepted.vertices:
+                if vertex.cell_id in moved_ids:
+                    continue
+                box = vertex_visual_box(vertex)
+                if box.right < left or box.left > right:
+                    continue
+                axes.add(box.top - route_clearance)
+                axes.add(box.bottom + route_clearance)
+            if not axes:
+                continue
+
+            affected_edges = {
+                edge_index
+                for name in moved_names
+                for edge_index in incident[name]
+            }
+            internal_chain_edges = {
+                edge_index
+                for edge_index in affected_edges
+                if logical_edges[edge_index - 1].source in chain
+                and logical_edges[edge_index - 1].target in chain
+            }
+
+            for axis in sorted(axes, key=lambda value: (abs(value - source_axis), value)):
+                chain_delta = axis - source_axis
+                target_delta = (
+                    axis - (target.y + target.height * target_anchor)
+                )
+                if abs(chain_delta) <= 1e-6 and abs(target_delta) <= 1e-6:
+                    continue
+                candidate = copy.deepcopy(accepted)
+                candidate_by_id = {
+                    vertex.cell_id: vertex for vertex in candidate.vertices
+                }
+                candidate_edges = {
+                    edge.cell_id: edge for edge in candidate.edges
+                }
+                for name in chain:
+                    candidate_by_id[by_name[name].cell_id].y += chain_delta
+                candidate_by_id[target.cell_id].y += target_delta
+
+                for edge_index in affected_edges:
+                    edge = candidate_edges[f"e{edge_index}"]
+                    if edge_index == leaf_edge_index:
+                        edge.waypoints = ()
+                        continue
+                    if edge_index in internal_chain_edges:
+                        edge.waypoints = tuple(
+                            (x, y + chain_delta) for x, y in edge.waypoints
+                        )
+                        continue
+                    edge_logical = logical_edges[edge_index - 1]
+                    edge_source = candidate_by_id[edge.source_id]
+                    edge_target = candidate_by_id[edge.target_id]
+                    start = abs_port_xy(
+                        edge_source.x, edge_source.y,
+                        edge_source.width, edge_source.height,
+                        edge_source.style, edge_source.drawclock_type,
+                        edge_logical.source_port,
+                    )
+                    end = abs_port_xy(
+                        edge_target.x, edge_target.y,
+                        edge_target.width, edge_target.height,
+                        edge_target.style, edge_target.drawclock_type,
+                        edge_logical.target_port,
+                    )
+                    if abs(start[1] - end[1]) <= 1e-6:
+                        edge.waypoints = ()
+                        continue
+                    old_points = edge_points(edge_index)
+                    old_vertical = [
+                        a[0]
+                        for a, b in zip(old_points, old_points[1:])
+                        if abs(a[0] - b[0]) <= 1e-6
+                        and abs(a[1] - b[1]) > 1e-6
+                    ]
+                    channel_left = (
+                        vertex_visual_box(edge_source).right + route_clearance
+                    )
+                    channel_right = (
+                        vertex_visual_box(edge_target).left - route_clearance
+                    )
+                    if channel_left <= channel_right:
+                        preferred = old_vertical[0] if old_vertical else (
+                            channel_left + channel_right
+                        ) / 2.0
+                        route_x = min(channel_right, max(channel_left, preferred))
+                    else:
+                        route_x = old_vertical[0] if old_vertical else (
+                            start[0] + end[0]
+                        ) / 2.0
+                    edge.waypoints = tuple(_simplify([
+                        start,
+                        (route_x, start[1]),
+                        (route_x, end[1]),
+                        end,
+                    ])[1:-1])
+
+                candidate_report = assess_layout(candidate, logical_edges, 0.0)
+                candidate_visible = _visible_layout_signature(
+                    candidate, logical_edges
+                )
+                dominates = (
+                    candidate_report["node_overlaps"] <= base_report["node_overlaps"]
+                    and candidate_report["edge_node_intersections"]
+                    <= base_report["edge_node_intersections"]
+                    and candidate_report["direction_violations"]
+                    <= base_report["direction_violations"]
+                    and candidate_visible[0] <= base_visible[0]
+                    and candidate_visible[1] <= base_visible[1]
+                    and candidate_report["ambiguous_overlaps"]
+                    <= base_report["ambiguous_overlaps"]
+                    and candidate_report["crossings"] <= base_report["crossings"]
+                    and candidate_report["bends_total"] < base_report["bends_total"]
+                )
+                if not dominates:
+                    blockers.update(name for name, passed in {
+                        "node-overlap": candidate_report["node_overlaps"] <= base_report["node_overlaps"],
+                        "edge-node": candidate_report["edge_node_intersections"] <= base_report["edge_node_intersections"],
+                        "direction": candidate_report["direction_violations"] <= base_report["direction_violations"],
+                        "visible-overlap": candidate_visible[0] <= base_visible[0],
+                        "visible-edge-node": candidate_visible[1] <= base_visible[1],
+                        "route-overlap": candidate_report["ambiguous_overlaps"] <= base_report["ambiguous_overlaps"],
+                        "crossing": candidate_report["crossings"] <= base_report["crossings"],
+                        "bend": candidate_report["bends_total"] < base_report["bends_total"],
+                    }.items() if not passed)
+                    continue
+                bends_removed += (
+                    base_report["bends_total"] - candidate_report["bends_total"]
+                )
+                accepted = candidate
+                accepted_moves += 1
+                improved = True
+                break
+            if improved:
+                break
+        if not improved:
+            break
+
+    return accepted, {
+        "leaf_continuation_row_moves": accepted_moves,
+        "leaf_continuation_bends_removed": bends_removed,
+        "leaf_continuation_blockers": dict(sorted(blockers.items())),
+    }
+
+
 def _refine_joint_coordinates(
     document: LayoutDocument,
     logical_edges,
@@ -1801,16 +2053,10 @@ def _refine_joint_coordinates(
         for vertex_id, delta in suspect_moves:
             old_bends = 0
             best_bends = 0
-            old_length = 0.0
-            best_length = 0.0
             for edge_index in incident[vertex_id]:
                 edge = edge_by_id[f"e{edge_index}"]
                 points = points_for(edge_index)
                 old_bends += max(0, len(points) - 2)
-                old_length += sum(
-                    abs(b[0] - a[0]) + abs(b[1] - a[1])
-                    for a, b in zip(points, points[1:])
-                )
                 start = (
                     points[0][0],
                     points[0][1]
@@ -1822,14 +2068,7 @@ def _refine_joint_coordinates(
                     + (delta if edge.target_id == vertex_id else 0.0),
                 )
                 best_bends += 0 if abs(start[1] - end[1]) <= 1e-6 else 2
-                best_length += (
-                    abs(end[0] - start[0])
-                    + abs(end[1] - start[1])
-                )
-            if (
-                best_bends < old_bends
-                and best_length <= old_length + 1e-6
-            ):
+            if best_bends < old_bends:
                 viable_suspects.add((vertex_id, delta))
         suspect_moves = viable_suspects
         if not suspect_moves:
@@ -1975,11 +2214,6 @@ def _refine_joint_coordinates(
                 max(0, len(points) - 2)
                 for points in incident_old_points.values()
             )
-            old_incident_length = sum(
-                abs(b[0] - a[0]) + abs(b[1] - a[1])
-                for points in incident_old_points.values()
-                for a, b in zip(points, points[1:])
-            )
             candidate = copy.deepcopy(accepted)
             candidate_by_id = {
                 vertex.cell_id: vertex for vertex in candidate.vertices
@@ -2093,21 +2327,8 @@ def _refine_joint_coordinates(
                 max(0, len(points) - 2)
                 for points in candidate_incident_points.values()
             )
-            candidate_incident_length = sum(
-                abs(b[0] - a[0]) + abs(b[1] - a[1])
-                for points in candidate_incident_points.values()
-                for a, b in zip(points, points[1:])
-            )
-            if (
-                candidate_incident_bends >= old_incident_bends
-                or candidate_incident_length
-                > old_incident_length + 1e-6
-            ):
-                blockers[
-                    "no-local-bend-dominance"
-                    if candidate_incident_bends >= old_incident_bends
-                    else "local-length"
-                ] += 1
+            if candidate_incident_bends >= old_incident_bends:
+                blockers["no-local-bend-dominance"] += 1
                 continue
             if accepted_report is None:
                 accepted_report = assess_layout(
@@ -2134,10 +2355,6 @@ def _refine_joint_coordinates(
                 <= accepted_report["ambiguous_overlaps"]
                 and candidate_report["crossings"] <= accepted_report["crossings"]
                 and candidate_report["bends_total"] < accepted_report["bends_total"]
-                and candidate_report["manhattan_length"]
-                <= accepted_report["manhattan_length"] + 1e-6
-                and candidate_visible[2] <= accepted_visible[2] + 1e-6
-                and candidate_visible[3] <= accepted_visible[3] + 1e-6
             )
             if not dominates:
                 checks = {
@@ -2149,9 +2366,6 @@ def _refine_joint_coordinates(
                     "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
                     "crossing": candidate_report["crossings"] <= accepted_report["crossings"],
                     "bend": candidate_report["bends_total"] < accepted_report["bends_total"],
-                    "length": candidate_report["manhattan_length"] <= accepted_report["manhattan_length"] + 1e-6,
-                    "visible-width": candidate_visible[2] <= accepted_visible[2] + 1e-6,
-                    "visible-height": candidate_visible[3] <= accepted_visible[3] + 1e-6,
                 }
                 blockers.update(name for name, passed in checks.items() if not passed)
                 continue
@@ -2589,6 +2803,19 @@ def generate_elk_layout(
         and outdegree[vertex.logical_name or vertex.name] <= 1
         and joint_coordinate_safe(vertex.logical_name or vertex.name)
     }
+    if plan.mode == "quality":
+        document, leaf_row_report = _refine_leaf_continuation_rows(
+            document,
+            logical_edges,
+            route_clearance=profile.route_clearance,
+        )
+    else:
+        leaf_row_report = {
+            "leaf_continuation_row_moves": 0,
+            "leaf_continuation_bends_removed": 0,
+            "leaf_continuation_blockers": {},
+        }
+    report["selection"].update(leaf_row_report)
     document, joint_report = _refine_joint_coordinates(
         document,
         logical_edges,

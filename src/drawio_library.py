@@ -8,13 +8,11 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-from internal_kind import INTERNAL_OBJECT_KEYS
-
 LABEL_PLACEHOLDER_RE = re.compile(
     r"%(?:name|pll_kind|ratio|in\d+_label)%"
 )
 
-from drawio_decode import decompress_diagram_payload
+from library_payload import decompress_diagram_payload
 
 
 def package_root() -> Path:
@@ -37,44 +35,6 @@ class LibraryShape:
     w: int
     h: int
     object_defaults: dict[str, str]
-
-
-def load_library_titles(path: str | Path) -> set[str]:
-    text = Path(path).read_text(encoding="utf-8").strip()
-    if text.startswith("<mxlibrary>"):
-        text = text[len("<mxlibrary>") : -len("</mxlibrary>")].strip()
-    entries = json.loads(text)
-    if not isinstance(entries, list):
-        raise ValueError("器件库不是 mxlibrary 数组")
-    titles: set[str] = set()
-    for entry in entries:
-        if not isinstance(entry, dict):
-            continue
-        title = entry.get("title")
-        if title:
-            titles.add(str(title))
-    if not titles:
-        raise ValueError("器件库未包含任何形状")
-    return titles
-
-
-def validate_layout_types(layout_types: set[str], library_titles: set[str]) -> None:
-    missing = sorted(layout_types - library_titles)
-    if missing:
-        raise ValueError(f"布局中的 drawclock 类型不在器件库中: {', '.join(missing)}")
-
-
-def unknown_library_vertex_message(
-    vertices: list[tuple[str, str]],
-    *,
-    reload: bool,
-) -> str:
-    suffix = "不在新器件库中" if reload else "不在器件库中"
-    lines = [
-        f"器件 {name}（类型 {dtype}）{suffix}"
-        for name, dtype in sorted(vertices, key=lambda item: (item[1], item[0]))
-    ]
-    return "\n".join(lines)
 
 
 def load_library_shapes(path: str | Path | None = None) -> dict[str, LibraryShape]:
@@ -148,28 +108,6 @@ def _cached_library_shapes(library_path: str) -> dict[str, LibraryShape]:
     return load_library_shapes(library_path)
 
 
-@lru_cache(maxsize=4)
-def _cached_library_styles(library_path: str) -> dict[str, str]:
-    return load_library_cell_styles(library_path)
-
-
-def canonical_vertex_style(
-    drawclock_type: str,
-    stored_style: str,
-    *,
-    library_path: str | Path | None = None,
-) -> str:
-    """Use embedded library HTML style when the diagram only has drawclockType metadata."""
-    shape = _cached_library_shapes(str(library_path or DEFAULT_LIBRARY_PATH)).get(
-        drawclock_type
-    )
-    if shape is None:
-        return stored_style
-    if "html=1" in stored_style and f"drawclockType={drawclock_type}" in stored_style:
-        return stored_style
-    return shape.style
-
-
 DEFAULT_PLL_KIND = "SC"
 DEFAULT_DIV_RATIO = "2"
 
@@ -234,35 +172,4 @@ def canonical_object_attrs(
         out["label"] = bake_label_placeholders(label, out)
         if not LABEL_PLACEHOLDER_RE.search(out["label"]):
             out["placeholders"] = "0"
-    return out
-
-
-def reload_object_attrs(
-    drawclock_type: str,
-    stored_attrs: dict[str, str],
-    *,
-    library_path: str | Path | None = None,
-) -> dict[str, str]:
-    """Apply library label template; merge stored values over library object defaults."""
-    lib = str(library_path or DEFAULT_LIBRARY_PATH)
-    shape = _cached_library_shapes(lib).get(drawclock_type)
-    if shape is None:
-        return canonical_object_attrs(drawclock_type, stored_attrs, library_path=lib)
-    schema = dict(shape.object_defaults)
-    for key in INTERNAL_OBJECT_KEYS:
-        schema.pop(key, None)
-    out = dict(schema)
-    for key, value in stored_attrs.items():
-        if key in ("label", "placeholders") or value is None:
-            continue
-        if key in INTERNAL_OBJECT_KEYS:
-            continue
-        if key in schema:
-            out[key] = value
-    for key in INTERNAL_OBJECT_KEYS:
-        out.pop(key, None)
-    if not out.get("name"):
-        out["name"] = stored_attrs.get("name") or drawclock_type
-    out["label"] = shape.label
-    out["placeholders"] = "1"
     return out

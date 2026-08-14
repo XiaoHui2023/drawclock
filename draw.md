@@ -1,88 +1,42 @@
-# draw
-
-## 结构布局
-
-- 同一父节点连接多个末端时，末端保持连续排列；相邻父节点的末端不会按名称交错。
-- 具有相同根集合和汇聚代数的多输入节点共用可行列；前后级数量不同时仍保持汇聚列整齐。
-- 根器件按下游区域放置。消费范围覆盖图高且包含顶部路线时，根器件从顶部进入；多个根的消费域可分离时，同根域连续排列。
-- 同一源端口的目标紧密时共用一条分发主干；目标存在自然大间隔时使用同一网络的局部主干，避免穿过无关区域。
-- 当入度为 0 的源连接多个相距很远的消费区域，且单一长主干的交叉与长度代价更高时，布局可在远端区域显示同一逻辑源的等价副本。副本不改变拓扑；中间器件和末端器件永不复制。
-- 单父末端在不与相邻器件重叠时精确对齐端口轴，避免亚像素短折线。
-
-结构示例位于 `example/auto-layout/17-terminal-fanout-order.json` 至 `20-asymmetric-merge-route-bulge.json`。编号 20 专门覆盖非对称 mux 汇聚：一侧多一级器件、另一侧被复用，输入边仍按固定端口顺序进入，不产生无故外凸或兄弟边交叉。
-
-`draw` 使用指定的 draw.io 器件库，将时钟拓扑配置生成一个成品图片。
+# 绘图
 
 ## 命令
 
 ```text
-drawclock draw -i <配置文件> -l <器件库.xml> -o <输出文件> [--crossing-style <风格>]
+drawclock -i <配置文件> -l <器件库.xml> -o <输出文件> [--crossing-style <风格>]
 ```
 
-| 参数 | 必填 | 说明 |
-| --- | --- | --- |
-| `-i, --input` | 是 | 配置文件。支持 `.json`、`.jsonc`、`.json5`、`.toml`、`.yaml`、`.yml`、`.ini`、`.conf`、`.config` |
-| `-l, --library` | 是 | 本次生图使用的 draw.io 器件库 XML |
-| `-o, --output` | 是 | 单个输出文件；内容始终是 SVG |
-| `--crossing-style` | 否 | 跨线风格：`arc`、`gap`、`sharp`、`none`；默认 `arc` |
+| 参数 | 取值 | 必填 | 默认值 | 说明 |
+| --- | --- | :---: | --- | --- |
+| `-i`, `--input` | 文件路径 | ✓ |  | JSON、JSONC、JSON5、TOML、YAML、YML、INI、CONF 或 CONFIG |
+| `-l`, `--library` | 文件路径 | ✓ |  | 每次按该库解析器件类型、尺寸、标签和端口 |
+| `-o`, `--output` | 文件路径 | ✓ |  | 内容固定为 SVG |
+| `--crossing-style` | `arc` / `gap` / `sharp` / `none` |  | `arc` | 跨线样式 |
 
-`draw` 只会写入 SVG，不根据 `--output` 的后缀选择格式。例如输出名为 `clock.png`、`clock.drawio` 或没有后缀，文件内容仍然是 SVG XML。发布包不包含浏览器或 PNG 渲染运行时。
+## 配置
 
-## 输入
-
-配置顶层是“器件名称 → 器件属性”：
+顶层键是实例名。每个实例只要求 `kind`；有前级时增加 `source`。`kind` 必须与指定器件库中的器件标题相同。
 
 ```json
 {
   "osc": {"kind": "source"},
-  "clk": {"kind": "clock", "source": "osc"}
+  "external_clk": {"kind": "from"},
+  "select": {
+    "kind": "mux2",
+    "source": {"0": "osc", "1": "external_clk"}
+  },
+  "divider": {"kind": "div", "source": "select"},
+  "clock": {"kind": "clock", "source": "divider"}
 }
 ```
 
-| 字段 | 说明 |
-| --- | --- |
-| `kind` | 必填。直接填写当前器件库中的器件 title，例如 `mux2` |
-| `source` | 根器件可省略；其它器件写上游器件名，多输入器件写输入名字到上游器件名的对象 |
-| 其它字段 | 可选。作为器件属性写入图中，属性名与含义由当前器件库定义 |
+`source` 为字符串时连接默认输入端口；为对象时，键是输入端口序号。未列出的输入端口可以不连接。多输出器件用 `器件名[输出键]` 选择输出。
 
-多输出器件使用 `器件名[输出键]`。`draw` 中的 `from` 是普通根器件，可以像 `source` 一样连接到下游器件；这与 `extract` 合并跨图连接时对 `from` 的处理规则不同。
-
-## 通用性
-
-- 器件图形、尺寸、样式和端口均从 `--library` 指定的库读取，不依赖内置库坐标。
-- `kind` 直接、唯一选择器件库 title；不会根据已连接端口数量猜测器件。
-- `source_kind`、`inv_kind`、`cell_kind` 等不是通用必填字段，只在当前器件库需要对应属性时填写。
-- 多输入器件只需填写实际连接的输入键，未连接端口可以省略。例如 `mux2` 可只连接 `0`、只连接 `1`，或同时连接两路。
-- 布局固定从左到右，节点数量没有命令行上限。
-
-## 布局
-
-- 末端 `clock` 对齐在最右层。根源使用最晚可行层；较短分支的源可以位于中间，前提是所有连线仍从左向右。
-- 普通一入一出链优先对齐端口轴；mux 按实际连接的固定端口顺序排列。
-- 同一 mux 的父节点顺序必须满足目标端口的上下次序；局部重心排序不能反转该硬约束。可直接相连的输入边不得绕成凸起后与兄弟输入边交叉。
-- 连线为正交折线；在不增加碰撞、重合和交叉时优先减少拐弯。长连线从实际碰到的器件或文字边界渐进扩展近端走廊，不默认绕到全图顶部或底部。
-- 器件实例文字属于可见占用区域。层间通道按当前器件库尺寸、实例名和标签字号计算；连线不得穿过器件下方文字。
-- 端口先沿水平方向引出到器件可见边界和布线净空之外，再允许转为纵向，不会从器件内部直接折下或折上。
-- 同一源端口的多个分支共用一条首纵向主干；不能出现同一源被另一源夹成 A/B/A 三条主干。只有目标轴存在由器件高度、净空和轨距共同证明的自然分簇时，才允许同一网络使用多个局部主干。
-- 源副本由目标端口轴的分区代价自动决定，只在减少远距离主干且不增加端口错误、碰撞、异网重合、交叉、面积或逻辑边时采用；不提供按名称、器件类型或图规模配置的开关。
+器件库可定义任意类型。布局只依据连接关系、库内几何、标签和端口计算，不按固定器件名或实例名分支。
 
 ## 示例
 
-发布包中的 `example/draw.json` 覆盖一条最小完整链：
-
-```text
-source + from → mux2 → pll → div → dto → inv → cell → gate → clock
+```powershell
+drawclock -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg
+drawclock -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg --crossing-style gap
 ```
-
-生成 SVG：
-
-```text
-drawclock draw -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg
-drawclock draw -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg --crossing-style gap
-```
-
-## 自动布局约束
-
-- 层间距由器件与实例文字的可见边界、端口净空和实际使用的布线路轨共同计算；未被最终连线使用的预留路轨会在布局求解阶段压缩。
-- 多个根输入不会固定堆放在左上角。布局器按下游端口的中位位置分布输入源；仅当该方案无法消除异网重叠时，才计算顶部对齐候选，并按重叠、输入源引起的交叉、拐弯数和有效面积择优。
-- `example/auto-layout/16-multi-from-clusters.json` 演示四个共享 `from` 输入按下游消费者分布到不同纵向区域。

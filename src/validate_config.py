@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from device_attrs_validate import collect_device_attr_errors
-from from_resolve import parse_source_ref
+from source_reference import parse_source_ref
 from library_ports import output_connection_key_suffixes
 
 

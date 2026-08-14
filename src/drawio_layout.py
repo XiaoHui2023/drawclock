@@ -3,9 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from drawio_graph import ParsedDiagram
-from drawio_library import canonical_object_attrs, canonical_vertex_style
-from drawio_ports import resolve_edge_style
 
 LAYOUT_VERSION = 1
 CROSSING_STYLES = ("arc", "gap", "sharp", "none")
@@ -55,81 +52,6 @@ def apply_crossing_style(document: LayoutDocument, crossing_style: str) -> None:
         if crossing_style != "none":
             parts.extend((f"jumpStyle={crossing_style}", "jumpSize=6"))
         edge.style = ";".join(parts) + ";"
-
-
-def layout_from_diagram(
-    diagram: ParsedDiagram, *, resolve_ports: bool = True
-) -> LayoutDocument:
-    vertices: list[VertexLayout] = []
-    edges: list[EdgeLayout] = []
-    for cell in diagram.cells.values():
-        if cell.is_edge:
-            if not cell.source_id or not cell.target_id:
-                continue
-            edges.append(
-                EdgeLayout(
-                    cell_id=cell.cell_id,
-                    source_id=cell.source_id,
-                    target_id=cell.target_id,
-                    style=cell.style,
-                    relative=cell.edge_relative,
-                    waypoints=cell.edge_waypoints,
-                )
-            )
-            continue
-        if not cell.drawclock_type:
-            continue
-        if cell.x is None or cell.y is None or cell.width is None or cell.height is None:
-            raise ValueError(f"器件 {cell.name} 缺少 mxGeometry 坐标或尺寸")
-        object_attrs = canonical_object_attrs(
-            cell.drawclock_type,
-            {**dict(cell.object_attrs), "name": cell.name},
-        )
-        style = canonical_vertex_style(cell.drawclock_type, cell.style)
-        if object_attrs.get("placeholders") == "0":
-            style = style.replace("placeholders=1;", "placeholders=0;")
-        vertices.append(
-            VertexLayout(
-                name=cell.name,
-                cell_id=cell.cell_id,
-                drawclock_type=cell.drawclock_type,
-                x=cell.x,
-                y=cell.y,
-                width=cell.width,
-                height=cell.height,
-                style=style,
-                object_attrs=object_attrs,
-            )
-        )
-    vertices.sort(key=lambda item: item.name)
-    edges.sort(key=lambda item: item.cell_id)
-    by_id = {vertex.cell_id: vertex for vertex in vertices}
-    normalized_edges: list[EdgeLayout] = []
-    for edge in edges:
-        src = by_id.get(edge.source_id)
-        tgt = by_id.get(edge.target_id)
-        style = edge.style
-        if resolve_ports and src is not None and tgt is not None:
-            style = resolve_edge_style(
-                src.style,
-                src.drawclock_type,
-                tgt.style,
-                tgt.drawclock_type,
-                edge.style,
-            )
-        normalized_edges.append(
-            EdgeLayout(
-                cell_id=edge.cell_id,
-                source_id=edge.source_id,
-                target_id=edge.target_id,
-                style=style,
-                relative=edge.relative,
-                waypoints=edge.waypoints,
-            )
-        )
-    return LayoutDocument(
-        version=LAYOUT_VERSION, vertices=vertices, edges=normalized_edges
-    )
 
 
 def layout_to_dict(doc: LayoutDocument) -> dict[str, Any]:

@@ -6,11 +6,12 @@ import sys
 import zipfile
 from pathlib import Path
 
+
 ROOT = Path(__file__).resolve().parents[1]
 SRC_DIR = ROOT / "src"
 
 
-def test_src_dir_help_exits_zero() -> None:
+def test_direct_draw_help_exits_zero() -> None:
     proc = subprocess.run(
         [sys.executable, str(SRC_DIR), "--help"],
         capture_output=True,
@@ -18,85 +19,40 @@ def test_src_dir_help_exits_zero() -> None:
         check=False,
     )
     assert proc.returncode == 0
-    assert "clock-tree" in proc.stdout.lower() or "draw.io" in proc.stdout
-    assert "extract" in proc.stdout
-    assert "draw" in proc.stdout
-    assert "reload" in proc.stdout
-    assert "drawio-to-json" not in proc.stdout
-    assert "json-to-drawio" not in proc.stdout
+    assert all(option in proc.stdout for option in (
+        "--input", "--library", "--output", "--crossing-style"
+    ))
+    assert all(command not in proc.stdout for command in (
+        "extract", "reload", "drawio-to-json", "json-to-drawio"
+    ))
 
 
-def test_legacy_conversion_aliases_still_parse() -> None:
-    for command in ("drawio-to-json", "run", "json-to-drawio"):
-        proc = subprocess.run(
-            [sys.executable, str(SRC_DIR), command, "--help"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        assert proc.returncode == 0, command
-
-
-def test_reload_help_exits_zero() -> None:
+def test_direct_draw_requires_input_library_and_output() -> None:
     proc = subprocess.run(
-        [sys.executable, str(SRC_DIR), "reload", "--help"],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert proc.returncode == 0
-    assert "--library FILE" in proc.stdout
-
-
-def test_reload_requires_library() -> None:
-    proc = subprocess.run(
-        [
-            sys.executable,
-            str(SRC_DIR),
-            "reload",
-            "-i",
-            str(ROOT / "tests" / "fixtures" / "mini-tree.drawio"),
-            "-o",
-            str(ROOT / "tests" / "_tmp_reload_out.drawio"),
-        ],
+        [sys.executable, str(SRC_DIR)],
         capture_output=True,
         text=True,
         check=False,
     )
     assert proc.returncode != 0
-    assert "library" in (proc.stderr + proc.stdout).lower()
+    combined = (proc.stdout + proc.stderr).lower()
+    assert "input" in combined
+    assert "library" in combined
+    assert "output" in combined
 
 
-def test_reload_batch_directory_cli(tmp_path: Path) -> None:
-    source = ROOT / "test.drawio.svg"
-    if not source.is_file():
-        pytest.skip("需要仓库根目录 test.drawio.svg")
-    inp_dir = tmp_path / "in"
-    out_dir = tmp_path / "out"
-    inp_dir.mkdir()
-    (inp_dir / "one.drawio.svg").write_text(source.read_text(encoding="utf-8"), encoding="utf-8")
-    proc = subprocess.run(
-        [
-            sys.executable,
-            str(SRC_DIR),
-            "reload",
-            "-i",
-            str(inp_dir),
-            "-l",
-            str(ROOT / "drawio-lib" / "drawclock.xml"),
-            "-o",
-            str(out_dir),
-        ],
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    assert proc.returncode == 0, proc.stderr
-    assert (out_dir / "one.drawio.svg").is_file()
-    assert "已写入" in proc.stderr
+def test_removed_subcommands_are_rejected() -> None:
+    for command in ("draw", "extract", "reload", "run", "drawio-to-json"):
+        proc = subprocess.run(
+            [sys.executable, str(SRC_DIR), command],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        assert proc.returncode != 0, command
 
 
-def test_release_archive_source_layout(tmp_path: Path, monkeypatch) -> None:
+def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch) -> None:
     spec = importlib.util.spec_from_file_location(
         "bundle_release", ROOT / "tools" / "bundle_release.py"
     )
@@ -110,19 +66,14 @@ def test_release_archive_source_layout(tmp_path: Path, monkeypatch) -> None:
     (project / "drawio-lib").mkdir()
     (project / "example").mkdir()
     (project / ".runtime" / "node").mkdir(parents=True)
-    (project / ".runtime" / "runtime-manifest.json").write_text(
-        "{}\n", encoding="utf-8"
-    )
+    (project / ".runtime" / "runtime-manifest.json").write_text("{}\n", encoding="utf-8")
     (project / ".runtime" / "node" / "node.exe").touch()
     (project / "dist" / "drawclock.exe").write_text("", encoding="utf-8")
     (project / "README.md").write_text("", encoding="utf-8")
     (project / "draw.md").write_text("", encoding="utf-8")
-    (project / "json.md").write_text("", encoding="utf-8")
     (project / "example" / "draw.json").write_text("{}", encoding="utf-8")
-    (project / "rule.md").write_text("", encoding="utf-8")
     (project / "pyproject.toml").write_text(
-        "[project]\nname = \"drawclock\"\nversion = \"1.2.3\"\n",
-        encoding="utf-8",
+        '[project]\nname = "drawclock"\nversion = "1.2.3"\n', encoding="utf-8"
     )
     (project / "src" / "__main__.py").write_text("print('ok')\n", encoding="utf-8")
 
@@ -131,17 +82,13 @@ def test_release_archive_source_layout(tmp_path: Path, monkeypatch) -> None:
     assert bundle_release.main() == 0
 
     archive = project / "dist" / "drawclock-1.2.3-windows.zip"
-    assert archive.is_file()
     with zipfile.ZipFile(archive) as zf:
         names = set(zf.namelist())
     prefix = "drawclock-1.2.3-windows/"
-    assert prefix + "pyproject.toml" in names
     assert prefix + "draw.md" in names
     assert prefix + "example/draw.json" in names
     assert prefix + "runtime/runtime-manifest.json" in names
-    assert prefix + "runtime/node/node.exe" in names
-    assert not any("headless-shell" in name for name in names)
     assert prefix + "source/__main__.py" in names
-    assert prefix + "source/pyproject.toml" not in names
-    assert prefix + "source/src/__main__.py" not in names
-    assert prefix + "drawclock-reload.exe" not in names
+    assert prefix + "json.md" not in names
+    assert prefix + "rule.md" not in names
+    assert not any("reload" in name or "extract" in name for name in names)

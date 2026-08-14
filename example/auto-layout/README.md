@@ -1,15 +1,15 @@
 # 自动布局示例
 
-所有示例只需输入拓扑、器件库和一个输出文件：
+所有示例只需输入连接配置、器件库和一个输出文件：
 
 ```powershell
-python src draw `
+python src `
   -i example/auto-layout/03-mux-dag.json `
   -l drawio-lib/drawclock.xml `
   -o example/generated/03-mux-dag.svg
 ```
 
-`draw` 固定写入 SVG，不需要格式参数；输出后缀不会改变文件内容。
+输出内容固定为 SVG；文件后缀不改变格式。
 
 | 级别 | 输入 | 覆盖场景 |
 | --- | --- | --- |
@@ -29,7 +29,7 @@ python src draw `
 | 高交叉 | `14-crossing-weave-128-clocks.json` | 520 nodes / 128 clocks；多根、多级重汇合和大量允许跨线 |
 | 综合折磨 | `15-routing-torture-512-clocks.json` | 1288 nodes / 512 clocks；长文字、高复用、跨层边和多级 mux 同时出现 |
 
-压力示例包含少量晶振和 PLL、大量复用的 mux、分频器、gate、多类 clock cell 和末端 clock。后三个对抗示例改变连接顺序、链深、复用源和实例名，不只是放大同一种阵列。坐标由输入拓扑以及当前器件库的尺寸、标签和端口一次计算得到，不进行成图后的坐标校准。
+压力示例包含少量晶振和 PLL、大量复用的 mux、分频器、gate、多类 clock cell 和末端 clock。后三个对抗示例改变连接顺序、链深、复用源和实例名，不只是放大同一种阵列。坐标由输入连接关系以及当前器件库的尺寸、标签和端口一次计算得到，不进行成图后的坐标校准。
 
 生成全部示例：
 

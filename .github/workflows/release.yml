@@ -92,8 +92,8 @@ jobs:
             Rolling release: self-contained Ubuntu 16.04 PyInstaller bundle from the main commit.
             The archive includes pinned Node.js and ELK layout runtimes.
             Before publishing, CI extracts the archive and exercises the frozen executable with the
-            host PATH isolated for extract, reload, fixed-SVG generation under arbitrary output
-            suffixes, supplied-library rendering, and large-layout bounds checks.
+            host PATH isolated for direct SVG generation under arbitrary output suffixes,
+            supplied-library rendering, supported config formats, and large-layout bounds checks.
           files: release-assets/**
           fail_on_unmatched_files: true
           generate_release_notes: false

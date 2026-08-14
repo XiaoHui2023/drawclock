@@ -4,10 +4,8 @@ from bisect import bisect_left, bisect_right, insort
 from collections import defaultdict
 from pathlib import Path
 
-from drawio_graph import edge_attachment
-from drawio_build import junction_points
 from drawio_layout import LayoutDocument
-from drawio_ports import abs_port_xy, port_anchors
+from drawio_ports import abs_port_xy, edge_attachment, port_anchors
 
 # draw.io places an html=1 label's content origin 2 px right and 7 px below
 # mxGeometry.  The component library deliberately applies the inverse offset
@@ -145,6 +143,101 @@ def _edge_arc_path(
             last = after
         commands.append(f"L {_svg_num(end[0])} {_svg_num(end[1])}")
     return " ".join(commands)
+
+
+def junction_points(document: LayoutDocument) -> list[tuple[float, float]]:
+    """Return visible split points of same-source-port shared prefixes."""
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    groups: dict[
+        tuple[str, tuple[float, float]],
+        list[list[tuple[float, float]]],
+    ] = {}
+    for edge in document.edges:
+        source = by_id.get(edge.source_id)
+        target = by_id.get(edge.target_id)
+        if source is None or target is None:
+            continue
+        exit_xy = edge_attachment(edge.style, end="exit")
+        entry_xy = edge_attachment(edge.style, end="entry")
+        if exit_xy is None or entry_xy is None:
+            continue
+        start = (
+            source.x + source.width * exit_xy[0],
+            source.y + source.height * exit_xy[1],
+        )
+        end = (
+            target.x + target.width * entry_xy[0],
+            target.y + target.height * entry_xy[1],
+        )
+        points = _simplify_points([start, *edge.waypoints, end])
+        groups.setdefault((edge.source_id, exit_xy), []).append(points)
+
+    junctions: set[tuple[float, float]] = set()
+    for paths in groups.values():
+        for index, first in enumerate(paths):
+            for second in paths[index + 1 :]:
+                split = _shared_prefix_split(first, second)
+                if split is not None and split != first[0]:
+                    junctions.add((round(split[0], 4), round(split[1], 4)))
+    return sorted(junctions, key=lambda point: (point[0], point[1]))
+
+
+def _shared_prefix_split(
+    first: list[tuple[float, float]],
+    second: list[tuple[float, float]],
+) -> tuple[float, float] | None:
+    if not first or not second or first[0] != second[0]:
+        return None
+    first_index = second_index = 0
+    current = first[0]
+    while first_index + 1 < len(first) and second_index + 1 < len(second):
+        first_end = first[first_index + 1]
+        second_end = second[second_index + 1]
+        first_direction = _direction(current, first_end)
+        second_direction = _direction(current, second_end)
+        if first_direction != second_direction:
+            return current
+        first_distance = abs(first_end[0] - current[0]) + abs(first_end[1] - current[1])
+        second_distance = abs(second_end[0] - current[0]) + abs(second_end[1] - current[1])
+        if first_distance < second_distance:
+            return first_end
+        if second_distance < first_distance:
+            return second_end
+        current = first_end
+        first_index += 1
+        second_index += 1
+        if current != second_end:
+            return current
+    return None
+
+
+def _direction(
+    start: tuple[float, float], end: tuple[float, float]
+) -> tuple[int, int]:
+    return (
+        0 if start[0] == end[0] else (1 if end[0] > start[0] else -1),
+        0 if start[1] == end[1] else (1 if end[1] > start[1] else -1),
+    )
+
+
+def _simplify_points(
+    points: list[tuple[float, float]],
+) -> list[tuple[float, float]]:
+    compact: list[tuple[float, float]] = []
+    for point in points:
+        if compact and point == compact[-1]:
+            continue
+        compact.append(point)
+        while len(compact) >= 3:
+            first, middle, last = compact[-3:]
+            if (
+                first[0] == middle[0] == last[0]
+                or first[1] == middle[1] == last[1]
+            ):
+                compact.pop(-2)
+            else:
+                break
+    return compact
 
 
 def build_preview_svg(

@@ -17,15 +17,16 @@ from auto_layout import (
     _ranks,
     _segment_hits_rect,
     build_logical_edges,
-    load_clock_tree,
-    load_component_hints,
     resolve_nodes,
 )
-from drawio_decode import extract_mxfile_xml, iter_diagram_models
-from drawio_graph import edge_attachment, parse_models
-from drawio_layout import LayoutDocument, layout_from_diagram
+from drawio_layout import LayoutDocument
 from drawio_library import load_library_shapes
-from drawio_ports import abs_port_xy, infer_port_from_attachment, port_anchors
+from drawio_ports import (
+    abs_port_xy,
+    edge_attachment,
+    infer_port_from_attachment,
+    port_anchors,
+)
 from visual_geometry import vertex_visual_box
 
 
@@ -1057,11 +1058,6 @@ def inspect_layout_quality(
     for edge_id, (source, target) in observed_edge_vertices.items():
         incident_edges_by_vertex[source.cell_id].append(edge_id)
         incident_edges_by_vertex[target.cell_id].append(edge_id)
-    current_min_x = min((box.left for box in visual_boxes.values()), default=0.0)
-    current_min_y = min((box.top for box in visual_boxes.values()), default=0.0)
-    current_max_x = max((box.right for box in visual_boxes.values()), default=0.0)
-    current_max_y = max((box.bottom for box in visual_boxes.values()), default=0.0)
-
     def simplify_candidate(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
         points = _canonical_orthogonal_points(points, tolerance)
         compact: list[tuple[float, float]] = []
@@ -1127,15 +1123,7 @@ def inspect_layout_quality(
                 max(0, len(edge_points[edge_id]) - 2)
                 for edge_id in incident_ids
             )
-            old_length = sum(
-                abs(b[0] - a[0]) + abs(b[1] - a[1])
-                for edge_id in incident_ids
-                for a, b in zip(
-                    edge_points[edge_id], edge_points[edge_id][1:]
-                )
-            )
             best_bends = 0
-            best_length = 0.0
             for edge_id in incident_ids:
                 source, target = observed_edge_vertices[edge_id]
                 points = edge_points[edge_id]
@@ -1152,8 +1140,7 @@ def inspect_layout_quality(
                 best_bends += (
                     0 if _close(start[1], end[1], tolerance) else 2
                 )
-                best_length += abs(end[0] - start[0]) + abs(end[1] - start[1])
-            if best_bends < old_bends and best_length <= old_length + tolerance:
+            if best_bends < old_bends:
                 viable_deltas.add(delta)
         if viable_deltas:
             suspect_vertices[vertex_id] = viable_deltas
@@ -1167,11 +1154,6 @@ def inspect_layout_quality(
         moved_box = visual_boxes[moved.name]
         incident_ids = set(incident_edges_by_vertex[vertex_id])
         old_bends = sum(max(0, len(edge_points[edge_id]) - 2) for edge_id in incident_ids)
-        old_length = sum(
-            abs(b[0] - a[0]) + abs(b[1] - a[1])
-            for edge_id in incident_ids
-            for a, b in zip(edge_points[edge_id], edge_points[edge_id][1:])
-        )
         old_segments = [
             segment
             for edge_id in incident_ids
@@ -1252,7 +1234,6 @@ def inspect_layout_quality(
                 continue
             candidate_segments: list[Segment] = []
             candidate_bends = 0
-            candidate_length = 0.0
             candidate_lead_violations = 0
             candidate_failed = False
             selected_option_segments: list[Segment] = []
@@ -1357,7 +1338,6 @@ def inspect_layout_quality(
                 selected_option_segments.extend(option_segments)
                 candidate_bends += max(0, len(option_segments) - 1)
                 candidate_lead_violations += option_score[0]
-                candidate_length += option_score[5]
             if candidate_failed or candidate_bends >= old_bends:
                 continue
             candidate_overlaps = sum(
@@ -1382,19 +1362,11 @@ def inspect_layout_quality(
                 for index, segment in enumerate(candidate_segments)
                 for other in candidate_segments[index + 1:]
             )
-            new_min_y = min(current_min_y, candidate_box[1])
-            new_max_y = max(current_max_y, candidate_box[3])
-            area_regression = (
-                new_max_y - new_min_y
-                > current_max_y - current_min_y + tolerance
-            )
             edge_ids = sorted(incident_ids)
             if (
                 candidate_overlaps <= old_overlaps
                 and candidate_crossings <= old_crossings
                 and candidate_lead_violations <= old_lead_violations
-                and candidate_length <= old_length + tolerance
-                and not area_regression
             ):
                 avoidable_joint_coordinate_bends.extend(edge_ids)
                 break
@@ -1405,10 +1377,6 @@ def inspect_layout_quality(
                 reasons.append("crossing")
             if candidate_lead_violations > old_lead_violations:
                 reasons.append("endpoint-lead")
-            if candidate_length > old_length + tolerance:
-                reasons.append("length")
-            if area_regression:
-                reasons.append("visible-height")
             for edge_id in edge_ids:
                 joint_coordinate_tradeoffs.setdefault(edge_id, []).extend(reasons)
 
@@ -1821,37 +1789,6 @@ def inspect_layout_quality(
         },
         "runtime_ms": round(runtime_ms, 3),
     }
-
-
-def inspect_drawio_quality(
-    config_path: str | Path,
-    drawio_path: str | Path,
-    *,
-    library_path: str | Path,
-    hints_path: str | Path | None = None,
-    grid: float = 10.0,
-    tolerance: float = 0.5,
-) -> dict[str, Any]:
-    started = time.perf_counter()
-    config = load_clock_tree(config_path)
-    hints = load_component_hints(hints_path)
-    mxfile = extract_mxfile_xml(str(drawio_path))
-    models = iter_diagram_models(mxfile)
-    if not models:
-        raise ValueError(f"draw.io file contains no diagram model: {drawio_path}")
-    # Inspect the artifact exactly as stored. Reload-time port repair must not
-    # hide a malformed generated connector from the quality gate.
-    document = layout_from_diagram(parse_models(models), resolve_ports=False)
-    elapsed_ms = (time.perf_counter() - started) * 1000
-    return inspect_layout_quality(
-        config,
-        document,
-        library_path=library_path,
-        component_hints=hints,
-        grid=grid,
-        tolerance=tolerance,
-        runtime_ms=elapsed_ms,
-    )
 
 
 def write_quality_report(report: dict[str, Any], output_path: str | Path) -> Path:

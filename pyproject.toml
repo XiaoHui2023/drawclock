@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "drawclock"
-version = "0.0.0"
-description = "从 draw.io 图生成时钟树相关输出"
+version = "1.0.0"
+description = "从时钟连接配置生成 SVG 时钟图"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = ["config-library[json5,toml,yaml]==0.18.1"]
@@ -16,27 +16,21 @@ dev = ["pytest>=8.0"]
 [tool.setuptools]
 package-dir = {"" = "src"}
 py-modules = [
-    "config_export",
     "config_input",
-    "device_attrs_convert",
     "device_attrs_validate",
-    "device_model",
-    "drawio_build",
-    "drawio_decode",
-    "drawio_graph",
+    "library_payload",
     "drawio_layout",
     "drawio_library",
     "drawio_ports",
     "layout_validate",
     "layout_preview",
-    "migrate",
-    "pipeline",
     "auto_layout",
     "elk_layout",
-    "topology",
     "validate_config",
-    "from_resolve",
+    "source_reference",
     "library_ports",
+    "internal_kind",
+    "visual_geometry",
 ]
 
 [tool.pytest.ini_options]

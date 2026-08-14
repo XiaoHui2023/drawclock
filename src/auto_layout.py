@@ -10,14 +10,19 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from config_input import load_config
-from drawio_build import build_drawio_xml, junction_points
 from drawio_layout import EdgeLayout, LAYOUT_VERSION, LayoutDocument, VertexLayout
 from drawio_library import LibraryShape, canonical_object_attrs, load_library_shapes
 from drawio_ports import EDGE_DRAW_STYLE, abs_port_xy, port_anchors
-from from_resolve import parse_source_ref
+from source_reference import parse_source_ref
 from internal_kind import INTERNAL_OBJECT_KEYS
 from library_ports import input_connection_keys, output_connection_keys, port_topology_from_style
 from validate_config import validate_config
+
+
+def _junction_count(document: LayoutDocument) -> int:
+    from layout_preview import junction_points
+
+    return len(junction_points(document))
 
 
 @dataclass(frozen=True)
@@ -998,7 +1003,7 @@ def generate_layout(
             "component_types": {
                 name: node.shape.title for name, node in sorted(nodes.items())
             },
-            "junction_dots": len(junction_points(document)),
+            "junction_dots": _junction_count(document),
             "crossing_treatment": (
                 "draw.io arc jump and SVG white-gap bridge"
                 if selected["crossings"]
@@ -1008,10 +1013,3 @@ def generate_layout(
         }
     )
     return document, final_report
-
-
-def write_generated_drawio(document: LayoutDocument, output_path: str | Path) -> Path:
-    output = Path(output_path)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(build_drawio_xml(document), encoding="utf-8")
-    return output

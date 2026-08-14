@@ -6,7 +6,26 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-from drawio_graph import _parse_points
+
+
+def _parse_points(style: str) -> tuple[tuple[float, float], ...]:
+  marker = "points=[["
+  start = style.find(marker)
+  if start < 0:
+    return ()
+  start += len(marker)
+  end = style.find("]]", start)
+  if end < 0:
+    return ()
+  inner = style[start:end].strip()
+  if not inner:
+    return ()
+  points = []
+  for segment in inner.split("],["):
+    parts = [part.strip() for part in segment.split(",")]
+    if len(parts) >= 2:
+      points.append((float(parts[0]), float(parts[1])))
+  return tuple(points)
 from drawio_library import DEFAULT_LIBRARY_PATH, load_library_shapes
 
 _LABEL_SPAN_RE = re.compile(r'<span style="([^"]+)">([^<]+)</span>')
