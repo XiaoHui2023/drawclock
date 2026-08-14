@@ -22,6 +22,7 @@ class VertexLayout:
     height: float
     style: str
     object_attrs: dict[str, str] = field(default_factory=dict)
+    logical_name: str | None = None
 
 
 @dataclass
@@ -145,6 +146,7 @@ def layout_to_dict(doc: LayoutDocument) -> dict[str, Any]:
                 "height": vertex.height,
                 "style": vertex.style,
                 "object": vertex.object_attrs,
+                **({"logical_name": vertex.logical_name} if vertex.logical_name else {}),
             }
             for vertex in doc.vertices
         ],
@@ -182,6 +184,11 @@ def layout_from_dict(data: dict[str, Any]) -> LayoutDocument:
                 height=float(raw["height"]),
                 style=str(raw.get("style", "")),
                 object_attrs={str(k): str(v) for k, v in obj.items()},
+                logical_name=(
+                    str(raw["logical_name"])
+                    if raw.get("logical_name") is not None
+                    else None
+                ),
             )
         )
     edges: list[EdgeLayout] = []

@@ -137,7 +137,10 @@ def test_elk_512_clock_stress_budget_and_integrity() -> None:
     line = quality["line_integrity"]
 
     assert sum(item.get("kind") == "clock" for item in config.values()) == 512
-    assert len(document.vertices) == 1046
+    logical_vertex_names = {vertex.logical_name or vertex.name for vertex in document.vertices}
+    replica_count = report["selection"]["source_rendering_replicas"]
+    assert len(logical_vertex_names) == 1046
+    assert len(document.vertices) == 1046 + replica_count
     assert len(document.edges) == 1300
     assert report["engine"] == "constraint-layered"
     assert report["selection"]["basis"] == "graph-structure"

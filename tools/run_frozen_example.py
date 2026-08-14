@@ -477,7 +477,17 @@ def main() -> int:
         ROOT,
         isolated_runtime=True,
     )
-    _assert_svg_image(stress_svg, expected_nodes=1046, expected_edges=1300)
+    # The logical graph has 1046 vertices.  Its two widely reused zero-indegree
+    # sources each need one additional rendering alias; logical edges stay 1300.
+    _assert_svg_image(stress_svg, expected_nodes=1048, expected_edges=1300)
+    stress_root = ET.parse(stress_svg).getroot()
+    stress_labels = [
+        "".join(node.itertext()).strip()
+        for node in stress_root.findall(f".//{{{SVG_NS}}}foreignObject")
+    ]
+    if stress_labels.count("xtal_0") != 2 or stress_labels.count("xtal_1") != 2:
+        print("frozen draw omitted topology-derived distant root aliases", file=sys.stderr)
+        return 1
 
     library_text = LIBRARY.read_text(encoding="utf-8").strip()
     library_entries = json.loads(

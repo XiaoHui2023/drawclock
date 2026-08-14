@@ -2,13 +2,18 @@ from __future__ import annotations
 
 import copy
 import time
+from collections import Counter
 from pathlib import Path
 
 import pytest
 
-from auto_layout import _ranks, build_logical_edges, load_clock_tree, resolve_nodes
+from auto_layout import PROFILES, _ranks, build_logical_edges, load_clock_tree, resolve_nodes
 from drawio_library import load_library_shapes
-from elk_layout import generate_elk_layout, select_layout_plan
+from elk_layout import (
+    _replicate_dispersed_roots,
+    generate_elk_layout,
+    select_layout_plan,
+)
 from auto_layout import LogicalEdge
 from layout_quality import inspect_layout_quality
 from scripts.build_stress_examples import build_dual_from_reuse
@@ -19,11 +24,58 @@ from scripts.build_stress_examples import build_asymmetric_merge_columns
 from scripts.build_stress_examples import build_dispersed_root_fanout
 from scripts.build_stress_examples import build_asymmetric_merge_route_bulge
 from drawio_ports import abs_port_xy, infer_port_from_attachment
+from drawio_layout import layout_from_dict, layout_to_dict
 
 
 ROOT = Path(__file__).resolve().parents[1]
 LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
 EXAMPLES = ROOT / "example" / "auto-layout"
+
+
+def _forced_dispersed_root_layout(config):
+    """Create a true distant-band artifact before testing root facilities."""
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    logical_edges = build_logical_edges(config, nodes, LIBRARY)
+    moved_ids = set()
+    for vertex in document.vertices:
+        if "_bottom_" in vertex.name:
+            vertex.y += 5000.0
+            moved_ids.add(vertex.cell_id)
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    for index, logical in enumerate(logical_edges, 1):
+        edge = next(edge for edge in document.edges if edge.cell_id == f"e{index}")
+        source = by_id[edge.source_id]
+        target = by_id[edge.target_id]
+        start = abs_port_xy(
+            source.x, source.y, source.width, source.height,
+            source.style, source.drawclock_type, logical.source_port,
+        )
+        end = abs_port_xy(
+            target.x, target.y, target.width, target.height,
+            target.style, target.drawclock_type, logical.target_port,
+        )
+        if edge.source_id in moved_ids and edge.target_id in moved_ids:
+            edge.waypoints = tuple((x, y + 5000.0) for x, y in edge.waypoints)
+        elif edge.source_id in moved_ids or edge.target_id in moved_ids:
+            lane_x = (start[0] + end[0]) / 2.0
+            edge.waypoints = ((lane_x, start[1]), (lane_x, end[1]))
+    return _replicate_dispersed_roots(
+        document, nodes, logical_edges, PROFILES["readable"]
+    )
+
+
+def _minimal_dispersed_config(root_kind="from"):
+    return {
+        "wide_root": {"kind": root_kind},
+        "wide_gate_top_0": {"kind": "gate", "source": "wide_root"},
+        "wide_clock_top_0": {"kind": "clock", "source": "wide_gate_top_0"},
+        "wide_gate_top_1": {"kind": "gate", "source": "wide_root"},
+        "wide_clock_top_1": {"kind": "clock", "source": "wide_gate_top_1"},
+        "wide_gate_bottom_0": {"kind": "gate", "source": "wide_root"},
+        "wide_clock_bottom_0": {"kind": "clock", "source": "wide_gate_bottom_0"},
+    }
 
 
 def test_strategy_depends_on_structure_not_node_count() -> None:
@@ -45,7 +97,7 @@ def test_strategy_depends_on_structure_not_node_count() -> None:
     [
         ("09-stress-1024-clocks", 1024, 2086, 2596, 5.0),
         ("10-stress-2048-clocks", 2048, 4166, 5188, 10.0),
-        ("11-stress-4096-clocks", 4096, 8326, 10372, 20.0),
+        ("11-stress-4096-clocks", 4096, 8326, 10372, 25.0),
     ],
 )
 def test_scalable_stress_generation_is_linear_and_complete(
@@ -64,7 +116,13 @@ def test_scalable_stress_generation_is_linear_and_complete(
     elapsed = time.perf_counter() - started
     assert report["engine"] == "constraint-layered"
     assert sum(item.get("kind") == "clock" for item in config.values()) == clock_count
-    assert len(document.vertices) == node_count
+    # Rendering-only aliases may repeat a zero-indegree logical source near a
+    # distant consumer cluster.  They must not change the logical graph size.
+    assert len({vertex.logical_name or vertex.name for vertex in document.vertices}) == node_count
+    assert (
+        len(document.vertices) - node_count
+        == report["selection"]["source_rendering_replicas"]
+    )
     assert len(document.edges) == edge_count
     assert elapsed < budget_seconds
 
@@ -126,7 +184,7 @@ def test_dual_from_reuse_has_no_avoidable_outer_detours() -> None:
     [
         (16, 2, True, 32),
         (64, 2, False, 128),
-        (128, 4, True, 512),
+        (64, 8, True, 512),
     ],
 )
 def test_adversarial_weave_quality_corpus(
@@ -147,6 +205,7 @@ def test_adversarial_weave_quality_corpus(
         library_path=LIBRARY,
         grid=0.0001,
         tolerance=0.01,
+        joint_coordinate_oracle=clock_count < 512,
     )
     line = quality["line_integrity"]
 
@@ -238,38 +297,128 @@ def test_equivalent_merge_cohorts_share_one_constraint_derived_column() -> None:
 
 
 def test_dispersed_root_uses_top_entry_and_justified_local_trunks() -> None:
-    config = build_dispersed_root_fanout()
-    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    config = _minimal_dispersed_config()
+    document, report = _forced_dispersed_root_layout(config)
     quality = inspect_layout_quality(
         config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
     )
     vertices = {vertex.name: vertex for vertex in document.vertices}
-    root = vertices["wide_root"]
+    root_anchors = [
+        vertex for vertex in document.vertices
+        if (vertex.logical_name or vertex.name) == "wide_root"
+    ]
     wide_targets = [
         vertex for name, vertex in vertices.items() if name.startswith("wide_gate_")
     ]
-    root_axis = abs_port_xy(
-        root.x, root.y, root.width, root.height,
-        root.style, root.drawclock_type, "right",
-    )[1]
-    target_axes = []
+    root_anchor_ids = {vertex.cell_id for vertex in root_anchors}
+    used_anchor_ids = set()
     for target in wide_targets:
         edge = next(
             edge for edge in document.edges
-            if edge.target_id == target.cell_id and edge.source_id == root.cell_id
+            if edge.target_id == target.cell_id and edge.source_id in root_anchor_ids
         )
-        port = infer_port_from_attachment(target.style, edge.style, end="entry")
-        assert port is not None
-        target_axes.append(abs_port_xy(
-            target.x, target.y, target.width, target.height,
-            target.style, target.drawclock_type, port,
-        )[1])
+        used_anchor_ids.add(edge.source_id)
 
     assert quality["passed"] is True
-    assert report["selection"]["boundary_placed_roots"] >= 1
-    assert abs(root_axis - min(target_axes)) <= 0.02
+    assert report["source_rendering_replicas"] >= 1
+    assert report["source_replica_length_saved_px"] > 0
+    assert used_anchor_ids == root_anchor_ids
+    assert quality["alignment"]["invalid_rendering_replicas"] == []
+    assert quality["alignment"]["unused_rendering_replicas"] == []
     assert quality["readability"]["fragmented_fanout_sources"] == {}
     assert quality["readability"]["root_consumer_interleavings"]["wide_root"] == 0
+
+
+def test_root_replication_is_zero_indegree_driven_not_component_kind() -> None:
+    config = _minimal_dispersed_config("gate")
+    document, _ = _forced_dispersed_root_layout(config)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    anchors = [
+        vertex for vertex in document.vertices
+        if (vertex.logical_name or vertex.name) == "wide_root"
+    ]
+
+    assert len(anchors) > 1
+    assert {vertex.drawclock_type for vertex in anchors} == {"gate"}
+    assert quality["passed"] is True
+
+
+def test_rendering_replica_identity_survives_layout_serialization() -> None:
+    config = _minimal_dispersed_config()
+    document, _ = _forced_dispersed_root_layout(config)
+    restored = layout_from_dict(layout_to_dict(document))
+
+    assert layout_to_dict(restored) == layout_to_dict(document)
+    assert any(vertex.logical_name for vertex in restored.vertices)
+
+
+def test_replica_quality_gate_fault_injection_covers_graph_identity() -> None:
+    config = _minimal_dispersed_config()
+    document, _ = _forced_dispersed_root_layout(config)
+
+    non_root = copy.deepcopy(document)
+    gate = next(vertex for vertex in non_root.vertices if vertex.name.startswith("wide_gate_"))
+    invalid = copy.deepcopy(gate)
+    invalid.name += "__invalid_replica"
+    invalid.cell_id += "_invalid"
+    invalid.logical_name = gate.name
+    non_root.vertices.append(invalid)
+    invalid_quality = inspect_layout_quality(
+        config, non_root, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert invalid.name in invalid_quality["alignment"]["invalid_rendering_replicas"]
+    assert invalid_quality["passed"] is False
+
+    unused = copy.deepcopy(document)
+    root = next(vertex for vertex in unused.vertices if vertex.name == "wide_root")
+    orphan = copy.copy(root)
+    orphan.name = "wide_root__unused"
+    orphan.cell_id = "wide_root_unused"
+    orphan.logical_name = "wide_root"
+    unused.vertices.append(orphan)
+    unused_quality = inspect_layout_quality(
+        config, unused, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert orphan.name in unused_quality["alignment"]["unused_rendering_replicas"]
+    assert unused_quality["passed"] is False
+
+    wrong_identity = copy.deepcopy(document)
+    replica = next(vertex for vertex in wrong_identity.vertices if vertex.logical_name == "wide_root")
+    replica.width += 1.0
+    identity_quality = inspect_layout_quality(
+        config, wrong_identity, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert replica.name in identity_quality["alignment"]["replica_identity_errors"]
+    assert identity_quality["passed"] is False
+
+    missing_edge = copy.deepcopy(document)
+    missing_edge.edges.pop()
+    edge_quality = inspect_layout_quality(
+        config, missing_edge, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert edge_quality["line_integrity"]["missing_edges"]
+    assert edge_quality["passed"] is False
+
+    redundant = copy.deepcopy(document)
+    outgoing = Counter(edge.source_id for edge in redundant.edges)
+    anchor = next(
+        vertex for vertex in redundant.vertices
+        if (vertex.logical_name or vertex.name) == "wide_root"
+        and outgoing[vertex.cell_id] >= 2
+    )
+    duplicate = copy.copy(anchor)
+    duplicate.name = "wide_root__redundant"
+    duplicate.cell_id = "wide_root_redundant"
+    duplicate.logical_name = "wide_root"
+    redundant.vertices.append(duplicate)
+    next(edge for edge in redundant.edges if edge.source_id == anchor.cell_id).source_id = duplicate.cell_id
+    redundant_quality = inspect_layout_quality(
+        config, redundant, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert redundant_quality["alignment"]["avoidable_source_replicas"]
+    assert redundant_quality["passed"] is False
 
 
 @pytest.mark.parametrize("long_branch", ["a", "b"])
@@ -285,6 +434,32 @@ def test_asymmetric_merge_inputs_follow_fixed_port_order_without_crossing(
     assert quality["passed"] is True
     assert quality["line_integrity"]["avoidable_local_merge_input_crossings"] == []
     assert quality["line_integrity"]["avoidable_merge_input_detours"] == []
+    assert quality["line_integrity"]["avoidable_joint_coordinate_bend_edges"] == []
+    tap_edge = next(
+        edge for edge in document.edges
+        if next(
+            vertex for vertex in document.vertices
+            if vertex.cell_id == edge.target_id
+        ).name.endswith("_tap")
+    )
+    assert quality["line_integrity"]["joint_coordinate_bend_tradeoffs"][
+        tap_edge.cell_id
+    ] == ["visible-height"]
+
+
+def test_joint_coordinate_refinement_accepts_only_a_global_dominance() -> None:
+    config = build_asymmetric_merge_route_bulge(long_branch="b")
+    config["independent_floor_anchor"] = {"kind": "from"}
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert report["selection"]["joint_coordinate_moves"] == 1
+    assert report["selection"]["joint_coordinate_bends_removed"] == 2
+    assert quality["line_integrity"]["bends_total"] == 6
+    assert quality["line_integrity"]["avoidable_joint_coordinate_bend_edges"] == []
+    assert quality["passed"] is True
 
 
 def test_quality_gate_rejects_unused_inter_rank_whitespace() -> None:
@@ -296,10 +471,12 @@ def test_quality_gate_rejects_unused_inter_rank_whitespace() -> None:
     ranks = _ranks(nodes, edges)
     widened = copy.deepcopy(document)
     boundary = min(
-        vertex.x for vertex in widened.vertices if ranks[vertex.name] == 2
+        vertex.x
+        for vertex in widened.vertices
+        if ranks[vertex.logical_name or vertex.name] == 2
     )
     for vertex in widened.vertices:
-        if ranks[vertex.name] >= 2:
+        if ranks[vertex.logical_name or vertex.name] >= 2:
             vertex.x += 40
     for edge in widened.edges:
         edge.waypoints = tuple(

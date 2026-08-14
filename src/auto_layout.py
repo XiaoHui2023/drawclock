@@ -3,7 +3,8 @@ from __future__ import annotations
 import json
 import math
 import time
-from collections import defaultdict, deque
+from bisect import bisect_left, bisect_right
+from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Iterable
@@ -717,12 +718,40 @@ def assess_layout(
 ) -> dict[str, Any]:
     by_id = {vertex.cell_id: vertex for vertex in doc.vertices}
     edge_by_id = {edge.cell_id: edge for edge in doc.edges}
+    bucket_size = 256.0
+
+    def bucket_keys(
+        left: float, top: float, right: float, bottom: float
+    ) -> Iterable[tuple[int, int]]:
+        for bx in range(math.floor(left / bucket_size), math.floor(right / bucket_size) + 1):
+            for by in range(math.floor(top / bucket_size), math.floor(bottom / bucket_size) + 1):
+                yield bx, by
+
+    node_buckets: dict[tuple[int, int], list[int]] = defaultdict(list)
+    node_rects = [
+        (vertex.x, vertex.y, vertex.x + vertex.width, vertex.y + vertex.height)
+        for vertex in doc.vertices
+    ]
+    for index, rect in enumerate(node_rects):
+        for key in bucket_keys(*rect):
+            node_buckets[key].append(index)
+    overlap_pairs: set[tuple[int, int]] = set()
+    for index, rect in enumerate(node_rects):
+        nearby: set[int] = set()
+        for key in bucket_keys(*rect):
+            nearby.update(node_buckets[key])
+        for other_index in nearby:
+            if other_index <= index:
+                continue
+            other = node_rects[other_index]
+            if (
+                max(rect[0], other[0]) < min(rect[2], other[2])
+                and max(rect[1], other[1]) < min(rect[3], other[3])
+            ):
+                overlap_pairs.add((index, other_index))
     segments: list[Segment] = []
-    node_overlaps = 0
-    for index, a in enumerate(doc.vertices):
-        for b in doc.vertices[index + 1 :]:
-            if max(a.x, b.x) < min(a.x + a.width, b.x + b.width) and max(a.y, b.y) < min(a.y + a.height, b.y + b.height):
-                node_overlaps += 1
+    segment_endpoints: list[tuple[str, str]] = []
+    node_overlaps = len(overlap_pairs)
     edge_node_intersections = 0
     bends_total = 0
     bends_max = 0
@@ -736,24 +765,129 @@ def assess_layout(
         points = _simplify([start, *edge.waypoints, end])
         edge_segments = _segments(points, logical)
         segments.extend(edge_segments)
+        segment_endpoints.extend(
+            [(edge.source_id, edge.target_id)] * len(edge_segments)
+        )
         bends = max(0, len(points) - 2)
         bends_total += bends
         bends_max = max(bends_max, bends)
         length += sum(abs(a[0] - b[0]) + abs(a[1] - b[1]) for a, b in zip(points, points[1:]))
-        for segment in edge_segments:
-            for vertex in doc.vertices:
-                if vertex.name in (logical.source, logical.target):
-                    continue
-                rect = (vertex.x, vertex.y, vertex.x + vertex.width, vertex.y + vertex.height)
-                edge_node_intersections += int(_segment_hits_rect(segment.a, segment.b, rect))
+    for segment, endpoints in zip(segments, segment_endpoints):
+        nearby: set[int] = set()
+        left, right = sorted((segment.a[0], segment.b[0]))
+        top, bottom = sorted((segment.a[1], segment.b[1]))
+        for key in bucket_keys(left, top, right, bottom):
+            nearby.update(node_buckets.get(key, ()))
+        edge_node_intersections += sum(
+            _segment_hits_rect(segment.a, segment.b, node_rects[index])
+            for index in nearby
+            if doc.vertices[index].cell_id not in endpoints
+        )
+    # Collapse geometrically identical shared trunks, then use an orthogonal
+    # sweep.  The previous square buckets still generated millions of segment
+    # pairs for large fanout trees even though only a few trunks were visible.
+    grouped: dict[
+        tuple[str, float, float, float, tuple[str, str]],
+        tuple[Segment, set[tuple[str, str, str]]],
+    ] = {}
+    for segment in segments:
+        if abs(segment.a[0] - segment.b[0]) <= 1e-6:
+            low, high = sorted((segment.a[1], segment.b[1]))
+            key = ("v", segment.a[0], low, high, segment.source_net)
+        else:
+            low, high = sorted((segment.a[0], segment.b[0]))
+            key = ("h", segment.a[1], low, high, segment.source_net)
+        if key not in grouped:
+            grouped[key] = (segment, set())
+        grouped[key][1].add(segment.edge_key)
+
+    verticals = [value for key, value in grouped.items() if key[0] == "v"]
+    horizontals = [value for key, value in grouped.items() if key[0] == "h"]
+    horizontal_by_y: dict[
+        float, list[tuple[float, float, Segment, set[tuple[str, str, str]]]]
+    ] = defaultdict(list)
+    horizontal_by_cell: dict[
+        tuple[int, float],
+        list[tuple[float, float, Segment, set[tuple[str, str, str]]]],
+    ] = defaultdict(list)
+    for segment, owners in horizontals:
+        x0, x1 = sorted((segment.a[0], segment.b[0]))
+        item = (x0, x1, segment, owners)
+        horizontal_by_y[segment.a[1]].append(item)
+        for bx in range(
+            math.floor(x0 / bucket_size),
+            math.floor(x1 / bucket_size) + 1,
+        ):
+            horizontal_by_cell[(bx, segment.a[1])].append(item)
+    horizontal_ys = sorted(horizontal_by_y)
+    for intervals in horizontal_by_y.values():
+        intervals.sort(key=lambda item: item[0])
+
     crossings = 0
+    crossing_points: set[tuple[float, float]] = set()
+    source_crossing_points: set[tuple[float, float]] = set()
+    logical_indegree = Counter(edge.target for edge in logical_edges)
+    root_names = {
+        name
+        for name in {edge.source for edge in logical_edges}
+        if logical_indegree[name] == 0
+    }
+    for vertical, vertical_owners in verticals:
+        x = vertical.a[0]
+        y0, y1 = sorted((vertical.a[1], vertical.b[1]))
+        for y in horizontal_ys[
+            bisect_right(horizontal_ys, y0):bisect_left(horizontal_ys, y1)
+        ]:
+            for x0, x1, horizontal, horizontal_owners in horizontal_by_cell.get(
+                (math.floor(x / bucket_size), y), ()
+            ):
+                if x0 >= x or x >= x1 or vertical.source_net == horizontal.source_net:
+                    continue
+                crossings += (
+                    len(vertical_owners) * len(horizontal_owners)
+                    - len(vertical_owners & horizontal_owners)
+                )
+                point = (round(x, 3), round(y, 3))
+                crossing_points.add(point)
+                if (
+                    vertical.source_net[0] in root_names
+                    or horizontal.source_net[0] in root_names
+                ):
+                    source_crossing_points.add(point)
+
     ambiguous = 0
-    for index, a in enumerate(segments):
-        for b in segments[index + 1 :]:
-            if a.edge_key == b.edge_key:
-                continue
-            crossings += int(_proper_cross(a, b))
-            ambiguous += int(_overlap_length(a, b) >= 10.0 and a.source_net != b.source_net)
+    parallel: dict[
+        tuple[str, float],
+        list[tuple[Segment, set[tuple[str, str, str]]]],
+    ] = defaultdict(list)
+    for segment, owners in verticals:
+        parallel[("v", segment.a[0])].append((segment, owners))
+    for segment, owners in horizontals:
+        parallel[("h", segment.a[1])].append((segment, owners))
+    for group in parallel.values():
+        intervals = []
+        for segment, owners in group:
+            values = (
+                (segment.a[1], segment.b[1])
+                if abs(segment.a[0] - segment.b[0]) <= 1e-6
+                else (segment.a[0], segment.b[0])
+            )
+            low, high = sorted(values)
+            intervals.append((low, high, segment, owners))
+        intervals.sort(key=lambda item: item[0])
+        active: list[tuple[float, Segment, set[tuple[str, str, str]]]] = []
+        for low, high, segment, owners in intervals:
+            active = [item for item in active if item[0] - low >= 10.0]
+            for other_high, other, other_owners in active:
+                if segment.source_net == other.source_net:
+                    continue
+                if min(high, other_high) - low < 10.0:
+                    continue
+                ambiguous += (
+                    len(owners) * len(other_owners)
+                    - len(owners & other_owners)
+                )
+            active.append((high, segment, owners))
     min_x = min((vertex.x for vertex in doc.vertices), default=0.0)
     min_y = min((vertex.y for vertex in doc.vertices), default=0.0)
     max_x = max((vertex.x + vertex.width for vertex in doc.vertices), default=0.0)
@@ -775,6 +909,8 @@ def assess_layout(
         "edge_node_intersections": edge_node_intersections,
         "direction_violations": direction_violations,
         "crossings": crossings,
+        "distinct_crossing_points": len(crossing_points),
+        "source_crossing_points": len(source_crossing_points),
         "ambiguous_overlaps": ambiguous,
         "bends_total": bends_total,
         "bends_max_per_edge": bends_max,

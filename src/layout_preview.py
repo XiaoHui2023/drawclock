@@ -273,7 +273,7 @@ def build_preview_svg(
                 f'<text x="{_svg_num(vertex.x + vertex.width / 2)}" '
                 f'y="{_svg_num(vertex.y + vertex.height / 2)}" '
                 'text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9">'
-                f'{_escape(vertex.name)}</text>'
+                f'{_escape(vertex.logical_name or vertex.name)}</text>'
             )
     lines.append("</svg>")
     return "\n".join(lines) + "\n"

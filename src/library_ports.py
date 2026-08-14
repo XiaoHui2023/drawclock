@@ -74,6 +74,7 @@ def port_topology_from_points(points: tuple[tuple[float, float], ...]) -> PortTo
   )
 
 
+@lru_cache(maxsize=128)
 def port_topology_from_style(style: str) -> PortTopology:
   return port_topology_from_points(_parse_points(style))
 
@@ -95,6 +96,7 @@ def topology_for_type(drawclock_type: str, *, library_path: str | Path | None = 
   return topologies[drawclock_type]
 
 
+@lru_cache(maxsize=128)
 def port_anchors(style: str) -> dict[str, tuple[float, float]]:
   points = _parse_points(style)
   topology = port_topology_from_points(points)

@@ -144,7 +144,7 @@ def _junction_xml(index: int, x: float, y: float) -> str:
 
 def _vertex_xml(vertex: VertexLayout) -> str:
     attrs = dict(vertex.object_attrs)
-    attrs["name"] = vertex.name
+    attrs["name"] = vertex.logical_name or vertex.name
     attrs = canonical_object_attrs(vertex.drawclock_type, attrs)
     label = attrs.get("label", "")
     if label and LABEL_PLACEHOLDER_RE.search(label):

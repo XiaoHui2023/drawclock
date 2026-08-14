@@ -74,7 +74,7 @@ def visual_box(
 
 def vertex_visual_box(vertex: Any) -> VisualBox:
     return visual_box(
-        name=str(vertex.name),
+        name=str(vertex.logical_name or vertex.name),
         label=str(vertex.object_attrs.get("label", "")),
         x=float(vertex.x),
         y=float(vertex.y),
