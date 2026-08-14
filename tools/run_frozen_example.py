@@ -17,6 +17,7 @@ LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
 DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
 STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
 ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
+COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
 SVG_NS = "http://www.w3.org/2000/svg"
 
 
@@ -91,8 +92,21 @@ def _draw(
     )
 
 
+def _assert_named_nodes_same_x(path: Path, names: tuple[str, ...]) -> None:
+    root = ET.fromstring(path.read_text(encoding="utf-8"))
+    x_by_name: dict[str, float] = {}
+    for element in root.findall(f"{{{SVG_NS}}}foreignObject"):
+        text_content = "".join(element.itertext())
+        for name in names:
+            if name in text_content:
+                x_by_name[name] = float(element.get("x", "nan"))
+    if set(x_by_name) != set(names) or len(set(x_by_name.values())) != 1:
+        raise SystemExit(f"layout_column nodes are not co-column: {x_by_name}")
+
+
 def main() -> int:
     global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC
+    global COLUMN_PREFERENCE
     binary = _binary_path()
     package_root = binary.parent
     if (package_root / "runtime" / "runtime-manifest.json").is_file():
@@ -103,9 +117,11 @@ def main() -> int:
         DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
         STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
         ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
+        COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
     runtime = binary.parent / "runtime"
     required = (
         binary, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC,
+        COLUMN_PREFERENCE,
         runtime / "runtime-manifest.json",
         runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node"),
         runtime / "elk" / "elk_layout.mjs",
@@ -126,6 +142,9 @@ def main() -> int:
         binary, ASYMMETRIC, out / "asymmetric-frozen.svg",
         max_total_bends=2,
     )
+    column_output = out / "column-preference-frozen.svg"
+    _draw(binary, COLUMN_PREFERENCE, column_output)
+    _assert_named_nodes_same_x(column_output, ("sel_00", "sel_01", "sel_02"))
 
     formats = {
         "json": '{"osc":{"kind":"source"}}',

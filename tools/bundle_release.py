@@ -23,6 +23,7 @@ RELEASE_PATHS = (
     "example/auto-layout/05-dense-cross-root.json",
     "example/auto-layout/08-stress-512-clocks.json",
     "example/auto-layout/20-asymmetric-merge-route-bulge.json",
+    "example/auto-layout/21-layout-column-preference.json",
 )
 
 SOURCE_DIR = "source"

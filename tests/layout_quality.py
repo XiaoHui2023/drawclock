@@ -13,6 +13,7 @@ from auto_layout import (
     LogicalEdge,
     Segment,
     _overlap_length,
+    _layout_column_groups,
     _proper_cross,
     _ranks,
     _segment_hits_rect,
@@ -30,7 +31,7 @@ from drawio_ports import (
 from visual_geometry import vertex_visual_box
 
 
-QUALITY_SCHEMA_VERSION = 9  # Test-only Agent artifact inspection schema.
+QUALITY_SCHEMA_VERSION = 10  # Test-only Agent artifact inspection schema.
 
 
 def _close(a: float, b: float, tolerance: float) -> bool:
@@ -120,7 +121,8 @@ def inspect_layout_quality(
         config, shapes, component_hints or {}, library_path=library_path
     )
     logical_edges = build_logical_edges(config, resolved, library_path)
-    ranks = _ranks(resolved, logical_edges)
+    layout_column_groups = _layout_column_groups(config)
+    ranks = _ranks(resolved, logical_edges, layout_column_groups)
     vertices_by_id = {vertex.cell_id: vertex for vertex in document.vertices}
     vertices_by_internal_name = {
         vertex.name: vertex for vertex in document.vertices
@@ -186,6 +188,20 @@ def inspect_layout_quality(
         ]
         rank_spreads[f"{rank}:{shape_type}"] = max(xs) - min(xs) if xs else 0.0
     rank_x_spread_max = max(rank_spreads.values(), default=0.0)
+    layout_column_misalignments: list[dict[str, Any]] = []
+    for label, names in sorted(layout_column_groups.items()):
+        # A nonzero expected rank span means the group contains a causal
+        # dependency and cannot legally occupy one column.
+        if len({ranks[name] for name in names}) != 1:
+            continue
+        xs = [vertices_by_name[name].x for name in names if name in vertices_by_name]
+        spread = max(xs) - min(xs) if xs else 0.0
+        if spread > tolerance:
+            layout_column_misalignments.append({
+                "label": f"{label[0]}:{label[1]}",
+                "nodes": sorted(names),
+                "spread_px": round(spread, 3),
+            })
 
     expected_counter = Counter(edge.key for edge in logical_edges)
     logical_fanout = Counter(
@@ -1836,6 +1852,7 @@ def inspect_layout_quality(
         + invalid_replicas + unused_replicas + replica_identity_errors
         + [f"avoidable-source-replica:{item}" for item in avoidable_source_replicas]
         + grid_violations + (["rank-x-spread"] if rank_x_spread_max > tolerance else [])
+        + (["layout-column-misalignment"] if layout_column_misalignments else [])
         + (["port-anchor-error"] if max(port_alignment_errors, default=0.0) > tolerance else [])
     )
     line_failures = (
@@ -1942,6 +1959,7 @@ def inspect_layout_quality(
             "grid_violations": grid_violations,
             "rank_x_spread_max_px": round(rank_x_spread_max, 3),
             "rank_x_spreads_px": {key: round(value, 3) for key, value in rank_spreads.items()},
+            "layout_column_misalignments": layout_column_misalignments,
             "port_alignment_error_max_px": round(max(port_alignment_errors, default=0.0), 3),
         },
         "line_integrity": {

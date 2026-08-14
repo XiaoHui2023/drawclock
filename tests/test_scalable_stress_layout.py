@@ -7,7 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from auto_layout import PROFILES, _ranks, build_logical_edges, load_clock_tree, resolve_nodes
+from auto_layout import (
+    PROFILES,
+    _layout_column_groups,
+    _ranks,
+    build_logical_edges,
+    load_clock_tree,
+    resolve_nodes,
+)
 from drawio_library import load_library_shapes
 from elk_layout import (
     _replicate_dispersed_roots,
@@ -160,6 +167,119 @@ def test_latest_feasible_layers_move_shorter_source_inward() -> None:
     assert ranks["from_b"] == 1
     assert ranks["gate_b_00"] + 1 == ranks["sel_00"]
     assert len({ranks[name] for name, item in config.items() if item["kind"] == "clock"}) == 1
+
+
+@pytest.mark.parametrize("reverse_input", [False, True])
+def test_layout_column_aligns_different_branch_depths(
+    reverse_input: bool,
+) -> None:
+    config = load_clock_tree(EXAMPLES / "21-layout-column-preference.json")
+    if reverse_input:
+        config = dict(reversed(config.items()))
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    edges = build_logical_edges(config, nodes, LIBRARY)
+    selected = ["sel_00", "sel_01", "sel_02"]
+
+    without_preference = copy.deepcopy(config)
+    for name in selected:
+        without_preference[name].pop("layout_column")
+    plain_nodes = resolve_nodes(
+        without_preference, shapes, {}, library_path=LIBRARY
+    )
+    plain_edges = build_logical_edges(without_preference, plain_nodes, LIBRARY)
+    plain_ranks = _ranks(plain_nodes, plain_edges)
+    assert len({plain_ranks[name] for name in selected}) == 3
+
+    ranks = _ranks(nodes, edges, _layout_column_groups(config))
+    assert len({ranks[name] for name in selected}) == 1
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    x_by_name = {vertex.name: vertex.x for vertex in document.vertices}
+    assert len({x_by_name[name] for name in selected}) == 1
+    assert all(
+        "layout_column" not in vertex.object_attrs
+        for vertex in document.vertices
+    )
+    assert report["selection"]["layout_column_groups"] == 1
+    assert report["selection"]["layout_column_aligned"] == 1
+    assert report["selection"]["layout_column_max_span"] == 0
+
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert quality["passed"] is True
+    assert quality["alignment"]["layout_column_misalignments"] == []
+
+
+def test_layout_column_quality_gate_rejects_shifted_member() -> None:
+    config = load_clock_tree(EXAMPLES / "21-layout-column-preference.json")
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    shifted = copy.deepcopy(document)
+    next(vertex for vertex in shifted.vertices if vertex.name == "sel_01").x += 20
+    quality = inspect_layout_quality(
+        config, shifted, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert quality["passed"] is False
+    assert "layout-column-misalignment" in quality["hard_failures"]
+    assert quality["alignment"]["layout_column_misalignments"] == [{
+        "label": "string:select_stage",
+        "nodes": ["sel_00", "sel_01", "sel_02"],
+        "spread_px": 20.0,
+    }]
+
+
+def test_layout_column_does_not_collapse_causal_nodes() -> None:
+    config = {
+        "root": {"kind": "from"},
+        "first": {
+            "kind": "gate", "layout_column": "stage", "source": "root",
+        },
+        "second": {
+            "kind": "div", "layout_column": "stage", "source": "first",
+        },
+        "clock": {"kind": "clock", "source": "second"},
+    }
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    edges = build_logical_edges(config, nodes, LIBRARY)
+    ranks = _ranks(nodes, edges, _layout_column_groups(config))
+    assert ranks["first"] < ranks["second"]
+
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    assert report["selection"]["layout_column_groups"] == 1
+    assert report["selection"]["layout_column_aligned"] == 0
+    assert report["selection"]["layout_column_max_span"] == 1
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert quality["passed"] is True
+
+
+def test_layout_column_is_independent_of_component_kind() -> None:
+    config = {
+        "root_a": {"kind": "from"},
+        "preferred_gate": {
+            "kind": "gate", "layout_column": 7, "source": "root_a",
+        },
+        "cell_a": {"kind": "cell", "source": "preferred_gate"},
+        "clock_a": {"kind": "clock", "source": "cell_a"},
+        "root_b": {"kind": "from"},
+        "gate_b": {"kind": "gate", "source": "root_b"},
+        "preferred_div": {
+            "kind": "div", "layout_column": 7, "source": "gate_b",
+        },
+        "clock_b": {"kind": "clock", "source": "preferred_div"},
+    }
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    x_by_name = {vertex.name: vertex.x for vertex in document.vertices}
+    assert x_by_name["preferred_gate"] == x_by_name["preferred_div"]
+    assert report["selection"]["layout_column_aligned"] == 1
+
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert quality["passed"] is True
+    assert quality["alignment"]["layout_column_misalignments"] == []
 
 
 def test_dual_from_reuse_has_no_avoidable_outer_detours() -> None:

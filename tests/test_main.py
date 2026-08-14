@@ -78,6 +78,7 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         "05-dense-cross-root.json",
         "08-stress-512-clocks.json",
         "20-asymmetric-merge-route-bulge.json",
+        "21-layout-column-preference.json",
     )
     for name in packaged_layout_examples:
         (project / "example" / "auto-layout" / name).write_text("{}", encoding="utf-8")

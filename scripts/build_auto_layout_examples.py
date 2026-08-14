@@ -35,6 +35,7 @@ EXAMPLES = (
     "18-asymmetric-merge-columns",
     "19-dispersed-root-fanout",
     "20-asymmetric-merge-route-bulge",
+    "21-layout-column-preference",
 )
 
 

@@ -19,6 +19,7 @@ from typing import Any
 from auto_layout import (
     PROFILES,
     _mean,
+    _layout_column_groups,
     _simplify,
     _ranks,
     _overlap_length,
@@ -103,7 +104,8 @@ def _regular_component_count(nodes, logical_edges, backbone: set[str]) -> int:
 
 def select_layout_plan(nodes, logical_edges) -> LayoutPlan:
     """Choose from graph structure, never from a global node-count boundary."""
-    rank = _ranks(nodes, logical_edges)
+    column_groups = _layout_column_groups(nodes)
+    rank = _ranks(nodes, logical_edges, column_groups)
     outgoing: dict[tuple[str, str], int] = defaultdict(int)
     for edge in logical_edges:
         outgoing[(edge.source, edge.source_port)] += 1
@@ -153,7 +155,8 @@ def _generate_scalable_layout(
     source_position_mode="consumer-median",
 ):
     """Linear layered layout for very large high-reuse clock networks."""
-    rank = _ranks(nodes, logical_edges)
+    column_groups = _layout_column_groups(nodes)
+    rank = _ranks(nodes, logical_edges, column_groups)
     max_rank = max(rank.values(), default=0)
     by_rank: dict[int, list[str]] = defaultdict(list)
     for name in nodes:
@@ -1661,6 +1664,19 @@ def _generate_scalable_layout(
             "route_overlaps": len(route_overlap_pairs),
             "bends_total": bend_total,
             "visible_layout_area": round(layout_area, 3),
+            "layout_column_groups": len(column_groups),
+            "layout_column_aligned": sum(
+                len({rank[name] for name in names}) == 1
+                for names in column_groups.values()
+            ),
+            "layout_column_max_span": max(
+                (
+                    max(rank[name] for name in names)
+                    - min(rank[name] for name in names)
+                    for names in column_groups.values()
+                ),
+                default=0,
+            ),
         },
     }
 
@@ -3136,7 +3152,9 @@ def _generate_elk_reference_layout(
     logical_edges = build_logical_edges(config, nodes, library_path)
     profile = PROFILES[profile_name]
     plan = select_layout_plan(nodes, logical_edges)
-    rank = _ranks(nodes, logical_edges)
+    rank = _ranks(
+        nodes, logical_edges, _layout_column_groups(nodes)
+    )
     if plan.mode == "domain":
         return _generate_scalable_layout(
             nodes, logical_edges, profile, started, library_path, plan

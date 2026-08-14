@@ -212,7 +212,33 @@ def build_logical_edges(
     return edges
 
 
-def _ranks(names: Iterable[str], edges: list[LogicalEdge]) -> dict[str, int]:
+def _layout_column_groups(
+    items: dict[str, Any],
+) -> dict[tuple[str, str], list[str]]:
+    groups: dict[tuple[str, str], list[str]] = defaultdict(list)
+    for name, value in items.items():
+        item = value.item if isinstance(value, ResolvedNode) else value
+        if not isinstance(item, dict) or "layout_column" not in item:
+            continue
+        value = item["layout_column"]
+        label = (
+            ("integer", str(value))
+            if isinstance(value, int)
+            else ("string", value)
+        )
+        groups[label].append(name)
+    return {
+        label: names
+        for label, names in groups.items()
+        if len(names) > 1
+    }
+
+
+def _ranks(
+    names: Iterable[str],
+    edges: list[LogicalEdge],
+    layout_columns: dict[tuple[str, str], list[str]] | None = None,
+) -> dict[str, int]:
     outgoing: dict[str, list[str]] = defaultdict(list)
     incoming: dict[str, list[str]] = defaultdict(list)
     indegree = {name: 0 for name in names}
@@ -268,6 +294,33 @@ def _ranks(names: Iterable[str], edges: list[LogicalEdge]) -> dict[str, int]:
             default=0,
         )
 
+    # Detect a same-label ancestor/descendant pair for every user group in one
+    # reverse DAG pass.  Such a group cannot occupy one rank because every edge
+    # must advance to the right, so it must not widen the graph in a futile
+    # attempt to satisfy an impossible preference.
+    column_groups = layout_columns or {}
+    column_bits = {
+        label: 1 << index for index, label in enumerate(column_groups)
+    }
+    member_bit = {
+        name: column_bits[label]
+        for label, cohort in column_groups.items()
+        for name in cohort
+    }
+    descendant_bits: dict[str, int] = {}
+    conflicting_bits = 0
+    for name in reversed(visited):
+        bits = 0
+        for child in outgoing[name]:
+            bits |= member_bit.get(child, 0) | descendant_bits[child]
+        conflicting_bits |= member_bit.get(name, 0) & bits
+        descendant_bits[name] = bits
+    feasible_columns = {
+        label: cohort
+        for label, cohort in column_groups.items()
+        if not conflicting_bits & column_bits[label]
+    }
+
     # Align every terminal on the rightmost layer, then schedule each
     # predecessor as late as its earliest consumer permits.  Equivalent merge
     # cohorts may need slack when one branch is longer before the merge and a
@@ -281,6 +334,12 @@ def _ranks(names: Iterable[str], edges: list[LogicalEdge]) -> dict[str, int]:
                 max(earliest[name] for name in cohort)
                 + max(downstream_depth[name] for name in cohort),
             )
+    for cohort in feasible_columns.values():
+        last_layer = max(
+            last_layer,
+            max(earliest[name] for name in cohort)
+            + max(downstream_depth[name] for name in cohort),
+        )
     latest = {name: last_layer for name in earliest}
     for name in reversed(visited):
         children = outgoing[name]
@@ -295,6 +354,17 @@ def _ranks(names: Iterable[str], edges: list[LogicalEdge]) -> dict[str, int]:
         upper = min(latest[name] for name in cohort)
         if lower <= upper:
             target = max(lower, min(latest[name] for name in cohort))
+            for name in cohort:
+                anchored[name] = target
+    # A user column label is a strong soft constraint.  It is applied after
+    # topology-derived merge cohorts, but only inside the common ASAP/ALAP
+    # interval.  A causally ordered group therefore remains left-to-right
+    # instead of being forced onto an invalid rank.
+    for cohort in feasible_columns.values():
+        lower = max(earliest[name] for name in cohort)
+        upper = min(latest[name] for name in cohort)
+        if lower <= upper:
+            target = upper
             for name in cohort:
                 anchored[name] = target
     for name in reversed(visited):
@@ -959,7 +1029,7 @@ def generate_layout(
         config, shapes, component_hints or {}, library_path=library_path
     )
     logical_edges = build_logical_edges(config, nodes, library_path)
-    rank = _ranks(nodes, logical_edges)
+    rank = _ranks(nodes, logical_edges, _layout_column_groups(config))
     orders = _candidate_orders(config, logical_edges, rank, candidate_limit)
     profile = PROFILES[profile_name]
     best: tuple[tuple[float, ...], LayoutDocument, dict[str, Any]] | None = None

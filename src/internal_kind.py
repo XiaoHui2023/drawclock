@@ -5,7 +5,9 @@ STYLE_SOURCE_KIND = "drawclockSourceKind"
 STYLE_INV_KIND = "drawclockInvKind"
 STYLE_CELL_KIND = "drawclockCellKind"
 
-INTERNAL_OBJECT_KEYS = frozenset({"kind", "source_kind", "inv_kind", "cell_kind"})
+INTERNAL_OBJECT_KEYS = frozenset({
+    "kind", "source_kind", "inv_kind", "cell_kind", "layout_column",
+})
 
 STYLE_KEY_TO_JSON: dict[str, str] = {
     STYLE_KIND: "kind",
