@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -27,6 +28,9 @@ FIG2 = ROOT / "example" / "fig2.drawio"
 AUTO_LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
 AUTO_DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
 STRESS_512 = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
+ASYMMETRIC_MERGE = (
+    ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
+)
 DRAW_EXAMPLE = ROOT / "example" / "draw.json"
 SVG_NS = "http://www.w3.org/2000/svg"
 
@@ -176,6 +180,77 @@ def _assert_svg_image(
     return width, height
 
 
+def _svg_edge_points(element: ET.Element) -> list[tuple[float, float]]:
+    if element.tag.endswith("polyline"):
+        return [
+            tuple(float(value) for value in token.split(",", 1))
+            for token in element.attrib.get("points", "").split()
+        ]
+    return [
+        (float(x), float(y))
+        for x, y in re.findall(
+            r"[ML]\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)",
+            element.attrib.get("d", ""),
+        )
+    ]
+
+
+def _assert_asymmetric_merge_routes(path: Path) -> None:
+    root = ET.parse(path).getroot()
+    mux = next(
+        child
+        for child in root
+        if child.tag == f"{{{SVG_NS}}}foreignObject"
+        and any(text.strip() == "sel" for text in child.itertext())
+    )
+    mux_left = float(mux.attrib["x"])
+    mux_right = mux_left + float(mux.attrib["width"])
+    mux_top = float(mux.attrib["y"])
+    mux_bottom = mux_top + float(mux.attrib["height"])
+    routes = []
+    for child in root:
+        if child.attrib.get("class") != "edge":
+            continue
+        points = _svg_edge_points(child)
+        if (
+            points
+            and mux_left <= points[-1][0] <= mux_right
+            and mux_top <= points[-1][1] <= mux_bottom
+        ):
+            routes.append(points)
+    if len(routes) != 2:
+        raise AssertionError(f"expected two mux input routes, found {len(routes)}")
+
+    def directions(points: list[tuple[float, float]]) -> list[str]:
+        result: list[str] = []
+        for a, b in zip(points, points[1:]):
+            direction = "h" if abs(a[1] - b[1]) <= 0.01 else "v"
+            if not result or result[-1] != direction:
+                result.append(direction)
+        return result
+
+    if any(len(directions(points)) - 1 > 2 for points in routes):
+        raise AssertionError("asymmetric mux input contains an avoidable bulge")
+    for a0, a1 in zip(routes[0], routes[0][1:]):
+        for b0, b1 in zip(routes[1], routes[1][1:]):
+            a_vertical = abs(a0[0] - a1[0]) <= 0.01
+            b_vertical = abs(b0[0] - b1[0]) <= 0.01
+            if a_vertical == b_vertical:
+                continue
+            vertical0, vertical1, horizontal0, horizontal1 = (
+                (a0, a1, b0, b1)
+                if a_vertical
+                else (b0, b1, a0, a1)
+            )
+            x = vertical0[0]
+            y = horizontal0[1]
+            if (
+                min(vertical0[1], vertical1[1]) < y < max(vertical0[1], vertical1[1])
+                and min(horizontal0[0], horizontal1[0]) < x < max(horizontal0[0], horizontal1[0])
+            ):
+                raise AssertionError("asymmetric mux input routes cross")
+
+
 def main() -> int:
     binary = _binary_path()
     if not binary.is_file():
@@ -193,7 +268,15 @@ def main() -> int:
         if not required_runtime.is_file():
             print(f"bundled runtime missing: {required_runtime}", file=sys.stderr)
             return 1
-    for required in (LIBRARY, FIG1, FIG2, AUTO_LINEAR, AUTO_DENSE, DRAW_EXAMPLE):
+    for required in (
+        LIBRARY,
+        FIG1,
+        FIG2,
+        AUTO_LINEAR,
+        AUTO_DENSE,
+        ASYMMETRIC_MERGE,
+        DRAW_EXAMPLE,
+    ):
         if not required.is_file():
             print(f"example input missing: {required}", file=sys.stderr)
             return 1
@@ -209,6 +292,7 @@ def main() -> int:
     fanout_config = out_dir / "fanout-frozen-smoke.json"
     fanout_svg = out_dir / "fanout-frozen-smoke.svg"
     stress_svg = out_dir / "stress-512-frozen-smoke.svg"
+    asymmetric_merge_svg = out_dir / "asymmetric-merge-frozen-smoke.svg"
     default_arc_svg = out_dir / "default-arc-frozen-smoke.svg"
 
     _run(
@@ -364,6 +448,26 @@ def main() -> int:
         isolated_runtime=True,
     )
     _assert_svg_image(fanout_svg, expected_nodes=21, expected_edges=20)
+    asymmetric_config = json.loads(ASYMMETRIC_MERGE.read_text(encoding="utf-8"))
+    _run(
+        binary,
+        [
+            "draw", "-i", str(ASYMMETRIC_MERGE), "-l", str(LIBRARY),
+            "-o", str(asymmetric_merge_svg),
+        ],
+        ROOT,
+        isolated_runtime=True,
+    )
+    _assert_svg_image(
+        asymmetric_merge_svg,
+        expected_nodes=len(asymmetric_config),
+        expected_edges=sum(
+            len(item["source"]) if isinstance(item.get("source"), dict) else 1
+            for item in asymmetric_config.values()
+            if "source" in item
+        ),
+    )
+    _assert_asymmetric_merge_routes(asymmetric_merge_svg)
     _run(
         binary,
         [

@@ -199,6 +199,37 @@ def build_dispersed_root_fanout(
     return config
 
 
+def build_asymmetric_merge_route_bulge(
+    *, long_branch: str = "b"
+) -> dict[str, dict[str, object]]:
+    """Minimal fixed-port fan-in trap with one reused asymmetric parent."""
+    if long_branch not in {"a", "b"}:
+        raise ValueError("long_branch must be 'a' or 'b'")
+    config: dict[str, dict[str, object]] = {
+        "from_a": {"kind": "from"},
+        "from_b": {"kind": "from"},
+        "gate_a": {"kind": "gate", "source": "from_a"},
+        "gate_b": {"kind": "gate", "source": "from_b"},
+    }
+    config[f"div_{long_branch}"] = {
+        "kind": "div",
+        "source": f"gate_{long_branch}",
+    }
+    inputs = {
+        "0": "div_a" if long_branch == "a" else "gate_a",
+        "1": "div_b" if long_branch == "b" else "gate_b",
+    }
+    config["sel"] = {"kind": "mux2", "source": inputs}
+    config["cell"] = {"kind": "cell", "source": "sel"}
+    config["clock"] = {"kind": "clock", "source": "cell"}
+    reused_branch = "b" if long_branch == "a" else "a"
+    config[f"gate_{reused_branch}_tap"] = {
+        "kind": "clock",
+        "source": f"gate_{reused_branch}",
+    }
+    return config
+
+
 def build_adversarial_weave(
     domain_count: int,
     *,
@@ -314,6 +345,7 @@ def main() -> int:
         ("17-terminal-fanout-order", build_terminal_fanout_crossing()),
         ("18-asymmetric-merge-columns", build_asymmetric_merge_columns()),
         ("19-dispersed-root-fanout", build_dispersed_root_fanout()),
+        ("20-asymmetric-merge-route-bulge", build_asymmetric_merge_route_bulge()),
     )
     for name, config in structural:
         (OUTPUT / f"{name}.json").write_text(

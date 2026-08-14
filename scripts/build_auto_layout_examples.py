@@ -34,6 +34,7 @@ EXAMPLES = (
     "17-terminal-fanout-order",
     "18-asymmetric-merge-columns",
     "19-dispersed-root-fanout",
+    "20-asymmetric-merge-route-bulge",
 )
 
 

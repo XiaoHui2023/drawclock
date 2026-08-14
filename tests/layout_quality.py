@@ -29,7 +29,7 @@ from drawio_ports import abs_port_xy, infer_port_from_attachment, port_anchors
 from visual_geometry import vertex_visual_box
 
 
-QUALITY_SCHEMA_VERSION = 6  # Test-only Agent artifact inspection schema.
+QUALITY_SCHEMA_VERSION = 7  # Test-only Agent artifact inspection schema.
 
 
 def _close(a: float, b: float, tolerance: float) -> bool:
@@ -167,6 +167,7 @@ def inspect_layout_quality(
     logical_fanout = Counter(
         (edge.source, edge.source_port) for edge in logical_edges
     )
+    logical_outdegree = Counter(edge.source for edge in logical_edges)
     logical_indegree = Counter(edge.target for edge in logical_edges)
     observed_counter: Counter[str] = Counter()
     dangling_edges: list[str] = []
@@ -457,6 +458,15 @@ def inspect_layout_quality(
             for a, b in zip(points, points[1:])
         )
         source_net = (source_name, source_port)
+        # One branch of a shared distribution net cannot be judged by an
+        # independent reroute: doing so may shorten that branch only by
+        # destroying the common trunk used by its siblings. Fan-out quality
+        # is enforced below by the trunk-fragmentation and cluster gates.
+        if (
+            logical_fanout[source_net] > 1
+            and len(first_stub_x_by_net[source_net]) <= 1
+        ):
+            continue
         other_segments = [
             segment
             for other_id, segments in edge_segments.items()
@@ -544,6 +554,7 @@ def inspect_layout_quality(
             avoidable_outer_detours.append(edge_id)
 
     crossings: list[tuple[str, str]] = []
+    crossing_owner_pairs: list[tuple[str, str]] = []
     crossing_pair_intersections = 0
     crossing_points: set[tuple[float, float]] = set()
     source_crossing_points: set[tuple[float, float]] = set()
@@ -569,6 +580,7 @@ def inspect_layout_quality(
                         same_net_junctions.append(pair)
                     else:
                         crossings.append(pair)
+                        crossing_owner_pairs.append(pair)
                         vertical, horizontal = (a, b) if a.a[0] == a.b[0] else (b, a)
                         point = (round(vertical.a[0], 3), round(horizontal.a[1], 3))
                         crossing_points.add(point)
@@ -636,6 +648,12 @@ def inspect_layout_quality(
                             for edge_id in vertical_owners | horizontal_owners
                         ):
                             source_crossing_points.add(point)
+                        crossing_owner_pairs.extend(
+                            tuple(sorted((edge_a, edge_b)))
+                            for edge_a in vertical_owners
+                            for edge_b in horizontal_owners
+                            if edge_a != edge_b
+                        )
                         untreated_crossings.extend(
                             tuple(sorted((edge_a, edge_b)))
                             for edge_a in vertical_owners
@@ -682,6 +700,31 @@ def inspect_layout_quality(
             if not (crossing_capable.get(pair[0]) or crossing_capable.get(pair[1]))
         ]
     untreated_crossings = sorted(set(untreated_crossings))
+    merge_input_crossings = sorted({
+        pair
+        for pair in crossing_owner_pairs
+        if observed_edge_ports[pair[0]][2] == observed_edge_ports[pair[1]][2]
+    })
+    merge_input_order_inversions = sorted({
+        pair
+        for pair in merge_input_crossings
+        if ranks[observed_edge_ports[pair[0]][0]]
+        == ranks[observed_edge_ports[pair[1]][0]]
+        and (
+            edge_points[pair[0]][0][1] - edge_points[pair[1]][0][1]
+        ) * (
+            edge_points[pair[0]][-1][1] - edge_points[pair[1]][-1][1]
+        ) < -(tolerance * tolerance)
+    })
+    avoidable_local_merge_input_crossings = sorted({
+        pair
+        for pair in merge_input_order_inversions
+        if all(
+            logical_indegree[observed_edge_ports[edge_id][0]] > 0
+            and logical_outdegree[observed_edge_ports[edge_id][0]] <= 2
+            for edge_id in pair
+        )
+    })
 
     # Independently search the artifact's own visibility channels for a
     # monotone H-V-H route.  A route is rejected only when that simpler route
@@ -690,7 +733,11 @@ def inspect_layout_quality(
     # structural instead of tying it to a pixel threshold or fixture name.
     avoidable_bend_edges: list[str] = []
     avoidable_crossing_edges: list[str] = []
+    avoidable_merge_input_detours: list[str] = []
     zigzag_edges: list[str] = []
+    observed_indegree = Counter(
+        target_name for _, _, target_name, _ in observed_edge_ports.values()
+    )
     segment_buckets: dict[tuple[int, int], list[int]] = defaultdict(list)
     for index, segment in enumerate(all_segments):
         min_x, max_x = sorted((segment.a[0], segment.b[0]))
@@ -723,13 +770,26 @@ def inspect_layout_quality(
 
     for edge_id, points in edge_points.items():
         actual_bends = max(0, len(points) - 2)
-        if actual_bends < 4:
-            continue
         source_name, source_port, target_name, _ = observed_edge_ports[edge_id]
+        # A per-edge H-V-H replacement is independent only for a one-to-one
+        # source net.  Replacing one branch of a shared fan-out could destroy
+        # its common trunk, so fan-out alternatives are judged by the trunk
+        # gate instead of this local merge-input gate.
+        is_merge_input = (
+            observed_indegree[target_name] > 1
+            and logical_fanout[(source_name, source_port)] == 1
+            and logical_outdegree[source_name] <= 2
+        )
+        if actual_bends < 4 and not (is_merge_input and actual_bends >= 2):
+            continue
         net = (source_name, source_port)
+        if logical_fanout[net] > 1:
+            continue
         own_segments = edge_segments[edge_id]
 
-        def route_cost(segments: list[Segment], bends: int) -> tuple[int, int, int, int, float]:
+        def route_cost(
+            segments: list[Segment], bends: int
+        ) -> tuple[int, int, int, int, float, float]:
             nearby_node_indices: set[int] = set()
             for segment in segments:
                 min_x, max_x = sorted((segment.a[0], segment.b[0]))
@@ -778,7 +838,14 @@ def inspect_layout_quality(
                 + abs(segment.b[1] - segment.a[1])
                 for segment in segments
             )
-            return hits, overlaps, crossing_count, bends, length
+            endpoint_low, endpoint_high = sorted((points[0][1], points[-1][1]))
+            route_axes = [axis for segment in segments for axis in (segment.a[1], segment.b[1])]
+            outer_excursion = max(
+                0.0,
+                endpoint_low - min(route_axes, default=endpoint_low),
+                max(route_axes, default=endpoint_high) - endpoint_high,
+            )
+            return hits, overlaps, crossing_count, bends, outer_excursion, length
 
         actual_cost = route_cost(own_segments, actual_bends)
         source_right = visual_boxes[source_name].right
@@ -789,8 +856,15 @@ def inspect_layout_quality(
             if source_right - tolerance <= point[0] <= target_left + tolerance
         }
         if source_right <= target_left:
-            candidate_xs.add((source_right + target_left) / 2.0)
-        best_cost: tuple[int, int, int, int, float] | None = None
+            channel_left = source_right + routing_clearance
+            channel_right = target_left - routing_clearance
+            if channel_left <= channel_right + tolerance:
+                candidate_xs.update((
+                    channel_left,
+                    (channel_left + channel_right) / 2.0,
+                    channel_right,
+                ))
+        best_cost: tuple[int, int, int, int, float, float] | None = None
         for x in candidate_xs:
             candidate_points = _canonical_orthogonal_points(
                 [points[0], (x, points[0][1]), (x, points[-1][1]), points[-1]],
@@ -833,6 +907,20 @@ def inspect_layout_quality(
             and best_cost[3] <= actual_cost[3]
         ):
             avoidable_crossing_edges.append(edge_id)
+        if (
+            is_merge_input
+            and best_cost[1] <= actual_cost[1]
+            and best_cost[2] <= actual_cost[2]
+            and best_cost[3] <= actual_cost[3]
+            and best_cost[4] <= actual_cost[4] + tolerance
+            and (
+                best_cost[2] < actual_cost[2]
+                or best_cost[3] < actual_cost[3]
+                or best_cost[4] < actual_cost[4] - tolerance
+                or best_cost[5] < actual_cost[5] - tolerance
+            )
+        ):
+            avoidable_merge_input_detours.append(edge_id)
 
     direction_violations = sorted(
         edge_id
@@ -921,7 +1009,6 @@ def inspect_layout_quality(
     # A sink-layer order inversion is an avoidable crossing: terminal nodes
     # have no successors constraining their vertical order, so swapping them
     # can remove the inversion without changing topology or port correctness.
-    logical_outdegree = Counter(edge.source for edge in logical_edges)
     terminal_edges: list[tuple[str, float, float, tuple[str, str]]] = []
     rightmost_rank = max(ranks.values(), default=0)
     for edge_id, (source_name, source_port, target_name, target_port) in observed_edge_ports.items():
@@ -1007,7 +1094,13 @@ def inspect_layout_quality(
         + backtracking_edges + edge_node_intersections
         + [f"avoidable-bends:{edge_id}" for edge_id in avoidable_bend_edges]
         + [f"avoidable-crossing:{edge_id}" for edge_id in avoidable_crossing_edges]
+        + [f"avoidable-merge-input-detour:{edge_id}" for edge_id in avoidable_merge_input_detours]
+        + [
+            f"avoidable-local-merge-input-crossing:{a}/{b}"
+            for a, b in avoidable_local_merge_input_crossings
+        ]
         + [f"avoidable-outer-detour:{edge_id}" for edge_id in avoidable_outer_detours]
+        + [f"fragmented-fanout:{net}" for net in fragmented_fanouts]
         + [f"overlap:{a}/{b}" for a, b in ambiguous_overlaps]
         + [f"unbridged:{a}/{b}" for a, b in untreated_crossings]
     )
@@ -1104,6 +1197,10 @@ def inspect_layout_quality(
             "avoidable_outer_detours": sorted(set(avoidable_outer_detours)),
             "avoidable_bend_edges": sorted(set(avoidable_bend_edges)),
             "avoidable_crossing_edges": sorted(set(avoidable_crossing_edges)),
+            "avoidable_merge_input_detours": sorted(set(avoidable_merge_input_detours)),
+            "merge_input_crossings": merge_input_crossings,
+            "merge_input_order_inversions": merge_input_order_inversions,
+            "avoidable_local_merge_input_crossings": avoidable_local_merge_input_crossings,
             "zigzag_edges": sorted(set(zigzag_edges)),
             "ambiguous_overlaps": [list(pair) for pair in ambiguous_overlaps],
             "crossings": crossing_pair_intersections,

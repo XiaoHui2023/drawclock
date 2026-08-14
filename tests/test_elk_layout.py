@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import time
 import sys
 from pathlib import Path
@@ -10,6 +11,7 @@ import elk_layout
 from auto_layout import load_clock_tree
 from elk_layout import elk_layout_available, generate_elk_layout
 from layout_quality import _points_for_edge, inspect_layout_quality
+from scripts.build_stress_examples import build_asymmetric_merge_route_bulge
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -248,6 +250,43 @@ def test_quality_fault_injection_rejects_avoidable_bends_and_crossing() -> None:
     assert line["avoidable_bend_edges"] == [edge.cell_id]
     assert line["avoidable_crossing_edges"] == [edge.cell_id]
     assert line["zigzag_edges"] == [edge.cell_id]
+
+
+def test_quality_fault_injection_rejects_two_bend_local_merge_crossing() -> None:
+    config = build_asymmetric_merge_route_bulge()
+    clean, _ = generate_elk_layout(config, library_path=LIBRARY)
+    document = copy.deepcopy(clean)
+    by_name = {vertex.name: vertex for vertex in document.vertices}
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    gate_a = by_name["gate_a"]
+    div_b = by_name["div_b"]
+    gate_a.y, div_b.y = div_b.y, gate_a.y
+    merge_edges = [
+        edge for edge in document.edges if by_id[edge.target_id].name == "sel"
+    ]
+    merge_edges.sort(key=lambda edge: by_id[edge.source_id].name)
+    starts_ends = [
+        (
+            edge,
+            _points_for_edge(edge, by_id[edge.source_id], by_id[edge.target_id])[0],
+            _points_for_edge(edge, by_id[edge.source_id], by_id[edge.target_id])[-1],
+        )
+        for edge in merge_edges
+    ]
+    first_channel = max(start[0] for _, start, _ in starts_ends) + 24
+    for index, (edge, start, end) in enumerate(starts_ends):
+        channel = first_channel + index * 10
+        edge.waypoints = ((channel, start[1]), (channel, end[1]))
+
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=10, tolerance=0.01
+    )
+    expected_pair = [tuple(sorted(edge.cell_id for edge in merge_edges))]
+
+    assert quality["passed"] is False
+    assert quality["line_integrity"][
+        "avoidable_local_merge_input_crossings"
+    ] == expected_pair
 
 
 def test_quality_fault_injection_rejects_vertical_departure_inside_source() -> None:

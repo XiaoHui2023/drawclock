@@ -340,6 +340,48 @@ def _generate_scalable_layout(
         # once.  Reordering by adjacent-layer topology keeps siblings
         # contiguous and removes the avoidable last-gap crossing before any
         # route is computed.
+        def enforce_target_port_order(names: list[str]) -> None:
+            """Project a barycentric order onto acyclic fixed-port precedences."""
+            base_position = {name: index for index, name in enumerate(names)}
+            members = set(names)
+            parents_by_target: dict[str, list[Any]] = defaultdict(list)
+            for source_name in names:
+                for edge in outgoing_internal[source_name]:
+                    if edge.source in members:
+                        parents_by_target[edge.target].append(edge)
+            successors: dict[str, set[str]] = defaultdict(set)
+            indegree = {name: 0 for name in names}
+            for target_name, edges in parents_by_target.items():
+                target = nodes[target_name]
+                ordered_edges = sorted(edges, key=lambda edge: (
+                    port_anchors(
+                        target.shape.style, target.shape.title
+                    )[edge.target_port][1],
+                    edge.target_port,
+                    base_position[edge.source],
+                ))
+                for left, right in zip(ordered_edges, ordered_edges[1:]):
+                    if left.source == right.source:
+                        continue
+                    if right.source not in successors[left.source]:
+                        successors[left.source].add(right.source)
+                        indegree[right.source] += 1
+            ready = [
+                (base_position[name], name)
+                for name in names if indegree[name] == 0
+            ]
+            heapq.heapify(ready)
+            constrained: list[str] = []
+            while ready:
+                _, name = heapq.heappop(ready)
+                constrained.append(name)
+                for child in sorted(successors[name], key=base_position.__getitem__):
+                    indegree[child] -= 1
+                    if indegree[child] == 0:
+                        heapq.heappush(ready, (base_position[child], child))
+            if len(constrained) == len(names):
+                names[:] = constrained
+
         levels_ascending = sorted(component_by_rank)
         for _ in range(4):
             order_index = {
@@ -352,24 +394,34 @@ def _generate_scalable_layout(
                 names.sort(key=lambda name: (
                     _mean(
                         order_index[edge.source]
+                        + port_anchors(
+                            nodes[edge.source].shape.style,
+                            nodes[edge.source].shape.title,
+                        )[edge.source_port][1]
                         for edge in incoming_internal[name]
                         if edge.source in order_index
                     ),
                     order_index[name],
                     name,
                 ))
+                enforce_target_port_order(names)
                 order_index.update({name: index for index, name in enumerate(names)})
             for level in reversed(levels_ascending[:-1]):
                 names = component_by_rank[level]
                 names.sort(key=lambda name: (
                     _mean(
                         order_index[edge.target]
+                        + port_anchors(
+                            nodes[edge.target].shape.style,
+                            nodes[edge.target].shape.title,
+                        )[edge.target_port][1]
                         for edge in outgoing_internal[name]
                         if edge.target in order_index
                     ),
                     order_index[name],
                     name,
                 ))
+                enforce_target_port_order(names)
                 order_index.update({name: index for index, name in enumerate(names)})
         band_height = max(
             sum(nodes[name].shape.h for name in names)
@@ -753,6 +805,7 @@ def _generate_scalable_layout(
         target_axis_by_edge[edge.key] = axis
         edges_by_net[(edge.source, edge.source_port)].append(edge)
     route_lane_key: dict[str, tuple[str, str, int]] = {}
+    source_trunk_lane_key: dict[str, tuple[str, str, int]] = {}
     fanout_trunk_clusters: dict[tuple[str, str], int] = {}
     for net, net_edges in edges_by_net.items():
         ordered = sorted(
@@ -775,6 +828,9 @@ def _generate_scalable_layout(
             if index and gaps[index - 1] > split_threshold:
                 cluster += 1
             route_lane_key[edge.key] = (*net, cluster)
+            source_trunk_lane_key[edge.key] = (
+                (*net, -1) if len(ordered) > 1 else (*net, cluster)
+            )
         fanout_trunk_clusters[net] = cluster + 1
 
     intervals_by_gap: dict[
@@ -815,6 +871,7 @@ def _generate_scalable_layout(
         source_rank = rank[edge.source]
         target_rank = rank[edge.target]
         key = route_lane_key[edge.key]
+        source_key = source_trunk_lane_key[edge.key]
         if target_rank - source_rank > 1:
             lane_y = local_long_lane(edge, sy, ty)
             long_lanes[edge.key] = lane_y
@@ -825,11 +882,11 @@ def _generate_scalable_layout(
             reserved_low = min(sy, ty, lane_y)
             reserved_high = max(sy, ty, lane_y)
             add_interval(
-                source_rank + 1, key, reserved_low, reserved_high
+                source_rank + 1, source_key, reserved_low, reserved_high
             )
             add_interval(target_rank, key, reserved_low, reserved_high)
         else:
-            add_interval(target_rank, key, sy, ty)
+            add_interval(target_rank, source_key, sy, ty)
 
     lane_index: dict[tuple[int, str, str, int], int] = {}
     lane_count: dict[int, int] = {}
@@ -904,6 +961,8 @@ def _generate_scalable_layout(
     logical_fanout = Counter(
         (edge.source, edge.source_port) for edge in logical_edges
     )
+    logical_outdegree = Counter(edge.source for edge in logical_edges)
+    logical_indegree = Counter(edge.target for edge in logical_edges)
     route_bucket_size = 256.0
     routed_buckets: dict[tuple[int, int], list[int]] = defaultdict(list)
     visible_buckets: dict[tuple[int, int], list[str]] = defaultdict(list)
@@ -1007,6 +1066,10 @@ def _generate_scalable_layout(
             in routed_horizontal_occupancy[a[1]]
         )
         bends = max(0, len(points) - 2)
+        micro_segments = sum(
+            0.01 < abs(b[0] - a[0]) + abs(b[1] - a[1]) < 1.0
+            for a, b in segments
+        )
         endpoint_low, endpoint_high = sorted((points[0][1], points[-1][1]))
         outer_excursion = max(
             0.0,
@@ -1024,6 +1087,7 @@ def _generate_scalable_layout(
             overlaps,
             crossings,
             bends,
+            micro_segments,
             outer_excursion,
             clearance_hits,
             length,
@@ -1050,7 +1114,9 @@ def _generate_scalable_layout(
         edge_lane_key = route_lane_key[edge.key]
         candidates: list[list[tuple[float, float]]] = []
         if target_rank - source_rank > 1:
-            first_x = lane_x(source_rank + 1, edge_lane_key)
+            first_x = lane_x(
+                source_rank + 1, source_trunk_lane_key[edge.key]
+            )
             last_x = lane_x(target_rank, edge_lane_key)
             lane_y = long_lanes[edge.key]
             candidates.append(_simplify(
@@ -1062,7 +1128,7 @@ def _generate_scalable_layout(
             candidates.append(_simplify(
                 [(sx, sy), (first_x, sy), (first_x, ty), (tx, ty)]
             ))
-            if last_x != first_x:
+            if last_x != first_x and logical_fanout[source_key] == 1:
                 candidates.append(_simplify(
                     [(sx, sy), (last_x, sy), (last_x, ty), (tx, ty)]
                 ))
@@ -1099,13 +1165,32 @@ def _generate_scalable_layout(
                 ):
                     break
         else:
-            edge_lane_x = lane_x(target_rank, edge_lane_key)
+            edge_lane_x = lane_x(
+                target_rank, source_trunk_lane_key[edge.key]
+            )
             if abs(sy - ty) <= 0.01:
                 candidates.append([(sx, sy), (tx, ty)])
             else:
                 candidates.append(_simplify(
                     [(sx, sy), (edge_lane_x, sy), (edge_lane_x, ty), (tx, ty)]
                 ))
+            first_x = edge_lane_x
+        if logical_fanout[source_key] > 1:
+            trunk_candidates = []
+            for candidate in candidates:
+                vertical_xs = [
+                    a[0]
+                    for a, b in zip(candidate, candidate[1:])
+                    if abs(a[0] - b[0]) <= 1e-6
+                    and abs(a[1] - b[1]) > 1e-6
+                ]
+                if not vertical_xs or abs(vertical_xs[0] - first_x) <= 1e-6:
+                    trunk_candidates.append(candidate)
+            if trunk_candidates and any(
+                not candidate_obstacle_hits(edge, candidate)
+                for candidate in trunk_candidates
+            ):
+                candidates = trunk_candidates
         selected_score, points = min(
             (candidate_score(edge, item), item) for item in candidates
         )
@@ -1178,20 +1263,25 @@ def _generate_scalable_layout(
                 for a, b in zip(points, points[1:])
                 if a != b
             )
+        complete_buckets: dict[tuple[int, int], list[int]] = defaultdict(list)
+        for index, segment in enumerate(complete_segments):
+            for bucket in segment_bucket_keys(segment.a, segment.b):
+                complete_buckets[bucket].append(index)
         changed = False
         for layout in layouts:
             logical = logical_by_id[layout.cell_id]
             points = layout_points(layout, logical)
             actual_bends = max(0, len(points) - 2)
-            if actual_bends < 4:
-                continue
             net = (logical.source, logical.source_port)
-            other_segments = [
-                segment
-                for segment in complete_segments
-                if segment.edge_key != logical.key
-                and segment.source_net != net
-            ]
+            local_merge_input = (
+                logical_indegree[logical.target] > 1
+                and logical_fanout[net] == 1
+                and logical_outdegree[logical.source] <= 2
+            )
+            if actual_bends < 4 and not (
+                local_merge_input and actual_bends >= 2
+            ):
+                continue
 
             def full_cost(candidate_points):
                 segments = [
@@ -1199,12 +1289,17 @@ def _generate_scalable_layout(
                     for a, b in zip(candidate_points, candidate_points[1:])
                     if a != b
                 ]
-                hits = sum(
-                    _segment_hits_rect(segment.a, segment.b, rect)
-                    for segment in segments
-                    for name, rect in visible_rects.items()
-                    if name not in (logical.source, logical.target)
-                )
+                hits = len(candidate_obstacle_hits(logical, candidate_points))
+                nearby_indices: set[int] = set()
+                for segment in segments:
+                    for bucket in segment_bucket_keys(segment.a, segment.b):
+                        nearby_indices.update(complete_buckets.get(bucket, ()))
+                other_segments = [
+                    complete_segments[index]
+                    for index in nearby_indices
+                    if complete_segments[index].edge_key != logical.key
+                    and complete_segments[index].source_net != net
+                ]
                 overlaps = sum(
                     _overlap_length(segment, other) >= profile.grid
                     for segment in segments
@@ -1216,11 +1311,17 @@ def _generate_scalable_layout(
                     for other in other_segments
                 )
                 bends = max(0, len(candidate_points) - 2)
+                micro_segments = sum(
+                    0.01
+                    < abs(b[0] - a[0]) + abs(b[1] - a[1])
+                    < 1.0
+                    for a, b in zip(candidate_points, candidate_points[1:])
+                )
                 length = sum(
                     abs(b[0] - a[0]) + abs(b[1] - a[1])
                     for a, b in zip(candidate_points, candidate_points[1:])
                 )
-                return hits, overlaps, crossings, bends, length
+                return hits, overlaps, crossings, bends, micro_segments, length
 
             actual_cost = full_cost(points)
             source_right = visible_rects[logical.source][2]
@@ -1236,6 +1337,13 @@ def _generate_scalable_layout(
                     (source_right + target_left) / 2.0,
                     target_left,
                 ))
+            if logical_fanout[net] > 1:
+                candidate_xs = {
+                    lane_x(
+                        rank[logical.source] + 1,
+                        source_trunk_lane_key[logical.key],
+                    )
+                }
             candidates = [
                 _simplify([
                     points[0],

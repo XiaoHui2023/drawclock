@@ -1,0 +1,39 @@
+{
+  "from_a": {
+    "kind": "from"
+  },
+  "from_b": {
+    "kind": "from"
+  },
+  "gate_a": {
+    "kind": "gate",
+    "source": "from_a"
+  },
+  "gate_b": {
+    "kind": "gate",
+    "source": "from_b"
+  },
+  "div_b": {
+    "kind": "div",
+    "source": "gate_b"
+  },
+  "sel": {
+    "kind": "mux2",
+    "source": {
+      "0": "gate_a",
+      "1": "div_b"
+    }
+  },
+  "cell": {
+    "kind": "cell",
+    "source": "sel"
+  },
+  "clock": {
+    "kind": "clock",
+    "source": "cell"
+  },
+  "gate_a_tap": {
+    "kind": "clock",
+    "source": "gate_a"
+  }
+}

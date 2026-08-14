@@ -17,6 +17,7 @@ from scripts.build_stress_examples import build_multi_from_clusters
 from scripts.build_stress_examples import build_terminal_fanout_crossing
 from scripts.build_stress_examples import build_asymmetric_merge_columns
 from scripts.build_stress_examples import build_dispersed_root_fanout
+from scripts.build_stress_examples import build_asymmetric_merge_route_bulge
 from drawio_ports import abs_port_xy, infer_port_from_attachment
 
 
@@ -192,6 +193,8 @@ def test_multi_from_roots_are_distributed_by_their_consumers() -> None:
 
     assert quality["passed"] is True
     assert report["selection"]["source_position_mode"] == "adaptive-span"
+    assert quality["readability"]["fanout_trunk_clusters"] == {}
+    assert quality["readability"]["fragmented_fanout_sources"] == {}
     assert len(set(source_tops)) == 4
     assert max(source_tops) - min(source_tops) > max(
         vertex.height
@@ -267,6 +270,21 @@ def test_dispersed_root_uses_top_entry_and_justified_local_trunks() -> None:
     assert abs(root_axis - min(target_axes)) <= 0.02
     assert quality["readability"]["fragmented_fanout_sources"] == {}
     assert quality["readability"]["root_consumer_interleavings"]["wide_root"] == 0
+
+
+@pytest.mark.parametrize("long_branch", ["a", "b"])
+def test_asymmetric_merge_inputs_follow_fixed_port_order_without_crossing(
+    long_branch: str,
+) -> None:
+    config = build_asymmetric_merge_route_bulge(long_branch=long_branch)
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert quality["passed"] is True
+    assert quality["line_integrity"]["avoidable_local_merge_input_crossings"] == []
+    assert quality["line_integrity"]["avoidable_merge_input_detours"] == []
 
 
 def test_quality_gate_rejects_unused_inter_rank_whitespace() -> None:
