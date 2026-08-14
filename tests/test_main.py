@@ -65,6 +65,7 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     (project / "src").mkdir()
     (project / "drawio-lib").mkdir()
     (project / "example").mkdir()
+    (project / "example" / "auto-layout").mkdir()
     (project / ".runtime" / "node").mkdir(parents=True)
     (project / ".runtime" / "runtime-manifest.json").write_text("{}\n", encoding="utf-8")
     (project / ".runtime" / "node" / "node.exe").touch()
@@ -72,6 +73,14 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     (project / "README.md").write_text("", encoding="utf-8")
     (project / "draw.md").write_text("", encoding="utf-8")
     (project / "example" / "draw.json").write_text("{}", encoding="utf-8")
+    packaged_layout_examples = (
+        "01-linear.json",
+        "05-dense-cross-root.json",
+        "08-stress-512-clocks.json",
+        "20-asymmetric-merge-route-bulge.json",
+    )
+    for name in packaged_layout_examples:
+        (project / "example" / "auto-layout" / name).write_text("{}", encoding="utf-8")
     (project / "pyproject.toml").write_text(
         '[project]\nname = "drawclock"\nversion = "1.2.3"\n', encoding="utf-8"
     )
@@ -87,6 +96,8 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     prefix = "drawclock-1.2.3-windows/"
     assert prefix + "draw.md" in names
     assert prefix + "example/draw.json" in names
+    for name in packaged_layout_examples:
+        assert prefix + "example/auto-layout/" + name in names
     assert prefix + "runtime/runtime-manifest.json" in names
     assert prefix + "source/__main__.py" in names
     assert prefix + "json.md" not in names

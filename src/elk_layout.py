@@ -1667,7 +1667,7 @@ def _generate_scalable_layout(
 
 def _visible_layout_signature(
     document: LayoutDocument, logical_edges
-) -> tuple[int, int, float, float]:
+) -> tuple[int, int, float, float, frozenset[tuple[str, str]], frozenset[tuple[str, str]]]:
     """Return visible-node/edge failures and visible bounding dimensions."""
     boxes = {
         vertex.cell_id: vertex_visual_box(vertex)
@@ -1691,16 +1691,19 @@ def _visible_layout_signature(
         for offset, index in enumerate(indices):
             for other_index in indices[offset + 1:]:
                 overlap_pairs.add(tuple(sorted((index, other_index))))
-    overlaps = sum(
-        max(boxes[vertices[left].cell_id].left, boxes[vertices[right].cell_id].left)
-        < min(boxes[vertices[left].cell_id].right, boxes[vertices[right].cell_id].right) - 1e-6
-        and max(boxes[vertices[left].cell_id].top, boxes[vertices[right].cell_id].top)
-        < min(boxes[vertices[left].cell_id].bottom, boxes[vertices[right].cell_id].bottom) - 1e-6
+    visible_overlap_pairs = frozenset(
+        tuple(sorted((vertices[left].cell_id, vertices[right].cell_id)))
         for left, right in overlap_pairs
+        if (
+            max(boxes[vertices[left].cell_id].left, boxes[vertices[right].cell_id].left)
+            < min(boxes[vertices[left].cell_id].right, boxes[vertices[right].cell_id].right) - 1e-6
+            and max(boxes[vertices[left].cell_id].top, boxes[vertices[right].cell_id].top)
+            < min(boxes[vertices[left].cell_id].bottom, boxes[vertices[right].cell_id].bottom) - 1e-6
+        )
     )
     by_id = {vertex.cell_id: vertex for vertex in vertices}
     edge_by_id = {edge.cell_id: edge for edge in document.edges}
-    hits = 0
+    visible_hit_pairs: set[tuple[str, str]] = set()
     for index, logical in enumerate(logical_edges, 1):
         edge = edge_by_id[f"e{index}"]
         source = by_id[edge.source_id]
@@ -1725,14 +1728,22 @@ def _visible_layout_signature(
                 if vertex.cell_id in (edge.source_id, edge.target_id):
                     continue
                 box = boxes[vertex.cell_id]
-                hits += int(_segment_hits_rect(
+                if _segment_hits_rect(
                     a, b, (box.left, box.top, box.right, box.bottom)
-                ))
+                ):
+                    visible_hit_pairs.add((edge.cell_id, vertex.cell_id))
     min_x = min((box.left for box in boxes.values()), default=0.0)
     min_y = min((box.top for box in boxes.values()), default=0.0)
     max_x = max((box.right for box in boxes.values()), default=0.0)
     max_y = max((box.bottom for box in boxes.values()), default=0.0)
-    return overlaps, hits, max_x - min_x, max_y - min_y
+    return (
+        len(visible_overlap_pairs),
+        len(visible_hit_pairs),
+        max_x - min_x,
+        max_y - min_y,
+        visible_overlap_pairs,
+        frozenset(visible_hit_pairs),
+    )
 
 
 def _refine_leaf_continuation_rows(
@@ -1949,8 +1960,8 @@ def _refine_leaf_continuation_rows(
                     <= base_report["edge_node_intersections"]
                     and candidate_report["direction_violations"]
                     <= base_report["direction_violations"]
-                    and candidate_visible[0] <= base_visible[0]
-                    and candidate_visible[1] <= base_visible[1]
+                    and candidate_visible[4].issubset(base_visible[4])
+                    and candidate_visible[5].issubset(base_visible[5])
                     and candidate_report["ambiguous_overlaps"]
                     <= base_report["ambiguous_overlaps"]
                     and candidate_report["crossings"] <= base_report["crossings"]
@@ -1961,8 +1972,8 @@ def _refine_leaf_continuation_rows(
                         "node-overlap": candidate_report["node_overlaps"] <= base_report["node_overlaps"],
                         "edge-node": candidate_report["edge_node_intersections"] <= base_report["edge_node_intersections"],
                         "direction": candidate_report["direction_violations"] <= base_report["direction_violations"],
-                        "visible-overlap": candidate_visible[0] <= base_visible[0],
-                        "visible-edge-node": candidate_visible[1] <= base_visible[1],
+                        "visible-overlap": candidate_visible[4].issubset(base_visible[4]),
+                        "visible-edge-node": candidate_visible[5].issubset(base_visible[5]),
                         "route-overlap": candidate_report["ambiguous_overlaps"] <= base_report["ambiguous_overlaps"],
                         "crossing": candidate_report["crossings"] <= base_report["crossings"],
                         "bend": candidate_report["bends_total"] < base_report["bends_total"],
@@ -1984,6 +1995,253 @@ def _refine_leaf_continuation_rows(
         "leaf_continuation_row_moves": accepted_moves,
         "leaf_continuation_bends_removed": bends_removed,
         "leaf_continuation_blockers": dict(sorted(blockers.items())),
+    }
+
+
+def _refine_exclusive_upstream_chain_axes(
+    document: LayoutDocument,
+    logical_edges,
+    *,
+    route_clearance: float,
+) -> tuple[LayoutDocument, dict[str, Any]]:
+    """Align a movable exclusive upstream chain with its downstream port."""
+    accepted = copy.deepcopy(document)
+    indegree: Counter[str] = Counter(edge.target for edge in logical_edges)
+    outdegree: Counter[str] = Counter(edge.source for edge in logical_edges)
+    incoming: dict[str, list[int]] = defaultdict(list)
+    incident: dict[str, list[int]] = defaultdict(list)
+    for edge_index, logical in enumerate(logical_edges, 1):
+        incoming[logical.target].append(edge_index)
+        incident[logical.source].append(edge_index)
+        incident[logical.target].append(edge_index)
+
+    accepted_moves = 0
+    bends_removed = 0
+    blockers: Counter[str] = Counter()
+
+    while True:
+        by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+        by_name = {
+            vertex.logical_name or vertex.name: vertex
+            for vertex in accepted.vertices
+        }
+        edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+
+        def points_for(edge_index: int):
+            logical = logical_edges[edge_index - 1]
+            edge = edge_by_id[f"e{edge_index}"]
+            source = by_id[edge.source_id]
+            target = by_id[edge.target_id]
+            start = abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            )
+            end = abs_port_xy(
+                target.x, target.y, target.width, target.height,
+                target.style, target.drawclock_type, logical.target_port,
+            )
+            return _simplify([start, *edge.waypoints, end])
+
+        base_report = assess_layout(accepted, logical_edges, 0.0)
+        base_visible = _visible_layout_signature(accepted, logical_edges)
+        best_candidate = None
+        best_signature = None
+        best_removed = 0
+
+        for main_edge_index, logical in enumerate(logical_edges, 1):
+            main_points = points_for(main_edge_index)
+            if len(main_points) - 2 != 2 or outdegree[logical.source] != 1:
+                continue
+
+            chain = {logical.source}
+            cursor = logical.source
+            while indegree[cursor] == 1:
+                parent_edge_index = incoming[cursor][0]
+                parent = logical_edges[parent_edge_index - 1].source
+                if outdegree[parent] != 1:
+                    break
+                chain.add(parent)
+                cursor = parent
+            if indegree[cursor] != 0:
+                continue
+
+            delta = main_points[-1][1] - main_points[0][1]
+            if abs(delta) <= 1e-6:
+                continue
+            affected_edges = {
+                edge_index
+                for name in chain
+                for edge_index in incident[name]
+            }
+            internal_edges = {
+                edge_index
+                for edge_index in affected_edges
+                if logical_edges[edge_index - 1].source in chain
+                and logical_edges[edge_index - 1].target in chain
+            }
+            boundary_edges = sorted(
+                affected_edges - internal_edges - {main_edge_index}
+            )
+            if len(boundary_edges) > 1:
+                continue
+
+            boundary_channels: list[float | None] = [None]
+            if boundary_edges:
+                boundary_index = boundary_edges[0]
+                old_points = points_for(boundary_index)
+                old_verticals = [
+                    a[0]
+                    for a, b in zip(old_points, old_points[1:])
+                    if abs(a[0] - b[0]) <= 1e-6
+                    and abs(a[1] - b[1]) > 1e-6
+                ]
+                boundary_edge = edge_by_id[f"e{boundary_index}"]
+                boundary_source = by_id[boundary_edge.source_id]
+                boundary_target = by_id[boundary_edge.target_id]
+                channel_left = (
+                    vertex_visual_box(boundary_source).right + route_clearance
+                )
+                channel_right = (
+                    vertex_visual_box(boundary_target).left - route_clearance
+                )
+                channels = list(old_verticals)
+                if channel_left <= channel_right + 1e-6:
+                    channels.extend((
+                        channel_left,
+                        (channel_left + channel_right) / 2.0,
+                        channel_right,
+                    ))
+                boundary_channels = list(dict.fromkeys(channels))
+                if not boundary_channels:
+                    boundary_channels = [
+                        (old_points[0][0] + old_points[-1][0]) / 2.0
+                    ]
+
+            old_affected_bends = sum(
+                max(0, len(points_for(edge_index)) - 2)
+                for edge_index in affected_edges
+            )
+            moved_ids = {by_name[name].cell_id for name in chain}
+            for boundary_channel in boundary_channels:
+                candidate = copy.deepcopy(accepted)
+                candidate_by_id = {
+                    vertex.cell_id: vertex for vertex in candidate.vertices
+                }
+                candidate_edges = {
+                    edge.cell_id: edge for edge in candidate.edges
+                }
+                for cell_id in moved_ids:
+                    candidate_by_id[cell_id].y += delta
+                for edge_index in affected_edges:
+                    edge = candidate_edges[f"e{edge_index}"]
+                    if edge_index == main_edge_index:
+                        edge.waypoints = ()
+                    elif edge_index in internal_edges:
+                        edge.waypoints = tuple(
+                            (x, y + delta) for x, y in edge.waypoints
+                        )
+                    else:
+                        edge_logical = logical_edges[edge_index - 1]
+                        source = candidate_by_id[edge.source_id]
+                        target = candidate_by_id[edge.target_id]
+                        start = abs_port_xy(
+                            source.x, source.y, source.width, source.height,
+                            source.style, source.drawclock_type,
+                            edge_logical.source_port,
+                        )
+                        end = abs_port_xy(
+                            target.x, target.y, target.width, target.height,
+                            target.style, target.drawclock_type,
+                            edge_logical.target_port,
+                        )
+                        if abs(start[1] - end[1]) <= 1e-6:
+                            edge.waypoints = ()
+                        else:
+                            route_x = boundary_channel
+                            if route_x is None:
+                                route_x = (start[0] + end[0]) / 2.0
+                            edge.waypoints = tuple(_simplify([
+                                start,
+                                (route_x, start[1]),
+                                (route_x, end[1]),
+                                end,
+                            ])[1:-1])
+
+                candidate_by_edge = {
+                    edge.cell_id: edge for edge in candidate.edges
+                }
+                candidate_affected_bends = 0
+                for edge_index in affected_edges:
+                    edge = candidate_by_edge[f"e{edge_index}"]
+                    edge_logical = logical_edges[edge_index - 1]
+                    source = candidate_by_id[edge.source_id]
+                    target = candidate_by_id[edge.target_id]
+                    start = abs_port_xy(
+                        source.x, source.y, source.width, source.height,
+                        source.style, source.drawclock_type,
+                        edge_logical.source_port,
+                    )
+                    end = abs_port_xy(
+                        target.x, target.y, target.width, target.height,
+                        target.style, target.drawclock_type,
+                        edge_logical.target_port,
+                    )
+                    candidate_affected_bends += max(
+                        0,
+                        len(_simplify([start, *edge.waypoints, end])) - 2,
+                    )
+                if candidate_affected_bends >= old_affected_bends:
+                    blockers["no-local-bend-dominance"] += 1
+                    continue
+
+                candidate_report = assess_layout(
+                    candidate, logical_edges, 0.0
+                )
+                candidate_visible = _visible_layout_signature(
+                    candidate, logical_edges
+                )
+                checks = {
+                    "node-overlap": candidate_report["node_overlaps"] <= base_report["node_overlaps"],
+                    "edge-node": candidate_report["edge_node_intersections"] <= base_report["edge_node_intersections"],
+                    "direction": candidate_report["direction_violations"] <= base_report["direction_violations"],
+                    "visible-overlap": candidate_visible[4].issubset(base_visible[4]),
+                    "visible-edge-node": candidate_visible[5].issubset(base_visible[5]),
+                    "route-overlap": candidate_report["ambiguous_overlaps"] <= base_report["ambiguous_overlaps"],
+                    "crossing": candidate_report["crossings"] <= base_report["crossings"],
+                    "bend": candidate_report["bends_total"] < base_report["bends_total"],
+                }
+                if not all(checks.values()):
+                    blockers.update(
+                        name for name, passed in checks.items() if not passed
+                    )
+                    continue
+                signature = (
+                    candidate_report["crossings"],
+                    candidate_report["ambiguous_overlaps"],
+                    candidate_report["bends_total"],
+                    candidate_report["manhattan_length"],
+                    tuple(sorted(chain)),
+                    main_edge_index,
+                    boundary_channel if boundary_channel is not None else 0.0,
+                )
+                if best_signature is None or signature < best_signature:
+                    best_candidate = candidate
+                    best_signature = signature
+                    best_removed = (
+                        base_report["bends_total"]
+                        - candidate_report["bends_total"]
+                    )
+
+        if best_candidate is None:
+            break
+        accepted = best_candidate
+        accepted_moves += 1
+        bends_removed += best_removed
+
+    return accepted, {
+        "exclusive_chain_axis_moves": accepted_moves,
+        "exclusive_chain_bends_removed": bends_removed,
+        "exclusive_chain_axis_blockers": dict(sorted(blockers.items())),
     }
 
 
@@ -2349,8 +2607,8 @@ def _refine_joint_coordinates(
                 <= accepted_report["edge_node_intersections"]
                 and candidate_report["direction_violations"]
                 <= accepted_report["direction_violations"]
-                and candidate_visible[0] <= accepted_visible[0]
-                and candidate_visible[1] <= accepted_visible[1]
+                and candidate_visible[4].issubset(accepted_visible[4])
+                and candidate_visible[5].issubset(accepted_visible[5])
                 and candidate_report["ambiguous_overlaps"]
                 <= accepted_report["ambiguous_overlaps"]
                 and candidate_report["crossings"] <= accepted_report["crossings"]
@@ -2361,8 +2619,8 @@ def _refine_joint_coordinates(
                     "node-overlap": candidate_report["node_overlaps"] <= accepted_report["node_overlaps"],
                     "edge-node": candidate_report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
                     "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
-                    "visible-overlap": candidate_visible[0] <= accepted_visible[0],
-                    "visible-edge-node": candidate_visible[1] <= accepted_visible[1],
+                    "visible-overlap": candidate_visible[4].issubset(accepted_visible[4]),
+                    "visible-edge-node": candidate_visible[5].issubset(accepted_visible[5]),
                     "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
                     "crossing": candidate_report["crossings"] <= accepted_report["crossings"],
                     "bend": candidate_report["bends_total"] < accepted_report["bends_total"],
@@ -2816,6 +3074,12 @@ def generate_elk_layout(
             "leaf_continuation_blockers": {},
         }
     report["selection"].update(leaf_row_report)
+    document, chain_axis_report = _refine_exclusive_upstream_chain_axes(
+        document,
+        logical_edges,
+        route_clearance=profile.route_clearance,
+    )
+    report["selection"].update(chain_axis_report)
     document, joint_report = _refine_joint_coordinates(
         document,
         logical_edges,

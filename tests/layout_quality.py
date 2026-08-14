@@ -30,7 +30,7 @@ from drawio_ports import (
 from visual_geometry import vertex_visual_box
 
 
-QUALITY_SCHEMA_VERSION = 8  # Test-only Agent artifact inspection schema.
+QUALITY_SCHEMA_VERSION = 9  # Test-only Agent artifact inspection schema.
 
 
 def _close(a: float, b: float, tolerance: float) -> bool:
@@ -1386,6 +1386,242 @@ def inspect_layout_quality(
         for edge_id, reasons in sorted(joint_coordinate_tradeoffs.items())
     }
 
+    # A fixed-endpoint route oracle cannot detect a dogleg that disappears
+    # only after translating an exclusive upstream chain.  Independently
+    # derive those chains from logical degree, translate their visible boxes
+    # and incident routes, and compare the complete local interaction set.
+    avoidable_exclusive_chain_bends: list[str] = []
+    observed_edge_by_key = {
+        _edge_key(*ports): edge_id
+        for edge_id, ports in observed_edge_ports.items()
+    }
+    incoming_logical: dict[str, list[LogicalEdge]] = defaultdict(list)
+    for logical in logical_edges:
+        incoming_logical[logical.target].append(logical)
+
+    def conflict_counts(
+        segments: list[Segment],
+        stationary: list[Segment],
+    ) -> tuple[int, int]:
+        overlaps = sum(
+            _overlap_length(segment, other) >= grid
+            and segment.source_net != other.source_net
+            for segment in segments
+            for other in stationary
+        )
+        crossings_count = sum(
+            _proper_cross(segment, other)
+            for segment in segments
+            for other in stationary
+        )
+        overlaps += sum(
+            _overlap_length(segment, other) >= grid
+            and segment.source_net != other.source_net
+            and segment.edge_key != other.edge_key
+            for index, segment in enumerate(segments)
+            for other in segments[index + 1:]
+        )
+        crossings_count += sum(
+            _proper_cross(segment, other)
+            and segment.edge_key != other.edge_key
+            for index, segment in enumerate(segments)
+            for other in segments[index + 1:]
+        )
+        return overlaps, crossings_count
+
+    for main_edge_id, main_points in edge_points.items():
+        if len(main_points) - 2 != 2:
+            continue
+        source_name, _, _, _ = observed_edge_ports[main_edge_id]
+        if logical_outdegree[source_name] != 1:
+            continue
+        chain = {source_name}
+        cursor = source_name
+        while logical_indegree[cursor] == 1:
+            parent_edge = incoming_logical[cursor][0]
+            if logical_outdegree[parent_edge.source] != 1:
+                break
+            chain.add(parent_edge.source)
+            cursor = parent_edge.source
+        if logical_indegree[cursor] != 0 or any(
+            len(logical_vertices[name]) != 1 for name in chain
+        ):
+            continue
+        delta = main_points[-1][1] - main_points[0][1]
+        if _close(delta, 0.0, tolerance):
+            continue
+
+        affected_logical = [
+            logical for logical in logical_edges
+            if logical.source in chain or logical.target in chain
+        ]
+        if any(logical.key not in observed_edge_by_key for logical in affected_logical):
+            continue
+        affected_ids = {
+            observed_edge_by_key[logical.key] for logical in affected_logical
+        }
+        boundary_ids = [
+            observed_edge_by_key[logical.key]
+            for logical in affected_logical
+            if logical.source not in chain and logical.target in chain
+        ]
+        if len(boundary_ids) > 1:
+            continue
+        old_bends = sum(
+            max(0, len(edge_points[edge_id]) - 2)
+            for edge_id in affected_ids
+        )
+        stationary_segments = [
+            segment
+            for index, segment in enumerate(all_segments)
+            if segment_edge_ids[index] not in affected_ids
+        ]
+        old_segments = [
+            segment
+            for edge_id in affected_ids
+            for segment in edge_segments[edge_id]
+        ]
+        old_overlaps, old_crossings = conflict_counts(
+            old_segments, stationary_segments
+        )
+
+        channels: list[float | None] = [None]
+        if boundary_ids:
+            boundary_id = boundary_ids[0]
+            boundary_points = edge_points[boundary_id]
+            channels = [
+                a[0]
+                for a, b in zip(boundary_points, boundary_points[1:])
+                if _close(a[0], b[0], tolerance)
+                and not _close(a[1], b[1], tolerance)
+            ]
+            boundary_source, boundary_target = observed_edge_vertices[boundary_id]
+            left = visual_boxes[boundary_source.name].right + routing_clearance
+            right = visual_boxes[boundary_target.name].left - routing_clearance
+            if left <= right + tolerance:
+                channels.extend((left, (left + right) / 2.0, right))
+            channels = list(dict.fromkeys(channels))
+            if not channels:
+                channels = [
+                    (boundary_points[0][0] + boundary_points[-1][0]) / 2.0
+                ]
+
+        moved_cell_ids = {
+            logical_vertices[name][0].cell_id for name in chain
+        }
+        candidate_boxes = {
+            vertex.cell_id: (
+                visual_boxes[vertex.name].left,
+                visual_boxes[vertex.name].top
+                + (delta if vertex.cell_id in moved_cell_ids else 0.0),
+                visual_boxes[vertex.name].right,
+                visual_boxes[vertex.name].bottom
+                + (delta if vertex.cell_id in moved_cell_ids else 0.0),
+            )
+            for vertex in document.vertices
+        }
+        moved_overlap = any(
+            left_id != right_id
+            and (
+                left_id in moved_cell_ids or right_id in moved_cell_ids
+            )
+            and max(candidate_boxes[left_id][0], candidate_boxes[right_id][0])
+            < min(candidate_boxes[left_id][2], candidate_boxes[right_id][2]) - tolerance
+            and max(candidate_boxes[left_id][1], candidate_boxes[right_id][1])
+            < min(candidate_boxes[left_id][3], candidate_boxes[right_id][3]) - tolerance
+            for index, left_id in enumerate(candidate_boxes)
+            for right_id in list(candidate_boxes)[index + 1:]
+        )
+        if moved_overlap:
+            continue
+
+        for channel in channels:
+            candidate_points_by_edge: dict[str, list[tuple[float, float]]] = {}
+            for edge_id in affected_ids:
+                source, target = observed_edge_vertices[edge_id]
+                points = edge_points[edge_id]
+                source_moved = source.cell_id in moved_cell_ids
+                target_moved = target.cell_id in moved_cell_ids
+                if edge_id == main_edge_id:
+                    option = [
+                        (points[0][0], points[0][1] + delta),
+                        points[-1],
+                    ]
+                elif source_moved and target_moved:
+                    option = [(x, y + delta) for x, y in points]
+                else:
+                    start = (
+                        points[0][0],
+                        points[0][1] + (delta if source_moved else 0.0),
+                    )
+                    end = (
+                        points[-1][0],
+                        points[-1][1] + (delta if target_moved else 0.0),
+                    )
+                    route_x = channel
+                    if route_x is None:
+                        route_x = (start[0] + end[0]) / 2.0
+                    option = (
+                        [start, end]
+                        if _close(start[1], end[1], tolerance)
+                        else [
+                            start,
+                            (route_x, start[1]),
+                            (route_x, end[1]),
+                            end,
+                        ]
+                    )
+                candidate_points_by_edge[edge_id] = simplify_candidate(option)
+            candidate_bends = sum(
+                max(0, len(points) - 2)
+                for points in candidate_points_by_edge.values()
+            )
+            if candidate_bends >= old_bends:
+                continue
+
+            candidate_segments_by_edge: dict[str, list[Segment]] = {}
+            for edge_id, points in candidate_points_by_edge.items():
+                source_name, source_port, _, _ = observed_edge_ports[edge_id]
+                candidate_segments_by_edge[edge_id] = [
+                    Segment(edge_id, (source_name, source_port), a, b)
+                    for a, b in zip(points, points[1:])
+                    if a != b
+                ]
+            candidate_segments = [
+                segment
+                for segments in candidate_segments_by_edge.values()
+                for segment in segments
+            ]
+            candidate_hits = 0
+            for edge_id, segments in candidate_segments_by_edge.items():
+                source, target = observed_edge_vertices[edge_id]
+                for segment in segments:
+                    candidate_hits += sum(
+                        _segment_hits_rect(segment.a, segment.b, box)
+                        for cell_id, box in candidate_boxes.items()
+                        if cell_id not in (source.cell_id, target.cell_id)
+                    )
+            candidate_hits += sum(
+                _segment_hits_rect(segment.a, segment.b, candidate_boxes[cell_id])
+                for segment in stationary_segments
+                for cell_id in moved_cell_ids
+            )
+            if candidate_hits:
+                continue
+            candidate_overlaps, candidate_crossings = conflict_counts(
+                candidate_segments, stationary_segments
+            )
+            if (
+                candidate_overlaps <= old_overlaps
+                and candidate_crossings <= old_crossings
+            ):
+                avoidable_exclusive_chain_bends.append(main_edge_id)
+                break
+
+    avoidable_exclusive_chain_bends = sorted(
+        set(avoidable_exclusive_chain_bends)
+    )
+
     direction_violations = sorted(
         edge_id
         for edge_id, _ in observed_edge_ports.items()
@@ -1616,6 +1852,10 @@ def inspect_layout_quality(
             f"avoidable-joint-coordinate-bends:{edge_id}"
             for edge_id in avoidable_joint_coordinate_bends
         ]
+        + [
+            f"avoidable-exclusive-chain-bends:{edge_id}"
+            for edge_id in avoidable_exclusive_chain_bends
+        ]
         + [f"avoidable-crossing:{edge_id}" for edge_id in avoidable_crossing_edges]
         + [f"avoidable-merge-input-detour:{edge_id}" for edge_id in avoidable_merge_input_detours]
         + [
@@ -1729,6 +1969,7 @@ def inspect_layout_quality(
             "avoidable_outer_detours": sorted(set(avoidable_outer_detours)),
             "avoidable_bend_edges": sorted(set(avoidable_bend_edges)),
             "avoidable_joint_coordinate_bend_edges": avoidable_joint_coordinate_bends,
+            "avoidable_exclusive_chain_bend_edges": avoidable_exclusive_chain_bends,
             "joint_coordinate_bend_tradeoffs": joint_coordinate_tradeoffs,
             "avoidable_crossing_edges": sorted(set(avoidable_crossing_edges)),
             "avoidable_merge_input_detours": sorted(set(avoidable_merge_input_detours)),

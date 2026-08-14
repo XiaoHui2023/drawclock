@@ -23,7 +23,7 @@ from scripts.build_stress_examples import build_terminal_fanout_crossing
 from scripts.build_stress_examples import build_asymmetric_merge_columns
 from scripts.build_stress_examples import build_dispersed_root_fanout
 from scripts.build_stress_examples import build_asymmetric_merge_route_bulge
-from drawio_ports import abs_port_xy, infer_port_from_attachment
+from drawio_ports import abs_port_xy, edge_attachment, infer_port_from_attachment
 from drawio_layout import layout_from_dict, layout_to_dict
 
 
@@ -446,6 +446,19 @@ def test_asymmetric_merge_inputs_follow_fixed_port_order_without_crossing(
     assert tap_edge.cell_id not in quality["line_integrity"][
         "joint_coordinate_bend_tradeoffs"
     ]
+    long_parent = f"div_{long_branch}"
+    merge_edge = next(
+        edge for edge in document.edges
+        if next(
+            vertex for vertex in document.vertices
+            if vertex.cell_id == edge.source_id
+        ).name == long_parent
+        and next(
+            vertex for vertex in document.vertices
+            if vertex.cell_id == edge.target_id
+        ).name == "sel"
+    )
+    assert merge_edge.waypoints == ()
 
 
 def test_joint_coordinate_refinement_accepts_only_a_global_dominance() -> None:
@@ -458,9 +471,93 @@ def test_joint_coordinate_refinement_accepts_only_a_global_dominance() -> None:
 
     assert report["selection"]["leaf_continuation_row_moves"] == 1
     assert report["selection"]["leaf_continuation_bends_removed"] == 4
+    assert report["selection"]["exclusive_chain_axis_moves"] == 1
+    assert report["selection"]["exclusive_chain_bends_removed"] == 2
     assert report["selection"]["joint_coordinate_moves"] == 0
-    assert quality["line_integrity"]["bends_total"] == 4
+    assert quality["line_integrity"]["bends_total"] == 2
     assert quality["line_integrity"]["avoidable_joint_coordinate_bend_edges"] == []
+    assert quality["passed"] is True
+
+
+def test_quality_gate_rejects_movable_exclusive_chain_dogleg() -> None:
+    config = build_asymmetric_merge_route_bulge(long_branch="b")
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    by_name = {vertex.name: vertex for vertex in document.vertices}
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    for name in ("from_b", "gate_b", "div_b"):
+        by_name[name].y += 20.0
+    edge = next(
+        item for item in document.edges
+        if by_id[item.source_id].name == "div_b"
+        and by_id[item.target_id].name == "sel"
+    )
+    source = by_id[edge.source_id]
+    target = by_id[edge.target_id]
+    exit_xy = edge_attachment(edge.style, end="exit")
+    entry_xy = edge_attachment(edge.style, end="entry")
+    assert exit_xy is not None and entry_xy is not None
+    start = (
+        source.x + source.width * exit_xy[0],
+        source.y + source.height * exit_xy[1],
+    )
+    end = (
+        target.x + target.width * entry_xy[0],
+        target.y + target.height * entry_xy[1],
+    )
+    channel = (start[0] + end[0]) / 2.0
+    edge.waypoints = (
+        (channel, start[1]),
+        (channel, end[1]),
+    )
+
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert quality["passed"] is False
+    assert quality["line_integrity"][
+        "avoidable_exclusive_chain_bend_edges"
+    ] == [edge.cell_id]
+
+
+@pytest.mark.parametrize("long_branch", ["a", "b"])
+def test_exclusive_chain_axis_refinement_ignores_names_and_input_order(
+    long_branch: str,
+) -> None:
+    original = build_asymmetric_merge_route_bulge(long_branch=long_branch)
+    names = list(original)
+    renamed = {
+        name: f"device_{index:02d}_with_unrelated_name"
+        for index, name in enumerate(names)
+    }
+    config: dict[str, dict[str, object]] = {}
+    for name in reversed(names):
+        item = copy.deepcopy(original[name])
+        source = item.get("source")
+        if isinstance(source, str):
+            item["source"] = renamed[source]
+        elif isinstance(source, dict):
+            item["source"] = {
+                port: renamed[parent]
+                for port, parent in source.items()
+            }
+        config[renamed[name]] = item
+
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    edge = next(
+        item for item in document.edges
+        if by_id[item.source_id].name == renamed[f"div_{long_branch}"]
+        and by_id[item.target_id].name == renamed["sel"]
+    )
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert edge.waypoints == ()
+    assert quality["line_integrity"][
+        "avoidable_exclusive_chain_bend_edges"
+    ] == []
     assert quality["passed"] is True
 
 

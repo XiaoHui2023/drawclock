@@ -119,4 +119,5 @@ def test_varied_topology_property_corpus(seed: int) -> None:
     assert line["source_lead_clearance_short"] == []
     assert line["target_lead_clearance_short"] == []
     assert line["avoidable_bend_edges"] == []
+    assert line["avoidable_exclusive_chain_bend_edges"] == []
     assert line["avoidable_crossing_edges"] == []

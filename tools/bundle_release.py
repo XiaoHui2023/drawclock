@@ -12,13 +12,17 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 BINARY_NAMES = ("drawclock",)
 
-# 运行期随包资源、绘图专档与最小测试配置。
+# 运行期随包资源、绘图专档与分层质量样例。
 RELEASE_PATHS = (
     "README.md",
     "draw.md",
     "pyproject.toml",
     "drawio-lib",
     "example/draw.json",
+    "example/auto-layout/01-linear.json",
+    "example/auto-layout/05-dense-cross-root.json",
+    "example/auto-layout/08-stress-512-clocks.json",
+    "example/auto-layout/20-asymmetric-merge-route-bulge.json",
 )
 
 SOURCE_DIR = "source"

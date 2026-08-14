@@ -50,7 +50,9 @@ def _edge_count(config: dict[str, dict[str, object]]) -> int:
     return count
 
 
-def _assert_svg(path: Path, *, nodes: int, edges: int) -> None:
+def _assert_svg(
+    path: Path, *, nodes: int, edges: int, max_total_bends: int | None = None,
+) -> None:
     root = ET.fromstring(path.read_text(encoding="utf-8"))
     if root.tag != f"{{{SVG_NS}}}svg":
         raise SystemExit(f"not SVG: {path}")
@@ -66,16 +68,41 @@ def _assert_svg(path: Path, *, nodes: int, edges: int) -> None:
     view_box = [float(value) for value in root.get("viewBox", "").split()]
     if len(view_box) != 4 or view_box[2] <= 0 or view_box[3] <= 0:
         raise SystemExit(f"invalid SVG bounds: {path}")
+    total_bends = sum(
+        max(0, len(element.get("points", "").split()) - 2)
+        for element in rendered_edges
+    )
+    if max_total_bends is not None and total_bends > max_total_bends:
+        raise SystemExit(
+            f"avoidable frozen SVG bends: {path} "
+            f"total={total_bends} maximum={max_total_bends}"
+        )
 
 
-def _draw(binary: Path, source: Path, output: Path, *extra: str) -> None:
+def _draw(
+    binary: Path, source: Path, output: Path, *extra: str,
+    max_total_bends: int | None = None,
+) -> None:
     _run(binary, ["-i", str(source), "-l", str(LIBRARY), "-o", str(output), *extra])
     config = json.loads(source.read_text(encoding="utf-8"))
-    _assert_svg(output, nodes=len(config), edges=_edge_count(config))
+    _assert_svg(
+        output, nodes=len(config), edges=_edge_count(config),
+        max_total_bends=max_total_bends,
+    )
 
 
 def main() -> int:
+    global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC
     binary = _binary_path()
+    package_root = binary.parent
+    if (package_root / "runtime" / "runtime-manifest.json").is_file():
+        ROOT = package_root
+        LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
+        DRAW_EXAMPLE = ROOT / "example" / "draw.json"
+        LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
+        DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
+        STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
+        ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
     runtime = binary.parent / "runtime"
     required = (
         binary, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC,
@@ -95,7 +122,10 @@ def main() -> int:
     _draw(binary, LINEAR, out / "arbitrary-suffix.png", "--crossing-style", "gap")
     _draw(binary, DENSE, out / "dense-frozen.svg")
     _draw(binary, STRESS, out / "stress-512-frozen.svg")
-    _draw(binary, ASYMMETRIC, out / "asymmetric-frozen.svg")
+    _draw(
+        binary, ASYMMETRIC, out / "asymmetric-frozen.svg",
+        max_total_bends=2,
+    )
 
     formats = {
         "json": '{"osc":{"kind":"source"}}',

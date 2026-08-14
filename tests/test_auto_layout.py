@@ -345,6 +345,41 @@ def test_layout_uses_kind_metadata_and_geometry_from_supplied_library(
     assert quality["passed"] is True
     assert quality["alignment"]["port_alignment_error_max_px"] == 0
 
+    asymmetric = {
+        "input_a": {"kind": "from"},
+        "input_b": {"kind": "from"},
+        "logic_a": {
+            "kind": "custom_gate_symbol",
+            "source": "input_a",
+        },
+        "logic_b": {
+            "kind": "custom_gate_symbol",
+            "source": "input_b",
+        },
+        "divide_b": {"kind": "div", "source": "logic_b"},
+        "select": {
+            "kind": "mux2",
+            "source": {"0": "logic_a", "1": "divide_b"},
+        },
+        "output": {"kind": "clock", "source": "select"},
+        "tap": {"kind": "clock", "source": "logic_a"},
+    }
+    asymmetric_document, _ = generate_elk_layout(
+        asymmetric,
+        library_path=custom_library,
+    )
+    asymmetric_quality = inspect_layout_quality(
+        asymmetric,
+        asymmetric_document,
+        library_path=custom_library,
+        grid=0.0001,
+        tolerance=0.01,
+    )
+    assert asymmetric_quality["line_integrity"][
+        "avoidable_exclusive_chain_bend_edges"
+    ] == []
+    assert asymmetric_quality["passed"] is True
+
 
 def test_invalid_output_selector_is_rejected() -> None:
     config = {

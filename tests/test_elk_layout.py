@@ -263,11 +263,20 @@ def test_quality_fault_injection_rejects_two_bend_local_merge_crossing() -> None
     by_id = {vertex.cell_id: vertex for vertex in document.vertices}
     gate_a = by_name["gate_a"]
     div_b = by_name["div_b"]
-    gate_a.y, div_b.y = div_b.y, gate_a.y
     merge_edges = [
         edge for edge in document.edges if by_id[edge.target_id].name == "sel"
     ]
     merge_edges.sort(key=lambda edge: by_id[edge.source_id].name)
+    clean_points = {
+        by_id[edge.source_id].name: _points_for_edge(
+            edge, by_id[edge.source_id], by_id[edge.target_id]
+        )
+        for edge in merge_edges
+    }
+    gate_axis = clean_points["gate_a"][0][1]
+    div_axis = clean_points["div_b"][0][1]
+    gate_a.y += clean_points["div_b"][-1][1] + 24 - gate_axis
+    div_b.y += clean_points["gate_a"][-1][1] - 30 - div_axis
     starts_ends = [
         (
             edge,
