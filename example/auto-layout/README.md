@@ -33,7 +33,7 @@ python src `
 | 非对称列 | `18-asymmetric-merge-columns.json` | 长短不同的 mux 输入支路与汇聚列 |
 | 分散源 | `19-dispersed-root-fanout.json` | 同一零入度源服务距离较远的消费簇 |
 | 汇聚折线 | `20-asymmetric-merge-route-bulge.json` | 长短分支进入 mux 时的可避免外凸折线 |
-| 列偏好 | `21-layout-column-preference.json` | 三条深度不同的支路用 `layout_column` 把 mux 排在同一列 |
+| 列等级 | `21-layout-column-preference.json` | `10`、`20`、`30` 控制左右顺序，同等级器件共列 |
 
 压力示例包含少量晶振和 PLL、大量复用的 mux、分频器、gate、多类 clock cell 和末端 clock。13 至 15 改变连接顺序、链深、复用源和实例名，不只是放大同一种阵列。坐标由输入连接关系以及当前器件库的尺寸、标签和端口一次计算得到，不进行成图后的坐标校准。
 

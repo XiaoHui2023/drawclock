@@ -1,0 +1,161 @@
+{
+  "capability_id": "drawclock-joint-coordinate-routing",
+  "owner": "constraint-layered coordinate assignment and orthogonal routing",
+  "problem": "Fixed-coordinate route checks can accept a drawing that is dominated after a legal coordinate reassignment.",
+  "scope": "All nodes, ports, ranks, component libraries and acyclic left-to-right input graphs; no kind, name, size-tier or fixture-specific branch. Rendering-only replicas are permitted only for zero-indegree nodes.",
+  "baseline": "The asymmetric merge fixture passes the old oracle with 8 bends although a legal 6-bend drawing exists.",
+  "benchmarks": [
+    "ELK layered Brandes-Koepf placement with edge straightening",
+    "OGDF orthogonal layout with bend bounds and compaction",
+    "yFiles hierarchical layout with exact ports, grouping and incremental optimization"
+  ],
+  "advantages": [
+    "Existing layout already has exact port geometry and independent global quality metrics",
+    "Layer order and rank constraints bound the one-dimensional coordinate search"
+  ],
+  "disadvantages": [
+    "Current placement and routing are optimized in separate phases",
+    "Current route dominance oracle freezes node coordinates"
+  ],
+  "limitations": [
+    "Global bend and crossing minimization is combinatorial",
+    "Commercial yFiles cannot be a bundled runtime dependency"
+  ],
+  "defects": [
+    "A four-bend edge can pass when a legal node-coordinate change yields two bends",
+    "A narrow terminal-only move would overfit one visible symptom"
+    ,"A single visual anchor for a widely dispersed zero-indegree source can force a long crossing-heavy distribution line"
+  ],
+  "bottlenecks": [
+    "Independent global candidate validation",
+    "Avoiding quadratic work on 4096-clock inputs"
+  ],
+  "metrics": [
+    {
+      "name": "known_bad_rejection",
+      "unit": "percent",
+      "direction": "higher",
+      "threshold": 100,
+      "measurement": "Run the independent oracle on every frozen bad artifact",
+      "evidence": "pytest specialization fixtures"
+    },
+    {
+      "name": "known_good_acceptance",
+      "unit": "percent",
+      "direction": "higher",
+      "threshold": 100,
+      "measurement": "Run the independent oracle on every frozen good artifact",
+      "evidence": "pytest success and regression corpus"
+    },
+    {
+      "name": "avoidable_joint_bends",
+      "unit": "edges",
+      "direction": "lower",
+      "threshold": 0,
+      "measurement": "Enumerate legal rank-order-preserving coordinate and orthogonal-route candidates independently",
+      "evidence": "layout quality report"
+    },
+    {
+      "name": "hard_quality_regressions",
+      "unit": "violations",
+      "direction": "lower",
+      "threshold": 0,
+      "measurement": "Compare ports, obstacles, crossings, overlaps, trunks, bounds and node separation before acceptance",
+      "evidence": "full quality matrix"
+    },
+    {
+      "name": "stress_4096_runtime",
+      "unit": "seconds",
+      "direction": "lower",
+      "threshold": 20,
+      "measurement": "Generate and inspect the frozen 4096-clock scenario",
+      "evidence": "timed stress test"
+    }
+  ],
+  "hypotheses": [
+    "A rank-order-preserving coordinate channel graph can expose dominated drawings without component-specific rules",
+    "Conflict-window exact search plus global dominance validation can reduce bends without worsening hard metrics",
+    "Spatial indexing and suspect-window filtering keep work near linear on repeated large structures"
+  ],
+  "allowed_variables": [
+    "node y coordinates within rank-order constraints",
+    "orthogonal route channels and waypoints",
+    "deterministic optimization iteration order",
+    "rendering-only anchor count and continuous consumer partition for zero-indegree nodes"
+  ],
+  "stages": [
+    {
+      "id": "oracle-red",
+      "input": "frozen good and bad layout documents",
+      "output": "independent dominance findings",
+      "checker": "pytest with positive, negative and injected-fault assertions",
+      "rollback": "revert oracle change if any good baseline is rejected",
+      "allowed_variables": ["quality oracle implementation and test fixtures"]
+    },
+    {
+      "id": "joint-optimize",
+      "input": "ranked nodes, exact ports and routed edges",
+      "output": "globally accepted coordinate and route updates",
+      "checker": "independent quality oracle plus metric dominance",
+      "rollback": "retain the previous accepted document",
+      "allowed_variables": ["node y coordinates", "incident edge routes"]
+    },
+    {
+      "id": "parent-regression",
+      "input": "optimized production code",
+      "output": "source, frozen and release evidence",
+      "checker": "full tests, random corpus, stress tests and extracted-package smoke",
+      "rollback": "revert to the last fully passing commit",
+      "allowed_variables": ["test and packaging execution only"]
+    }
+  ],
+  "hard_gates": [
+    "exact port endpoints",
+    "zero node or label penetration",
+    "zero node overlap",
+    "no additional different-net overlap or crossing",
+    "no additional fanout trunk fragmentation",
+    "no clipped visible geometry",
+    "no fixture, node-name, component-kind or size-tier branch",
+    "every logical edge is drawn exactly once",
+    "only zero-indegree logical nodes may have rendering replicas",
+    "no removable rendering replica"
+  ],
+  "failure_fixtures": [
+    "asymmetric merge long branch b",
+    "mirrored asymmetric merge long branch a",
+    "mutated library geometry and port anchors"
+  ],
+  "success_fixtures": [
+    "straight chain",
+    "shared-trunk fanout",
+    "dense multi-source merge",
+    "random acyclic property corpus"
+  ],
+  "fault_injections": [
+    "restore a dominated four-bend route and old node coordinate",
+    "offer a bend-reducing move that collides with a node label",
+    "offer a bend-reducing move that adds a different-net crossing",
+    "replace component kinds while preserving geometry and graph structure"
+    ,"replicate a non-root node or drop one edge while splitting a root"
+  ],
+  "rollback": "Keep the previous document and production commit whenever any hard metric regresses.",
+  "iteration_budget": {
+    "max_rounds": 4,
+    "max_time": "4 hours",
+    "review_trigger": "one good-baseline rejection or two failures of the same search representation"
+  },
+  "stop_conditions": [
+    "zero independently avoidable joint bends in the declared corpus",
+    "all hard quality metrics remain passing",
+    "4096-clock runtime remains within budget",
+    "frozen and downloaded release packages pass"
+  ],
+  "promotion_decision": {
+    "destination": "clock-tree-layout reference and quality gates",
+    "reason": "The method is reusable across left-to-right port-constrained layered diagrams.",
+    "independent_trigger": false,
+    "repeatable_validation": true
+  },
+  "writeback": "Project-specific evidence stays in the goal; generic joint optimization and oracle rules update the user-root clock-tree-layout skill."
+}

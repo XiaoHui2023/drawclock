@@ -32,14 +32,14 @@ drawclock -i <配置文件> -l <器件库.xml> -o <输出文件> [--crossing-sty
 
 `source` 为字符串时连接默认输入端口；为对象时，键是输入端口序号。未列出的输入端口可以不连接。多输出器件用 `器件名[输出键]` 选择输出。
 
-`layout_column` 是列偏好标签。值相同的器件在连接方向允许时进入同一列；存在先后依赖时仍保持从左到右。值可用非空字符串或整数。
+`layout_column` 是可选整数等级。数值越小越靠左，越大越靠右；相同数值的器件尽可能进入同一列。数值只表示顺序，`10` 与 `100` 不会保留中间空列。连接方向冲突时保持从左到右。
 
 ```json
 {
-  "a": {"kind": "from"},
-  "b": {"kind": "from"},
-  "select_a": {"kind": "mux2", "layout_column": "select_stage", "source": {"0": "a"}},
-  "select_b": {"kind": "mux2", "layout_column": "select_stage", "source": {"0": "b"}}
+  "a": {"kind": "from", "layout_column": 10},
+  "b": {"kind": "from", "layout_column": 10},
+  "select_a": {"kind": "mux2", "layout_column": 20, "source": {"0": "a"}},
+  "select_b": {"kind": "mux2", "layout_column": 20, "source": {"0": "b"}}
 }
 ```
 

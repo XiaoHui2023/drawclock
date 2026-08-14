@@ -12,7 +12,19 @@ node_modules/
 .runtime/
 .runtime-cache/
 *.egg-info/
-.cursor/
+.cursor/*
+!.cursor/skills/
+.cursor/skills/*
+!.cursor/skills/project-preload-skills/
+!.cursor/skills/project-preload-skills/**
+!.cursor/skills/project-design-notes/
+!.cursor/skills/project-design-notes/**
+!.cursor/skills/project-changelog/
+!.cursor/skills/project-changelog/**
+!.cursor/skills/project-goals/
+!.cursor/skills/project-goals/**
+!.cursor/skills/drawclock-drawio-pitfalls/
+!.cursor/skills/drawclock-drawio-pitfalls/**
 *.drawio.bak
 
 # 测试与本地临时输出

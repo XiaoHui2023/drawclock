@@ -1635,6 +1635,7 @@ def _generate_scalable_layout(
         if visible_bounds else 0.0
     )
     elapsed_ms = (time.perf_counter() - started) * 1000
+    ordered_column_groups = sorted(column_groups.items())
     return document, {
         "engine": "constraint-layered",
         "mode": (
@@ -1668,6 +1669,14 @@ def _generate_scalable_layout(
             "layout_column_aligned": sum(
                 len({rank[name] for name in names}) == 1
                 for names in column_groups.values()
+            ),
+            "layout_column_order_violations": sum(
+                max(rank[name] for name in left_names)
+                >= min(rank[name] for name in right_names)
+                for (_, left_names), (_, right_names) in zip(
+                    ordered_column_groups,
+                    ordered_column_groups[1:],
+                )
             ),
             "layout_column_max_span": max(
                 (

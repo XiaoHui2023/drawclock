@@ -182,8 +182,8 @@ def test_layout_column_aligns_different_branch_depths(
     selected = ["sel_00", "sel_01", "sel_02"]
 
     without_preference = copy.deepcopy(config)
-    for name in selected:
-        without_preference[name].pop("layout_column")
+    for item in without_preference.values():
+        item.pop("layout_column", None)
     plain_nodes = resolve_nodes(
         without_preference, shapes, {}, library_path=LIBRARY
     )
@@ -200,15 +200,30 @@ def test_layout_column_aligns_different_branch_depths(
         "layout_column" not in vertex.object_attrs
         for vertex in document.vertices
     )
-    assert report["selection"]["layout_column_groups"] == 1
-    assert report["selection"]["layout_column_aligned"] == 1
+    assert report["selection"]["layout_column_groups"] == 3
+    assert report["selection"]["layout_column_aligned"] == 3
+    assert report["selection"]["layout_column_order_violations"] == 0
     assert report["selection"]["layout_column_max_span"] == 0
+
+    grouped_names = {
+        10: ["root_a", "root_b", "root_c", "root_d"],
+        20: selected,
+        30: ["clk_00", "clk_01", "clk_02"],
+    }
+    group_x = {
+        level: {x_by_name[name] for name in names}
+        for level, names in grouped_names.items()
+    }
+    assert all(len(xs) == 1 for xs in group_x.values())
+    assert next(iter(group_x[10])) < next(iter(group_x[20]))
+    assert next(iter(group_x[20])) < next(iter(group_x[30]))
 
     quality = inspect_layout_quality(
         config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
     )
     assert quality["passed"] is True
     assert quality["alignment"]["layout_column_misalignments"] == []
+    assert quality["alignment"]["layout_column_order_violations"] == []
 
 
 def test_layout_column_quality_gate_rejects_shifted_member() -> None:
@@ -222,20 +237,46 @@ def test_layout_column_quality_gate_rejects_shifted_member() -> None:
     assert quality["passed"] is False
     assert "layout-column-misalignment" in quality["hard_failures"]
     assert quality["alignment"]["layout_column_misalignments"] == [{
-        "label": "string:select_stage",
+        "level": 20,
         "nodes": ["sel_00", "sel_01", "sel_02"],
         "spread_px": 20.0,
     }]
+
+
+def test_layout_column_quality_gate_rejects_reversed_numeric_order() -> None:
+    config = load_clock_tree(EXAMPLES / "21-layout-column-preference.json")
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    shifted = copy.deepcopy(document)
+    roots = [
+        vertex for vertex in shifted.vertices
+        if vertex.name in {"root_a", "root_b", "root_c", "root_d"}
+    ]
+    mux_x = next(
+        vertex.x for vertex in shifted.vertices if vertex.name == "sel_00"
+    )
+    for vertex in roots:
+        vertex.x = mux_x + 20
+    quality = inspect_layout_quality(
+        config, shifted, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert quality["passed"] is False
+    assert "layout-column-order" in quality["hard_failures"]
+    assert quality["alignment"]["layout_column_order_violations"][0][
+        "left_level"
+    ] == 10
+    assert quality["alignment"]["layout_column_order_violations"][0][
+        "right_level"
+    ] == 20
 
 
 def test_layout_column_does_not_collapse_causal_nodes() -> None:
     config = {
         "root": {"kind": "from"},
         "first": {
-            "kind": "gate", "layout_column": "stage", "source": "root",
+            "kind": "gate", "layout_column": 20, "source": "root",
         },
         "second": {
-            "kind": "div", "layout_column": "stage", "source": "first",
+            "kind": "div", "layout_column": 20, "source": "first",
         },
         "clock": {"kind": "clock", "source": "second"},
     }
@@ -248,6 +289,7 @@ def test_layout_column_does_not_collapse_causal_nodes() -> None:
     document, report = generate_elk_layout(config, library_path=LIBRARY)
     assert report["selection"]["layout_column_groups"] == 1
     assert report["selection"]["layout_column_aligned"] == 0
+    assert report["selection"]["layout_column_order_violations"] == 0
     assert report["selection"]["layout_column_max_span"] == 1
     quality = inspect_layout_quality(
         config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
@@ -280,6 +322,58 @@ def test_layout_column_is_independent_of_component_kind() -> None:
     )
     assert quality["passed"] is True
     assert quality["alignment"]["layout_column_misalignments"] == []
+
+
+def test_layout_column_numeric_distance_does_not_reserve_empty_columns() -> None:
+    config = {
+        "root": {"kind": "from", "layout_column": 10},
+        "gate": {"kind": "gate", "source": "root"},
+        "clock": {"kind": "clock", "layout_column": 100, "source": "gate"},
+    }
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    edges = build_logical_edges(config, nodes, LIBRARY)
+    ranks = _ranks(nodes, edges, _layout_column_groups(config))
+
+    assert ranks == {"root": 0, "gate": 1, "clock": 2}
+
+
+def test_layout_column_4096_unique_levels_stays_linear() -> None:
+    count = 4096
+    names = [f"node_{index:04d}" for index in range(count)]
+    edges = [
+        LogicalEdge(names[index], names[index + 1], "out", "in")
+        for index in range(count - 1)
+    ]
+    columns = {index * 10: [name] for index, name in enumerate(names)}
+
+    started = time.perf_counter()
+    ranks = _ranks(names, edges, columns)
+    elapsed = time.perf_counter() - started
+
+    assert ranks[names[0]] == 0
+    assert ranks[names[-1]] == count - 1
+    assert elapsed < 1.0
+
+
+def test_layout_column_reverse_topology_remains_forward() -> None:
+    config = {
+        "root": {"kind": "from", "layout_column": 30},
+        "gate": {"kind": "gate", "layout_column": 10, "source": "root"},
+        "clock": {"kind": "clock", "source": "gate"},
+    }
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    edges = build_logical_edges(config, nodes, LIBRARY)
+    ranks = _ranks(nodes, edges, _layout_column_groups(config))
+    assert ranks["root"] < ranks["gate"]
+
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    assert report["selection"]["layout_column_order_violations"] == 1
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    assert quality["passed"] is True
 
 
 def test_dual_from_reuse_has_no_avoidable_outer_detours() -> None:

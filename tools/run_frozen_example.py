@@ -92,7 +92,7 @@ def _draw(
     )
 
 
-def _assert_named_nodes_same_x(path: Path, names: tuple[str, ...]) -> None:
+def _named_node_xs(path: Path, names: tuple[str, ...]) -> dict[str, float]:
     root = ET.fromstring(path.read_text(encoding="utf-8"))
     x_by_name: dict[str, float] = {}
     for element in root.findall(f"{{{SVG_NS}}}foreignObject"):
@@ -100,8 +100,16 @@ def _assert_named_nodes_same_x(path: Path, names: tuple[str, ...]) -> None:
         for name in names:
             if name in text_content:
                 x_by_name[name] = float(element.get("x", "nan"))
-    if set(x_by_name) != set(names) or len(set(x_by_name.values())) != 1:
+    if set(x_by_name) != set(names):
+        raise SystemExit(f"layout_column nodes are missing: {x_by_name}")
+    return x_by_name
+
+
+def _assert_named_nodes_same_x(path: Path, names: tuple[str, ...]) -> float:
+    x_by_name = _named_node_xs(path, names)
+    if len(set(x_by_name.values())) != 1:
         raise SystemExit(f"layout_column nodes are not co-column: {x_by_name}")
+    return next(iter(x_by_name.values()))
 
 
 def main() -> int:
@@ -144,7 +152,20 @@ def main() -> int:
     )
     column_output = out / "column-preference-frozen.svg"
     _draw(binary, COLUMN_PREFERENCE, column_output)
-    _assert_named_nodes_same_x(column_output, ("sel_00", "sel_01", "sel_02"))
+    root_x = _assert_named_nodes_same_x(
+        column_output, ("root_a", "root_b", "root_c", "root_d")
+    )
+    mux_x = _assert_named_nodes_same_x(
+        column_output, ("sel_00", "sel_01", "sel_02")
+    )
+    clock_x = _assert_named_nodes_same_x(
+        column_output, ("clk_00", "clk_01", "clk_02")
+    )
+    if not root_x < mux_x < clock_x:
+        raise SystemExit(
+            "layout_column numeric order is not left-to-right: "
+            f"root={root_x}, mux={mux_x}, clock={clock_x}"
+        )
 
     formats = {
         "json": '{"osc":{"kind":"source"}}',

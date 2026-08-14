@@ -59,13 +59,13 @@ def test_draw_requires_kind_even_with_explicit_component() -> None:
         generate_layout(config, library_path=LIBRARY)
 
 
-@pytest.mark.parametrize("value", ["", "   ", True, 1.5, ["select"]])
+@pytest.mark.parametrize("value", ["", "select", True, 1.5, [20]])
 def test_layout_column_rejects_invalid_values(value: object) -> None:
     config = {"osc": {"kind": "source", "layout_column": value}}
 
     with pytest.raises(
         ValueError,
-        match="layout_column 必须是非空字符串或整数",
+        match="layout_column 必须是整数",
     ):
         generate_elk_layout(config, library_path=LIBRARY)
 

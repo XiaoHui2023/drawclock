@@ -1,0 +1,20 @@
+---
+name: project-goals
+description: drawclock 当前目标、验证证据与完成条件索引。
+---
+
+# 项目目标
+
+- [ ] 每条非共享普通边都通过可行通道的最少拐点证明，避免两拐点路线逃逸。
+- [x] 末端一分二与相邻一分一不产生可避免交叉。
+- [x] 非对称前后级的同源汇聚节点保持同列。
+- [x] 跨大区域根从合适边界进入，同根消费域不夹杂可分离的无关域。
+- [x] Agent 质检记录末层交叉、根消费域夹杂、合理局部主干、微线段和可避免拐点。
+- [x] `gate_a_tap` 类长距末端使用结构性整组换行消除非必要拐点，面积不再优先于美观。
+- [x] v1.0.0 只保留直接绘图主功能，v0.0.0 可恢复。
+
+- [x] [逐边最少拐点证明](goals/per-edge-bend-minimality.md)
+- [v1.0.0 单功能重构](goals/v1-draw-only.md)
+- [非对称汇聚输入异常外凸](goals/asymmetric-merge-route-bulge.md)
+- [坐标与正交路由联合优化](goals/joint-coordinate-routing-optimization.md)
+- [最小通用 draw 示例](goals/minimal-draw-example.md)

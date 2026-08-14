@@ -214,30 +214,20 @@ def build_logical_edges(
 
 def _layout_column_groups(
     items: dict[str, Any],
-) -> dict[tuple[str, str], list[str]]:
-    groups: dict[tuple[str, str], list[str]] = defaultdict(list)
+) -> dict[int, list[str]]:
+    groups: dict[int, list[str]] = defaultdict(list)
     for name, value in items.items():
         item = value.item if isinstance(value, ResolvedNode) else value
         if not isinstance(item, dict) or "layout_column" not in item:
             continue
-        value = item["layout_column"]
-        label = (
-            ("integer", str(value))
-            if isinstance(value, int)
-            else ("string", value)
-        )
-        groups[label].append(name)
-    return {
-        label: names
-        for label, names in groups.items()
-        if len(names) > 1
-    }
+        groups[item["layout_column"]].append(name)
+    return dict(groups)
 
 
 def _ranks(
     names: Iterable[str],
     edges: list[LogicalEdge],
-    layout_columns: dict[tuple[str, str], list[str]] | None = None,
+    layout_columns: dict[int, list[str]] | None = None,
 ) -> dict[str, int]:
     outgoing: dict[str, list[str]] = defaultdict(list)
     incoming: dict[str, list[str]] = defaultdict(list)
@@ -294,17 +284,17 @@ def _ranks(
             default=0,
         )
 
-    # Detect a same-label ancestor/descendant pair for every user group in one
-    # reverse DAG pass.  Such a group cannot occupy one rank because every edge
-    # must advance to the right, so it must not widen the graph in a futile
-    # attempt to satisfy an impossible preference.
+    # Build reachability summaries for the user-ranked groups in one reverse
+    # DAG pass.  Equal values request one column; increasing values request
+    # increasing columns.  A group that would reverse an already accepted
+    # lower value remains topology-driven instead of creating a directed cycle.
     column_groups = layout_columns or {}
     column_bits = {
-        label: 1 << index for index, label in enumerate(column_groups)
+        level: 1 << index for index, level in enumerate(column_groups)
     }
     member_bit = {
-        name: column_bits[label]
-        for label, cohort in column_groups.items()
+        name: column_bits[level]
+        for level, cohort in column_groups.items()
         for name in cohort
     }
     descendant_bits: dict[str, int] = {}
@@ -315,11 +305,83 @@ def _ranks(
             bits |= member_bit.get(child, 0) | descendant_bits[child]
         conflicting_bits |= member_bit.get(name, 0) & bits
         descendant_bits[name] = bits
-    feasible_columns = {
-        label: cohort
-        for label, cohort in column_groups.items()
-        if not conflicting_bits & column_bits[label]
-    }
+    feasible_columns: dict[int, list[str]] = {}
+    accepted_bits = 0
+    for level, cohort in sorted(column_groups.items()):
+        level_bit = column_bits[level]
+        same_level_conflict = bool(conflicting_bits & level_bit)
+        reversed_level_conflict = any(
+            descendant_bits[name] & accepted_bits for name in cohort
+        )
+        if same_level_conflict or reversed_level_conflict:
+            continue
+        feasible_columns[level] = cohort
+        accepted_bits |= level_bit
+
+    # Contract every accepted equal-level group, then add one ordering edge
+    # between adjacent numeric levels.  A single longest-path pass applies both
+    # equality and ordering in O(V + E + L); numeric distance is intentionally
+    # ignored, so 10 and 100 do not reserve ninety columns.
+    column_targets: dict[int, int] = {}
+    if feasible_columns:
+        member_level = {
+            name: level
+            for level, cohort in feasible_columns.items()
+            for name in cohort
+        }
+        representative = {
+            name: ("column", member_level[name])
+            if name in member_level else ("node", name)
+            for name in visited
+        }
+        representatives = list(dict.fromkeys(representative.values()))
+        constraint_out: dict[tuple[str, Any], dict[tuple[str, Any], None]] = {
+            item: {} for item in representatives
+        }
+        constraint_indegree = {item: 0 for item in representatives}
+
+        def add_constraint(
+            source: tuple[str, Any], target: tuple[str, Any]
+        ) -> None:
+            if source == target or target in constraint_out[source]:
+                return
+            constraint_out[source][target] = None
+            constraint_indegree[target] += 1
+
+        for edge in edges:
+            add_constraint(
+                representative[edge.source], representative[edge.target]
+            )
+        levels = list(feasible_columns)
+        for left_level, right_level in zip(levels, levels[1:]):
+            add_constraint(
+                ("column", left_level), ("column", right_level)
+            )
+
+        constraint_queue = deque(
+            item for item in representatives if constraint_indegree[item] == 0
+        )
+        constraint_rank = {item: 0 for item in representatives}
+        constraint_visited = 0
+        while constraint_queue:
+            item = constraint_queue.popleft()
+            constraint_visited += 1
+            for child in constraint_out[item]:
+                constraint_rank[child] = max(
+                    constraint_rank[child], constraint_rank[item] + 1
+                )
+                constraint_indegree[child] -= 1
+                if constraint_indegree[child] == 0:
+                    constraint_queue.append(child)
+        if constraint_visited != len(representatives):
+            raise RuntimeError("layout_column constraint graph contains a cycle")
+        earliest = {
+            name: constraint_rank[representative[name]] for name in visited
+        }
+        column_targets = {
+            level: constraint_rank[("column", level)]
+            for level in feasible_columns
+        }
 
     # Align every terminal on the rightmost layer, then schedule each
     # predecessor as late as its earliest consumer permits.  Equivalent merge
@@ -356,17 +418,10 @@ def _ranks(
             target = max(lower, min(latest[name] for name in cohort))
             for name in cohort:
                 anchored[name] = target
-    # A user column label is a strong soft constraint.  It is applied after
-    # topology-derived merge cohorts, but only inside the common ASAP/ALAP
-    # interval.  A causally ordered group therefore remains left-to-right
-    # instead of being forced onto an invalid rank.
-    for cohort in feasible_columns.values():
-        lower = max(earliest[name] for name in cohort)
-        upper = min(latest[name] for name in cohort)
-        if lower <= upper:
-            target = upper
-            for name in cohort:
-                anchored[name] = target
+    for level, cohort in feasible_columns.items():
+        target = column_targets[level]
+        for name in cohort:
+            anchored[name] = target
     for name in reversed(visited):
         children = outgoing[name]
         if children:

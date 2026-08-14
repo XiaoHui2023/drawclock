@@ -13,11 +13,10 @@ def collect_device_attr_errors(config: dict[str, dict[str, Any]]) -> list[str]:
         layout_column = item.get("layout_column")
         if layout_column is not None and (
             isinstance(layout_column, bool)
-            or not isinstance(layout_column, (str, int))
-            or isinstance(layout_column, str) and not layout_column.strip()
+            or not isinstance(layout_column, int)
         ):
             errors.append(
-                f"器件 {name} 的 layout_column 必须是非空字符串或整数"
+                f"器件 {name} 的 layout_column 必须是整数"
             )
     return errors
 
