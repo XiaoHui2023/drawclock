@@ -4,7 +4,6 @@ import html
 import re
 from dataclasses import dataclass
 from functools import lru_cache
-from pathlib import Path
 
 
 
@@ -26,7 +25,7 @@ def _parse_points(style: str) -> tuple[tuple[float, float], ...]:
     if len(parts) >= 2:
       points.append((float(parts[0]), float(parts[1])))
   return tuple(points)
-from drawio_library import DEFAULT_LIBRARY_PATH, load_library_shapes
+from drawio_library import LibrarySource, library_cache_key, load_library_shapes
 
 _LABEL_SPAN_RE = re.compile(r'<span style="([^"]+)">([^<]+)</span>')
 _PLACEHOLDER_RE = re.compile(r"^%[^%]+%$")
@@ -99,16 +98,16 @@ def port_topology_from_style(style: str) -> PortTopology:
 
 
 @lru_cache(maxsize=8)
-def load_library_port_topologies(library_path: str) -> dict[str, PortTopology]:
-  shapes = load_library_shapes(library_path)
+def load_library_port_topologies(library_paths: tuple[str, ...]) -> dict[str, PortTopology]:
+  shapes = load_library_shapes(library_paths)
   return {
     title: port_topology_from_style(shape.style)
     for title, shape in shapes.items()
   }
 
 
-def topology_for_type(drawclock_type: str, *, library_path: str | Path | None = None) -> PortTopology:
-  lib = str(library_path or DEFAULT_LIBRARY_PATH)
+def topology_for_type(drawclock_type: str, *, library_path: LibrarySource | None = None) -> PortTopology:
+  lib = library_cache_key(library_path)
   topologies = load_library_port_topologies(lib)
   if drawclock_type not in topologies:
     raise KeyError(f"器件类型不在器件库中: {drawclock_type}")
@@ -249,9 +248,9 @@ def _match_labeled_ports(
 
 
 @lru_cache(maxsize=8)
-def load_port_connection_keys(library_path: str) -> dict[str, tuple[dict[str, str], dict[str, str]]]:
-  shapes = load_library_shapes(library_path)
-  topologies = load_library_port_topologies(library_path)
+def load_port_connection_keys(library_paths: tuple[str, ...]) -> dict[str, tuple[dict[str, str], dict[str, str]]]:
+  shapes = load_library_shapes(library_paths)
+  topologies = load_library_port_topologies(library_paths)
   out: dict[str, tuple[dict[str, str], dict[str, str]]] = {}
   for title, shape in shapes.items():
     topology = topologies[title]
@@ -270,9 +269,9 @@ def load_port_connection_keys(library_path: str) -> dict[str, tuple[dict[str, st
 def input_connection_keys(
   drawclock_type: str,
   *,
-  library_path: str | Path | None = None,
+  library_path: LibrarySource | None = None,
 ) -> dict[str, str]:
-  lib = str(library_path or DEFAULT_LIBRARY_PATH)
+  lib = library_cache_key(library_path)
   keys = load_port_connection_keys(lib).get(drawclock_type)
   if keys is None:
     raise KeyError(f"器件类型不在器件库中: {drawclock_type}")
@@ -282,9 +281,9 @@ def input_connection_keys(
 def output_connection_keys(
   drawclock_type: str,
   *,
-  library_path: str | Path | None = None,
+  library_path: LibrarySource | None = None,
 ) -> dict[str, str]:
-  lib = str(library_path or DEFAULT_LIBRARY_PATH)
+  lib = library_cache_key(library_path)
   keys = load_port_connection_keys(lib).get(drawclock_type)
   if keys is None:
     raise KeyError(f"器件类型不在器件库中: {drawclock_type}")
@@ -294,10 +293,10 @@ def output_connection_keys(
 def output_connection_key_suffixes(
   config_kind: str,
   *,
-  library_path: str | Path | None = None,
+  library_path: LibrarySource | None = None,
 ) -> set[str]:
   """Valid source-reference suffixes when config kind is a unified major kind."""
-  lib = str(library_path or DEFAULT_LIBRARY_PATH)
+  lib = library_cache_key(library_path)
   keys_map = load_port_connection_keys(lib)
   titles = CONFIG_KIND_LIBRARY_TYPES.get(config_kind, (config_kind,))
   suffixes: set[str] = set()

@@ -32,7 +32,7 @@ from auto_layout import (
     Segment,
 )
 from drawio_layout import EdgeLayout, LAYOUT_VERSION, LayoutDocument
-from drawio_library import load_library_shapes
+from drawio_library import LibrarySource, library_cache_key, load_library_shapes
 from drawio_ports import EDGE_DRAW_STYLE, port_anchors
 from drawio_ports import abs_port_xy
 from validate_config import validate_config
@@ -2991,7 +2991,7 @@ def _replicate_dispersed_roots(
 def generate_elk_layout(
     config: dict[str, dict[str, Any]],
     *,
-    library_path: str | Path,
+    library_path: LibrarySource,
     component_hints: dict[str, str] | None = None,
     profile_name: str = "readable",
 ) -> tuple[LayoutDocument, dict[str, Any]]:
@@ -2999,6 +2999,7 @@ def generate_elk_layout(
     started = time.perf_counter()
     if profile_name not in PROFILES:
         raise ValueError(f"未知布局 profile: {profile_name}")
+    library_path = library_cache_key(library_path)
     validate_config(config, library_path=library_path)
     shapes = load_library_shapes(library_path)
     nodes = resolve_nodes(
@@ -3141,7 +3142,7 @@ def generate_elk_layout(
 def _generate_elk_reference_layout(
     config: dict[str, dict[str, Any]],
     *,
-    library_path: str | Path,
+    library_path: LibrarySource,
     component_hints: dict[str, str] | None = None,
     profile_name: str = "readable",
 ) -> tuple[LayoutDocument, dict[str, Any]]:
@@ -3154,6 +3155,7 @@ def _generate_elk_reference_layout(
         raise ValueError("ELK 布局运行时不可用；发布包应包含 runtime/node 与 runtime/elk")
     node_executable, script, runtime_cwd = runtime
 
+    library_path = library_cache_key(library_path)
     validate_config(config, library_path=library_path)
     shapes = load_library_shapes(library_path)
     nodes = resolve_nodes(

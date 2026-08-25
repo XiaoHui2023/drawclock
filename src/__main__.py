@@ -22,8 +22,10 @@ def _build_parser() -> argparse.ArgumentParser:
         "-l",
         "--library",
         required=True,
-        metavar="FILE",
-        help="draw.io 器件库 XML",
+        action="append",
+        nargs="+",
+        metavar="PATH",
+        help="一个或多个 draw.io 器件库 XML 或目录；可重复指定",
     )
     parser.add_argument(
         "-o",
@@ -44,9 +46,10 @@ def _build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
     output = Path(args.output)
+    libraries = [path for group in args.library for path in group]
     try:
         config = load_clock_tree(args.input)
-        document, _ = generate_elk_layout(config, library_path=args.library)
+        document, _ = generate_elk_layout(config, library_path=libraries)
         apply_crossing_style(document, args.crossing_style)
         write_preview_svg(
             document,

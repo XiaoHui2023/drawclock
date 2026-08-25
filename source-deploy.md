@@ -1,21 +1,21 @@
 # 源码离线部署
 
-发行包内的 `src/`、`runtime/`、`vendor/wheels/` 和器件库支持断网运行。需要同平台的 CPython 3.10～3.14。
+发行包内的 `src/`、`runtime/` 和器件库支持断网运行。Python 运行代码只使用标准库，不需要安装第三方 Python 包。需要同平台的 CPython 3.10～3.14。
 
 ## Windows
 
 ```powershell
 py -3.11 -m venv .venv
-.venv\Scripts\python.exe -m pip install --no-index --find-links vendor\wheels -r requirements-offline.txt
-.venv\Scripts\python.exe src -i example\draw.json -l drawio-lib\drawclock.xml -o clock-tree.svg
+.venv\Scripts\python.exe -I -S src -i example\draw.json -l drawio-lib\drawclock.xml -o clock-tree.svg
 ```
 
 ## Linux
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install --no-index --find-links vendor/wheels -r requirements-offline.txt
-.venv/bin/python src -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg
+.venv/bin/python -I -S src -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg
 ```
 
-安装命令禁止访问软件源。`source-manifest.json` 记录源码和离线依赖文件的 SHA-256；文件缺失或损坏时应重新取得完整发行包。
+`runtime/` 中的 Node.js 与 ELK 负责自动分层和布线，发行包已随平台提供，无需单独安装。删除该运行时会失去自动布局能力。
+
+`source-manifest.json` 记录源码、运行时、器件库和示例文件的 SHA-256；文件缺失或损坏时重新取得完整发行包。

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the executable and an archive with offline source dependencies.
+# Build the executable and an archive with source and bundled layout runtime.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -84,7 +84,6 @@ ensure_venv
 "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall "pyinstaller>=6.0"
 npm install --ignore-scripts
 "${PYTHON_CMD[@]}" "$ROOT/tools/fetch_release_runtime.py"
-"${PYTHON_CMD[@]}" "$ROOT/tools/prepare_source_bundle.py"
 
 rm -rf "$ROOT/build" "$ROOT/dist"
 

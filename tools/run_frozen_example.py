@@ -92,6 +92,21 @@ def _draw(
     )
 
 
+def _write_split_libraries(target: Path) -> tuple[Path, Path]:
+    text = LIBRARY.read_text(encoding="utf-8").strip()
+    entries = json.loads(text[len("<mxlibrary>") : -len("</mxlibrary>")])
+    midpoint = len(entries) // 2
+    first = target / "first.xml"
+    second = target / "nested" / "second.xml"
+    second.parent.mkdir(parents=True, exist_ok=True)
+    for path, part in ((first, entries[:midpoint]), (second, entries[midpoint:])):
+        path.write_text(
+            "<mxlibrary>" + json.dumps(part, ensure_ascii=False) + "</mxlibrary>",
+            encoding="utf-8",
+        )
+    return first, second.parent
+
+
 def _named_node_xs(path: Path, names: tuple[str, ...]) -> dict[str, float]:
     root = ET.fromstring(path.read_text(encoding="utf-8"))
     x_by_name: dict[str, float] = {}
@@ -167,23 +182,40 @@ def main() -> int:
             f"root={root_x}, mux={mux_x}, clock={clock_x}"
         )
 
-    formats = {
-        "json": '{"osc":{"kind":"source"}}',
-        "jsonc": '{// source\n"osc":{"kind":"source"}}',
-        "json5": "{'osc':{kind:'source'}}",
-        "toml": '[osc]\nkind="source"\n',
-        "yaml": "osc:\n  kind: source\n",
-        "yml": "osc:\n  kind: source\n",
-        "ini": "[osc]\nkind=source\n",
-        "conf": "[osc]\nkind=source\n",
-        "config": "[osc]\nkind=source\n",
-    }
-    for suffix, content in formats.items():
-        config_path = out / f"frozen-input.{suffix}"
-        image_path = out / f"frozen-input-{suffix}.svg"
-        config_path.write_text(content, encoding="utf-8")
-        _run(binary, ["-i", str(config_path), "-l", str(LIBRARY), "-o", str(image_path)])
-        _assert_svg(image_path, nodes=1, edges=0)
+    strict_json = out / "frozen-input.json"
+    strict_json.write_text('{"osc":{"kind":"source"}}', encoding="utf-8")
+    strict_output = out / "frozen-input-json.svg"
+    _run(binary, ["-i", str(strict_json), "-l", str(LIBRARY), "-o", str(strict_output)])
+    _assert_svg(strict_output, nodes=1, edges=0)
+
+    for suffix in ("jsonc", "json5", "toml", "yaml", "yml", "ini", "conf", "config"):
+        config_path = out / f"rejected-input.{suffix}"
+        config_path.write_text("{}", encoding="utf-8")
+        _run(
+            binary,
+            ["-i", str(config_path), "-l", str(LIBRARY), "-o", str(out / "rejected.svg")],
+            expect_success=False,
+        )
+
+    split_root = out / "split-libraries"
+    split_root.mkdir(parents=True, exist_ok=True)
+    first_library, library_directory = _write_split_libraries(split_root)
+    split_output = out / "split-libraries.svg"
+    _run(
+        binary,
+        [
+            "-i", str(DRAW_EXAMPLE),
+            "-l", str(first_library),
+            "-l", str(library_directory),
+            "-o", str(split_output),
+        ],
+    )
+    split_config = json.loads(DRAW_EXAMPLE.read_text(encoding="utf-8"))
+    _assert_svg(
+        split_output,
+        nodes=len(split_config),
+        edges=_edge_count(split_config),
+    )
 
     for removed in ("draw", "extract", "reload", "run", "drawio-to-json"):
         _run(binary, [removed], expect_success=False)

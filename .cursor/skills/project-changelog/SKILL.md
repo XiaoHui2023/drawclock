@@ -10,6 +10,9 @@ description: >-
 
 ## 2026-08-25
 
+- **JSON 与依赖收敛**：输入只接受严格 JSON，改用 Python 标准库解析；删除 config-library 及 JSON5、YAML、TOML 等传递依赖，源码运行时不再需要第三方 Python 包。
+- **多器件库合并**：`--library` 接受多个 XML 文件和目录并可重复填写；目录递归扫描 XML，输入稳定去重，同名器件冲突直接报错。
+- **源码发行简化**：发行包删除 requirements、wheelhouse 和依赖准备脚本；源码门在空虚拟环境中以 `-I -S` 运行，并验证严格 JSON 与文件、目录混合器件库。
 - **离线源码发行**：压缩包保留仓库 `src/` 名字，加入目标平台 CPython 3.10～3.14 固定版本 wheelhouse、源码部署说明和逐文件 SHA-256 清单；源码运行直接使用包内 Node.js 与 ELK。
 - **源码消费门**：CI 从解压包创建空虚拟环境，以 `--no-index` 安装包内依赖并通过 `python src` 生成 SVG；故障注入覆盖源码篡改和 wheel 缺失，冻结程序门仍独立执行。
 - **五件套迁移**：按当前用户根规则增加 `project-worklog`，预加载、设计笔记、changelog、目标和工作记录统一纳入仓库。

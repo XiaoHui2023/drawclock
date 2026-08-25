@@ -11,7 +11,13 @@ from typing import Any, Iterable
 
 from config_input import load_config
 from drawio_layout import EdgeLayout, LAYOUT_VERSION, LayoutDocument, VertexLayout
-from drawio_library import LibraryShape, canonical_object_attrs, load_library_shapes
+from drawio_library import (
+    LibraryShape,
+    LibrarySource,
+    canonical_object_attrs,
+    library_cache_key,
+    load_library_shapes,
+)
 from drawio_ports import EDGE_DRAW_STYLE, abs_port_xy, port_anchors
 from source_reference import parse_source_ref
 from internal_kind import INTERNAL_OBJECT_KEYS
@@ -143,7 +149,7 @@ def resolve_nodes(
     shapes: dict[str, LibraryShape],
     hints: dict[str, str],
     *,
-    library_path: str | Path,
+    library_path: LibrarySource,
 ) -> dict[str, ResolvedNode]:
     unknown_hints = sorted(set(hints) - set(config))
     if unknown_hints:
@@ -174,7 +180,7 @@ def _connection_port(mapping: dict[str, str], key: str, *, context: str) -> str:
 def build_logical_edges(
     config: dict[str, dict[str, Any]],
     nodes: dict[str, ResolvedNode],
-    library_path: str | Path,
+    library_path: LibrarySource,
 ) -> list[LogicalEdge]:
     edges: list[LogicalEdge] = []
     for target, item in config.items():
@@ -809,7 +815,7 @@ def _route_edges(
 def _vertex_layouts(
     nodes: dict[str, ResolvedNode],
     positions: dict[str, tuple[float, float]],
-    library_path: str | Path,
+    library_path: LibrarySource,
 ) -> list[VertexLayout]:
     vertices: list[VertexLayout] = []
     for name, node in nodes.items():
@@ -1068,7 +1074,7 @@ def _metric_vector(report: dict[str, Any]) -> tuple[float, ...]:
 def generate_layout(
     config: dict[str, dict[str, Any]],
     *,
-    library_path: str | Path,
+    library_path: LibrarySource,
     component_hints: dict[str, str] | None = None,
     profile_name: str = "readable",
     candidate_limit: int = 6,
@@ -1078,6 +1084,7 @@ def generate_layout(
         raise ValueError(f"未知布局 profile: {profile_name}")
     if not 1 <= candidate_limit <= 6:
         raise ValueError("candidate_limit 必须在 1..6")
+    library_path = library_cache_key(library_path)
     validate_config(config, library_path=library_path)
     shapes = load_library_shapes(library_path)
     nodes = resolve_nodes(

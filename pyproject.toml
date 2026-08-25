@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "从时钟连接配置生成 SVG 时钟图"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = ["config-library[json5,toml,yaml]==0.18.1"]
+dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0"]

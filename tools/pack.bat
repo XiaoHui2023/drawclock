@@ -1,5 +1,5 @@
 @echo off
-rem Build the executable and an archive with offline source dependencies.
+rem Build the executable and an archive with source and bundled layout runtime.
 cd /d "%~dp0\.."
 
 if not exist ".venv\Scripts\python.exe" (
@@ -17,9 +17,6 @@ call npm install --ignore-scripts
 if errorlevel 1 exit /b 1
 %PY% tools\fetch_release_runtime.py
 if errorlevel 1 exit /b 1
-%PY% tools\prepare_source_bundle.py
-if errorlevel 1 exit /b 1
-
 if exist build rmdir /s /q build
 if exist dist rmdir /s /q dist
 

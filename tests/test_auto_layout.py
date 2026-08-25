@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from auto_layout import generate_layout, load_clock_tree
+from drawio_library import load_library_shapes
 from elk_layout import generate_elk_layout
 from library_payload import compress_diagram_payload, decompress_diagram_payload
 from drawio_layout import apply_crossing_style, layout_to_dict
@@ -294,23 +295,119 @@ def test_agent_quality_facilities_are_not_public_cli_features() -> None:
         assert removed not in root_help
 
 
-@pytest.mark.parametrize(
-    ("suffix", "content"),
-    [
-        (".json", '{"晶振":{"kind":"source","source_kind":"source"}}'),
-        (".jsonc", '{// clock source\n"晶振":{"kind":"source","source_kind":"source"}}'),
-        (".json5", "{'晶振':{kind:'source',source_kind:'source'}}"),
-        (".toml", '["晶振"]\nkind="source"\nsource_kind="source"\n'),
-        (".yaml", "晶振:\n  kind: source\n  source_kind: source\n"),
-        (".ini", "[晶振]\nkind=source\nsource_kind=source\n"),
-    ],
-)
-def test_clock_tree_input_formats(suffix: str, content: str, tmp_path: Path) -> None:
-    source = tmp_path / f"clock-tree{suffix}"
-    source.write_text(content, encoding="utf-8")
+def test_clock_tree_accepts_strict_json_with_utf8_bom(tmp_path: Path) -> None:
+    source = tmp_path / "clock-tree.json"
+    source.write_text(
+        '{"晶振":{"kind":"source","source_kind":"source"}}',
+        encoding="utf-8-sig",
+    )
     assert load_clock_tree(source) == {
         "晶振": {"kind": "source", "source_kind": "source"}
     }
+
+
+@pytest.mark.parametrize("suffix", [".jsonc", ".json5", ".toml", ".yaml", ".ini"])
+def test_clock_tree_rejects_non_json_suffixes(suffix: str, tmp_path: Path) -> None:
+    source = tmp_path / f"clock-tree{suffix}"
+    source.write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError, match=r"只支持：\.json"):
+        load_clock_tree(source)
+
+
+def test_clock_tree_rejects_json_comments_and_non_object_root(tmp_path: Path) -> None:
+    commented = tmp_path / "commented.json"
+    commented.write_text('{// comment\n"osc": {}}', encoding="utf-8")
+    with pytest.raises(ValueError, match="无法读取拓扑配置"):
+        load_clock_tree(commented)
+    array = tmp_path / "array.json"
+    array.write_text("[]", encoding="utf-8")
+    with pytest.raises(ValueError, match="JSON 顶层必须是对象"):
+        load_clock_tree(array)
+
+
+def _write_split_library(path: Path, titles: set[str]) -> None:
+    text = LIBRARY.read_text(encoding="utf-8").strip()
+    entries = json.loads(text[len("<mxlibrary>") : -len("</mxlibrary>")])
+    selected = [entry for entry in entries if entry.get("title") in titles]
+    assert {entry["title"] for entry in selected} == titles
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        "<mxlibrary>" + json.dumps(selected, ensure_ascii=False) + "</mxlibrary>",
+        encoding="utf-8",
+    )
+
+
+def test_multiple_library_files_and_directories_merge_for_layout(tmp_path: Path) -> None:
+    first_dir = tmp_path / "first"
+    second_dir = tmp_path / "second"
+    source_file = first_dir / "source.xml"
+    gate_file = second_dir / "nested" / "gate.xml"
+    clock_file = tmp_path / "clock.xml"
+    _write_split_library(source_file, {"source"})
+    _write_split_library(gate_file, {"gate"})
+    _write_split_library(clock_file, {"clock"})
+
+    libraries = [first_dir, clock_file, second_dir, clock_file]
+    shapes = load_library_shapes(libraries)
+    assert set(shapes) == {"source", "gate", "clock"}
+    document, _ = generate_elk_layout(_linear_config(), library_path=libraries)
+    assert len(document.vertices) == 3
+
+
+def test_multiple_library_inputs_reject_invalid_paths_and_duplicate_titles(
+    tmp_path: Path,
+) -> None:
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    with pytest.raises(ValueError, match="没有 XML"):
+        load_library_shapes(empty)
+    with pytest.raises(FileNotFoundError, match="路径不存在"):
+        load_library_shapes(tmp_path / "missing")
+    wrong = tmp_path / "library.txt"
+    wrong.write_text("[]", encoding="utf-8")
+    with pytest.raises(ValueError, match="必须是 XML"):
+        load_library_shapes(wrong)
+
+    first = tmp_path / "first.xml"
+    second = tmp_path / "second.xml"
+    _write_split_library(first, {"source"})
+    _write_split_library(second, {"source"})
+    with pytest.raises(ValueError, match="重复 title source"):
+        load_library_shapes([first, second])
+
+
+def test_cli_accepts_repeated_mixed_library_files_and_directories(
+    tmp_path: Path,
+) -> None:
+    first_dir = tmp_path / "first"
+    second_dir = tmp_path / "second"
+    clock_file = tmp_path / "clock.xml"
+    _write_split_library(first_dir / "source.xml", {"source"})
+    _write_split_library(second_dir / "nested" / "gate.xml", {"gate"})
+    _write_split_library(clock_file, {"clock"})
+    input_path = tmp_path / "linear.json"
+    input_path.write_text(json.dumps(_linear_config()), encoding="utf-8")
+    output = tmp_path / "mixed-libraries.svg"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(SRC_DIR),
+            "-i",
+            str(input_path),
+            "-l",
+            str(first_dir),
+            str(clock_file),
+            "-l",
+            str(second_dir),
+            "-o",
+            str(output),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert "<svg " in output.read_text(encoding="utf-8")
 
 
 def test_layout_uses_kind_metadata_and_geometry_from_supplied_library(

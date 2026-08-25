@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 from device_attrs_validate import collect_device_attr_errors
+from drawio_library import LibrarySource, library_cache_key
 from source_reference import parse_source_ref
 from library_ports import output_connection_key_suffixes
 
@@ -11,8 +11,9 @@ from library_ports import output_connection_key_suffixes
 def validate_config(
   config: dict[str, dict[str, Any]],
   *,
-  library_path: str | Path,
+  library_path: LibrarySource,
 ) -> None:
+  library_path = library_cache_key(library_path)
   errors: list[str] = []
   errors.extend(collect_device_attr_errors(config))
   device_names = set(config.keys())

@@ -12,13 +12,14 @@ description: >-
 - 唯一入口是 `python src` 或安装后的 `drawclock`。绘图是主功能，无子命令。
 - 必填参数为 `-i/--input`、`-l/--library`、`-o/--output`；`--crossing-style` 保留 `arc`、`gap`、`sharp`、`none`，默认 `arc`。
 - 输出内容始终是 SVG，文件后缀不改变格式。
-- 配置由 configlib 读取，支持 JSON、JSONC、JSON5、TOML、YAML、YML、INI、CONF 和 CONFIG。
+- 配置只接受严格 JSON，由 Python 标准库 `json` 读取，不含第三方 Python 运行时依赖。
 - v0.0.0 tag 与 Release 保存旧的 extract/reload 版本；v1.0.0 起源码、CLI、示例、测试和发行包只含绘图功能。
 
 ## 配置与器件库
 
 - 顶层字典键是实例名。每个器件只要求 `kind`；根器件可以省略 `source`。
 - `kind` 直接对应 `--library` 中的器件 title，不按名字、连接端口或内置器件表猜测。
+- `--library` 接受一个或多个 XML 文件和目录，也可以重复指定；目录递归扫描 XML，按稳定路径顺序合并。相同文件去重，不同文件出现同名 title 时报错。
 - 多输入器件的 `source` 使用稀疏字典，未列出的有效输入端口可以不连接。
 - 多输出引用写成 `器件名[输出键]`。
 - `component`、`*_kind`、`freq`、`ratio` 等不是通用必填字段；附加属性由当前器件库定义。
@@ -51,11 +52,11 @@ description: >-
 ## 发布
 
 - PyInstaller 可执行文件随包带 Node.js 与 ELK 运行时，不依赖宿主 PATH。
-- 发行包包含主程序、runtime、原始 `src/`、目标平台 CPython 3.10～3.14 离线 wheelhouse、`drawio-lib/`、示例和源码部署说明。
-- 源码部署只要求同平台 CPython；pip 强制 `--no-index`，源码从发行目录 `runtime/` 加载 Node.js 与 ELK。
-- `source-manifest.json` 记录源码、wheelhouse、器件库、示例与运行时清单的 SHA-256，缺失和篡改均阻断源码消费门。
-- 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、所有配置格式、默认圆弧、示例、复杂图和 512 时钟压力图。
-- 同一解压包还要创建空虚拟环境，只安装包内 wheel，并通过 `python src` 生成可解析的 SVG。
+- 发行包包含主程序、runtime、原始 `src/`、`drawio-lib/`、示例和源码部署说明，不含 Python wheelhouse 或依赖清单。
+- 源码部署只要求同平台 CPython；以 `-I -S` 禁用用户目录和 site-packages 后，源码仍从发行目录 `runtime/` 加载 Node.js 与 ELK。
+- `source-manifest.json` 记录源码、器件库、示例与运行时清单的 SHA-256，缺失和篡改均阻断源码消费门。
+- 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、严格 JSON 拒绝规则、文件与目录混合器件库、默认圆弧、示例、复杂图和 512 时钟压力图。
+- 同一解压包还要创建空虚拟环境，通过 `python -I -S src` 生成可解析的 SVG，证明源码不借用第三方 Python 包。
 - 每次修改通过检查后读取用户根 `github-upload` 与 `github-release` 规则，提交、推送并发布当前 `pyproject.toml` 版本。
 
 ## 用户文档

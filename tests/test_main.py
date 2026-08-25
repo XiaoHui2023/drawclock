@@ -80,18 +80,10 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     (project / ".runtime" / "node").mkdir(parents=True)
     (project / ".runtime" / "runtime-manifest.json").write_text("{}\n", encoding="utf-8")
     (project / ".runtime" / "node" / "node.exe").touch()
-    (project / ".source-wheelhouse").mkdir()
-    (project / ".source-wheelhouse" / "wheelhouse-manifest.json").write_text(
-        '{}\n', encoding="utf-8"
-    )
-    (project / ".source-wheelhouse" / "dependency-1-py3-none-any.whl").touch()
     (project / "dist" / "drawclock.exe").write_text("", encoding="utf-8")
     (project / "README.md").write_text("", encoding="utf-8")
     (project / "draw.md").write_text("", encoding="utf-8")
     (project / "source-deploy.md").write_text("", encoding="utf-8")
-    (project / "requirements-offline.txt").write_text(
-        "dependency==1\n", encoding="utf-8"
-    )
     (project / "example" / "draw.json").write_text("{}", encoding="utf-8")
     packaged_layout_examples = (
         "01-linear.json",
@@ -123,9 +115,8 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     assert prefix + "src/__main__.py" in names
     assert prefix + "source/__main__.py" not in names
     assert prefix + "source-deploy.md" in names
-    assert prefix + "requirements-offline.txt" in names
-    assert prefix + "vendor/wheels/wheelhouse-manifest.json" in names
-    assert prefix + "vendor/wheels/dependency-1-py3-none-any.whl" in names
+    assert prefix + "requirements-offline.txt" not in names
+    assert not any("vendor/wheels/" in name for name in names)
     assert prefix + "source-manifest.json" in names
     assert not any(".egg-info/" in name for name in names)
     assert prefix + "json.md" not in names
@@ -133,7 +124,9 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     assert not any("reload" in name or "extract" in name for name in names)
 
 
-def test_source_manifest_rejects_missing_or_modified_source(tmp_path: Path) -> None:
+def test_source_manifest_rejects_missing_or_modified_source(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
     spec = importlib.util.spec_from_file_location(
         "run_source_release", ROOT / "tools" / "run_source_release.py"
     )
@@ -141,11 +134,14 @@ def test_source_manifest_rejects_missing_or_modified_source(tmp_path: Path) -> N
     gate = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(gate)
 
+    monkeypatch.setattr(gate.sys, "platform", "win32")
+    assert gate._venv_python(tmp_path / "venv") == tmp_path / "venv/Scripts/python.exe"
+    monkeypatch.setattr(gate.sys, "platform", "linux")
+    assert gate._venv_python(tmp_path / "venv") == tmp_path / "venv/bin/python"
+
     root = tmp_path / "release"
     files = {
         "src/__main__.py": b"print('ok')\n",
-        "vendor/wheels/wheelhouse-manifest.json": b"{}\n",
-        "requirements-offline.txt": b"dependency==1\n",
         "runtime/runtime-manifest.json": b"{}\n",
         "drawio-lib/drawclock.xml": b"<mxlibrary/>\n",
         "example/draw.json": b"{}\n",
@@ -171,6 +167,11 @@ def test_source_manifest_rejects_missing_or_modified_source(tmp_path: Path) -> N
         gate.validate_source_manifest(root)
 
     (root / "src" / "__main__.py").write_bytes(files["src/__main__.py"])
-    (root / "vendor" / "wheels" / "wheelhouse-manifest.json").unlink()
+    (root / "vendor" / "wheels").mkdir(parents=True)
+    with pytest.raises(ValueError, match="legacy Python runtime dependencies"):
+        gate.validate_source_manifest(root)
+
+    (root / "vendor" / "wheels").rmdir()
+    (root / "runtime" / "runtime-manifest.json").unlink()
     with pytest.raises(ValueError, match="paths differ"):
         gate.validate_source_manifest(root)

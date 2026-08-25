@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
 import pathlib
 import subprocess
 import sys
@@ -28,17 +27,21 @@ def validate_source_manifest(root: pathlib.Path) -> None:
         raise ValueError("source manifest has no files")
     actual_paths = {
         path.relative_to(root).as_posix()
-        for base in (root / "src", root / "vendor" / "wheels")
+        for base in (root / "src",)
         for path in base.rglob("*")
         if path.is_file()
     }
     required_paths = {
-        "requirements-offline.txt",
         "runtime/runtime-manifest.json",
         "drawio-lib/drawclock.xml",
         "example/draw.json",
     }
-    actual_paths.update(required_paths)
+    actual_paths.update(
+        relative for relative in required_paths if (root / relative).is_file()
+    )
+    legacy_paths = (root / "requirements-offline.txt", root / "vendor" / "wheels")
+    if any(path.exists() for path in legacy_paths):
+        raise ValueError("release still contains legacy Python runtime dependencies")
     if set(expected) != actual_paths:
         missing = sorted(set(expected) - actual_paths)
         extra = sorted(actual_paths - set(expected))
@@ -50,7 +53,7 @@ def validate_source_manifest(root: pathlib.Path) -> None:
 
 
 def _venv_python(venv: pathlib.Path) -> pathlib.Path:
-    return venv / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+    return venv / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
 
 
 def main() -> int:
@@ -63,32 +66,12 @@ def main() -> int:
         venv = pathlib.Path(temp) / "venv"
         subprocess.run([sys.executable, "-m", "venv", str(venv)], check=True)
         python = _venv_python(venv)
-        env = os.environ.copy()
-        env.update({
-            "PIP_NO_INDEX": "1",
-            "PIP_CONFIG_FILE": os.devnull,
-            "PYTHONNOUSERSITE": "1",
-        })
-        subprocess.run(
-            [
-                str(python),
-                "-m",
-                "pip",
-                "install",
-                "--no-index",
-                "--find-links",
-                str(root / "vendor" / "wheels"),
-                "-r",
-                str(root / "requirements-offline.txt"),
-            ],
-            cwd=root,
-            env=env,
-            check=True,
-        )
         output = pathlib.Path(temp) / "source-smoke.svg"
         subprocess.run(
             [
                 str(python),
+                "-I",
+                "-S",
                 str(root / "src"),
                 "-i",
                 str(root / "example" / "draw.json"),
@@ -98,7 +81,6 @@ def main() -> int:
                 str(output),
             ],
             cwd=temp,
-            env=env,
             check=True,
         )
         svg = ET.fromstring(output.read_text(encoding="utf-8"))

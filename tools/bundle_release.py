@@ -19,7 +19,6 @@ RELEASE_PATHS = (
     "README.md",
     "draw.md",
     "pyproject.toml",
-    "requirements-offline.txt",
     "source-deploy.md",
     "drawio-lib",
     "example/draw.json",
@@ -35,7 +34,6 @@ SOURCE_PATHS = (
 )
 
 RUNTIME_PATH = ".runtime"
-WHEELHOUSE_PATH = ".source-wheelhouse"
 
 
 def _sha256(path: pathlib.Path) -> str:
@@ -114,12 +112,6 @@ def main() -> int:
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dest)
 
-    wheelhouse = ROOT / WHEELHOUSE_PATH
-    if not (wheelhouse / "wheelhouse-manifest.json").is_file():
-        print("错误: 离线源码依赖未准备完成。", file=sys.stderr)
-        return 1
-    shutil.copytree(wheelhouse, bundle_dir / "vendor" / "wheels")
-
     runtime = ROOT / RUNTIME_PATH
     if not (runtime / "runtime-manifest.json").is_file():
         print("错误: 发布运行时未准备完成。", file=sys.stderr)
@@ -128,14 +120,13 @@ def main() -> int:
 
     manifest_paths = [
         path
-        for base in (bundle_dir / "src", bundle_dir / "vendor" / "wheels")
+        for base in (bundle_dir / "src",)
         for path in base.rglob("*")
         if path.is_file()
     ]
     manifest_paths.extend(
         bundle_dir / relative
         for relative in (
-            "requirements-offline.txt",
             "runtime/runtime-manifest.json",
             "drawio-lib/drawclock.xml",
             "example/draw.json",

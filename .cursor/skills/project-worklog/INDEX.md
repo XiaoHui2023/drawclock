@@ -4,3 +4,6 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | `records/offline-source-release.md` | record | done | 2026-08-25 11:19 +08:00 | 2026-08-25 12:10 +08:00 | 发行包源码离线部署 | 记录源码结构、离线依赖、包消费门和发布状态。 |
 | `analysis/offline-source-gap.md` | analysis | done | 2026-08-25 11:19 +08:00 | 2026-08-25 11:55 +08:00 | 现有发行包缺口分析 | 当前包含源码参考，但目录名和依赖材料不能支持断网源码运行。 |
+| `records/json-only-zero-dependencies.md` | record | active | 2026-08-25 14:00 +08:00 | 2026-08-25 15:33 +08:00 | JSON-only 零依赖收敛 | 记录输入格式、依赖删除、源码消费和发布状态。 |
+| `analysis/json-only-dependency-pruning.md` | analysis | done | 2026-08-25 14:00 +08:00 | 2026-08-25 14:00 +08:00 | 配置依赖裁剪分析 | 严格 JSON 可由标准库解析，ELK 运行时与配置依赖分离。 |
+| `records/multiple-library-inputs.md` | record | active | 2026-08-25 14:03 +08:00 | 2026-08-25 15:41 +08:00 | 多器件库输入与合并 | 记录 CLI 多值、目录扫描、合并冲突和端到端发布状态。 |
