@@ -1,5 +1,5 @@
 @echo off
-rem Build one PyInstaller executable and assemble the release archive.
+rem Build the executable and an archive with offline source dependencies.
 cd /d "%~dp0\.."
 
 if not exist ".venv\Scripts\python.exe" (
@@ -16,6 +16,8 @@ if errorlevel 1 %PY% -m pip install -q --upgrade --force-reinstall -e .
 call npm install --ignore-scripts
 if errorlevel 1 exit /b 1
 %PY% tools\fetch_release_runtime.py
+if errorlevel 1 exit /b 1
+%PY% tools\prepare_source_bundle.py
 if errorlevel 1 exit /b 1
 
 if exist build rmdir /s /q build

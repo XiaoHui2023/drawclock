@@ -11,6 +11,7 @@ work/
 node_modules/
 .runtime/
 .runtime-cache/
+.source-wheelhouse/
 *.egg-info/
 .cursor/*
 !.cursor/skills/
@@ -23,6 +24,8 @@ node_modules/
 !.cursor/skills/project-changelog/**
 !.cursor/skills/project-goals/
 !.cursor/skills/project-goals/**
+!.cursor/skills/project-worklog/
+!.cursor/skills/project-worklog/**
 !.cursor/skills/drawclock-drawio-pitfalls/
 !.cursor/skills/drawclock-drawio-pitfalls/**
 *.drawio.bak

@@ -8,6 +8,12 @@ description: >-
 
 （规则见 `~/.cursor/skills/agent-project-changelog/SKILL.md`。）
 
+## 2026-08-25
+
+- **离线源码发行**：压缩包保留仓库 `src/` 名字，加入目标平台 CPython 3.10～3.14 固定版本 wheelhouse、源码部署说明和逐文件 SHA-256 清单；源码运行直接使用包内 Node.js 与 ELK。
+- **源码消费门**：CI 从解压包创建空虚拟环境，以 `--no-index` 安装包内依赖并通过 `python src` 生成 SVG；故障注入覆盖源码篡改和 wheel 缺失，冻结程序门仍独立执行。
+- **五件套迁移**：按当前用户根规则增加 `project-worklog`，预加载、设计笔记、changelog、目标和工作记录统一纳入仓库。
+
 ## 2026-08-14
 
 - **四件套统一**：项目入口固定为 `project-preload-skills`、`project-design-notes`、`project-changelog`、`project-goals`，旧的 `python-project-*` 目录已迁移并删除。四件套加入版本控制，克隆仓库后可以直接运行统一检查器。

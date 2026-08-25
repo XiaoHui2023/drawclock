@@ -77,6 +77,23 @@ def test_elk_runtime_uses_original_staticx_program_path(
     assert elk_layout._elk_runtime() == (str(node), script, runtime / "elk")
 
 
+def test_elk_runtime_discovers_release_runtime_from_source(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    runtime = tmp_path / "runtime"
+    node = runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node")
+    script = runtime / "elk" / "elk_layout.mjs"
+    bundled = runtime / "elk" / "node_modules" / "elkjs" / "lib" / "elk.bundled.js"
+    for path in (node, script, bundled):
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.touch()
+    monkeypatch.setattr(elk_layout, "__file__", str(tmp_path / "src" / "elk_layout.py"))
+    monkeypatch.setattr(elk_layout.sys, "frozen", False, raising=False)
+    monkeypatch.setattr(elk_layout.shutil, "which", lambda _name: None)
+
+    assert elk_layout._elk_runtime() == (str(node), script, runtime / "elk")
+
+
 @pytest.mark.skipif(not elk_layout_available(), reason="ELK Node.js dependency is unavailable")
 def test_elk_exact_ports_and_lines_are_deterministic() -> None:
     _, first, _, quality = _generate("06-simple-16-clocks")

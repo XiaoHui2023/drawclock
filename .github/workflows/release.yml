@@ -30,6 +30,12 @@ jobs:
           test -n "$BINARY"
           python3 tools/run_frozen_example.py "$BINARY"
 
+      - name: Run extracted offline source deployment
+        run: |
+          PACKAGE_ROOT="$(find release-smoke -mindepth 1 -maxdepth 1 -type d -print -quit)"
+          test -n "$PACKAGE_ROOT"
+          python3 tools/run_source_release.py "$PACKAGE_ROOT"
+
       - name: Upload Linux release artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -90,10 +96,13 @@ jobs:
           name: ${{ steps.version.outputs.tag }}
           body: |
             Rolling release: self-contained Ubuntu 16.04 PyInstaller bundle from the main commit.
-            The archive includes pinned Node.js and ELK layout runtimes.
+            The archive includes the complete source tree, offline CPython 3.10-3.14 dependency
+            wheels, pinned Node.js and ELK layout runtimes.
             Before publishing, CI extracts the archive and exercises the frozen executable with the
             host PATH isolated for direct SVG generation under arbitrary output suffixes,
             supplied-library rendering, supported config formats, and large-layout bounds checks.
+            CI also creates a clean virtual environment, installs only from the archive wheelhouse,
+            and generates SVG through the extracted source tree.
           files: release-assets/**
           fail_on_unmatched_files: true
           generate_release_notes: false

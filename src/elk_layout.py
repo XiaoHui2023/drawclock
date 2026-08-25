@@ -48,6 +48,7 @@ def _elk_runtime() -> tuple[str, Path, Path] | None:
     if getattr(sys, "frozen", False):
         runtime_roots.append(Path(sys.executable).resolve().parent / "runtime")
     runtime_roots.append(project_root / ".runtime")
+    runtime_roots.append(project_root / "runtime")
     node_name = Path("node/node.exe") if sys.platform == "win32" else Path("node/bin/node")
     for root in runtime_roots:
         node = root / node_name

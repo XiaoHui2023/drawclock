@@ -51,8 +51,11 @@ description: >-
 ## 发布
 
 - PyInstaller 可执行文件随包带 Node.js 与 ELK 运行时，不依赖宿主 PATH。
-- 发行包包含主程序、runtime、`drawio-lib/`、`example/draw.json`、README、`draw.md` 和源码参考。
+- 发行包包含主程序、runtime、原始 `src/`、目标平台 CPython 3.10～3.14 离线 wheelhouse、`drawio-lib/`、示例和源码部署说明。
+- 源码部署只要求同平台 CPython；pip 强制 `--no-index`，源码从发行目录 `runtime/` 加载 Node.js 与 ELK。
+- `source-manifest.json` 记录源码、wheelhouse、器件库、示例与运行时清单的 SHA-256，缺失和篡改均阻断源码消费门。
 - 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、所有配置格式、默认圆弧、示例、复杂图和 512 时钟压力图。
+- 同一解压包还要创建空虚拟环境，只安装包内 wheel，并通过 `python src` 生成可解析的 SVG。
 - 每次修改通过检查后读取用户根 `github-upload` 与 `github-release` 规则，提交、推送并发布当前 `pyproject.toml` 版本。
 
 ## 用户文档
@@ -63,3 +66,4 @@ description: >-
 | `draw.md` | 参数、通用配置规则和使用示范 |
 | `example/README.md` | `example/` 内配置与运行命令 |
 | `example/auto-layout/README.md` | 各布局与压力配置覆盖范围 |
+| `source-deploy.md` | 发行包断网源码部署命令与 Python 版本边界 |

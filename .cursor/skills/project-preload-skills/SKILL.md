@@ -1,7 +1,7 @@
 ---
 name: project-preload-skills
 description: >-
-  drawclock 会话预加载顺序与用过的 skill 记录；与设计笔记、changelog、目标组成四件套。
+  drawclock 会话预加载顺序与用过的 skill 记录；与设计笔记、changelog、目标、工作记录组成五件套。
 ---
 
 # 会话清单（drawclock）
@@ -13,12 +13,14 @@ description: >-
 ### 每会话起手（固定）
 
 1. `~/.cursor/skills/project-skill-manifest-policy/SKILL.md`
-2. `~/.cursor/skills/doc-surface-roles-zh/SKILL.md`（**必须**；体裁：写什么 / 不写什么）
-3. `~/.cursor/skills/forbidden-doc-comment-vocabulary/SKILL.md`（**必须**；交稿前检索禁用词）
-4. `~/.cursor/skills/markdown-authoring-zh/SKILL.md`（**必须**）
-5. `.cursor/skills/project-design-notes/SKILL.md`（含用户向文档分工）
-6. `.cursor/skills/project-changelog/SKILL.md`（口径有疑或刚变更时）
-7. `.cursor/skills/project-goals/SKILL.md`
+2. `~/.cursor/skills/project-evolution-engine/SKILL.md`
+3. `~/.cursor/skills/doc-surface-roles-zh/SKILL.md`（**必须**；体裁：写什么 / 不写什么）
+4. `~/.cursor/skills/forbidden-doc-comment-vocabulary/SKILL.md`（**必须**；交稿前检索禁用词）
+5. `~/.cursor/skills/markdown-authoring-zh/SKILL.md`（**必须**）
+6. `.cursor/skills/project-design-notes/SKILL.md`（含用户向文档分工）
+7. `.cursor/skills/project-changelog/SKILL.md`（口径有疑或刚变更时）
+8. `.cursor/skills/project-goals/SKILL.md`
+9. `.cursor/skills/project-worklog/SKILL.md` 与 `INDEX.md`
 
 ### 改用户向 `*.md` 时（同轮追加）
 
@@ -54,7 +56,7 @@ description: >-
 - 需求、设计或验收变化时，当轮更新 **project-design-notes** 与 **project-changelog**；矛盾以 changelog 最新记录为准。
 - 改 draw.io 库：**Read drawclock-drawio-pitfalls** → 改 `scripts/drawio_lib/components/` → `python scripts/build_drawio_lib.py` → `pytest tests/test_label_overflow.py` 等 → `check OK` → **强制回写 drawclock-drawio-pitfalls**（见该 skill「改完必回写 skill」节）；决议级变更同步 changelog。
 
-## 项目内四件套
+## 项目内五件套
 
 | Skill | 职责 |
 | --- | --- |
@@ -62,6 +64,7 @@ description: >-
 | **project-design-notes** | drawclock 产品与器件设计 |
 | **project-changelog** | 按时间的决议 |
 | **project-goals** | 当前目标与验收证据 |
+| **project-worklog** | INDEX 管理的工作记录、分析和草稿 |
 | **drawclock-drawio-pitfalls** | 图形库画布五条易错点 + 改后验收（非三件套，专档） |
 
 同一职责只保留一个目录；同伴规范只在 `~/.cursor/skills/`。
@@ -81,8 +84,8 @@ description: >-
 
 ## 目录约定
 
-- 四件套目录名固定为表中四项，不按语言增加前缀。
-- 项目类型只影响预加载列表，不改变四件套路径。
+- 五件套目录名固定为表中五项，不按语言增加前缀。
+- 项目类型只影响预加载列表，不改变五件套路径。
 - 同伴 skill 只放在 `~/.cursor/skills/`，不在仓库中复制。
 
 ## 用过的 skill（追加记录）
@@ -110,3 +113,5 @@ description: >-
 - `verify-fix-repeat`、`skill-lesson-curation`、`agent-project-goals`（重复视觉缺陷、经验归档与目标证据）
 - `doc-surface-cli-tool-zh`、`markdown-authoring-zh`（更新 draw 专档）
 - `api-documentation-contract`、`python-doc-comments`、`doc-surface-topic-page-zh`、`doc-surface-subdir-readme-zh`（`layout_column` 配置接口、源码说明与示例文档）
+- `agent-project-worklog`、`agent-project-init`、`project-evolution-engine`（五件套迁移、任务记录与项目演进门）
+- `quality-oracle-integrity`、`test-coverage-discovery`（离线源码部署门、故障注入与独立浏览器 oracle）

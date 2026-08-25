@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -35,8 +36,16 @@ PORT_TOLERANCE_PX = 0.03
 
 def _edge_dump_dom(page: Path) -> str:
     assert BROWSER is not None
+    sandbox_args = (
+        ["--no-sandbox"]
+        if os.name != "nt" and hasattr(os, "geteuid") and os.geteuid() == 0
+        else []
+    )
     completed = subprocess.run(
-        [str(BROWSER), "--headless", "--disable-gpu", "--dump-dom", page.as_uri()],
+        [
+            str(BROWSER), "--headless", "--disable-gpu", *sandbox_args,
+            "--dump-dom", page.as_uri(),
+        ],
         check=True,
         capture_output=True,
         text=True,

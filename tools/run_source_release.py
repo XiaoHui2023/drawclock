@@ -1,0 +1,114 @@
+"""Validate and run an extracted release entirely through its source tree."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import tempfile
+import xml.etree.ElementTree as ET
+
+
+def _sha256(path: pathlib.Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_source_manifest(root: pathlib.Path) -> None:
+    manifest_path = root / "source-manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    expected = manifest.get("files")
+    if not isinstance(expected, dict) or not expected:
+        raise ValueError("source manifest has no files")
+    actual_paths = {
+        path.relative_to(root).as_posix()
+        for base in (root / "src", root / "vendor" / "wheels")
+        for path in base.rglob("*")
+        if path.is_file()
+    }
+    required_paths = {
+        "requirements-offline.txt",
+        "runtime/runtime-manifest.json",
+        "drawio-lib/drawclock.xml",
+        "example/draw.json",
+    }
+    actual_paths.update(required_paths)
+    if set(expected) != actual_paths:
+        missing = sorted(set(expected) - actual_paths)
+        extra = sorted(actual_paths - set(expected))
+        raise ValueError(f"source manifest paths differ: missing={missing} extra={extra}")
+    for relative, expected_hash in expected.items():
+        path = root / relative
+        if not path.is_file() or _sha256(path) != expected_hash:
+            raise ValueError(f"source manifest hash mismatch: {relative}")
+
+
+def _venv_python(venv: pathlib.Path) -> pathlib.Path:
+    return venv / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+
+
+def main() -> int:
+    if len(sys.argv) != 2:
+        print("usage: run_source_release.py <extracted-package-root>", file=sys.stderr)
+        return 2
+    root = pathlib.Path(sys.argv[1]).resolve()
+    validate_source_manifest(root)
+    with tempfile.TemporaryDirectory(prefix="drawclock-source-smoke-") as temp:
+        venv = pathlib.Path(temp) / "venv"
+        subprocess.run([sys.executable, "-m", "venv", str(venv)], check=True)
+        python = _venv_python(venv)
+        env = os.environ.copy()
+        env.update({
+            "PIP_NO_INDEX": "1",
+            "PIP_CONFIG_FILE": os.devnull,
+            "PYTHONNOUSERSITE": "1",
+        })
+        subprocess.run(
+            [
+                str(python),
+                "-m",
+                "pip",
+                "install",
+                "--no-index",
+                "--find-links",
+                str(root / "vendor" / "wheels"),
+                "-r",
+                str(root / "requirements-offline.txt"),
+            ],
+            cwd=root,
+            env=env,
+            check=True,
+        )
+        output = pathlib.Path(temp) / "source-smoke.svg"
+        subprocess.run(
+            [
+                str(python),
+                str(root / "src"),
+                "-i",
+                str(root / "example" / "draw.json"),
+                "-l",
+                str(root / "drawio-lib" / "drawclock.xml"),
+                "-o",
+                str(output),
+            ],
+            cwd=temp,
+            env=env,
+            check=True,
+        )
+        svg = ET.fromstring(output.read_text(encoding="utf-8"))
+        if not svg.tag.endswith("svg") or not svg.findall(
+            "{http://www.w3.org/2000/svg}foreignObject"
+        ):
+            raise SystemExit("offline source smoke did not produce a populated SVG")
+    print("offline source deployment passed")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

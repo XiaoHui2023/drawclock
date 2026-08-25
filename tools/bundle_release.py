@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 import pathlib
 import platform
 import re
@@ -12,11 +14,13 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 BINARY_NAMES = ("drawclock",)
 
-# 运行期随包资源、绘图专档与分层质量样例。
+# 运行时资源、绘图专档、源码部署材料与分层质量样例。
 RELEASE_PATHS = (
     "README.md",
     "draw.md",
     "pyproject.toml",
+    "requirements-offline.txt",
+    "source-deploy.md",
     "drawio-lib",
     "example/draw.json",
     "example/auto-layout/01-linear.json",
@@ -26,12 +30,20 @@ RELEASE_PATHS = (
     "example/auto-layout/21-layout-column-preference.json",
 )
 
-SOURCE_DIR = "source"
 SOURCE_PATHS = (
-    ("src", "."),
+    ("src", "src"),
 )
 
 RUNTIME_PATH = ".runtime"
+WHEELHOUSE_PATH = ".source-wheelhouse"
+
+
+def _sha256(path: pathlib.Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def _project_version(root: pathlib.Path) -> str:
@@ -89,7 +101,7 @@ def main() -> int:
         if not src.exists():
             print(f"错误: 未找到 {src}", file=sys.stderr)
             return 1
-        dest = bundle_dir / SOURCE_DIR if dest_rel == "." else bundle_dir / SOURCE_DIR / dest_rel
+        dest = bundle_dir / dest_rel
         if src.is_dir():
             shutil.copytree(
                 src,
@@ -100,11 +112,43 @@ def main() -> int:
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dest)
 
+    wheelhouse = ROOT / WHEELHOUSE_PATH
+    if not (wheelhouse / "wheelhouse-manifest.json").is_file():
+        print("错误: 离线源码依赖未准备完成。", file=sys.stderr)
+        return 1
+    shutil.copytree(wheelhouse, bundle_dir / "vendor" / "wheels")
+
     runtime = ROOT / RUNTIME_PATH
     if not (runtime / "runtime-manifest.json").is_file():
         print("错误: 发布运行时未准备完成。", file=sys.stderr)
         return 1
     shutil.copytree(runtime, bundle_dir / "runtime")
+
+    manifest_paths = [
+        path
+        for base in (bundle_dir / "src", bundle_dir / "vendor" / "wheels")
+        for path in base.rglob("*")
+        if path.is_file()
+    ]
+    manifest_paths.extend(
+        bundle_dir / relative
+        for relative in (
+            "requirements-offline.txt",
+            "runtime/runtime-manifest.json",
+            "drawio-lib/drawclock.xml",
+            "example/draw.json",
+        )
+    )
+    source_manifest = {
+        "schema": 1,
+        "files": {
+            path.relative_to(bundle_dir).as_posix(): _sha256(path)
+            for path in sorted(manifest_paths)
+        },
+    }
+    (bundle_dir / "source-manifest.json").write_text(
+        json.dumps(source_manifest, indent=2) + "\n", encoding="utf-8"
+    )
 
     archive_base = dist / tag
     fmt = "zip" if platform.system() == "Windows" else "gztar"
