@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-08-25
 
@@ -15,11 +15,15 @@
 
 ## 当前证据
 
+- success: 五个 skill 通过项目校验器、通用 quick validation、私有路径和断链故障注入。
+- success: 完整回归 321 项通过；最终 Windows ZIP 的冻结程序与源码消费门通过。
+- success: Release run 32866974014 成功，v1.0.0 指向 `d5e636a2035182d8c89437aead5abd9b2b423f1c`。
+- success: 下载后的 Linux 包通过包内 skill、冻结程序和源码消费门；SHA-256 为 `86FC3FF1E6EC34C4F963EFB72B647ADC640FE6C91259DE39AD52E5554E9987D9`。
 - worklog: `../../project-worklog/records/release-project-skills.md`
 
 ## 下一步
 
-- 建立 skill 内容和验证脚本。
+- 无。
 
 ## 收敛条件
 

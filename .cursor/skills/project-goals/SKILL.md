@@ -14,7 +14,7 @@ description: drawclock 当前目标、验证证据与完成条件索引。
 - [x] v1.0.0 只保留直接绘图主功能，v0.0.0 可恢复。
 - [x] 发布包仅靠标准库 Python 源码与包内 ELK 运行时完成 JSON 绘图，不携带 Python 运行时依赖。
 - [x] `--library` 同时接受多个器件库文件和目录，并确定性合并扫描结果。
-- [ ] [发布项目 Skills](goals/release-project-skills.md)
+- [x] [发布项目 Skills](goals/release-project-skills.md)
 
 - [x] [逐边最少拐点证明](goals/per-edge-bend-minimality.md)
 - [v1.0.0 单功能重构](goals/v1-draw-only.md)
