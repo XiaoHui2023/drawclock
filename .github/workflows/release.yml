@@ -97,12 +97,13 @@ jobs:
           body: |
             Rolling release: self-contained Ubuntu 16.04 PyInstaller bundle from the main commit.
             The archive includes the complete zero-Python-dependency source tree and pinned Node.js
-            and ELK layout runtimes.
+            and ELK layout runtimes, plus five progressively disclosed project maintenance skills.
             Before publishing, CI extracts the archive and exercises the frozen executable with the
             host PATH isolated for direct SVG generation under arbitrary output suffixes,
             supplied and merged-library rendering, strict JSON input, and large-layout bounds checks.
             CI also creates a clean virtual environment and generates SVG through the extracted
-            source tree with site-packages disabled.
+            source tree with site-packages disabled. Both package gates validate the project skill
+            inventory, references, UTF-8 content, and private-path exclusions.
           files: release-assets/**
           fail_on_unmatched_files: true
           generate_release_notes: false

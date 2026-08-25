@@ -52,9 +52,11 @@ description: >-
 ## 发布
 
 - PyInstaller 可执行文件随包带 Node.js 与 ELK 运行时，不依赖宿主 PATH。
-- 发行包包含主程序、runtime、原始 `src/`、`drawio-lib/`、示例和源码部署说明，不含 Python wheelhouse 或依赖清单。
+- 发行包包含主程序、runtime、原始 `src/`、`drawio-lib/`、示例、源码部署说明和根目录 `skills/`，不含 Python wheelhouse 或依赖清单。
+- `skills/` 包含器件库设计、布局算法、JSON 合约、成图设计和项目导航五个渐进披露 skill；只含项目知识，不含私人路径、身份或本机自动化信息，也不是绘图运行时依赖。
 - 源码部署只要求同平台 CPython；以 `-I -S` 禁用用户目录和 site-packages 后，源码仍从发行目录 `runtime/` 加载 Node.js 与 ELK。
-- `source-manifest.json` 记录源码、器件库、示例与运行时清单的 SHA-256，缺失和篡改均阻断源码消费门。
+- `source-manifest.json` 记录源码、项目 skill、器件库、示例与运行时清单的 SHA-256，缺失和篡改均阻断源码消费门。
+- 冻结包门和源码包门都执行包内 skill 校验器，检查固定目录集合、frontmatter、单层 references、链接完整性、UTF-8 和私人绝对路径。
 - 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、严格 JSON 拒绝规则、文件与目录混合器件库、默认圆弧、示例、复杂图和 512 时钟压力图。
 - 同一解压包还要创建空虚拟环境，通过 `python -I -S src` 生成可解析的 SVG，证明源码不借用第三方 Python 包。
 - 每次修改通过检查后读取用户根 `github-upload` 与 `github-release` 规则，提交、推送并发布当前 `pyproject.toml` 版本。

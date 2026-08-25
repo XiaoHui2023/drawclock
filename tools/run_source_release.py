@@ -11,6 +11,16 @@ import tempfile
 import xml.etree.ElementTree as ET
 
 
+REQUIRED_SKILL_FILES = {
+    "skills/clock-diagram-design/SKILL.md",
+    "skills/clock-json-schema/SKILL.md",
+    "skills/clock-layout-algorithms/SKILL.md",
+    "skills/component-library-design/SKILL.md",
+    "skills/drawclock-project-navigation/SKILL.md",
+    "skills/drawclock-project-navigation/scripts/validate_skills.py",
+}
+
+
 def _sha256(path: pathlib.Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -27,7 +37,7 @@ def validate_source_manifest(root: pathlib.Path) -> None:
         raise ValueError("source manifest has no files")
     actual_paths = {
         path.relative_to(root).as_posix()
-        for base in (root / "src",)
+        for base in (root / "src", root / "skills")
         for path in base.rglob("*")
         if path.is_file()
     }
@@ -39,6 +49,11 @@ def validate_source_manifest(root: pathlib.Path) -> None:
     actual_paths.update(
         relative for relative in required_paths if (root / relative).is_file()
     )
+    missing_skills = sorted(
+        relative for relative in REQUIRED_SKILL_FILES if not (root / relative).is_file()
+    )
+    if missing_skills:
+        raise ValueError(f"release project skills are missing: {missing_skills}")
     legacy_paths = (root / "requirements-offline.txt", root / "vendor" / "wheels")
     if any(path.exists() for path in legacy_paths):
         raise ValueError("release still contains legacy Python runtime dependencies")
@@ -52,6 +67,22 @@ def validate_source_manifest(root: pathlib.Path) -> None:
             raise ValueError(f"source manifest hash mismatch: {relative}")
 
 
+def validate_packaged_skills(root: pathlib.Path) -> None:
+    validator = root / "skills/drawclock-project-navigation/scripts/validate_skills.py"
+    completed = subprocess.run(
+        [sys.executable, str(validator), str(root / "skills")],
+        cwd=root,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        capture_output=True,
+        check=False,
+    )
+    if completed.returncode:
+        detail = (completed.stdout + completed.stderr).strip()
+        raise ValueError(f"release project skills failed validation: {detail}")
+
+
 def _venv_python(venv: pathlib.Path) -> pathlib.Path:
     return venv / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
 
@@ -62,6 +93,7 @@ def main() -> int:
         return 2
     root = pathlib.Path(sys.argv[1]).resolve()
     validate_source_manifest(root)
+    validate_packaged_skills(root)
     with tempfile.TemporaryDirectory(prefix="drawclock-source-smoke-") as temp:
         venv = pathlib.Path(temp) / "venv"
         subprocess.run([sys.executable, "-m", "venv", str(venv)], check=True)

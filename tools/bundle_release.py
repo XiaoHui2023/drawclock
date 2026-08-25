@@ -21,6 +21,7 @@ RELEASE_PATHS = (
     "pyproject.toml",
     "source-deploy.md",
     "drawio-lib",
+    "skills",
     "example/draw.json",
     "example/auto-layout/01-linear.json",
     "example/auto-layout/05-dense-cross-root.json",
@@ -120,7 +121,7 @@ def main() -> int:
 
     manifest_paths = [
         path
-        for base in (bundle_dir / "src",)
+        for base in (bundle_dir / "src", bundle_dir / "skills")
         for path in base.rglob("*")
         if path.is_file()
     ]

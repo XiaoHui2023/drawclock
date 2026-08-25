@@ -18,6 +18,7 @@ DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
 STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
 ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
 COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
+SKILLS = ROOT / "skills"
 SVG_NS = "http://www.w3.org/2000/svg"
 
 
@@ -129,7 +130,7 @@ def _assert_named_nodes_same_x(path: Path, names: tuple[str, ...]) -> float:
 
 def main() -> int:
     global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC
-    global COLUMN_PREFERENCE
+    global COLUMN_PREFERENCE, SKILLS
     binary = _binary_path()
     package_root = binary.parent
     if (package_root / "runtime" / "runtime-manifest.json").is_file():
@@ -141,6 +142,7 @@ def main() -> int:
         STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
         ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
         COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
+        SKILLS = ROOT / "skills"
     runtime = binary.parent / "runtime"
     required = (
         binary, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC,
@@ -149,11 +151,27 @@ def main() -> int:
         runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node"),
         runtime / "elk" / "elk_layout.mjs",
         runtime / "elk" / "node_modules" / "elkjs" / "lib" / "elk.bundled.js",
+        SKILLS / "clock-diagram-design" / "SKILL.md",
+        SKILLS / "clock-json-schema" / "SKILL.md",
+        SKILLS / "clock-layout-algorithms" / "SKILL.md",
+        SKILLS / "component-library-design" / "SKILL.md",
+        SKILLS / "drawclock-project-navigation" / "SKILL.md",
+        SKILLS / "drawclock-project-navigation" / "scripts" / "validate_skills.py",
     )
     missing = [str(path) for path in required if not path.is_file()]
     if missing:
         print("missing release inputs:\n" + "\n".join(missing), file=sys.stderr)
         return 1
+
+    subprocess.run(
+        [
+            sys.executable,
+            str(SKILLS / "drawclock-project-navigation" / "scripts" / "validate_skills.py"),
+            str(SKILLS),
+        ],
+        cwd=ROOT,
+        check=True,
+    )
 
     out = ROOT / "example" / "out"
     out.mkdir(parents=True, exist_ok=True)

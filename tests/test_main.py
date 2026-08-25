@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import shutil
 import subprocess
 import sys
 import zipfile
@@ -84,6 +85,7 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     (project / "README.md").write_text("", encoding="utf-8")
     (project / "draw.md").write_text("", encoding="utf-8")
     (project / "source-deploy.md").write_text("", encoding="utf-8")
+    shutil.copytree(ROOT / "skills", project / "skills")
     (project / "example" / "draw.json").write_text("{}", encoding="utf-8")
     packaged_layout_examples = (
         "01-linear.json",
@@ -115,6 +117,19 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     assert prefix + "src/__main__.py" in names
     assert prefix + "source/__main__.py" not in names
     assert prefix + "source-deploy.md" in names
+    for skill in (
+        "clock-diagram-design",
+        "clock-json-schema",
+        "clock-layout-algorithms",
+        "component-library-design",
+        "drawclock-project-navigation",
+    ):
+        assert prefix + f"skills/{skill}/SKILL.md" in names
+    assert (
+        prefix
+        + "skills/drawclock-project-navigation/scripts/validate_skills.py"
+        in names
+    )
     assert prefix + "requirements-offline.txt" not in names
     assert not any("vendor/wheels/" in name for name in names)
     assert prefix + "source-manifest.json" in names
@@ -145,6 +160,12 @@ def test_source_manifest_rejects_missing_or_modified_source(
         "runtime/runtime-manifest.json": b"{}\n",
         "drawio-lib/drawclock.xml": b"<mxlibrary/>\n",
         "example/draw.json": b"{}\n",
+        "skills/clock-diagram-design/SKILL.md": b"---\nname: clock-diagram-design\ndescription: test\n---\n",
+        "skills/clock-json-schema/SKILL.md": b"---\nname: clock-json-schema\ndescription: test\n---\n",
+        "skills/clock-layout-algorithms/SKILL.md": b"---\nname: clock-layout-algorithms\ndescription: test\n---\n",
+        "skills/component-library-design/SKILL.md": b"---\nname: component-library-design\ndescription: test\n---\n",
+        "skills/drawclock-project-navigation/SKILL.md": b"---\nname: drawclock-project-navigation\ndescription: test\n---\n",
+        "skills/drawclock-project-navigation/scripts/validate_skills.py": b"print('ok')\n",
     }
     for relative, content in files.items():
         path = root / relative
