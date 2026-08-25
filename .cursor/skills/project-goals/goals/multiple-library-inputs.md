@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-08-25
 
@@ -16,7 +16,10 @@
 
 ## 当前证据
 
-- failure: 当前 CLI 的 `--library` 只接受一个文件，内部缓存和端口解析也以单个路径为键。
+- success: CLI 支持同一 `-l` 后多个路径和重复 `-l`，文件与目录可以混用。
+- success: 目录递归扫描 XML，规范化结果稳定去重并缓存；不同文件同名 title 直接报错。
+- success: 全量 318 项通过；1024、2048、4096 压力耗时 2.31、7.00、25.31 秒。
+- success: 远端 Linux v1.0.0 下载包在隔离容器中的混合器件库冻结门通过，完整门耗时 27.182 秒。
 - worklog: `../../project-worklog/records/multiple-library-inputs.md`
 
 ## 已尝试
@@ -25,7 +28,7 @@
 
 ## 下一步
 
-- 在 `drawio_library` 建立路径展开、稳定合并和冲突检查，并让所有消费者使用规范化路径元组。
+- 无。
 
 ## 收敛条件
 

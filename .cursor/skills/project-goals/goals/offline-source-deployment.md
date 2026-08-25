@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-08-25
 
@@ -15,14 +15,10 @@
 
 ## 当前证据
 
-- success: Windows 本地发行包包含 16 个源码文件和 14 个依赖 wheel；全新虚拟环境断网消费通过，耗时 18.522 秒。
-- success: 同一新解压目录中的冻结程序消费通过，耗时 14.326 秒。
-- success: 最终远端 Linux 包含 16 个源码文件、0 个 `.egg-info` 文件和 14 个 wheel，SHA-256 为 `92C78B21A9B24CCFB1E3594C2BF321F5DE654CDFFB84B1A31A51803DDCC9F6F3`。
-- success: 最终远端 Linux 包在无网络 Python 3.12 容器中的源码部署耗时 4.036 秒，冻结程序消费耗时 29.535 秒。
-- failure: 旧发行包把源码放在 `source/`，而项目配置指向 `src/`；包内没有 Python 离线依赖，不能支持断网源码部署。
-- failure: Windows Edge 151 的无头模式在当前桌面会话返回空 DOM；同一组 5 项浏览器几何门已在隔离 Chromium 中通过。
-- failure: 首次远端 Linux 包的 `src/` 含 16 个源码文件和 5 个构建生成的 `drawclock.egg-info` 文件，源码集合不够纯净。
-- failure: 当前严格 JSON 入口仍经由 configlib，发行包因此携带 14 个 wheel；与收敛后的零 Python 运行时依赖目标不符。
+- success: Python 项目运行时依赖为空，严格 JSON 由标准库 `json` 解析；发行包不含 requirements 或 wheelhouse。
+- success: Windows 本地最终 ZIP 解压后，冻结门 43.858 秒、空虚拟环境 `-I -S` 源码门 12.683 秒，均通过；SHA-256 为 `2636DCA340BA2E50519B7DE226A4AD09D491529CE85BB7918A93B8D7259F7CEB`。
+- success: Release run 32817679182 成功，v1.0.0 指向功能提交 `e2eb8cc57de980dc103a4959ab851c7cacb36e87`。
+- success: 远端 Linux 包 SHA-256 为 `9B7AD06C2789612F397A22EBB2032260F75158EBC1733A34B86F3290122096A9`；隔离容器冻结门 27.182 秒、源码门 5.160 秒，均通过。
 - worklog: `../../project-worklog/records/offline-source-release.md`
 - worklog: `../../project-worklog/records/json-only-zero-dependencies.md`
 
@@ -37,7 +33,7 @@
 
 ## 下一步
 
-- 删除多格式加载器、运行时依赖、wheelhouse 组包与相关文档测试，重新验证源码和冻结包。
+- 无。
 
 ## 收敛条件
 
