@@ -106,7 +106,9 @@ def main() -> int:
             shutil.copytree(
                 src,
                 dest,
-                ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo"),
+                ignore=shutil.ignore_patterns(
+                    "__pycache__", "*.pyc", "*.pyo", "*.egg-info"
+                ),
             )
         else:
             dest.parent.mkdir(parents=True, exist_ok=True)

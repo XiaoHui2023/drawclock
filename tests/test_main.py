@@ -67,6 +67,10 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     project = tmp_path / "project"
     (project / "dist").mkdir(parents=True)
     (project / "src").mkdir()
+    (project / "src" / "drawclock.egg-info").mkdir()
+    (project / "src" / "drawclock.egg-info" / "PKG-INFO").write_text(
+        "generated\n", encoding="utf-8"
+    )
     (project / "drawio-lib").mkdir()
     (project / "drawio-lib" / "drawclock.xml").write_text(
         "<mxlibrary/>\n", encoding="utf-8"
@@ -123,6 +127,7 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     assert prefix + "vendor/wheels/wheelhouse-manifest.json" in names
     assert prefix + "vendor/wheels/dependency-1-py3-none-any.whl" in names
     assert prefix + "source-manifest.json" in names
+    assert not any(".egg-info/" in name for name in names)
     assert prefix + "json.md" not in names
     assert prefix + "rule.md" not in names
     assert not any("reload" in name or "extract" in name for name in names)

@@ -19,6 +19,7 @@
 - success: 同一新解压目录中的冻结程序消费通过，耗时 14.326 秒。
 - failure: 旧发行包把源码放在 `source/`，而项目配置指向 `src/`；包内没有 Python 离线依赖，不能支持断网源码部署。
 - failure: Windows Edge 151 的无头模式在当前桌面会话返回空 DOM；同一组 5 项浏览器几何门已在隔离 Chromium 中通过。
+- failure: 首次远端 Linux 包的 `src/` 含 16 个源码文件和 5 个构建生成的 `drawclock.egg-info` 文件，源码集合不够纯净。
 - worklog: `../../project-worklog/records/offline-source-release.md`
 
 ## 已尝试
@@ -26,6 +27,7 @@
 - 2026-08-25: 审计现有压缩包 -> 确认源码只是参考材料，不构成离线部署闭环。
 - 2026-08-25: 增加跨 Python 版本 wheelhouse 与源码清单 -> Windows 本地离线源码门通过。
 - 2026-08-25: 增加 Release 解压后源码消费门 -> 等待远端 Linux 资产下载复验。
+- 2026-08-25: 下载首次远端 Linux 资产核对源码集合 -> 功能文件齐全，但发现构建元数据混入，返回组包规则修正。
 
 ## 下一步
 

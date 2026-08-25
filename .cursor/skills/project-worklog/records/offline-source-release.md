@@ -17,8 +17,9 @@
 - 全量测试中 309 项通过，5 个浏览器几何测试因 Windows Edge 151 返回空 DOM 失败；隔离 Chromium 首次因 root sandbox 退出 1，测试启动器已限定在 Linux root 环境加入 `--no-sandbox`。
 - 隔离 Chromium 几何测试 5 项通过；其余 309 项通过，第三方 configlib 有一条已知弃用提示。
 - Windows 包含 16 个源码文件和 14 个 wheel；断网源码消费 18.522 秒，冻结程序消费 14.326 秒。
+- 首次远端 Linux 包下载与解压耗时 11.705 秒，14 个 wheel 齐全；`src/` 额外包含 5 个构建生成的 `drawclock.egg-info` 文件，未放行。
 
 ## 下一步
 
-- 重建压缩包并从新解压目录验证。
-- 推送后下载远程 Linux 资产复验。
+- 从源码复制规则中排除 `*.egg-info`，用夹具锁定纯净源码集合。
+- 重新发布后下载远程 Linux 资产复验。
