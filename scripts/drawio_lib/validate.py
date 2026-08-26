@@ -62,7 +62,9 @@ def validate_drawio_graph_xml(xml_str: str, *, context: str = "") -> None:
 
 def validate_mxlibrary_file(path: Path) -> None:
     raw = path.read_text(encoding="utf-8")
-    match = re.search(r"<mxlibrary>(.*)</mxlibrary>", raw, re.DOTALL)
+    match = re.fullmatch(
+        r"\s*<mxlibrary>\s*(.*?)\s*</mxlibrary>\s*", raw, re.DOTALL
+    )
     if not match:
         raise ValueError(f"{path}: missing <mxlibrary> wrapper")
     try:
@@ -71,11 +73,27 @@ def validate_mxlibrary_file(path: Path) -> None:
         raise ValueError(f"{path}: invalid JSON in mxlibrary: {exc}") from exc
     if not entries:
         raise ValueError(f"{path}: empty library")
+    if not isinstance(entries, list):
+        raise ValueError(f"{path}: mxlibrary payload must be an array")
+    if len(entries) != 1:
+        raise ValueError(
+            f"{path}: each library file must contain exactly one component"
+        )
     for index, entry in enumerate(entries):
+        if not isinstance(entry, dict):
+            raise ValueError(f"{path} entry[{index}]: must be an object")
         title = entry.get("title", f"entry[{index}]")
-        for key in ("xml", "w", "h"):
+        for key in ("title", "xml", "w", "h"):
             if key not in entry:
                 raise ValueError(f"{path} entry {title}: missing {key}")
+        if not isinstance(entry["title"], str) or not entry["title"].strip():
+            raise ValueError(f"{path} entry[{index}]: title must be a non-empty string")
+        if not isinstance(entry["xml"], str) or not entry["xml"].strip():
+            raise ValueError(f"{path} entry {title}: xml must be a non-empty string")
+        for dimension in ("w", "h"):
+            value = entry[dimension]
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+                raise ValueError(f"{path} entry {title}: {dimension} must be positive")
         graph_xml = decompress_drawio_xml(entry["xml"])
         validate_drawio_graph_xml(graph_xml, context=title)
 

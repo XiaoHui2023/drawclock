@@ -15,7 +15,7 @@ from scripts.build_stress_examples import build_asymmetric_merge_route_bulge
 
 
 ROOT = Path(__file__).resolve().parents[1]
-LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
+LIBRARY = ROOT / "drawio-lib" / "drawclock"
 EXAMPLES = ROOT / "example" / "auto-layout"
 
 

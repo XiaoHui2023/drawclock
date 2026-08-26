@@ -43,12 +43,20 @@ def validate_source_manifest(root: pathlib.Path) -> None:
     }
     required_paths = {
         "runtime/runtime-manifest.json",
-        "drawio-lib/drawclock.xml",
         "example/draw.json",
     }
     actual_paths.update(
         relative for relative in required_paths if (root / relative).is_file()
     )
+    library_dir = root / "drawio-lib" / "drawclock"
+    library_paths = {
+        path.relative_to(root).as_posix()
+        for path in library_dir.rglob("*.xml")
+        if path.is_file()
+    }
+    if not library_paths:
+        raise ValueError("release component library directory is empty")
+    actual_paths.update(library_paths)
     missing_skills = sorted(
         relative for relative in REQUIRED_SKILL_FILES if not (root / relative).is_file()
     )
@@ -108,7 +116,7 @@ def main() -> int:
                 "-i",
                 str(root / "example" / "draw.json"),
                 "-l",
-                str(root / "drawio-lib" / "drawclock.xml"),
+                str(root / "drawio-lib" / "drawclock"),
                 "-o",
                 str(output),
             ],

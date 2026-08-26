@@ -6,14 +6,14 @@
 
 ```powershell
 py -3.11 -m venv .venv
-.venv\Scripts\python.exe -I -S src -i example\draw.json -l drawio-lib\drawclock.xml -o clock-tree.svg
+.venv\Scripts\python.exe -I -S src -i example\draw.json -l drawio-lib\drawclock -o clock-tree.svg
 ```
 
 ## Linux
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -I -S src -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg
+.venv/bin/python -I -S src -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 ```
 
 `runtime/` 中的 Node.js 与 ELK 负责自动分层和布线，发行包已随平台提供，无需单独安装。删除该运行时会失去自动布局能力。

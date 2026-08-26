@@ -9,7 +9,7 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 | 参数 | 取值 | 必填 | 默认值 | 说明 |
 | --- | --- | :---: | --- | --- |
 | `-i`, `--input` | 文件路径 | ✓ |  | JSON |
-| `-l`, `--library` | 多个路径 | ✓ |  | 器件库 XML 或目录；目录递归扫描 XML |
+| `-l`, `--library` | 多个路径 | ✓ |  | 单器件库 XML 或目录；目录递归扫描 XML |
 | `-o`, `--output` | 文件路径 | ✓ |  | 内容固定为 SVG |
 | `--crossing-style` | `arc` / `gap` / `sharp` / `none` |  | `arc` | 跨线样式 |
 
@@ -45,12 +45,14 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 
 器件库可定义任意类型。布局只依据连接关系、库内几何、标签和端口计算，不按固定器件名或实例名分支。
 
-多个文件按参数顺序合并；目录内 XML 按路径稳定排序后合并。不同文件出现同名器件时直接报错，避免无提示覆盖。`-l` 可以重复填写，并可同时传入文件和目录。
+每个器件库 XML 必须使用标准 draw.io `mxlibrary` 格式，并且只包含一个器件。文件名不参与器件识别，器件类型始终取文件内的 `title`。
+
+多个文件按参数顺序合并；目录内 XML 按路径稳定排序后合并。不同文件出现同名器件时直接报错，避免无提示覆盖。`-l` 可以重复填写，并可同时传入多个文件和多个目录。
 
 ## 示例
 
 ```powershell
-drawclock -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg
-drawclock -i example/draw.json -l libraries/base.xml libraries/components -l libraries/project -o clock-tree.svg
-drawclock -i example/draw.json -l drawio-lib/drawclock.xml -o clock-tree.svg --crossing-style gap
+drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
+drawclock -i example/draw.json -l libraries/source.xml libraries/components -l libraries/project -o clock-tree.svg
+drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg --crossing-style gap
 ```

@@ -25,14 +25,14 @@ def package_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-DEFAULT_LIBRARY_PATH = package_root() / "drawio-lib" / "drawclock.xml"
+DEFAULT_LIBRARY_PATH = package_root() / "drawio-lib" / "drawclock"
 LibraryPath: TypeAlias = str | Path
 LibrarySource: TypeAlias = LibraryPath | Sequence[LibraryPath]
 
 
 @dataclass(frozen=True)
 class LibraryShape:
-    """One shape from drawclock.xml (style + HTML label + default size)."""
+    """One shape from a single-component library file."""
 
     title: str
     style: str
@@ -93,11 +93,16 @@ def _expand_library_paths(raw_paths: tuple[str, ...]) -> tuple[str, ...]:
 
 def _load_library_file(lib_path: Path) -> list[dict[str, object]]:
     text = lib_path.read_text(encoding="utf-8").strip()
-    if text.startswith("<mxlibrary>"):
-        text = text[len("<mxlibrary>") : -len("</mxlibrary>")].strip()
-    entries = json.loads(text)
+    match = re.fullmatch(r"<mxlibrary>\s*(.*?)\s*</mxlibrary>", text, re.DOTALL)
+    if match is None:
+        raise ValueError(f"器件库必须使用标准 mxlibrary 包装: {lib_path}")
+    entries = json.loads(match.group(1))
     if not isinstance(entries, list):
         raise ValueError(f"器件库不是 mxlibrary 数组: {lib_path}")
+    if len(entries) != 1:
+        raise ValueError(
+            f"每个器件库文件必须只包含一个器件: {lib_path}（实际 {len(entries)} 个）"
+        )
     return entries
 
 
@@ -109,21 +114,29 @@ def _load_library_shapes(library_paths: tuple[str, ...]) -> dict[str, LibrarySha
         lib_path = Path(library_path)
         for entry in _load_library_file(lib_path):
             if not isinstance(entry, dict):
-                continue
+                raise ValueError(f"器件库条目必须是对象: {lib_path}")
             title = entry.get("title")
             payload = entry.get("xml")
             w = entry.get("w")
             h = entry.get("h")
-            if not title or not payload or w is None or h is None:
-                continue
-            title = str(title)
+            if not isinstance(title, str) or not title.strip():
+                raise ValueError(f"器件库条目缺少有效 title: {lib_path}")
+            if not isinstance(payload, str) or not payload.strip():
+                raise ValueError(f"器件库条目缺少有效 xml: {lib_path}")
+            if any(
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or value <= 0
+                for value in (w, h)
+            ):
+                raise ValueError(f"器件库条目 w/h 必须是正数: {lib_path}")
             if title in shapes:
                 raise ValueError(
                     f"器件库存在重复 title {title}: {origins[title]}，{lib_path}"
                 )
             parsed = _parse_library_payload(str(payload))
             if parsed is None:
-                continue
+                raise ValueError(f"器件库未解析到顶点样式: {lib_path}")
             style, label, object_defaults = parsed
             shapes[title] = LibraryShape(
                 title=title,

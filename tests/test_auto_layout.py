@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -17,7 +18,7 @@ from layout_quality import inspect_layout_quality
 
 
 ROOT = Path(__file__).resolve().parents[1]
-LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
+LIBRARY = ROOT / "drawio-lib" / "drawclock"
 SRC_DIR = ROOT / "src"
 DRAW_EXAMPLE = ROOT / "example" / "draw.json"
 
@@ -326,15 +327,12 @@ def test_clock_tree_rejects_json_comments_and_non_object_root(tmp_path: Path) ->
 
 
 def _write_split_library(path: Path, titles: set[str]) -> None:
-    text = LIBRARY.read_text(encoding="utf-8").strip()
-    entries = json.loads(text[len("<mxlibrary>") : -len("</mxlibrary>")])
-    selected = [entry for entry in entries if entry.get("title") in titles]
-    assert {entry["title"] for entry in selected} == titles
+    assert len(titles) == 1
+    title = next(iter(titles))
+    source = LIBRARY / f"{title}.xml"
+    assert source.is_file()
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        "<mxlibrary>" + json.dumps(selected, ensure_ascii=False) + "</mxlibrary>",
-        encoding="utf-8",
-    )
+    shutil.copy2(source, path)
 
 
 def test_multiple_library_files_and_directories_merge_for_layout(tmp_path: Path) -> None:
@@ -352,6 +350,12 @@ def test_multiple_library_files_and_directories_merge_for_layout(tmp_path: Path)
     assert set(shapes) == {"source", "gate", "clock"}
     document, _ = generate_elk_layout(_linear_config(), library_path=libraries)
     assert len(document.vertices) == 3
+
+
+def test_component_identity_comes_from_title_not_filename(tmp_path: Path) -> None:
+    renamed = tmp_path / "arbitrary-name.xml"
+    _write_split_library(renamed, {"source"})
+    assert set(load_library_shapes(renamed)) == {"source"}
 
 
 def test_multiple_library_inputs_reject_invalid_paths_and_duplicate_titles(
@@ -374,6 +378,31 @@ def test_multiple_library_inputs_reject_invalid_paths_and_duplicate_titles(
     _write_split_library(second, {"source"})
     with pytest.raises(ValueError, match="重复 title source"):
         load_library_shapes([first, second])
+
+    combined = tmp_path / "combined.xml"
+    source_entry = json.loads(
+        (LIBRARY / "source.xml").read_text(encoding="utf-8").strip()[
+            len("<mxlibrary>") : -len("</mxlibrary>")
+        ]
+    )[0]
+    clock_entry = json.loads(
+        (LIBRARY / "clock.xml").read_text(encoding="utf-8").strip()[
+            len("<mxlibrary>") : -len("</mxlibrary>")
+        ]
+    )[0]
+    combined.write_text(
+        "<mxlibrary>"
+        + json.dumps([source_entry, clock_entry], ensure_ascii=False)
+        + "</mxlibrary>",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="只包含一个器件"):
+        load_library_shapes(combined)
+
+    unwrapped = tmp_path / "unwrapped.xml"
+    unwrapped.write_text(json.dumps([source_entry]), encoding="utf-8")
+    with pytest.raises(ValueError, match="标准 mxlibrary 包装"):
+        load_library_shapes(unwrapped)
 
 
 def test_cli_accepts_repeated_mixed_library_files_and_directories(
@@ -413,7 +442,10 @@ def test_cli_accepts_repeated_mixed_library_files_and_directories(
 def test_layout_uses_kind_metadata_and_geometry_from_supplied_library(
     tmp_path: Path,
 ) -> None:
-    text = LIBRARY.read_text(encoding="utf-8").strip()
+    custom_library = tmp_path / "custom"
+    shutil.copytree(LIBRARY, custom_library)
+    gate_library = custom_library / "gate.xml"
+    text = gate_library.read_text(encoding="utf-8").strip()
     entries = json.loads(text[len("<mxlibrary>") : -len("</mxlibrary>")])
     for entry in entries:
         if entry.get("title") == "gate":
@@ -426,10 +458,10 @@ def test_layout_uses_kind_metadata_and_geometry_from_supplied_library(
             )
             entry["xml"] = compress_diagram_payload(graph_xml)
             break
-    custom_library = tmp_path / "custom.xml"
-    custom_library.write_text(
+    (custom_library / "custom-gate.xml").write_text(
         "<mxlibrary>" + json.dumps(entries) + "</mxlibrary>", encoding="utf-8"
     )
+    gate_library.unlink()
 
     config = _linear_config()
     config["gate0"]["kind"] = "custom_gate_symbol"

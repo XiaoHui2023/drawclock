@@ -1,13 +1,13 @@
 # 器件库
 
-从左侧形状面板拖出器件，画时钟树示意图。只需导入 **`drawclock.xml`** 一个文件。
+`drawclock/` 中每个 XML 只包含一个器件，均为标准 draw.io 自定义库文件。drawclock 命令可直接加载整个目录。
 
 ## 使用
 
-1. 在 VS Code / Cursor 安装 **Draw.io Integration** 插件（`hediet.vscode-drawio`），在本仓库中打开任意 `.drawio` / `.drawio.svg` 文件。  
-2. **文件 → 导入**，选择 `drawclock.xml`。  
-3. 在左侧形状库的 **drawclock** 条目中，将器件拖到画布。  
-4. **双击**器件改属性；弹出框中 **Placeholders** 必须勾选，再点 **应用**。  
+1. 在 VS Code / Cursor 安装 **Draw.io Integration** 插件（`hediet.vscode-drawio`），在本仓库中打开任意 `.drawio` / `.drawio.svg` 文件。
+2. **文件 → 导入**，选择 `drawclock/` 中需要的器件 XML。
+3. 从左侧形状库将器件拖到画布。
+4. **双击**器件改属性；弹出框中 **Placeholders** 必须勾选，再点 **应用**。
 5. 从器件**端口**拖线到其它器件端口。
 
 ## 器件

@@ -5,7 +5,7 @@
 ```powershell
 python src `
   -i example/auto-layout/03-mux-dag.json `
-  -l drawio-lib/drawclock.xml `
+  -l drawio-lib/drawclock `
   -o example/generated/03-mux-dag.svg
 ```
 

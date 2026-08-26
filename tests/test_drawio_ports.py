@@ -7,7 +7,7 @@ from drawio_ports import abs_port_xy, infer_port_from_attachment, port_anchors
 
 
 ROOT = Path(__file__).resolve().parents[1]
-LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
+LIBRARY = ROOT / "drawio-lib" / "drawclock"
 
 
 def test_bake_label_replaces_name_and_defaults() -> None:

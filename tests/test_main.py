@@ -72,8 +72,8 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     (project / "src" / "drawclock.egg-info" / "PKG-INFO").write_text(
         "generated\n", encoding="utf-8"
     )
-    (project / "drawio-lib").mkdir()
-    (project / "drawio-lib" / "drawclock.xml").write_text(
+    (project / "drawio-lib" / "drawclock").mkdir(parents=True)
+    (project / "drawio-lib" / "drawclock" / "source.xml").write_text(
         "<mxlibrary/>\n", encoding="utf-8"
     )
     (project / "example").mkdir()
@@ -117,6 +117,8 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     assert prefix + "src/__main__.py" in names
     assert prefix + "source/__main__.py" not in names
     assert prefix + "source-deploy.md" in names
+    assert prefix + "drawio-lib/drawclock/source.xml" in names
+    assert prefix + "drawio-lib/drawclock.xml" not in names
     for skill in (
         "clock-diagram-design",
         "clock-json-schema",
@@ -158,7 +160,7 @@ def test_source_manifest_rejects_missing_or_modified_source(
     files = {
         "src/__main__.py": b"print('ok')\n",
         "runtime/runtime-manifest.json": b"{}\n",
-        "drawio-lib/drawclock.xml": b"<mxlibrary/>\n",
+        "drawio-lib/drawclock/source.xml": b"<mxlibrary/>\n",
         "example/draw.json": b"{}\n",
         "skills/clock-diagram-design/SKILL.md": b"---\nname: clock-diagram-design\ndescription: test\n---\n",
         "skills/clock-json-schema/SKILL.md": b"---\nname: clock-json-schema\ndescription: test\n---\n",

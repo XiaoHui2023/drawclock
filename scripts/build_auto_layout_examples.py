@@ -54,7 +54,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     source_dir = ROOT / "example" / "auto-layout"
-    library = ROOT / "drawio-lib" / "drawclock.xml"
+    library = ROOT / "drawio-lib" / "drawclock"
     args.output_dir.mkdir(parents=True, exist_ok=True)
     for name in EXAMPLES:
         config_path = source_dir / f"{name}.json"

@@ -126,12 +126,13 @@ def main() -> int:
         if path.is_file()
     ]
     manifest_paths.extend(
+        path
+        for path in (bundle_dir / "drawio-lib" / "drawclock").rglob("*.xml")
+        if path.is_file()
+    )
+    manifest_paths.extend(
         bundle_dir / relative
-        for relative in (
-            "runtime/runtime-manifest.json",
-            "drawio-lib/drawclock.xml",
-            "example/draw.json",
-        )
+        for relative in ("runtime/runtime-manifest.json", "example/draw.json")
     )
     source_manifest = {
         "schema": 1,

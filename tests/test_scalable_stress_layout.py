@@ -35,7 +35,7 @@ from drawio_layout import layout_from_dict, layout_to_dict
 
 
 ROOT = Path(__file__).resolve().parents[1]
-LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
+LIBRARY = ROOT / "drawio-lib" / "drawclock"
 EXAMPLES = ROOT / "example" / "auto-layout"
 
 

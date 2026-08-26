@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -11,7 +12,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
+LIBRARY = ROOT / "drawio-lib" / "drawclock"
 DRAW_EXAMPLE = ROOT / "example" / "draw.json"
 LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
 DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
@@ -93,19 +94,15 @@ def _draw(
     )
 
 
-def _write_split_libraries(target: Path) -> tuple[Path, Path]:
-    text = LIBRARY.read_text(encoding="utf-8").strip()
-    entries = json.loads(text[len("<mxlibrary>") : -len("</mxlibrary>")])
-    midpoint = len(entries) // 2
-    first = target / "first.xml"
-    second = target / "nested" / "second.xml"
-    second.parent.mkdir(parents=True, exist_ok=True)
-    for path, part in ((first, entries[:midpoint]), (second, entries[midpoint:])):
-        path.write_text(
-            "<mxlibrary>" + json.dumps(part, ensure_ascii=False) + "</mxlibrary>",
-            encoding="utf-8",
-        )
-    return first, second.parent
+def _write_mixed_library_inputs(target: Path) -> tuple[Path, Path]:
+    first = target / "source.xml"
+    remaining = target / "nested"
+    remaining.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(LIBRARY / "source.xml", first)
+    for path in LIBRARY.glob("*.xml"):
+        if path.name != "source.xml":
+            shutil.copy2(path, remaining / path.name)
+    return first, remaining
 
 
 def _named_node_xs(path: Path, names: tuple[str, ...]) -> dict[str, float]:
@@ -135,7 +132,7 @@ def main() -> int:
     package_root = binary.parent
     if (package_root / "runtime" / "runtime-manifest.json").is_file():
         ROOT = package_root
-        LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
+        LIBRARY = ROOT / "drawio-lib" / "drawclock"
         DRAW_EXAMPLE = ROOT / "example" / "draw.json"
         LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
         DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
@@ -145,7 +142,7 @@ def main() -> int:
         SKILLS = ROOT / "skills"
     runtime = binary.parent / "runtime"
     required = (
-        binary, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC,
+        binary, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC,
         COLUMN_PREFERENCE,
         runtime / "runtime-manifest.json",
         runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node"),
@@ -159,6 +156,8 @@ def main() -> int:
         SKILLS / "drawclock-project-navigation" / "scripts" / "validate_skills.py",
     )
     missing = [str(path) for path in required if not path.is_file()]
+    if not LIBRARY.is_dir() or not any(LIBRARY.glob("*.xml")):
+        missing.append(str(LIBRARY))
     if missing:
         print("missing release inputs:\n" + "\n".join(missing), file=sys.stderr)
         return 1
@@ -217,7 +216,7 @@ def main() -> int:
 
     split_root = out / "split-libraries"
     split_root.mkdir(parents=True, exist_ok=True)
-    first_library, library_directory = _write_split_libraries(split_root)
+    first_library, library_directory = _write_mixed_library_inputs(split_root)
     split_output = out / "split-libraries.svg"
     _run(
         binary,

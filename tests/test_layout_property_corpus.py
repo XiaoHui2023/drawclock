@@ -10,7 +10,7 @@ from layout_quality import inspect_layout_quality
 
 
 ROOT = Path(__file__).resolve().parents[1]
-LIBRARY = ROOT / "drawio-lib" / "drawclock.xml"
+LIBRARY = ROOT / "drawio-lib" / "drawclock"
 
 
 def _varied_clock_dag(seed: int) -> dict[str, dict[str, object]]:
