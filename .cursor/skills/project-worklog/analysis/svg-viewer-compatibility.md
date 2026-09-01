@@ -1,8 +1,8 @@
 # SVG 查看器兼容性分析
 
-- status: active
+- status: done
 - created: 2026-09-01 09:54 +08:00
-- updated: 2026-09-01 12:38 +08:00
+- updated: 2026-09-01 13:05 +08:00
 - scene: Ubuntu EOG 显示异常根因与方案比较
 
 ## 问题与失败基线
@@ -39,16 +39,16 @@
 | SVG-COMPAT-07 | GNOME 静态查看链显示完整 | Ubuntu librsvg 扁平化与独立路径 Oracle | 旧产物器件全部丢失 | covered |
 | SVG-COMPAT-08 | 冻结发行程序生成兼容 SVG | 解压包内二进制 + librsvg | 缺节点追溯的陈旧产物 | covered-local-package |
 | SVG-COMPAT-09 | 断网源码入口生成兼容 SVG | 解压包 `python -I -S src` + librsvg | 冻结输出污染清单扫描范围 | covered-local-package |
-| SVG-COMPAT-10 | 用户下载的远端资产与本地证据一致 | Release 下载、哈希、解压、双入口复验 | 待发布 | pending |
+| SVG-COMPAT-10 | 用户下载的远端资产与本地证据一致 | Release 下载、哈希、解压、双入口复验 | 复用本地产物冒充下载 | covered-remote |
 | SVG-KNOWLEDGE-01 | 发行包含完整 SVG 维护知识 | 七个 skill 结构、链接、UTF-8 与隐私门 | 缺目录、断链、私人路径 | covered |
 | SVG-FREQ-01 | 每个末端独占一行且末端同列 | 零出度集合、末端 x 和行轴不变量 | 两末端共行、末端左右摇摆 | covered-source |
 | SVG-FREQ-02 | 标题顺序为工作频率/SCAN/BIST，数值红色且按行对齐 | 结构化 data 属性、列 x 与末端行轴 | 交换列、红色标题、值错行 | covered-source |
 | SVG-FREQ-03 | 缺省频率为空且不裁切长值/标题 | 动态文字列宽与 viewBox 包含门 | 缺省占位文本、长值越界 | covered-source |
 | SVG-FREQ-04 | 无系统中文字体仍正确显示中文标题 | SIL OFL 开放字体固定轮廓 + 最小 Ubuntu librsvg | CJK 字体缺失时四个方框 | covered-source |
 
-当前可声明范围仅为源码工作树与 Ubuntu 24.04 librsvg 2.58；SVG-COMPAT-08～10 完成前不得声明发行资产就绪。
+声明范围为当前源码、Windows x64 本地冻结包、Ubuntu 16.04 staticx 远端包与 Ubuntu 24.04 librsvg 2.58 渲染链。
 
-## 待验证
+## 已验证
 
 - 浏览器和 librsvg 都必须绘出所有器件、文字、边与端口接触点。
 - 产物中不得包含 `foreignObject`、XHTML、脚本或外部资源引用。

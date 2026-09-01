@@ -1,8 +1,8 @@
 # 原生 SVG 兼容修复记录
 
-- status: active
+- status: done
 - created: 2026-09-01 09:54 +08:00
-- updated: 2026-09-01 12:48 +08:00
+- updated: 2026-09-01 13:05 +08:00
 - scene: 原生 SVG 兼容修复、专题 skill 与发行闭环
 
 ## 当前状态
@@ -49,9 +49,10 @@
 - 项目 SVG 成品/兼容 skill 与用户根部 `svg-artifact-production` 已补入“字体回退不等于自包含”、固定多语言标题轮廓化、许可/可访问性与无字体最小系统故障注入经验。
 - 项目/用户根部 skill 复验均通过，耗时 0.340 秒。提交前编译、22 份 SVG XML/禁用集/三标题、diff 和归档哈希自审通过，有效执行耗时 1.189 秒；首次单行 Python 检查因引号嵌套报 `unterminated string literal`，改用 XML DOM 后完整重跑。
 - PyInstaller 警告仅含 Windows 目标下标准库的 POSIX/Jython/代理条件导入，无项目模块、Node/ELK 资源或业务 hidden import 缺失；冻结完整功能门已直接验证该分类。
+- 提交 `a3dc27980144f914e4bac15c8844ffed3a34ce8d` 已推送，耗时 5.892 秒；Release #82 成功，Ubuntu 16.04 构建 job 从 02:59:41Z 运行到 03:01:44Z。
+- v1.0.0 注释 tag 剥离后精确指向 `a3dc27980144f914e4bac15c8844ffed3a34ce8d`。远端 Linux 资产大小 51,894,908 字节，下载后 SHA-256 为 `28A6B675B1F59B6B22030C1AAB9C8D20614600D59532D252BFBEBA2E80A1C4A7`，解压耗时 2.673 秒。
+- 远端包在 Ubuntu 16.04 的 staticx 冻结入口与 Python 3.10 `-I -S` 源码入口均生成第 22 示例；librsvg 2.58 对两份结果均观测到 7 器件、6 边、41 绘制路径，频率 Oracle 通过，源码+渲染阶段耗时 4.363 秒。
 
-## 下一步
+## 结论
 
-1. 完成末端行、频率列、缺省值和边界的独立 Oracle 及故障注入。
-2. 更新公开 JSON、绘图文档、项目 skills 与发行示例。
-3. 运行完整测试、冻结包、源码包与远端发行资产复验。
+SVG 查看器兼容、末端行和三列频率功能已在源码、Windows 本地冻结包、Linux CI staticx 包、断网源码入口与远端下载资产上闭合。
