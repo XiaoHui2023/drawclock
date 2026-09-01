@@ -13,6 +13,8 @@ description: 进入 drawclock 项目、判断文件职责、选择相关 skill�
 - 修改 rank、排序、坐标、路由、总线或性能：读取 [clock-layout-algorithms](../clock-layout-algorithms/SKILL.md)。
 - 设计输入字段、source 引用或生成器：读取 [clock-json-schema](../clock-json-schema/SKILL.md)。
 - 判断最终 SVG 是否美观、规整、可读：读取 [clock-diagram-design](../clock-diagram-design/SKILL.md)。
+- 修改最终 SVG 图元、文字或标签转换：读取 [svg-artifact-design](../svg-artifact-design/SKILL.md)。
+- 分析 EOG、librsvg 与浏览器显示差异：读取 [svg-portability](../svg-portability/SKILL.md)。
 
 ## 项目路由
 

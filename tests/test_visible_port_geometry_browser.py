@@ -17,6 +17,7 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from drawio_lib.components.registry import ALL
+from svg_native import render_native_label
 _BROWSER_CANDIDATES = [
     shutil.which(name)
     for name in ("msedge", "microsoft-edge", "google-chrome", "chromium")
@@ -214,20 +215,24 @@ def test_browser_ctm_maps_edge_endpoints_to_visible_gate_and_clock_contacts(
     start_x = gate_x + gate_point[0] * gate.W
     start_y = gate_y + gate_point[1] * gate.H
     page = tmp_path / "final-ctm-probe.html"
+    gate_render = render_native_label(
+        gate.label_html(), x=gate_x, y=gate_y, width=gate.W, height=gate.H,
+        content_offset_x=2.0, content_offset_y=7.0,
+    )
+    clock_render = render_native_label(
+        clock.label_html(), x=clock_x, y=clock_y, width=clock.W, height=clock.H,
+        content_offset_x=2.0, content_offset_y=7.0,
+    )
     page.write_text(
         f'''<!doctype html><meta charset="utf-8">
 <svg id="outer" xmlns="http://www.w3.org/2000/svg" width="400" height="260">
   <polyline id="edge" points="{start_x},{start_y} {end_x},{end_y}" fill="none" stroke="black"/>
-  <foreignObject x="{gate_x}" y="{gate_y}" width="{gate.W + 2}" height="{gate.H + 7}" overflow="visible">
-    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:{gate.W}px;height:{gate.H}px;overflow:visible">{gate.label_html()}</div>
-  </foreignObject>
-  <foreignObject x="{clock_x}" y="{clock_y}" width="{clock.W + 2}" height="{clock.H + 7}" overflow="visible">
-    <div xmlns="http://www.w3.org/1999/xhtml" style="position:relative;left:2px;top:7px;width:{clock.W}px;height:{clock.H}px;overflow:visible">{clock.label_html()}</div>
-  </foreignObject>
+  {gate_render}
+  {clock_render}
 </svg>
 <script>
   const edge = document.getElementById('edge');
-  const svgs = [...document.querySelectorAll('foreignObject svg')];
+  const svgs = [...document.querySelectorAll('svg.component-graphic')];
   const matrix = edge.getScreenCTM();
   const edgePoint = index => {{
     const p = edge.points.getItem(index).matrixTransform(matrix);

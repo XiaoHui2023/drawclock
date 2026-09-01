@@ -13,6 +13,8 @@ EXPECTED_SKILLS = (
     "clock-layout-algorithms",
     "component-library-design",
     "drawclock-project-navigation",
+    "svg-artifact-design",
+    "svg-portability",
 )
 FORBIDDEN_PATTERNS = (
     ("Windows user path", re.compile(r"(?i)[a-z]:[/\\]users[/\\]")),

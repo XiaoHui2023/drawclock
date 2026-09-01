@@ -1,0 +1,20 @@
+{
+  "osc": {"kind": "source"},
+  "gate_core": {"kind": "gate", "source": "osc"},
+  "gate_bus": {"kind": "gate", "source": "osc"},
+  "gate_debug": {"kind": "gate", "source": "osc"},
+  "core_clock": {
+    "kind": "clock",
+    "source": "gate_core",
+    "func_freq": "800 MHz",
+    "scan_freq": "50 MHz",
+    "bist_freq": "100 MHz"
+  },
+  "bus_clock": {
+    "kind": "clock",
+    "source": "gate_bus",
+    "func_freq": "400 MHz",
+    "bist_freq": "80 MHz"
+  },
+  "debug_clock": {"kind": "clock", "source": "gate_debug"}
+}

@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from bisect import bisect_left, bisect_right, insort
 from collections import defaultdict
+from dataclasses import dataclass
 from pathlib import Path
 
-from drawio_layout import LayoutDocument
+from drawio_layout import LayoutDocument, VertexLayout
 from drawio_ports import abs_port_xy, edge_attachment, port_anchors
+from svg_native import render_native_label, validate_static_svg
 
 # draw.io places an html=1 label's content origin 2 px right and 7 px below
 # mxGeometry.  The component library deliberately applies the inverse offset
@@ -13,6 +15,145 @@ from drawio_ports import abs_port_xy, edge_attachment, port_anchors
 # otherwise the visible symbol and the mathematically routed ports diverge.
 HTML_LABEL_CONTENT_OFFSET_X = 2.0
 HTML_LABEL_CONTENT_OFFSET_Y = 7.0
+
+FREQUENCY_COLUMNS = (
+    ("func_freq", "工作频率"),
+    ("scan_freq", "SCAN"),
+    ("bist_freq", "BIST"),
+)
+FREQUENCY_FONT_SIZE = 12.0
+FREQUENCY_COLUMN_GAP = 20.0
+FREQUENCY_TABLE_GAP = 34.0
+# Four fixed heading glyph outlines from Noto Sans CJK SC Regular 2.004
+# (SIL OFL 1.1).  Keeping only outlines makes the final SVG independent of
+# viewer fonts while adding no runtime dependency.  See licenses/.
+FREQUENCY_CJK_GLYPHS = (
+    "M52 72V-3H951V72H539V650H900V727H104V650H456V72Z",
+    "M526 828C476 681 395 536 305 442C322 430 351 404 363 391C414 447 463 520 506 601H575V-79H651V164H952V235H651V387H939V456H651V601H962V673H542C563 717 582 763 598 809ZM285 836C229 684 135 534 36 437C50 420 72 379 80 362C114 397 147 437 179 481V-78H254V599C293 667 329 741 357 814Z",
+    "M701 501C699 151 688 35 446-30C459-43 477-67 483-83C743-9 762 129 764 501ZM728 84C795 34 881-38 923-82L968-34C925 9 837 78 770 126ZM428 386C376 178 261 42 49-25C64-40 81-65 88-83C315-3 438 144 493 371ZM133 397C113 323 80 248 37 197C54 189 81 172 93 162C135 217 174 301 196 383ZM544 609V137H608V550H854V139H922V609H742L782 714H950V781H518V714H709C699 680 686 640 672 609ZM114 753V529H39V461H248V158H316V461H502V529H334V652H479V716H334V841H266V529H176V753Z",
+    "M829 643C794 603 732 548 687 515L742 478C788 510 846 558 892 605ZM56 337 94 277C160 309 242 353 319 394L304 451C213 407 118 363 56 337ZM85 599C139 565 205 515 236 481L290 527C256 561 190 609 136 640ZM677 408C746 366 832 306 874 266L930 311C886 351 797 410 730 448ZM51 202V132H460V-80H540V132H950V202H540V284H460V202ZM435 828C450 805 468 776 481 750H71V681H438C408 633 374 592 361 579C346 561 331 550 317 547C324 530 334 498 338 483C353 489 375 494 490 503C442 454 399 415 379 399C345 371 319 352 297 349C305 330 315 297 318 284C339 293 374 298 636 324C648 304 658 286 664 270L724 297C703 343 652 415 607 466L551 443C568 424 585 401 600 379L423 364C511 434 599 522 679 615L618 650C597 622 573 594 550 567L421 560C454 595 487 637 516 681H941V750H569C555 779 531 818 508 847Z",
+)
+
+
+@dataclass(frozen=True)
+class FrequencyTable:
+    terminals: tuple[tuple[VertexLayout, float], ...]
+    column_centers: tuple[float, ...]
+    header_y: float
+    min_x: float
+    min_y: float
+    max_x: float
+    max_y: float
+
+
+def _estimated_text_width(text: str) -> float:
+    """Conservative SVG text width without depending on an installed font."""
+    return sum(12.0 if ord(char) > 0x7F else 7.2 for char in text)
+
+
+def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
+    outgoing_ids = {edge.source_id for edge in document.edges}
+    terminals = [
+        vertex for vertex in document.vertices if vertex.cell_id not in outgoing_ids
+    ]
+    if not terminals:
+        return None
+
+    incoming_by_target = defaultdict(list)
+    for edge in document.edges:
+        incoming_by_target[edge.target_id].append(edge)
+
+    rows: list[tuple[VertexLayout, float]] = []
+    for vertex in terminals:
+        incoming = incoming_by_target.get(vertex.cell_id, [])
+        axes: list[float] = []
+        for edge in incoming:
+            entry_xy = edge_attachment(edge.style, end="entry")
+            if entry_xy is not None:
+                axes.append(vertex.y + vertex.height * entry_xy[1])
+        row_axis = sum(axes) / len(axes) if axes else vertex.y + vertex.height / 2
+        rows.append((vertex, row_axis))
+    rows.sort(key=lambda row: (row[1], row[0].name))
+
+    table_left = max(
+        vertex.x + vertex.width + HTML_LABEL_CONTENT_OFFSET_X
+        for vertex, _ in rows
+    ) + FREQUENCY_TABLE_GAP
+    column_widths: list[float] = []
+    for field, heading in FREQUENCY_COLUMNS:
+        widest = max(
+            [_estimated_text_width(heading)]
+            + [
+                _estimated_text_width(vertex.object_attrs.get(field, ""))
+                for vertex, _ in rows
+            ]
+        )
+        column_widths.append(max(58.0, widest + 12.0))
+    centers: list[float] = []
+    cursor = table_left
+    for width in column_widths:
+        centers.append(cursor + width / 2)
+        cursor += width + FREQUENCY_COLUMN_GAP
+    max_x = cursor - FREQUENCY_COLUMN_GAP
+    first_axis = rows[0][1]
+    header_y = first_axis - 28.0
+    return FrequencyTable(
+        terminals=tuple(rows),
+        column_centers=tuple(centers),
+        header_y=header_y,
+        min_x=table_left,
+        min_y=header_y - FREQUENCY_FONT_SIZE,
+        max_x=max_x,
+        max_y=max(row_axis + FREQUENCY_FONT_SIZE / 2 for _, row_axis in rows),
+    )
+
+
+def _render_frequency_table(table: FrequencyTable) -> list[str]:
+    lines = ['<g class="frequency-table">']
+    for (field, heading), center_x in zip(
+        FREQUENCY_COLUMNS, table.column_centers
+    ):
+        if heading == "工作频率":
+            start_x = center_x - 2 * FREQUENCY_FONT_SIZE
+            lines.append(
+                f'<g class="frequency-heading" data-frequency-field="{field}" '
+                'data-heading-render="outline" aria-label="工作频率" '
+                f'transform="translate({_svg_num(start_x)} {_svg_num(table.header_y)}) '
+                f'scale({_svg_num(FREQUENCY_FONT_SIZE / 1000)} '
+                f'{_svg_num(-FREQUENCY_FONT_SIZE / 1000)})" fill="#20252b">'
+            )
+            lines.append('<title>工作频率</title>')
+            for index, path in enumerate(FREQUENCY_CJK_GLYPHS):
+                lines.append(
+                    f'<path transform="translate({index * 1000} 0)" d="{path}"/>'
+                )
+            lines.append("</g>")
+            continue
+        lines.append(
+            f'<text class="frequency-heading" data-frequency-field="{field}" '
+            f'x="{_svg_num(center_x)}" y="{_svg_num(table.header_y)}" '
+            'text-anchor="middle" font-family="Noto Sans CJK SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif" '
+            f'font-size="{_svg_num(FREQUENCY_FONT_SIZE)}" fill="#20252b">'
+            f'{_escape(heading)}</text>'
+        )
+    for vertex, row_axis in table.terminals:
+        logical_name = vertex.logical_name or vertex.name
+        for (field, _), center_x in zip(
+            FREQUENCY_COLUMNS, table.column_centers
+        ):
+            value = vertex.object_attrs.get(field, "")
+            if not value:
+                continue
+            lines.append(
+                f'<text class="frequency-value" data-node-id="{_escape(logical_name)}" '
+                f'data-frequency-field="{field}" x="{_svg_num(center_x)}" '
+                f'y="{_svg_num(row_axis + FREQUENCY_FONT_SIZE * 0.35)}" '
+                'text-anchor="middle" font-family="Arial,Noto Sans CJK SC,sans-serif" '
+                f'font-size="{_svg_num(FREQUENCY_FONT_SIZE)}" fill="#d02020">'
+                f'{_escape(value)}</text>'
+            )
+    lines.append("</g>")
+    return lines
 
 
 def _svg_num(value: float) -> str:
@@ -292,6 +433,10 @@ def build_preview_svg(
     for x, y in junctions:
         all_x.extend((x - 3.0, x + 3.0))
         all_y.extend((y - 3.0, y + 3.0))
+    frequency_table = _frequency_table(document)
+    if frequency_table is not None:
+        all_x.extend((frequency_table.min_x, frequency_table.max_x))
+        all_y.extend((frequency_table.min_y, frequency_table.max_y))
     pad = 45.0
     min_x = min(all_x) - pad
     min_y = min(all_y) - pad
@@ -303,7 +448,6 @@ def build_preview_svg(
         '<?xml version="1.0" encoding="UTF-8"?>',
         (
             f'<svg xmlns="http://www.w3.org/2000/svg" '
-            f'xmlns:xhtml="http://www.w3.org/1999/xhtml" '
             f'viewBox="{_svg_num(min_x)} {_svg_num(min_y)} '
             f'{_svg_num(width)} {_svg_num(height)}" '
             f'width="{_svg_num(width)}" height="{_svg_num(height)}">'
@@ -342,20 +486,21 @@ def build_preview_svg(
     for vertex in document.vertices:
         label = vertex.object_attrs.get("label", "")
         if label:
-            # Keep the viewport on mxGeometry. Moving it would leave the
-            # left-side contact outside the clip boundary. The HTML content
-            # offset belongs inside the viewport and cancels the graphic's
-            # inverse (-2,-7) offset exactly.
-            lines.append(
-                f'<foreignObject x="{_svg_num(vertex.x)}" y="{_svg_num(vertex.y)}" '
-                f'width="{_svg_num(vertex.width + HTML_LABEL_CONTENT_OFFSET_X)}" '
-                f'height="{_svg_num(vertex.height + HTML_LABEL_CONTENT_OFFSET_Y)}" overflow="visible">'
-                '<div xmlns="http://www.w3.org/1999/xhtml" '
-                f'style="position:relative;left:{HTML_LABEL_CONTENT_OFFSET_X:g}px;'
-                f'top:{HTML_LABEL_CONTENT_OFFSET_Y:g}px;width:{vertex.width:g}px;'
-                f'height:{vertex.height:g}px;overflow:visible">'
-                f"{label}</div></foreignObject>"
+            rendered = render_native_label(
+                label,
+                x=vertex.x,
+                y=vertex.y,
+                width=vertex.width,
+                height=vertex.height,
+                content_offset_x=HTML_LABEL_CONTENT_OFFSET_X,
+                content_offset_y=HTML_LABEL_CONTENT_OFFSET_Y,
             )
+            logical_name = _escape(vertex.logical_name or vertex.name)
+            lines.append(rendered.replace(
+                '<g class="component">',
+                f'<g class="component" data-node-id="{logical_name}">',
+                1,
+            ))
         else:
             lines.append(
                 f'<rect x="{_svg_num(vertex.x)}" y="{_svg_num(vertex.y)}" '
@@ -368,8 +513,12 @@ def build_preview_svg(
                 'text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9">'
                 f'{_escape(vertex.logical_name or vertex.name)}</text>'
             )
+    if frequency_table is not None:
+        lines.extend(_render_frequency_table(frequency_table))
     lines.append("</svg>")
-    return "\n".join(lines) + "\n"
+    result = "\n".join(lines) + "\n"
+    validate_static_svg(result)
+    return result
 
 
 def write_preview_svg(

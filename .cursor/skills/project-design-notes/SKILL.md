@@ -12,6 +12,7 @@ description: >-
 - 唯一入口是 `python src` 或安装后的 `drawclock`。绘图是主功能，无子命令。
 - 必填参数为 `-i/--input`、`-l/--library`、`-o/--output`；`--crossing-style` 保留 `arc`、`gap`、`sharp`、`none`，默认 `arc`。
 - 输出内容始终是 SVG，文件后缀不改变格式。
+- 最终 SVG 只使用自包含的静态原生 SVG 图元与文字，不含 XHTML `foreignObject`、脚本或外部资源；无法转换的器件标签显式报错。
 - 配置只接受严格 JSON，由 Python 标准库 `json` 读取，不含第三方 Python 运行时依赖。
 - v0.0.0 tag 与 Release 保存旧的 extract/reload 版本；v1.0.0 起源码、CLI、示例、测试和发行包只含绘图功能。
 
@@ -43,6 +44,7 @@ description: >-
 ## 质量检查
 
 - Agent 检查端口坐标零偏差、水平引出、每条逻辑边恰好一次、正交线段、器件与文字穿越、节点重叠、异网重合、交叉、锯齿、可避免拐点、源主干碎裂、显示副本合法性和 SVG 边界。
+- SVG 兼容门同时检查浏览器 CTM、静态元素禁用集和 GNOME librsvg 的实际绘制结果；浏览器可打开或渲染命令退出 0 不能单独证明器件可见。
 - 可避免拐点分为固定节点路线候选、单节点联合候选和独占根链整组候选；每类都有独立故障注入。
 - 故障注入覆盖错误端口、缺边、重复边、斜线、文字穿越、终端排序交叉、汇聚外凸、源主干重复和显示副本身份错误。
 - 性质语料改变器件名字、类型、尺寸、端口、链深、根复用和连接顺序。
@@ -54,7 +56,7 @@ description: >-
 
 - PyInstaller 可执行文件随包带 Node.js 与 ELK 运行时，不依赖宿主 PATH。
 - 发行包包含主程序、runtime、原始 `src/`、`drawio-lib/`、示例、源码部署说明和根目录 `skills/`，不含 Python wheelhouse 或依赖清单。
-- `skills/` 包含器件库设计、布局算法、JSON 合约、成图设计和项目导航五个渐进披露 skill；只含项目知识，不含私人路径、身份或本机自动化信息，也不是绘图运行时依赖。
+- `skills/` 包含器件库、布局算法、JSON 合约、时钟图设计、SVG 成品、SVG 兼容性和项目导航七个渐进披露 skill；只含项目知识，不含私人路径、身份或本机自动化信息，也不是绘图运行时依赖。
 - 源码部署只要求同平台 CPython；以 `-I -S` 禁用用户目录和 site-packages 后，源码仍从发行目录 `runtime/` 加载 Node.js 与 ELK。
 - `source-manifest.json` 逐文件记录源码、项目 skill、器件库目录内各组件 XML、示例与运行时清单的 SHA-256，缺失和篡改均阻断源码消费门。
 - 冻结包门和源码包门都执行包内 skill 校验器，检查固定目录集合、frontmatter、单层 references、链接完整性、UTF-8 和私人绝对路径。

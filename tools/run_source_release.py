@@ -17,6 +17,8 @@ REQUIRED_SKILL_FILES = {
     "skills/clock-layout-algorithms/SKILL.md",
     "skills/component-library-design/SKILL.md",
     "skills/drawclock-project-navigation/SKILL.md",
+    "skills/svg-artifact-design/SKILL.md",
+    "skills/svg-portability/SKILL.md",
     "skills/drawclock-project-navigation/scripts/validate_skills.py",
 }
 
@@ -37,13 +39,12 @@ def validate_source_manifest(root: pathlib.Path) -> None:
         raise ValueError("source manifest has no files")
     actual_paths = {
         path.relative_to(root).as_posix()
-        for base in (root / "src", root / "skills")
+        for base in (root / "src", root / "skills", root / "licenses")
         for path in base.rglob("*")
         if path.is_file()
     }
     required_paths = {
         "runtime/runtime-manifest.json",
-        "example/draw.json",
     }
     actual_paths.update(
         relative for relative in required_paths if (root / relative).is_file()
@@ -57,6 +58,14 @@ def validate_source_manifest(root: pathlib.Path) -> None:
     if not library_paths:
         raise ValueError("release component library directory is empty")
     actual_paths.update(library_paths)
+    actual_paths.update(
+        path.relative_to(root).as_posix()
+        for path in (
+            root / "example/draw.json",
+            *(root / "example/auto-layout").glob("*.json"),
+        )
+        if path.is_file()
+    )
     missing_skills = sorted(
         relative for relative in REQUIRED_SKILL_FILES if not (root / relative).is_file()
     )
@@ -65,6 +74,8 @@ def validate_source_manifest(root: pathlib.Path) -> None:
     legacy_paths = (root / "requirements-offline.txt", root / "vendor" / "wheels")
     if any(path.exists() for path in legacy_paths):
         raise ValueError("release still contains legacy Python runtime dependencies")
+    if not (root / "licenses/NotoSansCJK-OFL-1.1.txt").is_file():
+        raise ValueError("release is missing the embedded heading outline license")
     if set(expected) != actual_paths:
         missing = sorted(set(expected) - actual_paths)
         extra = sorted(actual_paths - set(expected))
@@ -124,10 +135,15 @@ def main() -> int:
             check=True,
         )
         svg = ET.fromstring(output.read_text(encoding="utf-8"))
-        if not svg.tag.endswith("svg") or not svg.findall(
-            "{http://www.w3.org/2000/svg}foreignObject"
-        ):
+        components = [
+            element for element in svg.iter()
+            if "component" in element.get("class", "").split()
+        ]
+        if not svg.tag.endswith("svg") or not components:
             raise SystemExit("offline source smoke did not produce a populated SVG")
+        forbidden = {"foreignObject", "script", "iframe", "audio", "video", "canvas"}
+        if any(element.tag.rsplit("}", 1)[-1] in forbidden for element in svg.iter()):
+            raise SystemExit("offline source smoke produced browser-only SVG content")
     print("offline source deployment passed")
     return 0
 

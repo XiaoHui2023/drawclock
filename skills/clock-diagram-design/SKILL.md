@@ -14,6 +14,7 @@ description: 定义或评审 drawclock 最终 SVG 的视觉要求时使用，覆
 3. [连线、交叉与折点](references/edges-crossings-and-bends.md)
 4. [标签、留白与画布](references/footprints-spacing-and-canvas.md)
 5. [设计验收清单](references/review-checklist.md)
+6. [末端行与频率注释](references/terminal-frequency-table.md)
 
 ## 视觉优先级
 

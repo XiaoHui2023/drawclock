@@ -43,11 +43,32 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 }
 ```
 
+末端 clock 可选填写 `func_freq`、`scan_freq`、`bist_freq`，值为字符串或数字。所有末端独占一行并对齐到最右列；后方依次显示“工作频率”、“SCAN”、“BIST”。频率值为红色，未填字段保持空白。
+
+```json
+{
+  "clock_a": {
+    "kind": "clock",
+    "source": "gate_a",
+    "func_freq": "800 MHz",
+    "scan_freq": "50 MHz",
+    "bist_freq": "100 MHz"
+  },
+  "clock_b": {"kind": "clock", "source": "gate_b", "func_freq": 400}
+}
+```
+
 器件库可定义任意类型。布局只依据连接关系、库内几何、标签和端口计算，不按固定器件名或实例名分支。
 
 每个器件库 XML 必须使用标准 draw.io `mxlibrary` 格式，并且只包含一个器件。文件名不参与器件识别，器件类型始终取文件内的 `title`。
 
 多个文件按参数顺序合并；目录内 XML 按路径稳定排序后合并。不同文件出现同名器件时直接报错，避免无提示覆盖。`-l` 可以重复填写，并可同时传入多个文件和多个目录。
+
+## 输出
+
+器件、文字和连线均为原生 SVG 图元，不使用 XHTML、脚本或外部资源。输出文件可直接由浏览器、Ubuntu EOG 和 librsvg 打开，不需要 HTTP 服务。
+
+器件库标签若包含无法转换为静态 SVG 的 HTML 元素、容器变换或外部资源，绘图会报错，不生成缺少器件的结果。
 
 ## 示例
 
@@ -55,4 +76,5 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 drawclock -i example/draw.json -l libraries/source.xml libraries/components -l libraries/project -o clock-tree.svg
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg --crossing-style gap
+drawclock -i example/auto-layout/22-terminal-frequency-table.json -l drawio-lib/drawclock -o terminal-frequency.svg
 ```

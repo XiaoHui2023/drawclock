@@ -20,6 +20,7 @@ RELEASE_PATHS = (
     "draw.md",
     "pyproject.toml",
     "source-deploy.md",
+    "licenses",
     "drawio-lib",
     "skills",
     "example/draw.json",
@@ -28,6 +29,7 @@ RELEASE_PATHS = (
     "example/auto-layout/08-stress-512-clocks.json",
     "example/auto-layout/20-asymmetric-merge-route-bulge.json",
     "example/auto-layout/21-layout-column-preference.json",
+    "example/auto-layout/22-terminal-frequency-table.json",
 )
 
 SOURCE_PATHS = (
@@ -121,7 +123,9 @@ def main() -> int:
 
     manifest_paths = [
         path
-        for base in (bundle_dir / "src", bundle_dir / "skills")
+        for base in (
+            bundle_dir / "src", bundle_dir / "skills", bundle_dir / "licenses",
+        )
         for path in base.rglob("*")
         if path.is_file()
     ]
@@ -131,9 +135,10 @@ def main() -> int:
         if path.is_file()
     )
     manifest_paths.extend(
-        bundle_dir / relative
-        for relative in ("runtime/runtime-manifest.json", "example/draw.json")
+        path for path in (bundle_dir / "example").rglob("*.json")
+        if path.is_file()
     )
+    manifest_paths.append(bundle_dir / "runtime/runtime-manifest.json")
     source_manifest = {
         "schema": 1,
         "files": {

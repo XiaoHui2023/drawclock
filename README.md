@@ -1,10 +1,12 @@
 # drawclock
 
-根据时钟连接配置和指定的 draw.io 器件库生成从左到右的 SVG 时钟图。
+根据时钟连接配置和指定的 draw.io 器件库生成从左到右、自包含的静态 SVG 时钟图。
 
 ```powershell
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 ```
+
+末端 clock 可选填写 `func_freq`、`scan_freq`、`bist_freq`。输出会将末端逐行对齐，并在右侧按“工作频率 / SCAN / BIST”三列显示红色数值；未填项留空。完整示例见 `example/auto-layout/22-terminal-frequency-table.json`。
 
 ## 命令行参数
 

@@ -72,6 +72,39 @@ def test_layout_column_rejects_invalid_values(value: object) -> None:
         generate_elk_layout(config, library_path=LIBRARY)
 
 
+@pytest.mark.parametrize("field", ["func_freq", "scan_freq", "bist_freq"])
+@pytest.mark.parametrize("value", [None, True, [], {}])
+def test_frequency_fields_reject_non_display_scalars(
+    field: str, value: object,
+) -> None:
+    config = {"clk": {"kind": "clock", field: value}}
+
+    with pytest.raises(ValueError, match=rf"{field} 必须是字符串或数字"):
+        generate_elk_layout(config, library_path=LIBRARY)
+
+
+def test_frequency_fields_accept_strings_numbers_and_omission() -> None:
+    config = {
+        "source": {"kind": "source"},
+        "clk_a": {
+            "kind": "clock", "source": "source",
+            "func_freq": "800 MHz", "scan_freq": 50, "bist_freq": 125.5,
+        },
+        "clk_b": {"kind": "clock", "source": "source"},
+    }
+
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+
+    attrs = {vertex.name: vertex.object_attrs for vertex in document.vertices}
+    assert attrs["clk_a"]["func_freq"] == "800 MHz"
+    assert attrs["clk_a"]["scan_freq"] == "50"
+    assert attrs["clk_a"]["bist_freq"] == "125.5"
+    assert "func_freq" not in attrs["clk_b"]
+    terminals = [vertex for vertex in document.vertices if vertex.name.startswith("clk_")]
+    assert len({vertex.x for vertex in terminals}) == 1
+    assert len({vertex.y for vertex in terminals}) == len(terminals)
+
+
 def test_linear_layout_is_deterministic() -> None:
     config = _linear_config()
     first, report = generate_layout(config, library_path=LIBRARY)

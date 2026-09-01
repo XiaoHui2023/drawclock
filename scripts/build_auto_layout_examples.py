@@ -36,6 +36,7 @@ EXAMPLES = (
     "19-dispersed-root-fanout",
     "20-asymmetric-merge-route-bulge",
     "21-layout-column-preference",
+    "22-terminal-frequency-table",
 )
 
 

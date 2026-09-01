@@ -85,6 +85,10 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     (project / "README.md").write_text("", encoding="utf-8")
     (project / "draw.md").write_text("", encoding="utf-8")
     (project / "source-deploy.md").write_text("", encoding="utf-8")
+    (project / "licenses").mkdir()
+    (project / "licenses" / "NotoSansCJK-OFL-1.1.txt").write_text(
+        "SIL Open Font License 1.1\n", encoding="utf-8"
+    )
     shutil.copytree(ROOT / "skills", project / "skills")
     (project / "example" / "draw.json").write_text("{}", encoding="utf-8")
     packaged_layout_examples = (
@@ -93,6 +97,7 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         "08-stress-512-clocks.json",
         "20-asymmetric-merge-route-bulge.json",
         "21-layout-column-preference.json",
+        "22-terminal-frequency-table.json",
     )
     for name in packaged_layout_examples:
         (project / "example" / "auto-layout" / name).write_text("{}", encoding="utf-8")
@@ -117,6 +122,7 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     assert prefix + "src/__main__.py" in names
     assert prefix + "source/__main__.py" not in names
     assert prefix + "source-deploy.md" in names
+    assert prefix + "licenses/NotoSansCJK-OFL-1.1.txt" in names
     assert prefix + "drawio-lib/drawclock/source.xml" in names
     assert prefix + "drawio-lib/drawclock.xml" not in names
     for skill in (
@@ -162,11 +168,15 @@ def test_source_manifest_rejects_missing_or_modified_source(
         "runtime/runtime-manifest.json": b"{}\n",
         "drawio-lib/drawclock/source.xml": b"<mxlibrary/>\n",
         "example/draw.json": b"{}\n",
+        "example/auto-layout/22-terminal-frequency-table.json": b"{}\n",
+        "licenses/NotoSansCJK-OFL-1.1.txt": b"SIL Open Font License 1.1\n",
         "skills/clock-diagram-design/SKILL.md": b"---\nname: clock-diagram-design\ndescription: test\n---\n",
         "skills/clock-json-schema/SKILL.md": b"---\nname: clock-json-schema\ndescription: test\n---\n",
         "skills/clock-layout-algorithms/SKILL.md": b"---\nname: clock-layout-algorithms\ndescription: test\n---\n",
         "skills/component-library-design/SKILL.md": b"---\nname: component-library-design\ndescription: test\n---\n",
         "skills/drawclock-project-navigation/SKILL.md": b"---\nname: drawclock-project-navigation\ndescription: test\n---\n",
+        "skills/svg-artifact-design/SKILL.md": b"---\nname: svg-artifact-design\ndescription: test\n---\n",
+        "skills/svg-portability/SKILL.md": b"---\nname: svg-portability\ndescription: test\n---\n",
         "skills/drawclock-project-navigation/scripts/validate_skills.py": b"print('ok')\n",
     }
     for relative, content in files.items():
@@ -182,6 +192,12 @@ def test_source_manifest_rejects_missing_or_modified_source(
     }
     (root / "source-manifest.json").write_text(
         json.dumps(manifest), encoding="utf-8"
+    )
+    gate.validate_source_manifest(root)
+
+    (root / "example" / "out").mkdir()
+    (root / "example" / "out" / "frozen-input.json").write_text(
+        "{}\n", encoding="utf-8"
     )
     gate.validate_source_manifest(root)
 

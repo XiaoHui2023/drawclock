@@ -19,6 +19,7 @@ DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
 STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
 ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
 COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
+FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
 SKILLS = ROOT / "skills"
 SVG_NS = "http://www.w3.org/2000/svg"
 
@@ -63,11 +64,17 @@ def _assert_svg(
         element for element in list(root)
         if element.get("class") == "edge"
     ]
-    rendered_nodes = root.findall(f"{{{SVG_NS}}}foreignObject")
+    rendered_nodes = [
+        element for element in root.iter()
+        if "component" in element.get("class", "").split()
+    ]
     if len(rendered_nodes) < nodes or len(rendered_edges) != edges:
         raise SystemExit(
             f"unexpected SVG topology: {path} nodes={len(rendered_nodes)} edges={len(rendered_edges)}"
         )
+    forbidden = {"foreignObject", "script", "iframe", "audio", "video", "canvas"}
+    if any(element.tag.rsplit("}", 1)[-1] in forbidden for element in root.iter()):
+        raise SystemExit(f"browser-only SVG content: {path}")
     view_box = [float(value) for value in root.get("viewBox", "").split()]
     if len(view_box) != 4 or view_box[2] <= 0 or view_box[3] <= 0:
         raise SystemExit(f"invalid SVG bounds: {path}")
@@ -108,11 +115,22 @@ def _write_mixed_library_inputs(target: Path) -> tuple[Path, Path]:
 def _named_node_xs(path: Path, names: tuple[str, ...]) -> dict[str, float]:
     root = ET.fromstring(path.read_text(encoding="utf-8"))
     x_by_name: dict[str, float] = {}
-    for element in root.findall(f"{{{SVG_NS}}}foreignObject"):
+    for element in root.iter():
+        if "component" not in element.get("class", "").split():
+            continue
         text_content = "".join(element.itertext())
+        graphic = next(
+            (
+                child for child in element.iter()
+                if "component-graphic" in child.get("class", "").split()
+            ),
+            None,
+        )
+        if graphic is None:
+            continue
         for name in names:
             if name in text_content:
-                x_by_name[name] = float(element.get("x", "nan"))
+                x_by_name[name] = float(graphic.get("x", "nan"))
     if set(x_by_name) != set(names):
         raise SystemExit(f"layout_column nodes are missing: {x_by_name}")
     return x_by_name
@@ -125,9 +143,78 @@ def _assert_named_nodes_same_x(path: Path, names: tuple[str, ...]) -> float:
     return next(iter(x_by_name.values()))
 
 
+def _assert_frequency_table(path: Path, config_path: Path) -> None:
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    referenced = set()
+    for item in config.values():
+        source = item.get("source")
+        values = source.values() if isinstance(source, dict) else (source,)
+        referenced.update(
+            value.split("[", 1)[0]
+            for value in values
+            if isinstance(value, str)
+        )
+    terminals = set(config) - referenced
+    root = ET.fromstring(path.read_text(encoding="utf-8"))
+    components = [
+        element for element in root.iter()
+        if element.get("class") == "component"
+        and element.get("data-node-id") in terminals
+    ]
+    if len(components) != len(terminals):
+        raise SystemExit("frequency example terminal traceability is incomplete")
+    graphics = [
+        next(child for child in component.iter()
+             if child.get("class") == "component-graphic")
+        for component in components
+    ]
+    if len({graphic.get("x") for graphic in graphics}) != 1:
+        raise SystemExit("frequency example terminals are not co-column")
+    if len({graphic.get("y") for graphic in graphics}) != len(graphics):
+        raise SystemExit("frequency example places multiple terminals on one row")
+
+    headings = [
+        element for element in root.iter()
+        if element.get("class") == "frequency-heading"
+    ]
+    labels = [element.get("aria-label", element.text or "") for element in headings]
+    fields = [element.get("data-frequency-field") for element in headings]
+    if labels != ["工作频率", "SCAN", "BIST"] or fields != [
+        "func_freq", "scan_freq", "bist_freq",
+    ]:
+        raise SystemExit(f"frequency headings are invalid: {labels=} {fields=}")
+    if any(element.get("fill") != "#20252b" for element in headings):
+        raise SystemExit("frequency headings are not black")
+    outline = headings[0]
+    if outline.get("data-heading-render") != "outline" or sum(
+        child.tag.rsplit("}", 1)[-1] == "path" for child in outline
+    ) != 4:
+        raise SystemExit("Chinese frequency heading is not font-independent")
+
+    values = [
+        element for element in root.iter()
+        if element.get("class") == "frequency-value"
+    ]
+    observed = {
+        (element.get("data-node-id"), element.get("data-frequency-field")): element.text
+        for element in values
+    }
+    expected = {
+        (name, field): str(item[field])
+        for name, item in config.items()
+        if name in terminals
+        for field in ("func_freq", "scan_freq", "bist_freq")
+        if field in item and str(item[field])
+    }
+    if observed != expected or any(
+        element.get("fill") != "#d02020" for element in values
+    ):
+        raise SystemExit(f"frequency values are invalid: {observed=}, {expected=}")
+
+
 def main() -> int:
     global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC
-    global COLUMN_PREFERENCE, SKILLS
+    global COLUMN_PREFERENCE, FREQUENCY, SKILLS
     binary = _binary_path()
     package_root = binary.parent
     if (package_root / "runtime" / "runtime-manifest.json").is_file():
@@ -139,11 +226,12 @@ def main() -> int:
         STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
         ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
         COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
+        FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
         SKILLS = ROOT / "skills"
     runtime = binary.parent / "runtime"
     required = (
         binary, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC,
-        COLUMN_PREFERENCE,
+        COLUMN_PREFERENCE, FREQUENCY,
         runtime / "runtime-manifest.json",
         runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node"),
         runtime / "elk" / "elk_layout.mjs",
@@ -153,6 +241,8 @@ def main() -> int:
         SKILLS / "clock-layout-algorithms" / "SKILL.md",
         SKILLS / "component-library-design" / "SKILL.md",
         SKILLS / "drawclock-project-navigation" / "SKILL.md",
+        SKILLS / "svg-artifact-design" / "SKILL.md",
+        SKILLS / "svg-portability" / "SKILL.md",
         SKILLS / "drawclock-project-navigation" / "scripts" / "validate_skills.py",
     )
     missing = [str(path) for path in required if not path.is_file()]
@@ -198,6 +288,10 @@ def main() -> int:
             "layout_column numeric order is not left-to-right: "
             f"root={root_x}, mux={mux_x}, clock={clock_x}"
         )
+
+    frequency_output = out / "terminal-frequency-frozen.svg"
+    _draw(binary, FREQUENCY, frequency_output)
+    _assert_frequency_table(frequency_output, FREQUENCY)
 
     strict_json = out / "frozen-input.json"
     strict_json.write_text('{"osc":{"kind":"source"}}', encoding="utf-8")

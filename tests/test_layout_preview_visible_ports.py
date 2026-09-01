@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
@@ -17,6 +18,7 @@ from layout_preview import (
     HTML_LABEL_CONTENT_OFFSET_Y,
     build_preview_svg,
 )
+from svg_native import render_native_label, validate_static_svg
 from drawio_lib.components.label_overflow import (
     DRAWIO_HTML_LABEL_OFFSET_X,
     DRAWIO_HTML_LABEL_OFFSET_Y,
@@ -61,27 +63,83 @@ def test_native_preview_visible_graphic_origin_equals_geometry_origin(spec) -> N
         object_attrs={"label": label},
     )
     svg = build_preview_svg(LayoutDocument(version=1, vertices=[vertex], edges=[]))
-    foreign = re.search(r'<foreignObject x="([^\"]+)" y="([^\"]+)"', svg)
-    assert foreign is not None
-    viewport_x, viewport_y = (float(value) for value in foreign.groups())
-    content = re.search(
-        r'style="position:relative;left:([-\d.]+)px;top:([-\d.]+)px;', svg
+    graphic = re.search(
+        r'<svg class="component-graphic" x="([^\"]+)" y="([^\"]+)"', svg
     )
-    assert content is not None
-    content_dx, content_dy = (float(value) for value in content.groups())
-
+    assert graphic is not None
+    graphic_x, graphic_y = (float(value) for value in graphic.groups())
     drift_x, drift_y = _visible_drift(
-        content_x=viewport_x + content_dx,
-        content_y=viewport_y + content_dy,
-        graphic_dx=graphic_dx,
-        graphic_dy=graphic_dy,
+        content_x=graphic_x,
+        content_y=graphic_y,
+        graphic_dx=0.0,
+        graphic_dy=0.0,
         geometry_x=vertex.x,
         geometry_y=vertex.y,
     )
     assert drift_x == pytest.approx(0.0, abs=1e-9)
     assert drift_y == pytest.approx(0.0, abs=1e-9)
-    assert viewport_x == vertex.x
-    assert viewport_y == vertex.y
+    assert graphic_x == vertex.x
+    assert graphic_y == vertex.y
+    assert "foreignObject" not in svg
+    validate_static_svg(svg)
+
+
+@pytest.mark.parametrize("spec", ALL, ids=lambda spec: spec.module.TITLE)
+def test_every_component_label_has_a_portable_native_svg_render(spec) -> None:
+    mod = spec.module
+    rendered = render_native_label(
+        mod.label_html(),
+        x=10.0,
+        y=20.0,
+        width=mod.W,
+        height=mod.H,
+        content_offset_x=HTML_LABEL_CONTENT_OFFSET_X,
+        content_offset_y=HTML_LABEL_CONTENT_OFFSET_Y,
+    )
+    assert 'class="component-graphic"' in rendered
+    assert "foreignObject" not in rendered
+    assert "http://www.w3.org/1999/xhtml" not in rendered
+
+
+def test_static_svg_oracle_rejects_historical_foreign_object_escape() -> None:
+    broken = (
+        '<?xml version="1.0"?>'
+        '<svg xmlns="http://www.w3.org/2000/svg" '
+        'xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+        '<foreignObject width="10" height="10">'
+        '<xhtml:div>hidden in librsvg</xhtml:div>'
+        '</foreignObject></svg>'
+    )
+    with pytest.raises(ValueError, match="非静态通用 SVG"):
+        validate_static_svg(broken)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        '<image href="https://example.invalid/component.svg"/>',
+        '<style>@import url(https://example.invalid/style.css);</style>',
+        '<rect style="fill:url(https://example.invalid/fill.svg)"/>',
+        '<rect onclick="alert(1)"/>',
+    ],
+)
+def test_static_svg_oracle_rejects_external_or_active_content(payload: str) -> None:
+    broken = f'<svg xmlns="http://www.w3.org/2000/svg">{payload}</svg>'
+    with pytest.raises(ValueError):
+        validate_static_svg(broken)
+
+
+def test_label_converter_rejects_unhandled_geometry_css() -> None:
+    label = (
+        '<div style="position:relative;width:40px;height:40px;right:2px">'
+        '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"/>'
+        '</div>'
+    )
+    with pytest.raises(ValueError, match="不兼容的 HTML 样式: right"):
+        render_native_label(
+            label, x=0, y=0, width=40, height=40,
+            content_offset_x=2, content_offset_y=7,
+        )
 
 
 def test_native_preview_outer_and_inner_offsets_are_exact_inverses() -> None:
@@ -162,6 +220,95 @@ def test_preview_viewbox_contains_routes_below_all_nodes() -> None:
     assert viewbox is not None
     _, min_y, _, height = (float(value) for value in viewbox.group(1).split())
     assert min_y + height >= 945.0
+
+
+def test_terminal_frequency_table_has_one_aligned_row_per_sink() -> None:
+    style = "points=[[0,0.5,0,0,0],[1,0.5,0,0,0]];"
+    vertices = [
+        VertexLayout("root", "v0", "generic", 0, 80, 40, 40, style),
+        VertexLayout(
+            "clk_a", "v1", "generic", 200, 20, 40, 40, style,
+            object_attrs={
+                "func_freq": "800 MHz", "scan_freq": "50 MHz",
+                "bist_freq": "100 MHz",
+            },
+        ),
+        VertexLayout(
+            "clk_b", "v2", "generic", 200, 100, 40, 40, style,
+            object_attrs={"func_freq": "400 MHz", "bist_freq": "80 MHz"},
+        ),
+        VertexLayout(
+            "clk_c", "v3", "generic", 200, 180, 40, 40, style,
+            object_attrs={},
+        ),
+    ]
+    edge_style = "exitX=1;exitY=0.5;entryX=0;entryY=0.5;"
+    edges = [
+        EdgeLayout(f"e{index}", "v0", f"v{index}", edge_style)
+        for index in range(1, 4)
+    ]
+
+    svg = build_preview_svg(
+        LayoutDocument(version=1, vertices=vertices, edges=edges)
+    )
+    root = ET.fromstring(svg)
+    ns = {"svg": "http://www.w3.org/2000/svg"}
+    headings = [
+        element for element in root.iter()
+        if element.attrib.get("class") == "frequency-heading"
+    ]
+    values = root.findall(".//svg:text[@class='frequency-value']", ns)
+
+    assert [heading.attrib.get("aria-label", heading.text) for heading in headings] == [
+        "工作频率", "SCAN", "BIST",
+    ]
+    assert [heading.attrib["data-frequency-field"] for heading in headings] == [
+        "func_freq", "scan_freq", "bist_freq",
+    ]
+    assert all(heading.attrib["fill"] == "#20252b" for heading in headings)
+    assert headings[0].attrib["data-heading-render"] == "outline"
+    assert len(headings[0].findall("svg:path", ns)) == 4
+    assert all(value.attrib["fill"] == "#d02020" for value in values)
+    assert {(value.attrib["data-node-id"], value.text) for value in values} == {
+        ("clk_a", "800 MHz"), ("clk_a", "50 MHz"),
+        ("clk_a", "100 MHz"), ("clk_b", "400 MHz"),
+        ("clk_b", "80 MHz"),
+    }
+    row_y = {
+        node: {float(value.attrib["y"]) for value in values
+               if value.attrib["data-node-id"] == node}
+        for node in ("clk_a", "clk_b")
+    }
+    assert all(len(ys) == 1 for ys in row_y.values())
+    assert row_y["clk_a"] != row_y["clk_b"]
+    assert all(float(value.attrib["x"]) > 240 for value in values)
+
+    min_x, min_y, width, height = (
+        float(value) for value in root.attrib["viewBox"].split()
+    )
+    heading_centers = [
+        float(heading.attrib.get("x", headings[index].attrib.get("x", 0)))
+        for index, heading in enumerate(headings[1:], 1)
+    ]
+    assert min_x + width > max(heading_centers)
+    assert min_y < min(float(heading.attrib["y"]) for heading in headings[1:])
+    assert min_y + height > max(float(value.attrib["y"]) for value in values)
+
+
+def test_frequency_text_is_xml_escaped_and_long_value_expands_canvas() -> None:
+    vertex = VertexLayout(
+        "clk", "v1", "generic", 10, 20, 40, 40,
+        "points=[[0,0.5,0,0,0]];",
+        object_attrs={"func_freq": "A&B <nominal> " + "9" * 80},
+    )
+    svg = build_preview_svg(LayoutDocument(version=1, vertices=[vertex], edges=[]))
+    root = ET.fromstring(svg)
+    ns = {"svg": "http://www.w3.org/2000/svg"}
+    value = root.find(".//svg:text[@class='frequency-value']", ns)
+    assert value is not None
+    assert value.text == "A&B <nominal> " + "9" * 80
+    assert "A&amp;B &lt;nominal&gt;" in svg
+    assert float(root.attrib["width"]) > 700
 
 
 def test_preview_default_draws_real_arc_bridge_at_crossing() -> None:
