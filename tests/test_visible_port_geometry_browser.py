@@ -7,6 +7,7 @@ import re
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -28,8 +29,37 @@ _BROWSER_CANDIDATES.extend(
         r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
     ]
 )
+
+
+def _browser_can_dump_dom(candidate: Path) -> bool:
+    """A binary path alone is not evidence that headless DOM capture works."""
+    try:
+        with tempfile.TemporaryDirectory(prefix="drawclock-browser-probe-") as profile:
+            completed = subprocess.run(
+                [
+                    str(candidate), "--headless=new", "--disable-gpu", "--no-first-run",
+                    f"--user-data-dir={profile}", "--dump-dom",
+                    "data:text/html,%3Cpre%20id%3D%22result%22%3Eok%3C/pre%3E",
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                timeout=15,
+            )
+        return completed.returncode == 0 and '<pre id="result">ok</pre>' in completed.stdout
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
 BROWSER = next(
-    (Path(candidate) for candidate in _BROWSER_CANDIDATES if candidate and Path(candidate).is_file()),
+    (
+        Path(candidate)
+        for candidate in _BROWSER_CANDIDATES
+        if candidate
+        and Path(candidate).is_file()
+        and _browser_can_dump_dom(Path(candidate))
+    ),
     None,
 )
 PORT_TOLERANCE_PX = 0.03
@@ -45,6 +75,8 @@ def _edge_dump_dom(page: Path) -> str:
     completed = subprocess.run(
         [
             str(BROWSER), "--headless", "--disable-gpu", *sandbox_args,
+            "--no-first-run",
+            f"--user-data-dir={page.parent / 'browser-profile'}",
             "--dump-dom", page.as_uri(),
         ],
         check=True,
@@ -115,7 +147,7 @@ def _probe_cards(
     return _result_json(_edge_dump_dom(page))
 
 
-@pytest.mark.skipif(BROWSER is None, reason="headless browser is unavailable")
+@pytest.mark.skipif(BROWSER is None, reason="headless browser DOM capture is unavailable")
 def test_every_declared_port_hits_actual_visible_svg_geometry(tmp_path: Path) -> None:
     """Independent oracle: browser path geometry, not component port objects."""
     cards: list[str] = []
@@ -159,7 +191,7 @@ def test_every_declared_port_hits_actual_visible_svg_geometry(tmp_path: Path) ->
     assert checked == expected_port_count == 57
 
 
-@pytest.mark.skipif(BROWSER is None, reason="headless browser is unavailable")
+@pytest.mark.skipif(BROWSER is None, reason="headless browser DOM capture is unavailable")
 def test_probe_rejects_historical_gate_center_anchor_fault(tmp_path: Path) -> None:
     """Seeded fault: the bubble centre is not its external wire contact."""
     gate = next(spec.module for spec in ALL if spec.module.TITLE == "gate")
@@ -177,7 +209,7 @@ def test_probe_rejects_historical_gate_center_anchor_fault(tmp_path: Path) -> No
     assert abs(port["contactX"] - port["x"]) > PORT_TOLERANCE_PX
 
 
-@pytest.mark.skipif(BROWSER is None, reason="headless browser is unavailable")
+@pytest.mark.skipif(BROWSER is None, reason="headless browser DOM capture is unavailable")
 def test_probe_rejects_pll_input_without_visible_contact_lead(tmp_path: Path) -> None:
     """Seeded fault: a declared PLL input may not terminate in an empty notch."""
     pll = next(spec.module for spec in ALL if spec.module.TITLE == "pll")
@@ -197,7 +229,7 @@ def test_probe_rejects_pll_input_without_visible_contact_lead(tmp_path: Path) ->
     assert port["contactX"] is None or abs(port["contactX"] - port["x"]) > PORT_TOLERANCE_PX
 
 
-@pytest.mark.skipif(BROWSER is None, reason="headless browser is unavailable")
+@pytest.mark.skipif(BROWSER is None, reason="headless browser DOM capture is unavailable")
 @pytest.mark.parametrize("target_title", ["pll", "clock"])
 def test_browser_ctm_maps_edge_endpoints_to_visible_gate_and_clock_contacts(
     tmp_path: Path, target_title: str,

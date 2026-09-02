@@ -14,6 +14,7 @@ description: 修改、评审或扩展 drawclock 自动布局算法时使用，�
 3. 按[正交路由与总线](references/orthogonal-routing.md)从精确端口寻路、合并同源干线并简化折点。
 4. 按[规模化与确定性](references/scalability.md)限制候选、分解接多路下游的结构并保持输出稳定。
 5. 使用[质量目标与门禁](references/quality-gates.md)选择候选和阻止回归。
+   通用零入度源显示副本专项的边界、指标、反例和回退点见[源副本能力合同](references/source-replication-capability.json)。
 6. 选型或继续研究时查看[工具与资料](references/tools-and-sources.md)。
 
 ## 优先级

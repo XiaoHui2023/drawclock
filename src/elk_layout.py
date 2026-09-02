@@ -1787,7 +1787,7 @@ def _refine_leaf_continuation_rows(
     considers obstacle-boundary rows, and accepts only a strict global bend
     improvement with every hard geometry metric non-regressing.
     """
-    accepted = copy.deepcopy(document)
+    accepted = document
     indegree: Counter[str] = Counter(edge.target for edge in logical_edges)
     outdegree: Counter[str] = Counter(edge.source for edge in logical_edges)
     incoming: dict[str, list[int]] = defaultdict(list)
@@ -2031,7 +2031,6 @@ def _refine_exclusive_upstream_chain_axes(
     route_clearance: float,
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     """Align a movable exclusive upstream chain with its downstream port."""
-    accepted = copy.deepcopy(document)
     indegree: Counter[str] = Counter(edge.target for edge in logical_edges)
     outdegree: Counter[str] = Counter(edge.source for edge in logical_edges)
     incoming: dict[str, list[int]] = defaultdict(list)
@@ -2040,6 +2039,47 @@ def _refine_exclusive_upstream_chain_axes(
         incoming[logical.target].append(edge_index)
         incident[logical.source].append(edge_index)
         incident[logical.target].append(edge_index)
+
+    # Avoid copying and fully assessing a graph that has no structurally
+    # eligible chain.  This is a necessary-condition preflight only; every
+    # admitted candidate still passes the complete quality loop below.
+    initial_by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    initial_edges = {edge.cell_id: edge for edge in document.edges}
+    has_eligible_chain = False
+    for edge_index, logical in enumerate(logical_edges, 1):
+        if outdegree[logical.source] != 1:
+            continue
+        edge = initial_edges[f"e{edge_index}"]
+        source = initial_by_id[edge.source_id]
+        target = initial_by_id[edge.target_id]
+        start = abs_port_xy(
+            source.x, source.y, source.width, source.height,
+            source.style, source.drawclock_type, logical.source_port,
+        )
+        end = abs_port_xy(
+            target.x, target.y, target.width, target.height,
+            target.style, target.drawclock_type, logical.target_port,
+        )
+        points = _simplify([start, *edge.waypoints, end])
+        if len(points) - 2 != 2 or abs(points[-1][1] - points[0][1]) <= 1e-6:
+            continue
+        cursor = logical.source
+        while indegree[cursor] == 1:
+            parent = logical_edges[incoming[cursor][0] - 1].source
+            if outdegree[parent] != 1:
+                break
+            cursor = parent
+        if indegree[cursor] == 0:
+            has_eligible_chain = True
+            break
+    if not has_eligible_chain:
+        return document, {
+            "exclusive_chain_axis_moves": 0,
+            "exclusive_chain_bends_removed": 0,
+            "exclusive_chain_axis_blockers": {},
+        }
+
+    accepted = copy.deepcopy(document)
 
     accepted_moves = 0
     bends_removed = 0
@@ -2679,72 +2719,26 @@ def _optimal_source_anchor_partitions(
     *,
     row_axes: tuple[float, ...] = (),
     max_intervening_rows: int = 3,
-    max_partitions: int = 2,
 ) -> list[list[int]]:
-    """Solve contiguous L1 facilities with a geometry-normalized row budget."""
+    """Partition one shared trunk using an exact linear-time gap criterion.
+
+    For a consecutive band, service cost is its vertical span plus one fixed
+    anchor-opening charge.  Splitting at a gap changes the objective by
+    ``fixed_cost - gap`` independently of every other gap, so every gap larger
+    than the charge must be cut and no smaller/equal gap should be cut.
+    """
     ordered = sorted(samples)
-    count = len(ordered)
-    if count <= 1:
+    if len(ordered) <= 1:
         return [[item[1] for item in ordered]] if ordered else []
-    values = [item[0] for item in ordered]
-    # The fixed charge is expressed in typical visual-row pitches, never raw
-    # canvas pixels.  Actual occupied rows are a second trigger for irregular
-    # node sizes.  The DP still decides whether an admitted cut pays for
-    # itself, so the budget opens a candidate rather than forcing an alias.
-    admissible_left = {0} | {
-        index
-        for index in range(1, count)
-        if (
-            values[index] - values[index - 1] > fixed_cost
-            or sum(
-                values[index - 1] < axis < values[index]
-                for axis in row_axes
-            ) > max_intervening_rows
-        )
-    }
-    prefix = [0.0]
-    for value in values:
-        prefix.append(prefix[-1] + value)
-
-    def interval_cost(left: int, right: int) -> float:
-        middle = (left + right - 1) // 2
-        pivot = values[middle]
-        lower = pivot * (middle - left) - (prefix[middle] - prefix[left])
-        upper = (prefix[right] - prefix[middle + 1]) - pivot * (right - middle - 1)
-        return lower + upper
-
-    best = [float("inf")] * (count + 1)
-    previous = [-1] * (count + 1)
-    best[0] = -fixed_cost
-    for right in range(1, count + 1):
-        for left in range(right):
-            if left not in admissible_left:
-                continue
-            score = best[left] + fixed_cost + interval_cost(left, right)
-            if score < best[right] - 1e-9:
-                best[right] = score
-                previous[right] = left
-    partitions: list[list[int]] = []
-    right = count
-    while right:
-        left = previous[right]
-        partitions.append([ordered[index][1] for index in range(left, right)])
-        right = left
-    partitions.reverse()
-    if len(partitions) > max_partitions and max_partitions == 2:
-        cut = min(
-            (index for index in range(1, count) if index in admissible_left),
-            key=lambda index: (
-                interval_cost(0, index)
-                + interval_cost(index, count)
-                + fixed_cost,
-                index,
-            ),
-        )
-        return [
-            [ordered[index][1] for index in range(0, cut)],
-            [ordered[index][1] for index in range(cut, count)],
-        ]
+    # Kept in the signature because callers and QA express the human-readable
+    # row budget explicitly; the exact objective is fully determined by the
+    # geometry-normalized fixed charge derived from those values.
+    del row_axes, max_intervening_rows
+    partitions: list[list[int]] = [[ordered[0][1]]]
+    for previous, current in zip(ordered, ordered[1:]):
+        if current[0] - previous[0] > fixed_cost + 1e-9:
+            partitions.append([])
+        partitions[-1].append(current[1])
     return partitions
 
 
@@ -2753,6 +2747,8 @@ def _replicate_dispersed_roots(
     nodes,
     logical_edges,
     profile,
+    *,
+    include_assessment: bool = False,
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     """Add rendering anchors only when a zero-indegree source wins globally."""
     indegree = Counter(edge.target for edge in logical_edges)
@@ -2853,9 +2849,20 @@ def _replicate_dispersed_roots(
         if len(partitions) <= 1:
             continue
         candidate_roots += 1
-        candidate = copy.deepcopy(accepted)
+        outgoing_edge_ids = {f"e{edge_index}" for edge_index in outgoing[root]}
+        candidate = LayoutDocument(
+            version=accepted.version,
+            vertices=list(accepted.vertices),
+            edges=[
+                copy.copy(edge) if edge.cell_id in outgoing_edge_ids else edge
+                for edge in accepted.edges
+            ],
+        )
         candidate_by_id = {vertex.cell_id: vertex for vertex in candidate.vertices}
-        candidate_original = candidate_by_id[original.cell_id]
+        candidate_original = copy.copy(candidate_by_id[original.cell_id])
+        candidate.vertices[candidate.vertices.index(candidate_by_id[original.cell_id])] = (
+            candidate_original
+        )
         anchors = [candidate_original]
         for replica_index in range(1, len(partitions)):
             replica = copy.copy(candidate_original)
@@ -2978,7 +2985,24 @@ def _replicate_dispersed_roots(
                 edge.waypoints = tuple(points[1:-1])
 
         candidate.vertices.sort(key=lambda vertex: vertex.name)
-        candidate_report = assess_layout(candidate, logical_edges, 0.0)
+        candidate_report = assess_layout(
+            candidate,
+            logical_edges,
+            0.0,
+            reject_geometry_worse_than=(
+                accepted_report["node_overlaps"],
+                accepted_report["edge_node_intersections"],
+            ),
+        )
+        if candidate_report.get("geometry_short_circuit"):
+            if candidate_report["node_overlaps"] > accepted_report["node_overlaps"]:
+                replica_blockers["node-overlap"] += 1
+            if (
+                candidate_report["edge_node_intersections"]
+                > accepted_report["edge_node_intersections"]
+            ):
+                replica_blockers["edge-node"] += 1
+            continue
         replica_cost = partition_fixed_cost * (len(partitions) - 1)
         improves_distribution = (
             candidate_report["crossings"] < accepted_report["crossings"]
@@ -2992,7 +3016,6 @@ def _replicate_dispersed_roots(
             "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
             "crossing": candidate_report["crossings"] <= accepted_report["crossings"],
             "bend": candidate_report["bends_total"] <= accepted_report["bends_total"],
-            "area": candidate_report["area"] <= accepted_report["area"] + 1e-6,
             "distribution": improves_distribution,
         }
         if (
@@ -3004,7 +3027,6 @@ def _replicate_dispersed_roots(
             and candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"]
             and candidate_report["crossings"] <= accepted_report["crossings"]
             and candidate_report["bends_total"] <= accepted_report["bends_total"]
-            and candidate_report["area"] <= accepted_report["area"] + 1e-6
             and improves_distribution
         ):
             accepted = candidate
@@ -3015,7 +3037,7 @@ def _replicate_dispersed_roots(
             replica_blockers.update(
                 name for name, passed in checks.items() if not passed
             )
-    return accepted, {
+    report = {
         "source_replica_candidate_roots": candidate_roots,
         "source_replicated_roots": accepted_roots,
         "source_rendering_replicas": accepted_replicas,
@@ -3027,10 +3049,16 @@ def _replicate_dispersed_roots(
             - accepted_report["manhattan_length"],
             3,
         ),
+        "source_replica_area_delta_px2": round(
+            accepted_report["area"] - initial_report["area"], 3
+        ),
         "source_replica_blockers": dict(sorted(replica_blockers.items())),
         "source_replica_row_budget": max_intervening_rows,
         "source_replica_row_pitch_px": round(row_pitch, 3),
     }
+    if include_assessment:
+        report["_accepted_assessment"] = accepted_report
+    return accepted, report
 
 
 def generate_elk_layout(
@@ -3160,14 +3188,16 @@ def generate_elk_layout(
     )
     report["selection"].update(joint_report)
     document, replica_report = _replicate_dispersed_roots(
-        document, nodes, logical_edges, profile
+        document, nodes, logical_edges, profile, include_assessment=True
     )
+    accepted_assessment = replica_report.pop("_accepted_assessment")
     report["selection"].update(replica_report)
     refined = assess_layout(
         document,
         logical_edges,
         0.0,
         include_routing_statistics=True,
+        reuse_hard_metrics=accepted_assessment,
     )
     report["selection"].update({
         "source_crossing_points": refined["source_crossing_points"],

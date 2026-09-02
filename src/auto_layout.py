@@ -854,6 +854,8 @@ def assess_layout(
     runtime_ms: float,
     *,
     include_routing_statistics: bool = False,
+    reject_geometry_worse_than: tuple[int, int] | None = None,
+    reuse_hard_metrics: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     by_id = {vertex.cell_id: vertex for vertex in doc.vertices}
     edge_by_id = {edge.cell_id: edge for edge in doc.edges}
@@ -867,35 +869,44 @@ def assess_layout(
                 yield bx, by
 
     node_buckets: dict[tuple[int, int], list[int]] = defaultdict(list)
-    node_rects = [
-        (vertex.x, vertex.y, vertex.x + vertex.width, vertex.y + vertex.height)
-        for vertex in doc.vertices
-    ]
-    for index, rect in enumerate(node_rects):
-        for key in bucket_keys(*rect):
-            node_buckets[key].append(index)
+    node_rects: list[tuple[float, float, float, float]] = []
     overlap_pairs: set[tuple[int, int]] = set()
-    for index, rect in enumerate(node_rects):
-        nearby: set[int] = set()
-        for key in bucket_keys(*rect):
-            nearby.update(node_buckets[key])
-        for other_index in nearby:
-            if other_index <= index:
-                continue
-            other = node_rects[other_index]
-            if (
-                max(rect[0], other[0]) < min(rect[2], other[2])
-                and max(rect[1], other[1]) < min(rect[3], other[3])
-            ):
-                overlap_pairs.add((index, other_index))
+    if reuse_hard_metrics is None:
+        node_rects = [
+            (vertex.x, vertex.y, vertex.x + vertex.width, vertex.y + vertex.height)
+            for vertex in doc.vertices
+        ]
+        for index, rect in enumerate(node_rects):
+            for key in bucket_keys(*rect):
+                node_buckets[key].append(index)
+        for index, rect in enumerate(node_rects):
+            nearby: set[int] = set()
+            for key in bucket_keys(*rect):
+                nearby.update(node_buckets[key])
+            for other_index in nearby:
+                if other_index <= index:
+                    continue
+                other = node_rects[other_index]
+                if (
+                    max(rect[0], other[0]) < min(rect[2], other[2])
+                    and max(rect[1], other[1]) < min(rect[3], other[3])
+                ):
+                    overlap_pairs.add((index, other_index))
     segments: list[Segment] = []
     segment_edge_ids: list[str] = []
     segment_endpoints: list[tuple[str, str]] = []
-    node_overlaps = len(overlap_pairs)
-    edge_node_intersections = 0
+    node_overlaps = (
+        int(reuse_hard_metrics["node_overlaps"])
+        if reuse_hard_metrics is not None else len(overlap_pairs)
+    )
+    edge_node_intersections = (
+        int(reuse_hard_metrics["edge_node_intersections"])
+        if reuse_hard_metrics is not None else 0
+    )
     bends_total = 0
     bends_max = 0
     length = 0.0
+    edge_route_metrics: dict[str, dict[str, float | int]] = {}
     for index, logical in enumerate(logical_edges, 1):
         edge = edge_by_id[f"e{index}"]
         source = by_id[edge.source_id]
@@ -912,18 +923,56 @@ def assess_layout(
         bends = max(0, len(points) - 2)
         bends_total += bends
         bends_max = max(bends_max, bends)
-        length += sum(abs(a[0] - b[0]) + abs(a[1] - b[1]) for a, b in zip(points, points[1:]))
-    for segment, endpoints in zip(segments, segment_endpoints):
-        nearby: set[int] = set()
-        left, right = sorted((segment.a[0], segment.b[0]))
-        top, bottom = sorted((segment.a[1], segment.b[1]))
-        for key in bucket_keys(left, top, right, bottom):
-            nearby.update(node_buckets.get(key, ()))
-        edge_node_intersections += sum(
-            _segment_hits_rect(segment.a, segment.b, node_rects[index])
-            for index in nearby
-            if doc.vertices[index].cell_id not in endpoints
-        )
+        horizontal_length = 0.0
+        vertical_length = 0.0
+        max_vertical_length = 0.0
+        for a, b in zip(points, points[1:]):
+            if abs(a[1] - b[1]) <= 1e-6:
+                horizontal_length += abs(a[0] - b[0])
+            elif abs(a[0] - b[0]) <= 1e-6:
+                segment_length = abs(a[1] - b[1])
+                vertical_length += segment_length
+                max_vertical_length = max(max_vertical_length, segment_length)
+        route_length = horizontal_length + vertical_length
+        if include_routing_statistics:
+            direct_length = (
+                abs(points[-1][0] - points[0][0])
+                + abs(points[-1][1] - points[0][1])
+            )
+            edge_route_metrics[edge.cell_id] = {
+                "manhattan_length_px": round(route_length, 3),
+                "horizontal_length_px": round(horizontal_length, 3),
+                "vertical_length_px": round(vertical_length, 3),
+                "max_vertical_segment_px": round(max_vertical_length, 3),
+                "route_inefficiency": round(
+                    route_length / direct_length if direct_length > 1e-6 else 1.0,
+                    4,
+                ),
+                "bends": bends,
+                "segments": max(0, len(points) - 1),
+            }
+        length += route_length
+    if reuse_hard_metrics is None:
+        for segment, endpoints in zip(segments, segment_endpoints):
+            nearby: set[int] = set()
+            left, right = sorted((segment.a[0], segment.b[0]))
+            top, bottom = sorted((segment.a[1], segment.b[1]))
+            for key in bucket_keys(left, top, right, bottom):
+                nearby.update(node_buckets.get(key, ()))
+            edge_node_intersections += sum(
+                _segment_hits_rect(segment.a, segment.b, node_rects[index])
+                for index in nearby
+                if doc.vertices[index].cell_id not in endpoints
+            )
+    if reject_geometry_worse_than is not None and (
+        node_overlaps > reject_geometry_worse_than[0]
+        or edge_node_intersections > reject_geometry_worse_than[1]
+    ):
+        return {
+            "geometry_short_circuit": True,
+            "node_overlaps": node_overlaps,
+            "edge_node_intersections": edge_node_intersections,
+        }
     # Collapse geometrically identical shared trunks, then use an orthogonal
     # sweep.  The previous square buckets still generated millions of segment
     # pairs for large fanout trees even though only a few trunks were visible.
@@ -969,6 +1018,9 @@ def assess_layout(
     source_crossing_points: set[tuple[float, float]] = set()
     edge_crossing_points: dict[str, set[tuple[float, float]]] = defaultdict(set)
     edge_crossing_pair_incidents: Counter[str] = Counter()
+    grouped_crossing_points: dict[int, set[tuple[float, float]]] = defaultdict(set)
+    grouped_pair_incidents: Counter[int] = Counter()
+    grouped_owner_adjustments: Counter[tuple[int, str]] = Counter()
     logical_indegree = Counter(edge.target for edge in logical_edges)
     root_names = {
         name
@@ -993,30 +1045,45 @@ def assess_layout(
                 point = (round(x, 3), round(y, 3))
                 crossing_points.add(point)
                 if include_routing_statistics:
-                    for vertical_edge in vertical_owners:
-                        edge_crossing_points[vertical_edge].add(point)
-                        edge_crossing_pair_incidents[vertical_edge] += len(
-                            horizontal_owners - {vertical_edge}
-                        )
-                    for horizontal_edge in horizontal_owners:
-                        edge_crossing_points[horizontal_edge].add(point)
-                        edge_crossing_pair_incidents[horizontal_edge] += len(
-                            vertical_owners - {horizontal_edge}
-                        )
+                    vertical_key = id(vertical)
+                    horizontal_key = id(horizontal)
+                    grouped_crossing_points[vertical_key].add(point)
+                    grouped_crossing_points[horizontal_key].add(point)
+                    grouped_pair_incidents[vertical_key] += len(horizontal_owners)
+                    grouped_pair_incidents[horizontal_key] += len(vertical_owners)
+                    for shared_edge in vertical_owners & horizontal_owners:
+                        grouped_owner_adjustments[(vertical_key, shared_edge)] += 1
+                        grouped_owner_adjustments[(horizontal_key, shared_edge)] += 1
                 if (
                     vertical.source_net[0] in root_names
                     or horizontal.source_net[0] in root_names
                 ):
                     source_crossing_points.add(point)
 
-    ambiguous = 0
+    if include_routing_statistics:
+        for segment, owners in (*verticals, *horizontals):
+            group_key = id(segment)
+            points = grouped_crossing_points.get(group_key)
+            incidents = grouped_pair_incidents[group_key]
+            for edge_id in owners:
+                if points:
+                    edge_crossing_points[edge_id].update(points)
+                edge_crossing_pair_incidents[edge_id] += (
+                    incidents - grouped_owner_adjustments[(group_key, edge_id)]
+                )
+
+    ambiguous = (
+        int(reuse_hard_metrics["ambiguous_overlaps"])
+        if reuse_hard_metrics is not None else 0
+    )
     parallel: dict[
         tuple[str, float], list[tuple[Segment, set[str]]],
     ] = defaultdict(list)
-    for segment, owners in verticals:
-        parallel[("v", segment.a[0])].append((segment, owners))
-    for segment, owners in horizontals:
-        parallel[("h", segment.a[1])].append((segment, owners))
+    if reuse_hard_metrics is None:
+        for segment, owners in verticals:
+            parallel[("v", segment.a[0])].append((segment, owners))
+        for segment, owners in horizontals:
+            parallel[("h", segment.a[1])].append((segment, owners))
     for group in parallel.values():
         intervals = []
         for segment, owners in group:
@@ -1045,8 +1112,10 @@ def assess_layout(
     min_y = min((vertex.y for vertex in doc.vertices), default=0.0)
     max_x = max((vertex.x + vertex.width for vertex in doc.vertices), default=0.0)
     max_y = max((vertex.y + vertex.height for vertex in doc.vertices), default=0.0)
-    direction_violations = sum(
-        by_id[edge.source_id].x >= by_id[edge.target_id].x for edge in doc.edges
+    direction_violations = (
+        int(reuse_hard_metrics["direction_violations"])
+        if reuse_hard_metrics is not None
+        else sum(by_id[edge.source_id].x >= by_id[edge.target_id].x for edge in doc.edges)
     )
     routing_statistics = None
     if include_routing_statistics:
@@ -1099,7 +1168,12 @@ def assess_layout(
                 "crossing_pair_incidents": edge_crossing_pair_incidents[edge_id],
                 "vertical_span_px": round(high - low, 3),
                 "vertical_span_rows": round((high - low) / row_pitch, 3),
-                "intervening_rows": sum(low < axis < high for axis in row_centers),
+                "intervening_rows": max(
+                    0,
+                    bisect_left(row_centers, high)
+                    - bisect_right(row_centers, low),
+                ),
+                **edge_route_metrics[edge_id],
             }
             source_edge_ids[logical.source].append(edge_id)
         for source, edge_ids in sorted(source_edge_ids.items()):
@@ -1119,9 +1193,50 @@ def assess_layout(
                 "max_intervening_rows": max(
                     edge_statistics[edge_id]["intervening_rows"] for edge_id in edge_ids
                 ),
+                "rendering_anchors": len({
+                    edge_by_id[edge_id].source_id for edge_id in edge_ids
+                }),
+                "manhattan_length_px": round(sum(
+                    edge_statistics[edge_id]["manhattan_length_px"]
+                    for edge_id in edge_ids
+                ), 3),
+                "horizontal_length_px": round(sum(
+                    edge_statistics[edge_id]["horizontal_length_px"]
+                    for edge_id in edge_ids
+                ), 3),
+                "vertical_length_px": round(sum(
+                    edge_statistics[edge_id]["vertical_length_px"]
+                    for edge_id in edge_ids
+                ), 3),
+                "bends_total": sum(
+                    edge_statistics[edge_id]["bends"] for edge_id in edge_ids
+                ),
+                "bends_max_per_edge": max(
+                    edge_statistics[edge_id]["bends"] for edge_id in edge_ids
+                ),
+                "max_edge_length_px": max(
+                    edge_statistics[edge_id]["manhattan_length_px"]
+                    for edge_id in edge_ids
+                ),
             }
         routing_statistics = {
             "row_pitch_px": round(row_pitch, 3),
+            "totals": {
+                "edges": len(edge_statistics),
+                "crossing_pair_intersections": crossings,
+                "distinct_crossing_points": len(crossing_points),
+                "source_induced_crossing_points": len(source_crossing_points),
+                "bends_total": bends_total,
+                "manhattan_length_px": round(length, 3),
+                "horizontal_length_px": round(sum(
+                    item["horizontal_length_px"]
+                    for item in edge_route_metrics.values()
+                ), 3),
+                "vertical_length_px": round(sum(
+                    item["vertical_length_px"]
+                    for item in edge_route_metrics.values()
+                ), 3),
+            },
             "edges": edge_statistics,
             "sources": source_statistics,
         }

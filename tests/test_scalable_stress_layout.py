@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import itertools
 import time
 from collections import Counter
 from pathlib import Path
@@ -87,6 +88,52 @@ def _minimal_dispersed_config(root_kind="from"):
     }
 
 
+def _forced_multiband_root_layout(
+    band_count: int,
+    *,
+    band_gap: float = 500.0,
+    source_has_parent: bool = False,
+):
+    config: dict[str, dict[str, str]] = {"root": {"kind": "from"}}
+    fanout_source = "root"
+    if source_has_parent:
+        fanout_source = "fanout_source"
+        config[fanout_source] = {"kind": "gate", "source": "root"}
+    for band in range(band_count):
+        gate = f"gate_band_{band}"
+        config[gate] = {"kind": "gate", "source": fanout_source}
+        config[f"clock_band_{band}"] = {"kind": "clock", "source": gate}
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    logical_edges = build_logical_edges(config, nodes, LIBRARY)
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    for band in range(band_count):
+        for name in (f"gate_band_{band}", f"clock_band_{band}"):
+            by_id[nodes[name].cell_id].y += band * band_gap
+    for index, logical in enumerate(logical_edges, 1):
+        edge = next(edge for edge in document.edges if edge.cell_id == f"e{index}")
+        source = by_id[edge.source_id]
+        target = by_id[edge.target_id]
+        start = abs_port_xy(
+            source.x, source.y, source.width, source.height,
+            source.style, source.drawclock_type, logical.source_port,
+        )
+        end = abs_port_xy(
+            target.x, target.y, target.width, target.height,
+            target.style, target.drawclock_type, logical.target_port,
+        )
+        if abs(start[1] - end[1]) <= 1e-6:
+            edge.waypoints = ()
+        else:
+            lane_x = (start[0] + end[0]) / 2.0
+            edge.waypoints = ((lane_x, start[1]), (lane_x, end[1]))
+    laid_out, report = _replicate_dispersed_roots(
+        document, nodes, logical_edges, PROFILES["readable"]
+    )
+    return config, laid_out, report
+
+
 def test_source_partition_budget_triggers_just_after_three_visual_rows() -> None:
     row_pitch = 100.0
     assert _optimal_source_anchor_partitions(
@@ -101,6 +148,108 @@ def test_source_partition_budget_triggers_just_after_three_visual_rows() -> None
     ) == [[1], [2]]
 
 
+def test_source_partition_keeps_local_row_and_replicates_four_rows_away() -> None:
+    """A local consumer must not force a four-row source trunk."""
+    row_pitch = 100.0
+    assert _optimal_source_anchor_partitions(
+        [(0.0, 1), (400.0, 2)],
+        3 * row_pitch,
+        row_axes=(0.0, 100.0, 200.0, 300.0, 400.0),
+    ) == [[1], [2]]
+
+
+def test_source_partition_supports_every_geometry_justified_band() -> None:
+    """The general facility solver must not stop after two render anchors."""
+    row_pitch = 100.0
+    assert _optimal_source_anchor_partitions(
+        [(0.0, 1), (400.0, 2), (800.0, 3), (1200.0, 4)],
+        3 * row_pitch,
+        row_axes=tuple(float(axis) for axis in range(0, 1201, 100)),
+    ) == [[1], [2], [3], [4]]
+
+
+def test_source_partition_is_order_and_identity_independent() -> None:
+    samples = [(1200.0, 91), (400.0, 17), (0.0, 203), (800.0, 5)]
+    assert _optimal_source_anchor_partitions(
+        samples,
+        300.0,
+        row_axes=tuple(float(axis) for axis in range(0, 1201, 100)),
+    ) == [[203], [17], [5], [91]]
+
+
+def test_source_partition_does_not_duplicate_dense_local_fanout() -> None:
+    assert _optimal_source_anchor_partitions(
+        [(0.0, 1), (100.0, 2), (200.0, 3), (300.0, 4)],
+        300.0,
+        row_axes=(0.0, 100.0, 200.0, 300.0),
+    ) == [[1, 2, 3, 4]]
+
+
+def test_source_partition_gap_solver_matches_exhaustive_facility_optimum() -> None:
+    """Independent small-state oracle for the closed-form partition solver."""
+    fixed_cost = 300.0
+    for gaps in itertools.product((100.0, 300.0, 301.0, 450.0), repeat=4):
+        values = [0.0]
+        for gap in gaps:
+            values.append(values[-1] + gap)
+        samples = [(axis, index) for index, axis in enumerate(values)]
+        actual = _optimal_source_anchor_partitions(samples, fixed_cost)
+        actual_cuts = tuple(sum(map(len, actual[:index])) for index in range(1, len(actual)))
+
+        candidates = []
+        for cut_mask in itertools.product((False, True), repeat=len(gaps)):
+            cuts = (0,) + tuple(
+                index + 1 for index, cut in enumerate(cut_mask) if cut
+            ) + (len(values),)
+            score = fixed_cost * (len(cuts) - 1) + sum(
+                values[right - 1] - values[left]
+                for left, right in zip(cuts, cuts[1:])
+            )
+            candidates.append((score, len(cuts), cuts[1:-1]))
+        expected_cuts = min(candidates)[:2]
+        actual_score = fixed_cost * len(actual) + sum(
+            values[part[-1]] - values[part[0]] for part in actual
+        )
+        assert (actual_score, len(actual) + 1) == expected_cuts
+        assert actual_cuts == min(candidates)[2]
+
+
+def test_source_replication_integrates_every_distant_consumer_band() -> None:
+    config, document, report = _forced_multiband_root_layout(4)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    root_anchors = [
+        vertex
+        for vertex in document.vertices
+        if (vertex.logical_name or vertex.name) == "root"
+    ]
+
+    assert len(root_anchors) == 4
+    assert report["source_rendering_replicas"] == 3
+    assert report["source_replica_length_saved_px"] > 0
+    assert report["source_replica_area_delta_px2"] <= 0
+    assert quality["alignment"]["rendering_replicas"] == {"root": 3}
+    assert quality["alignment"]["avoidable_source_replicas"] == []
+    assert quality["passed"] is True
+
+
+def test_source_replication_never_aliases_an_intermediate_fanout() -> None:
+    config, document, report = _forced_multiband_root_layout(
+        4, source_has_parent=True
+    )
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert report["source_replica_candidate_roots"] == 0
+    assert report["source_rendering_replicas"] == 0
+    assert all(vertex.logical_name is None for vertex in document.vertices)
+    assert quality["alignment"]["invalid_rendering_replicas"] == []
+    assert quality["passed"] is False
+    assert quality["hard_failures"]
+
+
 def test_routing_statistics_are_attributed_to_edges_and_logical_sources() -> None:
     config = _minimal_dispersed_config()
     document, report = generate_elk_layout(config, library_path=LIBRARY)
@@ -110,8 +259,17 @@ def test_routing_statistics_are_attributed_to_edges_and_logical_sources() -> Non
     )
 
     assert statistics["row_pitch_px"] > 0
+    assert statistics["totals"]["edges"] == 6
+    assert statistics["totals"]["manhattan_length_px"] == pytest.approx(sum(
+        edge["manhattan_length_px"] for edge in statistics["edges"].values()
+    ), abs=0.001)
     assert len(statistics["edges"]) == 6
     assert statistics["sources"]["wide_root"]["outgoing_edges"] == 3
+    assert statistics["sources"]["wide_root"]["manhattan_length_px"] == pytest.approx(sum(
+        edge["manhattan_length_px"]
+        for edge in statistics["edges"].values()
+        if edge["source"] == "wide_root"
+    ), abs=0.001)
     assert statistics == quality["readability"]["routing_statistics"]
 
 
@@ -568,7 +726,17 @@ def test_multi_from_roots_are_distributed_by_their_consumers() -> None:
     assert quality["readability"]["fanout_trunk_clusters"] == {}
     assert quality["readability"]["fragmented_fanout_sources"] == {}
     assert len(set(source_tops)) == 4
-    assert report["selection"]["source_rendering_replicas"] <= 4
+    root_outgoing_edges = sum(
+        1
+        for item in report["selection"]["routing_statistics"]["edges"].values()
+        if item["source"].startswith("from_")
+    )
+    physical_root_anchors = 4 + report["selection"]["source_rendering_replicas"]
+    assert physical_root_anchors <= root_outgoing_edges
+    assert report["selection"]["source_replica_crossings_removed"] > 0
+    assert report["selection"]["source_replica_length_saved_px"] > 0
+    assert quality["alignment"]["unused_rendering_replicas"] == []
+    assert quality["alignment"]["avoidable_source_replicas"] == []
     assert max(source_tops) - min(source_tops) > max(
         vertex.height
         for vertex in document.vertices

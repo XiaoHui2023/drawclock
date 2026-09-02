@@ -899,8 +899,22 @@ def inspect_layout_quality(
     routing_source_edges: dict[str, list[str]] = defaultdict(list)
     for edge_id in sorted(observed_edge_ports, key=lambda item: int(item[1:])):
         source_name, _, target_name, _ = observed_edge_ports[edge_id]
-        start, end = edge_points[edge_id][0], edge_points[edge_id][-1]
+        points_for_edge = edge_points[edge_id]
+        start, end = points_for_edge[0], points_for_edge[-1]
         low, high = sorted((start[1], end[1]))
+        horizontal_length = sum(
+            abs(a[0] - b[0])
+            for a, b in zip(points_for_edge, points_for_edge[1:])
+            if abs(a[1] - b[1]) <= tolerance
+        )
+        vertical_lengths_for_edge = [
+            abs(a[1] - b[1])
+            for a, b in zip(points_for_edge, points_for_edge[1:])
+            if abs(a[0] - b[0]) <= tolerance
+        ]
+        vertical_length = sum(vertical_lengths_for_edge)
+        route_length = horizontal_length + vertical_length
+        direct_length = abs(end[0] - start[0]) + abs(end[1] - start[1])
         routing_edge_statistics[edge_id] = {
             "source": source_name,
             "target": target_name,
@@ -909,6 +923,18 @@ def inspect_layout_quality(
             "vertical_span_px": round(high - low, 3),
             "vertical_span_rows": round((high - low) / row_pitch, 3),
             "intervening_rows": sum(low < axis < high for axis in row_centers),
+            "manhattan_length_px": round(route_length, 3),
+            "horizontal_length_px": round(horizontal_length, 3),
+            "vertical_length_px": round(vertical_length, 3),
+            "max_vertical_segment_px": round(
+                max(vertical_lengths_for_edge, default=0.0), 3
+            ),
+            "route_inefficiency": round(
+                route_length / direct_length if direct_length > tolerance else 1.0,
+                4,
+            ),
+            "bends": max(0, len(points_for_edge) - 2),
+            "segments": max(0, len(points_for_edge) - 1),
         }
         routing_source_edges[source_name].append(edge_id)
     routing_source_statistics = {}
@@ -928,6 +954,31 @@ def inspect_layout_quality(
             ),
             "max_intervening_rows": max(
                 routing_edge_statistics[edge_id]["intervening_rows"] for edge_id in edge_ids
+            ),
+            "rendering_anchors": len({
+                observed_edge_vertices[edge_id][0].cell_id for edge_id in edge_ids
+            }),
+            "manhattan_length_px": round(sum(
+                routing_edge_statistics[edge_id]["manhattan_length_px"]
+                for edge_id in edge_ids
+            ), 3),
+            "horizontal_length_px": round(sum(
+                routing_edge_statistics[edge_id]["horizontal_length_px"]
+                for edge_id in edge_ids
+            ), 3),
+            "vertical_length_px": round(sum(
+                routing_edge_statistics[edge_id]["vertical_length_px"]
+                for edge_id in edge_ids
+            ), 3),
+            "bends_total": sum(
+                routing_edge_statistics[edge_id]["bends"] for edge_id in edge_ids
+            ),
+            "bends_max_per_edge": max(
+                routing_edge_statistics[edge_id]["bends"] for edge_id in edge_ids
+            ),
+            "max_edge_length_px": max(
+                routing_edge_statistics[edge_id]["manhattan_length_px"]
+                for edge_id in edge_ids
             ),
         }
 
@@ -2100,6 +2151,25 @@ def inspect_layout_quality(
         "readability": {
             "routing_statistics": {
                 "row_pitch_px": round(row_pitch, 3),
+                "totals": {
+                    "edges": len(routing_edge_statistics),
+                    "crossing_pair_intersections": crossing_pair_intersections,
+                    "distinct_crossing_points": len(crossing_points),
+                    "source_induced_crossing_points": len(source_crossing_points),
+                    "bends_total": bends_total,
+                    "manhattan_length_px": round(sum(
+                        item["manhattan_length_px"]
+                        for item in routing_edge_statistics.values()
+                    ), 3),
+                    "horizontal_length_px": round(sum(
+                        item["horizontal_length_px"]
+                        for item in routing_edge_statistics.values()
+                    ), 3),
+                    "vertical_length_px": round(sum(
+                        item["vertical_length_px"]
+                        for item in routing_edge_statistics.values()
+                    ), 3),
+                },
                 "edges": routing_edge_statistics,
                 "sources": routing_source_statistics,
             },
