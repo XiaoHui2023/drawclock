@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 from typing import Any
 
 
@@ -32,6 +33,7 @@ def _plain_text(label: str) -> str:
     return html.unescape(_TAG_RE.sub("", label)).strip()
 
 
+@lru_cache(maxsize=None)
 def estimated_label_width(
     name: str,
     label: str,

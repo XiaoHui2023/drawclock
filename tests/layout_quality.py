@@ -213,6 +213,7 @@ def inspect_layout_quality(
             vertices_by_name[name].x for name in ranks
             if ranks[name] == rank
             and name in vertices_by_name
+            and len(logical_vertices[name]) == 1
             and vertices_by_name[name].drawclock_type == shape_type
         ]
         rank_spreads[f"{rank}:{shape_type}"] = max(xs) - min(xs) if xs else 0.0
@@ -492,8 +493,7 @@ def inspect_layout_quality(
             if vertex is primary:
                 continue
             if (
-                not _close(vertex.x, primary.x, tolerance)
-                or vertex.drawclock_type != primary.drawclock_type
+                vertex.drawclock_type != primary.drawclock_type
                 or not _close(vertex.width, primary.width, tolerance)
                 or not _close(vertex.height, primary.height, tolerance)
                 or vertex.style != primary.style
@@ -749,6 +749,7 @@ def inspect_layout_quality(
                     else:
                         crossings.append(pair)
                         crossing_owner_pairs.append(pair)
+                        crossing_pair_intersections += 1
                         vertical, horizontal = (a, b) if a.a[0] == a.b[0] else (b, a)
                         point = (round(vertical.a[0], 3), round(horizontal.a[1], 3))
                         crossing_points.add(point)
@@ -931,11 +932,13 @@ def inspect_layout_quality(
                         if edge_a != edge_b
                     )
                 active.append((hi, segment, owners))
+    distinct_crossed_edge_pairs = sum(
+        owner_mask.bit_count() for owner_mask in edge_crossed_owner_masks
+    ) // 2
     crossings = sorted(set(crossings))
     same_net_junctions = sorted(set(same_net_junctions))
     ambiguous_overlaps = sorted(set(ambiguous_overlaps))
     if exact_pair_oracle:
-        crossing_pair_intersections = len(crossings)
         same_net_junction_intersections = len(same_net_junctions)
         untreated_crossings = [
             pair for pair in crossings
@@ -2103,24 +2106,31 @@ def inspect_layout_quality(
             assigned[source.cell_id].append(
                 target_axis - source.height * source_anchor
             )
-        groups = [sorted(assigned[anchor.cell_id]) for anchor in anchors]
-        groups = [group for group in groups if group]
+        groups = [
+            (anchor.x, sorted(assigned[anchor.cell_id]))
+            for anchor in anchors
+            if assigned[anchor.cell_id]
+        ]
         if len(groups) <= 1:
             continue
-        groups.sort(key=lambda group: median(group))
+        groups.sort(key=lambda item: median(item[1]))
 
         def l1_cost(values: list[float]) -> float:
             pivot = median(values)
             return sum(abs(value - pivot) for value in values)
 
         fixed_cost = row_pitch * 3
-        actual_cost = sum(l1_cost(group) for group in groups) + fixed_cost * len(groups)
+        actual_cost = sum(l1_cost(group) for _, group in groups) + fixed_cost * len(groups)
         for index in range(len(groups) - 1):
-            merged = groups[index] + groups[index + 1]
+            left_x, left_group = groups[index]
+            right_x, right_group = groups[index + 1]
+            if not _close(left_x, right_x, tolerance):
+                continue
+            merged = left_group + right_group
             merged_cost = (
                 actual_cost
-                - l1_cost(groups[index])
-                - l1_cost(groups[index + 1])
+                - l1_cost(left_group)
+                - l1_cost(right_group)
                 - fixed_cost
                 + l1_cost(merged)
             )
@@ -2299,6 +2309,7 @@ def inspect_layout_quality(
             "zigzag_edges": sorted(set(zigzag_edges)),
             "ambiguous_overlaps": [list(pair) for pair in ambiguous_overlaps],
             "crossings": crossing_pair_intersections,
+            "distinct_crossed_edge_pairs": distinct_crossed_edge_pairs,
             "distinct_crossing_points": len(crossing_points),
             "source_induced_crossing_points": len(source_crossing_points),
             "same_net_junctions": same_net_junction_intersections,
@@ -2313,6 +2324,7 @@ def inspect_layout_quality(
                 "totals": {
                     "edges": len(routing_edge_statistics),
                     "crossing_pair_intersections": crossing_pair_intersections,
+                    "distinct_crossed_edge_pairs": distinct_crossed_edge_pairs,
                     "distinct_crossing_points": len(crossing_points),
                     "source_induced_crossing_points": len(source_crossing_points),
                     "bends_total": bends_total,

@@ -1095,6 +1095,9 @@ def assess_layout(
                 edge_crossing_pair_incidents[edge_id] += (
                     incidents - grouped_owner_adjustments[(group_key, edge_id)]
                 )
+    distinct_crossed_edge_pairs = sum(
+        owner_mask.bit_count() for owner_mask in edge_crossed_owner_masks
+    ) // 2
 
     ambiguous = (
         int(reuse_hard_metrics["ambiguous_overlaps"])
@@ -1319,10 +1322,14 @@ def assess_layout(
             "totals": {
                 "edges": len(edge_statistics),
                 "crossing_pair_intersections": crossings,
+                "distinct_crossed_edge_pairs": distinct_crossed_edge_pairs,
                 "distinct_crossing_points": len(crossing_points),
                 "source_induced_crossing_points": len(source_crossing_points),
                 "bends_total": bends_total,
-                "manhattan_length_px": round(length, 3),
+                "manhattan_length_px": round(sum(
+                    item["manhattan_length_px"]
+                    for item in edge_route_metrics.values()
+                ), 3),
                 "horizontal_length_px": round(sum(
                     item["horizontal_length_px"]
                     for item in edge_route_metrics.values()

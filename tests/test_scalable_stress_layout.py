@@ -21,6 +21,8 @@ from drawio_library import load_library_shapes
 from elk_layout import (
     _optimal_source_anchor_partitions,
     _replicate_dispersed_roots,
+    _relocate_root_rendering_anchors,
+    _split_root_rendering_anchors_by_local_rows,
     generate_elk_layout,
     select_layout_plan,
 )
@@ -465,6 +467,139 @@ def test_routing_statistics_are_attributed_to_edges_and_logical_sources() -> Non
         if edge["source"] == "wide_root"
     ), abs=0.001)
     assert statistics == quality["readability"]["routing_statistics"]
+
+
+def test_complex_source_weave_statistics_match_exact_pair_oracle() -> None:
+    config = load_clock_tree(EXAMPLES / "19-dispersed-root-fanout.json")
+    document, report = generate_elk_layout(
+        config, library_path=LIBRARY, include_statistics=True
+    )
+    production = report["selection"]["routing_statistics"]
+    independent = inspect_layout_quality(
+        config,
+        document,
+        library_path=LIBRARY,
+        grid=0.0001,
+        tolerance=0.01,
+        exact_pair_oracle=True,
+    )["readability"]["routing_statistics"]
+
+    assert production == independent
+    assert production["totals"]["crossing_pair_intersections"] >= production["totals"]["distinct_crossed_edge_pairs"]
+    assert production["totals"]["distinct_crossed_edge_pairs"] >= production["totals"]["distinct_crossing_points"]
+
+
+def test_complex_source_weave_anchor_relocation_dominates_inherited_columns(
+    monkeypatch,
+) -> None:
+    import elk_layout as layout_module
+
+    config = load_clock_tree(EXAMPLES / "19-dispersed-root-fanout.json")
+
+    def keep_inherited(document, nodes, logical_edges, profile, **kwargs):
+        assessment = kwargs.get("accepted_assessment")
+        return document, {
+            "source_anchor_relocation_attempts": 0,
+            "source_anchor_column_moves": 0,
+            "source_anchor_crossings_removed": 0,
+            "source_anchor_source_crossings_removed": 0,
+            "source_anchor_length_saved_px": 0.0,
+            "source_anchor_relocation_blockers": {},
+            **({"_accepted_assessment": assessment} if kwargs.get("include_assessment") else {}),
+        }
+
+    monkeypatch.setattr(
+        layout_module, "_relocate_root_rendering_anchors", keep_inherited
+    )
+    inherited, inherited_report = layout_module.generate_elk_layout(
+        config, library_path=LIBRARY, include_statistics=True
+    )
+    monkeypatch.setattr(
+        layout_module,
+        "_relocate_root_rendering_anchors",
+        _relocate_root_rendering_anchors,
+    )
+    optimized, optimized_report = layout_module.generate_elk_layout(
+        config, library_path=LIBRARY, include_statistics=True
+    )
+    inherited_totals = inherited_report["selection"]["routing_statistics"]["totals"]
+    optimized_totals = optimized_report["selection"]["routing_statistics"]["totals"]
+    optimized_quality = inspect_layout_quality(
+        config, optimized, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert optimized_report["selection"]["source_anchor_column_moves"] > 0
+    assert (
+        optimized_totals["source_induced_crossing_points"],
+        optimized_totals["distinct_crossing_points"],
+        optimized_totals["bends_total"],
+        optimized_totals["manhattan_length_px"],
+    ) < (
+        inherited_totals["source_induced_crossing_points"],
+        inherited_totals["distinct_crossing_points"],
+        inherited_totals["bends_total"],
+        inherited_totals["manhattan_length_px"],
+    )
+    assert optimized_quality["passed"] is True, optimized_quality["hard_failures"]
+
+
+def test_complex_source_weave_local_facilities_dominate_one_anchor_per_root(
+    monkeypatch,
+) -> None:
+    """Long-root replication must improve the complete graph, not one route."""
+    import elk_layout as layout_module
+
+    config = load_clock_tree(EXAMPLES / "19-dispersed-root-fanout.json")
+
+    def keep_long_roots(document, nodes, logical_edges, profile, **kwargs):
+        assessment = kwargs.get("accepted_assessment")
+        return document, {
+            "source_local_partition_attempts": 0,
+            "source_local_partition_roots": 0,
+            "source_local_partition_replicas": 0,
+            "source_local_partition_row_pitch_px": 0.0,
+            "source_local_partition_gap_budget_px": 0.0,
+            "source_local_partition_crossings_removed": 0,
+            "source_local_partition_source_crossings_removed": 0,
+            "source_local_partition_length_saved_px": 0.0,
+            "source_local_partition_blockers": {},
+            **({"_accepted_assessment": assessment} if kwargs.get("include_assessment") else {}),
+        }
+
+    monkeypatch.setattr(
+        layout_module, "_split_root_rendering_anchors_by_local_rows", keep_long_roots
+    )
+    _, long_report = layout_module.generate_elk_layout(
+        config, library_path=LIBRARY, include_statistics=True
+    )
+    monkeypatch.setattr(
+        layout_module,
+        "_split_root_rendering_anchors_by_local_rows",
+        _split_root_rendering_anchors_by_local_rows,
+    )
+    optimized, optimized_report = layout_module.generate_elk_layout(
+        config, library_path=LIBRARY, include_statistics=True
+    )
+    long_totals = long_report["selection"]["routing_statistics"]["totals"]
+    optimized_totals = optimized_report["selection"]["routing_statistics"]["totals"]
+    optimized_sources = optimized_report["selection"]["routing_statistics"]["sources"]
+    quality = inspect_layout_quality(
+        config, optimized, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert optimized_report["selection"]["source_local_partition_roots"] >= 3
+    assert all(
+        optimized_sources[root]["rendering_anchors"] > 1
+        for root in ("source_a", "source_c", "source_g")
+    )
+    assert optimized_totals["distinct_crossing_points"] * 2 < \
+        long_totals["distinct_crossing_points"]
+    assert optimized_totals["source_induced_crossing_points"] * 3 < \
+        long_totals["source_induced_crossing_points"]
+    assert optimized_totals["bends_total"] <= long_totals["bends_total"]
+    assert optimized_totals["manhattan_length_px"] * 4 < \
+        long_totals["manhattan_length_px"] * 3
+    assert quality["passed"] is True, quality["hard_failures"]
 
 
 def test_crossing_statistics_identify_each_involved_edge_and_source() -> None:
@@ -1174,7 +1309,38 @@ def test_replica_quality_gate_fault_injection_covers_graph_identity() -> None:
     assert edge_quality["line_integrity"]["missing_edges"]
     assert edge_quality["passed"] is False
 
-    redundant = copy.deepcopy(document)
+    compact_config = {
+        "wide_root": {"kind": "from"},
+        "compact_mux": {
+            "kind": "mux2",
+            "source": {"0": "wide_root", "1": "wide_root"},
+        },
+        "compact_clock": {"kind": "clock", "source": "compact_mux"},
+    }
+    compact_document, _ = generate_elk_layout(
+        compact_config, library_path=LIBRARY
+    )
+    redundant = copy.deepcopy(compact_document)
+    compact_root_anchors = [
+        vertex for vertex in redundant.vertices
+        if (vertex.logical_name or vertex.name) == "wide_root"
+    ]
+    compact_primary = compact_root_anchors[0]
+    compact_shapes = load_library_shapes(LIBRARY)
+    compact_nodes = resolve_nodes(
+        compact_config, compact_shapes, {}, library_path=LIBRARY
+    )
+    compact_edges = build_logical_edges(compact_config, compact_nodes, LIBRARY)
+    for index, logical in enumerate(compact_edges, 1):
+        if logical.source == "wide_root":
+            next(
+                edge for edge in redundant.edges if edge.cell_id == f"e{index}"
+            ).source_id = compact_primary.cell_id
+    redundant.vertices = [
+        vertex for vertex in redundant.vertices
+        if (vertex.logical_name or vertex.name) != "wide_root"
+        or vertex.cell_id == compact_primary.cell_id
+    ]
     outgoing = Counter(edge.source_id for edge in redundant.edges)
     anchor = next(
         vertex for vertex in redundant.vertices
@@ -1188,7 +1354,11 @@ def test_replica_quality_gate_fault_injection_covers_graph_identity() -> None:
     redundant.vertices.append(duplicate)
     next(edge for edge in redundant.edges if edge.source_id == anchor.cell_id).source_id = duplicate.cell_id
     redundant_quality = inspect_layout_quality(
-        config, redundant, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+        compact_config,
+        redundant,
+        library_path=LIBRARY,
+        grid=0.0001,
+        tolerance=0.01,
     )
     assert redundant_quality["alignment"]["avoidable_source_replicas"]
     assert redundant_quality["passed"] is False
