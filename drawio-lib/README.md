@@ -79,6 +79,7 @@
 | --- | --- | --- |
 | source | ![source](images/source.svg) | 振荡源 |
 | pad | ![pad](images/pad.svg) | I/O 输出 |
+| pad3 | ![pad3](images/pad3.svg) | 三输入汇聚、单输出输入 pad |
 
 | 属性 | 说明 |
 | --- | --- |

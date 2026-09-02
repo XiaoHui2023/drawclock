@@ -1,0 +1,116 @@
+{
+  "shared_source": {
+    "kind": "from"
+  },
+  "near_gate": {
+    "kind": "gate",
+    "source": "shared_source"
+  },
+  "fanout_hub": {
+    "kind": "gate",
+    "source": "shared_source"
+  },
+  "fanout_branch_00": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "near_merge": {
+    "kind": "mux2",
+    "source": {
+      "0": "near_gate",
+      "1": "fanout_branch_00"
+    }
+  },
+  "fanout_clock_00": {
+    "kind": "clock",
+    "source": "near_merge"
+  },
+  "fanout_branch_01": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_01": {
+    "kind": "clock",
+    "source": "fanout_branch_01"
+  },
+  "fanout_branch_02": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_02": {
+    "kind": "clock",
+    "source": "fanout_branch_02"
+  },
+  "fanout_branch_03": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_03": {
+    "kind": "clock",
+    "source": "fanout_branch_03"
+  },
+  "fanout_branch_04": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_04": {
+    "kind": "clock",
+    "source": "fanout_branch_04"
+  },
+  "fanout_branch_05": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_05": {
+    "kind": "clock",
+    "source": "fanout_branch_05"
+  },
+  "fanout_branch_06": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_06": {
+    "kind": "clock",
+    "source": "fanout_branch_06"
+  },
+  "fanout_branch_07": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_07": {
+    "kind": "clock",
+    "source": "fanout_branch_07"
+  },
+  "fanout_branch_08": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_08": {
+    "kind": "clock",
+    "source": "fanout_branch_08"
+  },
+  "fanout_branch_09": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_09": {
+    "kind": "clock",
+    "source": "fanout_branch_09"
+  },
+  "fanout_branch_10": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_10": {
+    "kind": "clock",
+    "source": "fanout_branch_10"
+  },
+  "fanout_branch_11": {
+    "kind": "gate",
+    "source": "fanout_hub"
+  },
+  "fanout_clock_11": {
+    "kind": "clock",
+    "source": "fanout_branch_11"
+  }
+}

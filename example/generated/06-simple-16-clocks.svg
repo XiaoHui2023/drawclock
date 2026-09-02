@@ -3,6 +3,7 @@
 <style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}</style>
 <rect x="20.96" y="11.0009" width="1024.54" height="934.0069" fill="#ffffff"/>
 <text x="28.96" y="29.0009" font-family="Arial,sans-serif" font-size="12" fill="#68707a">06-simple-16-clocks</text>
+<polyline class="edge" points="99.96,410.0016 162.47,410.0016"/>
 <polyline class="edge" points="528.33,174.0009 604.71,174.0009"/>
 <polyline class="edge" points="626.71,174.0009 670.9,174.0009 670.9,96.0009 708.5,96.0009"/>
 <polyline class="edge" points="626.71,174.0009 670.9,174.0009 670.9,148.0009 708.5,148.0009"/>
@@ -10,6 +11,7 @@
 <polyline class="edge" points="626.71,174.0009 670.9,174.0009 670.9,252.0009 708.5,252.0009"/>
 <polyline class="edge" points="313.8,382.0009 392.968,382.0009"/>
 <polyline class="edge" points="413.752,382.0009 499.33,382.0009"/>
+<polyline class="edge" points="99.96,306.0016 162.47,306.0016"/>
 <polyline class="edge" points="528.33,382.0009 604.71,382.0009"/>
 <polyline class="edge" points="626.71,382.0009 670.9,382.0009 670.9,304.0009 708.5,304.0009"/>
 <polyline class="edge" points="626.71,382.0009 670.9,382.0009 670.9,356.0009 708.5,356.0009"/>
@@ -24,34 +26,29 @@
 <polyline class="edge" points="626.71,798.0009 670.9,798.0009 670.9,876.0009 708.5,876.0009"/>
 <polyline class="edge" points="313.8,590.0009 392.968,590.0009"/>
 <polyline class="edge" points="413.752,590.0009 499.33,590.0009"/>
+<polyline class="edge" points="99.96,533.9995 139.92,533.9995 139.92,722.0016 162.47,722.0016"/>
 <polyline class="edge" points="528.33,590.0009 604.71,590.0009"/>
 <polyline class="edge" points="626.71,590.0009 670.9,590.0009 670.9,512.0009 708.5,512.0009"/>
 <polyline class="edge" points="626.71,590.0009 670.9,590.0009 670.9,564.0009 708.5,564.0009"/>
 <polyline class="edge" points="626.71,590.0009 670.9,590.0009 670.9,616.0009 708.5,616.0009"/>
 <polyline class="edge" points="626.71,590.0009 670.9,590.0009 670.9,668.0009 708.5,668.0009"/>
-<polyline class="edge" points="99.96,444.0006 129.92,444.0006 129.92,117.9995 289.8,117.9995"/>
+<polyline class="edge" points="99.96,117.9995 289.8,117.9995"/>
 <polyline class="edge" points="198.47,410.0016 231.02,410.0016 231.02,174.0009 289.8,174.0009"/>
 <polyline class="edge" points="313.8,174.0009 392.968,174.0009"/>
 <polyline class="edge" points="413.752,174.0009 499.33,174.0009"/>
-<path class="edge" d="M 99.96 444.0006 L 129.92 444.0006 L 129.92 410.0016 L 135.92 410.0016 A 4 4 0 0 0 143.92 410.0016 L 162.47 410.0016"/>
-<path class="edge" d="M 99.96 500.0006 L 125.92 500.0006 A 4 4 0 0 0 133.92 500.0006 L 139.92 500.0006 L 139.92 359.0041 L 227.02 359.0041 A 4 4 0 0 0 235.02 359.0041 L 237.02 359.0041 A 4 4 0 0 0 245.02 359.0041 L 251.02 359.0041 L 251.02 325.9995 L 289.8 325.9995"/>
+<path class="edge" d="M 99.96 306.0016 L 139.92 306.0016 L 139.92 359.0041 L 227.02 359.0041 A 4 4 0 0 0 235.02 359.0041 L 237.02 359.0041 A 4 4 0 0 0 245.02 359.0041 L 251.02 359.0041 L 251.02 325.9995 L 289.8 325.9995"/>
 <path class="edge" d="M 198.47 306.0016 L 227.02 306.0016 A 4 4 0 0 0 235.02 306.0016 L 241.02 306.0016 L 241.02 382.0009 L 289.8 382.0009"/>
 <path class="edge" d="M 198.47 618.0016 L 217.02 618.0016 A 4 4 0 0 0 225.02 618.0016 L 227.02 618.0016 A 4 4 0 0 0 235.02 618.0016 L 241.02 618.0016 L 241.02 438.0023 L 289.8 438.0023"/>
-<path class="edge" d="M 99.96 500.0006 L 125.92 500.0006 A 4 4 0 0 0 133.92 500.0006 L 139.92 500.0006 L 139.92 306.0016 L 162.47 306.0016"/>
-<path class="edge" d="M 99.96 444.0006 L 129.92 444.0006 L 129.92 570.0041 L 135.92 570.0041 A 4 4 0 0 0 143.92 570.0041 L 221.02 570.0041 L 221.02 741.9995 L 237.02 741.9995 A 4 4 0 0 0 245.02 741.9995 L 247.02 741.9995 A 4 4 0 0 0 255.02 741.9995 L 289.8 741.9995"/>
+<path class="edge" d="M 99.96 618.0016 L 129.92 618.0016 L 129.92 570.0041 L 135.92 570.0041 A 4 4 0 0 0 143.92 570.0041 L 221.02 570.0041 L 221.02 741.9995 L 237.02 741.9995 A 4 4 0 0 0 245.02 741.9995 L 247.02 741.9995 A 4 4 0 0 0 255.02 741.9995 L 289.8 741.9995"/>
 <path class="edge" d="M 198.47 618.0016 L 217.02 618.0016 A 4 4 0 0 0 225.02 618.0016 L 227.02 618.0016 A 4 4 0 0 0 235.02 618.0016 L 241.02 618.0016 L 241.02 798.0009 L 247.02 798.0009 A 4 4 0 0 0 255.02 798.0009 L 289.8 798.0009"/>
 <path class="edge" d="M 198.47 722.0016 L 217.02 722.0016 A 4 4 0 0 0 225.02 722.0016 L 237.02 722.0016 A 4 4 0 0 0 245.02 722.0016 L 251.02 722.0016 L 251.02 854.0023 L 289.8 854.0023"/>
-<path class="edge" d="M 99.96 444.0006 L 129.92 444.0006 L 129.92 618.0016 L 135.92 618.0016 A 4 4 0 0 0 143.92 618.0016 L 162.47 618.0016"/>
-<path class="edge" d="M 99.96 500.0006 L 125.92 500.0006 A 4 4 0 0 0 133.92 500.0006 L 139.92 500.0006 L 139.92 533.9995 L 227.02 533.9995 A 4 4 0 0 0 235.02 533.9995 L 237.02 533.9995 A 4 4 0 0 0 245.02 533.9995 L 289.8 533.9995"/>
+<path class="edge" d="M 99.96 618.0016 L 135.92 618.0016 A 4 4 0 0 0 143.92 618.0016 L 162.47 618.0016"/>
+<path class="edge" d="M 99.96 533.9995 L 227.02 533.9995 A 4 4 0 0 0 235.02 533.9995 L 237.02 533.9995 A 4 4 0 0 0 245.02 533.9995 L 289.8 533.9995"/>
 <path class="edge" d="M 198.47 722.0016 L 217.02 722.0016 A 4 4 0 0 0 225.02 722.0016 L 237.02 722.0016 A 4 4 0 0 0 245.02 722.0016 L 251.02 722.0016 L 251.02 590.0009 L 289.8 590.0009"/>
 <path class="edge" d="M 198.47 410.0016 L 231.02 410.0016 L 231.02 646.0023 L 237.02 646.0023 A 4 4 0 0 0 245.02 646.0023 L 247.02 646.0023 A 4 4 0 0 0 255.02 646.0023 L 289.8 646.0023"/>
-<path class="edge" d="M 99.96 500.0006 L 125.92 500.0006 A 4 4 0 0 0 133.92 500.0006 L 139.92 500.0006 L 139.92 722.0016 L 162.47 722.0016"/>
 <path class="edge" d="M 198.47 306.0016 L 227.02 306.0016 A 4 4 0 0 0 235.02 306.0016 L 241.02 306.0016 L 241.02 230.0023 L 289.8 230.0023"/>
-<circle cx="129.92" cy="410.0016" r="3" fill="#000000"/>
-<circle cx="129.92" cy="444.0006" r="3" fill="#000000"/>
-<circle cx="129.92" cy="570.0041" r="3" fill="#000000"/>
-<circle cx="139.92" cy="359.0041" r="3" fill="#000000"/>
-<circle cx="139.92" cy="500.0006" r="3" fill="#000000"/>
+<circle cx="129.92" cy="618.0016" r="3" fill="#000000"/>
+<circle cx="139.92" cy="306.0016" r="3" fill="#000000"/>
 <circle cx="139.92" cy="533.9995" r="3" fill="#000000"/>
 <circle cx="231.02" cy="410.0016" r="3" fill="#000000"/>
 <circle cx="241.02" cy="306.0016" r="3" fill="#000000"/>
@@ -105,8 +102,11 @@
 <g class="component" data-node-id="pll_1"><svg class="component-graphic" x="160.47" y="276.0041" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 2 16 L 30 16 L 38 30 L 30 44 L 2 44 L 2 38 M 2 22 L 2 16" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" /><path d="M 2 30 L 8 30" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" /></svg><text x="176.47" y="309.5241" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">SC</text><text x="182.47" y="346.0241" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">pll_1</text></g>
 <g class="component" data-node-id="pll_2"><svg class="component-graphic" x="160.47" y="588.0041" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 2 16 L 30 16 L 38 30 L 30 44 L 2 44 L 2 38 M 2 22 L 2 16" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" /><path d="M 2 30 L 8 30" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" /></svg><text x="176.47" y="621.5241" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">SC</text><text x="182.47" y="658.0241" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">pll_2</text></g>
 <g class="component" data-node-id="pll_3"><svg class="component-graphic" x="160.47" y="692.0041" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 2 16 L 30 16 L 38 30 L 30 44 L 2 44 L 2 38 M 2 22 L 2 16" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" /><path d="M 2 30 L 8 30" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" /></svg><text x="176.47" y="725.5241" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">SC</text><text x="182.47" y="762.0241" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">pll_3</text></g>
-<g class="component" data-node-id="xtal_0"><svg class="component-graphic" x="65.96" y="413.9981" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><circle cx="20.0" cy="30" r="14" fill="none" stroke="#000000" stroke-width="2" /><path d="M 12.0 30.0 L 13.3 33.5 L 14.7 35.0 L 16.0 33.5 L 17.3 30.0 L 18.7 26.5 L 20.0 25.0 L 21.3 26.5 L 22.7 30.0 L 24.0 33.5 L 25.3 35.0 L 26.7 33.5 L 28.0 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="474.0181" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">xtal_0</text></g>
-<g class="component" data-node-id="xtal_1"><svg class="component-graphic" x="65.96" y="469.9981" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><circle cx="20.0" cy="30" r="14" fill="none" stroke="#000000" stroke-width="2" /><path d="M 12.0 30.0 L 13.3 33.5 L 14.7 35.0 L 16.0 33.5 L 17.3 30.0 L 18.7 26.5 L 20.0 25.0 L 21.3 26.5 L 22.7 30.0 L 24.0 33.5 L 25.3 35.0 L 26.7 33.5 L 28.0 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="530.0181" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">xtal_1</text></g>
+<g class="component" data-node-id="xtal_0"><svg class="component-graphic" x="65.96" y="87.997" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><circle cx="20.0" cy="30" r="14" fill="none" stroke="#000000" stroke-width="2" /><path d="M 12.0 30.0 L 13.3 33.5 L 14.7 35.0 L 16.0 33.5 L 17.3 30.0 L 18.7 26.5 L 20.0 25.0 L 21.3 26.5 L 22.7 30.0 L 24.0 33.5 L 25.3 35.0 L 26.7 33.5 L 28.0 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="148.017" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">xtal_0</text></g>
+<g class="component" data-node-id="xtal_0"><svg class="component-graphic" x="65.96" y="379.9991" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><circle cx="20.0" cy="30" r="14" fill="none" stroke="#000000" stroke-width="2" /><path d="M 12.0 30.0 L 13.3 33.5 L 14.7 35.0 L 16.0 33.5 L 17.3 30.0 L 18.7 26.5 L 20.0 25.0 L 21.3 26.5 L 22.7 30.0 L 24.0 33.5 L 25.3 35.0 L 26.7 33.5 L 28.0 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="440.0191" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">xtal_0</text></g>
+<g class="component" data-node-id="xtal_0"><svg class="component-graphic" x="65.96" y="587.9991" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><circle cx="20.0" cy="30" r="14" fill="none" stroke="#000000" stroke-width="2" /><path d="M 12.0 30.0 L 13.3 33.5 L 14.7 35.0 L 16.0 33.5 L 17.3 30.0 L 18.7 26.5 L 20.0 25.0 L 21.3 26.5 L 22.7 30.0 L 24.0 33.5 L 25.3 35.0 L 26.7 33.5 L 28.0 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="648.0191" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">xtal_0</text></g>
+<g class="component" data-node-id="xtal_1"><svg class="component-graphic" x="65.96" y="275.9991" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><circle cx="20.0" cy="30" r="14" fill="none" stroke="#000000" stroke-width="2" /><path d="M 12.0 30.0 L 13.3 33.5 L 14.7 35.0 L 16.0 33.5 L 17.3 30.0 L 18.7 26.5 L 20.0 25.0 L 21.3 26.5 L 22.7 30.0 L 24.0 33.5 L 25.3 35.0 L 26.7 33.5 L 28.0 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="336.0191" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">xtal_1</text></g>
+<g class="component" data-node-id="xtal_1"><svg class="component-graphic" x="65.96" y="503.997" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><circle cx="20.0" cy="30" r="14" fill="none" stroke="#000000" stroke-width="2" /><path d="M 12.0 30.0 L 13.3 33.5 L 14.7 35.0 L 16.0 33.5 L 17.3 30.0 L 18.7 26.5 L 20.0 25.0 L 21.3 26.5 L 22.7 30.0 L 24.0 33.5 L 25.3 35.0 L 26.7 33.5 L 28.0 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="564.017" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">xtal_1</text></g>
 <g class="frequency-table">
 <g class="frequency-heading" data-frequency-field="func_freq" data-heading-render="outline" aria-label="工作频率" transform="translate(790.5 68.0009) scale(0.012 -0.012)" fill="#20252b">
 <title>工作频率</title>

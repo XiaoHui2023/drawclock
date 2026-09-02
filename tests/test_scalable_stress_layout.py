@@ -32,6 +32,7 @@ from scripts.build_stress_examples import build_multi_from_clusters
 from scripts.build_stress_examples import build_terminal_fanout_crossing
 from scripts.build_stress_examples import build_asymmetric_merge_columns
 from scripts.build_stress_examples import build_dispersed_root_fanout
+from scripts.build_stress_examples import build_single_source_rendering_alias
 from scripts.build_stress_examples import build_middle_column_low_use_sources
 from scripts.build_stress_examples import build_asymmetric_merge_route_bulge
 from drawio_ports import abs_port_xy, edge_attachment, infer_port_from_attachment
@@ -237,7 +238,7 @@ def test_source_replication_integrates_every_distant_consumer_band() -> None:
 
 def test_public_single_source_example_naturally_renders_local_anchors() -> None:
     """The public fixture must prove aliases without a second logical source."""
-    config = build_dispersed_root_fanout()
+    config = build_single_source_rendering_alias()
     document, report = generate_elk_layout(
         config, library_path=LIBRARY, include_statistics=True
     )
@@ -264,6 +265,43 @@ def test_public_single_source_example_naturally_renders_local_anchors() -> None:
     assert selection["source_replica_length_saved_px"] > 0
     assert statistics["nodes"]["shared_source"]["rendering_anchors"] == 2
     assert len({vertex.logical_name or vertex.name for vertex in document.vertices}) == len(config)
+
+
+def test_public_multi_source_rows_cover_contiguous_interleaved_and_pad_fanin() -> None:
+    config = build_dispersed_root_fanout()
+    document, report = generate_elk_layout(
+        config, library_path=LIBRARY, include_statistics=True
+    )
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    def root_ancestors(name: str) -> set[str]:
+        source = config[name].get("source")
+        if not source:
+            return {name}
+        upstream = source.values() if isinstance(source, dict) else (source,)
+        roots: set[str] = set()
+        for reference in upstream:
+            roots.update(root_ancestors(str(reference).split("[", 1)[0]))
+        return roots
+
+    assert config["input_pad"]["source"] == {
+        "0": "pad_source_0",
+        "1": "pad_source_1",
+        "2": "pad_source_2",
+    }
+    expected = (
+        *([{"source_contiguous"}] * 3),
+        {"source_interleave_a"}, {"source_interleave_b"},
+        {"source_interleave_a"}, {"source_interleave_b"},
+        {"source_interleave_a"}, {"source_interleave_b"},
+        *([{"pad_source_0", "pad_source_1", "pad_source_2"}] * 3),
+    )
+    assert tuple(root_ancestors(f"row_clock_{index:02d}") for index in range(12)) == expected
+    assert len(document.vertices) == len(config)
+    assert report["selection"]["source_rendering_replicas"] == 0
+    assert quality["passed"] is True
 
 
 def test_source_replication_never_aliases_an_intermediate_fanout() -> None:

@@ -174,6 +174,48 @@ def build_asymmetric_merge_columns(
 
 
 def build_dispersed_root_fanout(
+    row_count: int = 12,
+) -> dict[str, dict[str, object]]:
+    """Independent sources serve contiguous, interleaved, and pad-fed rows."""
+    if row_count < 12:
+        raise ValueError("multi-source row example needs at least 12 rows")
+    config: dict[str, dict[str, object]] = {
+        "source_contiguous": {"kind": "source"},
+        "source_interleave_a": {"kind": "source"},
+        "source_interleave_b": {"kind": "source"},
+        "pad_source_0": {"kind": "source"},
+        "pad_source_1": {"kind": "source"},
+        "pad_source_2": {"kind": "source"},
+        "input_pad": {
+            "kind": "pad3",
+            "source": {
+                "0": "pad_source_0",
+                "1": "pad_source_1",
+                "2": "pad_source_2",
+            },
+        },
+    }
+    for index in range(row_count):
+        suffix = f"{index:02d}"
+        if index < 3:
+            source = "source_contiguous"
+        elif index < 9:
+            source = "source_interleave_a" if index % 2 else "source_interleave_b"
+        else:
+            source = "input_pad"
+        config[f"row_gate_{suffix}"] = {"kind": "gate", "source": source}
+        config[f"row_div_{suffix}"] = {
+            "kind": "div",
+            "source": f"row_gate_{suffix}",
+        }
+        config[f"row_clock_{suffix}"] = {
+            "kind": "clock",
+            "source": f"row_div_{suffix}",
+        }
+    return config
+
+
+def build_single_source_rendering_alias(
     middle_domains: int = 12,
 ) -> dict[str, dict[str, object]]:
     """One logical root gains a local rendering anchor near a distant child."""
@@ -187,12 +229,12 @@ def build_dispersed_root_fanout(
         branch = f"fanout_branch_{suffix}"
         config[branch] = {"kind": "gate", "source": "fanout_hub"}
         if index == 0:
-            merge = "near_merge"
-            config[merge] = {
+            branch_name = "near_merge"
+            config[branch_name] = {
                 "kind": "mux2",
                 "source": {"0": "near_gate", "1": branch},
             }
-            branch = merge
+            branch = branch_name
         config[f"fanout_clock_{suffix}"] = {"kind": "clock", "source": branch}
     return config
 
@@ -372,6 +414,7 @@ def main() -> int:
         ("19-dispersed-root-fanout", build_dispersed_root_fanout()),
         ("20-asymmetric-merge-route-bulge", build_asymmetric_merge_route_bulge()),
         ("23-middle-column-low-use-sources", build_middle_column_low_use_sources()),
+        ("24-single-source-rendering-alias", build_single_source_rendering_alias()),
     )
     for name, config in structural:
         (OUTPUT / f"{name}.json").write_text(

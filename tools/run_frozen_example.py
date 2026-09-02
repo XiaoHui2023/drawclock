@@ -20,7 +20,8 @@ STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
 ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
 COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
 FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
-LONG_FANOUT = ROOT / "example" / "auto-layout" / "19-dispersed-root-fanout.json"
+MULTI_SOURCE = ROOT / "example" / "auto-layout" / "19-dispersed-root-fanout.json"
+SINGLE_ALIAS = ROOT / "example" / "auto-layout" / "24-single-source-rendering-alias.json"
 MIDDLE_SOURCE = ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
 SKILLS = ROOT / "skills"
 SVG_NS = "http://www.w3.org/2000/svg"
@@ -167,6 +168,43 @@ def _assert_single_logical_source_has_rendering_anchors(
         )
 
 
+def _assert_multi_source_row_patterns(path: Path, config_path: Path) -> None:
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+
+    def root_ancestors(name: str) -> set[str]:
+        source = config[name].get("source")
+        if not source:
+            return {name}
+        values = source.values() if isinstance(source, dict) else (source,)
+        roots: set[str] = set()
+        for value in values:
+            roots.update(root_ancestors(str(value).split("[", 1)[0]))
+        return roots
+
+    expected = (
+        *([{"source_contiguous"}] * 3),
+        {"source_interleave_a"}, {"source_interleave_b"},
+        {"source_interleave_a"}, {"source_interleave_b"},
+        {"source_interleave_a"}, {"source_interleave_b"},
+        *([{"pad_source_0", "pad_source_1", "pad_source_2"}] * 3),
+    )
+    observed = tuple(root_ancestors(f"row_clock_{index:02d}") for index in range(12))
+    if observed != expected:
+        raise SystemExit(f"multi-source row ancestry is invalid: {observed}")
+    if config.get("input_pad", {}).get("source") != {
+        "0": "pad_source_0", "1": "pad_source_1", "2": "pad_source_2",
+    }:
+        raise SystemExit("multi-input pad fan-in is invalid")
+    root = ET.fromstring(path.read_text(encoding="utf-8"))
+    pad_nodes = [
+        element for element in root.iter()
+        if element.get("class") == "component"
+        and element.get("data-node-id") == "input_pad"
+    ]
+    if len(pad_nodes) != 1:
+        raise SystemExit(f"multi-input pad rendering is invalid: {len(pad_nodes)}")
+
+
 def _assert_frequency_table(path: Path, config_path: Path) -> None:
     config = json.loads(config_path.read_text(encoding="utf-8"))
     referenced = set()
@@ -238,7 +276,7 @@ def _assert_frequency_table(path: Path, config_path: Path) -> None:
 
 def main() -> int:
     global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC
-    global COLUMN_PREFERENCE, FREQUENCY, LONG_FANOUT, MIDDLE_SOURCE, SKILLS
+    global COLUMN_PREFERENCE, FREQUENCY, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE, SKILLS
     binary = _binary_path()
     package_root = binary.parent
     if (package_root / "runtime" / "runtime-manifest.json").is_file():
@@ -251,13 +289,14 @@ def main() -> int:
         ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
         COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
         FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
-        LONG_FANOUT = ROOT / "example" / "auto-layout" / "19-dispersed-root-fanout.json"
+        MULTI_SOURCE = ROOT / "example" / "auto-layout" / "19-dispersed-root-fanout.json"
+        SINGLE_ALIAS = ROOT / "example" / "auto-layout" / "24-single-source-rendering-alias.json"
         MIDDLE_SOURCE = ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
         SKILLS = ROOT / "skills"
     runtime = binary.parent / "runtime"
     required = (
         binary, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC,
-        COLUMN_PREFERENCE, FREQUENCY, LONG_FANOUT, MIDDLE_SOURCE,
+        COLUMN_PREFERENCE, FREQUENCY, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE,
         runtime / "runtime-manifest.json",
         runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node"),
         runtime / "elk" / "elk_layout.mjs",
@@ -319,10 +358,13 @@ def main() -> int:
     _draw(binary, FREQUENCY, frequency_output)
     _assert_frequency_table(frequency_output, FREQUENCY)
 
-    long_fanout_output = out / "long-fanout-frozen.svg"
-    _draw(binary, LONG_FANOUT, long_fanout_output)
+    multi_source_output = out / "multi-source-rows-frozen.svg"
+    _draw(binary, MULTI_SOURCE, multi_source_output)
+    _assert_multi_source_row_patterns(multi_source_output, MULTI_SOURCE)
+    single_alias_output = out / "single-source-alias-frozen.svg"
+    _draw(binary, SINGLE_ALIAS, single_alias_output)
     _assert_single_logical_source_has_rendering_anchors(
-        long_fanout_output, LONG_FANOUT, "shared_source"
+        single_alias_output, SINGLE_ALIAS, "shared_source"
     )
     middle_output = out / "middle-source-frozen.svg"
     _draw(binary, MIDDLE_SOURCE, middle_output)

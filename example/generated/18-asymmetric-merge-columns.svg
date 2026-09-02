@@ -9,41 +9,47 @@
 <polyline class="edge" points="416.28,295.005 505.678,295.005"/>
 <polyline class="edge" points="526.462,295.005 612.45,295.005"/>
 <polyline class="edge" points="634.45,295.005 702.6,295.005"/>
-<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,444.0075 175.11,444.0075"/>
-<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,500.0075 286.9,500.0075"/>
+<polyline class="edge" points="105.96,444.0075 175.11,444.0075"/>
+<polyline class="edge" points="204.11,500.0075 286.9,500.0075"/>
+<polyline class="edge" points="204.11,444.0075 285.508,444.0075"/>
 <polyline class="edge" points="306.292,444.0075 392.28,444.0075"/>
 <polyline class="edge" points="315.9,500.0075 392.28,500.0075"/>
 <polyline class="edge" points="204.11,146.0025 286.9,146.0025"/>
 <polyline class="edge" points="416.28,472.0075 612.45,472.0075"/>
 <polyline class="edge" points="634.45,472.0075 702.6,472.0075"/>
-<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,677.01 286.9,677.01"/>
+<polyline class="edge" points="105.96,621.01 286.9,621.01"/>
+<polyline class="edge" points="204.11,677.01 286.9,677.01"/>
 <polyline class="edge" points="315.9,621.01 392.28,621.01"/>
 <polyline class="edge" points="315.9,677.01 392.28,677.01"/>
 <polyline class="edge" points="416.28,649.01 505.678,649.01"/>
 <polyline class="edge" points="526.462,649.01 612.45,649.01"/>
 <polyline class="edge" points="634.45,649.01 702.6,649.01"/>
-<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,798.0125 175.11,798.0125"/>
+<polyline class="edge" points="105.96,798.0125 175.11,798.0125"/>
 <polyline class="edge" points="204.11,90.0025 285.508,90.0025"/>
-<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,854.0125 286.9,854.0125"/>
+<polyline class="edge" points="204.11,854.0125 286.9,854.0125"/>
+<polyline class="edge" points="204.11,798.0125 285.508,798.0125"/>
 <polyline class="edge" points="306.292,798.0125 392.28,798.0125"/>
 <polyline class="edge" points="315.9,854.0125 392.28,854.0125"/>
 <polyline class="edge" points="416.28,826.0125 612.45,826.0125"/>
 <polyline class="edge" points="634.45,826.0125 702.6,826.0125"/>
-<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,1031.015 286.9,1031.015"/>
+<polyline class="edge" points="105.96,975.015 286.9,975.015"/>
+<polyline class="edge" points="204.11,1031.015 286.9,1031.015"/>
 <polyline class="edge" points="315.9,975.015 392.28,975.015"/>
 <polyline class="edge" points="315.9,1031.015 392.28,1031.015"/>
 <polyline class="edge" points="306.292,90.0025 392.28,90.0025"/>
 <polyline class="edge" points="416.28,1003.015 505.678,1003.015"/>
 <polyline class="edge" points="526.462,1003.015 612.45,1003.015"/>
 <polyline class="edge" points="634.45,1003.015 702.6,1003.015"/>
-<polyline class="edge" points="105.96,90.0025 129.92,90.0025 129.92,1152.0175 175.11,1152.0175"/>
-<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,1208.0175 286.9,1208.0175"/>
+<polyline class="edge" points="105.96,1152.0175 175.11,1152.0175"/>
+<polyline class="edge" points="204.11,1208.0175 286.9,1208.0175"/>
+<polyline class="edge" points="204.11,1152.0175 285.508,1152.0175"/>
 <polyline class="edge" points="306.292,1152.0175 392.28,1152.0175"/>
 <polyline class="edge" points="315.9,1208.0175 392.28,1208.0175"/>
 <polyline class="edge" points="416.28,1180.0175 612.45,1180.0175"/>
 <polyline class="edge" points="634.45,1180.0175 702.6,1180.0175"/>
 <polyline class="edge" points="315.9,146.0025 392.28,146.0025"/>
-<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,1385.02 286.9,1385.02"/>
+<polyline class="edge" points="105.96,1329.02 286.9,1329.02"/>
+<polyline class="edge" points="204.11,1385.02 286.9,1385.02"/>
 <polyline class="edge" points="315.9,1329.02 392.28,1329.02"/>
 <polyline class="edge" points="315.9,1385.02 392.28,1385.02"/>
 <polyline class="edge" points="416.28,1357.02 505.678,1357.02"/>
@@ -51,28 +57,8 @@
 <polyline class="edge" points="634.45,1357.02 702.6,1357.02"/>
 <polyline class="edge" points="416.28,118.0025 612.45,118.0025"/>
 <polyline class="edge" points="634.45,118.0025 702.6,118.0025"/>
-<polyline class="edge" points="204.11,146.0025 238.3,146.0025 238.3,323.005 286.9,323.005"/>
-<path class="edge" d="M 204.11 444.0075 L 234.3 444.0075 A 4 4 0 0 0 242.3 444.0075 L 285.508 444.0075"/>
-<path class="edge" d="M 105.96 90.0025 L 129.92 90.0025 L 129.92 621.01 L 234.3 621.01 A 4 4 0 0 0 242.3 621.01 L 286.9 621.01"/>
-<path class="edge" d="M 204.11 798.0125 L 234.3 798.0125 A 4 4 0 0 0 242.3 798.0125 L 285.508 798.0125"/>
-<path class="edge" d="M 105.96 90.0025 L 129.92 90.0025 L 129.92 975.015 L 234.3 975.015 A 4 4 0 0 0 242.3 975.015 L 286.9 975.015"/>
-<path class="edge" d="M 204.11 1152.0175 L 234.3 1152.0175 A 4 4 0 0 0 242.3 1152.0175 L 285.508 1152.0175"/>
-<path class="edge" d="M 105.96 90.0025 L 129.92 90.0025 L 129.92 1329.02 L 234.3 1329.02 A 4 4 0 0 0 242.3 1329.02 L 286.9 1329.02"/>
-<path class="edge" d="M 105.96 90.0025 L 129.92 90.0025 L 129.92 267.005 L 234.3 267.005 A 4 4 0 0 0 242.3 267.005 L 286.9 267.005"/>
-<circle cx="129.92" cy="90.0025" r="3" fill="#000000"/>
-<circle cx="129.92" cy="267.005" r="3" fill="#000000"/>
-<circle cx="129.92" cy="444.0075" r="3" fill="#000000"/>
-<circle cx="129.92" cy="621.01" r="3" fill="#000000"/>
-<circle cx="129.92" cy="798.0125" r="3" fill="#000000"/>
-<circle cx="129.92" cy="975.015" r="3" fill="#000000"/>
-<circle cx="129.92" cy="1152.0175" r="3" fill="#000000"/>
-<circle cx="238.3" cy="146.0025" r="3" fill="#000000"/>
-<circle cx="238.3" cy="323.005" r="3" fill="#000000"/>
-<circle cx="238.3" cy="500.0075" r="3" fill="#000000"/>
-<circle cx="238.3" cy="677.01" r="3" fill="#000000"/>
-<circle cx="238.3" cy="854.0125" r="3" fill="#000000"/>
-<circle cx="238.3" cy="1031.015" r="3" fill="#000000"/>
-<circle cx="238.3" cy="1208.0175" r="3" fill="#000000"/>
+<polyline class="edge" points="105.96,267.005 286.9,267.005"/>
+<polyline class="edge" points="204.11,323.005 286.9,323.005"/>
 <g class="component" data-node-id="cell_00"><svg class="component-graphic" x="604.45" y="88" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><polygon points="8,15 30,30 8,45" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" /></svg><text x="626.45" y="148.02" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">cell_00</text></g>
 <g class="component" data-node-id="cell_01"><svg class="component-graphic" x="604.45" y="265.0025" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><polygon points="8,15 30,30 8,45" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" /></svg><text x="626.45" y="325.0225" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">cell_01</text></g>
 <g class="component" data-node-id="cell_02"><svg class="component-graphic" x="604.45" y="442.005" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><polygon points="8,15 30,30 8,45" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" /></svg><text x="626.45" y="502.025" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">cell_02</text></g>
@@ -122,7 +108,21 @@
 <g class="component" data-node-id="merge_06"><svg class="component-graphic" x="384.28" y="1122.0175" width="40" height="110" viewBox="0 0 40 110" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><polygon points="8,6 8,110 32,100 32,16" fill="none" stroke="#000000" stroke-width="2" /></svg><text x="398.28" y="1155.5375" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">0</text><text x="398.28" y="1211.5375" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">1</text><text x="406.28" y="1252.0375" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">merge_06</text></g>
 <g class="component" data-node-id="merge_07"><svg class="component-graphic" x="384.28" y="1299.02" width="40" height="110" viewBox="0 0 40 110" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><polygon points="8,6 8,110 32,100 32,16" fill="none" stroke="#000000" stroke-width="2" /></svg><text x="398.28" y="1332.54" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">0</text><text x="398.28" y="1388.54" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">1</text><text x="406.28" y="1429.04" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">merge_07</text></g>
 <g class="component" data-node-id="root_a"><svg class="component-graphic" x="65.96" y="76.0013" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="110.0213" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_a</text></g>
+<g class="component" data-node-id="root_a"><svg class="component-graphic" x="65.96" y="253.0038" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="287.0238" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_a</text></g>
+<g class="component" data-node-id="root_a"><svg class="component-graphic" x="65.96" y="430.0063" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="464.0263" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_a</text></g>
+<g class="component" data-node-id="root_a"><svg class="component-graphic" x="65.96" y="607.0088" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="641.0288" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_a</text></g>
+<g class="component" data-node-id="root_a"><svg class="component-graphic" x="65.96" y="784.0113" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="818.0313" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_a</text></g>
+<g class="component" data-node-id="root_a"><svg class="component-graphic" x="65.96" y="961.0138" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="995.0338" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_a</text></g>
+<g class="component" data-node-id="root_a"><svg class="component-graphic" x="65.96" y="1138.0163" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="1172.0363" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_a</text></g>
+<g class="component" data-node-id="root_a"><svg class="component-graphic" x="65.96" y="1315.0188" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="87.96" y="1349.0388" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_a</text></g>
 <g class="component" data-node-id="root_b"><svg class="component-graphic" x="164.11" y="132.0013" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="186.11" y="166.0213" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_b</text></g>
+<g class="component" data-node-id="root_b"><svg class="component-graphic" x="164.11" y="309.0038" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="186.11" y="343.0238" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_b</text></g>
+<g class="component" data-node-id="root_b"><svg class="component-graphic" x="164.11" y="486.0063" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="186.11" y="520.0263" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_b</text></g>
+<g class="component" data-node-id="root_b"><svg class="component-graphic" x="164.11" y="663.0088" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="186.11" y="697.0288" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_b</text></g>
+<g class="component" data-node-id="root_b"><svg class="component-graphic" x="164.11" y="840.0113" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="186.11" y="874.0313" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_b</text></g>
+<g class="component" data-node-id="root_b"><svg class="component-graphic" x="164.11" y="1017.0138" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="186.11" y="1051.0338" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_b</text></g>
+<g class="component" data-node-id="root_b"><svg class="component-graphic" x="164.11" y="1194.0163" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="186.11" y="1228.0363" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_b</text></g>
+<g class="component" data-node-id="root_b"><svg class="component-graphic" x="164.11" y="1371.0188" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="186.11" y="1405.0388" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">root_b</text></g>
 <g class="frequency-table">
 <g class="frequency-heading" data-frequency-field="func_freq" data-heading-render="outline" aria-label="工作频率" transform="translate(784.6 90.0025) scale(0.012 -0.012)" fill="#20252b">
 <title>工作频率</title>

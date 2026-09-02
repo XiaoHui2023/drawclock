@@ -32,6 +32,7 @@ RELEASE_PATHS = (
     "example/auto-layout/21-layout-column-preference.json",
     "example/auto-layout/22-terminal-frequency-table.json",
     "example/auto-layout/23-middle-column-low-use-sources.json",
+    "example/auto-layout/24-single-source-rendering-alias.json",
 )
 
 SOURCE_PATHS = (

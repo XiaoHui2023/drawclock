@@ -32,6 +32,7 @@ if str(SCRIPTS) not in sys.path:
         ("pll2", 3),
         ("source", 1),
         ("pad", 1),
+        ("pad3", 4),
         ("clock", 1),
         ("from", 1),
     ],
@@ -132,6 +133,20 @@ def test_pad_is_hollow_and_output_labeled_c() -> None:
     assert ">C</span>" in html
     svg = pad.preview_svg()
     assert ">C</text>" in svg
+
+
+def test_pad3_is_hollow_with_three_inputs_and_one_output() -> None:
+    pad3 = importlib.import_module("drawio_lib.components.pad3")
+    html = pad3.label_html()
+    points = pad3._parse_points(pad3.cell_style())
+
+    assert "<rect " in html
+    assert "<polygon " not in html
+    assert 'fill="none"' in html
+    assert len(points) == 4
+    assert [point[1] for point in points[:3]] == sorted(point[1] for point in points[:3])
+    for label in ("0", "1", "2", "C"):
+        assert f">{label}</span>" in html
 
 
 def test_inv_has_output_bubble() -> None:

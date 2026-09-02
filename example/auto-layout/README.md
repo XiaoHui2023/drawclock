@@ -31,11 +31,12 @@ python src `
 | 多源簇 | `16-multi-from-clusters.json` | 多个共享输入源连接多组相似支路 |
 | 末端排序 | `17-terminal-fanout-order.json` | 一分二末端与相邻单支路的交叉顺序 |
 | 非对称列 | `18-asymmetric-merge-columns.json` | 长短不同的 mux 输入支路与汇聚列 |
-| 单源远距离扇出 | `19-dispersed-root-fanout.json` | 配置只有一个逻辑源；其下级分散到近端和远端行簇时，自动显示多个同名源图案以消除无谓长干线 |
+| 多源行组合 | `19-dispersed-root-fanout.json` | 六个独立 source；覆盖连续行、两源交错行，以及三源先汇入 `pad3` 再服务下游行 |
 | 汇聚折线 | `20-asymmetric-merge-route-bulge.json` | 长短分支进入 mux 时的可避免外凸折线 |
 | 列等级 | `21-layout-column-preference.json` | `10`、`20`、`30` 控制左右顺序，同等级器件共列 |
 | 频率列 | `22-terminal-frequency-table.json` | 一行一个末端 clock，并显示工作频率、SCAN、BIST 三列 |
 | 多层自由源列 | `23-middle-column-low-use-sources.json` | 公共源经共享链留在最前；直接服务 mux 的低复用源进入第 4 层、位于 mux 左侧，避免首列长线、交叉与多余折点 |
+| 单源显示副本 | `24-single-source-rendering-alias.json` | 只有一个逻辑源；近端与远端消费带在质量向量更优时使用多个同名显示锚点 |
 
 压力示例包含少量晶振和 PLL、大量复用的 mux、分频器、gate、多类 clock cell 和末端 clock。13 至 15 改变连接顺序、链深、复用源和实例名，不只是放大同一种阵列。坐标由输入连接关系以及当前器件库的尺寸、标签和端口一次计算得到，不进行成图后的坐标校准。
 

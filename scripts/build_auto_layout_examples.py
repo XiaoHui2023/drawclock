@@ -38,6 +38,7 @@ EXAMPLES = (
     "21-layout-column-preference",
     "22-terminal-frequency-table",
     "23-middle-column-low-use-sources",
+    "24-single-source-rendering-alias",
 )
 
 
