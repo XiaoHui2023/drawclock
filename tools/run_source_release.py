@@ -107,6 +107,14 @@ def _venv_python(venv: pathlib.Path) -> pathlib.Path:
     return venv / ("Scripts/python.exe" if sys.platform == "win32" else "bin/python")
 
 
+def _edge_count(config: dict[str, dict[str, object]]) -> int:
+    count = 0
+    for item in config.values():
+        source = item.get("source")
+        count += len(source) if isinstance(source, dict) else int(source is not None)
+    return count
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         print("usage: run_source_release.py <extracted-package-root>", file=sys.stderr)
@@ -166,7 +174,15 @@ def main() -> int:
         statistics = json.loads(statistics_output.read_text(encoding="utf-8"))[
             "statistics"
         ]
-        if len(statistics["nodes"]) != 29 or statistics["totals"]["edges"] != 28:
+        statistics_config = json.loads(
+            (root / "example/auto-layout/23-middle-column-low-use-sources.json")
+            .read_text(encoding="utf-8")
+        )
+        expected_edges = _edge_count(statistics_config)
+        if (
+            len(statistics["nodes"]) != len(statistics_config)
+            or statistics["totals"]["edges"] != expected_edges
+        ):
             raise SystemExit("packaged layout statistics do not cover every node and edge")
         required_edge_fields = {
             "manhattan_length_px", "bends", "crossing_points",

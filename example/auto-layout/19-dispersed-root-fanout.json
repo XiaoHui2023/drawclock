@@ -1,176 +1,116 @@
 {
-  "wide_root": {
+  "shared_source": {
     "kind": "from"
   },
-  "local_root": {
-    "kind": "from"
-  },
-  "wide_gate_top_0": {
+  "near_gate": {
     "kind": "gate",
-    "source": "wide_root"
+    "source": "shared_source"
   },
-  "wide_clock_top_0": {
-    "kind": "clock",
-    "source": "wide_gate_top_0"
-  },
-  "wide_gate_top_1": {
+  "fanout_hub": {
     "kind": "gate",
-    "source": "wide_root"
+    "source": "shared_source"
   },
-  "wide_clock_top_1": {
-    "kind": "clock",
-    "source": "wide_gate_top_1"
-  },
-  "wide_gate_top_2": {
+  "fanout_branch_00": {
     "kind": "gate",
-    "source": "wide_root"
+    "source": "fanout_hub"
   },
-  "wide_clock_top_2": {
+  "near_merge": {
+    "kind": "mux2",
+    "source": {
+      "0": "near_gate",
+      "1": "fanout_branch_00"
+    }
+  },
+  "fanout_clock_00": {
     "kind": "clock",
-    "source": "wide_gate_top_2"
+    "source": "near_merge"
   },
-  "local_gate_middle_00": {
+  "fanout_branch_01": {
     "kind": "gate",
-    "source": "local_root"
+    "source": "fanout_hub"
   },
-  "local_div_middle_00": {
-    "kind": "div",
-    "source": "local_gate_middle_00"
-  },
-  "local_clock_middle_00": {
+  "fanout_clock_01": {
     "kind": "clock",
-    "source": "local_div_middle_00"
+    "source": "fanout_branch_01"
   },
-  "local_gate_middle_01": {
+  "fanout_branch_02": {
     "kind": "gate",
-    "source": "local_root"
+    "source": "fanout_hub"
   },
-  "local_div_middle_01": {
-    "kind": "div",
-    "source": "local_gate_middle_01"
-  },
-  "local_clock_middle_01": {
+  "fanout_clock_02": {
     "kind": "clock",
-    "source": "local_div_middle_01"
+    "source": "fanout_branch_02"
   },
-  "local_gate_middle_02": {
+  "fanout_branch_03": {
     "kind": "gate",
-    "source": "local_root"
+    "source": "fanout_hub"
   },
-  "local_div_middle_02": {
-    "kind": "div",
-    "source": "local_gate_middle_02"
-  },
-  "local_clock_middle_02": {
+  "fanout_clock_03": {
     "kind": "clock",
-    "source": "local_div_middle_02"
+    "source": "fanout_branch_03"
   },
-  "local_gate_middle_03": {
+  "fanout_branch_04": {
     "kind": "gate",
-    "source": "local_root"
+    "source": "fanout_hub"
   },
-  "local_div_middle_03": {
-    "kind": "div",
-    "source": "local_gate_middle_03"
-  },
-  "local_clock_middle_03": {
+  "fanout_clock_04": {
     "kind": "clock",
-    "source": "local_div_middle_03"
+    "source": "fanout_branch_04"
   },
-  "local_gate_middle_04": {
+  "fanout_branch_05": {
     "kind": "gate",
-    "source": "local_root"
+    "source": "fanout_hub"
   },
-  "local_div_middle_04": {
-    "kind": "div",
-    "source": "local_gate_middle_04"
-  },
-  "local_clock_middle_04": {
+  "fanout_clock_05": {
     "kind": "clock",
-    "source": "local_div_middle_04"
+    "source": "fanout_branch_05"
   },
-  "local_gate_middle_05": {
+  "fanout_branch_06": {
     "kind": "gate",
-    "source": "local_root"
+    "source": "fanout_hub"
   },
-  "local_div_middle_05": {
-    "kind": "div",
-    "source": "local_gate_middle_05"
-  },
-  "local_clock_middle_05": {
+  "fanout_clock_06": {
     "kind": "clock",
-    "source": "local_div_middle_05"
+    "source": "fanout_branch_06"
   },
-  "local_gate_middle_06": {
+  "fanout_branch_07": {
     "kind": "gate",
-    "source": "local_root"
+    "source": "fanout_hub"
   },
-  "local_div_middle_06": {
-    "kind": "div",
-    "source": "local_gate_middle_06"
-  },
-  "local_clock_middle_06": {
+  "fanout_clock_07": {
     "kind": "clock",
-    "source": "local_div_middle_06"
+    "source": "fanout_branch_07"
   },
-  "local_gate_middle_07": {
+  "fanout_branch_08": {
     "kind": "gate",
-    "source": "local_root"
+    "source": "fanout_hub"
   },
-  "local_div_middle_07": {
-    "kind": "div",
-    "source": "local_gate_middle_07"
-  },
-  "local_clock_middle_07": {
+  "fanout_clock_08": {
     "kind": "clock",
-    "source": "local_div_middle_07"
+    "source": "fanout_branch_08"
   },
-  "local_gate_middle_08": {
+  "fanout_branch_09": {
     "kind": "gate",
-    "source": "local_root"
+    "source": "fanout_hub"
   },
-  "local_div_middle_08": {
-    "kind": "div",
-    "source": "local_gate_middle_08"
-  },
-  "local_clock_middle_08": {
+  "fanout_clock_09": {
     "kind": "clock",
-    "source": "local_div_middle_08"
+    "source": "fanout_branch_09"
   },
-  "local_gate_middle_09": {
+  "fanout_branch_10": {
     "kind": "gate",
-    "source": "local_root"
+    "source": "fanout_hub"
   },
-  "local_div_middle_09": {
-    "kind": "div",
-    "source": "local_gate_middle_09"
-  },
-  "local_clock_middle_09": {
+  "fanout_clock_10": {
     "kind": "clock",
-    "source": "local_div_middle_09"
+    "source": "fanout_branch_10"
   },
-  "wide_gate_bottom_0": {
+  "fanout_branch_11": {
     "kind": "gate",
-    "source": "wide_root"
+    "source": "fanout_hub"
   },
-  "wide_clock_bottom_0": {
+  "fanout_clock_11": {
     "kind": "clock",
-    "source": "wide_gate_bottom_0"
-  },
-  "wide_gate_bottom_1": {
-    "kind": "gate",
-    "source": "wide_root"
-  },
-  "wide_clock_bottom_1": {
-    "kind": "clock",
-    "source": "wide_gate_bottom_1"
-  },
-  "wide_gate_bottom_2": {
-    "kind": "gate",
-    "source": "wide_root"
-  },
-  "wide_clock_bottom_2": {
-    "kind": "clock",
-    "source": "wide_gate_bottom_2"
+    "source": "fanout_branch_11"
   }
 }

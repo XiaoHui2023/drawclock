@@ -145,6 +145,28 @@ def _assert_named_nodes_same_x(path: Path, names: tuple[str, ...]) -> float:
     return next(iter(x_by_name.values()))
 
 
+def _assert_single_logical_source_has_rendering_anchors(
+    path: Path, config_path: Path, logical_name: str,
+) -> None:
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    roots = {
+        name for name, item in config.items()
+        if not item.get("source")
+    }
+    if roots != {logical_name}:
+        raise SystemExit(f"example is not single-logical-source: {roots}")
+    root = ET.fromstring(path.read_text(encoding="utf-8"))
+    anchors = [
+        element for element in root.iter()
+        if element.get("class") == "component"
+        and element.get("data-node-id") == logical_name
+    ]
+    if len(anchors) < 2:
+        raise SystemExit(
+            f"single logical source was not rendered near distant consumers: {len(anchors)}"
+        )
+
+
 def _assert_frequency_table(path: Path, config_path: Path) -> None:
     config = json.loads(config_path.read_text(encoding="utf-8"))
     referenced = set()
@@ -297,18 +319,30 @@ def main() -> int:
     _draw(binary, FREQUENCY, frequency_output)
     _assert_frequency_table(frequency_output, FREQUENCY)
 
-    _draw(binary, LONG_FANOUT, out / "long-fanout-frozen.svg")
+    long_fanout_output = out / "long-fanout-frozen.svg"
+    _draw(binary, LONG_FANOUT, long_fanout_output)
+    _assert_single_logical_source_has_rendering_anchors(
+        long_fanout_output, LONG_FANOUT, "shared_source"
+    )
     middle_output = out / "middle-source-frozen.svg"
     _draw(binary, MIDDLE_SOURCE, middle_output)
     source_x = _named_node_xs(
         middle_output,
         (
-            "common_source", "local_source_0", "local_source_1",
-            "local_source_2", "local_source_3",
+            "common_source", "local_source_00", "local_source_01",
+            "local_source_02", "local_source_03", "local_source_04",
+            "local_source_05", "local_source_06", "local_source_07",
+            "mux_00", "mux_01", "mux_02", "mux_03", "mux_04",
+            "mux_05", "mux_06", "mux_07",
         ),
     )
     local_xs = {source_x[name] for name in source_x if name.startswith("local_source_")}
-    if len(local_xs) != 1 or not source_x["common_source"] < next(iter(local_xs)):
+    mux_xs = {source_x[name] for name in source_x if name.startswith("mux_")}
+    if (
+        len(local_xs) != 1
+        or len(mux_xs) != 1
+        or not source_x["common_source"] < next(iter(local_xs)) < next(iter(mux_xs))
+    ):
         raise SystemExit(f"low-use roots did not move to a middle column: {source_x}")
 
     strict_json = out / "frozen-input.json"

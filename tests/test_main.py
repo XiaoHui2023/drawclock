@@ -46,6 +46,37 @@ def test_direct_draw_requires_input_library_and_output() -> None:
     assert "output" in combined
 
 
+def test_frozen_single_source_gate_identifies_zero_indegree_root(
+    tmp_path: Path,
+) -> None:
+    spec = importlib.util.spec_from_file_location(
+        "run_frozen_example", ROOT / "tools" / "run_frozen_example.py"
+    )
+    assert spec is not None and spec.loader is not None
+    gate = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(gate)
+
+    config = tmp_path / "single-source.json"
+    config.write_text(
+        json.dumps({
+            "shared_source": {"kind": "from"},
+            "terminal": {"kind": "clock", "source": "shared_source"},
+        }),
+        encoding="utf-8",
+    )
+    svg = tmp_path / "single-source.svg"
+    svg.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg">'
+        '<g class="component" data-node-id="shared_source"/>'
+        '<g class="component" data-node-id="shared_source"/>'
+        '</svg>',
+        encoding="utf-8",
+    )
+    gate._assert_single_logical_source_has_rendering_anchors(
+        svg, config, "shared_source"
+    )
+
+
 def test_removed_subcommands_are_rejected() -> None:
     for command in ("draw", "extract", "reload", "run", "drawio-to-json"):
         proc = subprocess.run(
@@ -163,6 +194,11 @@ def test_source_manifest_rejects_missing_or_modified_source(
     assert gate._venv_python(tmp_path / "venv") == tmp_path / "venv/Scripts/python.exe"
     monkeypatch.setattr(gate.sys, "platform", "linux")
     assert gate._venv_python(tmp_path / "venv") == tmp_path / "venv/bin/python"
+    assert gate._edge_count({
+        "root": {"kind": "from"},
+        "gate": {"kind": "gate", "source": "root"},
+        "mux": {"kind": "mux2", "source": {"0": "root", "1": "gate"}},
+    }) == 3
 
     root = tmp_path / "release"
     files = {

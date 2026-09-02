@@ -174,28 +174,53 @@ def build_asymmetric_merge_columns(
 
 
 def build_dispersed_root_fanout(
-    middle_domains: int = 10,
+    middle_domains: int = 12,
 ) -> dict[str, dict[str, object]]:
-    """One root serves two distant consumer bands around unrelated domains."""
+    """One logical root gains a local rendering anchor near a distant child."""
     config: dict[str, dict[str, object]] = {
-        "wide_root": {"kind": "from"},
-        "local_root": {"kind": "from"},
+        "shared_source": {"kind": "from"},
+        "near_gate": {"kind": "gate", "source": "shared_source"},
+        "fanout_hub": {"kind": "gate", "source": "shared_source"},
     }
-    for band in ("top",):
-        for index in range(3):
-            suffix = f"{band}_{index}"
-            config[f"wide_gate_{suffix}"] = {"kind": "gate", "source": "wide_root"}
-            config[f"wide_clock_{suffix}"] = {"kind": "clock", "source": f"wide_gate_{suffix}"}
     for index in range(middle_domains):
-        suffix = f"middle_{index:02d}"
-        config[f"local_gate_{suffix}"] = {"kind": "gate", "source": "local_root"}
-        config[f"local_div_{suffix}"] = {"kind": "div", "source": f"local_gate_{suffix}"}
-        config[f"local_clock_{suffix}"] = {"kind": "clock", "source": f"local_div_{suffix}"}
-    for band in ("bottom",):
-        for index in range(3):
-            suffix = f"{band}_{index}"
-            config[f"wide_gate_{suffix}"] = {"kind": "gate", "source": "wide_root"}
-            config[f"wide_clock_{suffix}"] = {"kind": "clock", "source": f"wide_gate_{suffix}"}
+        suffix = f"{index:02d}"
+        branch = f"fanout_branch_{suffix}"
+        config[branch] = {"kind": "gate", "source": "fanout_hub"}
+        if index == 0:
+            merge = "near_merge"
+            config[merge] = {
+                "kind": "mux2",
+                "source": {"0": "near_gate", "1": branch},
+            }
+            branch = merge
+        config[f"fanout_clock_{suffix}"] = {"kind": "clock", "source": branch}
+    return config
+
+
+def build_middle_column_low_use_sources(
+    domain_count: int = 8,
+) -> dict[str, dict[str, object]]:
+    """Low-use roots move beside their muxes while one shared root stays early."""
+    config: dict[str, dict[str, object]] = {
+        "common_source": {"kind": "from"},
+        "common_stage_1": {"kind": "gate", "source": "common_source"},
+        "common_stage_2": {"kind": "div", "source": "common_stage_1"},
+        "common_stage_3": {"kind": "cell", "source": "common_stage_2"},
+    }
+    for index in range(domain_count):
+        suffix = f"{index:02d}"
+        common_branch = f"common_branch_{suffix}"
+        local_source = f"local_source_{suffix}"
+        mux = f"mux_{suffix}"
+        cell = f"cell_{suffix}"
+        config[common_branch] = {"kind": "gate", "source": "common_stage_3"}
+        config[local_source] = {"kind": "from"}
+        config[mux] = {
+            "kind": "mux2",
+            "source": {"0": common_branch, "1": local_source},
+        }
+        config[cell] = {"kind": "cell", "source": mux}
+        config[f"clock_{suffix}"] = {"kind": "clock", "source": cell}
     return config
 
 
@@ -346,6 +371,7 @@ def main() -> int:
         ("18-asymmetric-merge-columns", build_asymmetric_merge_columns()),
         ("19-dispersed-root-fanout", build_dispersed_root_fanout()),
         ("20-asymmetric-merge-route-bulge", build_asymmetric_merge_route_bulge()),
+        ("23-middle-column-low-use-sources", build_middle_column_low_use_sources()),
     )
     for name, config in structural:
         (OUTPUT / f"{name}.json").write_text(

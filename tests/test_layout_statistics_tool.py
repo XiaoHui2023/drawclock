@@ -27,10 +27,11 @@ def test_agent_statistics_tool_covers_every_node_and_edge() -> None:
 
     assert report["schema"] == 1
     assert statistics["totals"]["edges"] == len(statistics["edges"])
-    assert len(statistics["nodes"]) == 29
-    assert statistics["nodes"]["common_source"]["direct_downstream_nodes"] == 4
-    assert statistics["nodes"]["local_source_0"]["direct_downstream_nodes"] == 1
-    assert statistics["nodes"]["clock_0"]["is_terminal"] is True
+    assert len(statistics["nodes"]) == 44
+    assert statistics["nodes"]["common_source"]["direct_downstream_nodes"] == 1
+    assert statistics["nodes"]["common_stage_3"]["direct_downstream_nodes"] == 8
+    assert statistics["nodes"]["local_source_00"]["direct_downstream_nodes"] == 1
+    assert statistics["nodes"]["clock_00"]["is_terminal"] is True
 
 
 def test_agent_statistics_tool_rejects_missing_node_and_edge_drift() -> None:
@@ -41,10 +42,10 @@ def test_agent_statistics_tool_rejects_missing_node_and_edge_drift() -> None:
     )
     config = __import__("json").loads(config_path.read_text(encoding="utf-8"))
     broken = copy.deepcopy(report["statistics"])
-    del broken["nodes"]["clock_0"]
+    del broken["nodes"]["clock_00"]
     broken["totals"]["edges"] -= 1
 
-    errors = module.validate_statistics(broken, config, 28)
+    errors = module.validate_statistics(broken, config, 43)
 
     assert "node statistics do not cover the input node set" in errors
     assert "edge statistics do not cover the generated edge set" in errors

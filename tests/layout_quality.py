@@ -4,7 +4,7 @@ import json
 import math
 import time
 from bisect import bisect_left, bisect_right
-from collections import Counter, defaultdict
+from collections import Counter, defaultdict, deque
 from pathlib import Path
 from statistics import median
 from typing import Any
@@ -32,6 +32,35 @@ from visual_geometry import vertex_visual_box
 
 
 QUALITY_SCHEMA_VERSION = 12  # Test-only Agent artifact inspection schema.
+
+
+def _independent_latest_forward_ranks(
+    names: list[str], logical_edges: list[LogicalEdge]
+) -> dict[str, int]:
+    """Recompute unconstrained ALAP ranks without the production rank owner."""
+    outgoing: dict[str, list[str]] = defaultdict(list)
+    indegree = {name: 0 for name in names}
+    for edge in logical_edges:
+        outgoing[edge.source].append(edge.target)
+        indegree[edge.target] += 1
+    queue = deque(name for name in names if indegree[name] == 0)
+    earliest = {name: 0 for name in names}
+    topological: list[str] = []
+    while queue:
+        name = queue.popleft()
+        topological.append(name)
+        for child in outgoing[name]:
+            earliest[child] = max(earliest[child], earliest[name] + 1)
+            indegree[child] -= 1
+            if indegree[child] == 0:
+                queue.append(child)
+    if len(topological) != len(names):
+        return earliest
+    latest = {name: max(earliest.values(), default=0) for name in names}
+    for name in reversed(topological):
+        if outgoing[name]:
+            latest[name] = min(latest[child] - 1 for child in outgoing[name])
+    return latest
 
 
 def _close(a: float, b: float, tolerance: float) -> bool:
@@ -229,6 +258,41 @@ def inspect_layout_quality(
     )
     logical_outdegree = Counter(edge.source for edge in logical_edges)
     logical_indegree = Counter(edge.target for edge in logical_edges)
+    independent_ranks = _independent_latest_forward_ranks(
+        list(resolved), logical_edges
+    )
+    primary_axes = {
+        name: (vertex_visual_box(vertex).left + vertex_visual_box(vertex).right) / 2.0
+        for name, vertex in vertices_by_name.items()
+    }
+    avoidable_root_layer_positions: list[dict[str, Any]] = []
+    independent_levels = set(independent_ranks.values())
+    for name in sorted(resolved):
+        expected_rank = independent_ranks[name]
+        if (
+            logical_indegree[name] != 0
+            or logical_outdegree[name] != 1
+            or expected_rank <= 0
+            or "layout_column" in config[name]
+            or name not in primary_axes
+        ):
+            continue
+        previous_rank = max(
+            rank for rank in independent_levels if rank < expected_rank
+        )
+        previous_axes = [
+            primary_axes[other]
+            for other, rank in independent_ranks.items()
+            if rank == previous_rank and other in primary_axes
+        ]
+        if previous_axes and primary_axes[name] <= max(previous_axes) + tolerance:
+            avoidable_root_layer_positions.append({
+                "node": name,
+                "expected_rank": expected_rank,
+                "actual_axis_x": round(primary_axes[name], 3),
+                "previous_rank": previous_rank,
+                "previous_rank_axis_x_max": round(max(previous_axes), 3),
+            })
     observed_counter: Counter[str] = Counter()
     dangling_edges: list[str] = []
     unresolved_port_edges: list[str] = []
@@ -2156,6 +2220,10 @@ def inspect_layout_quality(
     order_failures = (
         node_overlaps
         + direction_violations
+        + [
+            f"avoidable-root-layer:{item['node']}"
+            for item in avoidable_root_layer_positions
+        ]
         + (["avoidable-terminal-crossing"] if avoidable_terminal_crossings else [])
     )
     hard_failures = sorted(set(alignment_failures + line_failures + order_failures))
@@ -2295,6 +2363,7 @@ def inspect_layout_quality(
             "mux_input_order_inversions": mux_input_order_inversions,
             "terminal_order_inversions": terminal_order_inversions,
             "avoidable_terminal_crossings": avoidable_terminal_crossings,
+            "avoidable_root_layer_positions": avoidable_root_layer_positions,
             "vertical_gap_min_px": round(min(vertical_gaps), 3) if vertical_gaps else None,
             "vertical_gap_cv": round(gap_cv, 4),
             "visible_footprint_area_px2": round(visible_area, 2),

@@ -32,6 +32,7 @@ from scripts.build_stress_examples import build_multi_from_clusters
 from scripts.build_stress_examples import build_terminal_fanout_crossing
 from scripts.build_stress_examples import build_asymmetric_merge_columns
 from scripts.build_stress_examples import build_dispersed_root_fanout
+from scripts.build_stress_examples import build_middle_column_low_use_sources
 from scripts.build_stress_examples import build_asymmetric_merge_route_bulge
 from drawio_ports import abs_port_xy, edge_attachment, infer_port_from_attachment
 from drawio_layout import layout_from_dict, layout_to_dict
@@ -234,6 +235,37 @@ def test_source_replication_integrates_every_distant_consumer_band() -> None:
     assert quality["passed"] is True
 
 
+def test_public_single_source_example_naturally_renders_local_anchors() -> None:
+    """The public fixture must prove aliases without a second logical source."""
+    config = build_dispersed_root_fanout()
+    document, report = generate_elk_layout(
+        config, library_path=LIBRARY, include_statistics=True
+    )
+    logical_edges = build_logical_edges(
+        config,
+        resolve_nodes(config, load_library_shapes(LIBRARY), {}, library_path=LIBRARY),
+        LIBRARY,
+    )
+    indegree = Counter(edge.target for edge in logical_edges)
+    roots = [name for name in config if indegree[name] == 0]
+    anchors = [
+        vertex for vertex in document.vertices
+        if (vertex.logical_name or vertex.name) == "shared_source"
+    ]
+    used_source_ids = {edge.source_id for edge in document.edges}
+    selection = report["selection"]
+    statistics = selection["routing_statistics"]
+
+    assert roots == ["shared_source"]
+    assert len(anchors) == 2
+    assert all(anchor.cell_id in used_source_ids for anchor in anchors)
+    assert selection["source_replicated_roots"] == 1
+    assert selection["source_rendering_replicas"] == 1
+    assert selection["source_replica_length_saved_px"] > 0
+    assert statistics["nodes"]["shared_source"]["rendering_anchors"] == 2
+    assert len({vertex.logical_name or vertex.name for vertex in document.vertices}) == len(config)
+
+
 def test_source_replication_never_aliases_an_intermediate_fanout() -> None:
     config, document, report = _forced_multiband_root_layout(
         4, source_has_parent=True
@@ -350,37 +382,80 @@ def test_low_use_roots_move_to_their_latest_feasible_middle_column() -> None:
     x_by_name = {vertex.name: vertex.x for vertex in document.vertices}
 
     assert ranks["common_source"] == 0
-    assert {ranks[f"local_source_{index}"] for index in range(4)} == {1}
+    assert {ranks[f"local_source_{index:02d}"] for index in range(8)} == {4}
+    assert {ranks[f"mux_{index:02d}"] for index in range(8)} == {5}
     assert all(
-        x_by_name[f"local_source_{index}"] > x_by_name["common_source"]
-        for index in range(4)
+        x_by_name["common_source"] < x_by_name[f"local_source_{index:02d}"]
+        < x_by_name[f"mux_{index:02d}"]
+        for index in range(8)
     )
     assert quality["line_integrity"]["distinct_crossing_points"] == 0
     assert quality["passed"] is True
 
 
-def test_middle_column_oracle_rejects_forced_first_column_coordinates() -> None:
+def test_middle_column_oracle_rejects_full_forced_first_column_layout() -> None:
     config = load_clock_tree(
         ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
     )
+    natural, natural_report = generate_elk_layout(
+        config, library_path=LIBRARY, include_statistics=True
+    )
+    forced_config = copy.deepcopy(config)
+    for name, item in forced_config.items():
+        if name == "common_source" or name.startswith("local_source_"):
+            item["layout_column"] = 0
+    forced, forced_report = generate_elk_layout(
+        forced_config, library_path=LIBRARY, include_statistics=True
+    )
+    natural_quality = inspect_layout_quality(
+        config, natural, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    forced_quality = inspect_layout_quality(
+        config, forced, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    natural_totals = natural_report["selection"]["routing_statistics"]["totals"]
+    forced_totals = forced_report["selection"]["routing_statistics"]["totals"]
+
+    assert natural_totals["distinct_crossing_points"] == 0
+    assert forced_totals["distinct_crossing_points"] > 0
+    assert natural_totals["bends_total"] < forced_totals["bends_total"]
+    assert natural_totals["manhattan_length_px"] < forced_totals["manhattan_length_px"]
+    assert natural_quality["layout_order"]["avoidable_root_layer_positions"] == []
+    assert forced_quality["passed"] is False
+    assert {
+        item["node"]
+        for item in forced_quality["layout_order"]["avoidable_root_layer_positions"]
+    } == {f"local_source_{index:02d}" for index in range(8)}
+
+
+def test_middle_source_fixture_is_name_and_input_order_independent() -> None:
+    original = build_middle_column_low_use_sources()
+    names = list(original)
+    renamed = {name: f"arbitrary_{index:02d}" for index, name in enumerate(names)}
+    config: dict[str, dict[str, object]] = {}
+    for name in reversed(names):
+        item = copy.deepcopy(original[name])
+        source = item.get("source")
+        if isinstance(source, str):
+            item["source"] = renamed[source]
+        elif isinstance(source, dict):
+            item["source"] = {
+                port: renamed[parent] for port, parent in reversed(source.items())
+            }
+        config[renamed[name]] = item
     shapes = load_library_shapes(LIBRARY)
     nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
     edges = build_logical_edges(config, nodes, LIBRARY)
     ranks = _ranks(nodes, edges)
     document, _ = generate_elk_layout(config, library_path=LIBRARY)
-    x_by_name = {vertex.name: vertex.x for vertex in document.vertices}
-    forced_x = dict(x_by_name)
-    for index in range(4):
-        forced_x[f"local_source_{index}"] = forced_x["common_source"]
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
 
-    errors = [
-        name for name, rank in ranks.items()
-        if name.startswith("local_source_")
-        and rank > ranks["common_source"]
-        and forced_x[name] <= forced_x["common_source"]
-    ]
-
-    assert errors == [f"local_source_{index}" for index in range(4)]
+    assert ranks[renamed["common_source"]] == 0
+    assert {ranks[renamed[f"local_source_{index:02d}"]] for index in range(8)} == {4}
+    assert quality["layout_order"]["avoidable_root_layer_positions"] == []
+    assert quality["passed"] is True
 
 
 def test_four_row_dispersal_is_already_eligible_for_safe_replication() -> None:

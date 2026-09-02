@@ -1,8 +1,8 @@
 # 自由源布局与覆盖空间研究
 
-- status: done
+- status: active
 - created: 2026-09-02 14:42 +08:00
-- updated: 2026-09-02 18:48 +08:00
+- updated: 2026-09-02 18:49 +08:00
 - scene: 自由布局、图几何统计与组合覆盖研究
 
 ## 待核实问题
@@ -29,3 +29,11 @@
 ## 研究状态
 
 Find Skills 已执行四组查询，未找到比现有用户根质量与时钟布局技能更贴合的可直接采用项；未安装第三方 skill。联网已读 ELK、yFiles、NIST、pytest、Hypothesis 官方资料及 ELK/Hypothesis 主仓库问题；来源、反例、工具边界和采用规则已写回用户根专题并由项目实验闭环。ELK node-promotion 页面已保存本地快照与 SHA-256。NIST SP 800-142 PDF 的两个官方入口各重试一次，均在 60 秒触发 `HttpClient.Timeout`；改用 NIST 官方项目页正文完成组合覆盖方法核实，未声称 PDF 已下载。
+
+## 18:49 再研究：多层自由根与完整反事实
+
+- React Flow 官方明确自身不实现布局，只集成 Dagre、ELK 等；Dagre 偏简单树与速度，ELK 支持动态尺寸、端口和路由，因此 React Flow 不是本缺陷的算法 owner。
+- yFiles `HIERARCHICAL_OPTIMAL` 以所有边的层距离总和为目标，OGDF `OptimalRanking` 以 LP 求最小边长 ranking，Graphviz `dot` 以 network simplex 排 rank 后再做 mincross/坐标。这三条成熟路线共同支持“在前向约束内按全局边跨度选择内部层”，而不是“零入度等于第一层”。
+- ELK Layered 仍适合作为端口/正交/层内顺序基准，但只切换 `NETWORK_SIMPLEX` 或 node-placement 选项不能证明最终图更好；必须从最终几何复算交叉、折点、长度和障碍物命中。
+- 旧 23 号 fault 仅改节点 x，未同步路由，是弱 Oracle。采用完整反事实：复制同一拓扑，仅用公开相对列约束把全部根固定为同列，重新运行整个布局与路由，再与无约束候选按交叉、折点、长度比较；产品仍只采用无约束拓扑规则。
+- Find Skills 的前两条查询找到 OpenAI node-link/diagram、AntV G6、Syncfusion 等候选；后两条查询连续 60 秒无输出后有界终止。未安装第三方 skill；现有领域 skill 更贴合，失败检索不影响官方资料与本地实验，但候选生态覆盖不完整。
