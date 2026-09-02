@@ -2,7 +2,7 @@
 
 - status: active
 - created: 2026-09-02 14:42 +08:00
-- updated: 2026-09-02 23:12 +08:00
+- updated: 2026-09-02 23:34 +08:00
 - scene: 自由源分层、逐节点/逐边统计与特性覆盖闭环
 
 ## 当前声明
@@ -118,6 +118,10 @@ Windows clean pack 完成（约 75 s），产出 `drawclock.exe` 与 `drawclock-
 正确的解压消费门全部通过（约 31 s）：仓库独立驱动运行解压后的 frozen 全流程；`run_source_release` 在新 venv、`-I -S` 路径下通过；随机 cwd 直接以包内 19 JSON、包内器件目录和解压后的 exe 生成 SVG；独立冻结 Oracle 复核复杂特征通过。Windows exe 为 8,138,392 B，SHA-256 `EC8E9D32E59261C2DDC1B01A273B61931294CE137FA47E75A2FA8E8269B776B3`；zip 为 37,147,804 B，SHA-256 `E1B25E5639B2FEFED8D84375323CE201BAEEFBE22AF286E9CBBB921369A50824`。
 
 可复用教训已同步到用户根布局与 Oracle skill：删除“至少 10 px”盲区，要求生产候选、阶段接受与最终 Oracle 使用同一量纲/容差，并组合执行重命名、容器逆序和成员逆序；两个 skill 的 `quick_validate` 均通过（2.0 s），内容不含项目路径或私人信息。
+
+功能提交 `9a58dc0` 已推送；Release run `33641432228` 的 Ubuntu 16.04 构建、frozen/source 解压消费、librsvg 与 publish 均成功，tag peeled 到该提交，初次远端资产为 51,937,802 B、API SHA-256 `c351bc2ca41f73320c9c2677bd52020827ecbce83bd88cd169e0f92052a20c62`。发布后审计发现 workflow 仍只消费 publish 前 artifact，缺少“从 Release URL 重新下载后运行”的第六层门；新增 publish 后下载、哈希、全新目录解压、frozen/source smoke，需再次推送并值守，旧 run 不作为最终闭环。
+
+本机未安装 actionlint，按官方 GitHub Release API 获取当前 v1.7.12；首次把架构名猜作 `x86_64` 未找到资产，读取资产清单后改用官方实际命名 `windows_amd64`，下载成功且 workflow 校验零诊断通过（获取与校验约 58 s）。Release/skill 相关回归 9/9 通过（5.5 s；pytest 内 2.51 s）。未使用本机 Docker。
 
 用户随后撤销 23 号示例的充分性：旧配置给每个低复用源增加一个 local gate，只能演示从第 0 层后移到第 1 层，且故障门只是改 x 坐标，没有完整重排重路由，不能证明交叉、折点与长度收益。新的自然反例已在内存实验闭合：公共源经过三层共享链，再分别进入八个公共支路和 mux；八个低复用根直接进入对应 mux。无主观列约束时低复用根位于第 4 层、mux 位于第 5 层，结果为 0 交叉；把所有根通过已有 `layout_column` 合法强制到第 0 层后完整重排重路由，出现 7 个交叉、折点由 14 增至 16、总曼哈顿长度由约 8,865 px 增至约 13,620 px。该对照将替换弱坐标故障门。
 

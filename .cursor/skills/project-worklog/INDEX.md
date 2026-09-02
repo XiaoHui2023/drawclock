@@ -2,7 +2,7 @@
 
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `records/free-source-coverage-observability.md` | record | active | 2026-09-02 14:42 +08:00 | 2026-09-02 23:12 +08:00 | 自由源分层、逐节点/逐边统计与特性覆盖闭环 | 撤销 19 小规模组合，扩展为大量非周期交错、多 pad 重叠和混合汇聚的复杂回归。 |
+| `records/free-source-coverage-observability.md` | record | active | 2026-09-02 14:42 +08:00 | 2026-09-02 23:34 +08:00 | 自由源分层、逐节点/逐边统计与特性覆盖闭环 | 撤销 19 小规模组合，扩展为大量非周期交错、多 pad 重叠和混合汇聚的复杂回归。 |
 | `analysis/free-source-test-space-research.md` | analysis | active | 2026-09-02 14:42 +08:00 | 2026-09-02 21:42 +08:00 | 自由布局、图几何统计与组合覆盖研究 | 新覆盖矩阵冻结 8 根、48 行、非定距直连、重叠 pad 与 pad+source 再汇聚。 |
 | `records/routing-attribution-row-budget.md` | record | done | 2026-09-02 10:14 +08:00 | 2026-09-02 12:36 +08:00 | 通用零入度源显示副本与逐边/逐源路由归因 | 任意设施分区、独立归因、规模性能、本地与最终远端冻结/源码消费均已闭环。 |
 | `records/one-component-library-files.md` | record | done | 2026-08-26 09:42 +08:00 | 2026-08-26 10:21 +08:00 | 器件库从单文件全集迁移为一文件一器件 | 新结构、本地与远端发行消费均已通过。 |

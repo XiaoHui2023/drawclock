@@ -116,3 +116,22 @@ jobs:
           files: release-assets/**
           fail_on_unmatched_files: true
           generate_release_notes: false
+
+      - name: Download and smoke published release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir remote-release remote-smoke
+          gh release download "${{ steps.version.outputs.tag }}" \
+            --pattern 'drawclock-*-linux.tar.gz' \
+            --dir remote-release
+          ASSET="$(find remote-release -maxdepth 1 -type f -name 'drawclock-*-linux.tar.gz' -print -quit)"
+          test -n "$ASSET"
+          sha256sum "$ASSET"
+          tar -xzf "$ASSET" -C remote-smoke
+          PACKAGE_ROOT="$(find remote-smoke -mindepth 1 -maxdepth 1 -type d -print -quit)"
+          BINARY="$(find "$PACKAGE_ROOT" -maxdepth 1 -type f -name drawclock -print -quit)"
+          test -n "$PACKAGE_ROOT"
+          test -n "$BINARY"
+          python3 tools/run_frozen_example.py "$BINARY"
+          python3 tools/run_source_release.py "$PACKAGE_ROOT"
