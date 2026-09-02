@@ -1,8 +1,8 @@
 # 自由源分层、逐元素统计与覆盖闭环
 
-- status: active
+- status: done
 - created: 2026-09-02 14:42 +08:00
-- updated: 2026-09-02 20:49 +08:00
+- updated: 2026-09-02 21:24 +08:00
 - scene: 自由源分层、逐节点/逐边统计与特性覆盖闭环
 
 ## 当前声明
@@ -122,3 +122,11 @@ Agent 逐元素统计复验：19 有 28 边、0 交叉、22 折点、总曼哈�
 改用明确 `PYTHONPATH` 的模块入口后，器件、19/24 拓扑、冻结辅助 Oracle 与发行清单专项 66/66 通过（2.65 s）。Agent 逐元素统计显示 19 有 39 条边、0 交叉、16 折点、总曼哈顿长度 4,507.882 px；所有 12 条 gate→div 与 div→clock 行内边均为水平直线。布局会把交错编号的 A/B 消费行各自聚簇以消除交叉，但独立祖先 Oracle 仍验证输入拓扑的 A/B/A/B/A/B 行归属；这是全局交叉优化而不是篡改连接。
 
 综合布局、可见端口、静态 SVG、逐元素统计、覆盖账本、skills、发行清单和 CLI 门 255/255 通过（73.67 s）。`git diff --check` 与 `compileall` 通过；项目设计笔记和 changelog 已同步新旧 pad 合同与 19/24 的职责分离。下一步执行 clean Windows 打包及全新目录冻结/源码消费。
+
+clean Windows 打包约 93 s 完成，EXE 8,137,490 B，ZIP 37,145,385 B，ZIP SHA-256 `E451BB4E6304DDC558430DB1715FC5F87EAB0EF5569F825474D0D3305EDF797B`。全新目录解压后的 frozen 完整工作流和 `python -I -S` 源码消费通过。最终全量 395 PASS / 5 headless-browser 环境 SKIP（77.42 s）；跳过未折算为通过。
+
+功能提交 `3c6dae1e51633865840fe56319bdcabe97a6b4f9` 已推送；Release run `33634127815` 的 Linux 与 publish job 均成功，`v1.0.0` peeled tag 与提交一致。远端资产 51,936,995 B，API 与本机实际下载 SHA-256 均为 `7D93E5E6AA30C77288A298C8C2F275A37F2E09FA94FCDB57BC57EBC5B67306EE`，归档含 `pad3.xml`、19、24、源码入口与 manifest。远端下载耗时 6 min 41 s；本机未使用 Docker。
+
+## 完成结论（19 多源重设计）
+
+19 现在以六个独立 source 覆盖连续行、交错编号行和三源经 `pad3` 汇聚后扇出；24 保留原单逻辑源显示副本。拓扑、端口、逐边质量、静态 SVG、本地冻结/源码包、托管 Linux 发行与远端资产完整性均闭合，生产布局没有新增器件名或样例名特判。
