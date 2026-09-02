@@ -94,10 +94,12 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     packaged_layout_examples = (
         "01-linear.json",
         "05-dense-cross-root.json",
-        "08-stress-512-clocks.json",
-        "20-asymmetric-merge-route-bulge.json",
-        "21-layout-column-preference.json",
-        "22-terminal-frequency-table.json",
+            "08-stress-512-clocks.json",
+            "19-dispersed-root-fanout.json",
+            "20-asymmetric-merge-route-bulge.json",
+            "21-layout-column-preference.json",
+            "22-terminal-frequency-table.json",
+            "23-middle-column-low-use-sources.json",
     )
     for name in packaged_layout_examples:
         (project / "example" / "auto-layout" / name).write_text("{}", encoding="utf-8")
@@ -177,7 +179,8 @@ def test_source_manifest_rejects_missing_or_modified_source(
         "skills/drawclock-project-navigation/SKILL.md": b"---\nname: drawclock-project-navigation\ndescription: test\n---\n",
         "skills/svg-artifact-design/SKILL.md": b"---\nname: svg-artifact-design\ndescription: test\n---\n",
         "skills/svg-portability/SKILL.md": b"---\nname: svg-portability\ndescription: test\n---\n",
-        "skills/drawclock-project-navigation/scripts/validate_skills.py": b"print('ok')\n",
+            "skills/drawclock-project-navigation/scripts/validate_skills.py": b"print('ok')\n",
+            "skills/clock-layout-algorithms/scripts/layout_statistics.py": b"print('ok')\n",
     }
     for relative, content in files.items():
         path = root / relative

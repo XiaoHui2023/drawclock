@@ -272,6 +272,39 @@ def test_quality_fault_injection_rejects_avoidable_bends_and_crossing() -> None:
     assert line["zigzag_edges"] == [edge.cell_id]
 
 
+def test_quality_fault_injection_rejects_clear_corridor_bend_without_crossing() -> None:
+    """A needless dogleg must fail even when it crosses no other wire."""
+    config, document, _ = _two_parallel_chains()
+    vertices = {vertex.cell_id: vertex for vertex in document.vertices}
+    edge = next(
+        item
+        for item in document.edges
+        if vertices[item.source_id].name == "src_a"
+        and vertices[item.target_id].name == "gate_a"
+    )
+    points = _points_for_edge(
+        edge, vertices[edge.source_id], vertices[edge.target_id]
+    )
+    start, end = points[0], points[-1]
+    detour_y = start[1] - 30.0
+    edge.waypoints = (
+        (start[0] + 20.0, start[1]),
+        (start[0] + 20.0, detour_y),
+        (end[0] - 20.0, detour_y),
+        (end[0] - 20.0, end[1]),
+    )
+
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=10, tolerance=0.01
+    )
+    line = quality["line_integrity"]
+
+    assert quality["passed"] is False
+    assert line["avoidable_bend_edges"] == [edge.cell_id]
+    assert line["avoidable_crossing_edges"] == []
+    assert line["zigzag_edges"] == [edge.cell_id]
+
+
 def test_quality_fault_injection_rejects_two_bend_local_merge_crossing() -> None:
     config = build_asymmetric_merge_route_bulge()
     clean, _ = generate_elk_layout(config, library_path=LIBRARY)

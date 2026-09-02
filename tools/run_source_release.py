@@ -20,6 +20,7 @@ REQUIRED_SKILL_FILES = {
     "skills/svg-artifact-design/SKILL.md",
     "skills/svg-portability/SKILL.md",
     "skills/drawclock-project-navigation/scripts/validate_skills.py",
+    "skills/clock-layout-algorithms/scripts/layout_statistics.py",
 }
 
 
@@ -144,6 +145,38 @@ def main() -> int:
         forbidden = {"foreignObject", "script", "iframe", "audio", "video", "canvas"}
         if any(element.tag.rsplit("}", 1)[-1] in forbidden for element in svg.iter()):
             raise SystemExit("offline source smoke produced browser-only SVG content")
+
+        statistics_output = pathlib.Path(temp) / "layout-statistics.json"
+        subprocess.run(
+            [
+                str(python),
+                "-I",
+                "-S",
+                str(root / "skills/clock-layout-algorithms/scripts/layout_statistics.py"),
+                "-i",
+                str(root / "example/auto-layout/23-middle-column-low-use-sources.json"),
+                "-l",
+                str(root / "drawio-lib/drawclock"),
+                "-o",
+                str(statistics_output),
+            ],
+            cwd=temp,
+            check=True,
+        )
+        statistics = json.loads(statistics_output.read_text(encoding="utf-8"))[
+            "statistics"
+        ]
+        if len(statistics["nodes"]) != 29 or statistics["totals"]["edges"] != 28:
+            raise SystemExit("packaged layout statistics do not cover every node and edge")
+        required_edge_fields = {
+            "manhattan_length_px", "bends", "crossing_points",
+            "crossing_pair_incidents", "crossed_edge_count", "branch_siblings",
+        }
+        if any(
+            not required_edge_fields.issubset(edge)
+            for edge in statistics["edges"].values()
+        ):
+            raise SystemExit("packaged layout statistics are missing edge quality fields")
     print("offline source deployment passed")
     return 0
 

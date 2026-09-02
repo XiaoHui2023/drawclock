@@ -24,3 +24,4 @@ description: 进入 drawclock 项目、判断文件职责、选择相关 skill�
 4. 发布前执行[打包与发行门禁](references/package-and-release.md)。
 
 项目 skill 是发行包中的维护知识，不是运行时依赖，也不改变公开 CLI。
+项目级测试集完整性使用 `scripts/validate_test_coverage_manifest.py` 校验 `clock-layout-algorithms` 的特性/交互/场景账本；该门证明引用闭合，不替代 pytest、几何 Oracle 或发行消费。

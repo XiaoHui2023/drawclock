@@ -20,6 +20,8 @@ STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
 ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
 COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
 FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
+LONG_FANOUT = ROOT / "example" / "auto-layout" / "19-dispersed-root-fanout.json"
+MIDDLE_SOURCE = ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
 SKILLS = ROOT / "skills"
 SVG_NS = "http://www.w3.org/2000/svg"
 
@@ -214,7 +216,7 @@ def _assert_frequency_table(path: Path, config_path: Path) -> None:
 
 def main() -> int:
     global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC
-    global COLUMN_PREFERENCE, FREQUENCY, SKILLS
+    global COLUMN_PREFERENCE, FREQUENCY, LONG_FANOUT, MIDDLE_SOURCE, SKILLS
     binary = _binary_path()
     package_root = binary.parent
     if (package_root / "runtime" / "runtime-manifest.json").is_file():
@@ -227,11 +229,13 @@ def main() -> int:
         ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
         COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
         FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
+        LONG_FANOUT = ROOT / "example" / "auto-layout" / "19-dispersed-root-fanout.json"
+        MIDDLE_SOURCE = ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
         SKILLS = ROOT / "skills"
     runtime = binary.parent / "runtime"
     required = (
         binary, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC,
-        COLUMN_PREFERENCE, FREQUENCY,
+        COLUMN_PREFERENCE, FREQUENCY, LONG_FANOUT, MIDDLE_SOURCE,
         runtime / "runtime-manifest.json",
         runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node"),
         runtime / "elk" / "elk_layout.mjs",
@@ -292,6 +296,20 @@ def main() -> int:
     frequency_output = out / "terminal-frequency-frozen.svg"
     _draw(binary, FREQUENCY, frequency_output)
     _assert_frequency_table(frequency_output, FREQUENCY)
+
+    _draw(binary, LONG_FANOUT, out / "long-fanout-frozen.svg")
+    middle_output = out / "middle-source-frozen.svg"
+    _draw(binary, MIDDLE_SOURCE, middle_output)
+    source_x = _named_node_xs(
+        middle_output,
+        (
+            "common_source", "local_source_0", "local_source_1",
+            "local_source_2", "local_source_3",
+        ),
+    )
+    local_xs = {source_x[name] for name in source_x if name.startswith("local_source_")}
+    if len(local_xs) != 1 or not source_x["common_source"] < next(iter(local_xs)):
+        raise SystemExit(f"low-use roots did not move to a middle column: {source_x}")
 
     strict_json = out / "frozen-input.json"
     strict_json.write_text('{"osc":{"kind":"source"}}', encoding="utf-8")

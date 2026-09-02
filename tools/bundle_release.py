@@ -27,9 +27,11 @@ RELEASE_PATHS = (
     "example/auto-layout/01-linear.json",
     "example/auto-layout/05-dense-cross-root.json",
     "example/auto-layout/08-stress-512-clocks.json",
+    "example/auto-layout/19-dispersed-root-fanout.json",
     "example/auto-layout/20-asymmetric-merge-route-bulge.json",
     "example/auto-layout/21-layout-column-preference.json",
     "example/auto-layout/22-terminal-frequency-table.json",
+    "example/auto-layout/23-middle-column-low-use-sources.json",
 )
 
 SOURCE_PATHS = (

@@ -3067,6 +3067,7 @@ def generate_elk_layout(
     library_path: LibrarySource,
     component_hints: dict[str, str] | None = None,
     profile_name: str = "readable",
+    include_statistics: bool = False,
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     """Compute exact-rank, exact-port layout with one deterministic policy."""
     started = time.perf_counter()
@@ -3196,16 +3197,18 @@ def generate_elk_layout(
         document,
         logical_edges,
         0.0,
-        include_routing_statistics=True,
+        include_routing_statistics=include_statistics,
         reuse_hard_metrics=accepted_assessment,
     )
-    report["selection"].update({
+    refined_selection = {
         "source_crossing_points": refined["source_crossing_points"],
         "route_overlaps": refined["ambiguous_overlaps"],
         "bends_total": refined["bends_total"],
         "visible_layout_area": refined["area"],
-        "routing_statistics": refined["routing_statistics"],
-    })
+    }
+    if include_statistics:
+        refined_selection["routing_statistics"] = refined["routing_statistics"]
+    report["selection"].update(refined_selection)
     report["runtime_ms"] = round((time.perf_counter() - started) * 1000, 3)
     report["selection"]["source_position_candidates"] = [
         {

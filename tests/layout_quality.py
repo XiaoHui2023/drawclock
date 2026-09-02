@@ -655,6 +655,13 @@ def inspect_layout_quality(
     source_crossing_points: set[tuple[float, float]] = set()
     edge_crossing_points: dict[str, set[tuple[float, float]]] = defaultdict(set)
     edge_crossing_pair_incidents: Counter[str] = Counter()
+    ordered_edge_ids = sorted(
+        observed_edge_ports, key=lambda item: int(item[1:])
+    )
+    edge_index_by_id = {
+        edge_id: index for index, edge_id in enumerate(ordered_edge_ids)
+    }
+    edge_crossed_owner_masks = [0] * len(ordered_edge_ids)
     same_net_junctions: list[tuple[str, str]] = []
     same_net_junction_intersections = 0
     ambiguous_overlaps: list[tuple[str, str]] = []
@@ -685,6 +692,12 @@ def inspect_layout_quality(
                         edge_crossing_points[edge_b].add(point)
                         edge_crossing_pair_incidents[edge_a] += 1
                         edge_crossing_pair_incidents[edge_b] += 1
+                        edge_crossed_owner_masks[
+                            edge_index_by_id[edge_a]
+                        ] |= 1 << edge_index_by_id[edge_b]
+                        edge_crossed_owner_masks[
+                            edge_index_by_id[edge_b]
+                        ] |= 1 << edge_index_by_id[edge_a]
                         if (
                             observed_edge_ports[edge_a][0] in root_names
                             or observed_edge_ports[edge_b][0] in root_names
@@ -763,6 +776,26 @@ def inspect_layout_quality(
                             edge_crossing_points[edge_id].add(point)
                             edge_crossing_pair_incidents[edge_id] += len(
                                 vertical_owners - {edge_id}
+                            )
+                        vertical_mask = sum(
+                            1 << edge_index_by_id[edge_id]
+                            for edge_id in vertical_owners
+                        )
+                        horizontal_mask = sum(
+                            1 << edge_index_by_id[edge_id]
+                            for edge_id in horizontal_owners
+                        )
+                        for edge_id in vertical_owners:
+                            edge_crossed_owner_masks[
+                                edge_index_by_id[edge_id]
+                            ] |= horizontal_mask & ~(
+                                1 << edge_index_by_id[edge_id]
+                            )
+                        for edge_id in horizontal_owners:
+                            edge_crossed_owner_masks[
+                                edge_index_by_id[edge_id]
+                            ] |= vertical_mask & ~(
+                                1 << edge_index_by_id[edge_id]
                             )
                         if any(
                             observed_edge_ports[edge_id][0] in root_names
@@ -897,8 +930,8 @@ def inspect_layout_quality(
     )
     routing_edge_statistics: dict[str, dict[str, Any]] = {}
     routing_source_edges: dict[str, list[str]] = defaultdict(list)
-    for edge_id in sorted(observed_edge_ports, key=lambda item: int(item[1:])):
-        source_name, _, target_name, _ = observed_edge_ports[edge_id]
+    for edge_id in ordered_edge_ids:
+        source_name, source_port, target_name, _ = observed_edge_ports[edge_id]
         points_for_edge = edge_points[edge_id]
         start, end = points_for_edge[0], points_for_edge[-1]
         low, high = sorted((start[1], end[1]))
@@ -920,6 +953,13 @@ def inspect_layout_quality(
             "target": target_name,
             "crossing_points": len(edge_crossing_points[edge_id]),
             "crossing_pair_incidents": edge_crossing_pair_incidents[edge_id],
+            "crossed_edge_count": edge_crossed_owner_masks[
+                edge_index_by_id[edge_id]
+            ].bit_count(),
+            "source_port_fanout": logical_fanout[(source_name, source_port)],
+            "branch_siblings": max(
+                0, logical_fanout[(source_name, source_port)] - 1
+            ),
             "vertical_span_px": round(high - low, 3),
             "vertical_span_rows": round((high - low) / row_pitch, 3),
             "intervening_rows": sum(low < axis < high for axis in row_centers),
@@ -940,6 +980,11 @@ def inspect_layout_quality(
     routing_source_statistics = {}
     for source_name, edge_ids in sorted(routing_source_edges.items()):
         points = set().union(*(edge_crossing_points[edge_id] for edge_id in edge_ids))
+        source_crossed_mask = 0
+        for edge_id in edge_ids:
+            source_crossed_mask |= edge_crossed_owner_masks[
+                edge_index_by_id[edge_id]
+            ]
         routing_source_statistics[source_name] = {
             "outgoing_edges": len(edge_ids),
             "crossing_points": len(points),
@@ -949,6 +994,7 @@ def inspect_layout_quality(
             "crossing_pair_incidents": sum(
                 edge_crossing_pair_incidents[edge_id] for edge_id in edge_ids
             ),
+            "crossed_edge_count": source_crossed_mask.bit_count(),
             "max_vertical_span_rows": max(
                 routing_edge_statistics[edge_id]["vertical_span_rows"] for edge_id in edge_ids
             ),
@@ -978,6 +1024,51 @@ def inspect_layout_quality(
             ),
             "max_edge_length_px": max(
                 routing_edge_statistics[edge_id]["manhattan_length_px"]
+                for edge_id in edge_ids
+            ),
+        }
+    logical_children: dict[str, set[str]] = defaultdict(set)
+    logical_source_ports: dict[str, set[str]] = defaultdict(set)
+    for source_name, source_port, target_name, _ in observed_edge_ports.values():
+        logical_children[source_name].add(target_name)
+        logical_source_ports[source_name].add(source_port)
+    physical_anchor_counts = Counter(
+        vertex.logical_name or vertex.name for vertex in document.vertices
+    )
+    routing_node_statistics: dict[str, dict[str, Any]] = {}
+    for name in sorted(resolved):
+        edge_ids = routing_source_edges.get(name, [])
+        crossed_mask = 0
+        for edge_id in edge_ids:
+            crossed_mask |= edge_crossed_owner_masks[
+                edge_index_by_id[edge_id]
+            ]
+        routing_node_statistics[name] = {
+            "incoming_edges": logical_indegree[name],
+            "outgoing_edges": logical_outdegree[name],
+            "direct_downstream_nodes": len(logical_children[name]),
+            "source_port_nets": len(logical_source_ports[name]),
+            "rendering_anchors": physical_anchor_counts[name],
+            "is_root": logical_indegree[name] == 0,
+            "is_terminal": logical_outdegree[name] == 0,
+            "branch_siblings": sum(
+                max(0, logical_fanout[(name, port)] - 1)
+                for port in logical_source_ports[name]
+            ),
+            "crossing_points": len(set().union(*(
+                edge_crossing_points[edge_id] for edge_id in edge_ids
+            ))) if edge_ids else 0,
+            "crossing_pair_incidents": sum(
+                edge_crossing_pair_incidents[edge_id]
+                for edge_id in edge_ids
+            ),
+            "crossed_edge_count": crossed_mask.bit_count(),
+            "manhattan_length_px": round(sum(
+                routing_edge_statistics[edge_id]["manhattan_length_px"]
+                for edge_id in edge_ids
+            ), 3),
+            "bends_total": sum(
+                routing_edge_statistics[edge_id]["bends"]
                 for edge_id in edge_ids
             ),
         }
@@ -2171,6 +2262,7 @@ def inspect_layout_quality(
                     ), 3),
                 },
                 "edges": routing_edge_statistics,
+                "nodes": routing_node_statistics,
                 "sources": routing_source_statistics,
             },
             "crossings_per_100_edges": round(100 * len(crossing_points) / max(1, len(document.edges)), 3),

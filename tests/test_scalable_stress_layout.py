@@ -252,7 +252,9 @@ def test_source_replication_never_aliases_an_intermediate_fanout() -> None:
 
 def test_routing_statistics_are_attributed_to_edges_and_logical_sources() -> None:
     config = _minimal_dispersed_config()
-    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    document, report = generate_elk_layout(
+        config, library_path=LIBRARY, include_statistics=True
+    )
     statistics = report["selection"]["routing_statistics"]
     quality = inspect_layout_quality(
         config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
@@ -264,6 +266,10 @@ def test_routing_statistics_are_attributed_to_edges_and_logical_sources() -> Non
         edge["manhattan_length_px"] for edge in statistics["edges"].values()
     ), abs=0.001)
     assert len(statistics["edges"]) == 6
+    assert set(statistics["nodes"]) == set(config)
+    assert statistics["nodes"]["wide_root"]["direct_downstream_nodes"] == 3
+    assert statistics["nodes"]["wide_clock_top_0"]["is_terminal"] is True
+    assert statistics["nodes"]["wide_clock_top_0"]["outgoing_edges"] == 0
     assert statistics["sources"]["wide_root"]["outgoing_edges"] == 3
     assert statistics["sources"]["wide_root"]["manhattan_length_px"] == pytest.approx(sum(
         edge["manhattan_length_px"]
@@ -321,8 +327,60 @@ def test_crossing_statistics_identify_each_involved_edge_and_source() -> None:
     assert production == independent
     assert production["edges"]["e1"]["crossing_points"] == 1
     assert production["edges"]["e2"]["crossing_points"] == 1
+    assert production["edges"]["e1"]["crossed_edge_count"] == 1
+    assert production["edges"]["e2"]["crossed_edge_count"] == 1
     assert production["sources"]["root_a"]["crossing_points"] == 1
     assert production["sources"]["root_b"]["crossing_points"] == 1
+    assert production["nodes"]["root_a"]["crossed_edge_count"] == 1
+    assert production["nodes"]["root_b"]["crossed_edge_count"] == 1
+
+
+def test_low_use_roots_move_to_their_latest_feasible_middle_column() -> None:
+    config = load_clock_tree(
+        ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
+    )
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    edges = build_logical_edges(config, nodes, LIBRARY)
+    ranks = _ranks(nodes, edges)
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    x_by_name = {vertex.name: vertex.x for vertex in document.vertices}
+
+    assert ranks["common_source"] == 0
+    assert {ranks[f"local_source_{index}"] for index in range(4)} == {1}
+    assert all(
+        x_by_name[f"local_source_{index}"] > x_by_name["common_source"]
+        for index in range(4)
+    )
+    assert quality["line_integrity"]["distinct_crossing_points"] == 0
+    assert quality["passed"] is True
+
+
+def test_middle_column_oracle_rejects_forced_first_column_coordinates() -> None:
+    config = load_clock_tree(
+        ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
+    )
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    edges = build_logical_edges(config, nodes, LIBRARY)
+    ranks = _ranks(nodes, edges)
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    x_by_name = {vertex.name: vertex.x for vertex in document.vertices}
+    forced_x = dict(x_by_name)
+    for index in range(4):
+        forced_x[f"local_source_{index}"] = forced_x["common_source"]
+
+    errors = [
+        name for name, rank in ranks.items()
+        if name.startswith("local_source_")
+        and rank > ranks["common_source"]
+        and forced_x[name] <= forced_x["common_source"]
+    ]
+
+    assert errors == [f"local_source_{index}" for index in range(4)]
 
 
 def test_four_row_dispersal_is_already_eligible_for_safe_replication() -> None:
@@ -711,7 +769,9 @@ def test_multiple_source_placement_selects_best_valid_candidate() -> None:
 
 def test_multi_from_roots_are_distributed_by_their_consumers() -> None:
     config = build_multi_from_clusters()
-    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    document, report = generate_elk_layout(
+        config, library_path=LIBRARY, include_statistics=True
+    )
     quality = inspect_layout_quality(
         config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
     )
