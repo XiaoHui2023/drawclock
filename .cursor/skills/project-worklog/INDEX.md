@@ -2,8 +2,8 @@
 
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `records/free-source-coverage-observability.md` | record | active | 2026-09-02 14:42 +08:00 | 2026-09-02 19:51 +08:00 | 自由源分层、逐节点/逐边统计与特性覆盖闭环 | 第三轮 Windows 冻结/源码包与 388 项全量门通过；进入上传和远端 Linux 发行消费。 |
-| `analysis/free-source-test-space-research.md` | analysis | active | 2026-09-02 14:42 +08:00 | 2026-09-02 18:49 +08:00 | 自由布局、图几何统计与组合覆盖研究 | 重新对标 React Flow、ELK、yFiles、OGDF、Graphviz，补充完整反事实 Oracle；两条 Find Skills 查询超时保留为缺口。 |
+| `records/free-source-coverage-observability.md` | record | done | 2026-09-02 14:42 +08:00 | 2026-09-02 20:05 +08:00 | 自由源分层、逐节点/逐边统计与特性覆盖闭环 | 388 项全量、本地冻结/源码消费、托管 Linux 发行、tag 与远端资产摘要全部闭合。 |
+| `analysis/free-source-test-space-research.md` | analysis | done | 2026-09-02 14:42 +08:00 | 2026-09-02 20:05 +08:00 | 自由布局、图几何统计与组合覆盖研究 | 加权自由根、完整反事实与独立 Oracle 已落地；Find Skills 两条超时作为资料覆盖缺口保留。 |
 | `records/routing-attribution-row-budget.md` | record | done | 2026-09-02 10:14 +08:00 | 2026-09-02 12:36 +08:00 | 通用零入度源显示副本与逐边/逐源路由归因 | 任意设施分区、独立归因、规模性能、本地与最终远端冻结/源码消费均已闭环。 |
 | `records/one-component-library-files.md` | record | done | 2026-08-26 09:42 +08:00 | 2026-08-26 10:21 +08:00 | 器件库从单文件全集迁移为一文件一器件 | 新结构、本地与远端发行消费均已通过。 |
 | `records/release-project-skills.md` | record | done | 2026-08-25 16:30 +08:00 | 2026-08-25 17:53 +08:00 | 发布项目 Skills | 五个脱敏项目 skill、渐进披露、包内完整性与发布复验。 |
