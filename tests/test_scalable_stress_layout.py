@@ -267,8 +267,95 @@ def test_public_single_source_example_naturally_renders_local_anchors() -> None:
     assert len({vertex.logical_name or vertex.name for vertex in document.vertices}) == len(config)
 
 
-def test_public_multi_source_rows_cover_contiguous_interleaved_and_pad_fanin() -> None:
+def _assert_complex_multi_source_feature_space(
+    config: dict[str, dict[str, object]],
+) -> dict[str, object]:
+    """Independently prove that the public corpus spans the frozen topology space."""
+    roots = {name for name, item in config.items() if not item.get("source")}
+    terminals = [name for name, item in config.items() if item.get("kind") == "clock"]
+    pads = [name for name, item in config.items() if item.get("kind") == "pad3"]
+    memo: dict[str, frozenset[str]] = {}
+
+    def root_ancestors(name: str, active: frozenset[str] = frozenset()) -> frozenset[str]:
+        if name in memo:
+            return memo[name]
+        if name in active:
+            raise AssertionError(f"cycle while resolving root ancestry: {name}")
+        source = config[name].get("source")
+        if not source:
+            result = frozenset({name})
+        else:
+            upstream = source.values() if isinstance(source, dict) else (source,)
+            result = frozenset().union(*(
+                root_ancestors(str(reference).split("[", 1)[0], active | {name})
+                for reference in upstream
+            ))
+        memo[name] = result
+        return result
+
+    signatures = [root_ancestors(name) for name in terminals]
+    signature_sizes = Counter(map(len, signatures))
+    pad_port_counts = Counter(
+        len(config[name]["source"])
+        for name in pads
+        if isinstance(config[name].get("source"), dict)
+    )
+    source_pairs = {
+        pair
+        for signature in signatures
+        for pair in itertools.combinations(sorted(signature), 2)
+    }
+    hybrid_muxes = []
+    for name, item in config.items():
+        source = item.get("source")
+        if item.get("kind") != "mux2" or not isinstance(source, dict):
+            continue
+        upstream = {str(value).split("[", 1)[0] for value in source.values()}
+        if upstream & set(pads) and upstream & roots:
+            hybrid_muxes.append(name)
+
+    single_root_signatures = [signature for signature in signatures if len(signature) == 1]
+    direct_positions: dict[str, list[int]] = {root: [] for root in roots}
+    for position, signature in enumerate(single_root_signatures):
+        direct_positions[next(iter(signature))].append(position)
+    gaps = {
+        right - left
+        for positions in direct_positions.values()
+        for left, right in zip(positions, positions[1:])
+    }
+    gap_shapes = {
+        tuple(right - left for left, right in zip(positions, positions[1:]))
+        for positions in direct_positions.values()
+        if len(positions) > 1
+    }
+
+    assert len(roots) == 8
+    assert all(config[name].get("kind") == "source" for name in roots)
+    assert len(terminals) == 48
+    assert len(pads) == 8
+    assert pad_port_counts == Counter({3: 6, 2: 2})
+    assert len(hybrid_muxes) == 8
+    assert signature_sizes == Counter({1: 24, 3: 15, 4: 6, 2: 3})
+    assert len(set(signatures)) == 24
+    assert len(source_pairs) >= 24
+    assert sorted(map(len, direct_positions.values())) == [1, 2, 2, 2, 3, 4, 5, 5]
+    assert gaps == set(range(3, 12))
+    assert len(gap_shapes) >= 6
+    assert all(any(root in signature and len(signature) > 1 for signature in signatures)
+               for root in roots)
+    return {
+        "roots": len(roots),
+        "terminals": len(terminals),
+        "signature_sizes": signature_sizes,
+        "unique_signatures": len(set(signatures)),
+        "source_pairs": len(source_pairs),
+        "gap_values": gaps,
+    }
+
+
+def test_public_multi_source_rows_cover_complex_interleaved_feature_space() -> None:
     config = build_dispersed_root_fanout()
+    coverage = _assert_complex_multi_source_feature_space(config)
     document, report = generate_elk_layout(
         config, library_path=LIBRARY, include_statistics=True
     )
@@ -276,32 +363,63 @@ def test_public_multi_source_rows_cover_contiguous_interleaved_and_pad_fanin() -
         config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
     )
 
-    def root_ancestors(name: str) -> set[str]:
-        source = config[name].get("source")
-        if not source:
-            return {name}
-        upstream = source.values() if isinstance(source, dict) else (source,)
-        roots: set[str] = set()
-        for reference in upstream:
-            roots.update(root_ancestors(str(reference).split("[", 1)[0]))
-        return roots
-
-    assert config["input_pad"]["source"] == {
-        "0": "pad_source_0",
-        "1": "pad_source_1",
-        "2": "pad_source_2",
-    }
-    expected = (
-        *([{"source_contiguous"}] * 3),
-        {"source_interleave_a"}, {"source_interleave_b"},
-        {"source_interleave_a"}, {"source_interleave_b"},
-        {"source_interleave_a"}, {"source_interleave_b"},
-        *([{"pad_source_0", "pad_source_1", "pad_source_2"}] * 3),
-    )
-    assert tuple(root_ancestors(f"row_clock_{index:02d}") for index in range(12)) == expected
-    assert len(document.vertices) == len(config)
-    assert report["selection"]["source_rendering_replicas"] == 0
+    assert coverage["source_pairs"] >= 24
+    assert {vertex.logical_name or vertex.name for vertex in document.vertices} == set(config)
+    assert report["selection"]["source_rendering_replicas"] > 0
+    assert report["selection"]["routing_statistics"]["totals"]["edges"] > len(config)
     assert quality["passed"] is True
+
+
+def test_multi_source_feature_oracle_rejects_the_old_shallow_corpus() -> None:
+    """Mutation check: the former 12-terminal example must not escape again."""
+    config = build_dispersed_root_fanout()
+    shallow = {
+        name: item
+        for name, item in config.items()
+        if item.get("kind") != "clock" or int(name.rsplit("_", 1)[-1]) < 12
+    }
+    with pytest.raises(AssertionError):
+        _assert_complex_multi_source_feature_space(shallow)
+
+
+def test_complex_multi_source_corpus_survives_rename_and_order_transformations() -> None:
+    """Names, object order, and multi-input member order are not layout semantics."""
+    original = build_dispersed_root_fanout()
+    renamed = {name: f"node_{index:03d}" for index, name in enumerate(original)}
+
+    def rename_reference(reference: object) -> object:
+        if not isinstance(reference, str):
+            return reference
+        base, separator, port = reference.partition("[")
+        return renamed[base] + (separator + port if separator else "")
+
+    transformed: dict[str, dict[str, object]] = {}
+    for name, item in reversed(tuple(original.items())):
+        updated = copy.deepcopy(item)
+        source = updated.get("source")
+        if isinstance(source, dict):
+            updated["source"] = {
+                port: rename_reference(reference)
+                for port, reference in reversed(tuple(source.items()))
+            }
+        elif source is not None:
+            updated["source"] = rename_reference(source)
+        transformed[renamed[name]] = updated
+
+    assert _assert_complex_multi_source_feature_space(transformed) == \
+        _assert_complex_multi_source_feature_space(original)
+    document, report = generate_elk_layout(
+        transformed, library_path=LIBRARY, include_statistics=True
+    )
+    quality = inspect_layout_quality(
+        transformed, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert {vertex.logical_name or vertex.name for vertex in document.vertices} == \
+        set(transformed)
+    assert report["selection"]["routing_statistics"]["totals"]["edges"] == 190
+    assert quality["alignment"]["invalid_rendering_replicas"] == []
+    assert quality["passed"] is True, quality["hard_failures"]
 
 
 def test_source_replication_never_aliases_an_intermediate_fanout() -> None:

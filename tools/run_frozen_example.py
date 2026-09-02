@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
+import itertools
 import os
 import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from collections import Counter
 from pathlib import Path
 
 
@@ -170,39 +172,79 @@ def _assert_single_logical_source_has_rendering_anchors(
 
 def _assert_multi_source_row_patterns(path: Path, config_path: Path) -> None:
     config = json.loads(config_path.read_text(encoding="utf-8"))
+    roots = {name for name, item in config.items() if not item.get("source")}
+    terminals = [name for name, item in config.items() if item.get("kind") == "clock"]
+    pads = [name for name, item in config.items() if item.get("kind") == "pad3"]
+    memo: dict[str, frozenset[str]] = {}
 
-    def root_ancestors(name: str) -> set[str]:
+    def root_ancestors(name: str) -> frozenset[str]:
+        if name in memo:
+            return memo[name]
         source = config[name].get("source")
         if not source:
-            return {name}
+            result = frozenset({name})
+            memo[name] = result
+            return result
         values = source.values() if isinstance(source, dict) else (source,)
-        roots: set[str] = set()
+        ancestors: set[str] = set()
         for value in values:
-            roots.update(root_ancestors(str(value).split("[", 1)[0]))
-        return roots
+            ancestors.update(root_ancestors(str(value).split("[", 1)[0]))
+        result = frozenset(ancestors)
+        memo[name] = result
+        return result
 
-    expected = (
-        *([{"source_contiguous"}] * 3),
-        {"source_interleave_a"}, {"source_interleave_b"},
-        {"source_interleave_a"}, {"source_interleave_b"},
-        {"source_interleave_a"}, {"source_interleave_b"},
-        *([{"pad_source_0", "pad_source_1", "pad_source_2"}] * 3),
-    )
-    observed = tuple(root_ancestors(f"row_clock_{index:02d}") for index in range(12))
-    if observed != expected:
-        raise SystemExit(f"multi-source row ancestry is invalid: {observed}")
-    if config.get("input_pad", {}).get("source") != {
-        "0": "pad_source_0", "1": "pad_source_1", "2": "pad_source_2",
+    signatures = [root_ancestors(name) for name in terminals]
+    pairs = {
+        pair
+        for signature in signatures
+        for pair in itertools.combinations(sorted(signature), 2)
+    }
+    pad_ports = Counter(len(config[name]["source"]) for name in pads)
+    hybrid_muxes = 0
+    for item in config.values():
+        source = item.get("source")
+        if item.get("kind") != "mux2" or not isinstance(source, dict):
+            continue
+        upstream = {str(value).split("[", 1)[0] for value in source.values()}
+        hybrid_muxes += bool(upstream & set(pads) and upstream & roots)
+    observed = {
+        "roots": len(roots),
+        "terminals": len(terminals),
+        "pads": len(pads),
+        "pad_ports": pad_ports,
+        "hybrid_muxes": hybrid_muxes,
+        "signature_sizes": Counter(map(len, signatures)),
+        "unique_signatures": len(set(signatures)),
+        "source_pairs": len(pairs),
+    }
+    if observed != {
+        "roots": 8,
+        "terminals": 48,
+        "pads": 8,
+        "pad_ports": Counter({3: 6, 2: 2}),
+        "hybrid_muxes": 8,
+        "signature_sizes": Counter({1: 24, 3: 15, 4: 6, 2: 3}),
+        "unique_signatures": 24,
+        "source_pairs": 25,
     }:
-        raise SystemExit("multi-input pad fan-in is invalid")
+        raise SystemExit(f"multi-source feature coverage is invalid: {observed}")
     root = ET.fromstring(path.read_text(encoding="utf-8"))
-    pad_nodes = [
+    rendered_ids = [
+        element.get("data-node-id")
+        for element in root.iter()
+        if element.get("class") == "component"
+    ]
+    if set(rendered_ids) != set(config):
+        raise SystemExit("multi-source rendering lost logical node identities")
+    rendered_pad_nodes = [
         element for element in root.iter()
         if element.get("class") == "component"
-        and element.get("data-node-id") == "input_pad"
+        and element.get("data-node-id") in pads
     ]
-    if len(pad_nodes) != 1:
-        raise SystemExit(f"multi-input pad rendering is invalid: {len(pad_nodes)}")
+    if len(rendered_pad_nodes) != 8:
+        raise SystemExit(f"multi-input pad rendering is invalid: {len(rendered_pad_nodes)}")
+    if len(rendered_ids) <= len(config):
+        raise SystemExit("dispersed sources did not produce local rendering anchors")
 
 
 def _assert_frequency_table(path: Path, config_path: Path) -> None:

@@ -31,7 +31,7 @@ python src `
 | 多源簇 | `16-multi-from-clusters.json` | 多个共享输入源连接多组相似支路 |
 | 末端排序 | `17-terminal-fanout-order.json` | 一分二末端与相邻单支路的交叉顺序 |
 | 非对称列 | `18-asymmetric-merge-columns.json` | 长短不同的 mux 输入支路与汇聚列 |
-| 多源行组合 | `19-dispersed-root-fanout.json` | 六个独立 source；覆盖连续行、两源交错行，以及三源先汇入 `pad3` 再服务下游行 |
+| 复杂多源交错 | `19-dispersed-root-fanout.json` | 8 个独立 source、48 个 clock；覆盖非周期不定间隔直连、完整/稀疏 `pad3`、重叠根组合、PAD 扇出、PAD 与另一 source 经 mux 二次汇聚，以及不同链深和复用度 |
 | 汇聚折线 | `20-asymmetric-merge-route-bulge.json` | 长短分支进入 mux 时的可避免外凸折线 |
 | 列等级 | `21-layout-column-preference.json` | `10`、`20`、`30` 控制左右顺序，同等级器件共列 |
 | 频率列 | `22-terminal-frequency-table.json` | 一行一个末端 clock，并显示工作频率、SCAN、BIST 三列 |

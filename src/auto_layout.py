@@ -776,7 +776,7 @@ def _route_edges(
                 if segment.edge_key != prior.edge_key
             )
             ambiguous = sum(
-                _overlap_length(segment, prior) >= profile.grid
+                _overlap_length(segment, prior) > 1e-6
                 and segment.source_net != prior.source_net
                 for segment in candidate_segments
                 for prior in all_segments
@@ -1120,12 +1120,16 @@ def assess_layout(
             intervals.append((low, high, segment, owners))
         intervals.sort(key=lambda item: item[0])
         active: list[tuple[float, Segment, set[str]]] = []
+        minimum_overlap = 1e-6
         for low, high, segment, owners in intervals:
-            active = [item for item in active if item[0] - low >= 10.0]
+            active = [
+                item for item in active
+                if item[0] - low > minimum_overlap
+            ]
             for other_high, other, other_owners in active:
                 if segment.source_net == other.source_net:
                     continue
-                if min(high, other_high) - low < 10.0:
+                if min(high, other_high) - low <= minimum_overlap:
                     continue
                 ambiguous += (
                     len(owners) * len(other_owners)

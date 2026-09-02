@@ -173,45 +173,79 @@ def build_asymmetric_merge_columns(
     return config
 
 
-def build_dispersed_root_fanout(
-    row_count: int = 12,
-) -> dict[str, dict[str, object]]:
-    """Independent sources serve contiguous, interleaved, and pad-fed rows."""
-    if row_count < 12:
-        raise ValueError("multi-source row example needs at least 12 rows")
+def build_dispersed_root_fanout() -> dict[str, dict[str, object]]:
+    """Many roots weave through irregular direct, pad, and hybrid rows."""
+    roots = tuple(f"source_{letter}" for letter in "abcdefgh")
     config: dict[str, dict[str, object]] = {
-        "source_contiguous": {"kind": "source"},
-        "source_interleave_a": {"kind": "source"},
-        "source_interleave_b": {"kind": "source"},
-        "pad_source_0": {"kind": "source"},
-        "pad_source_1": {"kind": "source"},
-        "pad_source_2": {"kind": "source"},
-        "input_pad": {
+        root: {"kind": "source"} for root in roots
+    }
+
+    pad_inputs = (
+        ("source_a", "source_b", "source_c"),
+        ("source_d", "source_e", "source_f"),
+        ("source_a", "source_d", "source_g"),
+        ("source_b", "source_e", "source_h"),
+        ("source_c", "source_f", "source_a"),
+        ("source_d", None, "source_b"),
+        (None, "source_e", "source_c"),
+        ("source_f", "source_g", "source_a"),
+    )
+    for index, sources in enumerate(pad_inputs):
+        config[f"input_pad_{index}"] = {
             "kind": "pad3",
             "source": {
-                "0": "pad_source_0",
-                "1": "pad_source_1",
-                "2": "pad_source_2",
+                str(port): source
+                for port, source in enumerate(sources)
+                if source is not None
             },
-        },
-    }
-    for index in range(row_count):
+        }
+
+    def add_terminal_row(index: int, source: str) -> None:
         suffix = f"{index:02d}"
-        if index < 3:
-            source = "source_contiguous"
-        elif index < 9:
-            source = "source_interleave_a" if index % 2 else "source_interleave_b"
-        else:
-            source = "input_pad"
-        config[f"row_gate_{suffix}"] = {"kind": "gate", "source": source}
-        config[f"row_div_{suffix}"] = {
-            "kind": "div",
-            "source": f"row_gate_{suffix}",
+        tail = source
+        config[f"row_gate_{suffix}"] = {"kind": "gate", "source": tail}
+        tail = f"row_gate_{suffix}"
+        if index % 3 != 0:
+            config[f"row_div_{suffix}"] = {"kind": "div", "source": tail}
+            tail = f"row_div_{suffix}"
+        if index % 4 in {2, 3}:
+            config[f"row_cell_{suffix}"] = {"kind": "cell", "source": tail}
+            tail = f"row_cell_{suffix}"
+        config[f"row_clock_{suffix}"] = {"kind": "clock", "source": tail}
+
+    direct_sequence = (
+        "source_a", "source_b", "source_c", "source_a",
+        "source_d", "source_b", "source_e", "source_a",
+        "source_c", "source_f", "source_b", "source_d",
+        "source_a", "source_g", "source_c", "source_e",
+        "source_b", "source_h", "source_a", "source_d",
+        "source_f", "source_c", "source_b", "source_g",
+    )
+    row_index = 0
+    for source in direct_sequence:
+        add_terminal_row(row_index, source)
+        row_index += 1
+
+    pad_fanouts = (1, 3, 2, 4, 1, 2, 1, 2)
+    for pad_index, fanout in enumerate(pad_fanouts):
+        for _ in range(fanout):
+            add_terminal_row(row_index, f"input_pad_{pad_index}")
+            row_index += 1
+
+    hybrid_sources = (
+        "source_h", "source_a", "source_e", "source_c",
+        "source_g", "source_f", "source_b", "source_h",
+    )
+    for pad_index, source in enumerate(hybrid_sources):
+        select = f"row_select_{row_index:02d}"
+        config[select] = {
+            "kind": "mux2",
+            "source": {"0": f"input_pad_{pad_index}", "1": source},
         }
-        config[f"row_clock_{suffix}"] = {
-            "kind": "clock",
-            "source": f"row_div_{suffix}",
-        }
+        add_terminal_row(row_index, select)
+        row_index += 1
+
+    assert row_index == 48
     return config
 
 
