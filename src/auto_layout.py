@@ -7,6 +7,7 @@ from bisect import bisect_left, bisect_right
 from collections import Counter, defaultdict, deque
 from dataclasses import dataclass
 from pathlib import Path
+from statistics import median
 from typing import Any, Iterable
 
 from config_input import load_config
@@ -851,6 +852,8 @@ def assess_layout(
     doc: LayoutDocument,
     logical_edges: list[LogicalEdge],
     runtime_ms: float,
+    *,
+    include_routing_statistics: bool = False,
 ) -> dict[str, Any]:
     by_id = {vertex.cell_id: vertex for vertex in doc.vertices}
     edge_by_id = {edge.cell_id: edge for edge in doc.edges}
@@ -886,6 +889,7 @@ def assess_layout(
             ):
                 overlap_pairs.add((index, other_index))
     segments: list[Segment] = []
+    segment_edge_ids: list[str] = []
     segment_endpoints: list[tuple[str, str]] = []
     node_overlaps = len(overlap_pairs)
     edge_node_intersections = 0
@@ -901,6 +905,7 @@ def assess_layout(
         points = _simplify([start, *edge.waypoints, end])
         edge_segments = _segments(points, logical)
         segments.extend(edge_segments)
+        segment_edge_ids.extend([edge.cell_id] * len(edge_segments))
         segment_endpoints.extend(
             [(edge.source_id, edge.target_id)] * len(edge_segments)
         )
@@ -924,9 +929,9 @@ def assess_layout(
     # pairs for large fanout trees even though only a few trunks were visible.
     grouped: dict[
         tuple[str, float, float, float, tuple[str, str]],
-        tuple[Segment, set[tuple[str, str, str]]],
+        tuple[Segment, set[str]],
     ] = {}
-    for segment in segments:
+    for segment, edge_id in zip(segments, segment_edge_ids):
         if abs(segment.a[0] - segment.b[0]) <= 1e-6:
             low, high = sorted((segment.a[1], segment.b[1]))
             key = ("v", segment.a[0], low, high, segment.source_net)
@@ -935,16 +940,16 @@ def assess_layout(
             key = ("h", segment.a[1], low, high, segment.source_net)
         if key not in grouped:
             grouped[key] = (segment, set())
-        grouped[key][1].add(segment.edge_key)
+        grouped[key][1].add(edge_id)
 
     verticals = [value for key, value in grouped.items() if key[0] == "v"]
     horizontals = [value for key, value in grouped.items() if key[0] == "h"]
     horizontal_by_y: dict[
-        float, list[tuple[float, float, Segment, set[tuple[str, str, str]]]]
+        float, list[tuple[float, float, Segment, set[str]]]
     ] = defaultdict(list)
     horizontal_by_cell: dict[
         tuple[int, float],
-        list[tuple[float, float, Segment, set[tuple[str, str, str]]]],
+        list[tuple[float, float, Segment, set[str]]],
     ] = defaultdict(list)
     for segment, owners in horizontals:
         x0, x1 = sorted((segment.a[0], segment.b[0]))
@@ -962,6 +967,8 @@ def assess_layout(
     crossings = 0
     crossing_points: set[tuple[float, float]] = set()
     source_crossing_points: set[tuple[float, float]] = set()
+    edge_crossing_points: dict[str, set[tuple[float, float]]] = defaultdict(set)
+    edge_crossing_pair_incidents: Counter[str] = Counter()
     logical_indegree = Counter(edge.target for edge in logical_edges)
     root_names = {
         name
@@ -985,6 +992,17 @@ def assess_layout(
                 )
                 point = (round(x, 3), round(y, 3))
                 crossing_points.add(point)
+                if include_routing_statistics:
+                    for vertical_edge in vertical_owners:
+                        edge_crossing_points[vertical_edge].add(point)
+                        edge_crossing_pair_incidents[vertical_edge] += len(
+                            horizontal_owners - {vertical_edge}
+                        )
+                    for horizontal_edge in horizontal_owners:
+                        edge_crossing_points[horizontal_edge].add(point)
+                        edge_crossing_pair_incidents[horizontal_edge] += len(
+                            vertical_owners - {horizontal_edge}
+                        )
                 if (
                     vertical.source_net[0] in root_names
                     or horizontal.source_net[0] in root_names
@@ -993,8 +1011,7 @@ def assess_layout(
 
     ambiguous = 0
     parallel: dict[
-        tuple[str, float],
-        list[tuple[Segment, set[tuple[str, str, str]]]],
+        tuple[str, float], list[tuple[Segment, set[str]]],
     ] = defaultdict(list)
     for segment, owners in verticals:
         parallel[("v", segment.a[0])].append((segment, owners))
@@ -1011,7 +1028,7 @@ def assess_layout(
             low, high = sorted(values)
             intervals.append((low, high, segment, owners))
         intervals.sort(key=lambda item: item[0])
-        active: list[tuple[float, Segment, set[tuple[str, str, str]]]] = []
+        active: list[tuple[float, Segment, set[str]]] = []
         for low, high, segment, owners in intervals:
             active = [item for item in active if item[0] - low >= 10.0]
             for other_high, other, other_owners in active:
@@ -1031,13 +1048,90 @@ def assess_layout(
     direction_violations = sum(
         by_id[edge.source_id].x >= by_id[edge.target_id].x for edge in doc.edges
     )
+    routing_statistics = None
+    if include_routing_statistics:
+        raw_row_centers = sorted({
+            round(vertex.y + vertex.height / 2.0, 6)
+            for vertex in doc.vertices
+        })
+        median_height = median(
+            [vertex.height for vertex in doc.vertices] or [1.0]
+        )
+        row_bands: list[list[float]] = []
+        for axis in raw_row_centers:
+            if not row_bands or axis - row_bands[-1][0] >= median_height:
+                row_bands.append([axis])
+            else:
+                row_bands[-1].append(axis)
+        row_centers = [median(band) for band in row_bands]
+        row_deltas = [
+            right - left
+            for left, right in zip(row_centers, row_centers[1:])
+            if right - left > 1e-6
+        ]
+        # Cap a sparse artifact's observed gap by a geometry-derived pitch.
+        geometry_pitch = max(1.0, median_height * 2.0)
+        row_pitch = (
+            max(median_height, min(median(row_deltas), geometry_pitch))
+            if row_deltas else geometry_pitch
+        )
+        edge_statistics: dict[str, dict[str, Any]] = {}
+        source_statistics: dict[str, dict[str, Any]] = {}
+        source_edge_ids: dict[str, list[str]] = defaultdict(list)
+        for index, logical in enumerate(logical_edges, 1):
+            edge_id = f"e{index}"
+            edge = edge_by_id[edge_id]
+            source = by_id[edge.source_id]
+            target = by_id[edge.target_id]
+            start = abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            )
+            end = abs_port_xy(
+                target.x, target.y, target.width, target.height,
+                target.style, target.drawclock_type, logical.target_port,
+            )
+            low, high = sorted((start[1], end[1]))
+            edge_statistics[edge_id] = {
+                "source": logical.source,
+                "target": logical.target,
+                "crossing_points": len(edge_crossing_points[edge_id]),
+                "crossing_pair_incidents": edge_crossing_pair_incidents[edge_id],
+                "vertical_span_px": round(high - low, 3),
+                "vertical_span_rows": round((high - low) / row_pitch, 3),
+                "intervening_rows": sum(low < axis < high for axis in row_centers),
+            }
+            source_edge_ids[logical.source].append(edge_id)
+        for source, edge_ids in sorted(source_edge_ids.items()):
+            points = set().union(*(edge_crossing_points[edge_id] for edge_id in edge_ids))
+            source_statistics[source] = {
+                "outgoing_edges": len(edge_ids),
+                "crossing_points": len(points),
+                "edge_crossing_points_total": sum(
+                    len(edge_crossing_points[edge_id]) for edge_id in edge_ids
+                ),
+                "crossing_pair_incidents": sum(
+                    edge_crossing_pair_incidents[edge_id] for edge_id in edge_ids
+                ),
+                "max_vertical_span_rows": max(
+                    edge_statistics[edge_id]["vertical_span_rows"] for edge_id in edge_ids
+                ),
+                "max_intervening_rows": max(
+                    edge_statistics[edge_id]["intervening_rows"] for edge_id in edge_ids
+                ),
+            }
+        routing_statistics = {
+            "row_pitch_px": round(row_pitch, 3),
+            "edges": edge_statistics,
+            "sources": source_statistics,
+        }
     hard_pass = (
         node_overlaps == 0
         and edge_node_intersections == 0
         and ambiguous == 0
         and direction_violations == 0
     )
-    return {
+    report = {
         "hard_pass": hard_pass,
         "nodes": len(doc.vertices),
         "edges": len(doc.edges),
@@ -1056,6 +1150,9 @@ def assess_layout(
         "area": round((max_x - min_x) * (max_y - min_y), 2),
         "runtime_ms": round(runtime_ms, 3),
     }
+    if routing_statistics is not None:
+        report["routing_statistics"] = routing_statistics
+    return report
 
 
 def _metric_vector(report: dict[str, Any]) -> tuple[float, ...]:

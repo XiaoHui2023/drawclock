@@ -64,6 +64,22 @@
       "evidence": "full quality matrix"
     },
     {
+      "name": "routing_attribution_agreement",
+      "unit": "percent",
+      "direction": "higher",
+      "threshold": 100,
+      "measurement": "Compare production and independent per-edge/per-source crossing and row-span statistics",
+      "evidence": "routing statistics fault-injection tests"
+    },
+    {
+      "name": "dispersed_source_candidate_budget",
+      "unit": "visual rows",
+      "direction": "lower",
+      "threshold": 3,
+      "measurement": "Normalize consumer-band gaps by clustered visible-row pitch and admit a safe split immediately above the budget",
+      "evidence": "three-row boundary and four-row moderate-distance tests"
+    },
+    {
       "name": "stress_4096_runtime",
       "unit": "seconds",
       "direction": "lower",

@@ -2674,32 +2674,32 @@ def _refine_joint_coordinates(
 
 
 def _optimal_source_anchor_partitions(
-    samples: list[tuple[float, int]], fixed_cost: float
+    samples: list[tuple[float, int]],
+    fixed_cost: float,
+    *,
+    row_axes: tuple[float, ...] = (),
+    max_intervening_rows: int = 3,
+    max_partitions: int = 2,
 ) -> list[list[int]]:
-    """Solve contiguous L1 facilities across independently justified gaps."""
+    """Solve contiguous L1 facilities with a geometry-normalized row budget."""
     ordered = sorted(samples)
     count = len(ordered)
     if count <= 1:
         return [[item[1] for item in ordered]] if ordered else []
     values = [item[0] for item in ordered]
-    # A rendering alias is reserved for a genuinely separated consumer band:
-    # the empty interval at a cut must by itself repay one alias' complete
-    # service cost.  This prevents a uniform tall fanout from degenerating
-    # into hundreds of aliases while retaining exact DP inside admissible
-    # distant-band boundaries.
-    adjacent_gaps = [
-        values[index] - values[index - 1]
-        for index in range(1, count)
-    ]
-    local_gap = median(adjacent_gaps)
+    # The fixed charge is expressed in typical visual-row pitches, never raw
+    # canvas pixels.  Actual occupied rows are a second trigger for irregular
+    # node sizes.  The DP still decides whether an admitted cut pays for
+    # itself, so the budget opens a candidate rather than forcing an alias.
     admissible_left = {0} | {
         index
         for index in range(1, count)
         if (
             values[index] - values[index - 1] > fixed_cost
-            if count == 2
-            else values[index] - values[index - 1] - local_gap
-            > fixed_cost
+            or sum(
+                values[index - 1] < axis < values[index]
+                for axis in row_axes
+            ) > max_intervening_rows
         )
     }
     prefix = [0.0]
@@ -2731,6 +2731,20 @@ def _optimal_source_anchor_partitions(
         partitions.append([ordered[index][1] for index in range(left, right)])
         right = left
     partitions.reverse()
+    if len(partitions) > max_partitions and max_partitions == 2:
+        cut = min(
+            (index for index in range(1, count) if index in admissible_left),
+            key=lambda index: (
+                interval_cost(0, index)
+                + interval_cost(index, count)
+                + fixed_cost,
+                index,
+            ),
+        )
+        return [
+            [ordered[index][1] for index in range(0, cut)],
+            [ordered[index][1] for index in range(cut, count)],
+        ]
     return partitions
 
 
@@ -2752,6 +2766,35 @@ def _replicate_dispersed_roots(
     accepted_replicas = 0
     candidate_roots = 0
     replica_blockers: Counter[str] = Counter()
+    raw_row_centers = sorted({
+        round(vertex.y + vertex.height / 2.0, 6)
+        for vertex in document.vertices
+    })
+    median_height = median(
+        [vertex.height for vertex in document.vertices] or [1.0]
+    )
+    row_bands: list[list[float]] = []
+    for axis in raw_row_centers:
+        if not row_bands or axis - row_bands[-1][0] >= median_height:
+            row_bands.append([axis])
+        else:
+            row_bands[-1].append(axis)
+    row_centers = tuple(median(band) for band in row_bands)
+    row_deltas = [
+        right - left
+        for left, right in zip(row_centers, row_centers[1:])
+        if right - left > 1e-6
+    ]
+    geometry_pitch = max(
+        1.0,
+        median_height + profile.node_spacing,
+    )
+    row_pitch = (
+        max(median_height, min(median(row_deltas), geometry_pitch))
+        if row_deltas else geometry_pitch
+    )
+    max_intervening_rows = 3
+    partition_fixed_cost = row_pitch * max_intervening_rows
 
     def edge_points(
         doc: LayoutDocument,
@@ -2801,12 +2844,12 @@ def _replicate_dispersed_roots(
             horizontal_service.append(
                 max(0.0, target.x - original.x - original.width)
             )
-        fixed_cost = (
-            median(horizontal_service or [profile.layer_spacing])
-            + original.height
-            + 2 * profile.route_clearance
+        partitions = _optimal_source_anchor_partitions(
+            desired,
+            partition_fixed_cost,
+            row_axes=row_centers,
+            max_intervening_rows=max_intervening_rows,
         )
-        partitions = _optimal_source_anchor_partitions(desired, fixed_cost)
         if len(partitions) <= 1:
             continue
         candidate_roots += 1
@@ -2936,7 +2979,7 @@ def _replicate_dispersed_roots(
 
         candidate.vertices.sort(key=lambda vertex: vertex.name)
         candidate_report = assess_layout(candidate, logical_edges, 0.0)
-        replica_cost = fixed_cost * (len(partitions) - 1)
+        replica_cost = partition_fixed_cost * (len(partitions) - 1)
         improves_distribution = (
             candidate_report["crossings"] < accepted_report["crossings"]
             or candidate_report["manhattan_length"] + replica_cost
@@ -2985,6 +3028,8 @@ def _replicate_dispersed_roots(
             3,
         ),
         "source_replica_blockers": dict(sorted(replica_blockers.items())),
+        "source_replica_row_budget": max_intervening_rows,
+        "source_replica_row_pitch_px": round(row_pitch, 3),
     }
 
 
@@ -3118,12 +3163,18 @@ def generate_elk_layout(
         document, nodes, logical_edges, profile
     )
     report["selection"].update(replica_report)
-    refined = assess_layout(document, logical_edges, 0.0)
+    refined = assess_layout(
+        document,
+        logical_edges,
+        0.0,
+        include_routing_statistics=True,
+    )
     report["selection"].update({
         "source_crossing_points": refined["source_crossing_points"],
         "route_overlaps": refined["ambiguous_overlaps"],
         "bends_total": refined["bends_total"],
         "visible_layout_area": refined["area"],
+        "routing_statistics": refined["routing_statistics"],
     })
     report["runtime_ms"] = round((time.perf_counter() - started) * 1000, 3)
     report["selection"]["source_position_candidates"] = [

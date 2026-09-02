@@ -31,7 +31,7 @@ from drawio_ports import (
 from visual_geometry import vertex_visual_box
 
 
-QUALITY_SCHEMA_VERSION = 11  # Test-only Agent artifact inspection schema.
+QUALITY_SCHEMA_VERSION = 12  # Test-only Agent artifact inspection schema.
 
 
 def _close(a: float, b: float, tolerance: float) -> bool:
@@ -653,6 +653,8 @@ def inspect_layout_quality(
     crossing_pair_intersections = 0
     crossing_points: set[tuple[float, float]] = set()
     source_crossing_points: set[tuple[float, float]] = set()
+    edge_crossing_points: dict[str, set[tuple[float, float]]] = defaultdict(set)
+    edge_crossing_pair_incidents: Counter[str] = Counter()
     same_net_junctions: list[tuple[str, str]] = []
     same_net_junction_intersections = 0
     ambiguous_overlaps: list[tuple[str, str]] = []
@@ -679,6 +681,10 @@ def inspect_layout_quality(
                         vertical, horizontal = (a, b) if a.a[0] == a.b[0] else (b, a)
                         point = (round(vertical.a[0], 3), round(horizontal.a[1], 3))
                         crossing_points.add(point)
+                        edge_crossing_points[edge_a].add(point)
+                        edge_crossing_points[edge_b].add(point)
+                        edge_crossing_pair_incidents[edge_a] += 1
+                        edge_crossing_pair_incidents[edge_b] += 1
                         if (
                             observed_edge_ports[edge_a][0] in root_names
                             or observed_edge_ports[edge_b][0] in root_names
@@ -748,6 +754,16 @@ def inspect_layout_quality(
                         crossing_pair_intersections += pair_count
                         point = (round(x, 3), round(y, 3))
                         crossing_points.add(point)
+                        for edge_id in vertical_owners:
+                            edge_crossing_points[edge_id].add(point)
+                            edge_crossing_pair_incidents[edge_id] += len(
+                                horizontal_owners - {edge_id}
+                            )
+                        for edge_id in horizontal_owners:
+                            edge_crossing_points[edge_id].add(point)
+                            edge_crossing_pair_incidents[edge_id] += len(
+                                vertical_owners - {edge_id}
+                            )
                         if any(
                             observed_edge_ports[edge_id][0] in root_names
                             for edge_id in vertical_owners | horizontal_owners
@@ -854,6 +870,66 @@ def inspect_layout_quality(
             for edge_id in pair
         )
     })
+
+    raw_row_centers = sorted({
+        round(vertex.y + vertex.height / 2.0, 6)
+        for vertex in document.vertices
+    })
+    median_height = median(
+        [vertex.height for vertex in document.vertices] or [1.0]
+    )
+    row_bands: list[list[float]] = []
+    for axis in raw_row_centers:
+        if not row_bands or axis - row_bands[-1][0] >= median_height:
+            row_bands.append([axis])
+        else:
+            row_bands[-1].append(axis)
+    row_centers = [median(band) for band in row_bands]
+    row_deltas = [
+        right - left
+        for left, right in zip(row_centers, row_centers[1:])
+        if right - left > tolerance
+    ]
+    geometry_pitch = max(1.0, median_height * 2.0)
+    row_pitch = (
+        max(median_height, min(median(row_deltas), geometry_pitch))
+        if row_deltas else geometry_pitch
+    )
+    routing_edge_statistics: dict[str, dict[str, Any]] = {}
+    routing_source_edges: dict[str, list[str]] = defaultdict(list)
+    for edge_id in sorted(observed_edge_ports, key=lambda item: int(item[1:])):
+        source_name, _, target_name, _ = observed_edge_ports[edge_id]
+        start, end = edge_points[edge_id][0], edge_points[edge_id][-1]
+        low, high = sorted((start[1], end[1]))
+        routing_edge_statistics[edge_id] = {
+            "source": source_name,
+            "target": target_name,
+            "crossing_points": len(edge_crossing_points[edge_id]),
+            "crossing_pair_incidents": edge_crossing_pair_incidents[edge_id],
+            "vertical_span_px": round(high - low, 3),
+            "vertical_span_rows": round((high - low) / row_pitch, 3),
+            "intervening_rows": sum(low < axis < high for axis in row_centers),
+        }
+        routing_source_edges[source_name].append(edge_id)
+    routing_source_statistics = {}
+    for source_name, edge_ids in sorted(routing_source_edges.items()):
+        points = set().union(*(edge_crossing_points[edge_id] for edge_id in edge_ids))
+        routing_source_statistics[source_name] = {
+            "outgoing_edges": len(edge_ids),
+            "crossing_points": len(points),
+            "edge_crossing_points_total": sum(
+                len(edge_crossing_points[edge_id]) for edge_id in edge_ids
+            ),
+            "crossing_pair_incidents": sum(
+                edge_crossing_pair_incidents[edge_id] for edge_id in edge_ids
+            ),
+            "max_vertical_span_rows": max(
+                routing_edge_statistics[edge_id]["vertical_span_rows"] for edge_id in edge_ids
+            ),
+            "max_intervening_rows": max(
+                routing_edge_statistics[edge_id]["intervening_rows"] for edge_id in edge_ids
+            ),
+        }
 
     # Independently search the artifact's own visibility channels for a
     # monotone H-V-H route.  A route is rejected only when that simpler route
@@ -1807,7 +1883,6 @@ def inspect_layout_quality(
         if len(anchors) <= 1:
             continue
         assigned: dict[str, list[float]] = defaultdict(list)
-        horizontal_costs: list[float] = []
         for edge_id, (source_name, source_port, _, target_port) in observed_edge_ports.items():
             if source_name != root:
                 continue
@@ -1822,7 +1897,6 @@ def inspect_layout_quality(
             assigned[source.cell_id].append(
                 target_axis - source.height * source_anchor
             )
-            horizontal_costs.append(max(0.0, target.x - source.x - source.width))
         groups = [sorted(assigned[anchor.cell_id]) for anchor in anchors]
         groups = [group for group in groups if group]
         if len(groups) <= 1:
@@ -1833,11 +1907,7 @@ def inspect_layout_quality(
             pivot = median(values)
             return sum(abs(value - pivot) for value in values)
 
-        fixed_cost = (
-            anchors[0].height
-            + 2 * routing_clearance
-            + median(horizontal_costs or [grid])
-        )
+        fixed_cost = row_pitch * 3
         actual_cost = sum(l1_cost(group) for group in groups) + fixed_cost * len(groups)
         for index in range(len(groups) - 1):
             merged = groups[index] + groups[index + 1]
@@ -2028,6 +2098,11 @@ def inspect_layout_quality(
             "manhattan_length_px": round(manhattan_length, 2),
         },
         "readability": {
+            "routing_statistics": {
+                "row_pitch_px": round(row_pitch, 3),
+                "edges": routing_edge_statistics,
+                "sources": routing_source_statistics,
+            },
             "crossings_per_100_edges": round(100 * len(crossing_points) / max(1, len(document.edges)), 3),
             "route_inefficiency_mean": round(sum(route_inefficiencies) / max(1, len(route_inefficiencies)), 4),
             "route_inefficiency_max": round(max(route_inefficiencies, default=1.0), 4),

@@ -14,9 +14,11 @@ from auto_layout import (
     build_logical_edges,
     load_clock_tree,
     resolve_nodes,
+    assess_layout,
 )
 from drawio_library import load_library_shapes
 from elk_layout import (
+    _optimal_source_anchor_partitions,
     _replicate_dispersed_roots,
     generate_elk_layout,
     select_layout_plan,
@@ -39,7 +41,7 @@ LIBRARY = ROOT / "drawio-lib" / "drawclock"
 EXAMPLES = ROOT / "example" / "auto-layout"
 
 
-def _forced_dispersed_root_layout(config):
+def _forced_dispersed_root_layout(config, offset=5000.0):
     """Create a true distant-band artifact before testing root facilities."""
     document, _ = generate_elk_layout(config, library_path=LIBRARY)
     shapes = load_library_shapes(LIBRARY)
@@ -48,7 +50,7 @@ def _forced_dispersed_root_layout(config):
     moved_ids = set()
     for vertex in document.vertices:
         if "_bottom_" in vertex.name:
-            vertex.y += 5000.0
+            vertex.y += offset
             moved_ids.add(vertex.cell_id)
     by_id = {vertex.cell_id: vertex for vertex in document.vertices}
     for index, logical in enumerate(logical_edges, 1):
@@ -64,7 +66,7 @@ def _forced_dispersed_root_layout(config):
             target.style, target.drawclock_type, logical.target_port,
         )
         if edge.source_id in moved_ids and edge.target_id in moved_ids:
-            edge.waypoints = tuple((x, y + 5000.0) for x, y in edge.waypoints)
+            edge.waypoints = tuple((x, y + offset) for x, y in edge.waypoints)
         elif edge.source_id in moved_ids or edge.target_id in moved_ids:
             lane_x = (start[0] + end[0]) / 2.0
             edge.waypoints = ((lane_x, start[1]), (lane_x, end[1]))
@@ -83,6 +85,101 @@ def _minimal_dispersed_config(root_kind="from"):
         "wide_gate_bottom_0": {"kind": "gate", "source": "wide_root"},
         "wide_clock_bottom_0": {"kind": "clock", "source": "wide_gate_bottom_0"},
     }
+
+
+def test_source_partition_budget_triggers_just_after_three_visual_rows() -> None:
+    row_pitch = 100.0
+    assert _optimal_source_anchor_partitions(
+        [(0.0, 1), (300.0, 2)],
+        3 * row_pitch,
+        row_axes=(100.0, 200.0),
+    ) == [[1, 2]]
+    assert _optimal_source_anchor_partitions(
+        [(0.0, 1), (301.0, 2)],
+        3 * row_pitch,
+        row_axes=(100.0, 200.0, 300.0),
+    ) == [[1], [2]]
+
+
+def test_routing_statistics_are_attributed_to_edges_and_logical_sources() -> None:
+    config = _minimal_dispersed_config()
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    statistics = report["selection"]["routing_statistics"]
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert statistics["row_pitch_px"] > 0
+    assert len(statistics["edges"]) == 6
+    assert statistics["sources"]["wide_root"]["outgoing_edges"] == 3
+    assert statistics == quality["readability"]["routing_statistics"]
+
+
+def test_crossing_statistics_identify_each_involved_edge_and_source() -> None:
+    config = {
+        "root_a": {"kind": "from"},
+        "root_b": {"kind": "from"},
+        "gate_a": {"kind": "gate", "source": "root_a"},
+        "gate_b": {"kind": "gate", "source": "root_b"},
+    }
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    logical_edges = build_logical_edges(config, nodes, LIBRARY)
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    edge_by_id = {edge.cell_id: edge for edge in document.edges}
+    first = edge_by_id["e1"]
+    second = edge_by_id["e2"]
+    first_logical, second_logical = logical_edges
+    first_source = by_id[first.source_id]
+    first_target = by_id[first.target_id]
+    second_source = by_id[second.source_id]
+    second_target = by_id[second.target_id]
+    first_target.y = first_source.y + 300.0
+    second_source.y = first_source.y + 150.0
+    second_target.y = second_source.y
+    first_start = abs_port_xy(
+        first_source.x, first_source.y, first_source.width, first_source.height,
+        first_source.style, first_source.drawclock_type, first_logical.source_port,
+    )
+    first_end = abs_port_xy(
+        first_target.x, first_target.y, first_target.width, first_target.height,
+        first_target.style, first_target.drawclock_type, first_logical.target_port,
+    )
+    channel_x = (first_start[0] + first_end[0]) / 2.0
+    first.waypoints = ((channel_x, first_start[1]), (channel_x, first_end[1]))
+    second.waypoints = ()
+
+    production = assess_layout(
+        document,
+        logical_edges,
+        0.0,
+        include_routing_statistics=True,
+    )["routing_statistics"]
+    independent = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )["readability"]["routing_statistics"]
+
+    assert production == independent
+    assert production["edges"]["e1"]["crossing_points"] == 1
+    assert production["edges"]["e2"]["crossing_points"] == 1
+    assert production["sources"]["root_a"]["crossing_points"] == 1
+    assert production["sources"]["root_b"]["crossing_points"] == 1
+
+
+def test_four_row_dispersal_is_already_eligible_for_safe_replication() -> None:
+    config = _minimal_dispersed_config()
+    # Existing consumer rows already occupy part of the offset; 425 px leaves
+    # just over the measured three-row budget between adjacent bands.
+    document, report = _forced_dispersed_root_layout(config, offset=425.0)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert report["source_replica_row_budget"] == 3
+    assert report["source_replicated_roots"] == 1
+    assert report["source_rendering_replicas"] == 1
+    assert quality["passed"] is True
 
 
 def test_strategy_depends_on_structure_not_node_count() -> None:
@@ -461,7 +558,9 @@ def test_multi_from_roots_are_distributed_by_their_consumers() -> None:
         config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
     )
     source_tops = [
-        vertex.y for vertex in document.vertices if vertex.name.startswith("from_")
+        vertex.y
+        for vertex in document.vertices
+        if vertex.name.startswith("from_") and vertex.logical_name is None
     ]
 
     assert quality["passed"] is True
@@ -469,6 +568,7 @@ def test_multi_from_roots_are_distributed_by_their_consumers() -> None:
     assert quality["readability"]["fanout_trunk_clusters"] == {}
     assert quality["readability"]["fragmented_fanout_sources"] == {}
     assert len(set(source_tops)) == 4
+    assert report["selection"]["source_rendering_replicas"] <= 4
     assert max(source_tops) - min(source_tops) > max(
         vertex.height
         for vertex in document.vertices
