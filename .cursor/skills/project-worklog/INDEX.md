@@ -2,7 +2,7 @@
 
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `records/routing-attribution-row-budget.md` | record | active | 2026-09-02 10:14 +08:00 | 2026-09-02 11:24 +08:00 | 每条边/源节点交叉归因与分散扇出三行预算优化 | 受影响质量与三档压力预算均通过，准备全量回归。 |
+| `records/routing-attribution-row-budget.md` | record | done | 2026-09-02 10:14 +08:00 | 2026-09-02 11:24 +08:00 | 每条边/源节点交叉归因与分散扇出三行预算优化 | 逐边/逐源归因、三行预算、全量回归和 Ubuntu Release 消费均已闭环。 |
 | `records/one-component-library-files.md` | record | done | 2026-08-26 09:42 +08:00 | 2026-08-26 10:21 +08:00 | 器件库从单文件全集迁移为一文件一器件 | 新结构、本地与远端发行消费均已通过。 |
 | `records/release-project-skills.md` | record | done | 2026-08-25 16:30 +08:00 | 2026-08-25 17:53 +08:00 | 发布项目 Skills | 五个脱敏项目 skill、渐进披露、包内完整性与发布复验。 |
 | `records/offline-source-release.md` | record | done | 2026-08-25 11:19 +08:00 | 2026-08-25 12:10 +08:00 | 发行包源码离线部署 | 记录源码结构、离线依赖、包消费门和发布状态。 |
