@@ -1,8 +1,8 @@
 # 自由源分层、逐元素统计与覆盖闭环
 
-- status: active
+- status: done
 - created: 2026-09-02 14:42 +08:00
-- updated: 2026-09-02 18:28 +08:00
+- updated: 2026-09-02 18:48 +08:00
 - scene: 自由源分层、逐节点/逐边统计与特性覆盖闭环
 
 ## 当前声明
@@ -66,3 +66,9 @@
 职责分离后 4096 原门连续两次通过（pytest 内 28.80 s、27.32 s），统计相等与多源副本专项同时通过；最终全量 385 PASS / 5 浏览器环境 SKIP（97.63 s），30 s 上限未改。随后 Windows clean pack 通过（98.399 s）；最终 exe 8,135,544 B，SHA-256 `AF4A4F97729CBE3F6734CCF4A98FF75C5DE96B5EE3A60805E00EA55E5B437974`，zip 37,140,540 B，SHA-256 `D7AC0CD83FE7C3B2BAE96D43A3811DB59A65E6BC04E45A52F660573EC8A55650`。新目录解压后的 frozen 与 `-I -S` source/统计工具消费门均通过（29.834 s），准备上传与远端 Linux Release 门。
 
 交付前按用户追加要求再次审计用户根知识面：原自由源专题不足以单独承担“自由布局整体”导航。新增通用自由布局专题，分离 layering / ordering / coordinate assignment / routing 四个所有者，汇总 ELK、yFiles、Graphviz、libavoid、Dagre、React Flow 与有界精确 Oracle 的角色边界，冻结十类反例族、组合覆盖、逐元素观测和兼容性禁令；明确不得按器件名、样例 ID、节点数阈值或后校准修补。用户根 `clock-tree-layout` UTF-8 quick validation 通过。
+
+提交 `1e9e2f4` 已推送，远端 Release run `33606027910` 成功，v1.0.0 peeled tag 与提交一致。远端资产 51,931,379 B，API 与本机下载 SHA-256 均为 `57B95F8F337A4D64736FFCC0848AA3FA427E1BAB7DA61200B1B43CE4DCE4B168`，归档含 19/23、统计工具和源码。用户质疑本地 Docker 后复核：本机仅执行一次 `docker version` 只读探测且 engine 返回 HTTP 500，没有启动容器；Linux 构建/运行来自 GitHub 托管 runner。用户根 frozen gate 新增通用规则：本机不以 Docker 为交付依赖，异平台由平台原生/托管 CI 运行，本机只做异平台资产结构证据并明确边界。
+
+## 完成结论
+
+自由源后移、源显示副本、逐节点/逐边统计、无交叉多折点故障、特性/交互覆盖账本、两个公开示例、本地 Windows frozen/source 消费、远端 Linux frozen/source/librsvg 消费、tag 与远端资产摘要均已闭合。未把 NIST PDF 下载超时折算为成功；采用 NIST 官方网页正文作为降级证据，PDF 离线快照仍是资料完整性缺口，不影响已实现的项目机器门。

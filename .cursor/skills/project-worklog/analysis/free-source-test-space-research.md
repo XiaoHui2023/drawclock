@@ -1,8 +1,8 @@
 # 自由源布局与覆盖空间研究
 
-- status: active
+- status: done
 - created: 2026-09-02 14:42 +08:00
-- updated: 2026-09-02 14:42 +08:00
+- updated: 2026-09-02 18:48 +08:00
 - scene: 自由布局、图几何统计与组合覆盖研究
 
 ## 待核实问题
@@ -28,4 +28,4 @@
 
 ## 研究状态
 
-Find Skills 已执行四组查询，未找到比现有用户根质量与时钟布局技能更贴合的可直接采用项；未安装第三方 skill。联网已读 ELK、yFiles、NIST、pytest、Hypothesis 官方资料及 ELK/Hypothesis 主仓库问题；还需把来源、反例和采用边界写回用户根专题并完成本地实验。
+Find Skills 已执行四组查询，未找到比现有用户根质量与时钟布局技能更贴合的可直接采用项；未安装第三方 skill。联网已读 ELK、yFiles、NIST、pytest、Hypothesis 官方资料及 ELK/Hypothesis 主仓库问题；来源、反例、工具边界和采用规则已写回用户根专题并由项目实验闭环。ELK node-promotion 页面已保存本地快照与 SHA-256。NIST SP 800-142 PDF 的两个官方入口各重试一次，均在 60 秒触发 `HttpClient.Timeout`；改用 NIST 官方项目页正文完成组合覆盖方法核实，未声称 PDF 已下载。
