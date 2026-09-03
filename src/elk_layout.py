@@ -2978,6 +2978,7 @@ def _replicate_dispersed_roots(
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     """Add rendering anchors only when a zero-indegree source wins globally."""
     indegree = Counter(edge.target for edge in logical_edges)
+    outdegree = Counter(edge.source for edge in logical_edges)
     outgoing: dict[str, list[int]] = defaultdict(list)
     for index, logical in enumerate(logical_edges, 1):
         outgoing[logical.source].append(index)
@@ -3847,6 +3848,7 @@ def _relocate_root_rendering_anchors(
     *,
     accepted_assessment: dict[str, Any] | None = None,
     include_assessment: bool = False,
+    continuous_physical_search: bool = True,
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     """Move each already justified root anchor to a non-dominated later column."""
     indegree = Counter(edge.target for edge in logical_edges)
@@ -3929,7 +3931,9 @@ def _relocate_root_rendering_anchors(
                 )
                 anchor_columns = (
                     [*canonical_columns, continuous_latest]
-                    if outdegree[root] == 1 else canonical_columns
+                    if (
+                        len(indices) == 1 and continuous_physical_search
+                    ) else canonical_columns
                 )
                 if any(
                     column_x > anchor.x + 1e-6
@@ -3991,7 +3995,9 @@ def _relocate_root_rendering_anchors(
                 )
                 anchor_columns = (
                     [*canonical_columns, continuous_latest]
-                    if outdegree[root] == 1 else canonical_columns
+                    if (
+                        len(edge_indices) == 1 and continuous_physical_search
+                    ) else canonical_columns
                 )
                 for column_x in anchor_columns:
                     probe = copy.copy(anchor)
@@ -4005,7 +4011,6 @@ def _relocate_root_rendering_anchors(
                         feasible.append(column_x)
                 if not feasible or max(feasible) <= anchor.x + 1e-6:
                     continue
-                anchor.x = max(feasible)
                 source_port = logical_edges[edge_indices[0] - 1].source_port
                 source_anchor_y = port_anchors(
                     anchor.style, anchor.drawclock_type
@@ -4021,10 +4026,40 @@ def _relocate_root_rendering_anchors(
                         - anchor.height * source_anchor_y
                     )
                 wanted = median(desired_tops)
-                anchor.y = wanted
-                anchor.y = _nearest_clear_anchor_top(
-                    anchor, wanted, column_obstacles(anchor), profile.grid
-                )
+                original_x, original_y = anchor.x, anchor.y
+                if continuous_physical_search:
+                    position_choices = []
+                    for column_x in feasible:
+                        anchor.x = column_x
+                        anchor.y = _nearest_clear_anchor_top(
+                            anchor, wanted, column_obstacles(anchor), profile.grid
+                        )
+                        reverse_hits = _edges_hitting_focus_vertices(
+                            candidate,
+                            logical_edges,
+                            set(edge_indices),
+                            {anchor_id},
+                        )
+                        position_choices.append((
+                            len(reverse_hits),
+                            -column_x,
+                            abs(anchor.y - wanted),
+                            column_x,
+                            anchor.y,
+                        ))
+                    anchor.x, anchor.y = original_x, original_y
+                    selected_position = min(position_choices)
+                    anchor.x = selected_position[3]
+                    anchor.y = selected_position[4]
+                else:
+                    # The scalable tier searches only canonical columns.  Its
+                    # rightmost feasible column is the structural optimum for
+                    # route length; the unchanged whole-layout acceptance gate
+                    # below rejects any move that worsens visible geometry.
+                    anchor.x = max(feasible)
+                    anchor.y = _nearest_clear_anchor_top(
+                        anchor, wanted, column_obstacles(anchor), profile.grid
+                    )
                 dynamic_boxes.append(vertex_visual_box(anchor))
                 moved_ids.add(anchor_id)
 
@@ -4211,6 +4246,7 @@ def _split_root_rendering_anchors_by_local_rows(
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     """Offer local-row root aliases, accepting only full-layout dominance."""
     indegree = Counter(edge.target for edge in logical_edges)
+    outdegree = Counter(edge.source for edge in logical_edges)
     accepted = _clone_layout_geometry(document)
     accepted_report = (
         accepted_assessment
@@ -4642,6 +4678,692 @@ def _split_root_rendering_anchors_by_local_rows(
     return accepted, report
 
 
+def _open_root_facility_corridors(
+    document: LayoutDocument,
+    nodes,
+    logical_edges,
+    profile,
+    *,
+    accepted_assessment: dict[str, Any] | None = None,
+    include_assessment: bool = False,
+    _batch_zero: bool = True,
+    _sequential_fallback: bool = True,
+) -> tuple[LayoutDocument, dict[str, Any]]:
+    """Open a consumer-side corridor for a dominated one-edge root facility.
+
+    A physical rendering anchor is the optimization unit.  Logical fanout is
+    deliberately irrelevant: an already replicated root may have one edge per
+    facility.  The corridor width comes from the anchor's complete visible box
+    plus routing clearance, and every consumer rank at or to the right of the
+    target moves together.  No component kind, name, row count, or sample size
+    participates in the decision.
+    """
+    indegree = Counter(edge.target for edge in logical_edges)
+    accepted = _clone_layout_geometry(document)
+    accepted_report = (
+        accepted_assessment
+        if accepted_assessment is not None
+        else assess_layout(accepted, logical_edges, 0.0)
+    )
+    initial_report = dict(accepted_report)
+    attempts = 0
+    moves = 0
+    expanded_px = 0.0
+    retired_facilities = 0
+    blockers: Counter[str] = Counter()
+
+    def facility_pairs(doc: LayoutDocument, root_names) -> frozenset:
+        opening_cost = _source_facility_opening_cost(doc)
+        return frozenset(
+            (root_name, *pair)
+            for root_name in root_names
+            for pair in _avoidable_source_facility_pairs(
+                doc, logical_edges, root_name, opening_cost
+            )
+        )
+
+    def metric(report: dict[str, Any]) -> tuple[float, ...]:
+        return (
+            report["source_crossing_points"],
+            report["distinct_crossing_points"],
+            report["crossings"],
+            report["bends_total"],
+            report["manhattan_length"],
+            report["area"],
+        )
+
+    outdegree = Counter(edge.source for edge in logical_edges)
+    rank_outgoing: dict[str, list[str]] = defaultdict(list)
+    rank_indegree = {name: 0 for name in nodes}
+    for logical_edge in logical_edges:
+        rank_outgoing[logical_edge.source].append(logical_edge.target)
+        rank_indegree[logical_edge.target] += 1
+    rank_queue = [name for name in nodes if rank_indegree[name] == 0]
+    rank_order = []
+    earliest_rank = {name: 0 for name in nodes}
+    queue_index = 0
+    while queue_index < len(rank_queue):
+        name = rank_queue[queue_index]
+        queue_index += 1
+        rank_order.append(name)
+        for child in rank_outgoing[name]:
+            earliest_rank[child] = max(
+                earliest_rank[child], earliest_rank[name] + 1
+            )
+            rank_indegree[child] -= 1
+            if rank_indegree[child] == 0:
+                rank_queue.append(child)
+    logical_rank = {
+        name: max(earliest_rank.values(), default=0) for name in nodes
+    }
+    for name in reversed(rank_order):
+        if rank_outgoing[name]:
+            logical_rank[name] = min(
+                logical_rank[child] - 1 for child in rank_outgoing[name]
+            )
+    occupied_ranks = sorted(set(logical_rank.values()))
+    previous_rank = {
+        rank: occupied_ranks[index - 1]
+        for index, rank in enumerate(occupied_ranks)
+        if index > 0
+    }
+
+    def root_layer_inversions(doc: LayoutDocument) -> frozenset[str]:
+        """Return free one-edge roots left of the preceding ALAP rank."""
+        primary = {
+            vertex.name: vertex
+            for vertex in doc.vertices
+            if vertex.name in nodes
+        }
+        max_axis_by_rank: dict[int, float] = {}
+        for name, vertex in primary.items():
+            box = vertex_visual_box(vertex)
+            axis = (box.left + box.right) / 2.0
+            rank = logical_rank[name]
+            max_axis_by_rank[rank] = max(
+                max_axis_by_rank.get(rank, -math.inf), axis
+            )
+        inversions = set()
+        for name, vertex in primary.items():
+            rank = logical_rank[name]
+            if (
+                indegree[name] != 0
+                or outdegree[name] != 1
+                or rank not in previous_rank
+                or "layout_column" in nodes[name].item
+            ):
+                continue
+            box = vertex_visual_box(vertex)
+            axis = (box.left + box.right) / 2.0
+            if axis <= max_axis_by_rank.get(previous_rank[rank], -math.inf) + 1e-6:
+                inversions.add(name)
+        return frozenset(inversions)
+
+    def points_for(
+        doc: LayoutDocument,
+        edge_index: int,
+        by_id=None,
+        edge_by_id=None,
+    ):
+        if by_id is None:
+            by_id = {vertex.cell_id: vertex for vertex in doc.vertices}
+        if edge_by_id is None:
+            edge_by_id = {edge.cell_id: edge for edge in doc.edges}
+        edge = edge_by_id[f"e{edge_index}"]
+        logical = logical_edges[edge_index - 1]
+        source = by_id[edge.source_id]
+        target = by_id[edge.target_id]
+        start = abs_port_xy(
+            source.x, source.y, source.width, source.height,
+            source.style, source.drawclock_type, logical.source_port,
+        )
+        end = abs_port_xy(
+            target.x, target.y, target.width, target.height,
+            target.style, target.drawclock_type, logical.target_port,
+        )
+        return _simplify([start, *edge.waypoints, end])
+
+    def route_segment_hits_rect(a, b, rect) -> bool:
+        """Snap numerical axis noise before the strict rectangle predicate."""
+        if abs(a[0] - b[0]) <= 1e-6:
+            b = (a[0], b[1])
+        elif abs(a[1] - b[1]) <= 1e-6:
+            b = (b[0], a[1])
+        return _segment_hits_rect(a, b, rect)
+
+    roots = {
+        name for name in nodes
+        if indegree[name] == 0 and "layout_column" not in nodes[name].item
+    }
+    anchor_ids = [
+        vertex.cell_id for vertex in accepted.vertices
+        if (vertex.logical_name or vertex.name) in roots
+    ]
+    jobs: list[tuple[str, int, bool]] = []
+    job_by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+    job_edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+    job_statistics = assess_layout(
+        accepted,
+        logical_edges,
+        0.0,
+        include_routing_statistics=True,
+        reuse_hard_metrics=accepted_report,
+    )["routing_statistics"]["edges"]
+    for anchor_id in anchor_ids:
+        owned = [
+            int(edge.cell_id[1:])
+            for edge in accepted.edges if edge.source_id == anchor_id
+        ]
+        for edge_index in owned:
+            route = points_for(
+                accepted, edge_index, job_by_id, job_edge_by_id
+            )
+            if (
+                len(route) - 2 >= 4
+                or job_statistics[f"e{edge_index}"]["crossing_pair_incidents"] > 0
+            ):
+                jobs.append((anchor_id, edge_index, len(owned) > 1))
+
+    jobs.sort(key=lambda job: (
+        -job_statistics[f"e{job[1]}"]["crossing_pair_incidents"],
+        -job_statistics[f"e{job[1]}"]["bends"],
+        -job_statistics[f"e{job[1]}"]["manhattan_length_px"],
+        job[1],
+        job[0],
+    ))
+
+    segment_bucket_size = max(64.0, profile.node_spacing * 4.0)
+    base_segments: list[tuple[int, tuple[float, float], tuple[float, float]]] = []
+    base_segment_buckets: dict[tuple[int, int], list[int]] = defaultdict(list)
+
+    def segment_bucket_keys(a, b):
+        left, right = sorted((a[0], b[0]))
+        top, bottom = sorted((a[1], b[1]))
+        for bx in range(
+            math.floor(left / segment_bucket_size),
+            math.floor(right / segment_bucket_size) + 1,
+        ):
+            for by in range(
+                math.floor(top / segment_bucket_size),
+                math.floor(bottom / segment_bucket_size) + 1,
+            ):
+                yield bx, by
+
+    for base_edge_index in range(1, len(logical_edges) + 1):
+        base_points = points_for(
+            accepted, base_edge_index, job_by_id, job_edge_by_id
+        )
+        for a, b in zip(base_points, base_points[1:]):
+            segment_index = len(base_segments)
+            base_segments.append((base_edge_index, a, b))
+            for key in segment_bucket_keys(a, b):
+                base_segment_buckets[key].append(segment_index)
+
+    route_point_cache: dict[int, list[tuple[float, float]]] = {}
+    pending_changed_edges: set[int] = set()
+    pending_moves = 0
+    pending_base = None
+    pending_base_report = None
+    pending_base_visible = None
+    pending_first = None
+    pending_checkpoints: list[tuple[int, LayoutDocument]] = []
+    pending_roots: set[str] = set()
+    for anchor_id, edge_index, needs_replica in jobs:
+        by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+        edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+        edge = edge_by_id[f"e{edge_index}"]
+        if edge.source_id != anchor_id:
+            continue
+        attempts += 1
+        best = None
+        best_report = None
+        best_expansion = 0.0
+        best_deferred = False
+        source = by_id[anchor_id]
+        target = by_id[edge.target_id]
+        source_box = vertex_visual_box(source)
+        corridor_width = (
+            source_box.right - source_box.left
+            + 2.0 * profile.route_clearance
+        )
+        expansions = (0.0,) if pending_moves else (0.0, corridor_width)
+        for expansion in expansions:
+            candidate = _clone_layout_geometry(accepted)
+            candidate_by_id = {
+                vertex.cell_id: vertex for vertex in candidate.vertices
+            }
+            candidate_edge_by_id = {
+                item.cell_id: item for item in candidate.edges
+            }
+            candidate_source = candidate_by_id[anchor_id]
+            candidate_edge = candidate_edge_by_id[f"e{edge_index}"]
+            if needs_replica:
+                replica = copy.copy(candidate_source)
+                suffix = edge_index
+                used_ids = set(candidate_by_id)
+                used_names = {vertex.name for vertex in candidate.vertices}
+                while f"{anchor_id}c{suffix}" in used_ids:
+                    suffix += len(logical_edges) + 1
+                replica.cell_id = f"{anchor_id}c{suffix}"
+                replica.name = f"{source.name}__corridor_{suffix}"
+                while replica.name in used_names:
+                    suffix += len(logical_edges) + 1
+                    replica.cell_id = f"{anchor_id}c{suffix}"
+                    replica.name = f"{source.name}__corridor_{suffix}"
+                replica.logical_name = source.logical_name or source.name
+                candidate.vertices.append(replica)
+                candidate_by_id[replica.cell_id] = replica
+                candidate_source = replica
+                candidate_edge.source_id = replica.cell_id
+            candidate_target = candidate_by_id[candidate_edge.target_id]
+            suffix_x = target.x
+            if expansion > 0.0:
+                for vertex in candidate.vertices:
+                    if (
+                        vertex.cell_id != candidate_source.cell_id
+                        and vertex.x >= suffix_x - 1e-6
+                    ):
+                        vertex.x += expansion
+                for layout_edge in candidate.edges:
+                    layout_edge.waypoints = tuple(
+                        (
+                            x + (expansion if x >= suffix_x - 1e-6 else 0.0),
+                            y,
+                        )
+                        for x, y in layout_edge.waypoints
+                    )
+            logical = logical_edges[edge_index - 1]
+            target_box = vertex_visual_box(candidate_target)
+            right_overhang = (
+                vertex_visual_box(candidate_source).right - candidate_source.x
+            )
+            candidate_source.x = (
+                target_box.left - profile.route_clearance - right_overhang
+            )
+            source_anchor = port_anchors(
+                candidate_source.style, candidate_source.drawclock_type
+            )[logical.source_port]
+            target_anchor = port_anchors(
+                candidate_target.style, candidate_target.drawclock_type
+            )[logical.target_port]
+            candidate_source.y = (
+                candidate_target.y + candidate_target.height * target_anchor[1]
+                - candidate_source.height * source_anchor[1]
+            )
+            start = abs_port_xy(
+                candidate_source.x, candidate_source.y,
+                candidate_source.width, candidate_source.height,
+                candidate_source.style, candidate_source.drawclock_type,
+                logical.source_port,
+            )
+            end = abs_port_xy(
+                candidate_target.x, candidate_target.y,
+                candidate_target.width, candidate_target.height,
+                candidate_target.style, candidate_target.drawclock_type,
+                logical.target_port,
+            )
+            candidate_edge.waypoints = tuple(_simplify([start, end])[1:-1])
+            source_visible = vertex_visual_box(candidate_source)
+            source_rect = (
+                source_visible.left,
+                source_visible.top,
+                source_visible.right,
+                source_visible.bottom,
+            )
+            visible_overlap = False
+            candidate_edge_hit = False
+            for vertex in candidate.vertices:
+                if vertex.cell_id in (
+                    candidate_source.cell_id, candidate_target.cell_id
+                ):
+                    continue
+                box = vertex_visual_box(vertex)
+                if (
+                    max(source_visible.left, box.left)
+                    < min(source_visible.right, box.right) - 1e-6
+                    and max(source_visible.top, box.top)
+                    < min(source_visible.bottom, box.bottom) - 1e-6
+                ):
+                    visible_overlap = True
+                if route_segment_hits_rect(
+                    start, end, (box.left, box.top, box.right, box.bottom)
+                ):
+                    candidate_edge_hit = True
+                if visible_overlap and candidate_edge_hit:
+                    break
+            reverse_hit = False
+            if not visible_overlap and not candidate_edge_hit:
+                if expansion == 0.0:
+                    nearby_segments: set[int] = set()
+                    for key in segment_bucket_keys(
+                        (source_visible.left, source_visible.top),
+                        (source_visible.right, source_visible.bottom),
+                    ):
+                        nearby_segments.update(
+                            base_segment_buckets.get(key, ())
+                        )
+                    reverse_hit = any(
+                        owner != edge_index
+                        and owner not in pending_changed_edges
+                        and route_segment_hits_rect(a, b, source_rect)
+                        for segment_index in nearby_segments
+                        for owner, a, b in (base_segments[segment_index],)
+                    )
+                    if not reverse_hit:
+                        for changed_index in pending_changed_edges:
+                            changed_points = points_for(
+                                accepted, changed_index, by_id, edge_by_id
+                            )
+                            if any(
+                                route_segment_hits_rect(a, b, source_rect)
+                                for a, b in zip(
+                                    changed_points, changed_points[1:]
+                                )
+                            ):
+                                reverse_hit = True
+                                break
+                else:
+                    for other_index in range(1, len(logical_edges) + 1):
+                        if other_index == edge_index:
+                            continue
+                        if other_index not in route_point_cache:
+                            route_point_cache[other_index] = points_for(
+                                accepted, other_index, by_id, edge_by_id
+                            )
+                        old_points = route_point_cache[other_index]
+                        transformed_points = [
+                            (
+                                x + (
+                                    expansion
+                                    if x >= suffix_x - 1e-6 else 0.0
+                                ),
+                                y,
+                            )
+                            for x, y in old_points
+                        ]
+                        if any(
+                            route_segment_hits_rect(a, b, source_rect)
+                            for a, b in zip(
+                                transformed_points, transformed_points[1:]
+                            )
+                        ):
+                            reverse_hit = True
+                            break
+            if visible_overlap or candidate_edge_hit or reverse_hit:
+                if visible_overlap:
+                    blockers["visible-overlap"] += 1
+                if candidate_edge_hit or reverse_hit:
+                    blockers["visible-edge-node"] += 1
+                continue
+            if expansion == 0.0 and _batch_zero:
+                # Zero-width moves alter only this root facility and its one
+                # direct edge.  Accumulate locally safe moves, then validate
+                # their union once against the complete layout.  Expanded
+                # suffix moves remain individually transactional.
+                best = candidate
+                best_deferred = True
+                break
+            candidate_report = assess_layout(
+                candidate,
+                logical_edges,
+                0.0,
+                reuse_hard_metrics=accepted_report,
+            )
+            root_name = logical.source
+            accepted_facilities = facility_pairs(accepted, {root_name})
+            candidate_facilities = facility_pairs(candidate, {root_name})
+            hard_checks = {
+                "node-overlap": candidate_report["node_overlaps"] <= accepted_report["node_overlaps"],
+                "edge-node": candidate_report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
+                "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
+                "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
+                "source-facility": candidate_facilities.issubset(accepted_facilities),
+                "root-layer": root_layer_inversions(candidate).issubset(
+                    root_layer_inversions(accepted)
+                ),
+            }
+            if not all(hard_checks.values()):
+                blockers.update(name for name, passed in hard_checks.items() if not passed)
+                continue
+            if metric(candidate_report) >= metric(accepted_report):
+                blockers["quality-vector"] += 1
+                continue
+            if best_report is None or metric(candidate_report) < metric(best_report):
+                best = candidate
+                best_report = candidate_report
+                best_expansion = expansion
+        if best is not None:
+            if best_deferred:
+                if pending_moves == 0:
+                    pending_base = _clone_layout_geometry(accepted)
+                    pending_base_report = accepted_report
+                    pending_base_visible = _visible_layout_signature(
+                        accepted, logical_edges
+                    )
+                    pending_first = _clone_layout_geometry(candidate)
+                accepted = best
+                pending_moves += 1
+                pending_roots.add(logical.source)
+                pending_changed_edges.add(edge_index)
+                if pending_moves % 16 == 0:
+                    pending_checkpoints.append((
+                        pending_moves,
+                        _clone_layout_geometry(accepted),
+                    ))
+                route_point_cache.clear()
+                continue
+            accepted = best
+            accepted_report = best_report
+            route_point_cache.clear()
+            moves += 1
+            expanded_px += best_expansion
+            # An expanded suffix invalidates the base spatial index.  Commit
+            # one such coordinate transaction per convergence pass, then let
+            # the caller rebuild exact indices for the new geometry.
+            if best_expansion > 0.0:
+                break
+
+    if pending_moves:
+        pending_report = assess_layout(accepted, logical_edges, 0.0)
+        pending_visible = _visible_layout_signature(accepted, logical_edges)
+        pending_checks = {
+            "node-overlap": pending_report["node_overlaps"] <= pending_base_report["node_overlaps"],
+            "edge-node": pending_report["edge_node_intersections"] <= pending_base_report["edge_node_intersections"],
+            "visible-overlap": pending_visible[4].issubset(pending_base_visible[4]),
+            "visible-edge-node": pending_visible[5].issubset(pending_base_visible[5]),
+            "direction": pending_report["direction_violations"] <= pending_base_report["direction_violations"],
+            "route-overlap": pending_report["ambiguous_overlaps"] <= pending_base_report["ambiguous_overlaps"],
+            "source-facility": facility_pairs(accepted, pending_roots).issubset(
+                facility_pairs(pending_base, pending_roots)
+            ),
+            "root-layer": root_layer_inversions(accepted).issubset(
+                root_layer_inversions(pending_base)
+            ),
+            "quality-vector": metric(pending_report) < metric(pending_base_report),
+        }
+        if all(pending_checks.values()):
+            accepted_report = pending_report
+            moves += pending_moves
+        else:
+            accepted = pending_base
+            accepted_report = pending_base_report
+            blockers.update(
+                f"batch-{name}"
+                for name, passed in pending_checks.items() if not passed
+            )
+            if not _sequential_fallback:
+                report = {
+                    "source_corridor_attempts": attempts,
+                    "source_corridor_moves": moves,
+                    "source_corridor_retired_facilities": 0,
+                    "source_corridor_expanded_px": round(expanded_px, 3),
+                    "source_corridor_crossings_removed": (
+                        initial_report["distinct_crossing_points"]
+                        - accepted_report["distinct_crossing_points"]
+                    ),
+                    "source_corridor_bends_removed": (
+                        initial_report["bends_total"]
+                        - accepted_report["bends_total"]
+                    ),
+                    "source_corridor_blockers": dict(sorted(blockers.items())),
+                }
+                if include_assessment:
+                    report["_accepted_assessment"] = accepted_report
+                return accepted, report
+            accepted_prefix = None
+            accepted_prefix_report = None
+            accepted_prefix_count = 0
+            for prefix_count, prefix_document in pending_checkpoints:
+                prefix_report = assess_layout(
+                    prefix_document, logical_edges, 0.0
+                )
+                prefix_visible = _visible_layout_signature(
+                    prefix_document, logical_edges
+                )
+                prefix_checks = {
+                    "node-overlap": prefix_report["node_overlaps"] <= pending_base_report["node_overlaps"],
+                    "edge-node": prefix_report["edge_node_intersections"] <= pending_base_report["edge_node_intersections"],
+                    "visible-overlap": prefix_visible[4].issubset(pending_base_visible[4]),
+                    "visible-edge-node": prefix_visible[5].issubset(pending_base_visible[5]),
+                    "direction": prefix_report["direction_violations"] <= pending_base_report["direction_violations"],
+                    "route-overlap": prefix_report["ambiguous_overlaps"] <= pending_base_report["ambiguous_overlaps"],
+                    "source-facility": facility_pairs(
+                        prefix_document, pending_roots
+                    ).issubset(facility_pairs(pending_base, pending_roots)),
+                    "root-layer": root_layer_inversions(prefix_document).issubset(
+                        root_layer_inversions(pending_base)
+                    ),
+                    "quality-vector": metric(prefix_report) < metric(pending_base_report),
+                }
+                if not all(prefix_checks.values()):
+                    break
+                accepted_prefix = prefix_document
+                accepted_prefix_report = prefix_report
+                accepted_prefix_count = prefix_count
+            if accepted_prefix is not None:
+                accepted = accepted_prefix
+                accepted_report = accepted_prefix_report
+                moves += accepted_prefix_count
+            else:
+                first_report = assess_layout(pending_first, logical_edges, 0.0)
+                first_visible = _visible_layout_signature(
+                    pending_first, logical_edges
+                )
+                first_checks = {
+                    "node-overlap": first_report["node_overlaps"] <= pending_base_report["node_overlaps"],
+                    "edge-node": first_report["edge_node_intersections"] <= pending_base_report["edge_node_intersections"],
+                    "visible-overlap": first_visible[4].issubset(pending_base_visible[4]),
+                    "visible-edge-node": first_visible[5].issubset(pending_base_visible[5]),
+                    "direction": first_report["direction_violations"] <= pending_base_report["direction_violations"],
+                    "route-overlap": first_report["ambiguous_overlaps"] <= pending_base_report["ambiguous_overlaps"],
+                    "source-facility": facility_pairs(
+                        pending_first, pending_roots
+                    ).issubset(facility_pairs(pending_base, pending_roots)),
+                    "root-layer": root_layer_inversions(pending_first).issubset(
+                        root_layer_inversions(pending_base)
+                    ),
+                    "quality-vector": metric(first_report) < metric(pending_base_report),
+                }
+                if all(first_checks.values()):
+                    accepted = pending_first
+                    accepted_report = first_report
+                    moves += 1
+                else:
+                    blockers.update(
+                        f"sequential-{name}"
+                        for name, passed in first_checks.items() if not passed
+                    )
+                    sequential_document, sequential_report = (
+                        _open_root_facility_corridors(
+                            pending_base,
+                            nodes,
+                            logical_edges,
+                            profile,
+                            accepted_assessment=pending_base_report,
+                            include_assessment=include_assessment,
+                            _batch_zero=False,
+                            _sequential_fallback=_sequential_fallback,
+                        )
+                    )
+                    sequential_report["source_corridor_attempts"] += attempts
+                    sequential_report["source_corridor_moves"] += moves
+                    sequential_report["source_corridor_expanded_px"] = round(
+                        sequential_report["source_corridor_expanded_px"]
+                        + expanded_px,
+                        3,
+                    )
+                    merged_blockers = Counter(blockers)
+                    merged_blockers.update(
+                        sequential_report["source_corridor_blockers"]
+                    )
+                    sequential_report["source_corridor_blockers"] = dict(
+                        sorted(merged_blockers.items())
+                    )
+                    return sequential_document, sequential_report
+
+    served_ids = {edge.source_id for edge in accepted.edges}
+    served_logical = {
+        vertex.logical_name or vertex.name
+        for vertex in accepted.vertices
+        if vertex.cell_id in served_ids
+    }
+    for logical_name in sorted(roots):
+        primary = next(
+            (
+                vertex for vertex in accepted.vertices
+                if vertex.name == logical_name
+                and (vertex.logical_name or vertex.name) == logical_name
+            ),
+            None,
+        )
+        if (
+            primary is not None
+            and primary.cell_id not in served_ids
+            and logical_name in served_logical
+        ):
+            replacement = min(
+                (
+                    vertex for vertex in accepted.vertices
+                    if vertex.cell_id in served_ids
+                    and (vertex.logical_name or vertex.name) == logical_name
+                ),
+                key=lambda vertex: vertex.cell_id,
+            )
+            replacement.name = logical_name
+    kept_vertices = []
+    for vertex in accepted.vertices:
+        logical_name = vertex.logical_name or vertex.name
+        if (
+            logical_name in roots
+            and vertex.cell_id not in served_ids
+            and logical_name in served_logical
+        ):
+            retired_facilities += 1
+            continue
+        kept_vertices.append(vertex)
+    if retired_facilities:
+        accepted.vertices = kept_vertices
+        accepted_report = assess_layout(accepted, logical_edges, 0.0)
+
+    report = {
+        "source_corridor_attempts": attempts,
+        "source_corridor_moves": moves,
+        "source_corridor_retired_facilities": retired_facilities,
+        "source_corridor_expanded_px": round(expanded_px, 3),
+        "source_corridor_crossings_removed": (
+            initial_report["distinct_crossing_points"]
+            - accepted_report["distinct_crossing_points"]
+        ),
+        "source_corridor_bends_removed": (
+            initial_report["bends_total"] - accepted_report["bends_total"]
+        ),
+        "source_corridor_blockers": dict(sorted(blockers.items())),
+    }
+    if include_assessment:
+        report["_accepted_assessment"] = accepted_report
+    return accepted, report
+
+
 def generate_elk_layout(
     config: dict[str, dict[str, Any]],
     *,
@@ -4788,6 +5510,10 @@ def generate_elk_layout(
     )
     source_assessment = local_partition_report.pop("_accepted_assessment")
     report["selection"].update(local_partition_report)
+    precise_root_search_allowed = (
+        plan.gap_pair_work
+        <= 64 * max(1, len(nodes) + plan.edge_span_load)
+    )
     document, anchor_relocation_report = _relocate_root_rendering_anchors(
         document,
         nodes,
@@ -4795,9 +5521,56 @@ def generate_elk_layout(
         profile,
         accepted_assessment=source_assessment,
         include_assessment=True,
+        continuous_physical_search=precise_root_search_allowed,
     )
     accepted_assessment = anchor_relocation_report.pop("_accepted_assessment")
     report["selection"].update(anchor_relocation_report)
+    corridor_totals = {
+        "source_corridor_attempts": 0,
+        "source_corridor_moves": 0,
+        "source_corridor_retired_facilities": 0,
+        "source_corridor_expanded_px": 0.0,
+        "source_corridor_crossings_removed": 0,
+        "source_corridor_bends_removed": 0,
+    }
+    pre_corridor_document = _clone_layout_geometry(document)
+    pre_corridor_assessment = accepted_assessment
+    corridor_blockers: Counter[str] = Counter()
+    # A move can expose a later physical facility to a newly opened corridor.
+    # Rebuild the facility-edge job set after every improving pass.  Each
+    # accepted move strictly lowers the finite lexicographic quality vector,
+    # so convergence needs no diagram-size cutoff.
+    corridor_search_allowed = precise_root_search_allowed
+    if corridor_search_allowed:
+        while True:
+            document, corridor_report = _open_root_facility_corridors(
+                document,
+                nodes,
+                logical_edges,
+                profile,
+                accepted_assessment=accepted_assessment,
+                include_assessment=True,
+            )
+            accepted_assessment = corridor_report.pop("_accepted_assessment")
+            corridor_blockers.update(
+                corridor_report.pop("source_corridor_blockers")
+            )
+            for key in corridor_totals:
+                corridor_totals[key] += corridor_report[key]
+            if corridor_report["source_corridor_moves"] == 0:
+                break
+    else:
+        corridor_blockers["topology-work-budget"] = 1
+    corridor_totals["source_corridor_expanded_px"] = round(
+        corridor_totals["source_corridor_expanded_px"], 3
+    )
+    corridor_totals["source_corridor_blockers"] = dict(
+        sorted(corridor_blockers.items())
+    )
+    report["selection"].update(corridor_totals)
+    report["selection"]["source_corridor_search_allowed"] = (
+        corridor_search_allowed
+    )
     document, tree_report = _normalize_fanout_routes_as_trees(
         document,
         nodes,
@@ -4805,6 +5578,35 @@ def generate_elk_layout(
         route_clearance=profile.route_clearance,
         accepted_assessment=accepted_assessment,
     )
+    if tree_report["fanout_residual_logical_cycle_rank"] > 0:
+        fallback_document, fallback_tree_report = (
+            _normalize_fanout_routes_as_trees(
+                pre_corridor_document,
+                nodes,
+                logical_edges,
+                route_clearance=profile.route_clearance,
+                accepted_assessment=pre_corridor_assessment,
+            )
+        )
+        if (
+            fallback_tree_report["fanout_residual_logical_cycle_rank"]
+            < tree_report["fanout_residual_logical_cycle_rank"]
+        ):
+            document = fallback_document
+            tree_report = fallback_tree_report
+            report["selection"]["source_corridor_rollback_cycle_rank"] = 1
+            for key in (
+                "source_corridor_moves",
+                "source_corridor_retired_facilities",
+                "source_corridor_expanded_px",
+                "source_corridor_crossings_removed",
+                "source_corridor_bends_removed",
+            ):
+                report["selection"][key] = 0
+        else:
+            report["selection"]["source_corridor_rollback_cycle_rank"] = 0
+    else:
+        report["selection"]["source_corridor_rollback_cycle_rank"] = 0
     accepted_assessment = tree_report.pop("_accepted_assessment")
     report["selection"].update(tree_report)
     report["selection"]["source_rendering_replicas"] = (

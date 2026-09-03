@@ -28,6 +28,8 @@ ISSUES = (
     "FB-ROOT-004",
     "FB-BEND-005",
     "FB-PORT-006",
+    "FB-ROUTE-009",
+    "FB-ROOT-010",
 )
 
 
@@ -464,6 +466,323 @@ def _overlap_count_for_route(route: Route, routes: list[Route]) -> int:
     )
 
 
+def _endpoint_box_index(
+    point: tuple[float, float], node: str, boxes: list[Box]
+) -> int:
+    matches = [
+        index for index, box in enumerate(boxes)
+        if box.node == node and box.contains(point)
+    ]
+    if len(matches) != 1:
+        raise ValueError(
+            f"endpoint {point} for {node} resolves to {len(matches)} physical anchors"
+        )
+    return matches[0]
+
+
+def _route_interactions(
+    route: Route, others: list[Route]
+) -> tuple[int, int, int]:
+    points: set[tuple[float, float]] = set()
+    crossing_events = 0
+    overlaps = 0
+    for other in others:
+        if other.index == route.index or same_net(route, other):
+            continue
+        for a, b in segments(route):
+            for c, d in segments(other):
+                point = proper_cross(a, b, c, d)
+                if point is not None:
+                    crossing_events += 1
+                    points.add(point)
+                overlaps += int(collinear_overlap(a, b, c, d) > EPS)
+    return len(points), crossing_events, overlaps
+
+
+def _box_overlap(left: Box, right: Box) -> bool:
+    return (
+        left.x < right.x + right.w - EPS
+        and right.x < left.x + left.w - EPS
+        and left.y < right.y + right.h - EPS
+        and right.y < left.y + left.h - EPS
+    )
+
+
+def _route_hits_unrelated_box(
+    route: Route, boxes: list[Box], source_index: int, target_index: int
+) -> bool:
+    last_segment = len(route.points) - 2
+    for segment_index, (a, b) in enumerate(segments(route)):
+        for box_index, box in enumerate(boxes):
+            if box_index == source_index and segment_index == 0:
+                continue
+            if box_index == target_index and segment_index == last_segment:
+                continue
+            if _rect_interior_hit(a, b, box):
+                return True
+    return False
+
+
+def _box_is_crossed_by_routes(
+    box: Box, routes: list[Route], ignored_route_index: int
+) -> bool:
+    return any(
+        _rect_interior_hit(a, b, box)
+        for route in routes
+        if route.index != ignored_route_index
+        for a, b in segments(route)
+    )
+
+
+def _copy_route(route: Route, points: list[tuple[float, float]]) -> Route:
+    return Route(
+        route.index,
+        simplify(points),
+        source=route.source,
+        target=route.target,
+        target_port=route.target_port,
+        source_port=route.source_port,
+    )
+
+
+def _route_length(route: Route) -> float:
+    return sum(
+        abs(b[0] - a[0]) + abs(b[1] - a[1])
+        for a, b in segments(route)
+    )
+
+
+def _root_facility_split_witnesses(
+    roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Prove that one incident route deserves its own root display facility."""
+    source_box_by_route = {
+        route.index: _endpoint_box_index(route.points[0], route.source, boxes)
+        for route in routes
+    }
+    routes_by_anchor: dict[int, list[Route]] = defaultdict(list)
+    for route in routes:
+        if route.source in roots:
+            routes_by_anchor[source_box_by_route[route.index]].append(route)
+    witnesses: list[dict[str, Any]] = []
+    for route in routes:
+        if route.source not in roots or len(route.points) - 2 < 4:
+            continue
+        source_index = source_box_by_route[route.index]
+        if len(routes_by_anchor[source_index]) <= 1:
+            continue
+        target_index = _endpoint_box_index(route.points[-1], route.target, boxes)
+        source_box = boxes[source_index]
+        target_box = boxes[target_index]
+        output_x = route.points[0][0] - source_box.x
+        output_y = route.points[0][1] - source_box.y
+        clearance = max(
+            1.0,
+            min(source_box.w, source_box.h, target_box.w, target_box.h) / 4.0,
+        )
+        candidate_box = Box(
+            source_box.node,
+            target_box.x - clearance - source_box.w,
+            route.points[-1][1] - output_y,
+            source_box.w,
+            source_box.h,
+        )
+        if candidate_box.x <= source_box.x + EPS:
+            continue
+        if any(_box_overlap(candidate_box, box) for box in boxes):
+            continue
+        candidate = _copy_route(
+            route,
+            [
+                (candidate_box.x + output_x, candidate_box.y + output_y),
+                route.points[-1],
+            ],
+        )
+        candidate_boxes = [*boxes, candidate_box]
+        if _route_hits_unrelated_box(
+            candidate, candidate_boxes, len(candidate_boxes) - 1, target_index
+        ):
+            continue
+        if _box_is_crossed_by_routes(candidate_box, routes, route.index):
+            continue
+        before = _route_interactions(route, routes)
+        after = _route_interactions(candidate, routes)
+        before_bends = len(route.points) - 2
+        after_bends = len(candidate.points) - 2
+        before_length = _route_length(route)
+        after_length = _route_length(candidate)
+        if (
+            after[0] <= before[0]
+            and after[1] <= before[1]
+            and after[2] <= before[2]
+            and after_bends < before_bends
+            and after_length < before_length - EPS
+        ):
+            witnesses.append({
+                "root": route.source,
+                "edge_id": route.edge_id,
+                "anchor_edges_before": len(routes_by_anchor[source_index]),
+                "crossing_points_before": before[0],
+                "crossing_points_after": after[0],
+                "crossing_events_before": before[1],
+                "crossing_events_after": after[1],
+                "bends_before": before_bends,
+                "bends_after": after_bends,
+                "length_before": round(before_length, 4),
+                "length_after": round(after_length, 4),
+                "candidate_anchor": [
+                    round(candidate_box.x, 4), round(candidate_box.y, 4)
+                ],
+            })
+    return witnesses
+
+
+def _physical_anchor_relocation_witnesses(
+    roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Move one physical root facility past crossed trunks, widening its suffix."""
+    source_box_by_route = {
+        route.index: _endpoint_box_index(route.points[0], route.source, boxes)
+        for route in routes
+    }
+    routes_by_anchor: dict[int, list[Route]] = defaultdict(list)
+    for route in routes:
+        if route.source in roots:
+            routes_by_anchor[source_box_by_route[route.index]].append(route)
+    witnesses: list[dict[str, Any]] = []
+    for route in routes:
+        if route.source not in roots:
+            continue
+        source_index = source_box_by_route[route.index]
+        if len(routes_by_anchor[source_index]) != 1:
+            continue
+        before = _route_interactions(route, routes)
+        if before[1] == 0:
+            continue
+        crossed_vertical_x: list[float] = []
+        for other in routes:
+            if other.index == route.index or same_net(route, other):
+                continue
+            for a, b in segments(route):
+                for c, d in segments(other):
+                    if proper_cross(a, b, c, d) is None:
+                        continue
+                    vertical_a, _vertical_b = (
+                        (a, b) if abs(a[0] - b[0]) <= EPS else (c, d)
+                    )
+                    crossed_vertical_x.append(vertical_a[0])
+        if not crossed_vertical_x:
+            continue
+        target_index = _endpoint_box_index(route.points[-1], route.target, boxes)
+        source_box = boxes[source_index]
+        target_box = boxes[target_index]
+        clearance = max(
+            1.0,
+            min(source_box.w, source_box.h, target_box.w, target_box.h) / 4.0,
+        )
+        candidate_x = max(crossed_vertical_x) + clearance
+        if candidate_x <= source_box.x + EPS:
+            continue
+        suffix_cut = target_box.x
+        suffix_shift = max(
+            0.0,
+            candidate_x + source_box.w + clearance - target_box.x,
+        )
+        candidate_boxes = [
+            Box(
+                box.node,
+                box.x + (suffix_shift if box.x >= suffix_cut - EPS else 0.0),
+                box.y,
+                box.w,
+                box.h,
+            )
+            for box in boxes
+        ]
+        candidate_box = Box(
+            source_box.node,
+            candidate_x,
+            source_box.y,
+            source_box.w,
+            source_box.h,
+        )
+        candidate_boxes[source_index] = candidate_box
+        if any(
+            _box_overlap(candidate_box, box)
+            for index, box in enumerate(candidate_boxes)
+            if index != source_index
+        ):
+            continue
+        transformed = [
+            _copy_route(
+                other,
+                [
+                    (
+                        x + (suffix_shift if x >= suffix_cut - EPS else 0.0),
+                        y,
+                    )
+                    for x, y in other.points
+                ],
+            )
+            for other in routes
+        ]
+        candidate_route = next(
+            other for other in transformed if other.index == route.index
+        )
+        output_x = route.points[0][0] - source_box.x
+        start = (candidate_box.x + output_x, route.points[0][1])
+        end = candidate_route.points[-1]
+        candidate_route.points = simplify(
+            [start, end]
+            if abs(start[1] - end[1]) <= EPS
+            else [
+                start,
+                ((start[0] + end[0]) / 2.0, start[1]),
+                ((start[0] + end[0]) / 2.0, end[1]),
+                end,
+            ]
+        )
+        transformed_others = [
+            other for other in transformed if other.index != route.index
+        ]
+        if _route_hits_unrelated_box(
+            candidate_route, candidate_boxes, source_index, target_index
+        ):
+            continue
+        if _box_is_crossed_by_routes(
+            candidate_box, transformed_others, route.index
+        ):
+            continue
+        after = _route_interactions(candidate_route, transformed_others)
+        before_bends = len(route.points) - 2
+        after_bends = len(candidate_route.points) - 2
+        before_length = _route_length(route)
+        after_length = _route_length(candidate_route)
+        if (
+            (after[0], after[1]) < (before[0], before[1])
+            and after[2] <= before[2]
+            and after_bends <= before_bends
+            and after_length < before_length - EPS
+        ):
+            witnesses.append({
+                "root": route.source,
+                "edge_id": route.edge_id,
+                "physical_anchor_edges": 1,
+                "from_x": round(source_box.x, 4),
+                "to_x": round(candidate_box.x, 4),
+                "suffix_shift_px": round(suffix_shift, 4),
+                "crossed_trunk_x": sorted({round(x, 4) for x in crossed_vertical_x}),
+                "crossing_points_before": before[0],
+                "crossing_points_after": after[0],
+                "crossing_events_before": before[1],
+                "crossing_events_after": after[1],
+                "bends_before": before_bends,
+                "bends_after": after_bends,
+                "length_before": round(before_length, 4),
+                "length_after": round(after_length, 4),
+            })
+    return witnesses
+
+
 def _same_net_cycle(routes: list[Route]) -> bool:
     """Detect split/rejoin by cycles in a source net's segment arrangement."""
     raw = [segment for route in routes for segment in segments(route)]
@@ -690,6 +1009,12 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         for witness in public_root_crossings
         if root_kinds.get(witness["public_root"]) not in {"source", "from"}
     ]
+    root_facility_split_witnesses = _root_facility_split_witnesses(
+        roots, routes, boxes
+    )
+    physical_anchor_relocation_witnesses = (
+        _physical_anchor_relocation_witnesses(roots, routes, boxes)
+    )
     detected = {
         # Mixed kinds are only a precondition.  A defect is present only when
         # an ordinary zero-indegree component also exhibits the measured root
@@ -704,6 +1029,8 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         "FB-ROOT-004": bool(root_relocation_witnesses),
         "FB-BEND-005": bool(avoidable),
         "FB-PORT-006": bool(port_inversions),
+        "FB-ROUTE-009": bool(root_facility_split_witnesses),
+        "FB-ROOT-010": bool(physical_anchor_relocation_witnesses),
     }
     route_row_by_id = {row["edge_id"]: row for row in route_rows}
     node_statistics = {}
@@ -792,6 +1119,10 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             "root_relocation_witnesses": root_relocation_witnesses,
             "avoidable_bend_edges": avoidable,
             "port_order_inversions": port_inversions,
+            "root_facility_split_witnesses": root_facility_split_witnesses,
+            "physical_anchor_relocation_witnesses": (
+                physical_anchor_relocation_witnesses
+            ),
         },
         "detected_issues": [issue for issue in ISSUES if detected[issue]],
     }

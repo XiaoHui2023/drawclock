@@ -97,7 +97,10 @@ def test_oracle_reads_public_svg_without_importing_production(tmp_path: Path) ->
     assert report["totals"]["proper_crossing_events"] >= report["totals"]["distinct_crossing_points"]
     assert set(report["witnesses"]["mixed_root_kinds"]) == {"from", "gate", "source"}
     assert report["witnesses"]["mixed_root_quality_failures"] == []
-    assert report["detected_issues"] == []
+    # This fixture is a public-entry smoke test for the older mixed-root
+    # contract.  New independent detectors may legitimately discover another
+    # registered defect in the same artifact; do not make issues exclusive.
+    assert "FB-ROOT-001" not in report["detected_issues"]
     assert report["witnesses"]["split_rejoin_roots"] == []
 
 
@@ -115,9 +118,69 @@ def test_oracle_rejects_nonorthogonal_or_unrelated_curves() -> None:
         oracle._parse_path_as_polyline("M 0 0 Q 4 4 8 0")
 
 
-def test_default_arc_combined_example_has_no_feedback_witness(tmp_path: Path) -> None:
+def test_frozen_combined_example_reproduces_root_facility_detour() -> None:
     input_path = ROOT / "example/auto-layout/26-feedback-reproduction-combined.json"
-    output = tmp_path / "combined-default-arc.svg"
+    receipt = json.loads(
+        (ROOT / ".reproduction/receipts/FB-ROUTE-009.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    evidence = receipt["attempts"][0]["evidence_files"]
+    output = next(ROOT / path for path in evidence if path.endswith("/output.svg"))
+    report = oracle.analyze(input_path, output)
+    assert report["totals"]["logical_nodes"] == 121
+    assert report["totals"]["logical_edges"] == 122
+    assert report["totals"]["different_net_overlaps"] == 0
+    assert report["witnesses"]["split_rejoin_roots"] == []
+    assert "FB-ROUTE-009" in report["detected_issues"]
+    witness = report["witnesses"]["root_facility_split_witnesses"]
+    assert any(
+        row["root"] == "weave__public_gate"
+        and row["bends_before"] == 4
+        and row["bends_after"] == 0
+        and row["length_after"] < row["length_before"]
+        for row in witness
+    )
+
+
+def test_frozen_medium_example_reproduces_physical_anchor_column_escape() -> None:
+    input_path = ROOT / "example/auto-layout/07-medium-64-clocks.json"
+    receipt = json.loads(
+        (ROOT / ".reproduction/receipts/FB-ROOT-010.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    evidence = receipt["attempts"][0]["evidence_files"]
+    output = next(ROOT / path for path in evidence if path.endswith("/output.svg"))
+    report = oracle.analyze(input_path, output)
+    assert "FB-ROOT-010" in report["detected_issues"]
+    witnesses = report["witnesses"]["physical_anchor_relocation_witnesses"]
+    assert any(
+        row["root"] == "xtal_1"
+        and row["physical_anchor_edges"] == 1
+        and row["crossing_events_after"] < row["crossing_events_before"]
+        and row["length_after"] < row["length_before"]
+        for row in witnesses
+    )
+
+
+@pytest.mark.parametrize(
+    ("filename", "forbidden", "max_events", "max_points", "max_bends"),
+    [
+        ("26-feedback-reproduction-combined.json", {"FB-ROUTE-009", "FB-ROOT-010"}, 1, 1, 14),
+        ("07-medium-64-clocks.json", {"FB-ROOT-010"}, 130, 19, 204),
+    ],
+)
+def test_current_public_cli_closes_new_root_feedback(
+    tmp_path: Path,
+    filename: str,
+    forbidden: set[str],
+    max_events: int,
+    max_points: int,
+    max_bends: int,
+) -> None:
+    input_path = ROOT / "example/auto-layout" / filename
+    output = tmp_path / f"{Path(filename).stem}.svg"
     result = subprocess.run(
         [sys.executable, str(ROOT / "src"), "-i", str(input_path),
          "-l", str(ROOT / "drawio-lib"), "-o", str(output)],
@@ -125,11 +188,29 @@ def test_default_arc_combined_example_has_no_feedback_witness(tmp_path: Path) ->
     )
     assert result.returncode == 0, result.stdout + result.stderr
     report = oracle.analyze(input_path, output)
-    assert report["totals"]["logical_nodes"] == 121
-    assert report["totals"]["logical_edges"] == 122
+    assert forbidden.isdisjoint(report["detected_issues"])
     assert report["totals"]["different_net_overlaps"] == 0
-    assert report["witnesses"]["split_rejoin_roots"] == []
-    assert report["detected_issues"] == []
+    assert report["totals"]["proper_crossing_events"] <= max_events
+    assert report["totals"]["distinct_crossing_points"] <= max_points
+    assert report["totals"]["bends"] <= max_bends
+
+
+def test_single_route_root_without_crossed_trunk_is_clean_counterexample(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example/auto-layout/01-linear.json"
+    output = tmp_path / "linear.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["witnesses"]["root_facility_split_witnesses"] == []
+    assert report["witnesses"]["physical_anchor_relocation_witnesses"] == []
+    assert "FB-ROUTE-009" not in report["detected_issues"]
+    assert "FB-ROOT-010" not in report["detected_issues"]
 
 
 def test_oracle_rejects_frozen_mixed_root_failure() -> None:

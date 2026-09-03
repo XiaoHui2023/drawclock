@@ -32,12 +32,13 @@ def test_layout_feature_coverage_validator_kills_missing_role_interaction_and_te
     baseline = _manifest()
 
     missing_role = copy.deepcopy(baseline)
-    missing_role["scenarios"] = [
-        scenario for scenario in missing_role["scenarios"]
-        if scenario["id"] != "middle-source-fault"
-    ]
+    for scenario in missing_role["scenarios"]:
+        scenario["covers_interactions"] = [
+            item for item in scenario["covers_interactions"]
+            if item != "physical-root-corridor"
+        ]
     assert any(
-        "feature free-source-layer missing roles" in error
+        "interaction physical-root-corridor missing roles" in error
         for error in validator.validate(missing_role, ROOT)
     )
 

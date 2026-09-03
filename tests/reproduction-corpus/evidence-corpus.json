@@ -29,6 +29,24 @@
       "input": "example/auto-layout/20-asymmetric-merge-route-bulge.json",
       "library": "drawio-lib/drawclock.xml",
       "issues": ["FB-PORT-006"]
+    },
+    {
+      "id": "root-facility-detour-baseline",
+      "baseline_revision": "22228714675a60c169745f71f73e926857610db1",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "example/auto-layout/26-feedback-reproduction-combined.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROUTE-009"]
+    },
+    {
+      "id": "physical-root-column-baseline",
+      "baseline_revision": "22228714675a60c169745f71f73e926857610db1",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "example/auto-layout/07-medium-64-clocks.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROOT-010"]
     }
   ],
   "current_fix_cases": [
