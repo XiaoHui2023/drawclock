@@ -265,3 +265,6 @@
 - 第二轮 commit `11d2c79` 的远端反馈门仍失败且 build/publish 正确跳过；全新远端 clone 复验只剩 6 个 source-tree stale。逐文件规范哈希对比确认 22/17 个文件的差异完全来自本地打包生成的 `src/drawclock.egg-info/` 五个文件，17 个真实源码逐文件哈希全部一致。
 - 源码身份计算统一排除 `__pycache__` 和任意 `*.egg-info` 目录；新增打包元数据出现前、中、后源码树哈希恒等测试。该变化再次使旧绿灯收据失效，必须重新签发。
 - 第三次当前公开 CLI 双跑重签耗时 6.116 秒，verification `20260903T113127Z-74e8249a` 六项 `failures=[]`；白名单同步到该证据批次。
+- commit `1e72af9` 上传后远端 run `33750211106` 仍在反馈门失败。使用 Git Credential Manager 仅向 GitHub API 发出认证读请求（未输出凭据），成功取得 job 日志；六项实际错误均为 `fix receipt library tree is stale`。同 commit 的远端 Windows clone 已通过，下一步按平台逐文件比较器件库身份。
+- 本地与远端器件库均为 50 个文件，无缺失、额外或逐文件规范哈希差异。根因是直接排序 `WindowsPath` 时大小写不敏感，`drawclock/...` 排在 `README.md` 前；Linux POSIX 顺序相反。树哈希改为先形成仓库相对 POSIX 字符串记录，再按固定大小写敏感字节序排序；新增独立构造记录的等价测试。
+- 第四次当前公开 CLI 双跑重签耗时 6.105 秒，verification `20260903T113811Z-63f51aa7` 六项 `failures=[]`；白名单同步到该批次。

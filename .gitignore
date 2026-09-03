@@ -20,8 +20,8 @@ __pycache__/
 !.reproduction/fix-receipts/*.json
 !.reproduction/fix-evidence/
 .reproduction/fix-evidence/*
-!.reproduction/fix-evidence/20260903T113127Z-74e8249a/
-!.reproduction/fix-evidence/20260903T113127Z-74e8249a/**
+!.reproduction/fix-evidence/20260903T113811Z-63f51aa7/
+!.reproduction/fix-evidence/20260903T113811Z-63f51aa7/**
 .mypy_cache/
 .ruff_cache/
 dist/

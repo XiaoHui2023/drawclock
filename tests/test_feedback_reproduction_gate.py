@@ -57,6 +57,18 @@ class FeedbackReproductionGateTest(unittest.TestCase):
             self.assertEqual(module._tree_hash(ROOT / "src"), before)
         self.assertEqual(module._tree_hash(ROOT / "src"), before)
 
+    def test_tree_hash_uses_platform_neutral_posix_order(self) -> None:
+        spec = importlib.util.spec_from_file_location("drawclock_feedback_checker", CHECKER)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        paths = [path for path in (ROOT / "drawio-lib").rglob("*") if path.is_file()]
+        records = sorted(
+            (path.relative_to(ROOT).as_posix(), module._sha(path)) for path in paths
+        )
+        self.assertEqual(module._tree_hash(ROOT / "drawio-lib"), module._canonical(records))
+
     def test_naturally_reproduced_issues_unlock_solution_phase(self) -> None:
         result = self.run_gate("solve")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
