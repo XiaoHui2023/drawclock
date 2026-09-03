@@ -21,11 +21,8 @@ ORACLE = ROOT / "tools/feedback_layout_reproduction_oracle.py"
 
 
 def sha(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    data = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def canonical(value: Any) -> str:
@@ -147,7 +144,9 @@ def main() -> int:
         if not passed:
             failures.append(issue_id)
         receipt = {
-            "schema_version": 1, "issue_id": issue_id,
+            "schema_version": 1,
+            "hash_mode": "sha256-normalized-text-v1",
+            "issue_id": issue_id,
             "result": "fixed_verified" if passed else "failed",
             "verification_group": group,
             "baseline_fails": True, "current_passes": passed,

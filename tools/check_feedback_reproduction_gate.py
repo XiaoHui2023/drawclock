@@ -19,11 +19,11 @@ RELEASE_STATES = {"fixed_verified", "closed"}
 
 
 def _sha(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    # All artifacts bound by this gate are text. Git may materialize the same
+    # blob as CRLF on Windows and LF in Linux CI, so checkout policy must not
+    # change its identity.
+    data = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    return hashlib.sha256(data).hexdigest()
 
 
 def _canonical(value: Any) -> str:
@@ -190,6 +190,8 @@ def _validate_fix_receipt(issue: dict[str, Any], errors: list[str]) -> None:
         return
     if receipt.get("schema_version") != 1 or receipt.get("issue_id") != issue_id:
         errors.append(f"{issue_id}: fix receipt identity/schema mismatch")
+    if receipt.get("hash_mode") != "sha256-normalized-text-v1":
+        errors.append(f"{issue_id}: fix receipt hash mode is missing or unsupported")
     if receipt.get("result") != "fixed_verified" or receipt.get("baseline_fails") is not True or receipt.get("current_passes") is not True:
         errors.append(f"{issue_id}: fix receipt does not prove failing baseline and passing current output")
     baseline = ROOT / str(receipt.get("baseline_receipt", ""))

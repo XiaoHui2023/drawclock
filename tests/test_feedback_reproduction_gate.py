@@ -32,6 +32,19 @@ class FeedbackReproductionGateTest(unittest.TestCase):
         result = self.run_gate("structure")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_release_hashes_are_stable_across_lf_and_crlf_checkouts(self) -> None:
+        spec = importlib.util.spec_from_file_location("drawclock_feedback_checker", CHECKER)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as directory:
+            lf = Path(directory) / "lf.txt"
+            crlf = Path(directory) / "crlf.txt"
+            lf.write_bytes(b"first\nsecond\n")
+            crlf.write_bytes(b"first\r\nsecond\r\n")
+            self.assertEqual(module._sha(lf), module._sha(crlf))
+
     def test_naturally_reproduced_issues_unlock_solution_phase(self) -> None:
         result = self.run_gate("solve")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

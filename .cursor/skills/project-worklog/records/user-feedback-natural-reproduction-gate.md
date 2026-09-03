@@ -255,3 +255,10 @@
 - 解压包冻结入口分别生成：simple 0.638 秒、medium-64 0.713 秒、combined 0.980 秒、512 1.579 秒、1024 3.019 秒、2048 7.500 秒、4096 25.478 秒。独立最终 SVG Oracle 对 simple/medium/combined/512 均返回六项反馈命中数为零；combined 为 121 个逻辑节点、122 条边、8 次交叉事件、7 个交叉点、42 折点、24179.8665px，异网重叠为零。
 - 用户根 complete 门随后正确阻断：通用 validator 仍把同一 issue 下 PAD 与组合两个不同 case 的产物互相比对，报 `FB-ROUTE-002: deterministic current runs produced inconsistent artifacts`。同步将用户根规则与脚本改为逐 case 双跑确定性，并在项目回归中直接执行用户根 release 门，防止项目专用门与通用门再次漂移。
 - 用户根通用 release 门、14 项项目门测试及用户根 reproduction self-test 均通过；23 特性、15 交互、37 场景覆盖表通过。六项反馈据此全部从 `fixed_verified` 进入 `closed`，随后必须再跑 complete 门，不能以手改状态视为完成。
+- commit `641202c` 上传后，远端 run `33748936347` 在反馈门失败并正确跳过 build/publish。公开日志下载因未认证返回 `403 Must have admin rights`；用远端 main 的全新 clone 复验得到 18 个 stale 错误，定位为 Windows CRLF 原始字节哈希与 Linux LF checkout 不同。
+- 证据血缘改为 `sha256-normalized-text-v1`：Python、JSON、XML、SVG 与日志均先把 CRLF/CR 规范成 LF 再哈希；新增 LF/CRLF 等价测试。该修改会让旧 current fix 收据按设计失效，必须重新通过公开 CLI 双跑签发，禁止手改哈希。
+- release checker 还强制收据声明精确 `hash_mode`；缺失或未知模式一律失败，避免未来不同哈希语义被当作同一血缘。
+- 通过当前公开 CLI 对四个 case 重新双跑签发，耗时 6.177 秒，verification `20260903T112329Z-1ea40255` 的六项 `failures=[]`；Git 白名单同步指向这批跨平台规范哈希证据。
+- 项目 release 门随即通过，但直接调用用户根通用门的新增测试失败：通用 validator 仍用 raw hash 复验新模式，产生 62 个预期哈希不匹配。用户根脚本改为按收据声明选择 raw/normalized-text，旧收据兼容、未知模式失败；该失败证明两层门禁的真实交叉复验有效。
+- 规范哈希收敛后 15 项门禁测试 1.66 秒通过，用户根 self-test、release 与 complete 均通过；全量回归 437 通过、5 个既有浏览器目标环境项跳过、0 失败，耗时 70.95 秒。
+- 最终 Windows 包重建耗时 37.524 秒；ZIP 8,312,167 bytes、178 条目、26 个 auto-layout JSON、Runtime/npm 污染为零。全新解压后的冻结入口 52.916 秒通过，隔离源码部署 11.755 秒通过。

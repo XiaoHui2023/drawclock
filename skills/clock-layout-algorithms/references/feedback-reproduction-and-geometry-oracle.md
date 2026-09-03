@@ -44,7 +44,9 @@ Oracle 不导入 `src`，只读 JSON 与最终 SVG。它先完整绑定逻辑节
 
 `tools/run_feedback_fix_verification.py` 对当前公开 CLI 同样双跑，并要求逐问题 Oracle 明确返回“症状
 未观察到”。修复收据绑定旧红灯收据、源码树、器件库树、runner、Oracle、输入和原始 SVG；release
-门逐哈希重验，手填 `baseline_fails/current_passes` 不能放行。
+门逐哈希重验，手填 `baseline_fails/current_passes` 不能放行。上述对象均为文本，哈希前统一把
+CRLF/CR 规范化为 LF，使相同 Git 内容在 Windows 工作区与 Linux CI 中保持同一身份；不得用
+操作系统分支或跳过血缘检查掩盖换行差异。
 
 器件种类、节点数量、扇出和不等深链只是触发前提。每个缺陷 Oracle 必须另有最终几何 witness，
 并配置“相同前提但无症状”的干净反例；否则属于 Oracle 假通过。
