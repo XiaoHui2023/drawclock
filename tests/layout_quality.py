@@ -483,6 +483,49 @@ def inspect_layout_quality(
     missing_edges = sorted((expected_counter - observed_counter).elements())
     extra_edges = sorted((observed_counter - expected_counter).elements())
     duplicate_edges = sorted(key for key, count in observed_counter.items() if count > expected_counter[key])
+    # A physical source-port net must form a rooted geometric tree.  Shared
+    # prefixes and later branching are valid; split -> rejoin -> split creates
+    # an undirected cycle in the union and is always redundant.  Split every
+    # segment at all route vertices so a junction on another edge's interior
+    # is observed without depending on the production trunk implementation.
+    edge_source_ids = {edge.cell_id: edge.source_id for edge in document.edges}
+    physical_net_edges: dict[tuple[str, str, str], list[str]] = defaultdict(list)
+    for edge_id, (source_name, source_port, _, _) in observed_edge_ports.items():
+        physical_net_edges[(edge_source_ids[edge_id], source_name, source_port)].append(edge_id)
+    split_rejoin_fanout_nets: list[str] = []
+    for (source_id, source_name, source_port), edge_ids in physical_net_edges.items():
+        if len(edge_ids) < 2:
+            continue
+        vertices = {
+            (round(x, 6), round(y, 6))
+            for edge_id in edge_ids for x, y in edge_points[edge_id]
+        }
+        union_edges: set[tuple[tuple[float, float], tuple[float, float]]] = set()
+        for edge_id in edge_ids:
+            for a, b in zip(edge_points[edge_id], edge_points[edge_id][1:]):
+                if abs(a[0] - b[0]) <= tolerance:
+                    points = [p for p in vertices if abs(p[0] - a[0]) <= tolerance and min(a[1], b[1]) - tolerance <= p[1] <= max(a[1], b[1]) + tolerance]
+                    points.sort(key=lambda p: p[1])
+                else:
+                    points = [p for p in vertices if abs(p[1] - a[1]) <= tolerance and min(a[0], b[0]) - tolerance <= p[0] <= max(a[0], b[0]) + tolerance]
+                    points.sort(key=lambda p: p[0])
+                union_edges.update(tuple(sorted((left, right))) for left, right in zip(points, points[1:]) if left != right)
+        parent: dict[tuple[float, float], tuple[float, float]] = {}
+        def find(point):
+            parent.setdefault(point, point)
+            while parent[point] != point:
+                parent[point] = parent[parent[point]]
+                point = parent[point]
+            return point
+        has_cycle = False
+        for left, right in sorted(union_edges):
+            root_left, root_right = find(left), find(right)
+            if root_left == root_right:
+                has_cycle = True
+                break
+            parent[root_left] = root_right
+        if has_cycle:
+            split_rejoin_fanout_nets.append(f"{source_name}:{source_port}@{source_id}")
     used_source_ids = {edge.source_id for edge in document.edges}
     unused_replicas = sorted(
         vertex.name
@@ -2213,6 +2256,7 @@ def inspect_layout_quality(
         ]
         + [f"avoidable-outer-detour:{edge_id}" for edge_id in avoidable_outer_detours]
         + [f"fragmented-fanout:{net}" for net in fragmented_fanouts]
+        + [f"split-rejoin-fanout:{net}" for net in split_rejoin_fanout_nets]
         + [f"overlap:{a}/{b}" for a, b in ambiguous_overlaps]
         + [f"unbridged:{a}/{b}" for a, b in untreated_crossings]
     )
@@ -2333,6 +2377,7 @@ def inspect_layout_quality(
             "avoidable_local_merge_input_crossings": avoidable_local_merge_input_crossings,
             "root_merge_input_order_inversions": root_merge_input_order_inversions,
             "avoidable_root_merge_input_crossings": avoidable_root_merge_input_crossings,
+            "split_rejoin_fanout_nets": sorted(split_rejoin_fanout_nets),
             "zigzag_edges": sorted(set(zigzag_edges)),
             "ambiguous_overlaps": [list(pair) for pair in ambiguous_overlaps],
             "crossings": crossing_pair_intersections,

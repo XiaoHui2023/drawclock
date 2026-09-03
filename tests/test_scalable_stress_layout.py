@@ -1278,6 +1278,39 @@ def test_mixed_graph_roots_are_placed_by_consumers_and_fixed_port_order() -> Non
     assert quality["readability"]["fragmented_fanout_sources"] == {}
 
 
+def test_quality_oracle_rejects_same_root_split_rejoin_cycle() -> None:
+    config = {
+        "root": {"kind": "from"},
+        "gate_a": {"kind": "gate", "source": "root"},
+        "gate_b": {"kind": "gate", "source": "root"},
+        "clock_a": {"kind": "clock", "source": "gate_a"},
+        "clock_b": {"kind": "clock", "source": "gate_b"},
+    }
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    shapes = load_library_shapes(LIBRARY)
+    nodes = resolve_nodes(config, shapes, {}, library_path=LIBRARY)
+    logical_edges = build_logical_edges(config, nodes, LIBRARY)
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    root_edges = [edge for edge in document.edges if edge.source_id == nodes["root"].cell_id]
+    starts_ends = []
+    for edge in root_edges:
+        logical = logical_edges[int(edge.cell_id[1:]) - 1]
+        source, target = by_id[edge.source_id], by_id[edge.target_id]
+        start = abs_port_xy(source.x, source.y, source.width, source.height, source.style, source.drawclock_type, logical.source_port)
+        end = abs_port_xy(target.x, target.y, target.width, target.height, target.style, target.drawclock_type, logical.target_port)
+        starts_ends.append((edge, start, end))
+    start = starts_ends[0][1]
+    x1, x2 = start[0] + 20.0, start[0] + 40.0
+    x3 = min(item[2][0] for item in starts_ends) - 20.0
+    y_join = max(item[2][1] for item in starts_ends) + 90.0
+    for offset, (edge, _, end) in enumerate(starts_ends):
+        lane = x1 if offset == 0 else x2
+        edge.waypoints = ((lane, start[1]), (lane, y_join), (x3, y_join), (x3, end[1]))
+    quality = inspect_layout_quality(config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01)
+    assert quality["line_integrity"]["split_rejoin_fanout_nets"]
+    assert quality["passed"] is False
+
+
 def test_rendering_replica_identity_survives_layout_serialization() -> None:
     config = _minimal_dispersed_config()
     document, _ = _forced_dispersed_root_layout(config)
