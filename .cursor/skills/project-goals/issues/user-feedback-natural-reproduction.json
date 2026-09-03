@@ -94,6 +94,6 @@
   ],
   "process_incidents": [
     {"id": "META-CLAIM-007", "status": "open", "release_blocking": true, "summary": "未完整自然复现却声称全部完成并提交发布", "classification": ["reproduction_escape", "claim_escape", "oracle_escape"]},
-    {"id": "META-RELEASE-008", "status": "open", "release_blocking": true, "summary": "发布工作流未执行反馈复现门且 always 条件允许发布链继续", "evidence": "GitHub Actions run 33720713223 published v1.0.0 from 0a2f48b while six issues remained reported", "analysis": "交付门依据 src 变化选择 structure 阶段；远端 build 没有 feedback gate，publish 使用 always，因此问题账本没有成为发布前置依赖。"}
+    {"id": "META-RELEASE-008", "status": "closed", "release_blocking": true, "summary": "发布工作流未执行反馈复现门且 always 条件允许发布链继续", "evidence": "escape: run 33720713223 published 0a2f48b; verification: run 33724488973 failed feedback gate and skipped build/publish for 291274e", "analysis": "交付门曾依据 src 变化选择 structure 阶段，远端 build 没有 feedback gate 且 publish 使用 always。现在本地 pack 和受保护 release 命令强制 release 阶段，CI build/publish 显式依赖反馈门。", "fix_verification": {"current_run": 33724488973, "feedback_gate": "failure", "build": "skipped", "publish": "skipped", "tag_target_unchanged": "0a2f48b295133aa97aed05baa6cf75209f1c4378"}}
   ]
 }

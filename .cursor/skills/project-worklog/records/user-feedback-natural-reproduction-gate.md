@@ -2,7 +2,7 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-03 14:53 +08:00
+- updated: 2026-09-03 14:58 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 当前事实
@@ -100,3 +100,10 @@
 
 - 项目交付门将 `pack.bat`、`pack.sh`、`bundle_release.py` 和 `gh release` 统一映射到自包含 release 检查器；源码修改的 commit 仍走 solve，其它提交走 structure。
 - 8 项专项测试通过，覆盖三类触发命令、阶段选择、逐 issue 报告、pack 早停与 CI 依赖；py_compile 与 diff whitespace 检查通过。
+
+## 14:58 远端发布负门验证
+
+- 质量基础设施检查点 `291274e` 已推送 main；GitHub Actions run `33724488973` 在反馈门失败。
+- 同一 run 的 Linux Ubuntu 16.04 build 与 Publish GitHub Release 均为 skipped；feedback job 从开始到结束约 10 秒。
+- 远端 `v1.0.0^{}` 仍为 `0a2f48b`，现有资产发布时间未变化；因此本次没有发布新包，也没有移动滚动 tag。
+- `META-RELEASE-008` 的发布旁路修复已有真实 CI 证据，可以关闭；六条布局 issue 与 `META-CLAIM-007` 继续开放并阻断发布。

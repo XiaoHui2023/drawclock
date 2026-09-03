@@ -20,11 +20,11 @@
 - success: 用户根自然复现 runner/validator 的首轮自测能拒绝未复现、人工故障、伪造收据和入口失败。
 - failure: 远端运行 `33720713223` 在六条问题仍为 `reported` 时发布了提交 `0a2f48b`；旧 CI 未调用反馈门，且发布 job 使用了 `always()`。
 - success: 项目 release 检查器当前逐条报告六个未复现问题和两个流程事故并返回 1。
+- success: 远端 run `33724488973` 在 feedback gate 失败，Linux build 与 publish 均 skipped；`v1.0.0` 仍指向 `0a2f48b`。
 
 ## 下一步
 
 - 将 release 检查器置于本地 pack 的任何依赖/输出变化之前，并作为 CI build 与 publish 的必要前驱。
-- 推送后确认 Release workflow 在首个反馈门失败，后续 build/publish 均 skipped，现有 v1.0.0 tag 与资产不移动。
 - 六条问题逐条设计正常用户输入并取得两次自然红灯；门禁未闭合前不修改 `src/**`。
 
 ## 收敛条件
