@@ -4,6 +4,8 @@ __pycache__/
 *.prof
 *$py.class
 .pytest_cache/
+.codex/evidence/
+.reproduction/
 .mypy_cache/
 .ruff_cache/
 dist/

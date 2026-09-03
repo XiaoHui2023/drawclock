@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "issues": [
+    {
+      "id": "FB-ROOT-001",
+      "summary": "混合 source、from 和其它零入度器件的图根通用性",
+      "expected": "所有入度为零且有输出的器件按拓扑统一处理，不读取器件 kind 特判",
+      "actual": "旧证据主要覆盖 source/from，不能证明任意图根均正确",
+      "status": "reported",
+      "owner_paths": ["src/**"],
+      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
+      "baseline_revision": "6c9f9f4",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/25-mixed-root-port-order-torture.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-001", "--input", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "有效混合图根经公开 CLI 产生类别特判或错误列行为",
+      "reproduction_does_not_prove": "其它五条几何问题或根因",
+      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-001.json"
+    },
+    {
+      "id": "FB-ROUTE-002",
+      "summary": "同一图根的两条路线先分开、再合并、再分开",
+      "expected": "同一逻辑根端口的公共前段一次合并后不发生无拓扑依据的重新汇合",
+      "actual": "用户观察到重复分合造成多余走线和交叉；旧测试只人工改写航点",
+      "status": "reported",
+      "owner_paths": ["src/**"],
+      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
+      "baseline_revision": "6c9f9f4",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/19-dispersed-root-fanout.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/19-dispersed-root-fanout.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROUTE-002", "--input", "{project}/example/auto-layout/19-dispersed-root-fanout.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "公开 CLI 自然生成同根 split-rejoin 几何",
+      "reproduction_does_not_prove": "人工航点变异只证明 Oracle，不能满足本条",
+      "reproduction_receipt": ".reproduction/receipts/FB-ROUTE-002.json"
+    },
+    {
+      "id": "FB-ROOT-003",
+      "summary": "公共根位于下方并穿过单连接 pad 输入根",
+      "expected": "低复用图根靠近唯一消费者，公共根与固定目标端口纵序共同排列",
+      "actual": "公共根从下方长距离穿过其它根并与 pad 输入交叉",
+      "status": "reported",
+      "owner_paths": ["src/**"], "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"], "baseline_revision": "6c9f9f4",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/25-mixed-root-port-order-torture.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-003", "--input", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "根纵序相对目标端口反转并产生可避免交叉", "reproduction_does_not_prove": "所有根布局最优", "reproduction_receipt": ".reproduction/receipts/FB-ROOT-003.json"
+    },
+    {
+      "id": "FB-ROOT-004",
+      "summary": "大量单连接 from 固定第一列并与公共根交叉",
+      "expected": "无显式列约束的低复用图根可进入消费者前的任意可行中间列",
+      "actual": "单连接根留在首列，延长线路并与公共根分发路线交叉",
+      "status": "reported",
+      "owner_paths": ["src/**"], "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"], "baseline_revision": "6c9f9f4",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/23-middle-column-low-use-sources.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/23-middle-column-low-use-sources.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-004", "--input", "{project}/example/auto-layout/23-middle-column-low-use-sources.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "低复用根的首列位置被完整重排反事实支配", "reproduction_does_not_prove": "根复制或端口纵序问题", "reproduction_receipt": ".reproduction/receipts/FB-ROOT-004.json"
+    },
+    {
+      "id": "FB-BEND-005",
+      "summary": "相邻列节点本可直连却出现折点",
+      "expected": "无障碍且端口同轴的局部边为零折点直线",
+      "actual": "本可直连的边出现无交叉收益的额外折点",
+      "status": "reported",
+      "owner_paths": ["src/**"], "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"], "baseline_revision": "6c9f9f4",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/20-asymmetric-merge-route-bulge.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/20-asymmetric-merge-route-bulge.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-005", "--input", "{project}/example/auto-layout/20-asymmetric-merge-route-bulge.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "公开 SVG 中存在被无障碍直线严格支配的边", "reproduction_does_not_prove": "全图面积或全部路线最优", "reproduction_receipt": ".reproduction/receipts/FB-BEND-005.json"
+    },
+    {
+      "id": "FB-PORT-006",
+      "summary": "两个单连接图根相对 pad 端口次序反转",
+      "expected": "自由根纵序与固定目标端口纵序一致",
+      "actual": "连接端口 1 的根在端口 2 根下方，两个输入交叉",
+      "status": "reported",
+      "owner_paths": ["src/**"], "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"], "baseline_revision": "6c9f9f4",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/25-mixed-root-port-order-torture.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-PORT-006", "--input", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "根纵序反转直接造成固定 pad 输入交叉", "reproduction_does_not_prove": "公共根位置或 split-rejoin", "reproduction_receipt": ".reproduction/receipts/FB-PORT-006.json"
+    }
+  ],
+  "process_incidents": [
+    {"id": "META-CLAIM-007", "status": "open", "summary": "未完整自然复现却声称全部完成并提交发布", "classification": ["reproduction_escape", "claim_escape", "oracle_escape"]}
+  ]
+}
