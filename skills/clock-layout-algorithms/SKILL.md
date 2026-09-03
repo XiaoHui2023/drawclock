@@ -17,6 +17,7 @@ description: 修改、评审或扩展 drawclock 自动布局算法时使用，�
    通用零入度源显示副本专项的边界、指标、反例和回退点见[源副本能力合同](references/source-replication-capability.json)。
    自由源列、逐元素统计和特性覆盖专项见[自由源与覆盖能力合同](references/free-source-coverage-capability.json)。
    当前可执行的特性、风险交互、场景、Oracle 与故障注入映射见[布局特性覆盖账本](references/layout-feature-coverage.json)。
+   用户反馈的自然红灯、跨问题语料和独立最终 SVG 统计见[多对多复现与几何 Oracle](references/feedback-reproduction-and-geometry-oracle.md)。
 6. 选型或继续研究时查看[工具与资料](references/tools-and-sources.md)。
 
 Agent 需要定位某个节点或某根线的质量代价时，运行 `scripts/layout_statistics.py`。它显式启用几何统计，输出每个逻辑节点、每条逻辑边和每个出边节点的长度、折点、跨线、分支和显示锚点统计；这是包内质检工具，不是 `drawclock` 的用户子命令。正常 SVG 生成不物化逐边交叉伙伴集合，避免让诊断成本拖慢用户入口。

@@ -58,6 +58,10 @@ description: >-
 - 质量检查只存在于测试与 Agent 记录，不是公开 CLI 功能。
 - 用户对结果表达持续错误、异常、未复现或质量不过关时，按语义登记为独立 issue；每条均记录假设、正常入口尝试、观察、分析、未复现原因、证据和下一条件。
 - 未取得冻结基线经公开 CLI 的两次自然红灯前，禁止修改该问题的产品 owner；人工改 SVG、故障注入和 Oracle 变异只验证检测器，不能充当用户问题复现。
+- 反馈问题与测试载体采用多对多关系：问题 ID/直接判据保持独立，一张最终 SVG 可直接覆盖多个问题，一条问题也可出现在多个正常 JSON 中。总体覆盖只接受 `case -> observed issue IDs` 中由 Oracle 直接检测的边。
+- `tests/reproduction-corpus/` 的 60 个 JSON 交叉覆盖根类型、复用度、固定端口、链深、消费行距、可行列和插入顺序；`tools/check_feedback_reproduction_corpus.py` 验证完整笛卡尔积和正式映射，删除问题映射或降级 one-to-one 必须失败。
+- `tools/feedback_layout_reproduction_oracle.py` 不导入生产模块，只读最终 SVG，先完整绑定节点/边/端口，再区分内部交叉、端点接触、共线重叠和同网分支。多余折点与根位置只以无碰撞、无高优先级退化的严格反事实支配判定。
+- 搜索语料先覆盖全部反馈，再比较失败样本与没有症状的样本，最后制作综合 example；综合 example 不替代不同历史 revision 的正式收据。
 
 ## 发布
 

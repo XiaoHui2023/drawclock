@@ -1,0 +1,1633 @@
+{
+  "schema_version": 1,
+  "input": "25-mixed-root-port-order-torture.json",
+  "svg": "output.svg",
+  "totals": {
+    "logical_nodes": 69,
+    "rendered_nodes": 75,
+    "logical_edges": 66,
+    "rendered_edges": 66,
+    "proper_crossing_events": 4,
+    "distinct_crossing_points": 2,
+    "different_net_overlaps": 0,
+    "bends": 6,
+    "manhattan_length_px": 6090.116
+  },
+  "roots": {
+    "common_from": {
+      "kind": "from",
+      "outdegree": 4,
+      "rendered_copies": 4
+    },
+    "common_gate_root": {
+      "kind": "gate",
+      "outdegree": 4,
+      "rendered_copies": 4
+    },
+    "common_source": {
+      "kind": "source",
+      "outdegree": 4,
+      "rendered_copies": 1
+    },
+    "local_a_00": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_01": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_02": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_03": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_04": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_05": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_06": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_07": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_08": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_09": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_10": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_a_11": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_00": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_01": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_02": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_03": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_04": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_05": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_06": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_07": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_08": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_09": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_10": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_b_11": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    }
+  },
+  "edges": [
+    {
+      "edge_id": "svg-edge-0000",
+      "source": "common_source",
+      "target": "pad_00",
+      "target_port": "0",
+      "points": [
+        [
+          134.06,
+          322.9917
+        ],
+        [
+          198.12,
+          322.9917
+        ],
+        [
+          198.12,
+          89.9917
+        ],
+        [
+          345.28,
+          89.9917
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 444.22,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0001",
+      "source": "div_01",
+      "target": "cell_01",
+      "target_port": "left",
+      "points": [
+        [
+          367.672,
+          1078.0039
+        ],
+        [
+          436.61,
+          1078.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.938,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0002",
+      "source": "cell_01",
+      "target": "clock_01",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          1078.0039
+        ],
+        [
+          526.76,
+          1078.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0003",
+      "source": "local_a_02",
+      "target": "pad_02",
+      "target_port": "0",
+      "points": [
+        [
+          293.72,
+          1954.0457
+        ],
+        [
+          345.28,
+          1954.0457
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0004",
+      "source": "local_b_02",
+      "target": "pad_02",
+      "target_port": "1",
+      "points": [
+        [
+          293.72,
+          2010.0471
+        ],
+        [
+          345.28,
+          2010.0471
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0005",
+      "source": "common_gate_root",
+      "target": "pad_02",
+      "target_port": "2",
+      "points": [
+        [
+          140.06,
+          2066.0485
+        ],
+        [
+          345.28,
+          2066.0485
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 205.22,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0006",
+      "source": "pad_02",
+      "target": "cell_02",
+      "target_port": "left",
+      "points": [
+        [
+          369.28,
+          2010.0471
+        ],
+        [
+          436.61,
+          2010.0471
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 67.33,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0007",
+      "source": "cell_02",
+      "target": "clock_02",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          2010.0471
+        ],
+        [
+          526.76,
+          2010.0471
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0008",
+      "source": "common_source",
+      "target": "pad_03",
+      "target_port": "0",
+      "points": [
+        [
+          134.06,
+          322.9917
+        ],
+        [
+          243.72,
+          322.9917
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 109.66,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0009",
+      "source": "local_a_03",
+      "target": "pad_03",
+      "target_port": "1",
+      "points": [
+        [
+          140.06,
+          378.9931
+        ],
+        [
+          243.72,
+          378.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 103.66,
+      "crossing_pair_incidents": 2
+    },
+    {
+      "edge_id": "svg-edge-0010",
+      "source": "local_b_03",
+      "target": "pad_03",
+      "target_port": "2",
+      "points": [
+        [
+          134.06,
+          434.9945
+        ],
+        [
+          243.72,
+          434.9945
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 109.66,
+      "crossing_pair_incidents": 2
+    },
+    {
+      "edge_id": "svg-edge-0011",
+      "source": "local_a_00",
+      "target": "pad_00",
+      "target_port": "1",
+      "points": [
+        [
+          293.72,
+          145.9931
+        ],
+        [
+          345.28,
+          145.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0012",
+      "source": "pad_03",
+      "target": "div_03",
+      "target_port": "left",
+      "points": [
+        [
+          267.72,
+          378.9931
+        ],
+        [
+          346.888,
+          378.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 79.168,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0013",
+      "source": "div_03",
+      "target": "cell_03",
+      "target_port": "left",
+      "points": [
+        [
+          367.672,
+          378.9931
+        ],
+        [
+          436.61,
+          378.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.938,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0014",
+      "source": "cell_03",
+      "target": "clock_03",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          378.9931
+        ],
+        [
+          526.76,
+          378.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0015",
+      "source": "local_b_04",
+      "target": "pad_04",
+      "target_port": "0",
+      "points": [
+        [
+          293.72,
+          1255.0133
+        ],
+        [
+          345.28,
+          1255.0133
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0016",
+      "source": "common_from",
+      "target": "pad_04",
+      "target_port": "1",
+      "points": [
+        [
+          275.72,
+          1311.0147
+        ],
+        [
+          345.28,
+          1311.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 69.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0017",
+      "source": "local_a_04",
+      "target": "pad_04",
+      "target_port": "2",
+      "points": [
+        [
+          287.72,
+          1367.0161
+        ],
+        [
+          345.28,
+          1367.0161
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 57.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0018",
+      "source": "pad_04",
+      "target": "cell_04",
+      "target_port": "left",
+      "points": [
+        [
+          369.28,
+          1311.0147
+        ],
+        [
+          436.61,
+          1311.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 67.33,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0019",
+      "source": "cell_04",
+      "target": "clock_04",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          1311.0147
+        ],
+        [
+          526.76,
+          1311.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0020",
+      "source": "local_a_05",
+      "target": "pad_05",
+      "target_port": "0",
+      "points": [
+        [
+          192.16,
+          2187.0565
+        ],
+        [
+          243.72,
+          2187.0565
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0021",
+      "source": "local_b_05",
+      "target": "pad_05",
+      "target_port": "1",
+      "points": [
+        [
+          192.16,
+          2243.0579
+        ],
+        [
+          243.72,
+          2243.0579
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0022",
+      "source": "local_b_00",
+      "target": "pad_00",
+      "target_port": "2",
+      "points": [
+        [
+          287.72,
+          201.9945
+        ],
+        [
+          345.28,
+          201.9945
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 57.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0023",
+      "source": "common_gate_root",
+      "target": "pad_05",
+      "target_port": "2",
+      "points": [
+        [
+          140.06,
+          2299.0593
+        ],
+        [
+          243.72,
+          2299.0593
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 103.66,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0024",
+      "source": "pad_05",
+      "target": "div_05",
+      "target_port": "left",
+      "points": [
+        [
+          267.72,
+          2243.0579
+        ],
+        [
+          346.888,
+          2243.0579
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 79.168,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0025",
+      "source": "div_05",
+      "target": "cell_05",
+      "target_port": "left",
+      "points": [
+        [
+          367.672,
+          2243.0579
+        ],
+        [
+          436.61,
+          2243.0579
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.938,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0026",
+      "source": "cell_05",
+      "target": "clock_05",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          2243.0579
+        ],
+        [
+          526.76,
+          2243.0579
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0027",
+      "source": "common_source",
+      "target": "pad_06",
+      "target_port": "0",
+      "points": [
+        [
+          134.06,
+          322.9917
+        ],
+        [
+          198.12,
+          322.9917
+        ],
+        [
+          198.12,
+          555.9917
+        ],
+        [
+          345.28,
+          555.9917
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 444.22,
+      "crossing_pair_incidents": 2
+    },
+    {
+      "edge_id": "svg-edge-0028",
+      "source": "local_a_06",
+      "target": "pad_06",
+      "target_port": "1",
+      "points": [
+        [
+          293.72,
+          611.9931
+        ],
+        [
+          345.28,
+          611.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0029",
+      "source": "local_b_06",
+      "target": "pad_06",
+      "target_port": "2",
+      "points": [
+        [
+          287.72,
+          667.9945
+        ],
+        [
+          345.28,
+          667.9945
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 57.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0030",
+      "source": "pad_06",
+      "target": "cell_06",
+      "target_port": "left",
+      "points": [
+        [
+          369.28,
+          611.9931
+        ],
+        [
+          436.61,
+          611.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 67.33,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0031",
+      "source": "cell_06",
+      "target": "clock_06",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          611.9931
+        ],
+        [
+          526.76,
+          611.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0032",
+      "source": "local_b_07",
+      "target": "pad_07",
+      "target_port": "0",
+      "points": [
+        [
+          192.16,
+          1488.0241
+        ],
+        [
+          243.72,
+          1488.0241
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0033",
+      "source": "pad_00",
+      "target": "cell_00",
+      "target_port": "left",
+      "points": [
+        [
+          369.28,
+          145.9931
+        ],
+        [
+          436.61,
+          145.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 67.33,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0034",
+      "source": "common_from",
+      "target": "pad_07",
+      "target_port": "1",
+      "points": [
+        [
+          140.06,
+          1544.0255
+        ],
+        [
+          243.72,
+          1544.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 103.66,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0035",
+      "source": "local_a_07",
+      "target": "pad_07",
+      "target_port": "2",
+      "points": [
+        [
+          186.16,
+          1600.0269
+        ],
+        [
+          243.72,
+          1600.0269
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 57.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0036",
+      "source": "pad_07",
+      "target": "div_07",
+      "target_port": "left",
+      "points": [
+        [
+          267.72,
+          1544.0255
+        ],
+        [
+          346.888,
+          1544.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 79.168,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0037",
+      "source": "div_07",
+      "target": "cell_07",
+      "target_port": "left",
+      "points": [
+        [
+          367.672,
+          1544.0255
+        ],
+        [
+          436.61,
+          1544.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.938,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0038",
+      "source": "cell_07",
+      "target": "clock_07",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          1544.0255
+        ],
+        [
+          526.76,
+          1544.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0039",
+      "source": "local_a_08",
+      "target": "pad_08",
+      "target_port": "0",
+      "points": [
+        [
+          293.72,
+          2420.0673
+        ],
+        [
+          345.28,
+          2420.0673
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0040",
+      "source": "local_b_08",
+      "target": "pad_08",
+      "target_port": "1",
+      "points": [
+        [
+          293.72,
+          2476.0687
+        ],
+        [
+          345.28,
+          2476.0687
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0041",
+      "source": "common_gate_root",
+      "target": "pad_08",
+      "target_port": "2",
+      "points": [
+        [
+          140.06,
+          2532.0701
+        ],
+        [
+          345.28,
+          2532.0701
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 205.22,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0042",
+      "source": "pad_08",
+      "target": "cell_08",
+      "target_port": "left",
+      "points": [
+        [
+          369.28,
+          2476.0687
+        ],
+        [
+          436.61,
+          2476.0687
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 67.33,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0043",
+      "source": "cell_08",
+      "target": "clock_08",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          2476.0687
+        ],
+        [
+          526.76,
+          2476.0687
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0044",
+      "source": "cell_00",
+      "target": "clock_00",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          145.9931
+        ],
+        [
+          526.76,
+          145.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0045",
+      "source": "common_source",
+      "target": "pad_09",
+      "target_port": "0",
+      "points": [
+        [
+          134.06,
+          322.9917
+        ],
+        [
+          198.12,
+          322.9917
+        ],
+        [
+          198.12,
+          788.9917
+        ],
+        [
+          243.72,
+          788.9917
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 575.66,
+      "crossing_pair_incidents": 2
+    },
+    {
+      "edge_id": "svg-edge-0046",
+      "source": "local_a_09",
+      "target": "pad_09",
+      "target_port": "1",
+      "points": [
+        [
+          192.16,
+          844.9931
+        ],
+        [
+          243.72,
+          844.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0047",
+      "source": "local_b_09",
+      "target": "pad_09",
+      "target_port": "2",
+      "points": [
+        [
+          186.16,
+          900.9945
+        ],
+        [
+          243.72,
+          900.9945
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 57.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0048",
+      "source": "pad_09",
+      "target": "div_09",
+      "target_port": "left",
+      "points": [
+        [
+          267.72,
+          844.9931
+        ],
+        [
+          346.888,
+          844.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 79.168,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0049",
+      "source": "div_09",
+      "target": "cell_09",
+      "target_port": "left",
+      "points": [
+        [
+          367.672,
+          844.9931
+        ],
+        [
+          436.61,
+          844.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.938,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0050",
+      "source": "cell_09",
+      "target": "clock_09",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          844.9931
+        ],
+        [
+          526.76,
+          844.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0051",
+      "source": "local_b_10",
+      "target": "pad_10",
+      "target_port": "0",
+      "points": [
+        [
+          293.72,
+          1721.0349
+        ],
+        [
+          345.28,
+          1721.0349
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0052",
+      "source": "common_from",
+      "target": "pad_10",
+      "target_port": "1",
+      "points": [
+        [
+          275.72,
+          1777.0363
+        ],
+        [
+          345.28,
+          1777.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 69.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0053",
+      "source": "local_a_10",
+      "target": "pad_10",
+      "target_port": "2",
+      "points": [
+        [
+          287.72,
+          1833.0377
+        ],
+        [
+          345.28,
+          1833.0377
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 57.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0054",
+      "source": "pad_10",
+      "target": "cell_10",
+      "target_port": "left",
+      "points": [
+        [
+          369.28,
+          1777.0363
+        ],
+        [
+          436.61,
+          1777.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 67.33,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0055",
+      "source": "local_b_01",
+      "target": "pad_01",
+      "target_port": "0",
+      "points": [
+        [
+          140.06,
+          1022.0025
+        ],
+        [
+          243.72,
+          1022.0025
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 103.66,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0056",
+      "source": "cell_10",
+      "target": "clock_10",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          1777.0363
+        ],
+        [
+          526.76,
+          1777.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0057",
+      "source": "local_a_11",
+      "target": "pad_11",
+      "target_port": "0",
+      "points": [
+        [
+          192.16,
+          2653.0781
+        ],
+        [
+          243.72,
+          2653.0781
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0058",
+      "source": "local_b_11",
+      "target": "pad_11",
+      "target_port": "1",
+      "points": [
+        [
+          192.16,
+          2709.0795
+        ],
+        [
+          243.72,
+          2709.0795
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 51.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0059",
+      "source": "common_gate_root",
+      "target": "pad_11",
+      "target_port": "2",
+      "points": [
+        [
+          140.06,
+          2765.0809
+        ],
+        [
+          243.72,
+          2765.0809
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 103.66,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0060",
+      "source": "pad_11",
+      "target": "div_11",
+      "target_port": "left",
+      "points": [
+        [
+          267.72,
+          2709.0795
+        ],
+        [
+          346.888,
+          2709.0795
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 79.168,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0061",
+      "source": "div_11",
+      "target": "cell_11",
+      "target_port": "left",
+      "points": [
+        [
+          367.672,
+          2709.0795
+        ],
+        [
+          436.61,
+          2709.0795
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.938,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0062",
+      "source": "cell_11",
+      "target": "clock_11",
+      "target_port": "left",
+      "points": [
+        [
+          458.61,
+          2709.0795
+        ],
+        [
+          526.76,
+          2709.0795
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 68.15,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0063",
+      "source": "common_from",
+      "target": "pad_01",
+      "target_port": "1",
+      "points": [
+        [
+          140.06,
+          1078.0039
+        ],
+        [
+          243.72,
+          1078.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 103.66,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0064",
+      "source": "local_a_01",
+      "target": "pad_01",
+      "target_port": "2",
+      "points": [
+        [
+          186.16,
+          1134.0053
+        ],
+        [
+          243.72,
+          1134.0053
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 57.56,
+      "crossing_pair_incidents": 0
+    },
+    {
+      "edge_id": "svg-edge-0065",
+      "source": "pad_01",
+      "target": "div_01",
+      "target_port": "left",
+      "points": [
+        [
+          267.72,
+          1078.0039
+        ],
+        [
+          346.888,
+          1078.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 79.168,
+      "crossing_pair_incidents": 0
+    }
+  ],
+  "crossings": [
+    {
+      "point": [
+        198.12,
+        378.9931
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0027"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        198.12,
+        378.9931
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        198.12,
+        434.9945
+      ],
+      "edges": [
+        "svg-edge-0010",
+        "svg-edge-0027"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        198.12,
+        434.9945
+      ],
+      "edges": [
+        "svg-edge-0010",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    }
+  ],
+  "overlaps": [],
+  "witnesses": {
+    "mixed_root_kinds": [
+      "from",
+      "gate",
+      "source"
+    ],
+    "split_rejoin_roots": [],
+    "public_root_crossings": [
+      {
+        "public_root": "common_source",
+        "other_root": "local_a_03",
+        "edges": [
+          "svg-edge-0009",
+          "svg-edge-0027"
+        ]
+      },
+      {
+        "public_root": "common_source",
+        "other_root": "local_a_03",
+        "edges": [
+          "svg-edge-0009",
+          "svg-edge-0045"
+        ]
+      },
+      {
+        "public_root": "common_source",
+        "other_root": "local_b_03",
+        "edges": [
+          "svg-edge-0010",
+          "svg-edge-0027"
+        ]
+      },
+      {
+        "public_root": "common_source",
+        "other_root": "local_b_03",
+        "edges": [
+          "svg-edge-0010",
+          "svg-edge-0045"
+        ]
+      }
+    ],
+    "low_use_left_crossing_roots": [
+      "local_a_03",
+      "local_b_03"
+    ],
+    "root_relocation_witnesses": [
+      {
+        "root": "local_a_03",
+        "edge_id": "svg-edge-0009",
+        "from_x": 100.06,
+        "to_x": 179.72,
+        "crossings_before": 2,
+        "crossings_after": 0,
+        "length_before": 103.66,
+        "length_after": 24.0
+      },
+      {
+        "root": "local_b_03",
+        "edge_id": "svg-edge-0010",
+        "from_x": 100.06,
+        "to_x": 185.72,
+        "crossings_before": 2,
+        "crossings_after": 0,
+        "length_before": 109.66,
+        "length_after": 24.0
+      }
+    ],
+    "avoidable_bend_edges": [],
+    "port_order_inversions": []
+  },
+  "detected_issues": [
+    "FB-ROOT-001",
+    "FB-ROOT-003",
+    "FB-ROOT-004"
+  ]
+}

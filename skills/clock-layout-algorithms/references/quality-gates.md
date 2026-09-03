@@ -27,6 +27,11 @@
 
 面积和耗时不能覆盖前面的视觉质量退化。
 
+用户反馈复现采用多对多 corpus：测试载体可共享，但每条问题必须由自己的直接 Oracle 在最终 SVG
+中直接检测。正式收据必须绑定 `corpus_id`、`case_id`、`observed_issue_ids`、冻结 revision、输入、
+公开命令、runner/Oracle 和产物哈希；缺失边绑定、曲线路径无法精确解析、入口未到达或产物缺失均
+fail closed。详细流程见 `feedback-reproduction-and-geometry-oracle.md`。
+
 ## 反例族
 
 - 单链、树分支、双源 mux 汇聚；

@@ -1,0 +1,113 @@
+{
+  "late_clock_02": {
+    "kind": "clock",
+    "source": "late_div_02"
+  },
+  "early_clock": {
+    "kind": "clock",
+    "source": "early_chain_2"
+  },
+  "late_div_02": {
+    "kind": "div",
+    "source": "late_mux_02"
+  },
+  "late_clock_01": {
+    "kind": "clock",
+    "source": "late_div_01"
+  },
+  "late_div_01": {
+    "kind": "div",
+    "source": "late_mux_01"
+  },
+  "late_root_00_a": {
+    "kind": "gate"
+  },
+  "late_mux_00": {
+    "kind": "mux3",
+    "source": {
+      "0": "late_root_00_a",
+      "1": "late_root_00_b",
+      "2": "common_stage"
+    }
+  },
+  "late_root_01_a": {
+    "kind": "source"
+  },
+  "late_clock_00": {
+    "kind": "clock",
+    "source": "late_div_00"
+  },
+  "early_common": {
+    "kind": "from"
+  },
+  "early_chain_2": {
+    "kind": "gate",
+    "source": "early_chain_1"
+  },
+  "late_root_02_b": {
+    "kind": "gate"
+  },
+  "early_chain_1": {
+    "kind": "div",
+    "source": "early_chain_0"
+  },
+  "late_root_01_b": {
+    "kind": "from"
+  },
+  "late_div_03": {
+    "kind": "div",
+    "source": "late_mux_03"
+  },
+  "late_mux_01": {
+    "kind": "mux3",
+    "source": {
+      "0": "late_root_01_b",
+      "1": "common_stage",
+      "2": "late_root_01_a"
+    }
+  },
+  "late_root_02_a": {
+    "kind": "from"
+  },
+  "late_clock_03": {
+    "kind": "clock",
+    "source": "late_div_03"
+  },
+  "late_root_03_a": {
+    "kind": "gate"
+  },
+  "late_root_03_b": {
+    "kind": "source"
+  },
+  "late_mux_03": {
+    "kind": "mux3",
+    "source": {
+      "0": "late_root_03_a",
+      "1": "late_root_03_b",
+      "2": "common_stage"
+    }
+  },
+  "late_root_00_b": {
+    "kind": "source"
+  },
+  "late_mux_02": {
+    "kind": "mux3",
+    "source": {
+      "0": "common_stage",
+      "1": "late_root_02_a",
+      "2": "late_root_02_b"
+    }
+  },
+  "early_chain_0": {
+    "kind": "gate",
+    "source": "early_common"
+  },
+  "late_div_00": {
+    "kind": "div",
+    "source": "late_mux_00"
+  },
+  "common_stage": {
+    "kind": "gate",
+    "source": "early_common"
+  }
+}

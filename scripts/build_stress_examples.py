@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import random
 from pathlib import Path
 
 
@@ -369,6 +370,68 @@ def build_asymmetric_merge_route_bulge(
     return config
 
 
+def _prefix_config(
+    config: dict[str, dict[str, object]],
+    prefix: str,
+    *,
+    kind_overrides: dict[str, str] | None = None,
+) -> dict[str, dict[str, object]]:
+    """Namespace a topology while preserving source ports and public schema."""
+    overrides = kind_overrides or {}
+
+    def rename_source(value: object) -> object:
+        if isinstance(value, str):
+            if "[" in value:
+                node, selector = value.split("[", 1)
+                return f"{prefix}{node}[{selector}"
+            return f"{prefix}{value}"
+        if isinstance(value, dict):
+            return {port: rename_source(source) for port, source in value.items()}
+        return value
+
+    result: dict[str, dict[str, object]] = {}
+    for name, node in config.items():
+        copied = dict(node)
+        copied["kind"] = overrides.get(str(copied["kind"]), copied["kind"])
+        if "source" in copied:
+            copied["source"] = rename_source(copied["source"])
+        result[f"{prefix}{name}"] = copied
+    return result
+
+
+def build_feedback_reproduction_combined() -> dict[str, dict[str, object]]:
+    """Complex public example assembled only from general topology features."""
+    weave_items: list[tuple[str, dict[str, object]]] = []
+    public = ("public_source", "public_from", "public_gate")
+    for name, kind in zip(public, ("source", "from", "gate")):
+        weave_items.append((name, {"kind": kind}))
+    sparse = [f"sparse_{index:02d}" for index in range(16)]
+    for index, name in enumerate(sparse):
+        weave_items.append((name, {"kind": ("source", "from", "gate")[index % 3]}))
+    for row in range(8):
+        sources = [public[row % 3], sparse[2 * row], sparse[(2 * row + 7) % len(sparse)]]
+        shift = row % 3
+        sources = sources[shift:] + sources[:shift]
+        weave_items.extend(
+            (
+                (f"merge_{row:02d}", {"kind": "mux3", "source": {"0": sources[0], "1": sources[1], "2": sources[2]}}),
+                (f"select_{row:02d}", {"kind": "mux2", "source": {"0": f"merge_{row:02d}", "1": public[(row + 1) % 3]}}),
+                (f"clock_{row:02d}", {"kind": "clock", "source": f"select_{row:02d}"}),
+            )
+        )
+    random.Random(8).shuffle(weave_items)
+    combined = _prefix_config(dict(weave_items), "weave__")
+    combined.update(
+        _prefix_config(
+            build_mixed_root_port_order_torture(12),
+            "roots__",
+            kind_overrides={"pad3": "mux3"},
+        )
+    )
+    combined.update(_prefix_config(build_asymmetric_merge_route_bulge(), "ports__"))
+    return combined
+
+
 def build_adversarial_weave(
     domain_count: int,
     *,
@@ -488,6 +551,7 @@ def main() -> int:
         ("23-middle-column-low-use-sources", build_middle_column_low_use_sources()),
         ("24-single-source-rendering-alias", build_single_source_rendering_alias()),
         ("25-mixed-root-port-order-torture", build_mixed_root_port_order_torture()),
+        ("26-feedback-reproduction-combined", build_feedback_reproduction_combined()),
     )
     for name, config in structural:
         (OUTPUT / f"{name}.json").write_text(

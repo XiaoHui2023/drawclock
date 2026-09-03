@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "coverage_model": "many_to_many",
+  "factors": [
+    "root_kind",
+    "root_fanout",
+    "fixed_port_order",
+    "chain_depth",
+    "consumer_band_gap",
+    "feasible_root_rank",
+    "input_insertion_order"
+  ],
+  "issues": [
+    "FB-ROOT-001",
+    "FB-ROUTE-002",
+    "FB-ROOT-003",
+    "FB-ROOT-004",
+    "FB-BEND-005",
+    "FB-PORT-006"
+  ],
+  "cases": [
+    {
+      "id": "mux-r04-s00",
+      "path": "tests/reproduction-corpus/mux-r04-s00.json",
+      "family": "mux",
+      "rows": 4,
+      "seed": 0
+    },
+    {
+      "id": "mux-r04-s01",
+      "path": "tests/reproduction-corpus/mux-r04-s01.json",
+      "family": "mux",
+      "rows": 4,
+      "seed": 1
+    },
+    {
+      "id": "mux-r04-s02",
+      "path": "tests/reproduction-corpus/mux-r04-s02.json",
+      "family": "mux",
+      "rows": 4,
+      "seed": 2
+    },
+    {
+      "id": "mux-r04-s03",
+      "path": "tests/reproduction-corpus/mux-r04-s03.json",
+      "family": "mux",
+      "rows": 4,
+      "seed": 3
+    },
+    {
+      "id": "mux-r08-s00",
+      "path": "tests/reproduction-corpus/mux-r08-s00.json",
+      "family": "mux",
+      "rows": 8,
+      "seed": 0
+    },
+    {
+      "id": "mux-r08-s01",
+      "path": "tests/reproduction-corpus/mux-r08-s01.json",
+      "family": "mux",
+      "rows": 8,
+      "seed": 1
+    },
+    {
+      "id": "mux-r08-s02",
+      "path": "tests/reproduction-corpus/mux-r08-s02.json",
+      "family": "mux",
+      "rows": 8,
+      "seed": 2
+    },
+    {
+      "id": "mux-r08-s03",
+      "path": "tests/reproduction-corpus/mux-r08-s03.json",
+      "family": "mux",
+      "rows": 8,
+      "seed": 3
+    },
+    {
+      "id": "mux-r12-s00",
+      "path": "tests/reproduction-corpus/mux-r12-s00.json",
+      "family": "mux",
+      "rows": 12,
+      "seed": 0
+    },
+    {
+      "id": "mux-r12-s01",
+      "path": "tests/reproduction-corpus/mux-r12-s01.json",
+      "family": "mux",
+      "rows": 12,
+      "seed": 1
+    },
+    {
+      "id": "mux-r12-s02",
+      "path": "tests/reproduction-corpus/mux-r12-s02.json",
+      "family": "mux",
+      "rows": 12,
+      "seed": 2
+    },
+    {
+      "id": "mux-r12-s03",
+      "path": "tests/reproduction-corpus/mux-r12-s03.json",
+      "family": "mux",
+      "rows": 12,
+      "seed": 3
+    },
+    {
+      "id": "pad-r04-s00",
+      "path": "tests/reproduction-corpus/pad-r04-s00.json",
+      "family": "pad",
+      "rows": 4,
+      "seed": 0
+    },
+    {
+      "id": "pad-r04-s01",
+      "path": "tests/reproduction-corpus/pad-r04-s01.json",
+      "family": "pad",
+      "rows": 4,
+      "seed": 1
+    },
+    {
+      "id": "pad-r04-s02",
+      "path": "tests/reproduction-corpus/pad-r04-s02.json",
+      "family": "pad",
+      "rows": 4,
+      "seed": 2
+    },
+    {
+      "id": "pad-r04-s03",
+      "path": "tests/reproduction-corpus/pad-r04-s03.json",
+      "family": "pad",
+      "rows": 4,
+      "seed": 3
+    },
+    {
+      "id": "pad-r08-s00",
+      "path": "tests/reproduction-corpus/pad-r08-s00.json",
+      "family": "pad",
+      "rows": 8,
+      "seed": 0
+    },
+    {
+      "id": "pad-r08-s01",
+      "path": "tests/reproduction-corpus/pad-r08-s01.json",
+      "family": "pad",
+      "rows": 8,
+      "seed": 1
+    },
+    {
+      "id": "pad-r08-s02",
+      "path": "tests/reproduction-corpus/pad-r08-s02.json",
+      "family": "pad",
+      "rows": 8,
+      "seed": 2
+    },
+    {
+      "id": "pad-r08-s03",
+      "path": "tests/reproduction-corpus/pad-r08-s03.json",
+      "family": "pad",
+      "rows": 8,
+      "seed": 3
+    },
+    {
+      "id": "pad-r12-s00",
+      "path": "tests/reproduction-corpus/pad-r12-s00.json",
+      "family": "pad",
+      "rows": 12,
+      "seed": 0
+    },
+    {
+      "id": "pad-r12-s01",
+      "path": "tests/reproduction-corpus/pad-r12-s01.json",
+      "family": "pad",
+      "rows": 12,
+      "seed": 1
+    },
+    {
+      "id": "pad-r12-s02",
+      "path": "tests/reproduction-corpus/pad-r12-s02.json",
+      "family": "pad",
+      "rows": 12,
+      "seed": 2
+    },
+    {
+      "id": "pad-r12-s03",
+      "path": "tests/reproduction-corpus/pad-r12-s03.json",
+      "family": "pad",
+      "rows": 12,
+      "seed": 3
+    },
+    {
+      "id": "asym-r04-s00",
+      "path": "tests/reproduction-corpus/asym-r04-s00.json",
+      "family": "asym",
+      "rows": 4,
+      "seed": 0
+    },
+    {
+      "id": "asym-r04-s01",
+      "path": "tests/reproduction-corpus/asym-r04-s01.json",
+      "family": "asym",
+      "rows": 4,
+      "seed": 1
+    },
+    {
+      "id": "asym-r04-s02",
+      "path": "tests/reproduction-corpus/asym-r04-s02.json",
+      "family": "asym",
+      "rows": 4,
+      "seed": 2
+    },
+    {
+      "id": "asym-r04-s03",
+      "path": "tests/reproduction-corpus/asym-r04-s03.json",
+      "family": "asym",
+      "rows": 4,
+      "seed": 3
+    },
+    {
+      "id": "asym-r08-s00",
+      "path": "tests/reproduction-corpus/asym-r08-s00.json",
+      "family": "asym",
+      "rows": 8,
+      "seed": 0
+    },
+    {
+      "id": "asym-r08-s01",
+      "path": "tests/reproduction-corpus/asym-r08-s01.json",
+      "family": "asym",
+      "rows": 8,
+      "seed": 1
+    },
+    {
+      "id": "asym-r08-s02",
+      "path": "tests/reproduction-corpus/asym-r08-s02.json",
+      "family": "asym",
+      "rows": 8,
+      "seed": 2
+    },
+    {
+      "id": "asym-r08-s03",
+      "path": "tests/reproduction-corpus/asym-r08-s03.json",
+      "family": "asym",
+      "rows": 8,
+      "seed": 3
+    },
+    {
+      "id": "asym-r12-s00",
+      "path": "tests/reproduction-corpus/asym-r12-s00.json",
+      "family": "asym",
+      "rows": 12,
+      "seed": 0
+    },
+    {
+      "id": "asym-r12-s01",
+      "path": "tests/reproduction-corpus/asym-r12-s01.json",
+      "family": "asym",
+      "rows": 12,
+      "seed": 1
+    },
+    {
+      "id": "asym-r12-s02",
+      "path": "tests/reproduction-corpus/asym-r12-s02.json",
+      "family": "asym",
+      "rows": 12,
+      "seed": 2
+    },
+    {
+      "id": "asym-r12-s03",
+      "path": "tests/reproduction-corpus/asym-r12-s03.json",
+      "family": "asym",
+      "rows": 12,
+      "seed": 3
+    },
+    {
+      "id": "middle-r04-s00",
+      "path": "tests/reproduction-corpus/middle-r04-s00.json",
+      "family": "middle",
+      "rows": 4,
+      "seed": 0
+    },
+    {
+      "id": "middle-r04-s01",
+      "path": "tests/reproduction-corpus/middle-r04-s01.json",
+      "family": "middle",
+      "rows": 4,
+      "seed": 1
+    },
+    {
+      "id": "middle-r04-s02",
+      "path": "tests/reproduction-corpus/middle-r04-s02.json",
+      "family": "middle",
+      "rows": 4,
+      "seed": 2
+    },
+    {
+      "id": "middle-r04-s03",
+      "path": "tests/reproduction-corpus/middle-r04-s03.json",
+      "family": "middle",
+      "rows": 4,
+      "seed": 3
+    },
+    {
+      "id": "middle-r08-s00",
+      "path": "tests/reproduction-corpus/middle-r08-s00.json",
+      "family": "middle",
+      "rows": 8,
+      "seed": 0
+    },
+    {
+      "id": "middle-r08-s01",
+      "path": "tests/reproduction-corpus/middle-r08-s01.json",
+      "family": "middle",
+      "rows": 8,
+      "seed": 1
+    },
+    {
+      "id": "middle-r08-s02",
+      "path": "tests/reproduction-corpus/middle-r08-s02.json",
+      "family": "middle",
+      "rows": 8,
+      "seed": 2
+    },
+    {
+      "id": "middle-r08-s03",
+      "path": "tests/reproduction-corpus/middle-r08-s03.json",
+      "family": "middle",
+      "rows": 8,
+      "seed": 3
+    },
+    {
+      "id": "middle-r12-s00",
+      "path": "tests/reproduction-corpus/middle-r12-s00.json",
+      "family": "middle",
+      "rows": 12,
+      "seed": 0
+    },
+    {
+      "id": "middle-r12-s01",
+      "path": "tests/reproduction-corpus/middle-r12-s01.json",
+      "family": "middle",
+      "rows": 12,
+      "seed": 1
+    },
+    {
+      "id": "middle-r12-s02",
+      "path": "tests/reproduction-corpus/middle-r12-s02.json",
+      "family": "middle",
+      "rows": 12,
+      "seed": 2
+    },
+    {
+      "id": "middle-r12-s03",
+      "path": "tests/reproduction-corpus/middle-r12-s03.json",
+      "family": "middle",
+      "rows": 12,
+      "seed": 3
+    },
+    {
+      "id": "port-r04-s00",
+      "path": "tests/reproduction-corpus/port-r04-s00.json",
+      "family": "port",
+      "rows": 4,
+      "seed": 0
+    },
+    {
+      "id": "port-r04-s01",
+      "path": "tests/reproduction-corpus/port-r04-s01.json",
+      "family": "port",
+      "rows": 4,
+      "seed": 1
+    },
+    {
+      "id": "port-r04-s02",
+      "path": "tests/reproduction-corpus/port-r04-s02.json",
+      "family": "port",
+      "rows": 4,
+      "seed": 2
+    },
+    {
+      "id": "port-r04-s03",
+      "path": "tests/reproduction-corpus/port-r04-s03.json",
+      "family": "port",
+      "rows": 4,
+      "seed": 3
+    },
+    {
+      "id": "port-r08-s00",
+      "path": "tests/reproduction-corpus/port-r08-s00.json",
+      "family": "port",
+      "rows": 8,
+      "seed": 0
+    },
+    {
+      "id": "port-r08-s01",
+      "path": "tests/reproduction-corpus/port-r08-s01.json",
+      "family": "port",
+      "rows": 8,
+      "seed": 1
+    },
+    {
+      "id": "port-r08-s02",
+      "path": "tests/reproduction-corpus/port-r08-s02.json",
+      "family": "port",
+      "rows": 8,
+      "seed": 2
+    },
+    {
+      "id": "port-r08-s03",
+      "path": "tests/reproduction-corpus/port-r08-s03.json",
+      "family": "port",
+      "rows": 8,
+      "seed": 3
+    },
+    {
+      "id": "port-r12-s00",
+      "path": "tests/reproduction-corpus/port-r12-s00.json",
+      "family": "port",
+      "rows": 12,
+      "seed": 0
+    },
+    {
+      "id": "port-r12-s01",
+      "path": "tests/reproduction-corpus/port-r12-s01.json",
+      "family": "port",
+      "rows": 12,
+      "seed": 1
+    },
+    {
+      "id": "port-r12-s02",
+      "path": "tests/reproduction-corpus/port-r12-s02.json",
+      "family": "port",
+      "rows": 12,
+      "seed": 2
+    },
+    {
+      "id": "port-r12-s03",
+      "path": "tests/reproduction-corpus/port-r12-s03.json",
+      "family": "port",
+      "rows": 12,
+      "seed": 3
+    }
+  ]
+}

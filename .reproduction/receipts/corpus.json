@@ -1,0 +1,136 @@
+{
+  "schema_version": 1,
+  "corpus_id": "20260903T082519Z-2df8f82f",
+  "coverage_model": "many_to_many",
+  "cases": [
+    {
+      "case_id": "mixed-roots-current",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-001",
+        "FB-ROOT-003",
+        "FB-ROOT-004"
+      ],
+      "totals": {
+        "logical_nodes": 69,
+        "rendered_nodes": 75,
+        "logical_edges": 66,
+        "rendered_edges": 66,
+        "proper_crossing_events": 4,
+        "distinct_crossing_points": 2,
+        "different_net_overlaps": 0,
+        "bends": 6,
+        "manhattan_length_px": 6090.116
+      }
+    },
+    {
+      "case_id": "mixed-roots-current",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-001",
+        "FB-ROOT-003",
+        "FB-ROOT-004"
+      ],
+      "totals": {
+        "logical_nodes": 69,
+        "rendered_nodes": 75,
+        "logical_edges": 66,
+        "rendered_edges": 66,
+        "proper_crossing_events": 4,
+        "distinct_crossing_points": 2,
+        "different_net_overlaps": 0,
+        "bends": 6,
+        "manhattan_length_px": 6090.116
+      }
+    },
+    {
+      "case_id": "pad-weave-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-001",
+        "FB-ROUTE-002",
+        "FB-ROOT-003",
+        "FB-ROOT-004",
+        "FB-BEND-005"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 43,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 87,
+        "distinct_crossing_points": 48,
+        "different_net_overlaps": 0,
+        "bends": 46,
+        "manhattan_length_px": 12440.1454
+      }
+    },
+    {
+      "case_id": "pad-weave-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-001",
+        "FB-ROUTE-002",
+        "FB-ROOT-003",
+        "FB-ROOT-004",
+        "FB-BEND-005"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 43,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 87,
+        "distinct_crossing_points": 48,
+        "different_net_overlaps": 0,
+        "bends": 46,
+        "manhattan_length_px": 12440.1454
+      }
+    },
+    {
+      "case_id": "asymmetric-port-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-PORT-006"
+      ],
+      "totals": {
+        "logical_nodes": 9,
+        "rendered_nodes": 9,
+        "logical_edges": 8,
+        "rendered_edges": 8,
+        "proper_crossing_events": 1,
+        "distinct_crossing_points": 1,
+        "different_net_overlaps": 0,
+        "bends": 8,
+        "manhattan_length_px": 828.056
+      }
+    },
+    {
+      "case_id": "asymmetric-port-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-PORT-006"
+      ],
+      "totals": {
+        "logical_nodes": 9,
+        "rendered_nodes": 9,
+        "logical_edges": 8,
+        "rendered_edges": 8,
+        "proper_crossing_events": 1,
+        "distinct_crossing_points": 1,
+        "different_net_overlaps": 0,
+        "bends": 8,
+        "manhattan_length_px": 828.056
+      }
+    }
+  ],
+  "issue_attempt_counts": {
+    "FB-ROOT-001": 2,
+    "FB-ROUTE-002": 2,
+    "FB-ROOT-003": 2,
+    "FB-ROOT-004": 2,
+    "FB-BEND-005": 2,
+    "FB-PORT-006": 2
+  },
+  "missing_issues": []
+}

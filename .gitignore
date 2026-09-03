@@ -6,6 +6,15 @@ __pycache__/
 .pytest_cache/
 .codex/evidence/
 .reproduction/
+!.reproduction/
+.reproduction/*
+!.reproduction/receipts/
+.reproduction/receipts/*
+!.reproduction/receipts/*.json
+!.reproduction/evidence/
+.reproduction/evidence/*
+!.reproduction/evidence/20260903T082519Z-2df8f82f/
+!.reproduction/evidence/20260903T082519Z-2df8f82f/**
 .mypy_cache/
 .ruff_cache/
 dist/
@@ -42,6 +51,7 @@ example/out/roundtrip/
 example/out/restored.drawio
 example/out/drawio-layout.json
 example/out/from-reloaded/
+example/out/*.svg
 example/out/*-frozen-smoke.*
 example/out/draw-example.*
 example/auto-layout/*.svg

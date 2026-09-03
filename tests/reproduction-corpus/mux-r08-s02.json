@@ -1,0 +1,219 @@
+{
+  "gate_05": {
+    "kind": "gate",
+    "source": "mux_05"
+  },
+  "local_07_0": {
+    "kind": "source"
+  },
+  "gate_04": {
+    "kind": "gate",
+    "source": "mux_04"
+  },
+  "local_06_1": {
+    "kind": "source"
+  },
+  "local_06_0": {
+    "kind": "gate"
+  },
+  "local_01_1": {
+    "kind": "from"
+  },
+  "local_04_1": {
+    "kind": "from"
+  },
+  "local_00_0": {
+    "kind": "gate"
+  },
+  "gate_03": {
+    "kind": "gate",
+    "source": "mux_03"
+  },
+  "div_02": {
+    "kind": "div",
+    "source": "gate_02"
+  },
+  "local_04_0": {
+    "kind": "source"
+  },
+  "mux_07": {
+    "kind": "mux3",
+    "source": {
+      "0": "shared_wave",
+      "1": "local_07_1",
+      "2": "local_07_0"
+    }
+  },
+  "div_07": {
+    "kind": "div",
+    "source": "gate_07"
+  },
+  "mux_04": {
+    "kind": "mux3",
+    "source": {
+      "0": "shared_wave",
+      "1": "local_04_0",
+      "2": "local_04_1"
+    }
+  },
+  "local_01_0": {
+    "kind": "source"
+  },
+  "gate_07": {
+    "kind": "gate",
+    "source": "mux_07"
+  },
+  "div_00": {
+    "kind": "div",
+    "source": "gate_00"
+  },
+  "clock_00": {
+    "kind": "clock",
+    "source": "div_00"
+  },
+  "mux_02": {
+    "kind": "mux3",
+    "source": {
+      "0": "shared_from",
+      "1": "local_02_0",
+      "2": "local_02_1"
+    }
+  },
+  "mux_03": {
+    "kind": "mux3",
+    "source": {
+      "0": "shared_gate",
+      "1": "local_03_1",
+      "2": "local_03_0"
+    }
+  },
+  "mux_00": {
+    "kind": "mux3",
+    "source": {
+      "0": "shared_gate",
+      "1": "local_00_0",
+      "2": "local_00_1"
+    }
+  },
+  "local_03_0": {
+    "kind": "gate"
+  },
+  "mux_01": {
+    "kind": "mux3",
+    "source": {
+      "0": "shared_wave",
+      "1": "local_01_1",
+      "2": "local_01_0"
+    }
+  },
+  "mux_05": {
+    "kind": "mux3",
+    "source": {
+      "0": "shared_from",
+      "1": "local_05_1",
+      "2": "local_05_0"
+    }
+  },
+  "clock_05": {
+    "kind": "clock",
+    "source": "div_05"
+  },
+  "clock_01": {
+    "kind": "clock",
+    "source": "div_01"
+  },
+  "clock_07": {
+    "kind": "clock",
+    "source": "div_07"
+  },
+  "div_06": {
+    "kind": "div",
+    "source": "gate_06"
+  },
+  "div_03": {
+    "kind": "div",
+    "source": "gate_03"
+  },
+  "local_05_0": {
+    "kind": "from"
+  },
+  "gate_00": {
+    "kind": "gate",
+    "source": "mux_00"
+  },
+  "clock_04": {
+    "kind": "clock",
+    "source": "div_04"
+  },
+  "gate_02": {
+    "kind": "gate",
+    "source": "mux_02"
+  },
+  "local_00_1": {
+    "kind": "source"
+  },
+  "div_04": {
+    "kind": "div",
+    "source": "gate_04"
+  },
+  "clock_02": {
+    "kind": "clock",
+    "source": "div_02"
+  },
+  "clock_03": {
+    "kind": "clock",
+    "source": "div_03"
+  },
+  "local_02_0": {
+    "kind": "from"
+  },
+  "local_02_1": {
+    "kind": "gate"
+  },
+  "shared_gate": {
+    "kind": "gate"
+  },
+  "local_05_1": {
+    "kind": "gate"
+  },
+  "local_07_1": {
+    "kind": "from"
+  },
+  "div_05": {
+    "kind": "div",
+    "source": "gate_05"
+  },
+  "shared_from": {
+    "kind": "from"
+  },
+  "gate_06": {
+    "kind": "gate",
+    "source": "mux_06"
+  },
+  "local_03_1": {
+    "kind": "source"
+  },
+  "div_01": {
+    "kind": "div",
+    "source": "gate_01"
+  },
+  "clock_06": {
+    "kind": "clock",
+    "source": "div_06"
+  },
+  "mux_06": {
+    "kind": "mux3",
+    "source": {
+      "0": "shared_gate",
+      "1": "local_06_0",
+      "2": "local_06_1"
+    }
+  },
+  "shared_wave": {
+    "kind": "source"
+  },
+  "gate_01": {
+    "kind": "gate",
+    "source": "mux_01"
+  }
+}

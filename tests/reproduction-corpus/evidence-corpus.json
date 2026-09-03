@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "coverage_model": "many_to_many",
+  "attempts_per_case": 2,
+  "cases": [
+    {
+      "id": "mixed-roots-current",
+      "baseline_revision": "29252208654de2a2157004a4883c4c852a0c3191",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "example/auto-layout/25-mixed-root-port-order-torture.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROOT-001", "FB-ROOT-003", "FB-ROOT-004"]
+    },
+    {
+      "id": "pad-weave-baseline",
+      "baseline_revision": "6c9f9f42d9e0912309197d47b4b4c245db25ff75",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "tests/reproduction-corpus/pad-r08-s00.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROUTE-002", "FB-BEND-005"]
+    },
+    {
+      "id": "asymmetric-port-baseline",
+      "baseline_revision": "06c4c6c89f326b9cdc3a73ff2b229078789de544",
+      "python_role": "legacy",
+      "cli_mode": "draw_subcommand",
+      "input": "example/auto-layout/20-asymmetric-merge-route-bulge.json",
+      "library": "drawio-lib/drawclock.xml",
+      "issues": ["FB-PORT-006"]
+    }
+  ]
+}

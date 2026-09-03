@@ -1,0 +1,115 @@
+{
+  "sel_02": {
+    "kind": "mux2",
+    "source": {
+      "0": "div_a_02",
+      "1": "gate_b_02"
+    }
+  },
+  "gate_a_03": {
+    "kind": "gate",
+    "source": "root_source"
+  },
+  "cell_01": {
+    "kind": "cell",
+    "source": "sel_01"
+  },
+  "gate_a_02": {
+    "kind": "gate",
+    "source": "root_gate"
+  },
+  "gate_a_01": {
+    "kind": "gate",
+    "source": "root_from"
+  },
+  "gate_b_00": {
+    "kind": "gate",
+    "source": "one_use_00"
+  },
+  "div_a_01": {
+    "kind": "div",
+    "source": "gate_a_01"
+  },
+  "clock_01": {
+    "kind": "clock",
+    "source": "cell_01"
+  },
+  "div_a_02": {
+    "kind": "div",
+    "source": "gate_a_02"
+  },
+  "one_use_02": {
+    "kind": "source"
+  },
+  "cell_02": {
+    "kind": "cell",
+    "source": "sel_02"
+  },
+  "clock_02": {
+    "kind": "clock",
+    "source": "cell_02"
+  },
+  "cell_00": {
+    "kind": "cell",
+    "source": "sel_00"
+  },
+  "sel_00": {
+    "kind": "mux2",
+    "source": {
+      "0": "gate_a_00",
+      "1": "gate_b_00"
+    }
+  },
+  "root_source": {
+    "kind": "source"
+  },
+  "sel_03": {
+    "kind": "mux2",
+    "source": {
+      "0": "gate_a_03",
+      "1": "one_use_03"
+    }
+  },
+  "clock_03": {
+    "kind": "clock",
+    "source": "cell_03"
+  },
+  "one_use_00": {
+    "kind": "from"
+  },
+  "gate_b_02": {
+    "kind": "gate",
+    "source": "one_use_02"
+  },
+  "gate_a_00": {
+    "kind": "gate",
+    "source": "root_source"
+  },
+  "one_use_01": {
+    "kind": "gate"
+  },
+  "cell_03": {
+    "kind": "cell",
+    "source": "sel_03"
+  },
+  "sel_01": {
+    "kind": "mux2",
+    "source": {
+      "0": "div_a_01",
+      "1": "one_use_01"
+    }
+  },
+  "clock_00": {
+    "kind": "clock",
+    "source": "cell_00"
+  },
+  "one_use_03": {
+    "kind": "from"
+  },
+  "root_from": {
+    "kind": "from"
+  },
+  "root_gate": {
+    "kind": "gate"
+  }
+}

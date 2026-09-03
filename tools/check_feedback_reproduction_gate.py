@@ -26,6 +26,34 @@ def _attempts(issue: dict[str, Any]) -> list[dict[str, Any]]:
     return [item for item in attempts if isinstance(item, dict)] if isinstance(attempts, list) else []
 
 
+def _command_value(command: object, flags: tuple[str, ...]) -> str | None:
+    if not isinstance(command, list):
+        return None
+    for flag in flags:
+        if flag in command:
+            index = command.index(flag)
+            if index + 1 < len(command) and isinstance(command[index + 1], str):
+                value = command[index + 1].replace("\\", "/")
+                for prefix in ("{project}/", "{snapshot}/"):
+                    if value.startswith(prefix):
+                        value = value[len(prefix):]
+                return value
+    return None
+
+
+def _validate_input_lineage(issue: dict[str, Any], errors: list[str]) -> None:
+    issue_id = issue.get("id", "<missing>")
+    entrypoint = issue.get("entrypoint")
+    oracle = issue.get("oracle")
+    if not isinstance(entrypoint, dict) or not isinstance(oracle, dict):
+        errors.append(f"{issue_id}: entrypoint/oracle contract is missing")
+        return
+    produced = _command_value(entrypoint.get("command"), ("-i", "--input"))
+    observed = _command_value(oracle.get("command"), ("--input", "-i"))
+    if produced is None or observed is None or produced != observed:
+        errors.append(f"{issue_id}: producer and oracle input lineage differs")
+
+
 def _print_issue(issue: dict[str, Any]) -> None:
     print(f"ISSUE {issue.get('id', '<missing>')}", file=sys.stderr)
     print(f"  summary: {issue.get('summary', '<missing>')}", file=sys.stderr)
@@ -87,6 +115,8 @@ def _validate_release_receipt(issue: dict[str, Any], errors: list[str]) -> None:
         errors.append(f"{issue_id}: reproduction receipt does not report reproduced")
     if receipt.get("evidence_class") != "user_reproduction" or receipt.get("origin") != "natural_user_workflow":
         errors.append(f"{issue_id}: reproduction receipt is not natural user evidence")
+    if receipt.get("coverage_model") != "many_to_many" or not _text(receipt.get("corpus_id")):
+        errors.append(f"{issue_id}: reproduction receipt must bind a many-to-many corpus")
     for key in ("fault_injection", "output_mutated", "production_code_changed"):
         if receipt.get(key) is not False:
             errors.append(f"{issue_id}: {key} must be false")
@@ -104,6 +134,11 @@ def _validate_release_receipt(issue: dict[str, Any], errors: list[str]) -> None:
             errors.append(f"{issue_id}: receipt attempt {index} did not complete through the public entrypoint")
         if run.get("oracle_exit_code") != 0:
             errors.append(f"{issue_id}: receipt attempt {index} did not observe the reported symptom")
+        if run.get("corpus_id") != receipt.get("corpus_id") or not _text(run.get("case_id")):
+            errors.append(f"{issue_id}: receipt attempt {index} has invalid corpus/case identity")
+        observed = run.get("observed_issue_ids")
+        if not isinstance(observed, list) or issue_id not in observed:
+            errors.append(f"{issue_id}: receipt attempt {index} lacks direct issue observation")
         if run.get("artifact_before_oracle_sha256") != run.get("artifact_after_oracle_sha256"):
             errors.append(f"{issue_id}: receipt attempt {index} changed the artifact")
     if not all(run_ids) or len(run_ids) != len(set(run_ids)):
@@ -127,6 +162,7 @@ def _release_gate() -> int:
             continue
         issue_id = issue.get("id", "<missing>")
         _validate_attempt_log(issue, errors)
+        _validate_input_lineage(issue, errors)
         if issue.get("status") not in RELEASE_STATES:
             errors.append(f"{issue_id}: release blocked; status is {issue.get('status')}")
         _validate_release_receipt(issue, errors)

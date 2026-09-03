@@ -1,0 +1,138 @@
+{
+  "pair_clock_02": {
+    "kind": "clock",
+    "source": "pair_mux_02"
+  },
+  "pair_mux_05": {
+    "kind": "mux2",
+    "source": {
+      "0": "a_input_05",
+      "1": "z_input_05"
+    }
+  },
+  "a_input_06": {
+    "kind": "source"
+  },
+  "z_input_07": {
+    "kind": "source"
+  },
+  "pair_mux_01": {
+    "kind": "mux2",
+    "source": {
+      "0": "a_input_01",
+      "1": "z_input_01"
+    }
+  },
+  "z_input_01": {
+    "kind": "source"
+  },
+  "pair_mux_07": {
+    "kind": "mux2",
+    "source": {
+      "0": "a_input_07",
+      "1": "z_input_07"
+    }
+  },
+  "pair_mux_02": {
+    "kind": "mux2",
+    "source": {
+      "0": "z_input_02",
+      "1": "a_input_02"
+    }
+  },
+  "pair_mux_04": {
+    "kind": "mux2",
+    "source": {
+      "0": "z_input_04",
+      "1": "a_input_04"
+    }
+  },
+  "z_input_03": {
+    "kind": "gate"
+  },
+  "pair_mux_00": {
+    "kind": "mux2",
+    "source": {
+      "0": "z_input_00",
+      "1": "a_input_00"
+    }
+  },
+  "a_input_02": {
+    "kind": "gate"
+  },
+  "z_input_05": {
+    "kind": "from"
+  },
+  "a_input_04": {
+    "kind": "from"
+  },
+  "pair_clock_07": {
+    "kind": "clock",
+    "source": "pair_mux_07"
+  },
+  "pair_clock_00": {
+    "kind": "clock",
+    "source": "pair_mux_00"
+  },
+  "pair_clock_05": {
+    "kind": "clock",
+    "source": "pair_mux_05"
+  },
+  "pair_mux_06": {
+    "kind": "mux2",
+    "source": {
+      "0": "z_input_06",
+      "1": "a_input_06"
+    }
+  },
+  "a_input_07": {
+    "kind": "from"
+  },
+  "pair_clock_03": {
+    "kind": "clock",
+    "source": "pair_mux_03"
+  },
+  "z_input_04": {
+    "kind": "source"
+  },
+  "pair_mux_03": {
+    "kind": "mux2",
+    "source": {
+      "0": "a_input_03",
+      "1": "z_input_03"
+    }
+  },
+  "a_input_01": {
+    "kind": "from"
+  },
+  "z_input_06": {
+    "kind": "gate"
+  },
+  "pair_clock_04": {
+    "kind": "clock",
+    "source": "pair_mux_04"
+  },
+  "a_input_05": {
+    "kind": "gate"
+  },
+  "pair_clock_06": {
+    "kind": "clock",
+    "source": "pair_mux_06"
+  },
+  "a_input_03": {
+    "kind": "source"
+  },
+  "a_input_00": {
+    "kind": "source"
+  },
+  "z_input_02": {
+    "kind": "from"
+  },
+  "pair_clock_01": {
+    "kind": "clock",
+    "source": "pair_mux_01"
+  },
+  "z_input_00": {
+    "kind": "gate"
+  }
+}
