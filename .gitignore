@@ -13,15 +13,15 @@ __pycache__/
 !.reproduction/receipts/*.json
 !.reproduction/evidence/
 .reproduction/evidence/*
-!.reproduction/evidence/20260903T142956Z-73e71644/
-!.reproduction/evidence/20260903T142956Z-73e71644/**
+!.reproduction/evidence/20260903T170713Z-187ae636/
+!.reproduction/evidence/20260903T170713Z-187ae636/**
 !.reproduction/fix-receipts/
 .reproduction/fix-receipts/*
 !.reproduction/fix-receipts/*.json
 !.reproduction/fix-evidence/
 .reproduction/fix-evidence/*
-!.reproduction/fix-evidence/20260903T155038Z-c00c8e7c/
-!.reproduction/fix-evidence/20260903T155038Z-c00c8e7c/**
+!.reproduction/fix-evidence/20260903T174313Z-ab3e78ca/
+!.reproduction/fix-evidence/20260903T174313Z-ab3e78ca/**
 .mypy_cache/
 .ruff_cache/
 dist/
@@ -55,6 +55,7 @@ tests/_tmp_roundtrip/
 tests/_tmp_cli_src/
 tests/_tmp_*
 example/out/roundtrip/
+example/out/
 example/out/restored.drawio
 example/out/drawio-layout.json
 example/out/from-reloaded/

@@ -83,6 +83,104 @@ def test_same_net_topology_distinguishes_tree_from_split_rejoin_cycle() -> None:
     assert oracle._same_net_cycle(cycle) is True
 
 
+def test_vertical_root_facility_oracle_requires_full_geometric_dominance() -> None:
+    route = oracle.Route(
+        0,
+        [(10, 5), (30, 5), (30, 25), (50, 25)],
+        source="root",
+        target="sink",
+    )
+    boxes = [
+        oracle.Box("root", 0, 0, 10, 10),
+        oracle.Box("sink", 50, 20, 10, 10),
+    ]
+    witnesses = oracle._vertical_root_facility_bend_witnesses(
+        {"root"}, [route], boxes
+    )
+    assert len(witnesses) == 1
+    assert witnesses[0]["bends_before"] == 2
+    assert witnesses[0]["bends_after"] == 0
+
+    blocked = [*boxes, oracle.Box("obstacle", 20, 20, 10, 10)]
+    assert oracle._vertical_root_facility_bend_witnesses(
+        {"root"}, [route], blocked
+    ) == []
+
+
+def test_vertical_root_facility_oracle_counts_visible_label_footprint() -> None:
+    route = oracle.Route(
+        0,
+        [(10, 5), (30, 5), (30, 25), (50, 25)],
+        source="root",
+        target="sink",
+    )
+    boxes = [
+        oracle.Box("root", 0, 0, 10, 10),
+        oracle.Box("sink", 50, 20, 10, 10),
+        oracle.Box("label_owner", 20, 0, 2, 2, 18, 20, 14, 10),
+    ]
+    assert oracle._vertical_root_facility_bend_witnesses(
+        {"root"}, [route], boxes
+    ) == []
+
+
+def test_root_column_lag_oracle_aligns_only_through_a_safe_used_column() -> None:
+    lagging = oracle.Route(
+        0,
+        [(10, 5), (30, 5), (30, 25), (100, 25)],
+        source="lagging",
+        target="sink_a",
+    )
+    aligned = oracle.Route(
+        1, [(70, 65), (100, 65)], source="aligned", target="sink_b"
+    )
+    boxes = [
+        oracle.Box("lagging", 0, 0, 10, 10),
+        oracle.Box("aligned", 60, 60, 10, 10),
+        oracle.Box("sink_a", 100, 20, 10, 10),
+        oracle.Box("sink_b", 100, 60, 10, 10),
+    ]
+    witnesses = oracle._root_facility_column_lag_witnesses(
+        {"lagging", "aligned"}, [lagging, aligned], boxes
+    )
+    assert [row["root"] for row in witnesses] == ["lagging"]
+    assert witnesses[0]["crossing_events_before"] == 0
+    assert witnesses[0]["crossing_events_after"] == 0
+
+    blocked = [*boxes, oracle.Box("obstacle", 60, 20, 10, 10)]
+    assert oracle._root_facility_column_lag_witnesses(
+        {"lagging", "aligned"}, [lagging, aligned], blocked
+    ) == []
+
+
+def test_frozen_combined_artifact_exposes_bend_and_root_column_escapes() -> None:
+    input_path = ROOT / "example/auto-layout/26-feedback-reproduction-combined.json"
+    receipt = json.loads(
+        (ROOT / ".reproduction/receipts/FB-BEND-011.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    evidence = receipt["attempts"][0]["evidence_files"]
+    output = next(ROOT / path for path in evidence if path.endswith("/output.svg"))
+    report = oracle.analyze(input_path, output)
+    assert {"FB-BEND-011", "FB-ROOT-012"}.issubset(report["detected_issues"])
+    assert any(
+        row["source"] == "weave__public_from"
+        and row["target"] == "weave__merge_07"
+        and row["crossings_before"] == row["crossings_after"] == 0
+        and row["bends_before"] == 2
+        and row["bends_after"] == 0
+        for row in report["witnesses"]["vertical_root_facility_bend_witnesses"]
+    )
+    assert any(
+        row["root"] == "weave__public_from"
+        and row["target"] == "weave__merge_07"
+        and row["output_x_after"] > row["output_x_before"]
+        and row["crossing_events_before"] == row["crossing_events_after"] == 0
+        for row in report["witnesses"]["root_facility_column_lag_witnesses"]
+    )
+
+
 def test_oracle_reads_public_svg_without_importing_production(tmp_path: Path) -> None:
     input_path = ROOT / "tests" / "reproduction-corpus" / "pad-r08-s00.json"
     output = tmp_path / "output.svg"

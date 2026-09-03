@@ -3918,6 +3918,12 @@ def _relocate_root_rendering_anchors(
                 indices = edge_indices_by_anchor.get(anchor_id, [])
                 if not indices:
                     continue
+                if continuous_physical_search and any(
+                    current_edge_by_id[f"e{index}"].waypoints
+                    for index in indices
+                ):
+                    scope_can_move = True
+                    break
                 targets = [
                     current_by_id[current_edge_by_id[f"e{index}"].target_id]
                     for index in indices
@@ -4009,7 +4015,13 @@ def _relocate_root_rendering_anchors(
                         <= target_left + 1e-6
                     ):
                         feasible.append(column_x)
-                if not feasible or max(feasible) <= anchor.x + 1e-6:
+                if (
+                    not feasible
+                    or (
+                        not continuous_physical_search
+                        and max(feasible) <= anchor.x + 1e-6
+                    )
+                ):
                     continue
                 source_port = logical_edges[edge_indices[0] - 1].source_port
                 source_anchor_y = port_anchors(
@@ -4040,17 +4052,19 @@ def _relocate_root_rendering_anchors(
                             set(edge_indices),
                             {anchor_id},
                         )
+                        column_displacement = abs(column_x - original_x)
                         position_choices.append((
                             len(reverse_hits),
-                            -column_x,
                             abs(anchor.y - wanted),
+                            column_displacement,
+                            -column_x,
                             column_x,
                             anchor.y,
                         ))
                     anchor.x, anchor.y = original_x, original_y
                     selected_position = min(position_choices)
-                    anchor.x = selected_position[3]
-                    anchor.y = selected_position[4]
+                    anchor.x = selected_position[4]
+                    anchor.y = selected_position[5]
                 else:
                     # The scalable tier searches only canonical columns.  Its
                     # rightmost feasible column is the structural optimum for
@@ -4060,6 +4074,11 @@ def _relocate_root_rendering_anchors(
                     anchor.y = _nearest_clear_anchor_top(
                         anchor, wanted, column_obstacles(anchor), profile.grid
                     )
+                if (
+                    abs(anchor.x - original_x) <= 1e-6
+                    and abs(anchor.y - original_y) <= 1e-6
+                ):
+                    continue
                 dynamic_boxes.append(vertex_visual_box(anchor))
                 moved_ids.add(anchor_id)
 
@@ -5524,7 +5543,20 @@ def generate_elk_layout(
         continuous_physical_search=precise_root_search_allowed,
     )
     accepted_assessment = anchor_relocation_report.pop("_accepted_assessment")
-    report["selection"].update(anchor_relocation_report)
+    anchor_numeric_keys = (
+        "source_anchor_relocation_attempts",
+        "source_anchor_column_moves",
+        "source_anchor_crossings_removed",
+        "source_anchor_source_crossings_removed",
+        "source_anchor_length_saved_px",
+    )
+    anchor_totals = {
+        key: anchor_relocation_report[key] for key in anchor_numeric_keys
+    }
+    pre_corridor_anchor_totals = dict(anchor_totals)
+    anchor_blockers: Counter[str] = Counter(
+        anchor_relocation_report["source_anchor_relocation_blockers"]
+    )
     corridor_totals = {
         "source_corridor_attempts": 0,
         "source_corridor_moves": 0,
@@ -5557,7 +5589,33 @@ def generate_elk_layout(
             )
             for key in corridor_totals:
                 corridor_totals[key] += corridor_report[key]
-            if corridor_report["source_corridor_moves"] == 0:
+            corridor_moves = corridor_report["source_corridor_moves"]
+            document, followup_anchor_report = _relocate_root_rendering_anchors(
+                document,
+                nodes,
+                logical_edges,
+                profile,
+                # The corridor owner evaluates suffix translations with
+                # incrementally reused hard metrics.  Rebuild the complete
+                # baseline before handing coordinates back to the anchor
+                # owner; otherwise a valid move newly exposed by the corridor
+                # can be compared with a stale route/coordinate cache.
+                accepted_assessment=None,
+                include_assessment=True,
+                continuous_physical_search=True,
+            )
+            accepted_assessment = followup_anchor_report.pop(
+                "_accepted_assessment"
+            )
+            anchor_blockers.update(
+                followup_anchor_report["source_anchor_relocation_blockers"]
+            )
+            for key in anchor_numeric_keys:
+                anchor_totals[key] += followup_anchor_report[key]
+            if (
+                corridor_moves == 0
+                and followup_anchor_report["source_anchor_column_moves"] == 0
+            ):
                 break
     else:
         corridor_blockers["topology-work-budget"] = 1
@@ -5567,6 +5625,13 @@ def generate_elk_layout(
     corridor_totals["source_corridor_blockers"] = dict(
         sorted(corridor_blockers.items())
     )
+    anchor_totals["source_anchor_length_saved_px"] = round(
+        anchor_totals["source_anchor_length_saved_px"], 3
+    )
+    anchor_totals["source_anchor_relocation_blockers"] = dict(
+        sorted(anchor_blockers.items())
+    )
+    report["selection"].update(anchor_totals)
     report["selection"].update(corridor_totals)
     report["selection"]["source_corridor_search_allowed"] = (
         corridor_search_allowed
@@ -5603,6 +5668,8 @@ def generate_elk_layout(
                 "source_corridor_bends_removed",
             ):
                 report["selection"][key] = 0
+            for key, value in pre_corridor_anchor_totals.items():
+                report["selection"][key] = value
         else:
             report["selection"]["source_corridor_rollback_cycle_rank"] = 0
     else:

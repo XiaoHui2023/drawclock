@@ -47,6 +47,15 @@
       "input": "example/auto-layout/07-medium-64-clocks.json",
       "library": "drawio-lib",
       "issues": ["FB-ROOT-010"]
+    },
+    {
+      "id": "zero-crossing-root-facility-baseline",
+      "baseline_revision": "deaefc9c2205fbfaf63e70121cb7c378f39bfcef",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "example/auto-layout/26-feedback-reproduction-combined.json",
+      "library": "drawio-lib",
+      "issues": ["FB-BEND-011", "FB-ROOT-012"]
     }
   ],
   "current_fix_cases": [

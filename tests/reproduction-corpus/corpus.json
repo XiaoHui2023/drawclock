@@ -8,7 +8,10 @@
     "chain_depth",
     "consumer_band_gap",
     "feasible_root_rank",
-    "input_insertion_order"
+    "input_insertion_order",
+    "physical_root_facility",
+    "zero_crossing_bend",
+    "root_column_alignment"
   ],
   "issues": [
     "FB-ROOT-001",
@@ -18,7 +21,9 @@
     "FB-BEND-005",
     "FB-PORT-006",
     "FB-ROUTE-009",
-    "FB-ROOT-010"
+    "FB-ROOT-010",
+    "FB-BEND-011",
+    "FB-ROOT-012"
   ],
   "cases": [
     {

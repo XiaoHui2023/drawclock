@@ -31,7 +31,7 @@ from drawio_ports import (
 from visual_geometry import vertex_visual_box
 
 
-QUALITY_SCHEMA_VERSION = 12  # Test-only Agent artifact inspection schema.
+QUALITY_SCHEMA_VERSION = 13  # Test-only Agent artifact inspection schema.
 
 
 def _independent_latest_forward_ranks(
@@ -168,6 +168,13 @@ def inspect_layout_quality(
     }
     visual_boxes = {
         vertex.name: vertex_visual_box(vertex) for vertex in document.vertices
+    }
+    # Rendering replicas deliberately share a logical name.  Coordinate
+    # counterfactuals therefore key visible footprints by physical cell ID;
+    # a name-keyed map silently substitutes the last replica and can make a
+    # real one-edge root facility invisible to the quality oracle.
+    visual_boxes_by_id = {
+        vertex.cell_id: vertex_visual_box(vertex) for vertex in document.vertices
     }
 
     duplicate_node_names = sorted(
@@ -1438,11 +1445,56 @@ def inspect_layout_quality(
     # complete local interaction set and the visible bounding box do not
     # regress.  No component kind or instance name participates.
     avoidable_joint_coordinate_bends: list[str] = []
+    avoidable_zero_crossing_root_bends: list[str] = []
     joint_coordinate_tradeoffs: dict[str, list[str]] = {}
     incident_edges_by_vertex: dict[str, list[str]] = defaultdict(list)
+    physical_outdegree: Counter[str] = Counter()
     for edge_id, (source, target) in observed_edge_vertices.items():
         incident_edges_by_vertex[source.cell_id].append(edge_id)
         incident_edges_by_vertex[target.cell_id].append(edge_id)
+        physical_outdegree[source.cell_id] += 1
+    physical_root_axis_by_id: dict[str, float] = {}
+    for edge_id, (source, _target) in observed_edge_vertices.items():
+        logical_name = source.logical_name or source.name
+        if logical_indegree[logical_name] == 0:
+            physical_root_axis_by_id.setdefault(
+                source.cell_id, edge_points[edge_id][0][0]
+            )
+    root_column_separation = max(
+        tolerance,
+        median(
+            visual_boxes_by_id[cell_id].right
+            - visual_boxes_by_id[cell_id].left
+            for cell_id in physical_root_axis_by_id
+        ) / 2.0 if physical_root_axis_by_id else tolerance,
+    )
+    root_facility_columns: list[dict[str, Any]] = []
+    for cell_id, axis_x in sorted(
+        physical_root_axis_by_id.items(), key=lambda item: (item[1], item[0])
+    ):
+        if (
+            not root_facility_columns
+            or axis_x - float(root_facility_columns[-1]["axis_x_max"])
+            > root_column_separation
+        ):
+            root_facility_columns.append({
+                "axis_x_min": axis_x,
+                "axis_x_max": axis_x,
+                "facilities": [],
+            })
+        column = root_facility_columns[-1]
+        column["axis_x_max"] = max(float(column["axis_x_max"]), axis_x)
+        vertex = vertices_by_id[cell_id]
+        column["facilities"].append({
+            "cell_id": cell_id,
+            "logical_name": vertex.logical_name or vertex.name,
+            "axis_x": round(axis_x, 3),
+            "physical_outdegree": physical_outdegree[cell_id],
+        })
+    for column in root_facility_columns:
+        column["axis_x_min"] = round(float(column["axis_x_min"]), 3)
+        column["axis_x_max"] = round(float(column["axis_x_max"]), 3)
+        column["facility_count"] = len(column["facilities"])
     def simplify_candidate(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
         points = _canonical_orthogonal_points(points, tolerance)
         compact: list[tuple[float, float]] = []
@@ -1479,9 +1531,15 @@ def inspect_layout_quality(
         )
 
     for edge_id, points in edge_points.items():
-        if max(0, len(points) - 2) < 4:
-            continue
         source, target = observed_edge_vertices[edge_id]
+        source_name = source.logical_name or source.name
+        root_single_edge_facility = (
+            logical_indegree[source_name] == 0
+            and physical_outdegree[source.cell_id] == 1
+        )
+        minimum_bends = 2 if root_single_edge_facility else 4
+        if max(0, len(points) - 2) < minimum_bends:
+            continue
         horizontal_axes = {
             a[1]
             for a, b in zip(points, points[1:])
@@ -1490,8 +1548,12 @@ def inspect_layout_quality(
         }
         for vertex, endpoint in ((source, points[0]), (target, points[-1])):
             logical_name = vertex.logical_name or vertex.name
-            if (
+            movable_root_facility = (
                 logical_indegree[logical_name] == 0
+                and physical_outdegree[vertex.cell_id] == 1
+            )
+            if (
+                (logical_indegree[logical_name] == 0 and not movable_root_facility)
                 or logical_outdegree[logical_name] > 1
                 or not joint_coordinate_safe(logical_name)
             ):
@@ -1536,7 +1598,7 @@ def inspect_layout_quality(
 
     for vertex_id, deltas in suspect_vertices.items():
         moved = vertices_by_id[vertex_id]
-        moved_box = visual_boxes[moved.name]
+        moved_box = visual_boxes_by_id[vertex_id]
         incident_ids = set(incident_edges_by_vertex[vertex_id])
         old_bends = sum(max(0, len(edge_points[edge_id]) - 2) for edge_id in incident_ids)
         old_segments = [
@@ -1655,11 +1717,12 @@ def inspect_layout_quality(
                             other = document.vertices[index]
                             if other.cell_id in (source.cell_id, target.cell_id):
                                 continue
+                            other_box = visual_boxes_by_id[other.cell_id]
                             box = candidate_box if other.cell_id == vertex_id else (
-                                visual_boxes[other.name].left,
-                                visual_boxes[other.name].top,
-                                visual_boxes[other.name].right,
-                                visual_boxes[other.name].bottom,
+                                other_box.left,
+                                other_box.top,
+                                other_box.right,
+                                other_box.bottom,
                             )
                             hits += int(_segment_hits_rect(segment.a, segment.b, box))
                     nearby = [
@@ -1692,8 +1755,8 @@ def inspect_layout_quality(
                         + abs(segment.b[1] - segment.a[1])
                         for segment in option_segments
                     )
-                    source_box = visual_boxes[source.name]
-                    target_box = visual_boxes[target.name]
+                    source_box = visual_boxes_by_id[source.cell_id]
+                    target_box = visual_boxes_by_id[target.cell_id]
                     lead_violations = int(
                         len(option_points) > 2
                         and option_points[1][0]
@@ -1754,6 +1817,13 @@ def inspect_layout_quality(
                 and candidate_lead_violations <= old_lead_violations
             ):
                 avoidable_joint_coordinate_bends.extend(edge_ids)
+                moved_name = moved.logical_name or moved.name
+                if (
+                    logical_indegree[moved_name] == 0
+                    and physical_outdegree[vertex_id] == 1
+                    and old_crossings == 0
+                ):
+                    avoidable_zero_crossing_root_bends.extend(edge_ids)
                 break
             reasons = []
             if candidate_overlaps > old_overlaps:
@@ -1766,6 +1836,9 @@ def inspect_layout_quality(
                 joint_coordinate_tradeoffs.setdefault(edge_id, []).extend(reasons)
 
     avoidable_joint_coordinate_bends = sorted(set(avoidable_joint_coordinate_bends))
+    avoidable_zero_crossing_root_bends = sorted(
+        set(avoidable_zero_crossing_root_bends)
+    )
     joint_coordinate_tradeoffs = {
         edge_id: sorted(set(reasons))
         for edge_id, reasons in sorted(joint_coordinate_tradeoffs.items())
@@ -2241,6 +2314,10 @@ def inspect_layout_quality(
             for edge_id in avoidable_joint_coordinate_bends
         ]
         + [
+            f"avoidable-zero-crossing-root-bends:{edge_id}"
+            for edge_id in avoidable_zero_crossing_root_bends
+        ]
+        + [
             f"avoidable-exclusive-chain-bends:{edge_id}"
             for edge_id in avoidable_exclusive_chain_bends
         ]
@@ -2333,6 +2410,11 @@ def inspect_layout_quality(
                 if len(vertices) > 1
             },
             "avoidable_source_replicas": avoidable_source_replicas,
+            "root_facility_column_count": len(root_facility_columns),
+            "root_facility_column_separation_px": round(
+                root_column_separation, 3
+            ),
+            "root_facility_columns": root_facility_columns,
             "duplicate_node_names": duplicate_node_names,
             "type_mismatches": type_mismatches,
             "size_mismatches": size_mismatches,
@@ -2368,6 +2450,7 @@ def inspect_layout_quality(
             "avoidable_outer_detours": sorted(set(avoidable_outer_detours)),
             "avoidable_bend_edges": sorted(set(avoidable_bend_edges)),
             "avoidable_joint_coordinate_bend_edges": avoidable_joint_coordinate_bends,
+            "avoidable_zero_crossing_root_bend_edges": avoidable_zero_crossing_root_bends,
             "avoidable_exclusive_chain_bend_edges": avoidable_exclusive_chain_bends,
             "joint_coordinate_bend_tradeoffs": joint_coordinate_tradeoffs,
             "avoidable_crossing_edges": sorted(set(avoidable_crossing_edges)),

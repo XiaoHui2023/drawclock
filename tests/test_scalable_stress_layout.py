@@ -697,6 +697,14 @@ def test_low_use_roots_move_to_their_latest_feasible_middle_column() -> None:
         for index in range(8)
     )
     assert quality["line_integrity"]["distinct_crossing_points"] == 0
+    assert quality["line_integrity"][
+        "avoidable_zero_crossing_root_bend_edges"
+    ] == []
+    assert quality["alignment"]["root_facility_column_count"] == 2
+    assert sorted(
+        column["facility_count"]
+        for column in quality["alignment"]["root_facility_columns"]
+    ) == [1, 8]
     assert quality["passed"] is True
 
 
@@ -1532,6 +1540,68 @@ def test_joint_coordinate_refinement_accepts_only_a_global_dominance() -> None:
     assert quality["line_integrity"]["bends_total"] == 2
     assert quality["line_integrity"]["avoidable_joint_coordinate_bend_edges"] == []
     assert quality["passed"] is True
+
+
+def test_quality_gate_rejects_zero_crossing_bend_on_movable_root_facility() -> None:
+    config = {
+        "root": {"kind": "from"},
+        "gate": {"kind": "gate", "source": "root"},
+        "clock": {"kind": "clock", "source": "gate"},
+    }
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    root = next(vertex for vertex in document.vertices if vertex.name == "root")
+    edge = next(item for item in document.edges if item.source_id == root.cell_id)
+    target = by_id[edge.target_id]
+    root.y += 56.0
+    logical_edges = build_logical_edges(
+        config,
+        resolve_nodes(
+            config,
+            load_library_shapes(LIBRARY),
+            {},
+            library_path=LIBRARY,
+        ),
+        LIBRARY,
+    )
+    logical = logical_edges[int(edge.cell_id[1:]) - 1]
+    start = abs_port_xy(
+        root.x,
+        root.y,
+        root.width,
+        root.height,
+        root.style,
+        root.drawclock_type,
+        logical.source_port,
+    )
+    end = abs_port_xy(
+        target.x,
+        target.y,
+        target.width,
+        target.height,
+        target.style,
+        target.drawclock_type,
+        logical.target_port,
+    )
+    lane_x = (start[0] + end[0]) / 2.0
+    edge.waypoints = ((lane_x, start[1]), (lane_x, end[1]))
+
+    quality = inspect_layout_quality(
+        config,
+        document,
+        library_path=LIBRARY,
+        grid=0.0001,
+        tolerance=0.01,
+    )
+
+    assert quality["line_integrity"][
+        "avoidable_zero_crossing_root_bend_edges"
+    ] == [edge.cell_id]
+    assert (
+        f"avoidable-zero-crossing-root-bends:{edge.cell_id}"
+        in quality["hard_failures"]
+    )
+    assert quality["passed"] is False
 
 
 def test_quality_gate_rejects_movable_exclusive_chain_dogleg() -> None:

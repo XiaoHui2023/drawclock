@@ -16,6 +16,7 @@ import xml.etree.ElementTree as ET
 from collections import Counter, defaultdict
 from dataclasses import dataclass
 from pathlib import Path
+from statistics import median
 from typing import Any, Iterable
 
 
@@ -30,6 +31,8 @@ ISSUES = (
     "FB-PORT-006",
     "FB-ROUTE-009",
     "FB-ROOT-010",
+    "FB-BEND-011",
+    "FB-ROOT-012",
 )
 
 
@@ -40,10 +43,25 @@ class Box:
     y: float
     w: float
     h: float
+    visible_x: float | None = None
+    visible_y: float | None = None
+    visible_w: float | None = None
+    visible_h: float | None = None
 
     @property
     def cy(self) -> float:
         return self.y + self.h / 2
+
+    @property
+    def visual_bounds(self) -> tuple[float, float, float, float]:
+        if None not in (self.visible_x, self.visible_y, self.visible_w, self.visible_h):
+            return (
+                float(self.visible_x),
+                float(self.visible_y),
+                float(self.visible_x) + float(self.visible_w),
+                float(self.visible_y) + float(self.visible_h),
+            )
+        return self.x, self.y, self.x + self.w, self.y + self.h
 
     def contains(self, point: tuple[float, float], tolerance: float = 0.6) -> bool:
         return (
@@ -154,10 +172,26 @@ def parse_svg(path: Path, node_names: set[str] | None = None) -> tuple[list[Box]
             None,
         )
         if graphic is not None:
-            boxes.append(Box(node, *map(float, (
+            x, y, width, height = map(float, (
                 graphic.get("x", "0"), graphic.get("y", "0"),
                 graphic.get("width", "0"), graphic.get("height", "0"),
-            ))))
+            ))
+            left, top, right, bottom = x, y, x + width, y + height
+            for label in (child for child in group if child.tag == f"{NS}text"):
+                value = "".join(label.itertext())
+                size = float(label.get("font-size", "11"))
+                anchor_x = float(label.get("x", "0"))
+                baseline_y = float(label.get("y", "0"))
+                label_width = max(size, len(value) * size * 0.7)
+                anchor = label.get("text-anchor", "start")
+                label_left = anchor_x - (
+                    label_width / 2 if anchor == "middle" else label_width if anchor == "end" else 0
+                )
+                left = min(left, label_left)
+                right = max(right, label_left + label_width)
+                top = min(top, baseline_y - size)
+                bottom = max(bottom, baseline_y + size * 0.25)
+            boxes.append(Box(node, x, y, width, height, left, top, right - left, bottom - top))
     if not boxes and node_names:
         for foreign in root.iter(f"{NS}foreignObject"):
             tokens = {text.strip() for text in foreign.itertext() if text.strip()}
@@ -326,6 +360,35 @@ def _rect_interior_hit(a: tuple[float, float], b: tuple[float, float], box: Box)
     return True
 
 
+def _visual_rect_interior_hit(
+    a: tuple[float, float], b: tuple[float, float], box: Box
+) -> bool:
+    left, top, right, bottom = box.visual_bounds
+    if abs(a[1] - b[1]) <= EPS:
+        lo, hi = sorted((a[0], b[0]))
+        return top + EPS < a[1] < bottom - EPS and max(lo, left) + EPS < min(hi, right)
+    if abs(a[0] - b[0]) <= EPS:
+        lo, hi = sorted((a[1], b[1]))
+        return left + EPS < a[0] < right - EPS and max(lo, top) + EPS < min(hi, bottom)
+    return True
+
+
+def _visual_boxes_overlap(left_box: Box, right_box: Box) -> bool:
+    left = left_box.visual_bounds
+    right = right_box.visual_bounds
+    return (
+        max(left[0], right[0]) < min(left[2], right[2]) - EPS
+        and max(left[1], right[1]) < min(left[3], right[3]) - EPS
+    )
+
+
+def _endpoint_box(point: tuple[float, float], boxes: list[Box]) -> Box | None:
+    candidates = [box for box in boxes if box.contains(point, 0.01)]
+    if not candidates:
+        return None
+    return min(candidates, key=lambda box: (abs(box.cy - point[1]), box.x, box.y))
+
+
 def _cross_count_for_segment(a: tuple[float, float], b: tuple[float, float], route: Route, routes: list[Route]) -> int:
     count = 0
     for other in routes:
@@ -464,6 +527,221 @@ def _overlap_count_for_route(route: Route, routes: list[Route]) -> int:
         if other is not route and not same_net(other, route)
         for c, d in segments(other)
     )
+
+
+def _vertical_root_facility_bend_witnesses(
+    roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Detect a y-only root-facility move that strictly removes bends."""
+    boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+    for box in boxes:
+        boxes_by_node[box.node].append(box)
+    routes_by_facility: dict[tuple[str, float, float], list[Route]] = defaultdict(list)
+    source_box_by_key: dict[tuple[str, float, float], Box] = {}
+    for route in routes:
+        if route.source not in roots:
+            continue
+        source_box = _endpoint_box(route.points[0], boxes_by_node[route.source])
+        if source_box is None:
+            continue
+        key = (route.source, source_box.x, source_box.y)
+        source_box_by_key[key] = source_box
+        routes_by_facility[key].append(route)
+
+    witnesses = []
+    for key, facility_routes in sorted(routes_by_facility.items()):
+        if len(facility_routes) != 1:
+            continue
+        route = facility_routes[0]
+        actual_bends = max(0, len(route.points) - 2)
+        actual_crossings = _cross_count_for_route(route, routes)
+        if actual_bends == 0 or actual_crossings:
+            continue
+        source_box = source_box_by_key[key]
+        target_box = _endpoint_box(route.points[-1], boxes_by_node[route.target])
+        if target_box is None:
+            continue
+        delta_y = route.points[-1][1] - route.points[0][1]
+        if abs(delta_y) <= EPS:
+            continue
+        visible_left, visible_top, visible_right, visible_bottom = source_box.visual_bounds
+        moved = Box(
+            source_box.node,
+            source_box.x,
+            source_box.y + delta_y,
+            source_box.w,
+            source_box.h,
+            visible_left,
+            visible_top + delta_y,
+            visible_right - visible_left,
+            visible_bottom - visible_top,
+        )
+        if any(
+            box is not source_box and _visual_boxes_overlap(moved, box)
+            for box in boxes
+        ):
+            continue
+        moved_start = (route.points[0][0], route.points[-1][1])
+        end = route.points[-1]
+        if moved_start[0] >= end[0] - EPS:
+            continue
+        if any(
+            box is not source_box
+            and box is not target_box
+            and _visual_rect_interior_hit(moved_start, end, box)
+            for box in boxes
+        ):
+            continue
+        if any(
+            other is not route
+            and any(_visual_rect_interior_hit(a, b, moved) for a, b in segments(other))
+            for other in routes
+        ):
+            continue
+        candidate = [moved_start, end]
+        candidate_quality = _candidate_quality(
+            candidate,
+            route,
+            routes,
+            [box for box in boxes if box is not source_box and box is not target_box],
+        )
+        if candidate_quality is None:
+            continue
+        crossings, overlaps, length = candidate_quality
+        actual_overlaps = _overlap_count_for_route(route, routes)
+        actual_length = sum(
+            abs(b[0] - a[0]) + abs(b[1] - a[1]) for a, b in segments(route)
+        )
+        if (
+            crossings <= actual_crossings
+            and overlaps <= actual_overlaps
+            and length <= actual_length + EPS
+        ):
+            witnesses.append({
+                "edge_id": route.edge_id,
+                "source": route.source,
+                "target": route.target,
+                "physical_anchor_edges": 1,
+                "delta_y": round(delta_y, 4),
+                "bends_before": actual_bends,
+                "bends_after": 0,
+                "crossings_before": actual_crossings,
+                "crossings_after": crossings,
+                "overlaps_before": actual_overlaps,
+                "overlaps_after": overlaps,
+                "length_before": round(actual_length, 4),
+                "length_after": round(length, 4),
+                "candidate": [list(point) for point in candidate],
+            })
+    return witnesses
+
+
+def _root_facility_column_lag_witnesses(
+    roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Find one-edge root facilities dominated by a later used root column."""
+    boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+    for box in boxes:
+        boxes_by_node[box.node].append(box)
+    routes_by_facility: dict[tuple[str, float, float], list[Route]] = defaultdict(list)
+    source_box_by_key: dict[tuple[str, float, float], Box] = {}
+    for route in routes:
+        if route.source not in roots:
+            continue
+        source_box = _endpoint_box(route.points[0], boxes_by_node[route.source])
+        if source_box is None:
+            continue
+        key = (route.source, source_box.x, source_box.y)
+        source_box_by_key[key] = source_box
+        routes_by_facility[key].append(route)
+    canonical_output_xs = sorted({route.points[0][0] for route in routes if route.source in roots})
+    root_column_separation = median(
+        box.visual_bounds[2] - box.visual_bounds[0]
+        for box in boxes if box.node in roots
+    ) / 2.0
+    witnesses = []
+    for key, facility_routes in sorted(routes_by_facility.items()):
+        if len(facility_routes) != 1:
+            continue
+        route = facility_routes[0]
+        source_box = source_box_by_key[key]
+        target_box = _endpoint_box(route.points[-1], boxes_by_node[route.target])
+        if target_box is None:
+            continue
+        actual_crossings = _cross_count_for_route(route, routes)
+        actual_overlaps = _overlap_count_for_route(route, routes)
+        actual_bends = max(0, len(route.points) - 2)
+        actual_length = _route_length(route)
+        for output_x in reversed(canonical_output_xs):
+            if not (
+                route.points[0][0] + root_column_separation < output_x
+                < route.points[-1][0] - EPS
+            ):
+                continue
+            delta_x = output_x - route.points[0][0]
+            delta_y = route.points[-1][1] - route.points[0][1]
+            visual_left, visual_top, visual_right, visual_bottom = source_box.visual_bounds
+            moved = Box(
+                source_box.node,
+                source_box.x + delta_x,
+                source_box.y + delta_y,
+                source_box.w,
+                source_box.h,
+                visual_left + delta_x,
+                visual_top + delta_y,
+                visual_right - visual_left,
+                visual_bottom - visual_top,
+            )
+            if any(
+                box is not source_box and _visual_boxes_overlap(moved, box)
+                for box in boxes
+            ):
+                continue
+            candidate = _copy_route(route, [(output_x, route.points[-1][1]), route.points[-1]])
+            if any(
+                box is not source_box
+                and box is not target_box
+                and any(_visual_rect_interior_hit(a, b, box) for a, b in segments(candidate))
+                for box in boxes
+            ):
+                continue
+            if any(
+                other is not route
+                and any(_visual_rect_interior_hit(a, b, moved) for a, b in segments(other))
+                for other in routes
+            ):
+                continue
+            after = _route_interactions(candidate, routes)
+            after_bends = max(0, len(candidate.points) - 2)
+            after_length = _route_length(candidate)
+            if (
+                after[1] <= actual_crossings
+                and after[2] <= actual_overlaps
+                and after_bends <= actual_bends
+                and after_length < actual_length - EPS
+                and (
+                    after[1] < actual_crossings
+                    or after_bends < actual_bends
+                )
+            ):
+                witnesses.append({
+                    "root": route.source,
+                    "edge_id": route.edge_id,
+                    "target": route.target,
+                    "physical_anchor_edges": 1,
+                    "output_x_before": round(route.points[0][0], 4),
+                    "output_x_after": round(output_x, 4),
+                    "crossing_events_before": actual_crossings,
+                    "crossing_events_after": after[1],
+                    "overlaps_before": actual_overlaps,
+                    "overlaps_after": after[2],
+                    "bends_before": actual_bends,
+                    "bends_after": after_bends,
+                    "length_before": round(actual_length, 4),
+                    "length_after": round(after_length, 4),
+                })
+                break
+    return witnesses
 
 
 def _endpoint_box_index(
@@ -1015,6 +1293,12 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     physical_anchor_relocation_witnesses = (
         _physical_anchor_relocation_witnesses(roots, routes, boxes)
     )
+    vertical_root_facility_bend_witnesses = (
+        _vertical_root_facility_bend_witnesses(roots, routes, boxes)
+    )
+    root_facility_column_lag_witnesses = (
+        _root_facility_column_lag_witnesses(roots, routes, boxes)
+    )
     detected = {
         # Mixed kinds are only a precondition.  A defect is present only when
         # an ordinary zero-indegree component also exhibits the measured root
@@ -1031,6 +1315,8 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         "FB-PORT-006": bool(port_inversions),
         "FB-ROUTE-009": bool(root_facility_split_witnesses),
         "FB-ROOT-010": bool(physical_anchor_relocation_witnesses),
+        "FB-BEND-011": bool(vertical_root_facility_bend_witnesses),
+        "FB-ROOT-012": bool(root_facility_column_lag_witnesses),
     }
     route_row_by_id = {row["edge_id"]: row for row in route_rows}
     node_statistics = {}
@@ -1122,6 +1408,12 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             "root_facility_split_witnesses": root_facility_split_witnesses,
             "physical_anchor_relocation_witnesses": (
                 physical_anchor_relocation_witnesses
+            ),
+            "vertical_root_facility_bend_witnesses": (
+                vertical_root_facility_bend_witnesses
+            ),
+            "root_facility_column_lag_witnesses": (
+                root_facility_column_lag_witnesses
             ),
         },
         "detected_issues": [issue for issue in ISSUES if detected[issue]],

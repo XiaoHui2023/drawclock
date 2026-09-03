@@ -138,6 +138,57 @@
       ],
       "reproduction_receipt": ".reproduction/receipts/FB-ROOT-010.json",
       "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-010.json"}
+    },
+    {
+      "id": "FB-BEND-011",
+      "summary": "无异网交叉的根支路仍存在可避免折点",
+      "expected": "每条路线若存在保持精确端口、避开器件与文字、不增加异网重叠或交叉且严格减少折点的可行路线，则采用该支配路线；不能把原始折点数本身当作失败",
+      "actual": "用户指出包含 weave__public_from 与 weave__merge7 的最终 SVG 中该连接出现奇怪折点，现有质量结果未阻断",
+      "status": "closed",
+      "owner_paths": ["src/**"],
+      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
+      "baseline_revision": "deaefc9c2205fbfaf63e70121cb7c378f39bfcef",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "arc"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/26-feedback-reproduction-combined.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-011", "--input", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "公开 CLI 原始 SVG 中的路线存在被完整几何反事实严格支配的无交叉折点",
+      "reproduction_does_not_prove": "任意无交叉折线都不合理；端口纵差、障碍物或共享干线所需折点仍可成立",
+      "reproduction_attempts": [
+        {"attempted_at": "2026-09-04T00:30:00+08:00", "hypothesis": "用户指定路线存在于 final-medium.svg。", "method": "逐字搜索 final-medium.svg 与同目录 final-combined.svg 的节点身份，并检查 SVG 旁的输入来源元数据。", "result": "reproduction_blocked", "observed": "final-medium.svg 不含 weave__public_from 或 weave__merge7；weave__public_from 存在于 final-combined.svg，旁路质量 JSON 将该文件绑定到 26-feedback-reproduction-combined.json。", "analysis": "用户给出的文件名与实际节点所在产物不同，必须改用含该边且输入血缘可验证的 final-combined.svg 继续，不得把错误文件绑定为复现证据。", "why_not_reproduced": "尚未由独立 Oracle 完整绑定 weave__public_from→weave__merge7 的端口、航点与反事实路线。", "evidence": "example/out/final-medium.svg; example/out/final-combined.svg; example/out/final-combined.quality.json", "next_condition": "扩展独立 Oracle 后，以当前冻结 revision 经公开 CLI 双跑，证明该路线由更少折点且不增加高优先级缺陷的路线严格支配。"},
+        {"attempted_at": "2026-09-04T01:23:00+08:00", "hypothesis": "新增多对多 case 可为 011/012 签发冻结自然复现收据。", "method": "完整运行 60-case 结构门及冻结公开 CLI 语料。", "result": "reproduction_blocked", "observed": "全部入口运行后，runner 在签发新问题收据时抛出 KeyError: reproduction_receipt。", "analysis": "问题账本缺少收据输出路径，运行结果不能形成可消费证据；半成品不可升级状态。", "why_not_reproduced": "签名阶段失败，未生成绑定问题合同的正式收据。", "evidence": "runner stderr KeyError: reproduction_receipt", "next_condition": "补齐两项收据路径并从头完整重跑。"},
+        {"attempted_at": "2026-09-04T01:28:00+08:00", "hypothesis": "冻结 deaefc9c 的组合输入会稳定产生无交叉但被纵向同轴反事实支配的根设施折线。", "method": "从公开 CLI 完整生成两次原始 SVG；独立 Oracle 读取最终端点、物理设施和保守文字框，未改写产物。", "result": "reproduced", "observed": "两次 SVG 哈希一致；weave__public_from→weave__merge_07 均为 2→0 折点、549.4573→500.46px，交叉与异网重叠保持 0；另有 public_source→merge_03 同类见证。", "analysis": "固定端点换线无法消除 H-V-H；缺失自由度是单边根显示设施的纵坐标与路线联合选择。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-011.json", "next_condition": "以通用物理设施坐标候选修复，并在当前源码双跑中让该直接见证消失。"}
+      ],
+      "reproduction_receipt": ".reproduction/receipts/FB-BEND-011.json",
+      "fix_verification": {
+        "baseline_fails": true,
+        "current_passes": true,
+        "receipt": ".reproduction/fix-receipts/FB-BEND-011.json"
+      }
+    },
+    {
+      "id": "FB-ROOT-012",
+      "summary": "无交叉收益时自由零入度根仍不必要停在首列或分散列",
+      "expected": "无显式列约束的零入度设施在不增加交叉、碰撞、异网重叠和可避免折点时优先形成稳定整齐的局部列；只有严格改善更高优先级几何时才偏离",
+      "actual": "用户观察到多个 source 仍位于第一列且未见减少交叉的必要性，整体排列不够整齐",
+      "status": "closed",
+      "owner_paths": ["src/**"],
+      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
+      "baseline_revision": "deaefc9c2205fbfaf63e70121cb7c378f39bfcef",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "arc"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/26-feedback-reproduction-combined.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-012", "--input", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "公开 CLI 原始 SVG 中存在自由零入度设施，其偏离局部规范列没有带来高优先级几何收益并被整列候选严格支配",
+      "reproduction_does_not_prove": "所有图根都必须固定首列，或具有显式 layout_column、远距消费域、交叉收益的根也应强制同列",
+      "reproduction_attempts": [
+        {"attempted_at": "2026-09-04T01:23:00+08:00", "hypothesis": "新增多对多 case 可为 011/012 签发冻结自然复现收据。", "method": "完整运行 60-case 结构门及冻结公开 CLI 语料。", "result": "reproduction_blocked", "observed": "全部入口运行后，runner 在签发新问题收据时抛出 KeyError: reproduction_receipt。", "analysis": "问题账本缺少收据输出路径，运行结果不能形成可消费证据；半成品不可升级状态。", "why_not_reproduced": "签名阶段失败，未生成绑定问题合同的正式收据。", "evidence": "runner stderr KeyError: reproduction_receipt", "next_condition": "补齐两项收据路径并从头完整重跑。"},
+        {"attempted_at": "2026-09-04T01:28:00+08:00", "hypothesis": "冻结组合图的首列/早列单边根设施可进入另一根已使用的视觉列，并在不增加交叉时同时变直和缩短。", "method": "公开 CLI 双跑；独立 Oracle 只枚举最终 SVG 已使用的根输出列，按可视宽度聚类列并移动完整设施与端口。", "result": "reproduced", "observed": "两次 SVG 哈希一致；weave__public_from→weave__merge_07 的输出 x 可由 163.93 到 565.09，2→0 折点、549.4573→99.3px，交叉和异网重叠均保持 0；共 4 条跨视觉列见证。", "analysis": "当前设施迁移只在交叉收益或向右列搜索链被触发时工作，未把已使用根列的整齐性与零交叉支配纳入完整候选。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-012.json", "next_condition": "以拓扑根、物理服务边和既有视觉列为通用输入修复；显式列约束与真正交叉收益反例保持不变。"}
+      ],
+      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-012.json",
+      "fix_verification": {
+        "baseline_fails": true,
+        "current_passes": true,
+        "receipt": ".reproduction/fix-receipts/FB-ROOT-012.json"
+      }
     }
   ],
   "process_incidents": [
