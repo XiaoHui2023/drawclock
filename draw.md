@@ -77,4 +77,7 @@ drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 drawclock -i example/draw.json -l libraries/source.xml libraries/components -l libraries/project -o clock-tree.svg
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg --crossing-style gap
 drawclock -i example/auto-layout/22-terminal-frequency-table.json -l drawio-lib/drawclock -o terminal-frequency.svg
+drawclock -i example/auto-layout/25-mixed-root-port-order-torture.json -l drawio-lib/drawclock -o mixed-root-torture.svg
 ```
+
+`25-mixed-root-port-order-torture.json` 混合使用 `source`、`from` 和无上级的普通输出器件，交叉覆盖公共根复用、单连接根靠近 pad、固定输入端口顺序、共享干线与直连最少拐点。

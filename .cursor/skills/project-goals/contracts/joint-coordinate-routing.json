@@ -94,6 +94,7 @@
     "Spatial indexing and suspect-window filtering keep work near linear on repeated large structures"
   ],
   "allowed_variables": [
+    "zero-indegree node x coordinates inside their topology-feasible open interval",
     "node y coordinates within rank-order constraints",
     "orthogonal route channels and waypoints",
     "deterministic optimization iteration order",
@@ -138,6 +139,8 @@
     "no removable rendering replica"
   ],
   "failure_fixtures": [
+    "mixed source/from/gate roots feeding rotated pad3 ports",
+    "one-use roots sharing the first column with a high-reuse common root",
     "asymmetric merge long branch b",
     "mirrored asymmetric merge long branch a",
     "mutated library geometry and port anchors"

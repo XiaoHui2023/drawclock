@@ -39,6 +39,7 @@ EXAMPLES = (
     "22-terminal-frequency-table",
     "23-middle-column-low-use-sources",
     "24-single-source-rendering-alias",
+    "25-mixed-root-port-order-torture",
 )
 
 

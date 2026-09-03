@@ -132,6 +132,7 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
             "22-terminal-frequency-table.json",
             "23-middle-column-low-use-sources.json",
             "24-single-source-rendering-alias.json",
+            "25-mixed-root-port-order-torture.json",
     )
     for name in packaged_layout_examples:
         (project / "example" / "auto-layout" / name).write_text("{}", encoding="utf-8")

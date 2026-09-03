@@ -300,6 +300,44 @@ def build_middle_column_low_use_sources(
     return config
 
 
+def build_mixed_root_port_order_torture(
+    domain_count: int = 12,
+) -> dict[str, dict[str, object]]:
+    """Mixed-kind graph roots stress placement, port order, trunks and bends."""
+    config: dict[str, dict[str, object]] = {
+        "common_source": {"kind": "source"},
+        "common_from": {"kind": "from"},
+        # ``gate`` deliberately has no upstream edge.  It proves that root
+        # treatment is derived from graph degree, not a component-name list.
+        "common_gate_root": {"kind": "gate"},
+    }
+    root_kinds = ("from", "source", "gate")
+    for index in range(domain_count):
+        suffix = f"{index:02d}"
+        local_a = f"local_a_{suffix}"
+        local_b = f"local_b_{suffix}"
+        config[local_a] = {"kind": root_kinds[index % len(root_kinds)]}
+        config[local_b] = {"kind": root_kinds[(index + 1) % len(root_kinds)]}
+        common = ("common_source", "common_from", "common_gate_root")[index % 3]
+        # Rotate logical declaration order independently from fixed pad ports.
+        # A good layout orders the two one-use roots by their destination ports
+        # and lets them occupy a late feasible column beside this pad.
+        inputs = (
+            {"0": common, "1": local_a, "2": local_b},
+            {"0": local_b, "1": common, "2": local_a},
+            {"0": local_a, "1": local_b, "2": common},
+        )[index % 3]
+        pad = f"pad_{suffix}"
+        config[pad] = {"kind": "pad3", "source": inputs}
+        tail = pad
+        if index % 2:
+            config[f"div_{suffix}"] = {"kind": "div", "source": tail}
+            tail = f"div_{suffix}"
+        config[f"cell_{suffix}"] = {"kind": "cell", "source": tail}
+        config[f"clock_{suffix}"] = {"kind": "clock", "source": f"cell_{suffix}"}
+    return config
+
+
 def build_asymmetric_merge_route_bulge(
     *, long_branch: str = "b"
 ) -> dict[str, dict[str, object]]:
@@ -449,6 +487,7 @@ def main() -> int:
         ("20-asymmetric-merge-route-bulge", build_asymmetric_merge_route_bulge()),
         ("23-middle-column-low-use-sources", build_middle_column_low_use_sources()),
         ("24-single-source-rendering-alias", build_single_source_rendering_alias()),
+        ("25-mixed-root-port-order-torture", build_mixed_root_port_order_torture()),
     )
     for name, config in structural:
         (OUTPUT / f"{name}.json").write_text(

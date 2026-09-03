@@ -2,8 +2,8 @@
 
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `records/free-source-coverage-observability.md` | record | active | 2026-09-02 14:42 +08:00 | 2026-09-03 05:00 +08:00 | 自由源分层、逐节点/逐边统计与特性覆盖闭环 | Windows clean 包的冻结/源码全新目录消费与摘要已闭合。 |
-| `analysis/free-source-test-space-research.md` | analysis | active | 2026-09-02 14:42 +08:00 | 2026-09-03 05:00 +08:00 | 自由布局、图几何统计与组合覆盖研究 | 托管 Linux 仍独立负责 staticx、librsvg 与远端下载消费。 |
+| `records/free-source-coverage-observability.md` | record | active | 2026-09-02 14:42 +08:00 | 2026-09-03 12:18 +08:00 | 自由源分层、逐节点/逐边统计与特性覆盖闭环 | 最新源码定向门通过；本地 SVG 已归为可再生演示产物，JSON 纳入发行。 |
+| `analysis/free-source-test-space-research.md` | analysis | active | 2026-09-02 14:42 +08:00 | 2026-09-03 10:20 +08:00 | 自由布局、图几何统计与组合覆盖研究 | 新增混合根、split-rejoin、端口纵序与完整反事实覆盖矩阵。 |
 | `records/routing-attribution-row-budget.md` | record | done | 2026-09-02 10:14 +08:00 | 2026-09-02 12:36 +08:00 | 通用零入度源显示副本与逐边/逐源路由归因 | 任意设施分区、独立归因、规模性能、本地与最终远端冻结/源码消费均已闭环。 |
 | `records/one-component-library-files.md` | record | done | 2026-08-26 09:42 +08:00 | 2026-08-26 10:21 +08:00 | 器件库从单文件全集迁移为一文件一器件 | 新结构、本地与远端发行消费均已通过。 |
 | `records/release-project-skills.md` | record | done | 2026-08-25 16:30 +08:00 | 2026-08-25 17:53 +08:00 | 发布项目 Skills | 五个脱敏项目 skill、渐进披露、包内完整性与发布复验。 |

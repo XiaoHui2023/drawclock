@@ -3381,6 +3381,7 @@ def _relocate_root_rendering_anchors(
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     """Move each already justified root anchor to a non-dominated later column."""
     indegree = Counter(edge.target for edge in logical_edges)
+    outdegree = Counter(edge.source for edge in logical_edges)
     accepted = _clone_layout_geometry(document)
     accepted_report = (
         accepted_assessment
@@ -3410,11 +3411,13 @@ def _relocate_root_rendering_anchors(
             for vertex in accepted.vertices
             if (vertex.logical_name or vertex.name) == root
         ]
-        # Single logical roots already receive their latest feasible rank from
-        # the topology layerer.  This phase owns only independently movable
-        # physical aliases created for a dispersed fanout; reconsidering every
-        # ordinary root would repeat global assessment once per node.
-        if len(logical_anchors) <= 1:
+        if not logical_anchors:
+            continue
+        # A lone high-fanout root is owned by the preceding facility
+        # partitioner.  Reassessing its complete edge set here duplicates
+        # global work.  This stage adds the formerly missing one-use-root case
+        # and still relocates every independently created physical facility.
+        if len(logical_anchors) == 1 and outdegree[root] > 1:
             continue
         anchor_ids = {anchor.cell_id for anchor in logical_anchors}
         edge_indices_by_anchor: dict[str, list[int]] = defaultdict(list)
@@ -3451,6 +3454,14 @@ def _relocate_root_rendering_anchors(
                 target_left = min(
                     vertex_visual_box(target).left for target in targets
                 )
+                right_overhang = vertex_visual_box(anchor).right - anchor.x
+                continuous_latest = (
+                    target_left - profile.route_clearance - right_overhang
+                )
+                anchor_columns = (
+                    [*canonical_columns, continuous_latest]
+                    if outdegree[root] == 1 else canonical_columns
+                )
                 if any(
                     column_x > anchor.x + 1e-6
                     and all(column_x < target.x - 1e-6 for target in targets)
@@ -3460,7 +3471,7 @@ def _relocate_root_rendering_anchors(
                         + profile.route_clearance
                         <= target_left + 1e-6
                     )
-                    for column_x in canonical_columns
+                    for column_x in anchor_columns
                 ):
                     scope_can_move = True
                     break
@@ -3505,7 +3516,15 @@ def _relocate_root_rendering_anchors(
                 ]
                 target_left = min(vertex_visual_box(target).left for target in targets)
                 feasible = []
-                for column_x in canonical_columns:
+                right_overhang = vertex_visual_box(anchor).right - anchor.x
+                continuous_latest = (
+                    target_left - profile.route_clearance - right_overhang
+                )
+                anchor_columns = (
+                    [*canonical_columns, continuous_latest]
+                    if outdegree[root] == 1 else canonical_columns
+                )
+                for column_x in anchor_columns:
                     probe = copy.copy(anchor)
                     probe.x = column_x
                     if (

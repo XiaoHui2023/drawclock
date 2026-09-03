@@ -201,6 +201,7 @@ def inspect_layout_quality(
                 grid_violations.append(vertex.name)
 
     rank_spreads: dict[str, float] = {}
+    rank_indegree = Counter(edge.target for edge in logical_edges)
     # Compare like geometry with like geometry.  Different component types can
     # have different transparent left insets even when their connection axes
     # are aligned, so a raw mixed-shape left-edge comparison is a false reject.
@@ -214,6 +215,10 @@ def inspect_layout_quality(
             if ranks[name] == rank
             and name in vertices_by_name
             and len(logical_vertices[name]) == 1
+            and (
+                rank_indegree[name] > 0
+                or "layout_column" in config[name]
+            )
             and vertices_by_name[name].drawclock_type == shape_type
         ]
         rank_spreads[f"{rank}:{shape_type}"] = max(xs) - min(xs) if xs else 0.0
@@ -967,6 +972,22 @@ def inspect_layout_quality(
         if all(
             logical_indegree[observed_edge_ports[edge_id][0]] > 0
             and logical_outdegree[observed_edge_ports[edge_id][0]] <= 2
+            for edge_id in pair
+        )
+    })
+    root_merge_input_order_inversions = sorted({
+        pair
+        for pair in merge_input_order_inversions
+        if all(
+            logical_indegree[observed_edge_ports[edge_id][0]] == 0
+            for edge_id in pair
+        )
+    })
+    avoidable_root_merge_input_crossings = sorted({
+        pair
+        for pair in root_merge_input_order_inversions
+        if any(
+            logical_outdegree[observed_edge_ports[edge_id][0]] == 1
             for edge_id in pair
         )
     })
@@ -2186,6 +2207,10 @@ def inspect_layout_quality(
             f"avoidable-local-merge-input-crossing:{a}/{b}"
             for a, b in avoidable_local_merge_input_crossings
         ]
+        + [
+            f"avoidable-root-merge-input-crossing:{a}/{b}"
+            for a, b in avoidable_root_merge_input_crossings
+        ]
         + [f"avoidable-outer-detour:{edge_id}" for edge_id in avoidable_outer_detours]
         + [f"fragmented-fanout:{net}" for net in fragmented_fanouts]
         + [f"overlap:{a}/{b}" for a, b in ambiguous_overlaps]
@@ -2306,6 +2331,8 @@ def inspect_layout_quality(
             "merge_input_crossings": merge_input_crossings,
             "merge_input_order_inversions": merge_input_order_inversions,
             "avoidable_local_merge_input_crossings": avoidable_local_merge_input_crossings,
+            "root_merge_input_order_inversions": root_merge_input_order_inversions,
+            "avoidable_root_merge_input_crossings": avoidable_root_merge_input_crossings,
             "zigzag_edges": sorted(set(zigzag_edges)),
             "ambiguous_overlaps": [list(pair) for pair in ambiguous_overlaps],
             "crossings": crossing_pair_intersections,

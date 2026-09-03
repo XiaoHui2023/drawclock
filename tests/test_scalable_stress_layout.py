@@ -37,6 +37,7 @@ from scripts.build_stress_examples import build_dispersed_root_fanout
 from scripts.build_stress_examples import build_single_source_rendering_alias
 from scripts.build_stress_examples import build_middle_column_low_use_sources
 from scripts.build_stress_examples import build_asymmetric_merge_route_bulge
+from scripts.build_stress_examples import build_mixed_root_port_order_torture
 from drawio_ports import abs_port_xy, edge_attachment, infer_port_from_attachment
 from drawio_layout import layout_from_dict, layout_to_dict
 
@@ -1251,6 +1252,30 @@ def test_root_replication_is_zero_indegree_driven_not_component_kind() -> None:
     assert len(anchors) > 1
     assert {vertex.drawclock_type for vertex in anchors} == {"gate"}
     assert quality["passed"] is True
+
+
+def test_mixed_graph_roots_are_placed_by_consumers_and_fixed_port_order() -> None:
+    config = build_mixed_root_port_order_torture()
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    line = quality["line_integrity"]
+    vertices = {vertex.name: vertex for vertex in document.vertices}
+
+    assert quality["passed"] is True
+    assert line["root_merge_input_order_inversions"] == []
+    assert line["avoidable_root_merge_input_crossings"] == []
+    moved = 0
+    for index in range(12):
+        pad_x = vertices[f"pad_{index:02d}"].x
+        for prefix in ("local_a", "local_b"):
+            root = vertices[f"{prefix}_{index:02d}"]
+            moved += root.x > vertices["common_source"].x
+            assert root.x < pad_x
+    assert moved >= 18
+    assert line["avoidable_bend_edges"] == []
+    assert quality["readability"]["fragmented_fanout_sources"] == {}
 
 
 def test_rendering_replica_identity_survives_layout_serialization() -> None:
