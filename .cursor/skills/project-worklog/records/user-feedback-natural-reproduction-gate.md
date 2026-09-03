@@ -342,3 +342,5 @@
 - 最终反馈 release/complete 门分别耗时 0.57/0.62 秒，42 项反馈、Oracle、覆盖与发行 Skill 专项 6.08 秒全通过；最新 fix-evidence 的 66 个文件均可被 Git 追踪。
 - Windows 静态包构建约 33.75 秒成功。ZIP 为 8,333,531 bytes、151 个文件、26 个布局 JSON、7 个项目 Skills，未包含 `runtime/` 或 `node_modules/`；全新临时目录解压后冻结入口约 42.02 秒通过，标准库源码隔离部署 11.19 秒通过。
 - 发行前记录一致性审计发现目标页仍写修复前的下一步与六项开放状态；现按机器账本更新为 8 项已关闭、本地 443 项和静态包已通过，目标继续保持 active，直到远端 Release 资产下载消费完成。
+- commit `7aa0526` 推送 main 耗时 5.44 秒。远端 run `33776334314` 全部成功：反馈门约 6 秒，Ubuntu 16.04 构建与解压 frozen/source/librsvg 门约 165 秒，publish 与从 Release URL 再下载 smoke 约 95 秒。
+- `v1.0.0` 已移动到 `7aa0526`，`v0.0.0` 仍为 `8befc99`。远端 Linux 资产 17,237,791 bytes，SHA-256 `9409ac5115ad61fa05252a940f6c221cee763b243c35808b5262d798dcf55121`，148 个文件、26 个 auto-layout JSON、7 个项目 Skills、Runtime/npm 为零；再次独立下载后的标准库源码消费耗时 10.70 秒并通过。本记录进入 done。
