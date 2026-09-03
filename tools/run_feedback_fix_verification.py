@@ -35,7 +35,9 @@ def canonical(value: Any) -> str:
 def source_tree_hash() -> str:
     files = sorted(
         path for path in (ROOT / "src").rglob("*")
-        if path.is_file() and "__pycache__" not in path.parts
+        if path.is_file()
+        and "__pycache__" not in path.parts
+        and not any(part.endswith(".egg-info") for part in path.parts)
     )
     return canonical([(path.relative_to(ROOT).as_posix(), sha(path)) for path in files])
 

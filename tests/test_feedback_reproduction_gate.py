@@ -45,6 +45,18 @@ class FeedbackReproductionGateTest(unittest.TestCase):
             crlf.write_bytes(b"first\r\nsecond\r\n")
             self.assertEqual(module._sha(lf), module._sha(crlf))
 
+    def test_source_hash_ignores_generated_egg_info(self) -> None:
+        spec = importlib.util.spec_from_file_location("drawclock_feedback_checker", CHECKER)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        before = module._tree_hash(ROOT / "src")
+        with tempfile.TemporaryDirectory(dir=ROOT / "src", suffix=".egg-info") as directory:
+            (Path(directory) / "PKG-INFO").write_text("generated\n", encoding="utf-8")
+            self.assertEqual(module._tree_hash(ROOT / "src"), before)
+        self.assertEqual(module._tree_hash(ROOT / "src"), before)
+
     def test_naturally_reproduced_issues_unlock_solution_phase(self) -> None:
         result = self.run_gate("solve")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
