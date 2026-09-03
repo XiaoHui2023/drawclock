@@ -1,6 +1,6 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
 - updated: 2026-09-03 23:58 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
@@ -268,3 +268,6 @@
 - commit `1e72af9` 上传后远端 run `33750211106` 仍在反馈门失败。使用 Git Credential Manager 仅向 GitHub API 发出认证读请求（未输出凭据），成功取得 job 日志；六项实际错误均为 `fix receipt library tree is stale`。同 commit 的远端 Windows clone 已通过，下一步按平台逐文件比较器件库身份。
 - 本地与远端器件库均为 50 个文件，无缺失、额外或逐文件规范哈希差异。根因是直接排序 `WindowsPath` 时大小写不敏感，`drawclock/...` 排在 `README.md` 前；Linux POSIX 顺序相反。树哈希改为先形成仓库相对 POSIX 字符串记录，再按固定大小写敏感字节序排序；新增独立构造记录的等价测试。
 - 第四次当前公开 CLI 双跑重签耗时 6.105 秒，verification `20260903T113811Z-63f51aa7` 六项 `failures=[]`；白名单同步到该批次。
+- commit `483b0df` 的远端 run `33750840011` 全部成功：反馈门 11:39:04–11:39:10（约 6 秒），Ubuntu 16.04 构建与解压 frozen/source/librsvg 门 11:39:18–11:41:51（约 153 秒），发布及远端 Release 再下载 smoke 11:42:00–11:43:27（约 87 秒）。
+- `v1.0.0` 已移动到 `483b0df`，`v0.0.0` 仍保持 `8befc99`。远端 Linux 资产 17,222,476 bytes，SHA-256 `4ced72dd419bab383cf0787749be1b2ef53d6b0cfc686b1bd29bd83f30baf875`，173 条目、26 个 auto-layout JSON、7 个项目 Skills、Runtime/npm 污染为零。
+- 最终 Windows 包在所有随包 Skill 更新后重建，耗时 36.085 秒；ZIP 8,311,556 bytes、178 条目、26 个 auto-layout JSON、Runtime/npm 污染为零。全新解压后的冻结入口 51.620 秒通过，隔离源码部署 11.023 秒通过。本记录进入 done；最终记录提交仍由同一远端 workflow 再验一次，但不再修改产品或证据。
