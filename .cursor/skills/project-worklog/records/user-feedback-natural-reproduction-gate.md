@@ -2,7 +2,7 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-03 14:21 +08:00
+- updated: 2026-09-03 14:53 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 当前事实
@@ -57,3 +57,46 @@
 - 测试要求 `src/**` 写入前置命令保持启用，并拒绝把 pytest、monkeypatch、mutation 或改写输出
   注册为用户自然复现。
 - 测试只验证门禁，不是六个布局问题的复现证据。
+
+## 14:26 独立发布检查器
+
+- 新增项目内自包含的 `release` 阶段，干净 CI 不依赖用户根 skill；它要求每条问题均已自然复现、
+  修复验证且状态关闭，并逐项打印尝试、分析和未复现原因。
+- 非发布阶段继续委托用户根验证器，避免项目规则与通用工艺分叉。
+- 此时仅完成检查器实现，尚未接入打包脚本和 GitHub Actions；因此不得声称发布入口已经封闭。
+
+## 14:31 发布入口与逐项尝试
+
+- 六条 issue 分别记录现有思路、正常入口核查结果、分析、未复现原因和下一复现条件；没有任何条目被提升为 reproduced。
+- 本地 `pack.sh` / `pack.bat` 在环境和产物变化前调用 release 门；GitHub Actions 新增 feedback 前驱，build 与 publish 均依赖它并移除 `always()`。
+- 托管 hook 向项目交付门传递触发命令；项目对 pack/`gh release` 强制选择 release 阶段，而普通账本提交仍可选择 structure。
+- 当前 release 门按预期返回 1，列出六条问题、缺失收据/修复验证和两个开放流程事故；这是“禁止发布”的成功负例，不是布局质量通过。
+
+## 14:36 机器门自测
+
+- 用户根自然复现 validator 自测通过；托管 hook 主套件 44 项、模块隔离套件 32 项通过。
+- 项目反馈门 7 项通过：逐 issue 失败清单、solve 阻断、pack 早停顺序、CI 依赖与禁止 `always()` 均由静态/执行测试约束。
+- 首轮新增命令透传测试因临时策略未保护 `gh release` 而没有触发 mock，已改用策略保证保护的 `git push` 后通过；该失败没有被隐藏。
+
+## 14:40 托管安装与首次宿主探针
+
+- 托管安装器完成 44+32+33+6 项测试、4/4 mutation kill、25 文件 doctor，并热安装成功。
+- 首次真实交互宿主探针实际看到了 UserPromptSubmit 注入；随后因本机 Codex CLI 0.140.0 不支持指定的 `gpt-5.6-luna` 返回 HTTP 400，未进入产品写入拒绝阶段。
+- 该次不计宿主闭环通过；按有上限策略仅再以兼容模型重试一次。
+
+## 14:44 宿主探针有界收敛
+
+- 第二次改用 Codex CLI 可运行的 `gpt-5.4`；会话成功加载项目上下文、执行 UserPromptSubmit 及多个 Pre/PostToolUse，但 90 秒预算内 Agent 一直读取资料，尚未发起 README 写入。
+- 因而语义注入已在真实宿主可见，但“随后的产品写入被拒绝”只由项目上下文 33 项单测证明，尚无完整宿主级写入拒绝证据。
+- 两次有界尝试已用尽，本轮不再无限等待；恢复条件是精简探针提示/启动上下文或升级 CLI 后重新运行四路径宿主验收。
+
+## 14:49 完整回归与真实 pack 早停
+
+- 直接 `unittest discover` 因未加载 pyproject 的 `src/tests` pythonpath 出现 7 个导入错误；改用项目正式 pytest 入口后 409 passed、5 skipped，耗时 88.43 秒。
+- 真实执行 `tools/pack.bat` 在 release 检查器处 0.85 秒返回 1，逐条打印六个 issue；未进入 venv、pip、npm、PyInstaller 或 bundle 阶段。
+- 该失败正是当前开放反馈下的预期发布阻断；不能将其表述为发行包验证通过。
+
+## 14:53 触发命令分级闭环
+
+- 项目交付门将 `pack.bat`、`pack.sh`、`bundle_release.py` 和 `gh release` 统一映射到自包含 release 检查器；源码修改的 commit 仍走 solve，其它提交走 structure。
+- 8 项专项测试通过，覆盖三类触发命令、阶段选择、逐 issue 报告、pack 早停与 CI 依赖；py_compile 与 diff whitespace 检查通过。

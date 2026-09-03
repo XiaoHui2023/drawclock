@@ -5,6 +5,13 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
+# Fail before environment creation, downloads, builds, or dist mutation.
+if command -v python3 >/dev/null 2>&1; then
+  python3 tools/check_feedback_reproduction_gate.py --phase release
+else
+  python tools/check_feedback_reproduction_gate.py --phase release
+fi
+
 ensure_venv() {
   if [[ -f "$ROOT/.venv/bin/python" ]]; then
     PYTHON_CMD=("$ROOT/.venv/bin/python")

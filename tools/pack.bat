@@ -2,6 +2,15 @@
 rem Build the executable and an archive with source and bundled layout runtime.
 cd /d "%~dp0\.."
 
+rem Fail before environment creation, downloads, builds, or dist mutation.
+where py >nul 2>nul
+if errorlevel 1 (
+    python tools\check_feedback_reproduction_gate.py --phase release
+) else (
+    py -3 tools\check_feedback_reproduction_gate.py --phase release
+)
+if errorlevel 1 exit /b 1
+
 if not exist ".venv\Scripts\python.exe" (
     call "update.bat"
 )

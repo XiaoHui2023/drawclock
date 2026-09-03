@@ -15,6 +15,7 @@
       "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
       "reproduction_proves": "有效混合图根经公开 CLI 产生类别特判或错误列行为",
       "reproduction_does_not_prove": "其它五条几何问题或根因",
+      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:38:00+08:00", "hypothesis": "现有混合根 torture example 会经公开 CLI 暴露按 kind 特判的根布局。", "method": "审计 example 25、旧测试名称及现存证据路径，检查是否有冻结基线原始 SVG 与只读直接 Oracle 收据。", "result": "reproduction_blocked", "observed": "样例包含 source/from，但没有两次独立公开 CLI 红灯收据，也没有证明任意零入度器件均触发同一缺陷。", "analysis": "覆盖 source/from 不等价于覆盖拓扑定义的所有图根；现有资料只能形成待测假设。", "why_not_reproduced": "缺少冻结基线的两次自然运行与直接判定类别特判的只读 Oracle 证据。", "evidence": "example/auto-layout/25-mixed-root-port-order-torture.json; tests; .reproduction/receipts/FB-ROOT-001.json missing", "next_condition": "补充非 source/from 的零入度器件并让公开 CLI 在冻结基线上连续两次触发直接 Oracle 红灯。"}],
       "reproduction_receipt": ".reproduction/receipts/FB-ROOT-001.json"
     },
     {
@@ -31,6 +32,7 @@
       "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
       "reproduction_proves": "公开 CLI 自然生成同根 split-rejoin 几何",
       "reproduction_does_not_prove": "人工航点变异只证明 Oracle，不能满足本条",
+      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:39:00+08:00", "hypothesis": "example 19 的正常公开 CLI 输出自然包含同根先分、再合、再分。", "method": "核查旧 split-rejoin 测试与样例入口，区分正常生成输出和测试内人工航点改写。", "result": "not_reproduced", "observed": "旧测试先生成正常图再人工重写航点，随后 Oracle 能报错；正常产物本身没有合格红灯收据。", "analysis": "该测试只验证检测器能看见注入后的坏图，不能证明用户工作流会产生坏图。", "why_not_reproduced": "唯一红灯依赖输出变异，违反禁止人工注入故障和禁止改写产物的要求。", "evidence": "tests split-rejoin mutation test; example/auto-layout/19-dispersed-root-fanout.json; receipt missing", "next_condition": "重新设计自然输入，使未修改生产代码与未修改 SVG 的公开 CLI 输出直接出现 split-rejoin，并独立复跑两次。"}],
       "reproduction_receipt": ".reproduction/receipts/FB-ROUTE-002.json"
     },
     {
@@ -43,7 +45,9 @@
       "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/25-mixed-root-port-order-torture.json", "drawio-lib/**"], "deterministic": true},
       "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-003", "--input", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
       "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "根纵序相对目标端口反转并产生可避免交叉", "reproduction_does_not_prove": "所有根布局最优", "reproduction_receipt": ".reproduction/receipts/FB-ROOT-003.json"
+      "reproduction_proves": "根纵序相对目标端口反转并产生可避免交叉", "reproduction_does_not_prove": "所有根布局最优",
+      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:40:00+08:00", "hypothesis": "example 25 会自然生成公共根从下方向上穿过单连接 pad 输入根的交叉。", "method": "审计该样例的输入拓扑、目标端口与旧质量结果，搜索直接归因到根纵序反转的原始 SVG 收据。", "result": "reproduction_blocked", "observed": "样例意图覆盖该结构，但没有冻结旧实现输出、两次直接 Oracle 红灯或反事实重排证据。", "analysis": "测试意图和复杂结构存在不能代替实际生成几何的可重复失败。", "why_not_reproduced": "缺少可验证的自然失败产物和逐交叉归因，无法排除交叉来自另一条边。", "evidence": "example/auto-layout/25-mixed-root-port-order-torture.json; receipt missing", "next_condition": "冻结基线运行公开 CLI，两次记录同一根纵序反转和交叉边对，并用只读 Oracle 验证。"}],
+      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-003.json"
     },
     {
       "id": "FB-ROOT-004",
@@ -55,7 +59,9 @@
       "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/23-middle-column-low-use-sources.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/23-middle-column-low-use-sources.json", "drawio-lib/**"], "deterministic": true},
       "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-004", "--input", "{project}/example/auto-layout/23-middle-column-low-use-sources.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
       "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "低复用根的首列位置被完整重排反事实支配", "reproduction_does_not_prove": "根复制或端口纵序问题", "reproduction_receipt": ".reproduction/receipts/FB-ROOT-004.json"
+      "reproduction_proves": "低复用根的首列位置被完整重排反事实支配", "reproduction_does_not_prove": "根复制或端口纵序问题",
+      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:41:00+08:00", "hypothesis": "example 23 可证明单连接 from 固定首列并与公共根到 mux 的路线交叉。", "method": "将样例拓扑与用户明确描述的公共源、多低复用源和 mux 中间列场景逐项对照。", "result": "not_reproduced", "observed": "用户已明确指出 example 23 覆盖不够详细且不是目标场景；现有结果没有合格反事实支配证据。", "analysis": "两个不同源或简单中间列示例不能代表公共根与多个低复用根竞争 mux 输入的交叉。", "why_not_reproduced": "输入结构缺少用户要求的复杂交叉组合，且没有自然红灯收据。", "evidence": "example/auto-layout/23-middle-column-low-use-sources.json; user rejection; receipt missing", "next_condition": "构造公共根连接多 mux、多个单连接异类图根连接同批 mux 的复杂公开输入，并证明中间列反事实严格减少交叉和长度。"}],
+      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-004.json"
     },
     {
       "id": "FB-BEND-005",
@@ -67,7 +73,9 @@
       "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/20-asymmetric-merge-route-bulge.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/20-asymmetric-merge-route-bulge.json", "drawio-lib/**"], "deterministic": true},
       "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-005", "--input", "{project}/example/auto-layout/20-asymmetric-merge-route-bulge.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
       "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 SVG 中存在被无障碍直线严格支配的边", "reproduction_does_not_prove": "全图面积或全部路线最优", "reproduction_receipt": ".reproduction/receipts/FB-BEND-005.json"
+      "reproduction_proves": "公开 SVG 中存在被无障碍直线严格支配的边", "reproduction_does_not_prove": "全图面积或全部路线最优",
+      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:42:00+08:00", "hypothesis": "example 20 的相邻列同轴边会自然出现无收益折点。", "method": "审计样例、旧 gate_a_tap/sel 路径反馈与现有折点统计，检查是否保存了冻结基线的直接 dominance 证据。", "result": "reproduction_blocked", "observed": "存在用户截图式观察与针对性样例，但没有可核验的旧原始 SVG、障碍净空计算和两次独立红灯收据。", "analysis": "看到折点不等于证明它无必要；必须证明直线候选不碰节点、标签、端口或其它硬约束且质量向量严格更优。", "why_not_reproduced": "缺少冻结基线产物及只读直线可行性/支配 Oracle 收据。", "evidence": "example/auto-layout/20-asymmetric-merge-route-bulge.json; receipt missing", "next_condition": "用正常 CLI 生成两次相同折点，Oracle 同时证明直线路径可行且不降低更高优先级指标。"}],
+      "reproduction_receipt": ".reproduction/receipts/FB-BEND-005.json"
     },
     {
       "id": "FB-PORT-006",
@@ -79,10 +87,13 @@
       "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/25-mixed-root-port-order-torture.json", "drawio-lib/**"], "deterministic": true},
       "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-PORT-006", "--input", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
       "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "根纵序反转直接造成固定 pad 输入交叉", "reproduction_does_not_prove": "公共根位置或 split-rejoin", "reproduction_receipt": ".reproduction/receipts/FB-PORT-006.json"
+      "reproduction_proves": "根纵序反转直接造成固定 pad 输入交叉", "reproduction_does_not_prove": "公共根位置或 split-rejoin",
+      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:43:00+08:00", "hypothesis": "example 25 的两个单连接根会以目标 pad 端口相反的纵序自然生成交叉。", "method": "核查样例端口绑定、旧测试结果与收据目录，寻找两个独立公开 CLI 输出中的同一端口次序反转。", "result": "reproduction_blocked", "observed": "样例包含端口顺序压力结构，但没有逐端口坐标和交叉边对的自然复现收据。", "analysis": "仅有连接正确性不能证明根的纵序与端口纵序反转，也不能证明交叉可由交换根顺序消除。", "why_not_reproduced": "缺少两次原始 SVG 的端口坐标、根坐标与交叉归因证据。", "evidence": "example/auto-layout/25-mixed-root-port-order-torture.json; receipt missing", "next_condition": "公开 CLI 独立运行两次，并由只读 Oracle 验证根顺序反转、指定边对交叉及交换顺序的严格改善。"}],
+      "reproduction_receipt": ".reproduction/receipts/FB-PORT-006.json"
     }
   ],
   "process_incidents": [
-    {"id": "META-CLAIM-007", "status": "open", "summary": "未完整自然复现却声称全部完成并提交发布", "classification": ["reproduction_escape", "claim_escape", "oracle_escape"]}
+    {"id": "META-CLAIM-007", "status": "open", "release_blocking": true, "summary": "未完整自然复现却声称全部完成并提交发布", "classification": ["reproduction_escape", "claim_escape", "oracle_escape"]},
+    {"id": "META-RELEASE-008", "status": "open", "release_blocking": true, "summary": "发布工作流未执行反馈复现门且 always 条件允许发布链继续", "evidence": "GitHub Actions run 33720713223 published v1.0.0 from 0a2f48b while six issues remained reported", "analysis": "交付门依据 src 变化选择 structure 阶段；远端 build 没有 feedback gate，publish 使用 always，因此问题账本没有成为发布前置依赖。"}
   ]
 }

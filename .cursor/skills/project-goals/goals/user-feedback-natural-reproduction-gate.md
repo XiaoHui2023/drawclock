@@ -18,11 +18,14 @@
 - failure: 六条布局反馈没有逐条自然复现收据；上一轮完成声明无效。
 - failure: split-rejoin 只有人工重写航点的 Oracle 自测，不属于用户自然复现。
 - success: 用户根自然复现 runner/validator 的首轮自测能拒绝未复现、人工故障、伪造收据和入口失败。
+- failure: 远端运行 `33720713223` 在六条问题仍为 `reported` 时发布了提交 `0a2f48b`；旧 CI 未调用反馈门，且发布 job 使用了 `always()`。
+- success: 项目 release 检查器当前逐条报告六个未复现问题和两个流程事故并返回 1。
 
 ## 下一步
 
-- 接入项目 issue ledger、公开 CLI 复现 runner、只读 SVG Oracle 与 Codex PreToolUse/交付门。
-- 运行正向自然红灯和四类绕过负例；门禁未闭合前不修改 `src/**`。
+- 将 release 检查器置于本地 pack 的任何依赖/输出变化之前，并作为 CI build 与 publish 的必要前驱。
+- 推送后确认 Release workflow 在首个反馈门失败，后续 build/publish 均 skipped，现有 v1.0.0 tag 与资产不移动。
+- 六条问题逐条设计正常用户输入并取得两次自然红灯；门禁未闭合前不修改 `src/**`。
 
 ## 收敛条件
 

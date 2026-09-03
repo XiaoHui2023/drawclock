@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -15,6 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / ".cursor/skills/project-goals/issues/user-feedback-natural-reproduction.json"
 USER_VALIDATOR = Path.home() / ".cursor/skills/agent-quality-workflow/scripts/validate_feedback_reproduction.py"
+PROJECT_VALIDATOR = ROOT / "tools/check_feedback_reproduction_gate.py"
 READY = ROOT / ".codex/evidence/delivery-ready.json"
 BLOCKED = ROOT / ".codex/evidence/delivery-blocked.json"
 
@@ -64,19 +66,29 @@ def write_blocked(phase: str, detail: str) -> None:
     )
 
 
+def delivery_phase(paths: list[str], trigger_command: str) -> str:
+    release_trigger = bool(re.search(r"(?i)(?:^|[\\/\s])(pack(?:\.bat|\.sh)?|bundle_release\.py)(?:\s|$)|\bgh\s+release\b", trigger_command))
+    if release_trigger:
+        return "release"
+    return "solve" if any(path == "src" or path.startswith("src/") for path in paths) else "structure"
+
+
 def main() -> int:
     required_environment = ("CODEX_GATE_CHALLENGE", "CODEX_GATE_POLICY_SHA256", "CODEX_GATE_COMMAND_SHA256")
     missing = [name for name in required_environment if not os.environ.get(name)]
     if missing:
         print(f"missing managed challenge environment: {', '.join(missing)}", file=sys.stderr)
         return 2
-    if not USER_VALIDATOR.is_file():
-        print(f"user-root reproduction validator is missing: {USER_VALIDATOR}", file=sys.stderr)
-        return 2
     paths = changed_paths()
-    phase = "solve" if any(path == "src" or path.startswith("src/") for path in paths) else "structure"
+    trigger_command = os.environ.get("CODEX_GATE_TRIGGER_COMMAND", "")
+    phase = delivery_phase(paths, trigger_command)
+    validator = PROJECT_VALIDATOR if phase == "release" else USER_VALIDATOR
+    if not validator.is_file():
+        print(f"reproduction validator is missing: {validator}", file=sys.stderr)
+        return 2
     validation = subprocess.run(
-        [sys.executable, str(USER_VALIDATOR), str(MANIFEST), "--project-root", str(ROOT), "--phase", phase],
+        ([sys.executable, str(validator), "--phase", phase] if phase == "release" else
+         [sys.executable, str(validator), str(MANIFEST), "--project-root", str(ROOT), "--phase", phase]),
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -100,8 +112,9 @@ def main() -> int:
         "evidence": {
             "phase": phase,
             "manifest_sha256": sha256(MANIFEST),
-            "validator_sha256": sha256(USER_VALIDATOR),
+            "validator_sha256": sha256(validator),
             "changed_paths": paths,
+            "trigger_command": trigger_command,
             "policy_file_sha256": sha256(policy),
         },
     }
