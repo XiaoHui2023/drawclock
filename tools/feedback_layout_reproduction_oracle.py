@@ -55,6 +55,7 @@ class LogicalEdge:
     source: str
     target: str
     target_port: str
+    source_port: str = "right"
 
 
 @dataclass
@@ -64,6 +65,7 @@ class Route:
     source: str = ""
     target: str = ""
     target_port: str = ""
+    source_port: str = "right"
 
     @property
     def edge_id(self) -> str:
@@ -93,13 +95,43 @@ def simplify(points: Iterable[tuple[float, float]]) -> list[tuple[float, float]]
 
 
 def _parse_path_as_polyline(data: str) -> list[tuple[float, float]]:
-    """Read M/L-only paths. Reproduction runs use crossing-style none."""
-    if re.search(r"[AaCcHhQqSsTtVvZz]", data):
-        raise ValueError("Oracle requires a line-only edge path; run with --crossing-style none")
-    values = _numbers(data)
-    if len(values) < 4 or len(values) % 2:
-        raise ValueError(f"invalid line path: {data}")
-    return [(values[i], values[i + 1]) for i in range(0, len(values), 2)]
+    """Recover the rectilinear route from M/L and generated jump-arc paths."""
+    tokens = re.findall(
+        r"[A-Za-z]|[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?", data
+    )
+    points: list[tuple[float, float]] = []
+    index = 0
+    command = ""
+
+    def numbers(count: int) -> list[float]:
+        nonlocal index
+        values = tokens[index:index + count]
+        if len(values) != count or any(re.fullmatch(r"[A-Za-z]", value) for value in values):
+            raise ValueError(f"invalid SVG edge path: {data}")
+        index += count
+        return [float(value) for value in values]
+
+    while index < len(tokens):
+        token = tokens[index]
+        if re.fullmatch(r"[A-Za-z]", token):
+            command = token
+            index += 1
+        if command in {"M", "L"}:
+            x, y = numbers(2)
+            points.append((x, y))
+            command = "L"
+        elif command == "A":
+            _rx, _ry, _rotation, _large_arc, _sweep, x, y = numbers(7)
+            if not points or (
+                abs(points[-1][0] - x) > EPS and abs(points[-1][1] - y) > EPS
+            ):
+                raise ValueError("Oracle rejects non-orthogonal SVG edge arcs")
+            points.append((x, y))
+        else:
+            raise ValueError(f"Oracle rejects unsupported SVG edge command: {command}")
+    if len(points) < 2:
+        raise ValueError(f"invalid SVG edge path: {data}")
+    return simplify(points)
 
 
 def parse_svg(path: Path, node_names: set[str] | None = None) -> tuple[list[Box], list[Route]]:
@@ -149,8 +181,9 @@ def parse_svg(path: Path, node_names: set[str] | None = None) -> tuple[list[Box]
     return boxes, routes
 
 
-def _source_name(reference: str) -> str:
-    return reference.split("[", 1)[0]
+def _source_reference(reference: str) -> tuple[str, str]:
+    match = re.fullmatch(r"(.+)\[([^][]+)\]", reference)
+    return (match.group(1), match.group(2)) if match else (reference, "right")
 
 
 def parse_topology(path: Path) -> tuple[dict[str, dict[str, Any]], list[LogicalEdge]]:
@@ -163,10 +196,12 @@ def parse_topology(path: Path) -> tuple[dict[str, dict[str, Any]], list[LogicalE
             raise ValueError(f"node {target} must be an object")
         source = item.get("source")
         if isinstance(source, str):
-            edges.append(LogicalEdge(_source_name(source), target, "left"))
+            source_name, source_port = _source_reference(source)
+            edges.append(LogicalEdge(source_name, target, "left", source_port))
         elif isinstance(source, dict):
             for port, reference in source.items():
-                edges.append(LogicalEdge(_source_name(str(reference)), target, str(port)))
+                source_name, source_port = _source_reference(str(reference))
+                edges.append(LogicalEdge(source_name, target, str(port), source_port))
         elif source is not None:
             raise ValueError(f"node {target} has invalid source")
     return config, edges
@@ -215,7 +250,10 @@ def bind_routes(routes: list[Route], boxes: list[Box], logical: list[LogicalEdge
         chosen = sorted(same_pair_all, key=lambda edge: _port_order(edge.target_port))[route_rank]
         if chosen not in remaining:
             raise ValueError(f"duplicate route binding for {pair[0]} -> {pair[1]}.{chosen.target_port}")
-        route.source, route.target, route.target_port = chosen.source, chosen.target, chosen.target_port
+        route.source = chosen.source
+        route.target = chosen.target
+        route.target_port = chosen.target_port
+        route.source_port = chosen.source_port
         remaining.remove(chosen)
     if remaining:
         raise ValueError(f"SVG is missing {len(remaining)} logical edges")
@@ -228,6 +266,13 @@ def _port_order(value: str) -> tuple[int, str]:
 
 def segments(route: Route) -> list[tuple[tuple[float, float], tuple[float, float]]]:
     return list(zip(route.points, route.points[1:]))
+
+
+def same_net(left: Route, right: Route) -> bool:
+    return (
+        left.source == right.source
+        and left.source_port == right.source_port
+    )
 
 
 def proper_cross(a: tuple[float, float], b: tuple[float, float], c: tuple[float, float], d: tuple[float, float]) -> tuple[float, float] | None:
@@ -257,14 +302,14 @@ def route_crossings(routes: list[Route]) -> tuple[list[dict[str, Any]], list[dic
     overlaps: list[dict[str, Any]] = []
     for left_index, left in enumerate(routes):
         for right in routes[left_index + 1:]:
-            same_net = left.source == right.source
+            shared_net = same_net(left, right)
             for li, (a, b) in enumerate(segments(left)):
                 for ri, (c, d) in enumerate(segments(right)):
                     point = proper_cross(a, b, c, d)
-                    if point is not None and not same_net:
+                    if point is not None and not shared_net:
                         events.append({"point": list(point), "edges": [left.edge_id, right.edge_id], "segments": [li, ri]})
                     overlap = collinear_overlap(a, b, c, d)
-                    if overlap > EPS and not same_net:
+                    if overlap > EPS and not shared_net:
                         overlaps.append({"length": round(overlap, 4), "edges": [left.edge_id, right.edge_id]})
     return events, overlaps
 
@@ -282,7 +327,7 @@ def _rect_interior_hit(a: tuple[float, float], b: tuple[float, float], box: Box)
 def _cross_count_for_segment(a: tuple[float, float], b: tuple[float, float], route: Route, routes: list[Route]) -> int:
     count = 0
     for other in routes:
-        if other is route or other.source == route.source:
+        if other is route or same_net(other, route):
             continue
         count += sum(proper_cross(a, b, c, d) is not None for c, d in segments(other))
     return count
@@ -303,14 +348,14 @@ def _candidate_quality(
         proper_cross(a, b, c, d) is not None
         for a, b in zip(candidate, candidate[1:])
         for other in routes
-        if other is not route and other.source != route.source
+        if other is not route and not same_net(other, route)
         for c, d in segments(other)
     )
     overlaps = sum(
         collinear_overlap(a, b, c, d) > EPS
         for a, b in zip(candidate, candidate[1:])
         for other in routes
-        if other is not route and other.source != route.source
+        if other is not route and not same_net(other, route)
         for c, d in segments(other)
     )
     length = sum(abs(b[0] - a[0]) + abs(b[1] - a[1]) for a, b in zip(candidate, candidate[1:]))
@@ -404,7 +449,7 @@ def _cross_count_for_route(route: Route, routes: list[Route]) -> int:
         proper_cross(a, b, c, d) is not None
         for a, b in segments(route)
         for other in routes
-        if other is not route and other.source != route.source
+        if other is not route and not same_net(other, route)
         for c, d in segments(other)
     )
 
@@ -414,7 +459,7 @@ def _overlap_count_for_route(route: Route, routes: list[Route]) -> int:
         collinear_overlap(a, b, c, d) > EPS
         for a, b in segments(route)
         for other in routes
-        if other is not route and other.source != route.source
+        if other is not route and not same_net(other, route)
         for c, d in segments(other)
     )
 
@@ -504,10 +549,29 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     crossings, overlaps = route_crossings(routes)
     incident = Counter(edge for event in crossings for edge in event["edges"])
     overlap_incident = Counter(edge for event in overlaps for edge in event["edges"])
+    crossing_points_by_edge: dict[str, set[tuple[float, float]]] = defaultdict(set)
+    crossing_partners_by_edge: dict[str, set[str]] = defaultdict(set)
+    for event in crossings:
+        left, right = event["edges"]
+        point = tuple(event["point"])
+        crossing_points_by_edge[left].add(point)
+        crossing_points_by_edge[right].add(point)
+        crossing_partners_by_edge[left].add(right)
+        crossing_partners_by_edge[right].add(left)
+    fanout = Counter((route.source, route.source_port) for route in routes)
     route_rows = []
     avoidable = []
     for route in routes:
         length = sum(abs(b[0] - a[0]) + abs(b[1] - a[1]) for a, b in segments(route))
+        horizontal_length = sum(
+            abs(b[0] - a[0]) for a, b in segments(route)
+            if abs(a[1] - b[1]) <= EPS
+        )
+        vertical_segments = [
+            abs(b[1] - a[1]) for a, b in segments(route)
+            if abs(a[0] - b[0]) <= EPS
+        ]
+        vertical_length = sum(vertical_segments)
         bends = max(0, len(route.points) - 2)
         witness = _fewer_bend_witness(
             route, routes, boxes, incident[route.edge_id], overlap_incident[route.edge_id]
@@ -516,15 +580,34 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             avoidable.append({"edge_id": route.edge_id, "candidate": [list(point) for point in witness]})
         route_rows.append({
             "edge_id": route.edge_id, "source": route.source, "target": route.target,
-            "target_port": route.target_port, "points": [list(point) for point in route.points],
+            "source_port": route.source_port, "target_port": route.target_port,
+            "points": [list(point) for point in route.points],
             "segments": len(route.points) - 1, "bends": bends,
             "manhattan_length_px": round(length, 4),
+            "horizontal_length_px": round(horizontal_length, 4),
+            "vertical_length_px": round(vertical_length, 4),
+            "max_vertical_segment_px": round(max(vertical_segments, default=0.0), 4),
+            "crossing_points": len(crossing_points_by_edge[route.edge_id]),
             "crossing_pair_incidents": incident[route.edge_id],
+            "crossed_edge_count": len(crossing_partners_by_edge[route.edge_id]),
+            "source_port_fanout": fanout[(route.source, route.source_port)],
+            "branch_siblings": fanout[(route.source, route.source_port)] - 1,
         })
     split_rejoin = sorted(
-        source for source in roots
-        if len([route for route in routes if route.source == source]) > 1
-        and _same_net_cycle([route for route in routes if route.source == source])
+        f"{source}:{source_port}"
+        for source, source_port in {
+            (route.source, route.source_port)
+            for route in routes
+            if route.source in roots
+        }
+        if len([
+            route for route in routes
+            if (route.source, route.source_port) == (source, source_port)
+        ]) > 1
+        and _same_net_cycle([
+            route for route in routes
+            if (route.source, route.source_port) == (source, source_port)
+        ])
     )
     root_kinds = {name: str(config[name].get("kind", "")) for name in roots}
     first_x = min(box.x for name in roots for box in boxes_by_node[name]) if roots else 0.0
@@ -602,14 +685,89 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
                 other = next(route for route in routes if route.edge_id == other_id)
                 if other.source in roots and outdegree[other.source] == 1:
                     public_root_crossings.append({"public_root": public, "other_root": other.source, "edges": event["edges"]})
+    mixed_root_quality_failures = [
+        witness
+        for witness in public_root_crossings
+        if root_kinds.get(witness["public_root"]) not in {"source", "from"}
+    ]
     detected = {
-        "FB-ROOT-001": len(set(root_kinds.values())) >= 3,
+        # Mixed kinds are only a precondition.  A defect is present only when
+        # an ordinary zero-indegree component also exhibits the measured root
+        # placement failure; otherwise this would be an always-true coverage
+        # check masquerading as a defect oracle.
+        "FB-ROOT-001": (
+            len(set(root_kinds.values())) >= 3
+            and bool(mixed_root_quality_failures)
+        ),
         "FB-ROUTE-002": bool(split_rejoin),
         "FB-ROOT-003": bool(public_root_crossings),
         "FB-ROOT-004": bool(root_relocation_witnesses),
         "FB-BEND-005": bool(avoidable),
         "FB-PORT-006": bool(port_inversions),
     }
+    route_row_by_id = {row["edge_id"]: row for row in route_rows}
+    node_statistics = {}
+    for name in sorted(config):
+        outgoing_routes = [route for route in routes if route.source == name]
+        incoming_routes = [route for route in routes if route.target == name]
+        outgoing_rows = [route_row_by_id[route.edge_id] for route in outgoing_routes]
+        node_statistics[name] = {
+            "kind": str(config[name].get("kind", "")),
+            "incoming_edges": len(incoming_routes),
+            "outgoing_edges": len(outgoing_routes),
+            "direct_downstream_nodes": len({route.target for route in outgoing_routes}),
+            "source_port_nets": len({route.source_port for route in outgoing_routes}),
+            "rendering_anchors": len(boxes_by_node[name]),
+            "is_root": name in roots,
+            "is_terminal": not outgoing_routes,
+            "manhattan_length_px": round(sum(row["manhattan_length_px"] for row in outgoing_rows), 4),
+            "bends_total": sum(row["bends"] for row in outgoing_rows),
+            "crossing_points": len({
+                point
+                for route in outgoing_routes
+                for point in crossing_points_by_edge[route.edge_id]
+            }),
+            "crossing_pair_incidents": sum(
+                row["crossing_pair_incidents"] for row in outgoing_rows
+            ),
+            "crossed_edge_count": len({
+                partner
+                for route in outgoing_routes
+                for partner in crossing_partners_by_edge[route.edge_id]
+            }),
+        }
+    network_statistics = {}
+    for source, source_port in sorted(fanout):
+        net_routes = [
+            route for route in routes
+            if (route.source, route.source_port) == (source, source_port)
+        ]
+        rows = [route_row_by_id[route.edge_id] for route in net_routes]
+        key = f"{source}:{source_port}"
+        network_statistics[key] = {
+            "source": source,
+            "source_port": source_port,
+            "edges": len(net_routes),
+            "rendering_anchors": len({route.points[0] for route in net_routes}),
+            "branch_count": max(0, len(net_routes) - 1),
+            "crossing_points": len({
+                point
+                for route in net_routes
+                for point in crossing_points_by_edge[route.edge_id]
+            }),
+            "crossing_pair_incidents": sum(row["crossing_pair_incidents"] for row in rows),
+            "crossed_edge_count": len({
+                partner
+                for route in net_routes
+                for partner in crossing_partners_by_edge[route.edge_id]
+            }),
+            "manhattan_length_px": round(sum(row["manhattan_length_px"] for row in rows), 4),
+            "horizontal_length_px": round(sum(row["horizontal_length_px"] for row in rows), 4),
+            "vertical_length_px": round(sum(row["vertical_length_px"] for row in rows), 4),
+            "bends_total": sum(row["bends"] for row in rows),
+            "bends_max_per_edge": max((row["bends"] for row in rows), default=0),
+            "split_rejoin": key in split_rejoin,
+        }
     return {
         "schema_version": 1,
         "input": input_path.name, "svg": svg_path.name,
@@ -622,9 +780,12 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             "manhattan_length_px": round(sum(row["manhattan_length_px"] for row in route_rows), 4),
         },
         "roots": {name: {"kind": root_kinds[name], "outdegree": outdegree[name], "rendered_copies": len(boxes_by_node[name])} for name in sorted(roots)},
+        "nodes": node_statistics,
+        "networks": network_statistics,
         "edges": route_rows, "crossings": crossings, "overlaps": overlaps,
         "witnesses": {
             "mixed_root_kinds": sorted(set(root_kinds.values())),
+            "mixed_root_quality_failures": mixed_root_quality_failures,
             "split_rejoin_roots": split_rejoin,
             "public_root_crossings": public_root_crossings,
             "low_use_left_crossing_roots": low_use_left_crossing,

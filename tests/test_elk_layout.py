@@ -2,14 +2,10 @@ from __future__ import annotations
 
 import copy
 import time
-import sys
 from pathlib import Path
 
-import pytest
-
-import elk_layout
 from auto_layout import load_clock_tree
-from elk_layout import elk_layout_available, generate_elk_layout
+from elk_layout import generate_elk_layout
 from layout_quality import _points_for_edge, inspect_layout_quality
 from scripts.build_stress_examples import build_asymmetric_merge_route_bulge
 
@@ -35,66 +31,6 @@ def _generate(name: str):
     return config, document, report, quality
 
 
-def test_elk_runtime_discovers_bundled_node_and_module(
-    tmp_path: Path, monkeypatch,
-) -> None:
-    runtime = tmp_path / "runtime"
-    node = runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node")
-    script = runtime / "elk" / "elk_layout.mjs"
-    bundled = runtime / "elk" / "node_modules" / "elkjs" / "lib" / "elk.bundled.js"
-    for path in (node, script, bundled):
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.touch()
-    binary = tmp_path / ("drawclock.exe" if sys.platform == "win32" else "drawclock")
-    binary.touch()
-    monkeypatch.setattr(elk_layout.sys, "frozen", True, raising=False)
-    monkeypatch.setattr(elk_layout.sys, "executable", str(binary))
-    monkeypatch.setattr(elk_layout.shutil, "which", lambda _name: None)
-
-    assert elk_layout._elk_runtime() == (str(node), script, runtime / "elk")
-
-
-def test_elk_runtime_uses_original_staticx_program_path(
-    tmp_path: Path, monkeypatch,
-) -> None:
-    installed = tmp_path / "installed"
-    runtime = installed / "runtime"
-    node = runtime / "node" / (
-        "node.exe" if sys.platform == "win32" else "bin/node"
-    )
-    script = runtime / "elk" / "elk_layout.mjs"
-    bundled = runtime / "elk" / "node_modules" / "elkjs" / "lib" / "elk.bundled.js"
-    for path in (node, script, bundled):
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.touch()
-    monkeypatch.setenv("STATICX_PROG_PATH", str(installed / "drawclock"))
-    monkeypatch.setattr(elk_layout.sys, "frozen", True, raising=False)
-    monkeypatch.setattr(
-        elk_layout.sys, "executable", str(tmp_path / "staticx-bundle" / "drawclock")
-    )
-    monkeypatch.setattr(elk_layout.shutil, "which", lambda _name: None)
-
-    assert elk_layout._elk_runtime() == (str(node), script, runtime / "elk")
-
-
-def test_elk_runtime_discovers_release_runtime_from_source(
-    tmp_path: Path, monkeypatch,
-) -> None:
-    runtime = tmp_path / "runtime"
-    node = runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node")
-    script = runtime / "elk" / "elk_layout.mjs"
-    bundled = runtime / "elk" / "node_modules" / "elkjs" / "lib" / "elk.bundled.js"
-    for path in (node, script, bundled):
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.touch()
-    monkeypatch.setattr(elk_layout, "__file__", str(tmp_path / "src" / "elk_layout.py"))
-    monkeypatch.setattr(elk_layout.sys, "frozen", False, raising=False)
-    monkeypatch.setattr(elk_layout.shutil, "which", lambda _name: None)
-
-    assert elk_layout._elk_runtime() == (str(node), script, runtime / "elk")
-
-
-@pytest.mark.skipif(not elk_layout_available(), reason="ELK Node.js dependency is unavailable")
 def test_elk_exact_ports_and_lines_are_deterministic() -> None:
     _, first, _, quality = _generate("06-simple-16-clocks")
     _, second, _, _ = _generate("06-simple-16-clocks")
@@ -112,7 +48,6 @@ def test_elk_exact_ports_and_lines_are_deterministic() -> None:
     assert line["ambiguous_overlaps"] == []
 
 
-@pytest.mark.skipif(not elk_layout_available(), reason="ELK Node.js dependency is unavailable")
 def test_same_source_port_uses_one_vertical_distribution_trunk() -> None:
     config, document, _, quality = _generate("02-branch-tree")
 
@@ -121,7 +56,6 @@ def test_same_source_port_uses_one_vertical_distribution_trunk() -> None:
     assert quality["passed"] is True
 
 
-@pytest.mark.skipif(not elk_layout_available(), reason="ELK Node.js dependency is unavailable")
 def test_grouped_sweep_matches_exact_pair_oracle() -> None:
     config = load_clock_tree(EXAMPLES / "06-simple-16-clocks.json")
     document, _ = generate_elk_layout(
@@ -146,7 +80,6 @@ def test_grouped_sweep_matches_exact_pair_oracle() -> None:
         assert grouped["line_integrity"][key] == exact["line_integrity"][key]
 
 
-@pytest.mark.skipif(not elk_layout_available(), reason="ELK Node.js dependency is unavailable")
 def test_elk_512_clock_stress_budget_and_integrity() -> None:
     started = time.perf_counter()
     config, document, report, quality = _generate("08-stress-512-clocks")

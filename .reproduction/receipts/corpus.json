@@ -1,13 +1,12 @@
 {
   "schema_version": 1,
-  "corpus_id": "20260903T082519Z-2df8f82f",
+  "corpus_id": "20260903T105237Z-2a59310a",
   "coverage_model": "many_to_many",
   "cases": [
     {
       "case_id": "mixed-roots-current",
       "attempt": 1,
       "detected_issues": [
-        "FB-ROOT-001",
         "FB-ROOT-003",
         "FB-ROOT-004"
       ],
@@ -27,7 +26,6 @@
       "case_id": "mixed-roots-current",
       "attempt": 2,
       "detected_issues": [
-        "FB-ROOT-001",
         "FB-ROOT-003",
         "FB-ROOT-004"
       ],

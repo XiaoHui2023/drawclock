@@ -33,7 +33,7 @@ jobs:
       - name: Fix dist permissions
         run: sudo chown -R "$(id -u):$(id -g)" dist
 
-      - name: Run extracted frozen example with bundled runtimes
+      - name: Run extracted dependency-free frozen examples
         run: |
           mkdir release-smoke
           tar -xzf dist/drawclock-*-linux.tar.gz -C release-smoke
@@ -114,8 +114,9 @@ jobs:
           name: ${{ steps.version.outputs.tag }}
           body: |
             Rolling release: self-contained Ubuntu 16.04 PyInstaller bundle from the main commit.
-            The archive includes the complete zero-Python-dependency source tree and pinned Node.js
-            and ELK layout runtimes, plus progressively disclosed project maintenance skills.
+            The archive includes the complete standard-library-only Python source tree, component
+            libraries, examples, and progressively disclosed project maintenance skills. It does not
+            bundle Node.js, ELK, a browser, or third-party Python runtime dependencies.
             Before publishing, CI extracts the archive and exercises the frozen executable with the
             host PATH isolated for direct SVG generation under arbitrary output suffixes,
             supplied and merged-library rendering, strict JSON input, and large-layout bounds checks.

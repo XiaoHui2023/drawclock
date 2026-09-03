@@ -109,9 +109,6 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     )
     (project / "example").mkdir()
     (project / "example" / "auto-layout").mkdir()
-    (project / ".runtime" / "node").mkdir(parents=True)
-    (project / ".runtime" / "runtime-manifest.json").write_text("{}\n", encoding="utf-8")
-    (project / ".runtime" / "node" / "node.exe").touch()
     (project / "dist" / "drawclock.exe").write_text("", encoding="utf-8")
     (project / "README.md").write_text("", encoding="utf-8")
     (project / "draw.md").write_text("", encoding="utf-8")
@@ -122,17 +119,8 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     )
     shutil.copytree(ROOT / "skills", project / "skills")
     (project / "example" / "draw.json").write_text("{}", encoding="utf-8")
-    packaged_layout_examples = (
-        "01-linear.json",
-        "05-dense-cross-root.json",
-            "08-stress-512-clocks.json",
-            "19-dispersed-root-fanout.json",
-            "20-asymmetric-merge-route-bulge.json",
-            "21-layout-column-preference.json",
-            "22-terminal-frequency-table.json",
-            "23-middle-column-low-use-sources.json",
-            "24-single-source-rendering-alias.json",
-            "25-mixed-root-port-order-torture.json",
+    packaged_layout_examples = tuple(
+        path.name for path in sorted((ROOT / "example" / "auto-layout").glob("*.json"))
     )
     for name in packaged_layout_examples:
         (project / "example" / "auto-layout" / name).write_text("{}", encoding="utf-8")
@@ -153,7 +141,10 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     assert prefix + "example/draw.json" in names
     for name in packaged_layout_examples:
         assert prefix + "example/auto-layout/" + name in names
-    assert prefix + "runtime/runtime-manifest.json" in names
+    assert not any(name.startswith(prefix + "runtime/") for name in names)
+    assert not any(name.startswith(prefix + "node_modules/") for name in names)
+    assert prefix + "package.json" not in names
+    assert prefix + "package-lock.json" not in names
     assert prefix + "src/__main__.py" in names
     assert prefix + "source/__main__.py" not in names
     assert prefix + "source-deploy.md" in names
@@ -205,7 +196,6 @@ def test_source_manifest_rejects_missing_or_modified_source(
     root = tmp_path / "release"
     files = {
         "src/__main__.py": b"print('ok')\n",
-        "runtime/runtime-manifest.json": b"{}\n",
         "drawio-lib/drawclock/source.xml": b"<mxlibrary/>\n",
         "example/draw.json": b"{}\n",
         "example/auto-layout/22-terminal-frequency-table.json": b"{}\n",
@@ -248,10 +238,10 @@ def test_source_manifest_rejects_missing_or_modified_source(
 
     (root / "src" / "__main__.py").write_bytes(files["src/__main__.py"])
     (root / "vendor" / "wheels").mkdir(parents=True)
-    with pytest.raises(ValueError, match="legacy Python runtime dependencies"):
+    with pytest.raises(ValueError, match="unused runtime dependencies"):
         gate.validate_source_manifest(root)
 
     (root / "vendor" / "wheels").rmdir()
-    (root / "runtime" / "runtime-manifest.json").unlink()
-    with pytest.raises(ValueError, match="paths differ"):
+    (root / "runtime").mkdir()
+    with pytest.raises(ValueError, match="unused runtime dependencies"):
         gate.validate_source_manifest(root)

@@ -26,10 +26,5 @@ done
 bash "/tmp/${MINICONDA}" -b -p /opt/conda
 export PATH="/opt/conda/bin:$PATH"
 
-NODE_ARCHIVE=node-v16.20.2-linux-x64.tar.xz
-wget --tries=5 -O "/tmp/${NODE_ARCHIVE}" "https://nodejs.org/dist/v16.20.2/${NODE_ARCHIVE}"
-tar -xJf "/tmp/${NODE_ARCHIVE}" -C /opt
-export PATH="/opt/node-v16.20.2-linux-x64/bin:$PATH"
-
 python -m venv .venv
 bash tools/pack.sh

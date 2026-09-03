@@ -1,19 +1,13 @@
 from __future__ import annotations
 
-import json
 import heapq
 import math
-import os
 import copy
-import shutil
-import subprocess
 import sys
-import tempfile
 import time
 from collections import Counter, defaultdict
 from bisect import bisect_left, bisect_right
 from dataclasses import dataclass
-from pathlib import Path
 from statistics import median
 from typing import Any
 
@@ -38,35 +32,6 @@ from drawio_ports import EDGE_DRAW_STYLE, port_anchors
 from drawio_ports import abs_port_xy
 from validate_config import validate_config
 from visual_geometry import estimated_label_width, vertex_visual_box, visual_box
-
-
-def _elk_runtime() -> tuple[str, Path, Path] | None:
-    project_root = Path(__file__).resolve().parents[1]
-    runtime_roots: list[Path] = []
-    staticx_program = os.environ.get("STATICX_PROG_PATH")
-    if staticx_program:
-        runtime_roots.append(Path(staticx_program).resolve().parent / "runtime")
-    if getattr(sys, "frozen", False):
-        runtime_roots.append(Path(sys.executable).resolve().parent / "runtime")
-    runtime_roots.append(project_root / ".runtime")
-    runtime_roots.append(project_root / "runtime")
-    node_name = Path("node/node.exe") if sys.platform == "win32" else Path("node/bin/node")
-    for root in runtime_roots:
-        node = root / node_name
-        elk_root = root / "elk"
-        script = elk_root / "elk_layout.mjs"
-        bundled = elk_root / "node_modules" / "elkjs" / "lib" / "elk.bundled.js"
-        if node.is_file() and script.is_file() and bundled.is_file():
-            return str(node), script, elk_root
-    node = shutil.which("node")
-    script = project_root / "scripts" / "elk_layout.mjs"
-    if node and script.is_file() and (project_root / "node_modules" / "elkjs").is_dir():
-        return node, script, project_root
-    return None
-
-
-def elk_layout_available() -> bool:
-    return _elk_runtime() is not None
 
 
 @dataclass(frozen=True)
@@ -3323,6 +3288,510 @@ def _clone_layout_geometry(document: LayoutDocument) -> LayoutDocument:
     )
 
 
+def _normalize_fanout_routes_as_trees(
+    document: LayoutDocument,
+    nodes,
+    logical_edges,
+    *,
+    route_clearance: float = 0.0,
+    accepted_assessment: dict[str, Any] | None = None,
+) -> tuple[LayoutDocument, dict[str, Any]]:
+    """Remove split-rejoin cycles from each physical source-port network."""
+    accepted = _clone_layout_geometry(document)
+    accepted_report = (
+        accepted_assessment
+        if accepted_assessment is not None
+        else assess_layout(accepted, logical_edges, 0.0)
+    )
+    by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+    edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+    def canonical(point: tuple[float, float]) -> tuple[float, float]:
+        return round(point[0], 6), round(point[1], 6)
+
+    def route_endpoints(
+        index: int, local_by_id=None, local_edge_by_id=None,
+    ) -> tuple[tuple[float, float], tuple[float, float]]:
+        vertices = local_by_id if local_by_id is not None else by_id
+        edges = local_edge_by_id if local_edge_by_id is not None else edge_by_id
+        edge = edges[f"e{index}"]
+        logical = logical_edges[index - 1]
+        source = vertices[edge.source_id]
+        target = vertices[edge.target_id]
+        start = abs_port_xy(
+            source.x, source.y, source.width, source.height,
+            source.style, source.drawclock_type, logical.source_port,
+        )
+        end = abs_port_xy(
+            target.x, target.y, target.width, target.height,
+            target.style, target.drawclock_type, logical.target_port,
+        )
+        return start, end
+
+    def route_points(
+        index: int, local_by_id=None, local_edge_by_id=None,
+    ) -> list[tuple[float, float]]:
+        edges = local_edge_by_id if local_edge_by_id is not None else edge_by_id
+        edge = edges[f"e{index}"]
+        start, end = route_endpoints(index, local_by_id, local_edge_by_id)
+        return [canonical(point) for point in _simplify([start, *edge.waypoints, end])]
+
+    def union_graph(
+        indices: list[int],
+        provided_paths: dict[int, list[tuple[float, float]]] | None = None,
+        local_by_id=None,
+        local_edge_by_id=None,
+    ):
+        raw = []
+        for index in indices:
+            points = (
+                provided_paths[index]
+                if provided_paths is not None
+                else route_points(index, local_by_id, local_edge_by_id)
+            )
+            raw.extend(
+                (a, b) for a, b in zip(points, points[1:]) if a != b
+            )
+        vertical: dict[float, list[tuple[float, float]]] = defaultdict(list)
+        horizontal: dict[float, list[tuple[float, float]]] = defaultdict(list)
+        vertical_breaks: dict[float, set[float]] = defaultdict(set)
+        horizontal_breaks: dict[float, set[float]] = defaultdict(set)
+        for a, b in raw:
+            if abs(a[0] - b[0]) <= 1e-6:
+                low, high = sorted((a[1], b[1]))
+                vertical[a[0]].append((low, high))
+                vertical_breaks[a[0]].update((low, high))
+            else:
+                low, high = sorted((a[0], b[0]))
+                horizontal[a[1]].append((low, high))
+                horizontal_breaks[a[1]].update((low, high))
+
+        # Report every horizontal/vertical intersection in O((S + K) log S)
+        # with a coordinate-compressed sweep.  This replaces the former
+        # all-segment-pairs scan that made large fanout groups quadratic.
+        y_values = sorted(horizontal)
+        y_index = {value: index + 1 for index, value in enumerate(y_values)}
+        bit = [0] * (len(y_values) + 1)
+        active_counts: Counter[float] = Counter()
+
+        def bit_add(index: int, value: int) -> None:
+            while index < len(bit):
+                bit[index] += value
+                index += index & -index
+
+        def bit_sum(index: int) -> int:
+            result = 0
+            while index:
+                result += bit[index]
+                index -= index & -index
+            return result
+
+        def bit_select(order: int) -> int:
+            index = 0
+            step = 1 << (len(bit).bit_length() - 1)
+            while step:
+                probe = index + step
+                if probe < len(bit) and bit[probe] < order:
+                    index = probe
+                    order -= bit[probe]
+                step >>= 1
+            return index + 1
+
+        starts: dict[float, list[float]] = defaultdict(list)
+        ends: dict[float, list[float]] = defaultdict(list)
+        for y, intervals in horizontal.items():
+            for low, high in intervals:
+                starts[low].append(y)
+                ends[high].append(y)
+        for x in sorted(set(starts) | set(ends) | set(vertical)):
+            for y in starts.get(x, ()):
+                active_counts[y] += 1
+                if active_counts[y] == 1:
+                    bit_add(y_index[y], 1)
+            for low, high in vertical.get(x, ()):
+                lower_index = bisect_left(y_values, low)
+                upper_index = bisect_right(y_values, high)
+                before = bit_sum(lower_index)
+                through = bit_sum(upper_index)
+                for order in range(before + 1, through + 1):
+                    y = y_values[bit_select(order) - 1]
+                    vertical_breaks[x].add(y)
+                    horizontal_breaks[y].add(x)
+            for y in ends.get(x, ()):
+                active_counts[y] -= 1
+                if active_counts[y] == 0:
+                    bit_add(y_index[y], -1)
+
+        def merged(intervals):
+            result = []
+            for low, high in sorted(intervals):
+                if result and low <= result[-1][1] + 1e-6:
+                    result[-1] = (result[-1][0], max(result[-1][1], high))
+                else:
+                    result.append((low, high))
+            return result
+
+        graph: dict[tuple[float, float], dict[tuple[float, float], float]] = defaultdict(dict)
+        for x, intervals in vertical.items():
+            breaks = sorted(vertical_breaks[x])
+            for low, high in merged(intervals):
+                points = breaks[bisect_left(breaks, low):bisect_right(breaks, high)]
+                for first_y, second_y in zip(points, points[1:]):
+                    first, second = (x, first_y), (x, second_y)
+                    graph[first][second] = second_y - first_y
+                    graph[second][first] = second_y - first_y
+        for y, intervals in horizontal.items():
+            breaks = sorted(horizontal_breaks[y])
+            for low, high in merged(intervals):
+                points = breaks[bisect_left(breaks, low):bisect_right(breaks, high)]
+                for first_x, second_x in zip(points, points[1:]):
+                    first, second = (first_x, y), (second_x, y)
+                    graph[first][second] = second_x - first_x
+                    graph[second][first] = second_x - first_x
+        return graph
+
+    def cycle_rank(graph) -> int:
+        parent: dict[tuple[float, float], tuple[float, float]] = {}
+
+        def find(point):
+            parent.setdefault(point, point)
+            while parent[point] != point:
+                parent[point] = parent[parent[point]]
+                point = parent[point]
+            return point
+
+        edge_count = 0
+        for left in sorted(graph):
+            for right in sorted(graph[left]):
+                if left >= right:
+                    continue
+                edge_count += 1
+                root_left, root_right = find(left), find(right)
+                if root_left != root_right:
+                    parent[root_left] = root_right
+        vertices = set(graph)
+        component_count = len({find(point) for point in vertices})
+        return max(0, edge_count - len(vertices) + component_count)
+
+    def has_cycle(graph) -> bool:
+        return cycle_rank(graph) > 0
+
+    def target_leaf_graph(graph, indices):
+        """Keep every destination contact as a leaf of the shared tree."""
+        result = {
+            point: dict(neighbours) for point, neighbours in graph.items()
+        }
+        for index in indices:
+            points = route_points(index)
+            if len(points) < 2:
+                continue
+            previous_point, end = points[-2], points[-1]
+            candidates = []
+            for neighbour, length in result.get(end, {}).items():
+                if abs(previous_point[0] - end[0]) <= 1e-6:
+                    on_approach = (
+                        abs(neighbour[0] - end[0]) <= 1e-6
+                        and min(previous_point[1], end[1]) - 1e-6
+                        <= neighbour[1]
+                        <= max(previous_point[1], end[1]) + 1e-6
+                    )
+                else:
+                    on_approach = (
+                        abs(neighbour[1] - end[1]) <= 1e-6
+                        and min(previous_point[0], end[0]) - 1e-6
+                        <= neighbour[0]
+                        <= max(previous_point[0], end[0]) + 1e-6
+                    )
+                if on_approach:
+                    candidates.append((length, neighbour))
+            if not candidates:
+                continue
+            allowed = min(candidates)[1]
+            for neighbour in tuple(result.get(end, {})):
+                if neighbour == allowed:
+                    continue
+                result[end].pop(neighbour, None)
+                result[neighbour].pop(end, None)
+        return result
+
+    def routes_share_segment(left_index: int, right_index: int) -> bool:
+        left = route_points(left_index)
+        right = route_points(right_index)
+        for a, b in zip(left, left[1:]):
+            for c, d in zip(right, right[1:]):
+                if abs(a[0] - b[0]) <= 1e-6 and abs(c[0] - d[0]) <= 1e-6:
+                    if abs(a[0] - c[0]) <= 1e-6:
+                        low = max(min(a[1], b[1]), min(c[1], d[1]))
+                        high = min(max(a[1], b[1]), max(c[1], d[1]))
+                        if high - low > 1e-6:
+                            return True
+                elif abs(a[1] - b[1]) <= 1e-6 and abs(c[1] - d[1]) <= 1e-6:
+                    if abs(a[1] - c[1]) <= 1e-6:
+                        low = max(min(a[0], b[0]), min(c[0], d[0]))
+                        high = min(max(a[0], b[0]), max(c[0], d[0]))
+                        if high - low > 1e-6:
+                            return True
+        return False
+
+    alias_consolidations = 0
+    alias_blockers: Counter[str] = Counter()
+    logical_groups: dict[tuple[str, str], list[int]] = defaultdict(list)
+    for index, logical in enumerate(logical_edges, 1):
+        logical_groups[(logical.source, logical.source_port)].append(index)
+    for (logical_source, _), logical_indices in sorted(logical_groups.items()):
+        baseline_rank = cycle_rank(union_graph(logical_indices))
+        if len(logical_indices) < 2 or baseline_rank == 0:
+            continue
+        parent = {index: index for index in logical_indices}
+
+        def find(index):
+            while parent[index] != index:
+                parent[index] = parent[parent[index]]
+                index = parent[index]
+            return index
+
+        for offset, left in enumerate(logical_indices):
+            for right in logical_indices[offset + 1:]:
+                if (
+                    edge_by_id[f"e{left}"].source_id != edge_by_id[f"e{right}"].source_id
+                    and routes_share_segment(left, right)
+                ):
+                    root_left, root_right = find(left), find(right)
+                    if root_left != root_right:
+                        parent[root_right] = root_left
+        components: dict[int, list[int]] = defaultdict(list)
+        for index in logical_indices:
+            components[find(index)].append(index)
+        for component in sorted(components.values(), key=lambda value: tuple(value)):
+            source_ids = sorted({edge_by_id[f"e{index}"].source_id for index in component})
+            if len(source_ids) < 2:
+                continue
+            candidates = []
+            for keep_source_id in source_ids:
+                candidate = _clone_layout_geometry(accepted)
+                candidate_by_id = {vertex.cell_id: vertex for vertex in candidate.vertices}
+                candidate_edges = {edge.cell_id: edge for edge in candidate.edges}
+                keep_source = candidate_by_id[keep_source_id]
+                valid = True
+                for index in component:
+                    edge = candidate_edges[f"e{index}"]
+                    logical = logical_edges[index - 1]
+                    old_points = route_points(index)
+                    target = candidate_by_id[edge.target_id]
+                    start = abs_port_xy(
+                        keep_source.x, keep_source.y, keep_source.width, keep_source.height,
+                        keep_source.style, keep_source.drawclock_type, logical.source_port,
+                    )
+                    end = abs_port_xy(
+                        target.x, target.y, target.width, target.height,
+                        target.style, target.drawclock_type, logical.target_port,
+                    )
+                    edge.source_id = keep_source_id
+                    if len(old_points) > 2:
+                        points = _simplify([
+                            start, (old_points[1][0], start[1]), *old_points[2:-1], end,
+                        ])
+                    elif abs(start[1] - end[1]) <= 1e-6:
+                        points = [start, end]
+                    else:
+                        channel = (start[0] + end[0]) / 2.0
+                        points = [start, (channel, start[1]), (channel, end[1]), end]
+                    if any(
+                        abs(a[0] - b[0]) > 1e-6 and abs(a[1] - b[1]) > 1e-6
+                        for a, b in zip(points, points[1:])
+                    ):
+                        valid = False
+                        break
+                    edge.waypoints = tuple(points[1:-1])
+                if not valid:
+                    alias_blockers["non-orthogonal"] += 1
+                    continue
+                used_source_ids = {edge.source_id for edge in candidate.edges}
+                candidate.vertices = [
+                    vertex for vertex in candidate.vertices
+                    if (vertex.logical_name or vertex.name) != logical_source
+                    or vertex.cell_id in used_source_ids
+                ]
+                candidate_by_id = {vertex.cell_id: vertex for vertex in candidate.vertices}
+                candidate_edges = {edge.cell_id: edge for edge in candidate.edges}
+                candidate_rank = cycle_rank(union_graph(
+                    logical_indices,
+                    local_by_id=candidate_by_id,
+                    local_edge_by_id=candidate_edges,
+                ))
+                if candidate_rank > baseline_rank:
+                    alias_blockers["logical-cycle"] += 1
+                    continue
+                candidate_report = assess_layout(candidate, logical_edges, 0.0)
+                accepted_visible = _visible_layout_signature(accepted, logical_edges)
+                candidate_visible = _visible_layout_signature(candidate, logical_edges)
+                changed = set(component)
+                accepted_endpoint = _route_endpoint_signature(
+                    accepted, logical_edges, changed, route_clearance
+                )
+                candidate_endpoint = _route_endpoint_signature(
+                    candidate, logical_edges, changed, route_clearance
+                )
+                checks = {
+                    "node-overlap": candidate_report["node_overlaps"] <= accepted_report["node_overlaps"],
+                    "edge-node": candidate_report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
+                    "visible-overlap": candidate_visible[4].issubset(accepted_visible[4]),
+                    "visible-edge-node": candidate_visible[5].issubset(accepted_visible[5]),
+                    "endpoint-route": candidate_endpoint.issubset(accepted_endpoint),
+                    "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
+                    "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
+                    "crossing": candidate_report["crossings"] <= accepted_report["crossings"],
+                    "bend": candidate_report["bends_total"] <= accepted_report["bends_total"],
+                    "length": candidate_report["manhattan_length"] <= accepted_report["manhattan_length"] + 1e-6,
+                }
+                if all(checks.values()):
+                    score = (
+                        candidate_rank, candidate_report["crossings"], candidate_report["bends_total"],
+                        candidate_report["manhattan_length"], keep_source_id,
+                    )
+                    candidates.append((score, candidate, candidate_report))
+                else:
+                    alias_blockers.update(name for name, passed in checks.items() if not passed)
+            if candidates:
+                _, accepted, accepted_report = min(candidates, key=lambda item: item[0])
+                by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+                edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+                alias_consolidations += len(source_ids) - 1
+                baseline_rank = cycle_rank(union_graph(logical_indices))
+
+    groups: dict[tuple[str, str], list[int]] = defaultdict(list)
+    for index, logical in enumerate(logical_edges, 1):
+        groups[(edge_by_id[f"e{index}"].source_id, logical.source_port)].append(index)
+
+    normalized = 0
+    cycles_before = 0
+    blockers: Counter[str] = Counter()
+    for indices in groups.values():
+        if len(indices) < 2:
+            continue
+        graph = union_graph(indices)
+        if not has_cycle(graph):
+            continue
+        cycles_before += 1
+        routing_graph = target_leaf_graph(graph, indices)
+        start = route_points(indices[0])[0]
+        start_state = (start, "")
+        distances = {start_state: (0.0, 0, 0)}
+        previous: dict[
+            tuple[tuple[float, float], str],
+            tuple[tuple[float, float], str],
+        ] = {}
+        queue = [(0.0, 0, 0, start, "")]
+        while queue:
+            distance, bends, hops, point, incoming_axis = heapq.heappop(queue)
+            state = (point, incoming_axis)
+            if (distance, bends, hops) != distances.get(state):
+                continue
+            for neighbour, length in sorted(routing_graph.get(point, {}).items()):
+                axis = "v" if abs(point[0] - neighbour[0]) <= 1e-6 else "h"
+                turn = int(bool(incoming_axis) and incoming_axis != axis)
+                candidate = (distance + length, bends + turn, hops + 1)
+                neighbour_state = (neighbour, axis)
+                if candidate < distances.get(
+                    neighbour_state, (math.inf, sys.maxsize, sys.maxsize)
+                ):
+                    distances[neighbour_state] = candidate
+                    previous[neighbour_state] = state
+                    heapq.heappush(queue, (*candidate, neighbour, axis))
+        candidate = _clone_layout_geometry(accepted)
+        candidate_edges = {edge.cell_id: edge for edge in candidate.edges}
+        chosen_paths: dict[int, list[tuple[float, float]]] = {}
+        complete = True
+        for index in indices:
+            end = route_points(index)[-1]
+            end_states = [
+                state for state in ((end, "h"), (end, "v"), (end, ""))
+                if state in distances
+            ]
+            if not end_states:
+                complete = False
+                break
+            state = min(end_states, key=lambda item: (distances[item], item[1]))
+            states = [state]
+            while states[-1] != start_state:
+                states.append(previous[states[-1]])
+            states.reverse()
+            path = [item[0] for item in states]
+            chosen_paths[index] = path
+            canonical_start, canonical_end = path[0], path[-1]
+            actual_start, actual_end = route_endpoints(index)
+            path[0], path[-1] = actual_start, actual_end
+            if len(path) > 2:
+                first = list(path[1])
+                if abs(first[0] - canonical_start[0]) <= 1e-6:
+                    first[0] = actual_start[0]
+                if abs(first[1] - canonical_start[1]) <= 1e-6:
+                    first[1] = actual_start[1]
+                path[1] = tuple(first)
+                last = list(path[-2])
+                if abs(last[0] - canonical_end[0]) <= 1e-6:
+                    last[0] = actual_end[0]
+                if abs(last[1] - canonical_end[1]) <= 1e-6:
+                    last[1] = actual_end[1]
+                path[-2] = tuple(last)
+            simplified = _simplify(path)
+            if len(simplified) > 2:
+                first = list(simplified[1])
+                if abs(first[0] - actual_start[0]) <= 1e-6:
+                    first[0] = actual_start[0]
+                if abs(first[1] - actual_start[1]) <= 1e-6:
+                    first[1] = actual_start[1]
+                simplified[1] = tuple(first)
+                last = list(simplified[-2])
+                if abs(last[0] - actual_end[0]) <= 1e-6:
+                    last[0] = actual_end[0]
+                if abs(last[1] - actual_end[1]) <= 1e-6:
+                    last[1] = actual_end[1]
+                simplified[-2] = tuple(last)
+            candidate_edges[f"e{index}"].waypoints = tuple(simplified[1:-1])
+        if not complete:
+            blockers["disconnected-union"] += 1
+            continue
+        if has_cycle(union_graph(indices, chosen_paths)):
+            blockers["candidate-cycle"] += 1
+            continue
+        candidate_report = assess_layout(candidate, logical_edges, 0.0)
+        checks = {
+            "node-overlap": candidate_report["node_overlaps"] <= accepted_report["node_overlaps"],
+            "edge-node": candidate_report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
+            "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
+            "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
+            "crossing": candidate_report["crossings"] <= accepted_report["crossings"],
+            "bend": candidate_report["bends_total"] <= accepted_report["bends_total"],
+            "length": candidate_report["manhattan_length"] <= accepted_report["manhattan_length"] + 1e-6,
+        }
+        # Every route now follows one predecessor map rooted at the physical
+        # output port.  The union is therefore a subtree of that predecessor
+        # tree; an additional cycle check against the still-accepted document
+        # would inspect stale routes rather than this candidate.
+        if all(checks.values()):
+            accepted = candidate
+            accepted_report = candidate_report
+            by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+            edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+            normalized += 1
+        else:
+            blockers.update(name for name, passed in checks.items() if not passed)
+    residual_logical_cycle_rank = sum(
+        cycle_rank(union_graph(indices))
+        for indices in logical_groups.values()
+        if len(indices) > 1
+    )
+    return accepted, {
+        "fanout_alias_consolidations": alias_consolidations,
+        "fanout_alias_consolidation_blockers": dict(sorted(alias_blockers.items())),
+        "fanout_cycle_candidates": cycles_before,
+        "fanout_cycles_normalized": normalized,
+        "fanout_residual_logical_cycle_rank": residual_logical_cycle_rank,
+        "fanout_tree_normalization_blockers": dict(sorted(blockers.items())),
+        "_accepted_assessment": accepted_report,
+    }
+
+
 def _nearest_clear_anchor_top(
     anchor,
     wanted: float,
@@ -4329,6 +4798,15 @@ def generate_elk_layout(
     )
     accepted_assessment = anchor_relocation_report.pop("_accepted_assessment")
     report["selection"].update(anchor_relocation_report)
+    document, tree_report = _normalize_fanout_routes_as_trees(
+        document,
+        nodes,
+        logical_edges,
+        route_clearance=profile.route_clearance,
+        accepted_assessment=accepted_assessment,
+    )
+    accepted_assessment = tree_report.pop("_accepted_assessment")
+    report["selection"].update(tree_report)
     report["selection"]["source_rendering_replicas"] = (
         len(document.vertices) - len(nodes)
     )
@@ -4359,156 +4837,4 @@ def generate_elk_layout(
         }
         for _, _, candidate_report in candidates
     ]
-    return document, report
-
-
-def _generate_elk_reference_layout(
-    config: dict[str, dict[str, Any]],
-    *,
-    library_path: LibrarySource,
-    component_hints: dict[str, str] | None = None,
-    profile_name: str = "readable",
-) -> tuple[LayoutDocument, dict[str, Any]]:
-    """Lay out a clock DAG with ELK Layered and exact library ports."""
-    started = time.perf_counter()
-    if profile_name not in PROFILES:
-        raise ValueError(f"未知布局 profile: {profile_name}")
-    runtime = _elk_runtime()
-    if runtime is None:
-        raise ValueError("ELK 布局运行时不可用；发布包应包含 runtime/node 与 runtime/elk")
-    node_executable, script, runtime_cwd = runtime
-
-    library_path = library_cache_key(library_path)
-    validate_config(config, library_path=library_path)
-    shapes = load_library_shapes(library_path)
-    nodes = resolve_nodes(
-        config, shapes, component_hints or {}, library_path=library_path
-    )
-    logical_edges = build_logical_edges(config, nodes, library_path)
-    profile = PROFILES[profile_name]
-    plan = select_layout_plan(nodes, logical_edges)
-    rank = _ranks(
-        nodes, logical_edges, _layout_column_groups(nodes)
-    )
-    if plan.mode == "domain":
-        return _generate_scalable_layout(
-            nodes, logical_edges, profile, started, library_path, plan
-        )
-    graph: dict[str, Any] = {
-        "layout": {
-            "nodeSpacing": profile.node_spacing,
-            "layerSpacing": profile.layer_spacing,
-            "edgeNodeSpacing": profile.route_clearance * 2,
-            "edgeSpacing": max(10.0, profile.grid),
-            "margin": profile.margin,
-            "mode": "quality",
-        },
-        "nodes": [],
-        "edges": [],
-    }
-    left_insets: dict[str, float] = {}
-    for name, node in nodes.items():
-        anchors = port_anchors(node.shape.style, node.shape.title)
-        width = float(node.shape.w)
-        west_xs = [rx * width for rx, _ in anchors.values() if rx < 0.5]
-        east_xs = [rx * width for rx, _ in anchors.values() if rx >= 0.5]
-        left_inset = min(west_xs) if west_xs else 0.0
-        right_boundary = max(east_xs) if east_xs else width
-        left_insets[name] = left_inset
-        graph["nodes"].append({
-            "id": name,
-            "rank": rank[name],
-            "layoutWidth": right_boundary - left_inset,
-            "height": float(node.shape.h),
-            "ports": [
-                {
-                    "id": port,
-                    "x": rx * width - left_inset,
-                    "y": ry * float(node.shape.h),
-                    "side": "WEST" if rx < 0.5 else "EAST",
-                }
-                for port, (rx, ry) in anchors.items()
-            ],
-        })
-    for index, edge in enumerate(logical_edges, 1):
-        graph["edges"].append({
-            "id": f"e{index}",
-            "source": edge.source,
-            "target": edge.target,
-            "sourcePort": edge.source_port,
-            "targetPort": edge.target_port,
-        })
-
-    try:
-        with tempfile.TemporaryDirectory(prefix="drawclock-elk-") as temp_dir:
-            input_path = Path(temp_dir) / "input.json"
-            output_path = Path(temp_dir) / "output.json"
-            input_path.write_text(json.dumps(graph), encoding="utf-8")
-            completed = subprocess.run(
-                [node_executable, str(script), str(input_path), str(output_path)],
-                cwd=runtime_cwd,
-                capture_output=True,
-                text=True,
-                timeout=120,
-                check=False,
-            )
-            if completed.returncode != 0:
-                detail = completed.stderr.strip().splitlines()[-1] if completed.stderr.strip() else "unknown error"
-                raise ValueError(f"ELK 布局失败: {detail}")
-            result = json.loads(output_path.read_text(encoding="utf-8"))
-    except subprocess.TimeoutExpired as exc:
-        raise ValueError("ELK 布局超过 120 秒预算") from exc
-
-    positions = {
-        name: (
-            round(float(position["x"]) - left_insets[name], 4),
-            round(float(position["y"]), 4),
-        )
-        for name, position in result["nodes"].items()
-    }
-    edges: list[EdgeLayout] = []
-    for index, logical in enumerate(logical_edges, 1):
-        edge_id = f"e{index}"
-        points = _simplify([
-            (round(float(point["x"]), 4), round(float(point["y"]), 4))
-            for point in result["edges"][edge_id]["points"]
-        ])
-        source_anchor = port_anchors(
-            nodes[logical.source].shape.style, nodes[logical.source].shape.title
-        )[logical.source_port]
-        target_anchor = port_anchors(
-            nodes[logical.target].shape.style, nodes[logical.target].shape.title
-        )[logical.target_port]
-        style = (
-            f"{EDGE_DRAW_STYLE}jumpStyle=arc;jumpSize=6;"
-            f"exitX={source_anchor[0]:g};exitY={source_anchor[1]:g};"
-            f"entryX={target_anchor[0]:g};entryY={target_anchor[1]:g};"
-        )
-        edges.append(EdgeLayout(
-            cell_id=edge_id,
-            source_id=nodes[logical.source].cell_id,
-            target_id=nodes[logical.target].cell_id,
-            style=style,
-            waypoints=tuple(points[1:-1]),
-        ))
-    document = LayoutDocument(
-        version=LAYOUT_VERSION,
-        vertices=_vertex_layouts(nodes, positions, library_path),
-        edges=edges,
-    )
-    report = assess_layout(document, logical_edges, (time.perf_counter() - started) * 1000)
-    report.update({
-        "engine": "elk-layered",
-        "engine_version": "elkjs 0.11.1",
-        "profile": profile_name,
-        "layout_runtime_ms": round(float(result["runtimeMs"]), 3),
-        "selection": {
-            "basis": "graph-structure",
-            "fanout_cutoff": plan.fanout_cutoff,
-            "backbone_nodes": len(plan.backbone),
-            "regular_components": plan.component_count,
-            "edge_span_load": plan.edge_span_load,
-            "gap_pair_work": plan.gap_pair_work,
-        },
-    })
     return document, report

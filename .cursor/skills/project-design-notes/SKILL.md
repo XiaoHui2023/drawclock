@@ -65,13 +65,13 @@ description: >-
 
 ## 发布
 
-- PyInstaller 可执行文件随包带 Node.js 与 ELK 运行时，不依赖宿主 PATH。
-- 发行包包含主程序、runtime、原始 `src/`、`drawio-lib/`、示例、源码部署说明和根目录 `skills/`，不含 Python wheelhouse 或依赖清单。
+- PyInstaller 可执行文件内含本项目 Python 模块，不依赖宿主 Python、Node.js、ELK 或浏览器。
+- 发行包包含主程序、原始 `src/`、`drawio-lib/`、全部公开示例、源码部署说明和根目录 `skills/`；不含 Runtime、npm 清单、Python wheelhouse 或依赖清单。
 - `skills/` 包含器件库、布局算法、JSON 合约、时钟图设计、SVG 成品、SVG 兼容性和项目导航七个渐进披露 skill；只含项目知识，不含私人路径、身份或本机自动化信息，也不是绘图运行时依赖。
-- 源码部署只要求同平台 CPython；以 `-I -S` 禁用用户目录和 site-packages 后，源码仍从发行目录 `runtime/` 加载 Node.js 与 ELK。
-- `source-manifest.json` 逐文件记录源码、项目 skill、器件库目录内各组件 XML、示例与运行时清单的 SHA-256，缺失和篡改均阻断源码消费门。
+- 源码部署只要求 CPython 3.10 或更高版本；以 `-I -S` 禁用用户目录和 site-packages 后仍可直接生成 SVG。
+- `source-manifest.json` 逐文件记录源码、项目 skill、器件库目录内各组件 XML 与示例的 SHA-256，缺失和篡改均阻断源码消费门。
 - 冻结包门和源码包门都执行包内 skill 校验器，检查固定目录集合、frontmatter、单层 references、链接完整性、UTF-8 和私人绝对路径。
-- 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、严格 JSON 拒绝规则、文件与目录混合器件库、默认圆弧、示例、复杂图和 512 时钟压力图。
+- 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、严格 JSON 拒绝规则、文件与目录混合器件库、默认圆弧、示例、复杂图及 512/1024/2048/4096 四档压力图，并拒绝任何 Runtime/npm 污染。
 - 本地 `pack.sh` / `pack.bat` 在创建环境、下载依赖或修改 `dist/` 之前执行自包含 release 门；任一反馈未自然复现、未修复验证或未关闭均非零退出。
 - GitHub Actions 的反馈门是 build 的必要前驱，publish 同时依赖反馈门与 build；发布 job 禁止用 `always()` 绕过失败传播。
 - 同一解压包还要创建空虚拟环境，通过 `python -I -S src` 生成可解析的 SVG，证明源码不借用第三方 Python 包。

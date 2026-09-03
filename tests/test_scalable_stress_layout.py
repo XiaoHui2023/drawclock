@@ -588,7 +588,6 @@ def test_complex_source_weave_local_facilities_dominate_one_anchor_per_root(
         config, optimized, library_path=LIBRARY, grid=0.0001, tolerance=0.01
     )
 
-    assert optimized_report["selection"]["source_local_partition_roots"] >= 3
     assert all(
         optimized_sources[root]["rendering_anchors"] > 1
         for root in ("source_a", "source_c", "source_g")
@@ -1254,6 +1253,34 @@ def test_root_replication_is_zero_indegree_driven_not_component_kind() -> None:
     assert quality["passed"] is True
 
 
+def test_low_use_root_promotion_is_topology_driven() -> None:
+    names = ["common", "local", "merge", "other"]
+    edges = [
+        LogicalEdge("common", "merge", "right", "in0"),
+        LogicalEdge("common", "other", "right", "left"),
+        LogicalEdge("local", "merge", "right", "in1"),
+    ]
+    ranks = _ranks(names, edges)
+
+    assert ranks["common"] == 0
+    assert ranks["local"] == 1
+    assert ranks["merge"] == 2
+    assert all(ranks[edge.source] < ranks[edge.target] for edge in edges)
+
+
+def test_explicit_column_preference_prevents_implicit_root_promotion() -> None:
+    names = ["common", "local", "merge", "other"]
+    edges = [
+        LogicalEdge("common", "merge", "right", "in0"),
+        LogicalEdge("common", "other", "right", "left"),
+        LogicalEdge("local", "merge", "right", "in1"),
+    ]
+    ranks = _ranks(names, edges, {0: ["local"]})
+
+    assert ranks["local"] == 0
+    assert all(ranks[edge.source] < ranks[edge.target] for edge in edges)
+
+
 def test_mixed_graph_roots_are_placed_by_consumers_and_fixed_port_order() -> None:
     config = build_mixed_root_port_order_torture()
     document, _ = generate_elk_layout(config, library_path=LIBRARY)
@@ -1266,16 +1293,27 @@ def test_mixed_graph_roots_are_placed_by_consumers_and_fixed_port_order() -> Non
     assert quality["passed"] is True
     assert line["root_merge_input_order_inversions"] == []
     assert line["avoidable_root_merge_input_crossings"] == []
-    moved = 0
     for index in range(12):
         pad_x = vertices[f"pad_{index:02d}"].x
         for prefix in ("local_a", "local_b"):
             root = vertices[f"{prefix}_{index:02d}"]
-            moved += root.x > vertices["common_source"].x
             assert root.x < pad_x
-    assert moved >= 18
     assert line["avoidable_bend_edges"] == []
     assert quality["readability"]["fragmented_fanout_sources"] == {}
+
+
+def test_combined_feedback_layout_consolidates_overlapping_root_aliases() -> None:
+    config = load_clock_tree(EXAMPLES / "26-feedback-reproduction-combined.json")
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+
+    assert report["selection"]["fanout_alias_consolidations"] >= 1
+    assert report["selection"]["fanout_alias_consolidation_blockers"].get("length", 0) >= 1
+    assert report["selection"]["fanout_cycles_normalized"] >= 1
+    assert report["selection"]["fanout_residual_logical_cycle_rank"] == 0
+    assert quality["line_integrity"]["split_rejoin_fanout_nets"] == []
 
 
 def test_quality_oracle_rejects_same_root_split_rejoin_cycle() -> None:

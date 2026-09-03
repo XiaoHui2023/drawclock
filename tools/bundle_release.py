@@ -14,7 +14,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 BINARY_NAMES = ("drawclock",)
 
-# 运行时资源、绘图专档、源码部署材料与分层质量样例。
+# 绘图专档、源码部署材料与分层质量样例。
 RELEASE_PATHS = (
     "README.md",
     "draw.md",
@@ -24,24 +24,11 @@ RELEASE_PATHS = (
     "drawio-lib",
     "skills",
     "example/draw.json",
-    "example/auto-layout/01-linear.json",
-    "example/auto-layout/05-dense-cross-root.json",
-    "example/auto-layout/08-stress-512-clocks.json",
-    "example/auto-layout/19-dispersed-root-fanout.json",
-    "example/auto-layout/20-asymmetric-merge-route-bulge.json",
-    "example/auto-layout/21-layout-column-preference.json",
-    "example/auto-layout/22-terminal-frequency-table.json",
-    "example/auto-layout/23-middle-column-low-use-sources.json",
-    "example/auto-layout/24-single-source-rendering-alias.json",
-    "example/auto-layout/25-mixed-root-port-order-torture.json",
 )
 
 SOURCE_PATHS = (
     ("src", "src"),
 )
-
-RUNTIME_PATH = ".runtime"
-
 
 def _sha256(path: pathlib.Path) -> str:
     digest = hashlib.sha256()
@@ -119,11 +106,15 @@ def main() -> int:
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dest)
 
-    runtime = ROOT / RUNTIME_PATH
-    if not (runtime / "runtime-manifest.json").is_file():
-        print("错误: 发布运行时未准备完成。", file=sys.stderr)
+    example_source = ROOT / "example" / "auto-layout"
+    example_target = bundle_dir / "example" / "auto-layout"
+    example_target.mkdir(parents=True, exist_ok=True)
+    example_paths = sorted(example_source.glob("*.json"))
+    if not example_paths:
+        print("错误: 未找到自动布局 JSON 示例。", file=sys.stderr)
         return 1
-    shutil.copytree(runtime, bundle_dir / "runtime")
+    for source in example_paths:
+        shutil.copy2(source, example_target / source.name)
 
     manifest_paths = [
         path
@@ -142,7 +133,6 @@ def main() -> int:
         path for path in (bundle_dir / "example").rglob("*.json")
         if path.is_file()
     )
-    manifest_paths.append(bundle_dir / "runtime/runtime-manifest.json")
     source_manifest = {
         "schema": 1,
         "files": {

@@ -13,8 +13,15 @@ __pycache__/
 !.reproduction/receipts/*.json
 !.reproduction/evidence/
 .reproduction/evidence/*
-!.reproduction/evidence/20260903T082519Z-2df8f82f/
-!.reproduction/evidence/20260903T082519Z-2df8f82f/**
+!.reproduction/evidence/20260903T105237Z-2a59310a/
+!.reproduction/evidence/20260903T105237Z-2a59310a/**
+!.reproduction/fix-receipts/
+.reproduction/fix-receipts/*
+!.reproduction/fix-receipts/*.json
+!.reproduction/fix-evidence/
+.reproduction/fix-evidence/*
+!.reproduction/fix-evidence/20260903T105303Z-d8d5eb84/
+!.reproduction/fix-evidence/20260903T105303Z-d8d5eb84/**
 .mypy_cache/
 .ruff_cache/
 dist/

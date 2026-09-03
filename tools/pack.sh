@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the executable and an archive with source and bundled layout runtime.
+# Build the dependency-free executable and source archive.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -89,9 +89,6 @@ ensure_venv
 "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall -e ".[dev]" 2>/dev/null \
   || "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall -e .
 "${PYTHON_CMD[@]}" -m pip install -q --upgrade --force-reinstall "pyinstaller>=6.0"
-npm install --ignore-scripts
-"${PYTHON_CMD[@]}" "$ROOT/tools/fetch_release_runtime.py"
-
 rm -rf "$ROOT/build" "$ROOT/dist"
 
 echo "==> PyInstaller: drawclock.spec"

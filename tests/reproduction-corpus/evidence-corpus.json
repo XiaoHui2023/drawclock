@@ -10,7 +10,7 @@
       "cli_mode": "direct",
       "input": "example/auto-layout/25-mixed-root-port-order-torture.json",
       "library": "drawio-lib",
-      "issues": ["FB-ROOT-001", "FB-ROOT-003", "FB-ROOT-004"]
+      "issues": ["FB-ROOT-003", "FB-ROOT-004"]
     },
     {
       "id": "pad-weave-baseline",
@@ -19,7 +19,7 @@
       "cli_mode": "direct",
       "input": "tests/reproduction-corpus/pad-r08-s00.json",
       "library": "drawio-lib",
-      "issues": ["FB-ROUTE-002", "FB-BEND-005"]
+      "issues": ["FB-ROOT-001", "FB-ROUTE-002", "FB-BEND-005"]
     },
     {
       "id": "asymmetric-port-baseline",
@@ -29,6 +29,14 @@
       "input": "example/auto-layout/20-asymmetric-merge-route-bulge.json",
       "library": "drawio-lib/drawclock.xml",
       "issues": ["FB-PORT-006"]
+    }
+  ],
+  "current_fix_cases": [
+    {
+      "id": "combined-cross-feature-current",
+      "input": "example/auto-layout/26-feedback-reproduction-combined.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROUTE-002"]
     }
   ]
 }

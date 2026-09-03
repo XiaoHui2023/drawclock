@@ -2,7 +2,7 @@
 
 ## 包内容
 
-发行压缩包至少包含：冻结可执行文件、`src/`、`runtime/`、`drawio-lib/`、公开示例、用户文档、`skills/` 和 `source-manifest.json`。
+发行压缩包至少包含：冻结可执行文件、`src/`、`drawio-lib/`、`example/auto-layout/` 下的全部 JSON 示例、用户文档、`skills/` 和 `source-manifest.json`。包内禁止出现未使用的 Node.js、ELK、浏览器或第三方 Python 运行时。
 
 `skills/` 是纯文本维护资料，不是程序运行依赖；即使删除它，绘图运行逻辑也不应改变。发行门验证七个 skill 齐全、引用有效、无私人路径或身份信息，并把它们纳入 SHA-256 清单。
 

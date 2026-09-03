@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "issue_id": "FB-ROUTE-002",
+  "result": "fixed_verified",
+  "verification_group": "20260903T105303Z-d8d5eb84",
+  "baseline_fails": true,
+  "current_passes": true,
+  "baseline_receipt": ".reproduction/receipts/FB-ROUTE-002.json",
+  "baseline_receipt_sha256": "0fe642e8596f70872bf136f2136c06d3c6555f2ea87a0d5df01a702af258fcfc",
+  "source_tree_sha256": "9e410f4864cad0af13f7d3266b78d8d6c934b6701ec5854bbd0bec18c380c1f0",
+  "library_tree_sha256": "109a44f3fc7697b70965ab41ce630888486e19dc13fe4c64ab4a068922a81305",
+  "runner_sha256": "d85b0fecfc44146cb95dad93983c6e55a5a27628017b83eb9fdb1ce1560234da",
+  "oracle_sha256": "8c8ab93fec6260a95377c7c89bddf9ef5c610b04ce0fd26e70b4ec09ad8189f6",
+  "attempts": [
+    {
+      "run_id": "20260903T105303Z-d8d5eb84:pad-weave-baseline:1",
+      "case_id": "pad-weave-baseline",
+      "public_entrypoint": "public_cli",
+      "producer_exit_code": 0,
+      "issue_oracle_exit_code": 1,
+      "detected_issue_ids": [],
+      "artifact_before_oracle_sha256": "15b634557ea1ee8bccdafa5f8a84a118320c7feada329d1ac31106bbc6816401",
+      "artifact_after_oracle_sha256": "15b634557ea1ee8bccdafa5f8a84a118320c7feada329d1ac31106bbc6816401",
+      "input_sha256": "90a46ca8a251e363e1214eb2058489468a169a1a0dac2cc1619b0278c6e3f422",
+      "source_tree_sha256": "9e410f4864cad0af13f7d3266b78d8d6c934b6701ec5854bbd0bec18c380c1f0",
+      "library_tree_sha256": "109a44f3fc7697b70965ab41ce630888486e19dc13fe4c64ab4a068922a81305",
+      "runner_sha256": "d85b0fecfc44146cb95dad93983c6e55a5a27628017b83eb9fdb1ce1560234da",
+      "oracle_sha256": "8c8ab93fec6260a95377c7c89bddf9ef5c610b04ce0fd26e70b4ec09ad8189f6",
+      "started_at": "2026-09-03T10:53:05.202045+00:00",
+      "ended_at": "2026-09-03T10:53:05.982962+00:00",
+      "evidence_files": {
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/pad-weave-baseline/attempt-1/output.svg": "15b634557ea1ee8bccdafa5f8a84a118320c7feada329d1ac31106bbc6816401",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/pad-weave-baseline/attempt-1/producer.log": "1687d059cb15e9685a330052eb11d093eced57d6d534c9da7915a6bd4120e8eb",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/pad-weave-baseline/attempt-1/report.json": "7c038e08facfc2c592c10b4e59e26b668b9ee66dd78a3538d8962a1d437b1402",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/pad-weave-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/pad-weave-baseline/attempt-1/FB-ROUTE-002.log": "8bb81ba5d2df4f8bdde4ea88ee68bd0d4e7bedf3b14ecb789e6b8f80f636d16f"
+      }
+    },
+    {
+      "run_id": "20260903T105303Z-d8d5eb84:pad-weave-baseline:2",
+      "case_id": "pad-weave-baseline",
+      "public_entrypoint": "public_cli",
+      "producer_exit_code": 0,
+      "issue_oracle_exit_code": 1,
+      "detected_issue_ids": [],
+      "artifact_before_oracle_sha256": "15b634557ea1ee8bccdafa5f8a84a118320c7feada329d1ac31106bbc6816401",
+      "artifact_after_oracle_sha256": "15b634557ea1ee8bccdafa5f8a84a118320c7feada329d1ac31106bbc6816401",
+      "input_sha256": "90a46ca8a251e363e1214eb2058489468a169a1a0dac2cc1619b0278c6e3f422",
+      "source_tree_sha256": "9e410f4864cad0af13f7d3266b78d8d6c934b6701ec5854bbd0bec18c380c1f0",
+      "library_tree_sha256": "109a44f3fc7697b70965ab41ce630888486e19dc13fe4c64ab4a068922a81305",
+      "runner_sha256": "d85b0fecfc44146cb95dad93983c6e55a5a27628017b83eb9fdb1ce1560234da",
+      "oracle_sha256": "8c8ab93fec6260a95377c7c89bddf9ef5c610b04ce0fd26e70b4ec09ad8189f6",
+      "started_at": "2026-09-03T10:53:06.171162+00:00",
+      "ended_at": "2026-09-03T10:53:06.967660+00:00",
+      "evidence_files": {
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/pad-weave-baseline/attempt-2/output.svg": "15b634557ea1ee8bccdafa5f8a84a118320c7feada329d1ac31106bbc6816401",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/pad-weave-baseline/attempt-2/producer.log": "7ac8d17148fa40346aeed8995aba2487b7bd40eb3d5ef7e35e402e130d3b0df5",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/pad-weave-baseline/attempt-2/report.json": "7c038e08facfc2c592c10b4e59e26b668b9ee66dd78a3538d8962a1d437b1402",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/pad-weave-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/pad-weave-baseline/attempt-2/FB-ROUTE-002.log": "8bb81ba5d2df4f8bdde4ea88ee68bd0d4e7bedf3b14ecb789e6b8f80f636d16f"
+      }
+    },
+    {
+      "run_id": "20260903T105303Z-d8d5eb84:combined-cross-feature-current:1",
+      "case_id": "combined-cross-feature-current",
+      "public_entrypoint": "public_cli",
+      "producer_exit_code": 0,
+      "issue_oracle_exit_code": 1,
+      "detected_issue_ids": [],
+      "artifact_before_oracle_sha256": "412051eaeadc16976db34536657372a62d63d015eb3fa9d3ef84ac2bf8eafb2c",
+      "artifact_after_oracle_sha256": "412051eaeadc16976db34536657372a62d63d015eb3fa9d3ef84ac2bf8eafb2c",
+      "input_sha256": "28a1e58887b56d3a5f57a28652d621daf4c7c1e835a990561c4a2945e76cf937",
+      "source_tree_sha256": "9e410f4864cad0af13f7d3266b78d8d6c934b6701ec5854bbd0bec18c380c1f0",
+      "library_tree_sha256": "109a44f3fc7697b70965ab41ce630888486e19dc13fe4c64ab4a068922a81305",
+      "runner_sha256": "d85b0fecfc44146cb95dad93983c6e55a5a27628017b83eb9fdb1ce1560234da",
+      "oracle_sha256": "8c8ab93fec6260a95377c7c89bddf9ef5c610b04ce0fd26e70b4ec09ad8189f6",
+      "started_at": "2026-09-03T10:53:08.215868+00:00",
+      "ended_at": "2026-09-03T10:53:09.183689+00:00",
+      "evidence_files": {
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/combined-cross-feature-current/attempt-1/output.svg": "412051eaeadc16976db34536657372a62d63d015eb3fa9d3ef84ac2bf8eafb2c",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/combined-cross-feature-current/attempt-1/producer.log": "a2d0a57219cf7fc5de2d6ac88a0b04cfa37d0a9ce4b37841d30c4301a7b1940b",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/combined-cross-feature-current/attempt-1/report.json": "5c446380193045c3fd476f4b994702c8f322754e6d8831f4e5e5dad4c709743b",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/combined-cross-feature-current/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/combined-cross-feature-current/attempt-1/FB-ROUTE-002.log": "24d09e7c4234b81c04d09323fd7c59b56f9b56b8f348861c04a702c183544c69"
+      }
+    },
+    {
+      "run_id": "20260903T105303Z-d8d5eb84:combined-cross-feature-current:2",
+      "case_id": "combined-cross-feature-current",
+      "public_entrypoint": "public_cli",
+      "producer_exit_code": 0,
+      "issue_oracle_exit_code": 1,
+      "detected_issue_ids": [],
+      "artifact_before_oracle_sha256": "412051eaeadc16976db34536657372a62d63d015eb3fa9d3ef84ac2bf8eafb2c",
+      "artifact_after_oracle_sha256": "412051eaeadc16976db34536657372a62d63d015eb3fa9d3ef84ac2bf8eafb2c",
+      "input_sha256": "28a1e58887b56d3a5f57a28652d621daf4c7c1e835a990561c4a2945e76cf937",
+      "source_tree_sha256": "9e410f4864cad0af13f7d3266b78d8d6c934b6701ec5854bbd0bec18c380c1f0",
+      "library_tree_sha256": "109a44f3fc7697b70965ab41ce630888486e19dc13fe4c64ab4a068922a81305",
+      "runner_sha256": "d85b0fecfc44146cb95dad93983c6e55a5a27628017b83eb9fdb1ce1560234da",
+      "oracle_sha256": "8c8ab93fec6260a95377c7c89bddf9ef5c610b04ce0fd26e70b4ec09ad8189f6",
+      "started_at": "2026-09-03T10:53:09.196556+00:00",
+      "ended_at": "2026-09-03T10:53:10.164633+00:00",
+      "evidence_files": {
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/combined-cross-feature-current/attempt-2/output.svg": "412051eaeadc16976db34536657372a62d63d015eb3fa9d3ef84ac2bf8eafb2c",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/combined-cross-feature-current/attempt-2/producer.log": "e9cd6c9858e02d39e059380ad5bbbc337a09d10fd35953fb7c1a578e533d6cd9",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/combined-cross-feature-current/attempt-2/report.json": "5c446380193045c3fd476f4b994702c8f322754e6d8831f4e5e5dad4c709743b",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/combined-cross-feature-current/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260903T105303Z-d8d5eb84/combined-cross-feature-current/attempt-2/FB-ROUTE-002.log": "24d09e7c4234b81c04d09323fd7c59b56f9b56b8f348861c04a702c183544c69"
+      }
+    }
+  ]
+}

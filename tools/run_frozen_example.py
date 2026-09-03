@@ -19,6 +19,9 @@ DRAW_EXAMPLE = ROOT / "example" / "draw.json"
 LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
 DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
 STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
+STRESS_1024 = ROOT / "example" / "auto-layout" / "09-stress-1024-clocks.json"
+STRESS_2048 = ROOT / "example" / "auto-layout" / "10-stress-2048-clocks.json"
+STRESS_4096 = ROOT / "example" / "auto-layout" / "11-stress-4096-clocks.json"
 ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
 COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
 FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
@@ -317,17 +320,21 @@ def _assert_frequency_table(path: Path, config_path: Path) -> None:
 
 
 def main() -> int:
-    global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC
+    global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS
+    global STRESS_1024, STRESS_2048, STRESS_4096, ASYMMETRIC
     global COLUMN_PREFERENCE, FREQUENCY, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE, SKILLS
     binary = _binary_path()
     package_root = binary.parent
-    if (package_root / "runtime" / "runtime-manifest.json").is_file():
+    if (package_root / "source-manifest.json").is_file():
         ROOT = package_root
         LIBRARY = ROOT / "drawio-lib" / "drawclock"
         DRAW_EXAMPLE = ROOT / "example" / "draw.json"
         LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
         DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
         STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
+        STRESS_1024 = ROOT / "example" / "auto-layout" / "09-stress-1024-clocks.json"
+        STRESS_2048 = ROOT / "example" / "auto-layout" / "10-stress-2048-clocks.json"
+        STRESS_4096 = ROOT / "example" / "auto-layout" / "11-stress-4096-clocks.json"
         ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
         COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
         FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
@@ -335,14 +342,10 @@ def main() -> int:
         SINGLE_ALIAS = ROOT / "example" / "auto-layout" / "24-single-source-rendering-alias.json"
         MIDDLE_SOURCE = ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
         SKILLS = ROOT / "skills"
-    runtime = binary.parent / "runtime"
     required = (
-        binary, DRAW_EXAMPLE, LINEAR, DENSE, STRESS, ASYMMETRIC,
+        binary, DRAW_EXAMPLE, LINEAR, DENSE, STRESS,
+        STRESS_1024, STRESS_2048, STRESS_4096, ASYMMETRIC,
         COLUMN_PREFERENCE, FREQUENCY, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE,
-        runtime / "runtime-manifest.json",
-        runtime / ("node/node.exe" if sys.platform == "win32" else "node/bin/node"),
-        runtime / "elk" / "elk_layout.mjs",
-        runtime / "elk" / "node_modules" / "elkjs" / "lib" / "elk.bundled.js",
         SKILLS / "clock-diagram-design" / "SKILL.md",
         SKILLS / "clock-json-schema" / "SKILL.md",
         SKILLS / "clock-layout-algorithms" / "SKILL.md",
@@ -357,6 +360,15 @@ def main() -> int:
         missing.append(str(LIBRARY))
     if missing:
         print("missing release inputs:\n" + "\n".join(missing), file=sys.stderr)
+        return 1
+    forbidden_runtime = (
+        package_root / "runtime",
+        package_root / "node_modules",
+        package_root / "package.json",
+        package_root / "package-lock.json",
+    )
+    if any(path.exists() for path in forbidden_runtime):
+        print("release contains an unused Node/ELK runtime", file=sys.stderr)
         return 1
 
     subprocess.run(
@@ -375,6 +387,9 @@ def main() -> int:
     _draw(binary, LINEAR, out / "arbitrary-suffix.png", "--crossing-style", "gap")
     _draw(binary, DENSE, out / "dense-frozen.svg")
     _draw(binary, STRESS, out / "stress-512-frozen.svg")
+    _draw(binary, STRESS_1024, out / "stress-1024-frozen.svg")
+    _draw(binary, STRESS_2048, out / "stress-2048-frozen.svg")
+    _draw(binary, STRESS_4096, out / "stress-4096-frozen.svg")
     _draw(
         binary, ASYMMETRIC, out / "asymmetric-frozen.svg",
         max_total_bends=2,

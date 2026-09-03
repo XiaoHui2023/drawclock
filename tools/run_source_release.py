@@ -44,12 +44,6 @@ def validate_source_manifest(root: pathlib.Path) -> None:
         for path in base.rglob("*")
         if path.is_file()
     }
-    required_paths = {
-        "runtime/runtime-manifest.json",
-    }
-    actual_paths.update(
-        relative for relative in required_paths if (root / relative).is_file()
-    )
     library_dir = root / "drawio-lib" / "drawclock"
     library_paths = {
         path.relative_to(root).as_posix()
@@ -72,9 +66,16 @@ def validate_source_manifest(root: pathlib.Path) -> None:
     )
     if missing_skills:
         raise ValueError(f"release project skills are missing: {missing_skills}")
-    legacy_paths = (root / "requirements-offline.txt", root / "vendor" / "wheels")
+    legacy_paths = (
+        root / "requirements-offline.txt",
+        root / "vendor" / "wheels",
+        root / "runtime",
+        root / "node_modules",
+        root / "package.json",
+        root / "package-lock.json",
+    )
     if any(path.exists() for path in legacy_paths):
-        raise ValueError("release still contains legacy Python runtime dependencies")
+        raise ValueError("release still contains unused runtime dependencies")
     if not (root / "licenses/NotoSansCJK-OFL-1.1.txt").is_file():
         raise ValueError("release is missing the embedded heading outline license")
     if set(expected) != actual_paths:

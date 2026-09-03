@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
@@ -15,6 +16,27 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / ".cursor/skills/project-goals/issues/user-feedback-natural-reproduction.json"
 USER_VALIDATOR = Path.home() / ".cursor/skills/agent-quality-workflow/scripts/validate_feedback_reproduction.py"
 RELEASE_STATES = {"fixed_verified", "closed"}
+
+
+def _sha(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as stream:
+        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _canonical(value: Any) -> str:
+    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _tree_hash(root: Path) -> str:
+    files = sorted(
+        path for path in root.rglob("*")
+        if path.is_file() and "__pycache__" not in path.parts
+    )
+    return _canonical([(path.relative_to(ROOT).as_posix(), _sha(path)) for path in files])
 
 
 def _text(value: Any) -> str:
@@ -145,6 +167,86 @@ def _validate_release_receipt(issue: dict[str, Any], errors: list[str]) -> None:
         errors.append(f"{issue_id}: reproduction run IDs must be present and independent")
 
 
+def _validate_fix_receipt(issue: dict[str, Any], errors: list[str]) -> None:
+    issue_id = issue.get("id", "<missing>")
+    fix = issue.get("fix_verification")
+    if not isinstance(fix, dict):
+        errors.append(f"{issue_id}: fix verification is missing")
+        return
+    relative = fix.get("receipt")
+    if not _text(relative):
+        errors.append(f"{issue_id}: fix verification receipt path is missing")
+        return
+    path = (ROOT / relative).resolve()
+    try:
+        path.relative_to(ROOT.resolve())
+    except ValueError:
+        errors.append(f"{issue_id}: fix verification receipt escapes repository")
+        return
+    try:
+        receipt = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"{issue_id}: invalid fix verification receipt: {exc}")
+        return
+    if receipt.get("schema_version") != 1 or receipt.get("issue_id") != issue_id:
+        errors.append(f"{issue_id}: fix receipt identity/schema mismatch")
+    if receipt.get("result") != "fixed_verified" or receipt.get("baseline_fails") is not True or receipt.get("current_passes") is not True:
+        errors.append(f"{issue_id}: fix receipt does not prove failing baseline and passing current output")
+    baseline = ROOT / str(receipt.get("baseline_receipt", ""))
+    if not baseline.is_file() or receipt.get("baseline_receipt_sha256") != _sha(baseline):
+        errors.append(f"{issue_id}: fix receipt baseline lineage is stale")
+    if receipt.get("source_tree_sha256") != _tree_hash(ROOT / "src"):
+        errors.append(f"{issue_id}: fix receipt source tree is stale")
+    if receipt.get("library_tree_sha256") != _tree_hash(ROOT / "drawio-lib"):
+        errors.append(f"{issue_id}: fix receipt library tree is stale")
+    runner = ROOT / "tools/run_feedback_fix_verification.py"
+    oracle = ROOT / "tools/feedback_layout_reproduction_oracle.py"
+    if receipt.get("runner_sha256") != _sha(runner) or receipt.get("oracle_sha256") != _sha(oracle):
+        errors.append(f"{issue_id}: fix receipt runner/oracle lineage is stale")
+    attempts = receipt.get("attempts")
+    if not isinstance(attempts, list) or len(attempts) < 2:
+        errors.append(f"{issue_id}: fix receipt needs two current public runs")
+        return
+    run_ids = []
+    case_runs: dict[str, list[dict[str, Any]]] = {}
+    for index, attempt in enumerate(attempts):
+        if not isinstance(attempt, dict):
+            errors.append(f"{issue_id}: invalid fix attempt {index}")
+            continue
+        run_ids.append(attempt.get("run_id"))
+        case_id = attempt.get("case_id")
+        if not _text(case_id):
+            errors.append(f"{issue_id}: fix attempt {index} has no case identity")
+        else:
+            case_runs.setdefault(case_id, []).append(attempt)
+        if attempt.get("public_entrypoint") != "public_cli" or attempt.get("producer_exit_code") != 0:
+            errors.append(f"{issue_id}: fix attempt {index} did not use a successful public CLI")
+        if attempt.get("issue_oracle_exit_code") != 1 or issue_id in attempt.get("detected_issue_ids", []):
+            errors.append(f"{issue_id}: fix attempt {index} still observes the symptom")
+        if attempt.get("artifact_before_oracle_sha256") != attempt.get("artifact_after_oracle_sha256"):
+            errors.append(f"{issue_id}: fix attempt {index} mutated the output")
+        evidence = attempt.get("evidence_files")
+        if not isinstance(evidence, dict) or not evidence:
+            errors.append(f"{issue_id}: fix attempt {index} has no evidence")
+        else:
+            for relative_path, expected in evidence.items():
+                evidence_path = ROOT / relative_path
+                if not evidence_path.is_file() or _sha(evidence_path) != expected:
+                    errors.append(f"{issue_id}: fix evidence is missing or stale: {relative_path}")
+    if not all(run_ids) or len(run_ids) != len(set(run_ids)):
+        errors.append(f"{issue_id}: fix run IDs must be independent")
+    for case_id, runs in case_runs.items():
+        if len(runs) < 2:
+            errors.append(f"{issue_id}: fix case {case_id} needs two independent runs")
+            continue
+        inputs = {run.get("input_sha256") for run in runs}
+        artifacts = {run.get("artifact_before_oracle_sha256") for run in runs}
+        if None in inputs or len(inputs) != 1:
+            errors.append(f"{issue_id}: fix case {case_id} does not bind one input")
+        if None in artifacts or len(artifacts) != 1:
+            errors.append(f"{issue_id}: fix case {case_id} is nondeterministic")
+
+
 def _release_gate() -> int:
     try:
         manifest = json.loads(MANIFEST.read_text(encoding="utf-8-sig"))
@@ -166,9 +268,7 @@ def _release_gate() -> int:
         if issue.get("status") not in RELEASE_STATES:
             errors.append(f"{issue_id}: release blocked; status is {issue.get('status')}")
         _validate_release_receipt(issue, errors)
-        fix = issue.get("fix_verification")
-        if not isinstance(fix, dict) or fix.get("baseline_fails") is not True or fix.get("current_passes") is not True:
-            errors.append(f"{issue_id}: release requires failing baseline and passing current artifact")
+        _validate_fix_receipt(issue, errors)
     incidents = manifest.get("process_incidents", [])
     if not isinstance(incidents, list):
         errors.append("process_incidents must be an array")

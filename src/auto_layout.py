@@ -258,6 +258,52 @@ def _ranks(
         cyclic = sorted(name for name, degree in indegree.items() if degree > 0)
         raise ValueError(f"clock-tree 包含环路: {', '.join(cyclic)}")
 
+    # A low-use root feeding the same merge as a reusable root needs a real
+    # intermediate layer.  Moving it after routing makes the old distribution
+    # trunk look like an obstacle and traps the layout in the first column.
+    # Seed the layer before the merge here, so ordering and routing see the
+    # complete geometry together.  The rule uses only indegree, outdegree and
+    # ancestry; component kinds and fixture names never participate.
+    explicit_column_nodes = {
+        name for cohort in (layout_columns or {}).values() for name in cohort
+    }
+    root_outdegree = {
+        name: len(outgoing[name]) for name in visited if not incoming[name]
+    }
+    ancestor_roots: dict[str, frozenset[str]] = {}
+    for name in visited:
+        ancestor_roots[name] = (
+            frozenset((name,))
+            if not incoming[name]
+            else frozenset().union(
+                *(ancestor_roots[parent] for parent in incoming[name])
+            )
+        )
+    promoted_roots = {
+        root
+        for root, degree in root_outdegree.items()
+        if degree == 1
+        and root not in explicit_column_nodes
+        and any(
+            other != root and root_outdegree.get(other, 0) > 1
+            for other in ancestor_roots[outgoing[root][0]]
+        )
+    }
+    distribution_roots = {
+        root
+        for root, degree in root_outdegree.items()
+        if degree > 1
+        and any(len(incoming[target]) > 1 for target in outgoing[root])
+    }
+    if promoted_roots:
+        for name in visited:
+            if not incoming[name]:
+                earliest[name] = int(name in promoted_roots)
+            else:
+                earliest[name] = max(
+                    earliest[parent] + 1 for parent in incoming[name]
+                )
+
     # Repeated reconvergence is easier to scan when equivalent merge points
     # share a column.  Build cohorts from topology only: the complete set of
     # root ancestors plus the number of merge points already traversed.  The
@@ -369,6 +415,10 @@ def _ranks(
             item for item in representatives if constraint_indegree[item] == 0
         )
         constraint_rank = {item: 0 for item in representatives}
+        for name in promoted_roots:
+            constraint_rank[representative[name]] = max(
+                constraint_rank[representative[name]], 1
+            )
         constraint_visited = 0
         while constraint_queue:
             item = constraint_queue.popleft()
@@ -435,6 +485,8 @@ def _ranks(
             anchored[name] = min(
                 anchored[name], min(anchored[child] - 1 for child in children)
             )
+    for root in distribution_roots - explicit_column_nodes:
+        anchored[root] = earliest[root]
     return anchored
 
 
