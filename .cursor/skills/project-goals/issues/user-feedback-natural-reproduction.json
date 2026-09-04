@@ -247,7 +247,7 @@
       "summary": "紧凑且工整的公共零入度时钟消费带被过度拆成多个同名显示节点",
       "expected": "同一零入度逻辑器件的多个下游若形成相邻或近邻且排列工整的消费带，应优先由一个显示设施和一条共享纵向主干贯穿分发；只有拆分能严格改善更高优先级的碰撞、异网重叠、交叉或显著远距走线时才允许多个同名显示节点",
       "actual": "用户观察到公共 clock 连接相距约四至五行的多个节点时被拆成多个同名器件分别连接，虽然单一纵线整体分发更整齐美观；进一步澄清视觉条目应交替为 common root→mux3_i 与 private root_i→mux3_i，第三输入允许空置，多个 mux3 后继续连接下游链，此时公共根仍应形成一条共享纵线。此前新增的 pad3 用例选错器件语义，不能作为该澄清要求的覆盖证据",
-      "status": "fixed_verified",
+      "status": "closed",
       "owner_paths": ["src/**"],
       "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
       "baseline_revision": "41a5e5963088f81aba62a66d46464234d504d473",
@@ -267,7 +267,13 @@
       "fix_verification": {
         "baseline_fails": true,
         "current_passes": true,
-        "receipt": ".reproduction/fix-receipts/FB-ROOT-015.json"
+        "receipt": ".reproduction/fix-receipts/FB-ROOT-015.json",
+        "release_verification": {
+          "commit": "aabdd4893c6411c6bc0b122e78c6e32d55a59ebc",
+          "run_id": 33856758637,
+          "tag": "v1.0.0",
+          "asset_sha256": "4FA0AB41980F7057633C32BFC62A9E99B229F3912448C150357223EBE00F899C"
+        }
       }
     }
   ],

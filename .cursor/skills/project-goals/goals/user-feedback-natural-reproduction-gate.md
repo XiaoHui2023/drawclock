@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-09-04
 
@@ -37,6 +37,7 @@
 
 ## 发行结果
 
+- commit `aabdd4893c6411c6bc0b122e78c6e32d55a59ebc` 的 Release run `33856758637` 三个 job 全部通过；`v1.0.0^{}` 精确指向该提交。公开 Linux 资产为 17,158,600 bytes、SHA-256 `4FA0AB41980F7057633C32BFC62A9E99B229F3912448C150357223EBE00F899C`；CI 回下载后的 frozen/source smoke 与本机独立下载后的 source smoke 均通过，包内 22 个自动布局 JSON 且无 512+ 高压样例。`FB-ROOT-015` 已关闭。
 - commit `0ab215f59461c3d6b8e05d6786184a51168daf33` 的 Release run `33837315298` 三个 job 全部通过；`v1.0.0^{}` 精确指向该提交，`v0.0.0` 保留旧版恢复点。
 - 远端 Linux 资产为 17,248,649 bytes，SHA-256 `f6356be32fb0fb289f0a7264a487eb148a45e9191a007421dc6f83fdcc3f292e`；CI 在发布后重新下载并通过冻结入口、离线源码入口和 GNOME librsvg，独立下载的摘要与结构也一致。
 
