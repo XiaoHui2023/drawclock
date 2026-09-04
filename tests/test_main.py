@@ -118,6 +118,12 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         "SIL Open Font License 1.1\n", encoding="utf-8"
     )
     shutil.copytree(ROOT / "skills", project / "skills")
+    (project / "example" / "README.md").write_text(
+        "# Examples\n", encoding="utf-8"
+    )
+    (project / "example" / "auto-layout" / "README.md").write_text(
+        "# Automatic layout examples\n", encoding="utf-8"
+    )
     (project / "example" / "draw.json").write_text("{}", encoding="utf-8")
     packaged_layout_examples = tuple(
         path.name for path in sorted((ROOT / "example" / "auto-layout").glob("*.json"))
@@ -138,6 +144,8 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         names = set(zf.namelist())
     prefix = "drawclock-1.2.3-windows/"
     assert prefix + "draw.md" in names
+    assert prefix + "example/README.md" in names
+    assert prefix + "example/auto-layout/README.md" in names
     assert prefix + "example/draw.json" in names
     for name in packaged_layout_examples:
         assert prefix + "example/auto-layout/" + name in names

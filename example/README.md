@@ -6,4 +6,4 @@
 drawclock -i example/draw.json -l drawio-lib/drawclock -o example/generated/draw.svg
 ```
 
-`auto-layout/` 包含线性、分支、复用、交叉和 512 至 4096 个末端时钟的压力配置。
+`auto-layout/` 包含线性、分支、复用、交叉和最多 128 个末端时钟的代表性复杂配置。

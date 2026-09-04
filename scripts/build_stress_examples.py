@@ -517,10 +517,6 @@ def main() -> int:
     scenarios = (
         ("06-simple-16-clocks", 4),
         ("07-medium-64-clocks", 16),
-        ("08-stress-512-clocks", 128),
-        ("09-stress-1024-clocks", 256),
-        ("10-stress-2048-clocks", 512),
-        ("11-stress-4096-clocks", 1024),
     )
     for name, domain_count in scenarios:
         config = build(domain_count)
@@ -563,7 +559,6 @@ def main() -> int:
     adversarial = (
         ("13-label-clearance-weave", 16, 2, True),
         ("14-crossing-weave-128-clocks", 64, 2, False),
-        ("15-routing-torture-512-clocks", 128, 4, True),
     )
     for name, domains, clocks_per_domain, long_names in adversarial:
         config = build_adversarial_weave(

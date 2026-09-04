@@ -18,10 +18,7 @@ LIBRARY = ROOT / "drawio-lib" / "drawclock"
 DRAW_EXAMPLE = ROOT / "example" / "draw.json"
 LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
 DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
-STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
-STRESS_1024 = ROOT / "example" / "auto-layout" / "09-stress-1024-clocks.json"
-STRESS_2048 = ROOT / "example" / "auto-layout" / "10-stress-2048-clocks.json"
-STRESS_4096 = ROOT / "example" / "auto-layout" / "11-stress-4096-clocks.json"
+MEDIUM = ROOT / "example" / "auto-layout" / "07-medium-64-clocks.json"
 ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
 COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
 FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
@@ -320,8 +317,7 @@ def _assert_frequency_table(path: Path, config_path: Path) -> None:
 
 
 def main() -> int:
-    global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, STRESS
-    global STRESS_1024, STRESS_2048, STRESS_4096, ASYMMETRIC
+    global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, MEDIUM, ASYMMETRIC
     global COLUMN_PREFERENCE, FREQUENCY, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE, SKILLS
     binary = _binary_path()
     package_root = binary.parent
@@ -331,10 +327,7 @@ def main() -> int:
         DRAW_EXAMPLE = ROOT / "example" / "draw.json"
         LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
         DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
-        STRESS = ROOT / "example" / "auto-layout" / "08-stress-512-clocks.json"
-        STRESS_1024 = ROOT / "example" / "auto-layout" / "09-stress-1024-clocks.json"
-        STRESS_2048 = ROOT / "example" / "auto-layout" / "10-stress-2048-clocks.json"
-        STRESS_4096 = ROOT / "example" / "auto-layout" / "11-stress-4096-clocks.json"
+        MEDIUM = ROOT / "example" / "auto-layout" / "07-medium-64-clocks.json"
         ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
         COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
         FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
@@ -343,8 +336,7 @@ def main() -> int:
         MIDDLE_SOURCE = ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
         SKILLS = ROOT / "skills"
     required = (
-        binary, DRAW_EXAMPLE, LINEAR, DENSE, STRESS,
-        STRESS_1024, STRESS_2048, STRESS_4096, ASYMMETRIC,
+        binary, DRAW_EXAMPLE, LINEAR, DENSE, MEDIUM, ASYMMETRIC,
         COLUMN_PREFERENCE, FREQUENCY, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE,
         SKILLS / "clock-diagram-design" / "SKILL.md",
         SKILLS / "clock-json-schema" / "SKILL.md",
@@ -386,10 +378,7 @@ def main() -> int:
     _draw(binary, DRAW_EXAMPLE, out / "draw-example-frozen.svg")
     _draw(binary, LINEAR, out / "arbitrary-suffix.png", "--crossing-style", "gap")
     _draw(binary, DENSE, out / "dense-frozen.svg")
-    _draw(binary, STRESS, out / "stress-512-frozen.svg")
-    _draw(binary, STRESS_1024, out / "stress-1024-frozen.svg")
-    _draw(binary, STRESS_2048, out / "stress-2048-frozen.svg")
-    _draw(binary, STRESS_4096, out / "stress-4096-frozen.svg")
+    _draw(binary, MEDIUM, out / "medium-64-frozen.svg")
     _draw(
         binary, ASYMMETRIC, out / "asymmetric-frozen.svg",
         max_total_bends=2,

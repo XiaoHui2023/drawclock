@@ -11,9 +11,9 @@
 - 独立 Oracle 新增 `root_facility_split_witnesses` 与 `physical_anchor_relocation_witnesses`，判定只读取最终 SVG、逻辑零入度、物理端点归属和几何，不读取器件 kind、实例名、样例号或生产布局模块。正式双跑收据尚未签发。
 - Oracle 测试增加当前公开入口的两项自然红灯与一个同样含零入度根但无跨干线/无设施拆分收益的干净反例；测试产物只用于检测器校准，正式复现仍必须由冻结 revision 双跑收据授权。
 
-- status: done
+- status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-04 16:10 +08:00
+- updated: 2026-09-04 18:20 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
@@ -493,3 +493,34 @@
 - 发布后的 Linux 资产由 CI 从公开 Release 地址重新下载，并以解压后的最终冻结程序、包内零依赖源码和 GNOME librsvg 完成消费。独立下载核对为 17,248,649 bytes、SHA-256 `f6356be32fb0fb289f0a7264a487eb148a45e9191a007421dc6f83fdcc3f292e`、148 个文件，含冻结程序、完整 `src/`、examples、器件库与 7 个项目 Skills。
 - 本机没有 `gh`，REST API 降级成功完成 run、jobs、tag、Release 与附件核对；WSL 仅暴露 `docker-desktop`，按用户约束没有调用本机 Docker。Linux 可执行消费由远端发布后回下载门完成，本机只作摘要与解包结构复核。
 - `FB-BEND-014` 与 `FB-ROOT-015` 在远端最终制品验证后由 `fixed_verified` 关闭；13 项反馈均有冻结自然红灯、当前双跑绿灯和远端发布血缘，本记录完成。
+- 用户进一步明确 `FB-ROOT-015` 的交错形态：多个条目分别由同一公共零入度根和各自私有零入度根接入多输入 pad，pad 后继续下游链；公共根的消费者之间虽夹有私有输入条目，仍希望一个显示设施和一条共享纵干线。旧 mux 正式 case 相似但不是该精确两输入 pad 形态，故撤销该项关闭状态并冻结 `src/**`。
+- 新增合法公开输入 `interleaved-common-root-pads.json`：6 个 `pad3` 各连接 `common_clock` 与独立 `private_from_XX`，第三输入保持合法空置，并分别继续 `cell→clock`。该输入不含坐标、航点、故障标记或生产私有字段；下一步在冻结 `41a5e596` 和当前公开 CLI 上分别双跑并由最终 SVG Oracle 判定设施数与首纵向主干。
+- 精确结构在冻结 `41a5e596` 与当前版各公开双跑，合计耗时 3.533 秒；每个版本的两次 SVG SHA-256 均为 `BC450307E00868C0435B7E067997CE1125A1659E0785D12299C5451A18AB2693`，说明该形态在旧版和当前版都已自然正确，不能作为旧缺陷红灯。两版均为 1 个 `common_clock` 设施、6 条完整公共边、0 交叉、0 异网重叠、无 split-rejoin；5 条非同轴支路的首纵段都位于唯一通道 `x=170.84`。该输入从内部复现语料移动为发布示例 `example/auto-layout/27-interleaved-common-root-pads.json`，作为 FB-ROOT-015 的新增干净边界与发行回归。
+- 新增最终 SVG 直接门禁 `test_interleaved_common_root_uses_one_visible_vertical_trunk`：经公开 CLI 生成后，独立 Oracle 必须绑定 6 条 `common_clock→pad_XX` 边、一个渲染设施、一个网络设施，重新枚举全部非零纵段并证明其 x 通道集合大小为 1，同时要求无 split-rejoin、交叉、异网重叠或 ROOT-015 见证。覆盖账本和包内质量专题已把交替私有 pad 输入及下游链登记为 `source-replicas × fanout-bus × library-geometry-root-facility` 的成功/发行场景。
+- 首轮聚焦门 2.738 秒为 4 通过、1 失败。失败来自新测试错误地对 Oracle 的 `edges` 列表调用 `.values()`，在进入几何断言前即抛出 `AttributeError`；该轮不计成功，也不表明布局失败。下一步按报告 schema 直接遍历列表并重跑同一门禁。
+- 新测试已按 Oracle schema 改为直接遍历 `edges` 列表；生产布局、Oracle 和示例均未改变。准备重跑同一 5 项聚焦门。
+- 修正后的聚焦门 2.373 秒、5/5 通过：新增交替 pad 直接门、原紧凑合并、真正远距四设施和覆盖账本突变门均通过。示例生成与独立统计 0.599 秒，25/25 节点、24/24 边完整，0 交叉、0 异网重叠；公共根为 1 个设施、6 条边、唯一首纵向通道且无 split-rejoin。
+- 全量回归 108.897 秒为 457 通过、5 跳过、4 失败；四项均由反馈证据门拒绝扩展后的 `FB-ROOT-015` 旧收据和 `reproduction_in_progress` 状态，未出现布局/示例/覆盖测试失败。该轮不计全绿；下一步把精确场景作为“前提存在、症状不存在”的第三次干净反例尝试写入账本，并重新签发 13 项冻结红灯与当前绿灯血缘。
+- 正式 runner 首次 10.694 秒以 exit 2 拒绝，原因是未传既有历史入口所需的 `--legacy-python`；该半批未签收。使用项目既有 `.venv/Scripts/python.exe` 从头重跑 71.592 秒成功，批次 `20260904T070450Z-d6a9832a` 对 13/13 问题各有两次冻结公开入口红灯且 `missing_issues=[]`。ROOT-015 仍由真实失败的 compact-root case 命中；新增交替 pad 例保持干净边界，不冒充复现。015 现推进为 `reproduced`，下一步先验 solve 门再运行当前版双跑。
+- solve 门与当前版正式双跑合计 25.298 秒通过，验证组 `20260904T070631Z-e8adab75` 对 13 项均 `failures=[]`。ROOT-015 状态推进为 `fixed_verified`；证据白名单切换到本轮新红灯/绿灯目录，旧批次继续由 Git 忽略但历史提交仍可检索。下一步运行 release 门与全量测试，尚不关闭。
+- release 门先验 13 项通过；全量回归合计 106.684 秒，461 通过、5 个目标环境条件项跳过、0 失败。新增交替 pad 最终 SVG 门使通过数增加 1；没有修改生产源码。下一步重新构建静态包并在全新解压目录消费第 27 个自动布局示例。
+- Windows 静态包构建 35.753 秒通过；全新目录解包后的完整 frozen example 矩阵 61.824 秒通过，包内存在第 27 个示例，ZIP SHA-256 为 `AB2279DA0380D3D6F1727C86AB7B148A540055D66E4FD610E5DEF6895E22630E`。包内 exe 对第 27 例的独立 SVG 复算为 1 个公共设施、6 条边、唯一纵通道 `[170.84]`、0 交叉、无 split-rejoin；包内零依赖源码部署亦通过，专项加源码耗时 12.476 秒。
+- 项目 changelog 与公开示例索引已补充第 27 例，并顺带补齐原索引缺少的第 25、26 行；布局算法未改。ROOT-015 保持 `fixed_verified`，须等待提交、远端 Linux staticx 构建及公开 Release 回下载消费后再关闭。
+- README 修改后未复用旧包：包相关门 3.524 秒、7/7 通过，重新构建 Windows ZIP 31.010 秒成功。全新解包消费在 1.226 秒处被新增结构检查拒绝：第 27 个 JSON 存在，但 `example/auto-layout/README.md` 不在归档中。该轮不计包消费成功；这是既有组包遗漏公开示例索引的发行覆盖缺口，下一步检查统一 bundle owner，按公开文档集合修复并增加归档断言，禁止为 27 号写特例复制。
+- 根因是 `bundle_release.RELEASE_PATHS` 只列 `example/draw.json`，自动布局阶段又只复制 `*.json`，导致 `example/README.md` 与 `example/auto-layout/README.md` 都未进入发行包。统一公开文档清单现加入这两个 README；归档测试的隔离项目先创建两份文档并逐路径断言，未按样例编号或文件内容特判。
+- 通用组包修复的聚焦门 3.435 秒、8/8 通过；最终重建 31.641 秒。全新目录解压后，完整 frozen 矩阵与零依赖源码消费合计 69.051 秒通过，两级示例 README 与第 27 个 JSON 均存在，最终 Windows ZIP SHA-256 为 `E6F6B1D96D4D7261D0979AEDE6A3F51DC4FD2230644DFAC633FBECE9480D26C7`。下一步因 bundle owner 变化重跑完整 pytest，不能用聚焦门代替。
+- bundle owner 变化后的完整 pytest 105.903 秒通过：461 passed、5 skipped、0 failed。ROOT-015 仍为 `fixed_verified`，本地源码、最终 SVG、覆盖账本、完整回归、Windows 冻结包与离线源码包均闭合；准备提交推送，远端 Linux Release 下载验证前不关闭。
+- 17:05 用户纠正第 27 号场景的汇聚器件应为三输入 `mux3`，而不是 `pad3`。只读核对 0.467 秒确认 `drawio-lib` 与 `scripts/drawio_lib` 在工作区和暂存区均无差异，器件库没有被修改；错误位于新示例、测试与覆盖合同。撤销该场景的覆盖结论并把 `FB-ROOT-015` 退回 `reproduction_in_progress`；历史 pad3 运行保留为语义不匹配旁证，禁止用于 mux3 验收。下一步只改合法复现输入/测试合同，不改 `src/**`。
+- 17:10 第 27 号合法复现输入已改为 `27-interleaved-common-root-mux3.json`：六个 `mux_00..05` 精确使用 `kind: mux3`，公共根接输入 0、私有 `from` 接输入 1、输入 2 空置，每个 mux 后保留 `cell→clock`。专项测试新增输入语义、精确端口、单设施、单纵干线、无 split-rejoin、无异网交叉/重叠断言；示例 README、布局覆盖账本和质量门同步改为 mux3。JSON 语法与 `git diff --check` 已通过，生产 `src/**` 未修改；尚未执行冻结/当前双跑。
+- 17:20 冻结 `41a5e596` 与当前版对 mux3 第 27 号各通过公开 CLI 独立运行两次，四张 SVG SHA-256 均为 `304C076F84D214614F9AF86D333D17BBB325663676ACCC3187B84EDFD10DE601`，单次 producer 272–362ms。独立 Oracle 前后 SVG 哈希不变，均统计到 1 个公共设施、1 个 rendering anchor、6 条公共边到输入 0、6 条私有边到输入 1、唯一纵干线 x=170.84、0 交叉、0 异网重叠且无 split-rejoin。结论：mux3 澄清场景是成功边界，不是新生产红灯；ROOT-015 恢复 `fixed_verified`，真实冻结红灯仍为 `mux-r04-s00`，待重跑完整 corpus 与发行门重签陈旧收据。
+- 17:25 完整自然复现 corpus 使用 `--legacy-python .venv/Scripts/python.exe` 从头运行约 70 秒并通过，新 corpus ID 为 `20260904T074548Z-f845689e`。13 个问题均各有 2 次冻结公开入口自然观测，`missing_issues=[]`；ROOT-015 由 `compact-root-fanout-baseline` 两次直接检出，mux3 第 27 号继续作为成功边界分账。新 reproduction evidence 与 receipts 已由 runner 生成，下一步运行 solve 门与当前 fix verification。
+- 17:30 `check_feedback_reproduction_gate.py --phase solve` 通过 13 项；当前公开 CLI fix verification 约 27 秒完成，verification group `20260904T074734Z-5bc1831b`、`failures=[]`；随后 release 阶段门通过 13 项。reproduction 与 fix 收据现已绑定更新后的问题账本，进入专项与完整 pytest。
+- 17:35 mux3 边界、紧凑单设施、远距设施拆分、稀疏 mux3 端口和覆盖账本闭环专项共 8 项在 1.01 秒内通过。完整 pytest 收集 466 项并在 1 分 49 秒完成：461 passed、5 skipped、0 failed；跳过项为既有浏览器可见端口测试，原生 SVG/librsvg 兼容门已执行。进入 Windows 静态包与全新解压消费。
+- 17:40 `tools/pack.bat` 先重验反馈 release 门，随后以 PyInstaller 6.22.2 / Python 3.11.9 在约 35 秒内成功重建 Windows onefile 与 ZIP。新 `drawclock-1.0.0-windows.zip` 大小 8,351,080 字节，SHA-256 为 `79782DCCB19611AD0BD1A0ACAD498B4BDB3433EDE6F9984260B4C8080C0E1560`，不同于交接中的旧包；尚未完成全新解压消费，不据构建退出码声明包可交付。
+- 17:50 新 ZIP 解压到全新 `work/drawclock-consume-ef05595d96e441dbad7d274424d8a011` 后，包内 7 个项目 Skill、两级 example README、source manifest、frozen 综合工作流与空环境 `python -I -S` 源码部署均通过。包内 exe 顺序运行 `draw.json` 加 27 个自动布局 JSON 共 28 个输入，全部生成可解析原生 SVG，批量阶段 1 分 37 秒。第 27 号 mux3 的 frozen 与包内源码输出 SHA-256 均为 `304C076F84D214614F9AF86D333D17BBB325663676ACCC3187B84EDFD10DE601`；独立 Oracle 前后字节不变，均为 25 节点、24 边、公共/私有端口 0/1、单设施、单 rendering anchor、唯一纵干线 x=170.84、0 交叉、0 异网重叠且无 split-rejoin。进入提交、上传与远端 Release 门。
+- 17:55 用户明确不再考虑 512 以及更高节点压力范围，允许去掉对应内容。撤销 17:40 构建的 ZIP 与 17:50 消费结果作为最终交付依据；下一步只读审计 512/1024/2048/4096 示例、测试、覆盖账本、文档、runner 和发行包引用，再删除高压力专属面并在新范围重跑全链。范围收缩只移除维护/发行压力样本，不把固定最大节点数写入生产 CLI。
+- 18:00 范围收缩已落实：删除 512/1024/2048/4096 五份输入 JSON 及对应五份受管生成 SVG，移除其生成器、冻结 runner、性能测试与发行覆盖引用；维护规模改为 16/64/128 个终端时钟，生产源码和 CLI 不设新的固定上限。引用审计确认旧高压契约只残留在待删除的生成 SVG 中；下一步以正确清单参数重跑覆盖校验和受影响测试。
+- 18:05 覆盖清单校验通过（26 features、19 interactions、48 scenarios），受影响的结构策略、128 交错质量、mux3 公共纵干线和发行归档专项 5/5 通过。冻结自然语料从头双跑约 62 秒，corpus `20260904T080323Z-ca29ae92` 覆盖 13/13 且 `missing_issues=[]`；solve 门和当前公开入口验证随后通过，verification `20260904T080445Z-b2bcdb2c`、`failures=[]`。下一步执行 release 门与新范围完整 pytest。
+- 18:10 release 门通过 13 项；新范围完整 pytest 在 61.43 秒内完成，454 passed、5 skipped、0 failed。相较删除前减少 7 个高压力专属测试，保留 128 终端复杂交错质量门与通用算法测试。下一步重建 Windows 静态包并从全新解压目录消费缩减后的全部发行示例。
+- 18:15 Windows 静态包重建通过，最终 ZIP 为 8,247,735 字节、SHA-256 `2FCB9FF35021DBCAE9EDA2EABA9A7611939619DA253C4EF8DD7DD672F6C41056`。全新目录 `work/drawclock-consume-20260904-1815` 中，冻结 workflow、7 个项目 Skill、source manifest、空 venv 的 `python -I -S` 源码部署及 23 个发行输入（draw + 22 auto-layout）全部通过；包内 512+ 高压样例为 0，两级示例 README 和 mux3 第 27 例均存在。进入提交上传审计与远端滚动 Release 值守。
+- 18:20 目标账本已把 512+ 范围收缩由 pending 更新为 success，并移除旧 1024/2048/4096 性能承诺；`.gitignore` 证据白名单切换到最终红灯 `20260904T080323Z-ca29ae92` 与绿灯 `20260904T080445Z-b2bcdb2c`。远程 fetch 后 main 与 origin/main 为 0 ahead/0 behind；下一步从索引移除未提交的旧证据批次、暂存最终树并请求托管 delivery-ready 回执。

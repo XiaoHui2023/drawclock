@@ -23,6 +23,8 @@ RELEASE_PATHS = (
     "licenses",
     "drawio-lib",
     "skills",
+    "example/README.md",
+    "example/auto-layout/README.md",
     "example/draw.json",
 )
 

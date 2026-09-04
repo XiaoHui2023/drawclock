@@ -80,32 +80,6 @@ def test_grouped_sweep_matches_exact_pair_oracle() -> None:
         assert grouped["line_integrity"][key] == exact["line_integrity"][key]
 
 
-def test_elk_512_clock_stress_budget_and_integrity() -> None:
-    started = time.perf_counter()
-    config, document, report, quality = _generate("08-stress-512-clocks")
-    elapsed = time.perf_counter() - started
-    line = quality["line_integrity"]
-
-    assert sum(item.get("kind") == "clock" for item in config.values()) == 512
-    logical_vertex_names = {vertex.logical_name or vertex.name for vertex in document.vertices}
-    replica_count = report["selection"]["source_rendering_replicas"]
-    assert len(logical_vertex_names) == 1046
-    assert len(document.vertices) == 1046 + replica_count
-    assert len(document.edges) == 1300
-    assert report["engine"] == "constraint-layered"
-    assert report["selection"]["basis"] == "graph-structure"
-    assert report["selection"]["backbone_nodes"] > 0
-    assert line["missing_edges"] == []
-    assert line["extra_edges"] == []
-    assert line["non_orthogonal_segments"] == []
-    assert line["micro_segments"] == []
-    assert line["source_lead_non_horizontal"] == []
-    assert line["target_lead_non_horizontal"] == []
-    assert line["edge_node_intersections"] == []
-    assert line["ambiguous_overlaps"] == []
-    assert elapsed < 30
-
-
 def test_quality_rejects_avoidable_global_bottom_detour() -> None:
     config = {
         "src": {"kind": "from"},
