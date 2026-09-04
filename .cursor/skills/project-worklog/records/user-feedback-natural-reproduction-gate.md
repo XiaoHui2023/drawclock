@@ -11,9 +11,9 @@
 - 独立 Oracle 新增 `root_facility_split_witnesses` 与 `physical_anchor_relocation_witnesses`，判定只读取最终 SVG、逻辑零入度、物理端点归属和几何，不读取器件 kind、实例名、样例号或生产布局模块。正式双跑收据尚未签发。
 - Oracle 测试增加当前公开入口的两项自然红灯与一个同样含零入度根但无跨干线/无设施拆分收益的干净反例；测试产物只用于检测器校准，正式复现仍必须由冻结 revision 双跑收据授权。
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-04 15:52 +08:00
+- updated: 2026-09-04 16:10 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
@@ -489,3 +489,7 @@
 - 15:39 Windows 一条龙 pack 约 37 秒通过，PyInstaller 6.22.2 / Python 3.11.9 生成 exe 与 zip；警告只有当前平台不可用的 POSIX/Jython 条件模块。15:40–15:47 将 SHA-256 为 `310EE19FA3FEBAE4592311347D9F6F1522CA775ADE823AE9A52A79C189C1EF7D` 的 zip 解到全新目录，结构审计为 151 个文件，7 个项目 skill 校验通过；测试驱动器从解压根只消费包内 exe、器件库和全部 examples，约 56 秒输出 `frozen draw workflow passed`。下一步执行包内零依赖源码 smoke。
 - 15:50 全新解压目录的源码部署 smoke 12.48 秒通过：临时空 venv 使用 `-I -S` 直接运行包内 `src`，以包内 `draw.json` 和拆分器件库生成 SVG；包内统计脚本覆盖中间列样例的全部节点、边及逐边长度/折点/交叉字段。接下来只将 Git 白名单切换到本轮最终红灯与绿灯证据目录，防止陈旧证据进入提交。
 - 15:52 `.gitignore` 的受控证据白名单已由旧批次切换为冻结红灯 `20260904T033247Z-b99d523b` 和当前绿灯 `20260904T042255Z-369bd91a`；其它诊断、失败实验和误触发批次继续忽略，不进入发行血缘。
+- 16:10 产品与证据提交 `0ab215f59461c3d6b8e05d6786184a51168daf33` 已推送。远端 Release run `33837315298` 的反馈阻断门、Ubuntu 16.04 静态构建及发布 job 全部成功；滚动标签 `v1.0.0^{}` 精确指向该提交。
+- 发布后的 Linux 资产由 CI 从公开 Release 地址重新下载，并以解压后的最终冻结程序、包内零依赖源码和 GNOME librsvg 完成消费。独立下载核对为 17,248,649 bytes、SHA-256 `f6356be32fb0fb289f0a7264a487eb148a45e9191a007421dc6f83fdcc3f292e`、148 个文件，含冻结程序、完整 `src/`、examples、器件库与 7 个项目 Skills。
+- 本机没有 `gh`，REST API 降级成功完成 run、jobs、tag、Release 与附件核对；WSL 仅暴露 `docker-desktop`，按用户约束没有调用本机 Docker。Linux 可执行消费由远端发布后回下载门完成，本机只作摘要与解包结构复核。
+- `FB-BEND-014` 与 `FB-ROOT-015` 在远端最终制品验证后由 `fixed_verified` 关闭；13 项反馈均有冻结自然红灯、当前双跑绿灯和远端发布血缘，本记录完成。
