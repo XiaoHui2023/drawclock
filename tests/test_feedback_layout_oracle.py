@@ -124,6 +124,95 @@ def test_vertical_root_facility_oracle_counts_visible_label_footprint() -> None:
     ) == []
 
 
+def test_crossing_free_intervals_cover_whole_prefix_interior_and_suffix() -> None:
+    route = oracle.Route(0, [(0, 10), (30, 10), (30, 20), (70, 20), (70, 30), (100, 30)], source="a", target="b")
+    crossings = [
+        oracle.Route(1, [(10, 0), (10, 40)], source="x1", target="y1"),
+        oracle.Route(2, [(50, 0), (50, 40)], source="x2", target="y2"),
+        oracle.Route(3, [(90, 0), (90, 40)], source="x3", target="y3"),
+    ]
+    intervals = oracle._ordered_crossing_free_intervals(route, [route, *crossings])
+    assert [row["kind"] for row in intervals] == ["prefix", "interior", "interior", "suffix"]
+    assert [row["internal_bends"] for row in intervals] == [0, 2, 2, 0]
+    straight = oracle.Route(4, [(0, 0), (20, 0)], source="p", target="q")
+    assert oracle._ordered_crossing_free_intervals(straight, [straight])[0]["kind"] == "whole"
+
+
+def test_frozen_public_svg_exposes_crossing_partitioned_tail_bend() -> None:
+    input_path = ROOT / "example/auto-layout/26-feedback-reproduction-combined.json"
+    receipt = json.loads(
+        (ROOT / ".reproduction/receipts/FB-BEND-013.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    evidence = receipt["attempts"][0]["evidence_files"]
+    output = next(ROOT / path for path in evidence if path.endswith("/output.svg"))
+    report = oracle.analyze(input_path, output)
+    assert "FB-BEND-013" in report["detected_issues"]
+    witness = report["witnesses"]["downstream_corridor_tail_bend_witnesses"][0]
+    assert witness["crossing_pairs_before"] == witness["crossing_pairs_after"] == 1
+    assert any(
+        row["tail_kind"] == "suffix"
+        and row["crossings_before"] == 1
+        and row["tail_bends_before"] == 2
+        and row["tail_bends_after"] == 0
+        for row in witness["affected_edges"]
+    )
+
+
+def test_downstream_corridor_oracle_finds_crossing_free_tail_bends() -> None:
+    routes = [
+        oracle.Route(0, [(10, 5), (30, 5), (30, 0), (50, 0)], source="a", target="mux", target_port="0"),
+        oracle.Route(1, [(10, 25), (35, 25), (35, 20), (50, 20)], source="b", target="mux", target_port="1"),
+        oracle.Route(2, [(60, 10), (80, 10)], source="mux", target="sink"),
+        oracle.Route(3, [(20, 15), (20, 30)], source="x", target="y"),
+    ]
+    logical = [oracle.LogicalEdge("a", "mux", "0"), oracle.LogicalEdge("b", "mux", "1"), oracle.LogicalEdge("mux", "sink", "left"), oracle.LogicalEdge("x", "y", "left")]
+    boxes = [
+        oracle.Box("a", 0, 0, 10, 10), oracle.Box("b", 0, 20, 10, 10),
+        oracle.Box("mux", 50, -5, 10, 30), oracle.Box("sink", 80, 5, 10, 10),
+        oracle.Box("x", 15, 10, 10, 5), oracle.Box("y", 15, 30, 10, 5),
+    ]
+    witness = oracle._downstream_corridor_tail_bend_witnesses(logical, routes, boxes)
+    assert len(witness) == 1
+    assert witness[0]["target"] == "mux"
+    assert witness[0]["crossing_pairs_before"] == witness[0]["crossing_pairs_after"] == 1
+    assert witness[0]["bends_after"] < witness[0]["bends_before"]
+    assert any(row["crossings_before"] == 1 for row in witness[0]["affected_edges"])
+
+
+def test_downstream_corridor_oracle_rejects_nonuniform_or_blocked_moves() -> None:
+    logical = [oracle.LogicalEdge("a", "mux", "0"), oracle.LogicalEdge("b", "mux", "1")]
+    boxes = [oracle.Box("a", 0, 0, 10, 10), oracle.Box("b", 0, 20, 10, 10), oracle.Box("mux", 50, -5, 10, 30)]
+    nonuniform = [
+        oracle.Route(0, [(10, 5), (30, 5), (30, 0), (50, 0)], source="a", target="mux", target_port="0"),
+        oracle.Route(1, [(10, 25), (35, 25), (35, 18), (50, 18)], source="b", target="mux", target_port="1"),
+    ]
+    assert oracle._downstream_corridor_tail_bend_witnesses(logical, nonuniform, boxes) == []
+    uniform = [
+        oracle.Route(0, [(10, 5), (30, 5), (30, 0), (50, 0)], source="a", target="mux", target_port="0"),
+        oracle.Route(1, [(10, 25), (35, 25), (35, 20), (50, 20)], source="b", target="mux", target_port="1"),
+    ]
+    assert oracle._downstream_corridor_tail_bend_witnesses(logical, uniform, [*boxes, oracle.Box("obstacle", 50, 25, 10, 10)]) == []
+
+
+def test_downstream_corridor_oracle_expands_a_conflicting_target_row() -> None:
+    routes = [
+        oracle.Route(0, [(10, 5), (30, 5), (30, 0), (50, 0)], source="a", target="mux", target_port="0"),
+        oracle.Route(1, [(10, 25), (35, 25), (35, 20), (50, 20)], source="b", target="mux", target_port="1"),
+        oracle.Route(2, [(10, 5), (25, 5), (25, 28), (80, 28)], source="a", target="tap"),
+    ]
+    logical = [oracle.LogicalEdge("a", "mux", "0"), oracle.LogicalEdge("b", "mux", "1"), oracle.LogicalEdge("a", "tap", "left")]
+    boxes = [
+        oracle.Box("a", 0, 0, 10, 10), oracle.Box("b", 0, 20, 10, 10),
+        oracle.Box("mux", 50, -5, 10, 30), oracle.Box("tap", 80, 23, 10, 10),
+    ]
+    witness = oracle._downstream_corridor_tail_bend_witnesses(logical, routes, boxes)
+    assert len(witness) == 1
+    assert witness[0]["moved_nodes"] == 2
+    assert witness[0]["bends_after"] < witness[0]["bends_before"]
+
+
 def test_root_column_lag_oracle_aligns_only_through_a_safe_used_column() -> None:
     lagging = oracle.Route(
         0,
@@ -265,7 +354,7 @@ def test_frozen_medium_example_reproduces_physical_anchor_column_escape() -> Non
 @pytest.mark.parametrize(
     ("filename", "forbidden", "max_events", "max_points", "max_bends"),
     [
-        ("26-feedback-reproduction-combined.json", {"FB-ROUTE-009", "FB-ROOT-010"}, 1, 1, 14),
+        ("26-feedback-reproduction-combined.json", {"FB-ROUTE-009", "FB-ROOT-010", "FB-BEND-013"}, 1, 1, 2),
         ("07-medium-64-clocks.json", {"FB-ROOT-010"}, 130, 19, 204),
     ],
 )

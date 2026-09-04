@@ -8,12 +8,12 @@
   "output_mutated": false,
   "production_code_changed": false,
   "coverage_model": "many_to_many",
-  "corpus_id": "20260903T170713Z-187ae636",
+  "corpus_id": "20260904T021756Z-d4363165",
   "issue_contract_sha256": "311bef0dcbb2a51c9c537e071be80998dfd5664b1065d86fb82acd3f1f6099e7",
   "attempts": [
     {
-      "run_id": "20260903T170713Z-187ae636:asymmetric-port-baseline:1",
-      "corpus_id": "20260903T170713Z-187ae636",
+      "run_id": "20260904T021756Z-d4363165:asymmetric-port-baseline:1",
+      "corpus_id": "20260904T021756Z-d4363165",
       "case_id": "asymmetric-port-baseline",
       "observed_issue_ids": [
         "FB-PORT-006"
@@ -27,23 +27,23 @@
       "artifact_after_oracle_sha256": "907aa339b96e00de8997063e85b3b86fa1e17b8c817523cd1a533513f370a7c4",
       "producer_tree_before_sha256": "7afff436c0422bd55535b97ee0e624644c03de14099384906a11bdbae3ac4ca9",
       "producer_tree_after_sha256": "7afff436c0422bd55535b97ee0e624644c03de14099384906a11bdbae3ac4ca9",
-      "command_sha256": "24c1024d9ceb34217422ae35e9cf2fd9129edf0d1bd2b1873ffb032bf91c9d02",
+      "command_sha256": "c2fec8e747d4063a32b9bb9a3a82cf99fa99e78cafcec74f77c36c6b3973ca5c",
       "input_sha256": "2a4f796b1abc5deaca5af68337ee58a67f330eed25542b6234fb3955523ff79d",
       "runner_sha256": "f8a35b735920e4788273c4c6aa5b1139995869fef56e5ad234a9976ade614f7e",
-      "oracle_sha256": "a8a405c4f6190dffc28d3dbe14bedafcf7832250ec95d7032c5e961a50b544ce",
-      "started_at": "2026-09-03T17:07:24.127388+00:00",
-      "ended_at": "2026-09-03T17:07:24.909188+00:00",
+      "oracle_sha256": "1cd35d91cb07fe44c1e7cec9a95b81930327bb07427ecb7a3094e4188cd97946",
+      "started_at": "2026-09-04T02:18:08.013616+00:00",
+      "ended_at": "2026-09-04T02:18:08.803545+00:00",
       "evidence_files": {
-        ".reproduction/evidence/20260903T170713Z-187ae636/asymmetric-port-baseline/attempt-1/output.svg": "907aa339b96e00de8997063e85b3b86fa1e17b8c817523cd1a533513f370a7c4",
-        ".reproduction/evidence/20260903T170713Z-187ae636/asymmetric-port-baseline/attempt-1/producer.log": "ebcbf8187ca4fe641c42a136589052fa44754fb0d3a5cfdc4cecfd3a8b33b62b",
-        ".reproduction/evidence/20260903T170713Z-187ae636/asymmetric-port-baseline/attempt-1/report.json": "8d3e141275dcee463e9ffec3ef5507eb64fad0eb22db393d70c2a0aa5e5fb006",
-        ".reproduction/evidence/20260903T170713Z-187ae636/asymmetric-port-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/evidence/20260903T170713Z-187ae636/asymmetric-port-baseline/attempt-1/FB-PORT-006.log": "8d3e141275dcee463e9ffec3ef5507eb64fad0eb22db393d70c2a0aa5e5fb006"
+        ".reproduction/evidence/20260904T021756Z-d4363165/asymmetric-port-baseline/attempt-1/output.svg": "907aa339b96e00de8997063e85b3b86fa1e17b8c817523cd1a533513f370a7c4",
+        ".reproduction/evidence/20260904T021756Z-d4363165/asymmetric-port-baseline/attempt-1/producer.log": "a617dfe3eff65a6b9f7b0ede649f560fd67dfb63971c06e96d0376f680f4db80",
+        ".reproduction/evidence/20260904T021756Z-d4363165/asymmetric-port-baseline/attempt-1/report.json": "8b36a17633bdf260458604143d3f83d199134184161c0546937ee7b619ea6ae6",
+        ".reproduction/evidence/20260904T021756Z-d4363165/asymmetric-port-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260904T021756Z-d4363165/asymmetric-port-baseline/attempt-1/FB-PORT-006.log": "8b36a17633bdf260458604143d3f83d199134184161c0546937ee7b619ea6ae6"
       }
     },
     {
-      "run_id": "20260903T170713Z-187ae636:asymmetric-port-baseline:2",
-      "corpus_id": "20260903T170713Z-187ae636",
+      "run_id": "20260904T021756Z-d4363165:asymmetric-port-baseline:2",
+      "corpus_id": "20260904T021756Z-d4363165",
       "case_id": "asymmetric-port-baseline",
       "observed_issue_ids": [
         "FB-PORT-006"
@@ -57,18 +57,18 @@
       "artifact_after_oracle_sha256": "907aa339b96e00de8997063e85b3b86fa1e17b8c817523cd1a533513f370a7c4",
       "producer_tree_before_sha256": "7afff436c0422bd55535b97ee0e624644c03de14099384906a11bdbae3ac4ca9",
       "producer_tree_after_sha256": "7afff436c0422bd55535b97ee0e624644c03de14099384906a11bdbae3ac4ca9",
-      "command_sha256": "15afed3c29eeabe3114bf466a717b7d137f759d03d2448d515d501e06d9f286b",
+      "command_sha256": "760c9a443c6da184da27108695e9b09ec9341b81681081366bd4225592d9817c",
       "input_sha256": "2a4f796b1abc5deaca5af68337ee58a67f330eed25542b6234fb3955523ff79d",
       "runner_sha256": "f8a35b735920e4788273c4c6aa5b1139995869fef56e5ad234a9976ade614f7e",
-      "oracle_sha256": "a8a405c4f6190dffc28d3dbe14bedafcf7832250ec95d7032c5e961a50b544ce",
-      "started_at": "2026-09-03T17:07:24.919707+00:00",
-      "ended_at": "2026-09-03T17:07:25.695059+00:00",
+      "oracle_sha256": "1cd35d91cb07fe44c1e7cec9a95b81930327bb07427ecb7a3094e4188cd97946",
+      "started_at": "2026-09-04T02:18:08.815078+00:00",
+      "ended_at": "2026-09-04T02:18:09.603432+00:00",
       "evidence_files": {
-        ".reproduction/evidence/20260903T170713Z-187ae636/asymmetric-port-baseline/attempt-2/output.svg": "907aa339b96e00de8997063e85b3b86fa1e17b8c817523cd1a533513f370a7c4",
-        ".reproduction/evidence/20260903T170713Z-187ae636/asymmetric-port-baseline/attempt-2/producer.log": "960189f812bdc7c085dcb5ab2008558ba703cd92845b5f64097ba374af61292a",
-        ".reproduction/evidence/20260903T170713Z-187ae636/asymmetric-port-baseline/attempt-2/report.json": "8d3e141275dcee463e9ffec3ef5507eb64fad0eb22db393d70c2a0aa5e5fb006",
-        ".reproduction/evidence/20260903T170713Z-187ae636/asymmetric-port-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/evidence/20260903T170713Z-187ae636/asymmetric-port-baseline/attempt-2/FB-PORT-006.log": "8d3e141275dcee463e9ffec3ef5507eb64fad0eb22db393d70c2a0aa5e5fb006"
+        ".reproduction/evidence/20260904T021756Z-d4363165/asymmetric-port-baseline/attempt-2/output.svg": "907aa339b96e00de8997063e85b3b86fa1e17b8c817523cd1a533513f370a7c4",
+        ".reproduction/evidence/20260904T021756Z-d4363165/asymmetric-port-baseline/attempt-2/producer.log": "63cc958c4ac0a55281485833cf8ac6b960d364af8b1548f9e6d108dc37de2e41",
+        ".reproduction/evidence/20260904T021756Z-d4363165/asymmetric-port-baseline/attempt-2/report.json": "8b36a17633bdf260458604143d3f83d199134184161c0546937ee7b619ea6ae6",
+        ".reproduction/evidence/20260904T021756Z-d4363165/asymmetric-port-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260904T021756Z-d4363165/asymmetric-port-baseline/attempt-2/FB-PORT-006.log": "8b36a17633bdf260458604143d3f83d199134184161c0546937ee7b619ea6ae6"
       }
     }
   ]

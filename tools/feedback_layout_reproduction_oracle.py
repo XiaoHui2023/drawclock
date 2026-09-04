@@ -33,6 +33,7 @@ ISSUES = (
     "FB-ROOT-010",
     "FB-BEND-011",
     "FB-ROOT-012",
+    "FB-BEND-013",
 )
 
 
@@ -527,6 +528,218 @@ def _overlap_count_for_route(route: Route, routes: list[Route]) -> int:
         if other is not route and not same_net(other, route)
         for c, d in segments(other)
     )
+
+
+def _ordered_crossing_free_intervals(
+    route: Route, routes: list[Route]
+) -> list[dict[str, Any]]:
+    """Split one route at proper crossings in path order and count local bends."""
+    cumulative = [0.0]
+    for a, b in segments(route):
+        cumulative.append(cumulative[-1] + abs(b[0] - a[0]) + abs(b[1] - a[1]))
+    events: dict[tuple[float, float], float] = {}
+    for segment_index, (a, b) in enumerate(segments(route)):
+        for other in routes:
+            if other is route or same_net(route, other):
+                continue
+            for c, d in segments(other):
+                point = proper_cross(a, b, c, d)
+                if point is not None:
+                    events[point] = cumulative[segment_index] + abs(point[0] - a[0]) + abs(point[1] - a[1])
+    cuts = [(0.0, route.points[0]), *sorted(
+        ((distance, point) for point, distance in events.items()),
+        key=lambda row: (row[0], row[1]),
+    ), (cumulative[-1], route.points[-1])]
+    intervals = []
+    for index, ((start_distance, start), (end_distance, end)) in enumerate(zip(cuts, cuts[1:])):
+        if end_distance - start_distance <= EPS:
+            continue
+        if len(cuts) == 2:
+            kind = "whole"
+        elif index == 0:
+            kind = "prefix"
+        elif index == len(cuts) - 2:
+            kind = "suffix"
+        else:
+            kind = "interior"
+        intervals.append({
+            "kind": kind,
+            "start": [round(start[0], 4), round(start[1], 4)],
+            "end": [round(end[0], 4), round(end[1], 4)],
+            "path_start_px": round(start_distance, 4),
+            "path_end_px": round(end_distance, 4),
+            "length_px": round(end_distance - start_distance, 4),
+            "internal_bends": sum(
+                start_distance + EPS < distance < end_distance - EPS
+                for distance in cumulative[1:-1]
+            ),
+        })
+    return intervals
+
+
+def _downstream_corridor_tail_bend_witnesses(
+    logical: list[LogicalEdge], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Find a common downstream y-translation that straightens fan-in tails."""
+    successors: dict[str, set[str]] = defaultdict(set)
+    incoming: dict[str, list[Route]] = defaultdict(list)
+    for edge in logical:
+        successors[edge.source].add(edge.target)
+    for route in routes:
+        incoming[route.target].append(route)
+    original_crossings, original_overlaps = route_crossings(routes)
+    original_crossing_pairs = {tuple(sorted(row["edges"])) for row in original_crossings}
+    original_overlap_pairs = {tuple(sorted(row["edges"])) for row in original_overlaps}
+    original_bends = sum(max(0, len(route.points) - 2) for route in routes)
+    original_length = sum(_route_length(route) for route in routes)
+    original_box_overlaps = {
+        (left_index, right_index)
+        for left_index, left in enumerate(boxes)
+        for right_index, right in enumerate(boxes[left_index + 1:], left_index + 1)
+        if _visual_boxes_overlap(left, right)
+    }
+
+    def route_box_hits(candidate_routes: list[Route], candidate_boxes: list[Box]) -> set[tuple[int, int]]:
+        hits: set[tuple[int, int]] = set()
+        for candidate in candidate_routes:
+            source_index = _endpoint_box_index(candidate.points[0], candidate.source, candidate_boxes)
+            target_index = _endpoint_box_index(candidate.points[-1], candidate.target, candidate_boxes)
+            for box_index, box in enumerate(candidate_boxes):
+                if box_index in {source_index, target_index}:
+                    continue
+                if any(_visual_rect_interior_hit(a, b, box) for a, b in segments(candidate)):
+                    hits.add((candidate.index, box_index))
+        return hits
+
+    original_route_box_hits = route_box_hits(routes, boxes)
+    witnesses: list[dict[str, Any]] = []
+
+    for target, boundary_routes in sorted(incoming.items()):
+        if len(boundary_routes) < 2:
+            continue
+        deltas = [route.points[0][1] - route.points[-1][1] for route in boundary_routes]
+        if any(abs(delta) <= EPS for delta in deltas) or max(deltas) - min(deltas) > EPS:
+            continue
+        delta_y = deltas[0]
+        moved_nodes = {target}
+        while True:
+            expanded = moved_nodes | {
+                child for parent in moved_nodes for child in successors.get(parent, set())
+            }
+            if expanded == moved_nodes:
+                break
+            moved_nodes = expanded
+        candidate_boxes: list[Box] = []
+        candidate_routes: list[Route] = []
+        feasible = True
+        for _closure_round in range(len(boxes) + 1):
+            candidate_boxes = [
+                Box(
+                    box.node, box.x,
+                    box.y + (delta_y if box.node in moved_nodes else 0.0),
+                    box.w, box.h, box.visible_x,
+                    None if box.visible_y is None else box.visible_y + (delta_y if box.node in moved_nodes else 0.0),
+                    box.visible_w, box.visible_h,
+                )
+                for box in boxes
+            ]
+            candidate_box_overlaps = {
+                (left_index, right_index)
+                for left_index, left in enumerate(candidate_boxes)
+                for right_index, right in enumerate(candidate_boxes[left_index + 1:], left_index + 1)
+                if _visual_boxes_overlap(left, right)
+            }
+            if not candidate_box_overlaps.issubset(original_box_overlaps):
+                feasible = False
+                break
+            candidate_routes = []
+            for route in routes:
+                source_moved = route.source in moved_nodes
+                target_moved = route.target in moved_nodes
+                if source_moved and target_moved:
+                    points = [(x, y + delta_y) for x, y in route.points]
+                elif not source_moved and target_moved:
+                    start = route.points[0]
+                    end = (route.points[-1][0], route.points[-1][1] + delta_y)
+                    if abs(start[1] - end[1]) <= EPS:
+                        points = [start, end]
+                    else:
+                        channels = [
+                            point[0] for point in route.points[1:-1]
+                            if min(start[0], end[0]) + EPS < point[0] < max(start[0], end[0]) - EPS
+                        ]
+                        channel = channels[0] if channels else (start[0] + end[0]) / 2.0
+                        points = [start, (channel, start[1]), (channel, end[1]), end]
+                elif source_moved and not target_moved:
+                    feasible = False
+                    break
+                else:
+                    points = list(route.points)
+                candidate_routes.append(_copy_route(route, simplify(points)))
+            if not feasible:
+                break
+            new_hits = route_box_hits(candidate_routes, candidate_boxes) - original_route_box_hits
+            if not new_hits:
+                break
+            route_by_index = {route.index: route for route in routes}
+            expandable = {
+                route_by_index[route_index].target
+                for route_index, box_index in new_hits
+                if candidate_boxes[box_index].node in moved_nodes
+                and route_by_index[route_index].source not in moved_nodes
+                and route_by_index[route_index].target not in moved_nodes
+            }
+            if not expandable:
+                feasible = False
+                break
+            moved_nodes.update(expandable)
+            while True:
+                expanded = moved_nodes | {
+                    child for parent in moved_nodes for child in successors.get(parent, set())
+                }
+                if expanded == moved_nodes:
+                    break
+                moved_nodes = expanded
+        else:
+            feasible = False
+        if not feasible or not route_box_hits(candidate_routes, candidate_boxes).issubset(original_route_box_hits):
+            continue
+        candidate_crossings, candidate_overlaps = route_crossings(candidate_routes)
+        crossing_pairs = {tuple(sorted(row["edges"])) for row in candidate_crossings}
+        overlap_pairs = {tuple(sorted(row["edges"])) for row in candidate_overlaps}
+        candidate_bends = sum(max(0, len(route.points) - 2) for route in candidate_routes)
+        candidate_length = sum(_route_length(route) for route in candidate_routes)
+        if (
+            not crossing_pairs.issubset(original_crossing_pairs)
+            or not overlap_pairs.issubset(original_overlap_pairs)
+            or candidate_bends >= original_bends
+            or candidate_length > original_length + EPS
+        ):
+            continue
+        affected = []
+        for route in boundary_routes:
+            intervals = _ordered_crossing_free_intervals(route, routes)
+            suffix = next((row for row in reversed(intervals) if row["kind"] in {"suffix", "whole"}), None)
+            if suffix is not None and suffix["internal_bends"]:
+                affected.append({
+                    "edge_id": route.edge_id, "source": route.source,
+                    "target_port": route.target_port,
+                    "crossings_before": _cross_count_for_route(route, routes),
+                    "tail_kind": suffix["kind"],
+                    "tail_bends_before": suffix["internal_bends"],
+                    "tail_bends_after": 0,
+                })
+        if affected:
+            witnesses.append({
+                "target": target, "delta_y": round(delta_y, 4),
+                "moved_nodes": len(moved_nodes), "affected_edges": affected,
+                "crossing_pairs_before": len(original_crossing_pairs),
+                "crossing_pairs_after": len(crossing_pairs),
+                "bends_before": original_bends, "bends_after": candidate_bends,
+                "length_before": round(original_length, 4),
+                "length_after": round(candidate_length, 4),
+            })
+    return witnesses
 
 
 def _vertical_root_facility_bend_witnesses(
@@ -1299,6 +1512,9 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     root_facility_column_lag_witnesses = (
         _root_facility_column_lag_witnesses(roots, routes, boxes)
     )
+    downstream_corridor_tail_bend_witnesses = (
+        _downstream_corridor_tail_bend_witnesses(logical, routes, boxes)
+    )
     detected = {
         # Mixed kinds are only a precondition.  A defect is present only when
         # an ordinary zero-indegree component also exhibits the measured root
@@ -1317,6 +1533,7 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         "FB-ROOT-010": bool(physical_anchor_relocation_witnesses),
         "FB-BEND-011": bool(vertical_root_facility_bend_witnesses),
         "FB-ROOT-012": bool(root_facility_column_lag_witnesses),
+        "FB-BEND-013": bool(downstream_corridor_tail_bend_witnesses),
     }
     route_row_by_id = {row["edge_id"]: row for row in route_rows}
     node_statistics = {}
@@ -1414,6 +1631,13 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             ),
             "root_facility_column_lag_witnesses": (
                 root_facility_column_lag_witnesses
+            ),
+            "crossing_free_intervals": {
+                route.edge_id: _ordered_crossing_free_intervals(route, routes)
+                for route in routes
+            },
+            "downstream_corridor_tail_bend_witnesses": (
+                downstream_corridor_tail_bend_witnesses
             ),
         },
         "detected_issues": [issue for issue in ISSUES if detected[issue]],

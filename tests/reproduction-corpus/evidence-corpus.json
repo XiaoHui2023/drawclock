@@ -56,6 +56,15 @@
       "input": "example/auto-layout/26-feedback-reproduction-combined.json",
       "library": "drawio-lib",
       "issues": ["FB-BEND-011", "FB-ROOT-012"]
+    },
+    {
+      "id": "crossing-partitioned-tail-baseline",
+      "baseline_revision": "5fe9a44b9e54121b372176dbcca631e2538b02c5",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "example/auto-layout/26-feedback-reproduction-combined.json",
+      "library": "drawio-lib",
+      "issues": ["FB-BEND-013"]
     }
   ],
   "current_fix_cases": [
@@ -63,7 +72,7 @@
       "id": "combined-cross-feature-current",
       "input": "example/auto-layout/26-feedback-reproduction-combined.json",
       "library": "drawio-lib",
-      "issues": ["FB-ROUTE-002"]
+      "issues": ["FB-ROUTE-002", "FB-BEND-013"]
     }
   ]
 }

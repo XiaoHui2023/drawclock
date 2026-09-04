@@ -11,7 +11,8 @@
     "input_insertion_order",
     "physical_root_facility",
     "zero_crossing_bend",
-    "root_column_alignment"
+    "root_column_alignment",
+    "crossing_partitioned_bend"
   ],
   "issues": [
     "FB-ROOT-001",
@@ -23,7 +24,8 @@
     "FB-ROUTE-009",
     "FB-ROOT-010",
     "FB-BEND-011",
-    "FB-ROOT-012"
+    "FB-ROOT-012",
+    "FB-BEND-013"
   ],
   "cases": [
     {

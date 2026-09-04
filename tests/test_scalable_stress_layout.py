@@ -1337,7 +1337,22 @@ def test_combined_feedback_layout_consolidates_overlapping_root_aliases() -> Non
     assert report["selection"]["source_corridor_moves"] >= 1
     assert report["selection"]["source_corridor_crossings_removed"] >= 1
     assert report["selection"]["source_corridor_bends_removed"] >= 1
+    assert report["selection"]["downstream_corridor_axis_moves"] >= 1
+    assert report["selection"]["downstream_corridor_axis_bends_removed"] >= 4
     assert quality["line_integrity"]["split_rejoin_fanout_nets"] == []
+
+    nodes = resolve_nodes(
+        config, load_library_shapes(LIBRARY), {}, library_path=LIBRARY
+    )
+    logical_edges = build_logical_edges(config, nodes, LIBRARY)
+    physical_edges = {edge.cell_id: edge for edge in document.edges}
+    sel_inputs = [
+        physical_edges[f"e{index}"]
+        for index, logical in enumerate(logical_edges, 1)
+        if logical.target == "ports__sel"
+    ]
+    assert len(sel_inputs) == 2
+    assert all(edge.waypoints == () for edge in sel_inputs)
 
 
 def test_quality_oracle_rejects_same_root_split_rejoin_cycle() -> None:

@@ -189,6 +189,33 @@
         "current_passes": true,
         "receipt": ".reproduction/fix-receipts/FB-ROOT-012.json"
       }
+    },
+    {
+      "id": "FB-BEND-013",
+      "summary": "边在最后一次交叉之后的无交叉尾段仍存在可避免折点",
+      "expected": "把路线按交叉、分叉、合流和端口邻域分为局部区段；任一区段若存在保持端口、网络连续性和既有交叉语义且不增加碰撞、异网重叠或交叉的更少折点候选，则原路线必须被拒绝",
+      "actual": "ports__div_b 到 ports__sel 输入 1 的路线在较早横段发生一次交叉；最后交叉点之后已无交叉，却仍以水平、竖直、水平两次转向进入端口，旧的整边无交叉筛选因此漏检",
+      "status": "closed",
+      "owner_paths": ["src/**"],
+      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
+      "baseline_revision": "5fe9a44b9e54121b372176dbcca631e2538b02c5",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "arc"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/26-feedback-reproduction-combined.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-013", "--input", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "公开 CLI 自然生成的最终 SVG 中，交叉分割后的局部无交叉区段存在被完整几何反事实严格支配的多余转向",
+      "reproduction_does_not_prove": "所有含交叉路线或所有端口前折线都不合理；障碍、固定端口纵差、共享网络分叉及保持交叉顺序所需的转向仍可成立",
+      "reproduction_attempts": [
+        {"attempted_at": "2026-09-04T09:49:00+08:00", "hypothesis": "现有整边级无交叉折点 Oracle 会识别 ports__sel 输入路线的局部尾段冗余。", "method": "从当前公开入口 SVG 的独立统计中读取两条 ports__sel 入边的规范化航点、逐段交叉位置、折点和端口坐标。", "result": "not_reproduced", "observed": "ports__div_b→ports__sel 输入 1 为 3 段、2 折点、1 个交叉；唯一交叉位于第一横段，交叉后的路线仍有 2 个折点。ports__gate_a→输入 0 为 3 段、2 折点、整边 0 交叉。", "analysis": "旧 BEND-011 只筛选整条边交叉数为零且只覆盖可移动根设施；当前边是中间器件入 mux 的普通边，整边有一次交叉，因此交叉后的无交叉尾段从候选空间和指标中同时消失，属于 oracle_escape、coverage_escape 与 ownership_escape。", "why_not_reproduced": "现有 Oracle 没有沿折线参数顺序定位最后交叉，也没有为交叉分割后的首段、中段、尾段建立保持前缀/后缀语义的局部反事实。", "evidence": "example/out/final-combined.svg; example/out/final-combined.latest-oracle.json", "next_condition": "先扩展独立 Oracle 的局部区段表示和正反校准，再从冻结 5fe9a44 公开 CLI 双跑签发自然红灯；在此之前产品 owner 保持冻结。"},
+        {"attempted_at": "2026-09-04T09:56:00+08:00", "hypothesis": "共同移动 ports__sel 及其下游闭包 20px 会在保持原交叉对的同时把两条入边尾段变直。", "method": "新增独立下游闭包刚体平移反事实，先运行 27 项正反校准，再直接检查当前公开 SVG。", "result": "not_reproduced", "observed": "27 项 Oracle 测试在 7.565 秒内通过，但真实产物检查 0.412 秒返回 symptom not observed。", "analysis": "反事实把候选全图要求为绝对零视觉框重叠和零 edge-box 命中；原图中与移动无关的既有对象也导致候选被拒绝，比较量纲错误。", "why_not_reproduced": "应比较具体错误对象集合不得新增，而不是要求候选总错误数为零。", "evidence": "pytest tests/test_feedback_layout_oracle.py; direct FB-BEND-013 oracle exit 1", "next_condition": "改为 node-pair 与 edge-node-pair 身份集合差分，正反校准后重新检查真实产物。"},
+        {"attempted_at": "2026-09-04T10:00:00+08:00", "hypothesis": "新增证据 case 后正式 runner 可直接签发冻结双跑收据。", "method": "先运行 60-case 多对多结构门，再运行完整冻结公开入口 runner。", "result": "reproduction_blocked", "observed": "结构门 0.276 秒通过；runner 11.162 秒后因既有 06c legacy case 缺少 --legacy-python 返回 2。", "analysis": "FB-BEND-013 case 尚未获得完整批次签名；环境参数缺失不能算未观察到，也不能复用半批证据。", "why_not_reproduced": "完整语料包含旧 draw 子命令 case，必须显式提供项目已有隔离 Python 解释器。", "evidence": "run_feedback_reproduction_corpus.py exit 2: legacy corpus case requires --legacy-python", "next_condition": "使用项目既有 .venv/Scripts/python.exe 从头重跑整个批次，不下载依赖。"},
+        {"attempted_at": "2026-09-04T10:03:00+08:00", "hypothesis": "冻结 5fe9a44 的公开 CLI 会确定性产生交叉后尾段可由视觉行闭包变直的症状。", "method": "显式使用既有隔离 legacy Python，从头运行全部七个正式 case；目标 case 由冻结源码公开 CLI 两次生成，Oracle 前后验证原始 SVG 哈希。", "result": "reproduced", "observed": "批次 20260904T020233Z-622f7479 耗时 51.908 秒；FB-BEND-013 两次均直接命中，输出哈希一致为 428063c1...8aa，missing_issues=[]。", "analysis": "症状稳定属于交叉分割后的局部区段及目标视觉行坐标 owner；器件名、固定坐标和手工产物均不是触发条件。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-013.json", "next_condition": "solve 门通过后，以通用视觉行闭包候选接入生产坐标阶段，并用当前公开入口双跑转绿。"}
+      ],
+      "reproduction_receipt": ".reproduction/receipts/FB-BEND-013.json",
+      "fix_verification": {
+        "baseline_fails": true,
+        "current_passes": true,
+        "receipt": ".reproduction/fix-receipts/FB-BEND-013.json"
+      }
     }
   ],
   "process_incidents": [

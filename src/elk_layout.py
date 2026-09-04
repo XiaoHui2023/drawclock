@@ -2939,6 +2939,208 @@ def _refine_joint_coordinates(
     }
 
 
+def _refine_downstream_corridor_axes(
+    document: LayoutDocument,
+    logical_edges,
+    *,
+    route_clearance: float = 18.0,
+) -> tuple[LayoutDocument, dict[str, Any]]:
+    """Remove bends from crossing-free fan-in tails by moving a visual row.
+
+    A crossing on an earlier route section cannot justify bends beside the
+    target port.  Candidates come only from common incoming port-axis offsets;
+    ownership grows over downstream topology and any visual-row conflict.
+    Acceptance is global, strict, and independent of names or component kinds.
+    """
+    accepted = copy.deepcopy(document)
+    moves = bends_removed = moved_vertices_total = 0
+    blockers: Counter[str] = Counter()
+
+    while True:
+        by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+        edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+        outgoing: dict[str, list[int]] = defaultdict(list)
+        incoming: dict[str, list[int]] = defaultdict(list)
+        for index, edge in enumerate(accepted.edges, 1):
+            outgoing[edge.source_id].append(index)
+            incoming[edge.target_id].append(index)
+
+        def descendants(seeds: set[str]) -> set[str]:
+            closure = set(seeds)
+            stack = list(seeds)
+            while stack:
+                for edge_index in outgoing.get(stack.pop(), ()):
+                    target = edge_by_id[f"e{edge_index}"].target_id
+                    if target not in closure:
+                        closure.add(target)
+                        stack.append(target)
+            return closure
+
+        def points_for(doc: LayoutDocument, edge_index: int):
+            vertices = {vertex.cell_id: vertex for vertex in doc.vertices}
+            edges = {edge.cell_id: edge for edge in doc.edges}
+            edge = edges[f"e{edge_index}"]
+            logical = logical_edges[edge_index - 1]
+            source, target = vertices[edge.source_id], vertices[edge.target_id]
+            start = abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            )
+            end = abs_port_xy(
+                target.x, target.y, target.width, target.height,
+                target.style, target.drawclock_type, logical.target_port,
+            )
+            return _simplify([start, *edge.waypoints, end])
+
+        base_report = assess_layout(accepted, logical_edges, 0.0)
+        base_visible = _visible_layout_signature(accepted, logical_edges)
+        specs: list[tuple[int, str, float]] = []
+        for target_id, edge_indices in incoming.items():
+            if len(edge_indices) < 2:
+                continue
+            paths = [points_for(accepted, index) for index in edge_indices]
+            offsets = [path[0][1] - path[-1][1] for path in paths]
+            old_bends = sum(max(0, len(path) - 2) for path in paths)
+            if old_bends == 0 or abs(offsets[0]) <= 1e-6:
+                continue
+            if any(abs(value - offsets[0]) > 1e-6 for value in offsets[1:]):
+                blockers["nonuniform-port-axis-offset"] += 1
+                continue
+            specs.append((old_bends, target_id, offsets[0]))
+
+        accepted_one = False
+        for _, target_id, delta_y in sorted(
+            specs, key=lambda item: (-item[0], abs(item[2]), item[1])
+        ):
+            moved_ids = descendants({target_id})
+            candidate = None
+            changed_edges: set[int] = set()
+            valid = True
+            # Every conflict-closure step adds a vertex, so no pass cap exists.
+            while True:
+                candidate = copy.deepcopy(accepted)
+                vertices = {
+                    vertex.cell_id: vertex for vertex in candidate.vertices
+                }
+                edges = {edge.cell_id: edge for edge in candidate.edges}
+                for vertex_id in moved_ids:
+                    vertices[vertex_id].y += delta_y
+                changed_edges = set()
+                for edge_index, edge in enumerate(candidate.edges, 1):
+                    source_moved = edge.source_id in moved_ids
+                    target_moved = edge.target_id in moved_ids
+                    if not source_moved and not target_moved:
+                        continue
+                    if source_moved and not target_moved:
+                        blockers["non-downstream-closed-owner"] += 1
+                        valid = False
+                        break
+                    changed_edges.add(edge_index)
+                    if source_moved:
+                        edge.waypoints = tuple(
+                            (x, y + delta_y) for x, y in edge.waypoints
+                        )
+                        continue
+                    old_path = points_for(accepted, edge_index)
+                    path = points_for(candidate, edge_index)
+                    start, end = path[0], path[-1]
+                    if abs(start[1] - end[1]) <= 1e-6:
+                        edge.waypoints = ()
+                        continue
+                    axes = [
+                        a[0]
+                        for a, b in zip(old_path, old_path[1:])
+                        if abs(a[0] - b[0]) <= 1e-6
+                        and abs(a[1] - b[1]) > 1e-6
+                    ]
+                    source_box = vertex_visual_box(vertices[edge.source_id])
+                    target_box = vertex_visual_box(vertices[edge.target_id])
+                    left = source_box.right + route_clearance
+                    right = target_box.left - route_clearance
+                    if not axes:
+                        axes = [(start[0] + end[0]) / 2.0]
+                    if left <= right + 1e-6:
+                        axes.extend((left, (left + right) / 2.0, right))
+                    options = [
+                        _simplify([start, (x, start[1]), (x, end[1]), end])
+                        for x in dict.fromkeys(axes)
+                    ]
+                    best = min(options, key=lambda option: (
+                        max(0, len(option) - 2),
+                        sum(
+                            abs(b[0] - a[0]) + abs(b[1] - a[1])
+                            for a, b in zip(option, option[1:])
+                        ),
+                        tuple(option),
+                    ))
+                    edge.waypoints = tuple(best[1:-1])
+                if not valid:
+                    break
+                visible = _visible_layout_signature(candidate, logical_edges)
+                expandable: set[str] = set()
+                unresolved = False
+                for edge_id, hit_id in visible[5] - base_visible[5]:
+                    hit_edge = edges[edge_id]
+                    if (
+                        hit_id in moved_ids
+                        and hit_edge.source_id not in moved_ids
+                        and hit_edge.target_id not in moved_ids
+                    ):
+                        expandable.add(hit_edge.target_id)
+                    else:
+                        unresolved = True
+                if unresolved:
+                    blockers["new-visible-edge-node-hit"] += 1
+                    valid = False
+                    break
+                expanded = descendants(expandable) - moved_ids
+                if not expanded:
+                    break
+                moved_ids.update(expanded)
+            if not valid or candidate is None:
+                continue
+
+            report = assess_layout(candidate, logical_edges, 0.0)
+            visible = _visible_layout_signature(candidate, logical_edges)
+            old_endpoint = _route_endpoint_signature(
+                accepted, logical_edges, changed_edges, route_clearance
+            )
+            new_endpoint = _route_endpoint_signature(
+                candidate, logical_edges, changed_edges, route_clearance
+            )
+            checks = {
+                "node-overlap": report["node_overlaps"] <= base_report["node_overlaps"],
+                "edge-node": report["edge_node_intersections"] <= base_report["edge_node_intersections"],
+                "direction": report["direction_violations"] <= base_report["direction_violations"],
+                "visible-overlap": visible[4].issubset(base_visible[4]),
+                "visible-edge-node": visible[5].issubset(base_visible[5]),
+                "endpoint": new_endpoint.issubset(old_endpoint),
+                "route-overlap": report["ambiguous_overlaps"] <= base_report["ambiguous_overlaps"],
+                "crossing": report["crossings"] <= base_report["crossings"],
+                "crossing-points": report["distinct_crossing_points"] <= base_report["distinct_crossing_points"],
+                "bend": report["bends_total"] < base_report["bends_total"],
+                "length": report["manhattan_length"] <= base_report["manhattan_length"] + 1e-6,
+            }
+            if not all(checks.values()):
+                blockers.update(name for name, passed in checks.items() if not passed)
+                continue
+            bends_removed += base_report["bends_total"] - report["bends_total"]
+            moved_vertices_total += len(moved_ids)
+            moves += 1
+            accepted = candidate
+            accepted_one = True
+            break
+        if not accepted_one:
+            break
+
+    return accepted, {
+        "downstream_corridor_axis_moves": moves,
+        "downstream_corridor_axis_bends_removed": bends_removed,
+        "downstream_corridor_axis_moved_vertices": moved_vertices_total,
+        "downstream_corridor_axis_blockers": dict(sorted(blockers.items())),
+    }
+
+
 def _optimal_source_anchor_partitions(
     samples: list[tuple[float, int]],
     fixed_cost: float,
@@ -5510,6 +5712,12 @@ def generate_elk_layout(
         route_clearance=profile.route_clearance,
     )
     report["selection"].update(joint_report)
+    document, downstream_axis_report = _refine_downstream_corridor_axes(
+        document,
+        logical_edges,
+        route_clearance=profile.route_clearance,
+    )
+    report["selection"].update(downstream_axis_report)
     document, replica_report = _replicate_dispersed_roots(
         document,
         nodes,

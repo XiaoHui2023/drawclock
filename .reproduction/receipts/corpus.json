@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "corpus_id": "20260903T170713Z-187ae636",
+  "corpus_id": "20260904T021756Z-d4363165",
   "coverage_model": "many_to_many",
   "cases": [
     {
@@ -9,8 +9,7 @@
       "detected_issues": [
         "FB-ROOT-003",
         "FB-ROOT-004",
-        "FB-ROOT-010",
-        "FB-ROOT-012"
+        "FB-ROOT-010"
       ],
       "totals": {
         "logical_nodes": 69,
@@ -30,8 +29,7 @@
       "detected_issues": [
         "FB-ROOT-003",
         "FB-ROOT-004",
-        "FB-ROOT-010",
-        "FB-ROOT-012"
+        "FB-ROOT-010"
       ],
       "totals": {
         "logical_nodes": 69,
@@ -135,7 +133,8 @@
       "detected_issues": [
         "FB-ROUTE-009",
         "FB-ROOT-010",
-        "FB-ROOT-012"
+        "FB-ROOT-012",
+        "FB-BEND-013"
       ],
       "totals": {
         "logical_nodes": 121,
@@ -155,7 +154,8 @@
       "detected_issues": [
         "FB-ROUTE-009",
         "FB-ROOT-010",
-        "FB-ROOT-012"
+        "FB-ROOT-012",
+        "FB-BEND-013"
       ],
       "totals": {
         "logical_nodes": 121,
@@ -210,7 +210,8 @@
       "attempt": 1,
       "detected_issues": [
         "FB-BEND-011",
-        "FB-ROOT-012"
+        "FB-ROOT-012",
+        "FB-BEND-013"
       ],
       "totals": {
         "logical_nodes": 121,
@@ -229,7 +230,8 @@
       "attempt": 2,
       "detected_issues": [
         "FB-BEND-011",
-        "FB-ROOT-012"
+        "FB-ROOT-012",
+        "FB-BEND-013"
       ],
       "totals": {
         "logical_nodes": 121,
@@ -241,6 +243,42 @@
         "different_net_overlaps": 0,
         "bends": 10,
         "manhattan_length_px": 20852.3379
+      }
+    },
+    {
+      "case_id": "crossing-partitioned-tail-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-BEND-013"
+      ],
+      "totals": {
+        "logical_nodes": 121,
+        "rendered_nodes": 143,
+        "logical_edges": 122,
+        "rendered_edges": 122,
+        "proper_crossing_events": 1,
+        "distinct_crossing_points": 1,
+        "different_net_overlaps": 0,
+        "bends": 6,
+        "manhattan_length_px": 26714.752
+      }
+    },
+    {
+      "case_id": "crossing-partitioned-tail-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-BEND-013"
+      ],
+      "totals": {
+        "logical_nodes": 121,
+        "rendered_nodes": 143,
+        "logical_edges": 122,
+        "rendered_edges": 122,
+        "proper_crossing_events": 1,
+        "distinct_crossing_points": 1,
+        "different_net_overlaps": 0,
+        "bends": 6,
+        "manhattan_length_px": 26714.752
       }
     }
   ],
@@ -254,7 +292,8 @@
     "FB-ROUTE-009": 2,
     "FB-ROOT-010": 2,
     "FB-BEND-011": 2,
-    "FB-ROOT-012": 2
+    "FB-ROOT-012": 2,
+    "FB-BEND-013": 2
   },
   "missing_issues": []
 }
