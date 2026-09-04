@@ -81,8 +81,9 @@ def main() -> int:
             "managed-hook-only delivery gate: missing managed challenge environment: "
             f"{', '.join(missing)}. Direct invocation is an expected negative control and "
             "cannot issue a trusted receipt; do not set these variables manually. Let the "
-            "managed Stop hook run, or invoke a protected commit/push/release command, then "
-            "verify the receipt artifact_tree against the current prospective Git tree.",
+            "managed Stop hook run, or use a host path whose protected command is covered by "
+            "PreToolUse, then verify the receipt artifact_tree against the current prospective "
+            "Git tree. If the receipt stays stale, diagnose host tool-hook coverage.",
             file=sys.stderr,
         )
         return 2
