@@ -13,7 +13,7 @@
 
 - status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-04 18:25 +08:00
+- updated: 2026-09-04 18:30 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
@@ -378,7 +378,7 @@
 - `v1.0.0` 已移动到 `7aa0526`，`v0.0.0` 仍为 `8befc99`。远端 Linux 资产 17,237,791 bytes，SHA-256 `9409ac5115ad61fa05252a940f6c221cee763b243c35808b5262d798dcf55121`，148 个文件、26 个 auto-layout JSON、7 个项目 Skills、Runtime/npm 为零；再次独立下载后的标准库源码消费耗时 10.70 秒并通过。本记录进入 done。
 # 2026-09-04 重新打开
 
-- status: active
+- 阶段状态（当时）：active
 - `FB-BEND-011`：用户指出 `weave__public_from→weave__merge7` 有无交叉收益的异常折点。初步血缘检查发现用户给出的 `final-medium.svg` 不含 `weave__` 节点；实际节点位于 `final-combined.svg`，且旁路元数据绑定 `26-feedback-reproduction-combined.json`。先扩展独立反事实 Oracle，再以冻结 `deaefc9c` 公开入口双跑。
 - `FB-ROOT-012`：用户指出多个自由根仍无必要地停在首列。新判据不能把“根不在同列”直接判错，而要证明局部规范列候选不增加碰撞、异网重叠、交叉和可避免折点；仅在严格改善更高优先级几何时允许偏离。
 - 本轮前置规范与项目状态读取约 38 秒；文件血缘核对约 3.8 秒；问题账本登记与 JSON 校验约 4.6 秒。生产 owner 保持冻结。
@@ -525,3 +525,4 @@
 - 18:15 Windows 静态包重建通过，最终 ZIP 为 8,247,735 字节、SHA-256 `2FCB9FF35021DBCAE9EDA2EABA9A7611939619DA253C4EF8DD7DD672F6C41056`。全新目录 `work/drawclock-consume-20260904-1815` 中，冻结 workflow、7 个项目 Skill、source manifest、空 venv 的 `python -I -S` 源码部署及 23 个发行输入（draw + 22 auto-layout）全部通过；包内 512+ 高压样例为 0，两级示例 README 和 mux3 第 27 例均存在。进入提交上传审计与远端滚动 Release 值守。
 - 18:20 目标账本已把 512+ 范围收缩由 pending 更新为 success，并移除旧 1024/2048/4096 性能承诺；`.gitignore` 证据白名单切换到最终红灯 `20260904T080323Z-ca29ae92` 与绿灯 `20260904T080445Z-b2bcdb2c`。远程 fetch 后 main 与 origin/main 为 0 ahead/0 behind；下一步从索引移除未提交的旧证据批次、暂存最终树并请求托管 delivery-ready 回执。
 - 18:25 产品提交 `aabdd4893c6411c6bc0b122e78c6e32d55a59ebc` 已推送；Release run `33856758637` 的反馈门、Ubuntu 16.04 PyInstaller/staticx、librsvg 与 publish 全部成功，`v1.0.0^{}` 指向该提交。CI 从公开 Release 回下载后通过 frozen/source smoke；本机独立下载资产 17,158,600 字节、SHA-256 `4FA0AB41980F7057633C32BFC62A9E99B229F3912448C150357223EBE00F899C`，包内源码消费通过、22 个 auto-layout JSON、512+ 高压样例为 0。`FB-ROOT-015` 关闭，本记录完成。
+- 18:30 复核闭环记录提交的“回执阻断”：直接运行 managed-only delivery command 的缺 challenge exit 2 是防伪负基线，不能代表外层 Hook 失败；Stop 已把 ready receipt 更新到当前树 `32b303bb4ce14d426815c1241c6bd307a508afc6` 并清除质量状态。项目脚本、单测、通用恢复知识库和独立分析记录已补充正确诊断顺序，闭环提交可以继续走受保护 push。

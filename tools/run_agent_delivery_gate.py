@@ -77,7 +77,14 @@ def main() -> int:
     required_environment = ("CODEX_GATE_CHALLENGE", "CODEX_GATE_POLICY_SHA256", "CODEX_GATE_COMMAND_SHA256")
     missing = [name for name in required_environment if not os.environ.get(name)]
     if missing:
-        print(f"missing managed challenge environment: {', '.join(missing)}", file=sys.stderr)
+        print(
+            "managed-hook-only delivery gate: missing managed challenge environment: "
+            f"{', '.join(missing)}. Direct invocation is an expected negative control and "
+            "cannot issue a trusted receipt; do not set these variables manually. Let the "
+            "managed Stop hook run, or invoke a protected commit/push/release command, then "
+            "verify the receipt artifact_tree against the current prospective Git tree.",
+            file=sys.stderr,
+        )
         return 2
     paths = changed_paths()
     trigger_command = os.environ.get("CODEX_GATE_TRIGGER_COMMAND", "")

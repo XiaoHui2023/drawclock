@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import importlib.util
+import os
 import subprocess
 import sys
 import tempfile
@@ -124,6 +125,27 @@ class FeedbackReproductionGateTest(unittest.TestCase):
             self.assertEqual(module.delivery_phase([], command), "release", command)
         self.assertEqual(module.delivery_phase(["src/auto_layout.py"], "git commit -m fix"), "solve")
         self.assertEqual(module.delivery_phase(["tests/test_gate.py"], "git push"), "structure")
+
+    def test_delivery_gate_direct_invocation_is_an_explicit_negative_control(self) -> None:
+        environment = os.environ.copy()
+        for name in (
+            "CODEX_GATE_CHALLENGE",
+            "CODEX_GATE_POLICY_SHA256",
+            "CODEX_GATE_COMMAND_SHA256",
+        ):
+            environment.pop(name, None)
+        result = subprocess.run(
+            [sys.executable, str(DELIVERY_GATE)],
+            cwd=ROOT,
+            env=environment,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("managed-hook-only delivery gate", result.stderr)
+        self.assertIn("expected negative control", result.stderr)
+        self.assertIn("do not set these variables manually", result.stderr)
 
     def test_policy_checks_product_writes_before_side_effect(self) -> None:
         policy = json.loads(POLICY.read_text(encoding="utf-8"))
