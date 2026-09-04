@@ -11,9 +11,9 @@
 - 独立 Oracle 新增 `root_facility_split_witnesses` 与 `physical_anchor_relocation_witnesses`，判定只读取最终 SVG、逻辑零入度、物理端点归属和几何，不读取器件 kind、实例名、样例号或生产布局模块。正式双跑收据尚未签发。
 - Oracle 测试增加当前公开入口的两项自然红灯与一个同样含零入度根但无跨干线/无设施拆分收益的干净反例；测试产物只用于检测器校准，正式复现仍必须由冻结 revision 双跑收据授权。
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-04 11:00 +08:00
+- updated: 2026-09-04 10:36 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 当前事实
@@ -424,3 +424,4 @@
 - 项目/用户根 complete 门合计约 2.1 秒通过；最终全量 453 passed、5 skipped、0 failed，pytest 115.99 秒。Windows 构建约 30.45 秒，ZIP 8,346,493 bytes，SHA-256 `48B82818BE6090A811E01367F2E65ED1B9BC16662C3706CA4F9E3AF1E49D87C1`；最终冻结 workflow 约 60 秒通过。
 - 首次全新解压复验以 `--issue` 模式检查绿图，Oracle 按约定以 exit 1 表示“未检测到该 issue”，外层把该预期码显示为失败；改用 report 模式后明确 `detected_issues=[]`。解压冻结入口 2.044 秒生成组合图，指标为交叉事件/点 1/1、折点 2、线长 26694.752px；包内零依赖源码入口 11.025 秒通过，26 个布局 JSON、7 个 Skills，Runtime/node_modules/.venv 目录均为 0。本机未使用 Docker。
 - 上传前 fetch 确认 main 与 origin/main 为 0 ahead/0 behind；首次 PowerShell 未引用 `@{u}` 导致 rev-list 把展开值当 revision 报错，随后以引号重跑得到 0/0。历史/当前敏感路径与新增密钥/仓外路径扫描均为空，dist/build/work 正确被忽略。证据白名单从旧批次迁移到本轮自然红灯 `20260904T021756Z-d4363165` 与当前绿灯 `20260904T021905Z-657e17a8`，避免收据引用未入库文件。
+- 产品与证据提交 `09c99d906d89073bbdf393e9293797d43b00c3bf` 推送约 3.925 秒。远端 run `33829646709` 的反馈门、Ubuntu 16.04 staticx 构建、解压 frozen/source/librsvg、publish 与 Release URL 回下载均成功。v1.0.0 解引用到该提交；Linux 资产 17,246,981 bytes，SHA-256 `deda05edc2537fe891671a51cbccf9cdea2ea25fac889ac279be95ca0f65d7f8`，下载 14.220 秒，包内源码消费 9.708 秒通过。本记录完成。
