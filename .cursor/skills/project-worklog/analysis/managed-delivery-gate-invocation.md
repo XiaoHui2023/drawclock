@@ -2,7 +2,7 @@
 
 - status: done
 - created: 2026-09-04 18:30 +08:00
-- updated: 2026-09-04 18:35 +08:00
+- updated: 2026-09-04 18:40 +08:00
 - scene: 闭环提交后的新鲜回执与 push 误阻断诊断
 
 ## 问题
@@ -28,3 +28,11 @@
 - 通用硬门禁知识库固定诊断顺序：记录触发前树与回执，触发 managed Stop 或真实受保护操作，再核对新 challenge、回执修改时间和当前树；内层 stderr 不代表外层 Hook 结果。
 - 当前交付使用一次性受控桥接：把原 push 命令交给已安装 managed Hook 入口，由 Hook 自行生成 challenge；Hook 通过后先精确核对新回执树，再执行 push。禁止手工设置 challenge。
 - 机器级覆盖缺口不能由项目代码修复；当前无需 Quarantine、重装或重启。恢复条件是升级到包含 Code Mode 嵌套 Hook 修复的 Codex 版本，并重新通过真实宿主 Pre/Post/Stop 故障注入。
+
+## 运行时修复与最终结果
+
+- 第一次桥接在副作用前被外层 Hook 正确拒绝：`core-handlers` 把 WindowsApps `python.exe` 绝对路径当目录并探测 `python.exe\.codex\quality-gate.json`，得到 `[WinError 1920] 系统无法访问此文件`。没有执行桥接或 push。
+- 第一处仅修复 policy owner 后，第二次故障注入由 `project-context` 在 `python.exe\.cursor\skills\project-preload-skills\SKILL.md` 复现同一 WinError，再次没有 push。这证明局部补丁不足。
+- 最终把 `discovery_start` 下沉到共享 effective-root 模块：现有文件路径只在 policy/项目上下文发现阶段转为父目录；原始文件目标仍保留给 write preconditions。policy 与 project-context 使用同一 helper。
+- 新增 policy 与 project-context 两个绝对可执行文件路径回归。最终 45 个核心 Hook、32 个模块运行时、36 个项目上下文测试全部通过；安装器的 4/4 变异测试、两次 staged/installed doctor 均通过。最终安装备份为 `C:\ProgramData\OpenAI\Codex\backups\20260904T095603.273489Z-7a3341b8`，配置未改、无需重启。
+- 第三次同操作桥接通过，Hook 自行签发新 challenge，回执树精确匹配 `0d0120edaad41a4dda5a84b4977ad93658ea058f`；随后 `main` 从 `aabdd48` 推送到 `4a28304`。产品 Release 资产未重建，因为本轮只修改诊断脚本、测试与记录，未修改产品、示例或发行内容。

@@ -13,7 +13,7 @@
 
 - status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-04 18:35 +08:00
+- updated: 2026-09-04 18:40 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
@@ -527,3 +527,4 @@
 - 18:25 产品提交 `aabdd4893c6411c6bc0b122e78c6e32d55a59ebc` 已推送；Release run `33856758637` 的反馈门、Ubuntu 16.04 PyInstaller/staticx、librsvg 与 publish 全部成功，`v1.0.0^{}` 指向该提交。CI 从公开 Release 回下载后通过 frozen/source smoke；本机独立下载资产 17,158,600 字节、SHA-256 `4FA0AB41980F7057633C32BFC62A9E99B229F3912448C150357223EBE00F899C`，包内源码消费通过、22 个 auto-layout JSON、512+ 高压样例为 0。`FB-ROOT-015` 关闭，本记录完成。
 - 18:30 复核闭环记录提交的“回执阻断”：直接运行 managed-only delivery command 的缺 challenge exit 2 是防伪负基线，不能代表外层 Hook 失败；Stop 已把 ready receipt 更新到当前树 `32b303bb4ce14d426815c1241c6bd307a508afc6` 并清除质量状态。项目脚本、单测、通用恢复知识库和独立分析记录已补充正确诊断顺序，闭环提交可以继续走受保护 push。
 - 18:35 真实受保护 commit `13227a4` 进一步证明当前 Codex 0.140.0 Code Mode 的嵌套 `exec_command` 未触发 PreToolUse：命令执行后回执仍为旧树，而新提交树为 `9f9e79e05f60840e3ff21c1642f6e9e697eba87e`。这与 OpenAI issue #23411 一致；前一条“可直接继续受保护 push”的范围被修正。当前 push 使用 managed 入口自行生成 challenge 的同操作桥接并先核对回执，上游修复前不宣称机器级覆盖已恢复。
+- 18:40 两次桥接故障注入分别在 policy 与 project-context owner 复现 WindowsApps `python.exe` 被误作目录、探测 `.codex/.cursor` 子路径而触发 WinError 1920；两次均在 push 前拒绝。共享 effective-root 新增 `discovery_start` 后，45/32/36 项回归、4/4 变异、staged/installed doctor 全部通过并热安装；第三次桥接签发树 `0d0120edaad41a4dda5a84b4977ad93658ea058f` 后成功把 main 推到 `4a28304`。本机运行时缺陷已解决，Code Mode 上游覆盖边界继续如实保留。
