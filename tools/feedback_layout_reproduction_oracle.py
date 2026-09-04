@@ -34,6 +34,8 @@ ISSUES = (
     "FB-BEND-011",
     "FB-ROOT-012",
     "FB-BEND-013",
+    "FB-BEND-014",
+    "FB-ROOT-015",
 )
 
 
@@ -849,6 +851,191 @@ def _vertical_root_facility_bend_witnesses(
     return witnesses
 
 
+def _adjacent_root_height_bend_witnesses(
+    roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Find safe straightening moves beside another root in the same column."""
+    base = _vertical_root_facility_bend_witnesses(roots, routes, boxes)
+    boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+    for box in boxes:
+        boxes_by_node[box.node].append(box)
+    result = []
+    for witness in base:
+        route = next(route for route in routes if route.edge_id == witness["edge_id"])
+        source_box = _endpoint_box(route.points[0], boxes_by_node[route.source])
+        if source_box is None:
+            continue
+        source_left, source_top, source_right, source_bottom = source_box.visual_bounds
+        neighbors = []
+        for other in boxes:
+            if other is source_box or other.node not in roots:
+                continue
+            other_left, other_top, other_right, other_bottom = other.visual_bounds
+            if abs(other.x - source_box.x) > EPS:
+                continue
+            gap = max(other_top - source_bottom, source_top - other_bottom, 0.0)
+            neighbors.append((gap, other, (other_left, other_top, other_right, other_bottom)))
+        if not neighbors:
+            continue
+        gap, neighbor, neighbor_bounds = min(
+            neighbors, key=lambda item: (item[0], abs(item[1].cy - source_box.cy), item[1].node)
+        )
+        moved_top = source_top + witness["delta_y"]
+        moved_bottom = source_bottom + witness["delta_y"]
+        moved_gap = max(
+            neighbor_bounds[1] - moved_bottom,
+            moved_top - neighbor_bounds[3],
+            0.0,
+        )
+        result.append({
+            **witness,
+            "neighbor": neighbor.node,
+            "source_visible_height": round(source_bottom - source_top, 4),
+            "neighbor_visible_height": round(neighbor_bounds[3] - neighbor_bounds[1], 4),
+            "visible_gap_before": round(gap, 4),
+            "visible_gap_after": round(moved_gap, 4),
+        })
+    return result
+
+
+def _orthogonal_union_length(routes: list[Route]) -> float:
+    """Measure visible ink once when same-net route segments overlap."""
+    horizontal: dict[float, list[tuple[float, float]]] = defaultdict(list)
+    vertical: dict[float, list[tuple[float, float]]] = defaultdict(list)
+    for route in routes:
+        for start, end in segments(route):
+            if abs(start[1] - end[1]) <= EPS:
+                horizontal[round(start[1], 4)].append(tuple(sorted((start[0], end[0]))))
+            elif abs(start[0] - end[0]) <= EPS:
+                vertical[round(start[0], 4)].append(tuple(sorted((start[1], end[1]))))
+            else:
+                return math.inf
+
+    def merged_length(groups: dict[float, list[tuple[float, float]]]) -> float:
+        total = 0.0
+        for intervals in groups.values():
+            low, high = sorted(intervals)[0]
+            for next_low, next_high in sorted(intervals)[1:]:
+                if next_low <= high + EPS:
+                    high = max(high, next_high)
+                else:
+                    total += high - low
+                    low, high = next_low, next_high
+            total += high - low
+        return total
+
+    return merged_length(horizontal) + merged_length(vertical)
+
+
+def _mergeable_root_facility_witnesses(
+    roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Prove that duplicate root facilities lose to one obstacle-free trunk."""
+    boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+    for box in boxes:
+        boxes_by_node[box.node].append(box)
+    witnesses = []
+    for root in sorted(roots):
+        root_boxes = boxes_by_node[root]
+        root_routes = [route for route in routes if route.source == root]
+        if len(root_boxes) <= 1 or len(root_routes) < 2:
+            continue
+        target_xs = [route.points[-1][0] for route in root_routes]
+        target_width = median(
+            boxes_by_node[route.target][0].w for route in root_routes
+        )
+        if max(target_xs) - min(target_xs) > target_width + EPS:
+            continue
+        original_crossings, original_overlaps = route_crossings(routes)
+        original_ink = _orthogonal_union_length(root_routes)
+        original_facility_cost = sum(
+            2.0 * ((right - left) + (bottom - top))
+            for left, top, right, bottom in (box.visual_bounds for box in root_boxes)
+        )
+        original_cost = original_ink + original_facility_cost
+        root_route_ids = {id(route) for route in root_routes}
+        unaffected = [route for route in routes if id(route) not in root_route_ids]
+        for keep in root_boxes:
+            served = [
+                route for route in root_routes
+                if _endpoint_box(route.points[0], root_boxes) is keep
+            ]
+            if not served:
+                continue
+            start = served[0].points[0]
+            min_target_x = min(target_xs)
+            if start[0] >= min_target_x - EPS:
+                continue
+            channel_candidates = {
+                round((start[0] + min_target_x) / 2.0, 4),
+                round(start[0] + (min_target_x - start[0]) / 3.0, 4),
+                round(min_target_x - (min_target_x - start[0]) / 3.0, 4),
+            }
+            for route in root_routes:
+                channel_candidates.update(
+                    round(a[0], 4)
+                    for a, b in segments(route)
+                    if abs(a[0] - b[0]) <= EPS and start[0] < a[0] < min_target_x
+                )
+            for channel_x in sorted(channel_candidates):
+                candidate_routes = []
+                valid = True
+                for route in root_routes:
+                    end = route.points[-1]
+                    candidate = Route(
+                        route.index,
+                        simplify([start, (channel_x, start[1]), (channel_x, end[1]), end]),
+                        source=route.source,
+                        target=route.target,
+                        target_port=route.target_port,
+                        source_port=route.source_port,
+                    )
+                    target_box = _endpoint_box(end, boxes_by_node[route.target])
+                    obstacles = [
+                        box for box in boxes
+                        if box.node != root and box is not target_box
+                    ]
+                    if any(
+                        _visual_rect_interior_hit(a, b, box)
+                        for a, b in segments(candidate)
+                        for box in obstacles
+                    ):
+                        valid = False
+                        break
+                    candidate_routes.append(candidate)
+                if not valid:
+                    continue
+                candidate_all = [*unaffected, *candidate_routes]
+                candidate_crossings, candidate_overlaps = route_crossings(candidate_all)
+                if len(candidate_crossings) > len(original_crossings) or len(candidate_overlaps) > len(original_overlaps):
+                    continue
+                keep_left, keep_top, keep_right, keep_bottom = keep.visual_bounds
+                candidate_cost = _orthogonal_union_length(candidate_routes) + 2.0 * (
+                    (keep_right - keep_left) + (keep_bottom - keep_top)
+                )
+                if candidate_cost >= original_cost - EPS:
+                    continue
+                witnesses.append({
+                    "root": root,
+                    "facilities_before": len(root_boxes),
+                    "facilities_after": 1,
+                    "targets": len(root_routes),
+                    "channel_x": channel_x,
+                    "crossing_events_before": len(original_crossings),
+                    "crossing_events_after": len(candidate_crossings),
+                    "overlaps_before": len(original_overlaps),
+                    "overlaps_after": len(candidate_overlaps),
+                    "root_ink_before": round(original_ink, 4),
+                    "root_ink_after": round(_orthogonal_union_length(candidate_routes), 4),
+                    "display_cost_before": round(original_cost, 4),
+                    "display_cost_after": round(candidate_cost, 4),
+                })
+                break
+            if witnesses and witnesses[-1]["root"] == root:
+                break
+    return witnesses
+
+
 def _root_facility_column_lag_witnesses(
     roots: set[str], routes: list[Route], boxes: list[Box]
 ) -> list[dict[str, Any]]:
@@ -1515,6 +1702,12 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     downstream_corridor_tail_bend_witnesses = (
         _downstream_corridor_tail_bend_witnesses(logical, routes, boxes)
     )
+    adjacent_root_height_bend_witnesses = (
+        _adjacent_root_height_bend_witnesses(roots, routes, boxes)
+    )
+    mergeable_root_facility_witnesses = (
+        _mergeable_root_facility_witnesses(roots, routes, boxes)
+    )
     detected = {
         # Mixed kinds are only a precondition.  A defect is present only when
         # an ordinary zero-indegree component also exhibits the measured root
@@ -1534,6 +1727,8 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         "FB-BEND-011": bool(vertical_root_facility_bend_witnesses),
         "FB-ROOT-012": bool(root_facility_column_lag_witnesses),
         "FB-BEND-013": bool(downstream_corridor_tail_bend_witnesses),
+        "FB-BEND-014": bool(adjacent_root_height_bend_witnesses),
+        "FB-ROOT-015": bool(mergeable_root_facility_witnesses),
     }
     route_row_by_id = {row["edge_id"]: row for row in route_rows}
     node_statistics = {}
@@ -1638,6 +1833,12 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             },
             "downstream_corridor_tail_bend_witnesses": (
                 downstream_corridor_tail_bend_witnesses
+            ),
+            "adjacent_root_height_bend_witnesses": (
+                adjacent_root_height_bend_witnesses
+            ),
+            "mergeable_root_facility_witnesses": (
+                mergeable_root_facility_witnesses
             ),
         },
         "detected_issues": [issue for issue in ISSUES if detected[issue]],

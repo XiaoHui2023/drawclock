@@ -8,12 +8,12 @@
   "output_mutated": false,
   "production_code_changed": false,
   "coverage_model": "many_to_many",
-  "corpus_id": "20260904T021756Z-d4363165",
+  "corpus_id": "20260904T033247Z-b99d523b",
   "issue_contract_sha256": "7cbb9e8ceddf093ef2c00818dc6d561e7ef5123aa234096630f1b8625ef5c15d",
   "attempts": [
     {
-      "run_id": "20260904T021756Z-d4363165:crossing-partitioned-tail-baseline:1",
-      "corpus_id": "20260904T021756Z-d4363165",
+      "run_id": "20260904T033247Z-b99d523b:crossing-partitioned-tail-baseline:1",
+      "corpus_id": "20260904T033247Z-b99d523b",
       "case_id": "crossing-partitioned-tail-baseline",
       "observed_issue_ids": [
         "FB-BEND-013"
@@ -27,23 +27,23 @@
       "artifact_after_oracle_sha256": "428063c10090270f54df531a13f119db9d0d592bbfead3960cb417ca554918aa",
       "producer_tree_before_sha256": "320ee9e877e189b21b5438712ae7cd926f7c7c8a2753e831543a3e6b2b276346",
       "producer_tree_after_sha256": "320ee9e877e189b21b5438712ae7cd926f7c7c8a2753e831543a3e6b2b276346",
-      "command_sha256": "19994a50d83eb6acb2beb0d6313b499ef93e865360f39e0236284a9180f11678",
+      "command_sha256": "0384242520364983de1fff9d73651c0749293ba08230897bd4db1dea64f7c5a1",
       "input_sha256": "28a1e58887b56d3a5f57a28652d621daf4c7c1e835a990561c4a2945e76cf937",
       "runner_sha256": "f8a35b735920e4788273c4c6aa5b1139995869fef56e5ad234a9976ade614f7e",
-      "oracle_sha256": "1cd35d91cb07fe44c1e7cec9a95b81930327bb07427ecb7a3094e4188cd97946",
-      "started_at": "2026-09-04T02:18:40.702679+00:00",
-      "ended_at": "2026-09-04T02:18:43.848637+00:00",
+      "oracle_sha256": "1a62818cf5cc3bf23c87f743a38a53ac2d3959a74b9a7739ecdd5d3640e3dd23",
+      "started_at": "2026-09-04T03:33:31.993612+00:00",
+      "ended_at": "2026-09-04T03:33:35.022043+00:00",
       "evidence_files": {
-        ".reproduction/evidence/20260904T021756Z-d4363165/crossing-partitioned-tail-baseline/attempt-1/output.svg": "428063c10090270f54df531a13f119db9d0d592bbfead3960cb417ca554918aa",
-        ".reproduction/evidence/20260904T021756Z-d4363165/crossing-partitioned-tail-baseline/attempt-1/producer.log": "3e199e07bc02a451f041b2ac93892f3b87f5f4b54fdc166d0764aa5a90c14759",
-        ".reproduction/evidence/20260904T021756Z-d4363165/crossing-partitioned-tail-baseline/attempt-1/report.json": "bb759230fb2701a86b242cd57d9402328be79798528be57d559b327512ca1aad",
-        ".reproduction/evidence/20260904T021756Z-d4363165/crossing-partitioned-tail-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/evidence/20260904T021756Z-d4363165/crossing-partitioned-tail-baseline/attempt-1/FB-BEND-013.log": "bb759230fb2701a86b242cd57d9402328be79798528be57d559b327512ca1aad"
+        ".reproduction/evidence/20260904T033247Z-b99d523b/crossing-partitioned-tail-baseline/attempt-1/output.svg": "428063c10090270f54df531a13f119db9d0d592bbfead3960cb417ca554918aa",
+        ".reproduction/evidence/20260904T033247Z-b99d523b/crossing-partitioned-tail-baseline/attempt-1/producer.log": "ca643014f0116fb087295e002ea4607302b60844f1e82df1194bd50f25926b2f",
+        ".reproduction/evidence/20260904T033247Z-b99d523b/crossing-partitioned-tail-baseline/attempt-1/report.json": "72324852ba638f93fe42e27cb21489d1f25cd40bd54c0a9a2cc2818e8ad8ccca",
+        ".reproduction/evidence/20260904T033247Z-b99d523b/crossing-partitioned-tail-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260904T033247Z-b99d523b/crossing-partitioned-tail-baseline/attempt-1/FB-BEND-013.log": "72324852ba638f93fe42e27cb21489d1f25cd40bd54c0a9a2cc2818e8ad8ccca"
       }
     },
     {
-      "run_id": "20260904T021756Z-d4363165:crossing-partitioned-tail-baseline:2",
-      "corpus_id": "20260904T021756Z-d4363165",
+      "run_id": "20260904T033247Z-b99d523b:crossing-partitioned-tail-baseline:2",
+      "corpus_id": "20260904T033247Z-b99d523b",
       "case_id": "crossing-partitioned-tail-baseline",
       "observed_issue_ids": [
         "FB-BEND-013"
@@ -57,18 +57,18 @@
       "artifact_after_oracle_sha256": "428063c10090270f54df531a13f119db9d0d592bbfead3960cb417ca554918aa",
       "producer_tree_before_sha256": "320ee9e877e189b21b5438712ae7cd926f7c7c8a2753e831543a3e6b2b276346",
       "producer_tree_after_sha256": "320ee9e877e189b21b5438712ae7cd926f7c7c8a2753e831543a3e6b2b276346",
-      "command_sha256": "95945e2f9d3ea0152540c479eea6a304e044eece0fdd75ea732a8bd5f8ddc985",
+      "command_sha256": "d85adc297bb8032ec23f4c33fbf3c62d854628c9643f1a87240b34f94a5b5816",
       "input_sha256": "28a1e58887b56d3a5f57a28652d621daf4c7c1e835a990561c4a2945e76cf937",
       "runner_sha256": "f8a35b735920e4788273c4c6aa5b1139995869fef56e5ad234a9976ade614f7e",
-      "oracle_sha256": "1cd35d91cb07fe44c1e7cec9a95b81930327bb07427ecb7a3094e4188cd97946",
-      "started_at": "2026-09-04T02:18:43.862461+00:00",
-      "ended_at": "2026-09-04T02:18:47.043034+00:00",
+      "oracle_sha256": "1a62818cf5cc3bf23c87f743a38a53ac2d3959a74b9a7739ecdd5d3640e3dd23",
+      "started_at": "2026-09-04T03:33:35.035077+00:00",
+      "ended_at": "2026-09-04T03:33:38.067863+00:00",
       "evidence_files": {
-        ".reproduction/evidence/20260904T021756Z-d4363165/crossing-partitioned-tail-baseline/attempt-2/output.svg": "428063c10090270f54df531a13f119db9d0d592bbfead3960cb417ca554918aa",
-        ".reproduction/evidence/20260904T021756Z-d4363165/crossing-partitioned-tail-baseline/attempt-2/producer.log": "fbc54442a273a2d4217cf647c70dfeb13ebe05515f2cdef6e22a10d66879946b",
-        ".reproduction/evidence/20260904T021756Z-d4363165/crossing-partitioned-tail-baseline/attempt-2/report.json": "bb759230fb2701a86b242cd57d9402328be79798528be57d559b327512ca1aad",
-        ".reproduction/evidence/20260904T021756Z-d4363165/crossing-partitioned-tail-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/evidence/20260904T021756Z-d4363165/crossing-partitioned-tail-baseline/attempt-2/FB-BEND-013.log": "bb759230fb2701a86b242cd57d9402328be79798528be57d559b327512ca1aad"
+        ".reproduction/evidence/20260904T033247Z-b99d523b/crossing-partitioned-tail-baseline/attempt-2/output.svg": "428063c10090270f54df531a13f119db9d0d592bbfead3960cb417ca554918aa",
+        ".reproduction/evidence/20260904T033247Z-b99d523b/crossing-partitioned-tail-baseline/attempt-2/producer.log": "1c8dfcd68e183016ec823efbfcd9a87edd3d59023bfae62c9f458f01e4ddd728",
+        ".reproduction/evidence/20260904T033247Z-b99d523b/crossing-partitioned-tail-baseline/attempt-2/report.json": "72324852ba638f93fe42e27cb21489d1f25cd40bd54c0a9a2cc2818e8ad8ccca",
+        ".reproduction/evidence/20260904T033247Z-b99d523b/crossing-partitioned-tail-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260904T033247Z-b99d523b/crossing-partitioned-tail-baseline/attempt-2/FB-BEND-013.log": "72324852ba638f93fe42e27cb21489d1f25cd40bd54c0a9a2cc2818e8ad8ccca"
       }
     }
   ]

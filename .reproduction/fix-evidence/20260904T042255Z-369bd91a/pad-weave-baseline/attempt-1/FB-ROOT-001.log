@@ -1,0 +1,3511 @@
+{
+  "schema_version": 1,
+  "input": "pad-r08-s00.json",
+  "svg": "output.svg",
+  "totals": {
+    "logical_nodes": 43,
+    "rendered_nodes": 56,
+    "logical_edges": 48,
+    "rendered_edges": 48,
+    "proper_crossing_events": 0,
+    "distinct_crossing_points": 0,
+    "different_net_overlaps": 0,
+    "bends": 0,
+    "manhattan_length_px": 4909.26
+  },
+  "roots": {
+    "public_from": {
+      "kind": "from",
+      "outdegree": 6,
+      "rendered_copies": 6
+    },
+    "public_gate": {
+      "kind": "gate",
+      "outdegree": 5,
+      "rendered_copies": 5
+    },
+    "public_source": {
+      "kind": "source",
+      "outdegree": 5,
+      "rendered_copies": 5
+    },
+    "sparse_00": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_01": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_02": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_03": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_04": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_05": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_06": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_07": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_08": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_09": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_10": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_11": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_12": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_13": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_14": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_15": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    }
+  },
+  "nodes": {
+    "clock_00": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_01": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_02": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_03": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_04": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_05": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_06": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_07": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_00": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_01": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_02": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_03": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_04": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_05": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_06": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_07": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_00": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 216.4,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_01": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 216.4,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_02": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 216.4,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_03": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 216.4,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_04": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 216.4,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_05": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 216.4,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_06": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 216.4,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_07": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 216.4,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "public_from": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 6,
+      "direct_downstream_nodes": 6,
+      "source_port_nets": 1,
+      "rendering_anchors": 6,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 402.38,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "public_gate": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 5,
+      "direct_downstream_nodes": 5,
+      "source_port_nets": 1,
+      "rendering_anchors": 5,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 489.43,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "public_source": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 5,
+      "direct_downstream_nodes": 5,
+      "source_port_nets": 1,
+      "rendering_anchors": 5,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 526.25,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_00": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_01": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 66.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_02": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 66.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_03": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_04": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 66.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_05": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 66.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_06": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_07": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 66.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_08": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 66.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_09": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_10": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 66.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_11": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 66.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_12": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_13": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 66.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_14": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 66.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_15": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.15,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    }
+  },
+  "networks": {
+    "mux_after_00:right": {
+      "source": "mux_after_00",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_01:right": {
+      "source": "mux_after_01",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_02:right": {
+      "source": "mux_after_02",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_03:right": {
+      "source": "mux_after_03",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_04:right": {
+      "source": "mux_after_04",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_05:right": {
+      "source": "mux_after_05",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_06:right": {
+      "source": "mux_after_06",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_07:right": {
+      "source": "mux_after_07",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_00:right": {
+      "source": "pad_00",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_01:right": {
+      "source": "pad_01",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_02:right": {
+      "source": "pad_02",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_03:right": {
+      "source": "pad_03",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_04:right": {
+      "source": "pad_04",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_05:right": {
+      "source": "pad_05",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_06:right": {
+      "source": "pad_06",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_07:right": {
+      "source": "pad_07",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "public_from:right": {
+      "source": "public_from",
+      "source_port": "right",
+      "edges": 6,
+      "rendering_anchors": 6,
+      "branch_count": 5,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 402.38,
+      "horizontal_length_px": 402.38,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "public_gate:right": {
+      "source": "public_gate",
+      "source_port": "right",
+      "edges": 5,
+      "rendering_anchors": 5,
+      "branch_count": 4,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 489.43,
+      "horizontal_length_px": 489.43,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "public_source:right": {
+      "source": "public_source",
+      "source_port": "right",
+      "edges": 5,
+      "rendering_anchors": 5,
+      "branch_count": 4,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 526.25,
+      "horizontal_length_px": 526.25,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_00:right": {
+      "source": "sparse_00",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_01:right": {
+      "source": "sparse_01",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_02:right": {
+      "source": "sparse_02",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_03:right": {
+      "source": "sparse_03",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_04:right": {
+      "source": "sparse_04",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_05:right": {
+      "source": "sparse_05",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_06:right": {
+      "source": "sparse_06",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_07:right": {
+      "source": "sparse_07",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_08:right": {
+      "source": "sparse_08",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_09:right": {
+      "source": "sparse_09",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_10:right": {
+      "source": "sparse_10",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_11:right": {
+      "source": "sparse_11",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_12:right": {
+      "source": "sparse_12",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_13:right": {
+      "source": "sparse_13",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_14:right": {
+      "source": "sparse_14",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_15:right": {
+      "source": "sparse_15",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    }
+  },
+  "edges": [
+    {
+      "edge_id": "svg-edge-0000",
+      "source": "pad_02",
+      "target": "mux_after_02",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          362.0,
+          146.0039
+        ],
+        [
+          578.4,
+          146.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0001",
+      "source": "sparse_09",
+      "target": "pad_01",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          265.85,
+          1544.0363
+        ],
+        [
+          338.0,
+          1544.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0002",
+      "source": "public_from",
+      "target": "pad_01",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          283.03,
+          1600.0377
+        ],
+        [
+          338.0,
+          1600.0377
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 54.97,
+      "horizontal_length_px": 54.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0003",
+      "source": "pad_07",
+      "target": "mux_after_07",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          362.0,
+          845.0147
+        ],
+        [
+          578.4,
+          845.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0004",
+      "source": "public_gate",
+      "target": "mux_after_07",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          502.97,
+          901.0147
+        ],
+        [
+          578.4,
+          901.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 75.43,
+      "horizontal_length_px": 75.43,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0005",
+      "source": "mux_after_04",
+      "target": "clock_04",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          602.4,
+          1339.0255
+        ],
+        [
+          685.6,
+          1339.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0006",
+      "source": "pad_05",
+      "target": "mux_after_05",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          362.0,
+          379.0039
+        ],
+        [
+          578.4,
+          379.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0007",
+      "source": "public_source",
+      "target": "mux_after_05",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          490.15,
+          435.0039
+        ],
+        [
+          578.4,
+          435.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 88.25,
+      "horizontal_length_px": 88.25,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0008",
+      "source": "pad_03",
+      "target": "mux_after_03",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          362.0,
+          612.0039
+        ],
+        [
+          578.4,
+          612.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0009",
+      "source": "public_from",
+      "target": "mux_after_03",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          502.97,
+          668.0039
+        ],
+        [
+          578.4,
+          668.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 75.43,
+      "horizontal_length_px": 75.43,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0010",
+      "source": "sparse_14",
+      "target": "pad_07",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          271.85,
+          789.0133
+        ],
+        [
+          338.0,
+          789.0133
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0011",
+      "source": "public_source",
+      "target": "mux_after_02",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          490.15,
+          202.0039
+        ],
+        [
+          578.4,
+          202.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 88.25,
+      "horizontal_length_px": 88.25,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0012",
+      "source": "sparse_05",
+      "target": "pad_07",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          271.85,
+          845.0147
+        ],
+        [
+          338.0,
+          845.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0013",
+      "source": "public_from",
+      "target": "pad_07",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          271.85,
+          901.0161
+        ],
+        [
+          338.0,
+          901.0161
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0014",
+      "source": "public_source",
+      "target": "pad_06",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          270.21,
+          1721.0349
+        ],
+        [
+          338.0,
+          1721.0349
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 67.79,
+      "horizontal_length_px": 67.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0015",
+      "source": "sparse_12",
+      "target": "pad_06",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          265.85,
+          1777.0363
+        ],
+        [
+          338.0,
+          1777.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0016",
+      "source": "sparse_03",
+      "target": "pad_06",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          265.85,
+          1833.0377
+        ],
+        [
+          338.0,
+          1833.0377
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0017",
+      "source": "sparse_08",
+      "target": "pad_04",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          271.85,
+          1255.0241
+        ],
+        [
+          338.0,
+          1255.0241
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0018",
+      "source": "sparse_15",
+      "target": "pad_04",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          265.85,
+          1311.0255
+        ],
+        [
+          338.0,
+          1311.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0019",
+      "source": "public_from",
+      "target": "pad_04",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          283.03,
+          1367.0269
+        ],
+        [
+          338.0,
+          1367.0269
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 54.97,
+      "horizontal_length_px": 54.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0020",
+      "source": "mux_after_02",
+      "target": "clock_02",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          602.4,
+          174.0039
+        ],
+        [
+          685.6,
+          174.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0021",
+      "source": "pad_06",
+      "target": "mux_after_06",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          362.0,
+          1777.0363
+        ],
+        [
+          578.4,
+          1777.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0022",
+      "source": "mux_after_05",
+      "target": "clock_05",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          602.4,
+          407.0039
+        ],
+        [
+          685.6,
+          407.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0023",
+      "source": "public_from",
+      "target": "mux_after_06",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          502.97,
+          1833.0363
+        ],
+        [
+          578.4,
+          1833.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 75.43,
+      "horizontal_length_px": 75.43,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0024",
+      "source": "public_source",
+      "target": "pad_03",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          123.83,
+          556.0025
+        ],
+        [
+          338.0,
+          556.0025
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 214.17,
+      "horizontal_length_px": 214.17,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0025",
+      "source": "sparse_06",
+      "target": "pad_03",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          265.85,
+          612.0039
+        ],
+        [
+          338.0,
+          612.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0026",
+      "source": "sparse_13",
+      "target": "pad_03",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          271.85,
+          668.0053
+        ],
+        [
+          338.0,
+          668.0053
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0027",
+      "source": "sparse_01",
+      "target": "pad_05",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          271.85,
+          323.0025
+        ],
+        [
+          338.0,
+          323.0025
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0028",
+      "source": "public_gate",
+      "target": "pad_05",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          283.03,
+          379.0039
+        ],
+        [
+          338.0,
+          379.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 54.97,
+      "horizontal_length_px": 54.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0029",
+      "source": "sparse_10",
+      "target": "pad_05",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          271.85,
+          435.0053
+        ],
+        [
+          338.0,
+          435.0053
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0030",
+      "source": "mux_after_07",
+      "target": "clock_07",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          602.4,
+          873.0147
+        ],
+        [
+          685.6,
+          873.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0031",
+      "source": "pad_00",
+      "target": "mux_after_00",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          362.0,
+          1078.0147
+        ],
+        [
+          578.4,
+          1078.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0032",
+      "source": "public_from",
+      "target": "mux_after_00",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          502.97,
+          1134.0147
+        ],
+        [
+          578.4,
+          1134.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 75.43,
+      "horizontal_length_px": 75.43,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0033",
+      "source": "mux_after_03",
+      "target": "clock_03",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          602.4,
+          640.0039
+        ],
+        [
+          685.6,
+          640.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0034",
+      "source": "sparse_11",
+      "target": "pad_02",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          271.85,
+          90.0025
+        ],
+        [
+          338.0,
+          90.0025
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0035",
+      "source": "public_gate",
+      "target": "pad_02",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          146.0039
+        ],
+        [
+          338.0,
+          146.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 208.17,
+      "horizontal_length_px": 208.17,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0036",
+      "source": "sparse_04",
+      "target": "pad_02",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          271.85,
+          202.0053
+        ],
+        [
+          338.0,
+          202.0053
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0037",
+      "source": "pad_04",
+      "target": "mux_after_04",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          362.0,
+          1311.0255
+        ],
+        [
+          578.4,
+          1311.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0038",
+      "source": "public_gate",
+      "target": "mux_after_04",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          502.97,
+          1367.0255
+        ],
+        [
+          578.4,
+          1367.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 75.43,
+      "horizontal_length_px": 75.43,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0039",
+      "source": "mux_after_06",
+      "target": "clock_06",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          602.4,
+          1805.0363
+        ],
+        [
+          685.6,
+          1805.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0040",
+      "source": "mux_after_01",
+      "target": "clock_01",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          602.4,
+          1572.0363
+        ],
+        [
+          685.6,
+          1572.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0041",
+      "source": "pad_01",
+      "target": "mux_after_01",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          362.0,
+          1544.0363
+        ],
+        [
+          578.4,
+          1544.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 216.4,
+      "horizontal_length_px": 216.4,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0042",
+      "source": "public_gate",
+      "target": "mux_after_01",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          502.97,
+          1600.0363
+        ],
+        [
+          578.4,
+          1600.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 75.43,
+      "horizontal_length_px": 75.43,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0043",
+      "source": "public_source",
+      "target": "pad_00",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          270.21,
+          1022.0133
+        ],
+        [
+          338.0,
+          1022.0133
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 67.79,
+      "horizontal_length_px": 67.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0044",
+      "source": "sparse_00",
+      "target": "pad_00",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          265.85,
+          1078.0147
+        ],
+        [
+          338.0,
+          1078.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.15,
+      "horizontal_length_px": 72.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0045",
+      "source": "sparse_07",
+      "target": "pad_00",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          271.85,
+          1134.0161
+        ],
+        [
+          338.0,
+          1134.0161
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0046",
+      "source": "mux_after_00",
+      "target": "clock_00",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          602.4,
+          1106.0147
+        ],
+        [
+          685.6,
+          1106.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0047",
+      "source": "sparse_02",
+      "target": "pad_01",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          271.85,
+          1488.0349
+        ],
+        [
+          338.0,
+          1488.0349
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 66.15,
+      "horizontal_length_px": 66.15,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    }
+  ],
+  "crossings": [],
+  "overlaps": [],
+  "witnesses": {
+    "mixed_root_kinds": [
+      "from",
+      "gate",
+      "source"
+    ],
+    "mixed_root_quality_failures": [],
+    "split_rejoin_roots": [],
+    "public_root_crossings": [],
+    "low_use_left_crossing_roots": [],
+    "root_relocation_witnesses": [],
+    "avoidable_bend_edges": [],
+    "port_order_inversions": [],
+    "root_facility_split_witnesses": [],
+    "physical_anchor_relocation_witnesses": [],
+    "vertical_root_facility_bend_witnesses": [],
+    "root_facility_column_lag_witnesses": [],
+    "crossing_free_intervals": {
+      "svg-edge-0000": [
+        {
+          "kind": "whole",
+          "start": [
+            362.0,
+            146.0039
+          ],
+          "end": [
+            578.4,
+            146.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 216.4,
+          "length_px": 216.4,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0001": [
+        {
+          "kind": "whole",
+          "start": [
+            265.85,
+            1544.0363
+          ],
+          "end": [
+            338.0,
+            1544.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.15,
+          "length_px": 72.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0002": [
+        {
+          "kind": "whole",
+          "start": [
+            283.03,
+            1600.0377
+          ],
+          "end": [
+            338.0,
+            1600.0377
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 54.97,
+          "length_px": 54.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0003": [
+        {
+          "kind": "whole",
+          "start": [
+            362.0,
+            845.0147
+          ],
+          "end": [
+            578.4,
+            845.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 216.4,
+          "length_px": 216.4,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0004": [
+        {
+          "kind": "whole",
+          "start": [
+            502.97,
+            901.0147
+          ],
+          "end": [
+            578.4,
+            901.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 75.43,
+          "length_px": 75.43,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0005": [
+        {
+          "kind": "whole",
+          "start": [
+            602.4,
+            1339.0255
+          ],
+          "end": [
+            685.6,
+            1339.0255
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0006": [
+        {
+          "kind": "whole",
+          "start": [
+            362.0,
+            379.0039
+          ],
+          "end": [
+            578.4,
+            379.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 216.4,
+          "length_px": 216.4,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0007": [
+        {
+          "kind": "whole",
+          "start": [
+            490.15,
+            435.0039
+          ],
+          "end": [
+            578.4,
+            435.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 88.25,
+          "length_px": 88.25,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0008": [
+        {
+          "kind": "whole",
+          "start": [
+            362.0,
+            612.0039
+          ],
+          "end": [
+            578.4,
+            612.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 216.4,
+          "length_px": 216.4,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0009": [
+        {
+          "kind": "whole",
+          "start": [
+            502.97,
+            668.0039
+          ],
+          "end": [
+            578.4,
+            668.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 75.43,
+          "length_px": 75.43,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0010": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            789.0133
+          ],
+          "end": [
+            338.0,
+            789.0133
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0011": [
+        {
+          "kind": "whole",
+          "start": [
+            490.15,
+            202.0039
+          ],
+          "end": [
+            578.4,
+            202.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 88.25,
+          "length_px": 88.25,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0012": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            845.0147
+          ],
+          "end": [
+            338.0,
+            845.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0013": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            901.0161
+          ],
+          "end": [
+            338.0,
+            901.0161
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0014": [
+        {
+          "kind": "whole",
+          "start": [
+            270.21,
+            1721.0349
+          ],
+          "end": [
+            338.0,
+            1721.0349
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 67.79,
+          "length_px": 67.79,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0015": [
+        {
+          "kind": "whole",
+          "start": [
+            265.85,
+            1777.0363
+          ],
+          "end": [
+            338.0,
+            1777.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.15,
+          "length_px": 72.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0016": [
+        {
+          "kind": "whole",
+          "start": [
+            265.85,
+            1833.0377
+          ],
+          "end": [
+            338.0,
+            1833.0377
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.15,
+          "length_px": 72.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0017": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            1255.0241
+          ],
+          "end": [
+            338.0,
+            1255.0241
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0018": [
+        {
+          "kind": "whole",
+          "start": [
+            265.85,
+            1311.0255
+          ],
+          "end": [
+            338.0,
+            1311.0255
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.15,
+          "length_px": 72.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0019": [
+        {
+          "kind": "whole",
+          "start": [
+            283.03,
+            1367.0269
+          ],
+          "end": [
+            338.0,
+            1367.0269
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 54.97,
+          "length_px": 54.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0020": [
+        {
+          "kind": "whole",
+          "start": [
+            602.4,
+            174.0039
+          ],
+          "end": [
+            685.6,
+            174.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0021": [
+        {
+          "kind": "whole",
+          "start": [
+            362.0,
+            1777.0363
+          ],
+          "end": [
+            578.4,
+            1777.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 216.4,
+          "length_px": 216.4,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0022": [
+        {
+          "kind": "whole",
+          "start": [
+            602.4,
+            407.0039
+          ],
+          "end": [
+            685.6,
+            407.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0023": [
+        {
+          "kind": "whole",
+          "start": [
+            502.97,
+            1833.0363
+          ],
+          "end": [
+            578.4,
+            1833.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 75.43,
+          "length_px": 75.43,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0024": [
+        {
+          "kind": "whole",
+          "start": [
+            123.83,
+            556.0025
+          ],
+          "end": [
+            338.0,
+            556.0025
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 214.17,
+          "length_px": 214.17,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0025": [
+        {
+          "kind": "whole",
+          "start": [
+            265.85,
+            612.0039
+          ],
+          "end": [
+            338.0,
+            612.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.15,
+          "length_px": 72.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0026": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            668.0053
+          ],
+          "end": [
+            338.0,
+            668.0053
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0027": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            323.0025
+          ],
+          "end": [
+            338.0,
+            323.0025
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0028": [
+        {
+          "kind": "whole",
+          "start": [
+            283.03,
+            379.0039
+          ],
+          "end": [
+            338.0,
+            379.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 54.97,
+          "length_px": 54.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0029": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            435.0053
+          ],
+          "end": [
+            338.0,
+            435.0053
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0030": [
+        {
+          "kind": "whole",
+          "start": [
+            602.4,
+            873.0147
+          ],
+          "end": [
+            685.6,
+            873.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0031": [
+        {
+          "kind": "whole",
+          "start": [
+            362.0,
+            1078.0147
+          ],
+          "end": [
+            578.4,
+            1078.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 216.4,
+          "length_px": 216.4,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0032": [
+        {
+          "kind": "whole",
+          "start": [
+            502.97,
+            1134.0147
+          ],
+          "end": [
+            578.4,
+            1134.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 75.43,
+          "length_px": 75.43,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0033": [
+        {
+          "kind": "whole",
+          "start": [
+            602.4,
+            640.0039
+          ],
+          "end": [
+            685.6,
+            640.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0034": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            90.0025
+          ],
+          "end": [
+            338.0,
+            90.0025
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0035": [
+        {
+          "kind": "whole",
+          "start": [
+            129.83,
+            146.0039
+          ],
+          "end": [
+            338.0,
+            146.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 208.17,
+          "length_px": 208.17,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0036": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            202.0053
+          ],
+          "end": [
+            338.0,
+            202.0053
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0037": [
+        {
+          "kind": "whole",
+          "start": [
+            362.0,
+            1311.0255
+          ],
+          "end": [
+            578.4,
+            1311.0255
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 216.4,
+          "length_px": 216.4,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0038": [
+        {
+          "kind": "whole",
+          "start": [
+            502.97,
+            1367.0255
+          ],
+          "end": [
+            578.4,
+            1367.0255
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 75.43,
+          "length_px": 75.43,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0039": [
+        {
+          "kind": "whole",
+          "start": [
+            602.4,
+            1805.0363
+          ],
+          "end": [
+            685.6,
+            1805.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0040": [
+        {
+          "kind": "whole",
+          "start": [
+            602.4,
+            1572.0363
+          ],
+          "end": [
+            685.6,
+            1572.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0041": [
+        {
+          "kind": "whole",
+          "start": [
+            362.0,
+            1544.0363
+          ],
+          "end": [
+            578.4,
+            1544.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 216.4,
+          "length_px": 216.4,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0042": [
+        {
+          "kind": "whole",
+          "start": [
+            502.97,
+            1600.0363
+          ],
+          "end": [
+            578.4,
+            1600.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 75.43,
+          "length_px": 75.43,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0043": [
+        {
+          "kind": "whole",
+          "start": [
+            270.21,
+            1022.0133
+          ],
+          "end": [
+            338.0,
+            1022.0133
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 67.79,
+          "length_px": 67.79,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0044": [
+        {
+          "kind": "whole",
+          "start": [
+            265.85,
+            1078.0147
+          ],
+          "end": [
+            338.0,
+            1078.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.15,
+          "length_px": 72.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0045": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            1134.0161
+          ],
+          "end": [
+            338.0,
+            1134.0161
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0046": [
+        {
+          "kind": "whole",
+          "start": [
+            602.4,
+            1106.0147
+          ],
+          "end": [
+            685.6,
+            1106.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0047": [
+        {
+          "kind": "whole",
+          "start": [
+            271.85,
+            1488.0349
+          ],
+          "end": [
+            338.0,
+            1488.0349
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 66.15,
+          "length_px": 66.15,
+          "internal_bends": 0
+        }
+      ]
+    },
+    "downstream_corridor_tail_bend_witnesses": [],
+    "adjacent_root_height_bend_witnesses": [],
+    "mergeable_root_facility_witnesses": []
+  },
+  "detected_issues": []
+}
+feedback layout oracle: symptom not observed: FB-ROOT-001

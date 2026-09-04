@@ -124,6 +124,69 @@ def test_vertical_root_facility_oracle_counts_visible_label_footprint() -> None:
     ) == []
 
 
+def test_adjacent_root_height_oracle_uses_visible_clearance() -> None:
+    route = oracle.Route(
+        0,
+        [(10, 35), (30, 35), (30, 40), (60, 40)],
+        source="lower",
+        target="sink",
+    )
+    boxes = [
+        oracle.Box("upper", 0, 0, 10, 20),
+        oracle.Box("lower", 0, 25, 10, 20),
+        oracle.Box("sink", 60, 35, 10, 10),
+    ]
+    witnesses = oracle._adjacent_root_height_bend_witnesses(
+        {"upper", "lower"}, [route], boxes
+    )
+    assert len(witnesses) == 1
+    assert witnesses[0]["neighbor"] == "upper"
+    assert witnesses[0]["visible_gap_after"] == 10
+
+    too_tall = [
+        oracle.Box("upper", 0, 0, 10, 35),
+        oracle.Box("lower", 0, 25, 10, 20),
+        oracle.Box("sink", 60, 35, 10, 10),
+    ]
+    assert oracle._adjacent_root_height_bend_witnesses(
+        {"upper", "lower"}, [route], too_tall
+    ) == []
+
+
+def test_root_facility_merge_oracle_balances_shared_ink_and_glyphs() -> None:
+    near_routes = [
+        oracle.Route(0, [(10, 5), (100, 5)], source="root", target="a"),
+        oracle.Route(1, [(10, 85), (100, 85)], source="root", target="b"),
+    ]
+    near_boxes = [
+        oracle.Box("root", 0, 0, 10, 10),
+        oracle.Box("root", 0, 80, 10, 10),
+        oracle.Box("a", 100, 0, 10, 10),
+        oracle.Box("b", 100, 80, 10, 10),
+    ]
+    witnesses = oracle._mergeable_root_facility_witnesses(
+        {"root"}, near_routes, near_boxes
+    )
+    assert len(witnesses) == 1
+    assert witnesses[0]["facilities_before"] == 2
+    assert witnesses[0]["facilities_after"] == 1
+    assert witnesses[0]["display_cost_after"] < witnesses[0]["display_cost_before"]
+
+    far_routes = [
+        oracle.Route(0, [(10, 5), (100, 5)], source="root", target="a"),
+        oracle.Route(1, [(10, 405), (100, 405)], source="root", target="b"),
+    ]
+    far_boxes = [
+        oracle.Box("root", 0, 0, 10, 10),
+        oracle.Box("root", 0, 400, 10, 10),
+        oracle.Box("a", 100, 0, 10, 10),
+        oracle.Box("b", 100, 400, 10, 10),
+    ]
+    assert oracle._mergeable_root_facility_witnesses(
+        {"root"}, far_routes, far_boxes
+    ) == []
+
+
 def test_crossing_free_intervals_cover_whole_prefix_interior_and_suffix() -> None:
     route = oracle.Route(0, [(0, 10), (30, 10), (30, 20), (70, 20), (70, 30), (100, 30)], source="a", target="b")
     crossings = [
@@ -268,6 +331,37 @@ def test_frozen_combined_artifact_exposes_bend_and_root_column_escapes() -> None
         and row["crossing_events_before"] == row["crossing_events_after"] == 0
         for row in report["witnesses"]["root_facility_column_lag_witnesses"]
     )
+
+
+@pytest.mark.parametrize(
+    ("issue_id", "input_name", "witness_key"),
+    [
+        (
+            "FB-BEND-014",
+            "adjacent-tall-roots-pad.json",
+            "adjacent_root_height_bend_witnesses",
+        ),
+        (
+            "FB-ROOT-015",
+            "mux-r04-s00.json",
+            "mergeable_root_facility_witnesses",
+        ),
+    ],
+)
+def test_frozen_public_artifacts_expose_latest_root_feedback(
+    issue_id: str, input_name: str, witness_key: str
+) -> None:
+    receipt = json.loads(
+        (ROOT / f".reproduction/receipts/{issue_id}.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    evidence = receipt["attempts"][0]["evidence_files"]
+    output = next(ROOT / path for path in evidence if path.endswith("/output.svg"))
+    report = oracle.analyze(ROOT / "tests/reproduction-corpus" / input_name, output)
+
+    assert issue_id in report["detected_issues"]
+    assert report["witnesses"][witness_key]
 
 
 def test_oracle_reads_public_svg_without_importing_production(tmp_path: Path) -> None:

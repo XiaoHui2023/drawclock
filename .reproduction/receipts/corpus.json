@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "corpus_id": "20260904T021756Z-d4363165",
+  "corpus_id": "20260904T033247Z-b99d523b",
   "coverage_model": "many_to_many",
   "cases": [
     {
@@ -211,7 +211,8 @@
       "detected_issues": [
         "FB-BEND-011",
         "FB-ROOT-012",
-        "FB-BEND-013"
+        "FB-BEND-013",
+        "FB-BEND-014"
       ],
       "totals": {
         "logical_nodes": 121,
@@ -231,7 +232,8 @@
       "detected_issues": [
         "FB-BEND-011",
         "FB-ROOT-012",
-        "FB-BEND-013"
+        "FB-BEND-013",
+        "FB-BEND-014"
       ],
       "totals": {
         "logical_nodes": 121,
@@ -280,6 +282,80 @@
         "bends": 6,
         "manhattan_length_px": 26714.752
       }
+    },
+    {
+      "case_id": "adjacent-tall-root-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-BEND-011",
+        "FB-BEND-014"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 56,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 2,
+        "manhattan_length_px": 5791.0708
+      }
+    },
+    {
+      "case_id": "adjacent-tall-root-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-BEND-011",
+        "FB-BEND-014"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 56,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 2,
+        "manhattan_length_px": 5791.0708
+      }
+    },
+    {
+      "case_id": "compact-root-fanout-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-015"
+      ],
+      "totals": {
+        "logical_nodes": 27,
+        "rendered_nodes": 28,
+        "logical_edges": 24,
+        "rendered_edges": 24,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 0,
+        "manhattan_length_px": 1932.144
+      }
+    },
+    {
+      "case_id": "compact-root-fanout-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-015"
+      ],
+      "totals": {
+        "logical_nodes": 27,
+        "rendered_nodes": 28,
+        "logical_edges": 24,
+        "rendered_edges": 24,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 0,
+        "manhattan_length_px": 1932.144
+      }
     }
   ],
   "issue_attempt_counts": {
@@ -293,7 +369,9 @@
     "FB-ROOT-010": 2,
     "FB-BEND-011": 2,
     "FB-ROOT-012": 2,
-    "FB-BEND-013": 2
+    "FB-BEND-013": 2,
+    "FB-BEND-014": 2,
+    "FB-ROOT-015": 2
   },
   "missing_issues": []
 }

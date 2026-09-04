@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: done
+- status: active
 - owner: agent
 - updated: 2026-09-04
 
@@ -14,6 +14,9 @@
 - commit、push、release 与完成声明消费当前 issue 集合和制品身份；不能复用旧 PASS。
 
 ## 当前证据
+
+- failure: `FB-BEND-014` 已登记；两个相邻高 `source` 连接右侧多输入器件时，下方路线出现折点，而矮 `from` 对照不出现。尚未证明直线路线是否穿过真实可视图形或标签，生产 `src/**` 继续冻结。
+- failure: `FB-ROOT-015` 已登记；公共零入度时钟的下游仅相隔约四至五个视觉行且排列工整时仍出现多个同名显示设施。尚未证明单设施共享纵干线反事实是否无退化占优，生产 `src/**` 继续冻结。
 
 - failure: `FB-ROUTE-009` 已登记；`final-combined.svg` 的 `weave__public_gate→weave__select_04` 为 4 拐点、934.1805px、1 次交叉，旧固定坐标逐边 Oracle 无法表达根显示锚点拆分反事实。
 - failure: `FB-ROOT-010` 已登记；`final-medium.svg` 的多个 `xtal_1` 单边显示锚点仍在纵干线左侧，单边跨 2–8 个异网伙伴，旧 Oracle 因逻辑总出度为 10 而跳过物理单边锚点。

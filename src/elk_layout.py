@@ -2976,9 +2976,16 @@ def _refine_downstream_corridor_axes(
                         stack.append(target)
             return closure
 
-        def points_for(doc: LayoutDocument, edge_index: int):
-            vertices = {vertex.cell_id: vertex for vertex in doc.vertices}
-            edges = {edge.cell_id: edge for edge in doc.edges}
+        def points_for(
+            doc: LayoutDocument,
+            edge_index: int,
+            vertices=None,
+            edges=None,
+        ):
+            if vertices is None:
+                vertices = {vertex.cell_id: vertex for vertex in doc.vertices}
+            if edges is None:
+                edges = {edge.cell_id: edge for edge in doc.edges}
             edge = edges[f"e{edge_index}"]
             logical = logical_edges[edge_index - 1]
             source, target = vertices[edge.source_id], vertices[edge.target_id]
@@ -2992,13 +2999,14 @@ def _refine_downstream_corridor_axes(
             )
             return _simplify([start, *edge.waypoints, end])
 
-        base_report = assess_layout(accepted, logical_edges, 0.0)
-        base_visible = _visible_layout_signature(accepted, logical_edges)
         specs: list[tuple[int, str, float]] = []
         for target_id, edge_indices in incoming.items():
             if len(edge_indices) < 2:
                 continue
-            paths = [points_for(accepted, index) for index in edge_indices]
+            paths = [
+                points_for(accepted, index, by_id, edge_by_id)
+                for index in edge_indices
+            ]
             offsets = [path[0][1] - path[-1][1] for path in paths]
             old_bends = sum(max(0, len(path) - 2) for path in paths)
             if old_bends == 0 or abs(offsets[0]) <= 1e-6:
@@ -3007,6 +3015,15 @@ def _refine_downstream_corridor_axes(
                 blockers["nonuniform-port-axis-offset"] += 1
                 continue
             specs.append((old_bends, target_id, offsets[0]))
+
+        # Most large regular trees have fan-in, but no fan-in whose complete
+        # downstream row can legally share one axis.  Do the linear structural
+        # preflight first and avoid constructing global collision/crossing
+        # indexes when there is no candidate to evaluate.
+        if not specs:
+            break
+        base_report = assess_layout(accepted, logical_edges, 0.0)
+        base_visible = _visible_layout_signature(accepted, logical_edges)
 
         accepted_one = False
         for _, target_id, delta_y in sorted(
@@ -3170,6 +3187,20 @@ def _optimal_source_anchor_partitions(
     return partitions
 
 
+def _visible_facility_opening_cost(vertex, profile) -> float:
+    """Price one root facility by its actual visible outline.
+
+    The shared-net objective pays route ink once and the complete visible
+    outline (including label overflow) once per physical glyph.  This is the
+    smallest library-derived facility charge: spacing and clearance remain
+    hard feasibility constraints, not a second visual penalty.  ``profile``
+    stays explicit so both partition owners share one stable interface.
+    """
+    del profile
+    box = vertex_visual_box(vertex)
+    return 2.0 * ((box.right - box.left) + (box.bottom - box.top))
+
+
 def _replicate_dispersed_roots(
     document: LayoutDocument,
     nodes,
@@ -3219,7 +3250,7 @@ def _replicate_dispersed_roots(
         if row_deltas else geometry_pitch
     )
     max_intervening_rows = 3
-    partition_fixed_cost = row_pitch * max_intervening_rows
+    facility_costs: list[float] = []
 
     def edge_points(
         doc: LayoutDocument,
@@ -3255,6 +3286,8 @@ def _replicate_dispersed_roots(
         original = by_id.get(nodes[root].cell_id)
         if original is None:
             continue
+        partition_fixed_cost = _visible_facility_opening_cost(original, profile)
+        facility_costs.append(partition_fixed_cost)
         desired: list[tuple[float, int]] = []
         horizontal_service: list[float] = []
         for edge_index in outgoing[root]:
@@ -3476,6 +3509,13 @@ def _replicate_dispersed_roots(
         "source_replica_blockers": dict(sorted(replica_blockers.items())),
         "source_replica_row_budget": max_intervening_rows,
         "source_replica_row_pitch_px": round(row_pitch, 3),
+        "source_replica_facility_cost_px": (
+            {
+                "min": round(min(facility_costs), 3),
+                "max": round(max(facility_costs), 3),
+            }
+            if facility_costs else {"min": 0.0, "max": 0.0}
+        ),
     }
     if include_assessment:
         report["_accepted_assessment"] = accepted_report
@@ -4492,11 +4532,10 @@ def _split_root_rendering_anchors_by_local_rows(
         max(median_height, min(median(deltas), geometry_pitch))
         if deltas else geometry_pitch
     )
-    local_gap_budget = row_pitch * 3.0
-    # A second display facility is justified only after a consumer gap spans
-    # several ordinary rows.  This is the same geometry-derived facility cost
-    # used by the independent redundancy oracle; splitting every adjacent row
-    # would merely trade one vertical trunk for visual duplication.
+    facility_costs: list[float] = []
+    # Both facility owners use the same geometry-derived objective. A second
+    # display facility is justified only when the saved shared-net ink exceeds
+    # the actual visible cost of duplicating this arbitrary library glyph.
     attempts = 0
     accepted_roots = 0
     accepted_replicas = 0
@@ -4540,6 +4579,8 @@ def _split_root_rendering_anchors_by_local_rows(
             )
             if len(edge_indices) < 2:
                 continue
+            local_gap_budget = _visible_facility_opening_cost(source_anchor, profile)
+            facility_costs.append(local_gap_budget)
             samples = []
             for index in edge_indices:
                 logical = logical_edges[index - 1]
@@ -4880,7 +4921,13 @@ def _split_root_rendering_anchors_by_local_rows(
         "source_local_partition_roots": accepted_roots,
         "source_local_partition_replicas": accepted_replicas,
         "source_local_partition_row_pitch_px": round(row_pitch, 3),
-        "source_local_partition_gap_budget_px": round(local_gap_budget, 3),
+        "source_local_partition_gap_budget_px": round(
+            max(facility_costs, default=0.0), 3
+        ),
+        "source_local_partition_facility_cost_range_px": {
+            "min": round(min(facility_costs), 3) if facility_costs else 0.0,
+            "max": round(max(facility_costs), 3) if facility_costs else 0.0,
+        },
         "source_local_partition_crossings_removed": (
             initial_report["distinct_crossing_points"]
             - accepted_report["distinct_crossing_points"]

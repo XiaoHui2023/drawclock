@@ -65,6 +65,24 @@
       "input": "example/auto-layout/26-feedback-reproduction-combined.json",
       "library": "drawio-lib",
       "issues": ["FB-BEND-013"]
+    },
+    {
+      "id": "adjacent-tall-root-baseline",
+      "baseline_revision": "41a5e5963088f81aba62a66d46464234d504d473",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "tests/reproduction-corpus/adjacent-tall-roots-pad.json",
+      "library": "drawio-lib",
+      "issues": ["FB-BEND-014"]
+    },
+    {
+      "id": "compact-root-fanout-baseline",
+      "baseline_revision": "41a5e5963088f81aba62a66d46464234d504d473",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "tests/reproduction-corpus/mux-r04-s00.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROOT-015"]
     }
   ],
   "current_fix_cases": [

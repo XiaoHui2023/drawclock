@@ -1,0 +1,109 @@
+{
+  "shared_root": {
+    "kind": "source"
+  },
+  "local_00": {
+    "kind": "from"
+  },
+  "mux_00": {
+    "kind": "mux2",
+    "source": {
+      "0": "shared_root",
+      "1": "local_00"
+    }
+  },
+  "cell_00": {
+    "kind": "cell",
+    "source": "mux_00"
+  },
+  "clock_00": {
+    "kind": "clock",
+    "source": "cell_00"
+  },
+  "local_01": {
+    "kind": "from"
+  },
+  "mux_01": {
+    "kind": "mux2",
+    "source": {
+      "0": "local_01"
+    }
+  },
+  "cell_01": {
+    "kind": "cell",
+    "source": "mux_01"
+  },
+  "clock_01": {
+    "kind": "clock",
+    "source": "cell_01"
+  },
+  "local_02": {
+    "kind": "from"
+  },
+  "mux_02": {
+    "kind": "mux2",
+    "source": {
+      "0": "local_02"
+    }
+  },
+  "cell_02": {
+    "kind": "cell",
+    "source": "mux_02"
+  },
+  "clock_02": {
+    "kind": "clock",
+    "source": "cell_02"
+  },
+  "local_03": {
+    "kind": "from"
+  },
+  "mux_03": {
+    "kind": "mux2",
+    "source": {
+      "0": "local_03"
+    }
+  },
+  "cell_03": {
+    "kind": "cell",
+    "source": "mux_03"
+  },
+  "clock_03": {
+    "kind": "clock",
+    "source": "cell_03"
+  },
+  "local_04": {
+    "kind": "from"
+  },
+  "mux_04": {
+    "kind": "mux2",
+    "source": {
+      "0": "local_04"
+    }
+  },
+  "cell_04": {
+    "kind": "cell",
+    "source": "mux_04"
+  },
+  "clock_04": {
+    "kind": "clock",
+    "source": "cell_04"
+  },
+  "local_05": {
+    "kind": "from"
+  },
+  "mux_05": {
+    "kind": "mux2",
+    "source": {
+      "0": "shared_root",
+      "1": "local_05"
+    }
+  },
+  "cell_05": {
+    "kind": "cell",
+    "source": "mux_05"
+  },
+  "clock_05": {
+    "kind": "clock",
+    "source": "cell_05"
+  }
+}

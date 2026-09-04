@@ -216,6 +216,56 @@
         "current_passes": true,
         "receipt": ".reproduction/fix-receipts/FB-BEND-013.json"
       }
+    },
+    {
+      "id": "FB-BEND-014",
+      "summary": "相邻高器件连接右侧多输入器件时，下方根路线出现疑似可避免折点",
+      "expected": "布局必须从当前器件库的实际可视图形、标签、端口和净空计算障碍；当下方零入度器件到目标端口的直线路线不与相邻器件或文字相交且不增加其它高优先级缺陷时，路线应为零折点；只有真实碰撞使直线不可行时才允许绕行",
+      "actual": "用户观察到两个圆形波浪 source 同列且相邻行连接右侧 pad 时，下方 source 出现折点，而较矮的 from 在等价结构中不会；怀疑器件高度、可视包围盒或行间净空计算过度保守",
+      "status": "fixed_verified",
+      "owner_paths": ["src/**"],
+      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
+      "baseline_revision": "41a5e5963088f81aba62a66d46464234d504d473",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/adjacent-tall-roots-pad.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/adjacent-tall-roots-pad.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-014", "--input", "{project}/tests/reproduction-corpus/adjacent-tall-roots-pad.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "公开 CLI 原始 SVG 中，下方较高零入度器件的路线在实际可视净空允许直连时仍保留被严格支配的折点",
+      "reproduction_does_not_prove": "所有较高器件的折线都错误；真实图形、标签、端口引线或相邻行碰撞所需的绕行仍合理，也不能在复现前断言根因一定是高度计算",
+      "reproduction_attempts": [
+        {"attempted_at": "2026-09-04T11:20:00+08:00", "hypothesis": "两个同列相邻 source 与两个同列相邻 from 分别连接右侧 pad3 时，高 source 的下方路线会自然出现折点。", "method": "通过当前冻结 revision 的公开 CLI 对同一严格 JSON 连续生成两次 SVG；独立 Oracle 绑定 10 个逻辑/渲染节点和 8 条边，比较 source/from 入边的折点与交叉。", "result": "not_reproduced", "observed": "两次 SVG 哈希均为 ACB89AC7...F74751；全部 8 条边均为直线，全图 0 折点、0 交叉，source 与 from 两组均未出现症状。", "analysis": "器件高度本身不足以触发问题。当前 source 单元 55px，在该 pad3 端口间距下两枚 source 可分别与端口同轴且不重叠。需要交叉变化端口占用、相邻行约束、其它支路和根纵序。", "why_not_reproduced": "有效输入包含用户描述的基本结构，但布局自然选择了无碰撞同轴位置，没有产生下方折线。", "evidence": ".reproduction/scratch/fb-014-015-current/adjacent-tall-roots-pad-1.svg; adjacent-report.json", "next_condition": "以相同 source/from 高度对照，系统搜索 pad 端口组合、插入顺序、邻近支路和多行交错；Oracle 仍要求最终直线反事实无真实可视碰撞。"},
+        {"attempted_at": "2026-09-04T11:48:00+08:00", "hypothesis": "保持公开 pad-r08-s02 拓扑与端口次序，仅把同尺寸的公共根器件换成真实 source，可自然保留由最终行轴造成的无谓折点。", "method": "冻结 revision 41a5e596 的公开 CLI 连续生成两次；独立 Oracle 使用 SVG 中真实可视包围盒、标签、端口和全图异网交叉，整体平移完整物理根设施到目标端口轴作反事实。", "result": "reproduced", "observed": "正式批次 20260904T033247Z-b99d523b 双运行哈希均为 9303E6A4...F776949；svg-edge-0043 从 2 折点、391.1808 长度可降为 0 折点、214.17 长度，交叉与异网重叠均保持 0。source 与同列相邻 source 的真实可视高度均为 62.77，平移前净间隙仍为 49.2314。", "analysis": "高度数据已被 Oracle 正确纳入，问题不是 source 高度漏算；缺口是布局阶段没有枚举并接受完整物理根设施到端口视觉行的合法坐标候选。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-014.json", "next_condition": "solve 门通过后，以通用物理设施坐标候选修复并用当前公开入口双跑转绿。"}
+      ],
+      "reproduction_receipt": ".reproduction/receipts/FB-BEND-014.json",
+      "fix_verification": {
+        "baseline_fails": true,
+        "current_passes": true,
+        "receipt": ".reproduction/fix-receipts/FB-BEND-014.json"
+      }
+    },
+    {
+      "id": "FB-ROOT-015",
+      "summary": "紧凑且工整的公共零入度时钟消费带被过度拆成多个同名显示节点",
+      "expected": "同一零入度逻辑器件的多个下游若形成相邻或近邻且排列工整的消费带，应优先由一个显示设施和一条共享纵向主干贯穿分发；只有拆分能严格改善更高优先级的碰撞、异网重叠、交叉或显著远距走线时才允许多个同名显示节点",
+      "actual": "用户观察到公共 clock 连接相距约四至五行的多个节点时被拆成多个同名器件分别连接，虽然单一纵线整体分发更整齐美观；怀疑远距消费带分区过度拆分",
+      "status": "fixed_verified",
+      "owner_paths": ["src/**"],
+      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
+      "baseline_revision": "41a5e5963088f81aba62a66d46464234d504d473",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/mux-r04-s00.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/mux-r04-s00.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-015", "--input", "{project}/tests/reproduction-corpus/mux-r04-s00.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "公开 CLI 原始 SVG 把一个几何紧凑、可由单一共享纵干线无退化服务的逻辑根拆成多个物理设施，且合并反事实严格改善显示设施数、主干连续性或总折点",
+      "reproduction_does_not_prove": "所有四至五行跨度都必须合并；行数不是固定阈值，真实器件尺寸、净空、交叉、消费簇间隙与路径长度可能证明拆分合理",
+      "reproduction_attempts": [
+        {"attempted_at": "2026-09-04T11:20:00+08:00", "hypothesis": "一个公共 source 连接首尾 mux，中间穿插四条独立工整支路时，会自然形成约四至五行间隔并被拆成多个显示设施。", "method": "通过当前冻结 revision 的公开 CLI 连续生成两次 SVG；独立 Oracle 统计公共逻辑根的渲染副本和最终行序。", "result": "not_reproduced", "observed": "两次 SVG 哈希均为 57361C6C...FC43；shared_root 只有 1 个显示设施。层内排序把 mux_00 与 mux_05 排成相邻两行，其余四条支路位于其后。", "analysis": "输入对象顺序不能强制最终视觉行；公共祖先相似性会主动聚拢共同消费者。这是同触发语义下的干净反例，不是过度拆分红灯。", "why_not_reproduced": "最终消费端不再相隔四至五个视觉行，拆分前提没有成立。", "evidence": ".reproduction/scratch/fb-014-015-current/compact-root-fanout-band-1.svg; compact-report.json", "next_condition": "使用固定多输入端口、交错祖先签名或既有公开 alias 样例形成自然分隔，再由独立设施合并反事实直接判断是否过度拆分。"},
+        {"attempted_at": "2026-09-04T11:50:00+08:00", "hypothesis": "既有四行 mux 搜索用例的共享 source 消费者被自然分隔时，固定行距分区会把本可共享纵干线的根过度复制。", "method": "冻结 revision 41a5e596 的公开 CLI 对 mux-r04-s00 连续生成两次；独立 Oracle 枚举单设施共享纵干线，以同网线段并集长度加实际可视设施周长比较显示成本，并要求交叉、异网重叠和障碍不退化。", "result": "reproduced", "observed": "正式批次 20260904T033247Z-b99d523b 双运行哈希均为 A2EBA9FF...30E287；shared_wave 被渲染为 2 个设施。合并为 1 个设施后交叉仍为 0、异网重叠仍为 0，综合显示成本从 991.86 降至 811.9233。", "analysis": "当前拆分准则把逐边曼哈顿长度与固定行距成本相加，未对共享同网主干去重，也未使用器件真实可视复制成本，因此会系统性高估合并方案。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-015.json", "next_condition": "solve 门通过后，以通用共享网络几何成本修复并用当前公开入口双跑转绿。"}
+      ],
+      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-015.json",
+      "fix_verification": {
+        "baseline_fails": true,
+        "current_passes": true,
+        "receipt": ".reproduction/fix-receipts/FB-ROOT-015.json"
+      }
     }
   ],
   "process_incidents": [

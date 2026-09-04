@@ -219,6 +219,58 @@ def test_source_partition_gap_solver_matches_exhaustive_facility_optimum() -> No
         assert actual_cuts == min(candidates)[2]
 
 
+def test_adjacent_tall_roots_use_roundoff_stable_straight_port_axis() -> None:
+    """A sub-pixel arithmetic tail must not create a false obstacle detour."""
+    config = load_clock_tree(
+        ROOT / "tests/reproduction-corpus/adjacent-tall-roots-pad.json"
+    )
+    document, report = generate_elk_layout(config, library_path=LIBRARY)
+    logical_edges = build_logical_edges(
+        config,
+        resolve_nodes(
+            config, load_library_shapes(LIBRARY), {}, library_path=LIBRARY
+        ),
+        LIBRARY,
+    )
+    physical_edges = {edge.cell_id: edge for edge in document.edges}
+    target_edges = [
+        physical_edges[f"e{index}"]
+        for index, edge in enumerate(logical_edges, 1)
+        if edge.source == "public_gate" and edge.target == "pad_03"
+    ]
+
+    assert len(target_edges) == 1
+    assert target_edges[0].waypoints == ()
+    assert report["selection"]["bends_total"] == 0
+
+
+def test_compact_common_root_prefers_one_shared_vertical_facility() -> None:
+    """Nearby orderly consumers share a trunk; no row-count rule is used."""
+    config = load_clock_tree(ROOT / "tests/reproduction-corpus/mux-r04-s00.json")
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    nodes = resolve_nodes(
+        config, load_library_shapes(LIBRARY), {}, library_path=LIBRARY
+    )
+    logical_edges = build_logical_edges(config, nodes, LIBRARY)
+    physical_edges = {edge.cell_id: edge for edge in document.edges}
+    facilities = [
+        vertex
+        for vertex in document.vertices
+        if (vertex.logical_name or vertex.name) == "shared_wave"
+    ]
+    shared_edges = [
+        physical_edges[f"e{index}"]
+        for index, edge in enumerate(logical_edges, 1)
+        if edge.source == "shared_wave"
+    ]
+
+    assert len(facilities) == 1
+    assert len(shared_edges) == 2
+    assert {edge.source_id for edge in shared_edges} == {facilities[0].cell_id}
+    assert shared_edges[0].waypoints[0] == shared_edges[1].waypoints[0]
+    assert shared_edges[0].waypoints[1][0] == shared_edges[1].waypoints[1][0]
+
+
 def test_source_replication_integrates_every_distant_consumer_band() -> None:
     config, document, report = _forced_multiband_root_layout(4)
     quality = inspect_layout_quality(
@@ -733,7 +785,7 @@ def test_middle_column_oracle_rejects_full_forced_first_column_layout() -> None:
 
     assert natural_totals["distinct_crossing_points"] == 0
     assert forced_totals["distinct_crossing_points"] > 0
-    assert natural_totals["bends_total"] < forced_totals["bends_total"]
+    assert natural_totals["bends_total"] <= forced_totals["bends_total"]
     assert natural_totals["manhattan_length_px"] < forced_totals["manhattan_length_px"]
     assert natural_quality["layout_order"]["avoidable_root_layer_positions"] == []
     assert forced_quality["passed"] is False

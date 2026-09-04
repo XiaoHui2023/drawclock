@@ -12,7 +12,9 @@
     "physical_root_facility",
     "zero_crossing_bend",
     "root_column_alignment",
-    "crossing_partitioned_bend"
+    "crossing_partitioned_bend",
+    "adjacent_root_visible_clearance",
+    "root_facility_merge_cost"
   ],
   "issues": [
     "FB-ROOT-001",
@@ -25,7 +27,9 @@
     "FB-ROOT-010",
     "FB-BEND-011",
     "FB-ROOT-012",
-    "FB-BEND-013"
+    "FB-BEND-013",
+    "FB-BEND-014",
+    "FB-ROOT-015"
   ],
   "cases": [
     {

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from auto_layout import generate_layout, load_clock_tree
+from auto_layout import _segment_hits_rect, generate_layout, load_clock_tree
 from drawio_library import load_library_shapes
 from elk_layout import generate_elk_layout
 from library_payload import compress_diagram_payload, decompress_diagram_payload
@@ -29,6 +29,24 @@ def _linear_config() -> dict[str, dict[str, str]]:
         "gate0": {"kind": "gate", "source": "xtal"},
         "clk0": {"kind": "clock", "source": "gate0"},
     }
+
+
+def test_segment_rectangle_intersection_tolerates_axis_roundoff() -> None:
+    rect = (20.0, 30.0, 40.0, 50.0)
+
+    assert not _segment_hits_rect(
+        (0.0, 10.0000000000002), (60.0, 10.0), rect
+    )
+    assert _segment_hits_rect(
+        (0.0, 40.0000000000002), (60.0, 40.0), rect
+    )
+    assert not _segment_hits_rect(
+        (10.0000000000002, 0.0), (10.0, 60.0), rect
+    )
+    assert _segment_hits_rect(
+        (30.0000000000002, 0.0), (30.0, 60.0), rect
+    )
+    assert _segment_hits_rect((0.0, 0.0), (60.0, 60.0), rect)
 
 
 def test_draw_example_covers_one_shape_per_component_kind() -> None:

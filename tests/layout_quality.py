@@ -2224,10 +2224,20 @@ def inspect_layout_quality(
         for low, high in [(min(axes), max(axes))]
     }
     avoidable_source_replicas: list[str] = []
+    coincident_source_replicas: list[str] = []
     for root in sorted(root_names):
         anchors = logical_vertices.get(root, [])
         if len(anchors) <= 1:
             continue
+        for index, left in enumerate(anchors):
+            for right in anchors[index + 1:]:
+                if (
+                    _close(left.x, right.x, tolerance)
+                    and _close(left.y, right.y, tolerance)
+                ):
+                    coincident_source_replicas.append(
+                        f"{root}:{left.cell_id}/{right.cell_id}"
+                    )
         assigned: dict[str, list[float]] = defaultdict(list)
         for edge_id, (source_name, source_port, _, target_port) in observed_edge_ports.items():
             if source_name != root:
@@ -2293,7 +2303,11 @@ def inspect_layout_quality(
     alignment_failures = (
         duplicate_node_names + missing_nodes + extra_nodes + type_mismatches + size_mismatches
         + invalid_replicas + unused_replicas + replica_identity_errors
-        + [f"avoidable-source-replica:{item}" for item in avoidable_source_replicas]
+        # The L1 calculation above is a cheap candidate screen, not a proof
+        # that the merged net can be rerouted around every node and label.
+        # Only exact duplicate facilities are a hard failure here; the full
+        # artifact oracle validates nearby merges against route geometry.
+        + [f"coincident-source-replica:{item}" for item in coincident_source_replicas]
         + grid_violations + (["rank-x-spread"] if rank_x_spread_max > tolerance else [])
         + (["layout-column-misalignment"] if layout_column_misalignments else [])
         + (["layout-column-order"] if layout_column_order_violations else [])
@@ -2410,6 +2424,7 @@ def inspect_layout_quality(
                 if len(vertices) > 1
             },
             "avoidable_source_replicas": avoidable_source_replicas,
+            "coincident_source_replicas": coincident_source_replicas,
             "root_facility_column_count": len(root_facility_columns),
             "root_facility_column_separation_px": round(
                 root_column_separation, 3

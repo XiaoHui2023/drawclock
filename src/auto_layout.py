@@ -671,12 +671,13 @@ def _segment_hits_rect(
     rect: tuple[float, float, float, float],
 ) -> bool:
     left, top, right, bottom = rect
-    if a[0] == b[0]:
-        x = a[0]
+    epsilon = 1e-6
+    if abs(a[0] - b[0]) <= epsilon:
+        x = (a[0] + b[0]) / 2.0
         lo, hi = sorted((a[1], b[1]))
         return left < x < right and max(lo, top) < min(hi, bottom)
-    if a[1] == b[1]:
-        y = a[1]
+    if abs(a[1] - b[1]) <= epsilon:
+        y = (a[1] + b[1]) / 2.0
         lo, hi = sorted((a[0], b[0]))
         return top < y < bottom and max(lo, left) < min(hi, right)
     return True
