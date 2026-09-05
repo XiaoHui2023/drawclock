@@ -247,7 +247,7 @@
       "summary": "紧凑且工整的公共零入度时钟消费带被过度拆成多个同名显示节点",
       "expected": "同一零入度逻辑器件的多个下游若形成相邻或近邻且排列工整的消费带，应优先由一个显示设施和一条共享纵向主干贯穿分发；只有拆分能严格改善更高优先级的碰撞、异网重叠、交叉或显著远距走线时才允许多个同名显示节点",
       "actual": "用户观察到一个公共 from 与多个私人 from 分别两两接入多个 mux、每个 mux 直接输出一路 clock 的复用数组中，公共 from 被分散显示而没有用一条纵向总线分发。此前第 27 号样例使用公共 source、mux3 和 cell 中间级，输入器件类型与输出链均不符合这次明确描述，因此旧绿图不能作为该严格场景的覆盖证据",
-      "status": "fixed_verified",
+      "status": "closed",
       "owner_paths": ["src/**"],
       "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
       "baseline_revision": "41a5e5963088f81aba62a66d46464234d504d473",
@@ -271,10 +271,10 @@
         "current_passes": true,
         "receipt": ".reproduction/fix-receipts/FB-ROOT-015.json",
         "release_verification": {
-          "commit": "aabdd4893c6411c6bc0b122e78c6e32d55a59ebc",
-          "run_id": 33856758637,
+          "commit": "6e054f3627149ea87d1d7075f7a78f76fd2df4d7",
+          "run_id": 33973881006,
           "tag": "v1.0.0",
-          "asset_sha256": "4FA0AB41980F7057633C32BFC62A9E99B229F3912448C150357223EBE00F899C"
+          "asset_sha256": "C53BDDB2E1BF58B4B5313DFC831ABEB4E19165DFF4694E7C947C8FD536EE746D"
         }
       }
     }

@@ -11,9 +11,9 @@
 - 独立 Oracle 新增 `root_facility_split_witnesses` 与 `physical_anchor_relocation_witnesses`，判定只读取最终 SVG、逻辑零入度、物理端点归属和几何，不读取器件 kind、实例名、样例号或生产布局模块。正式双跑收据尚未签发。
 - Oracle 测试增加当前公开入口的两项自然红灯与一个同样含零入度根但无跨干线/无设施拆分收益的干净反例；测试产物只用于检测器校准，正式复现仍必须由冻结 revision 双跑收据授权。
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-05 23:13 +08:00
+- updated: 2026-09-05 23:18 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
@@ -546,3 +546,5 @@
 - 首次全新解包消费在 2.5 秒内由 frozen runner 报 `missing release inputs` 并退出。解包检查确认 ZIP 含外层目录 `drawclock-1.0.0-windows/`；runner 参数实际要求可执行文件路径，我误传了外层解压目录。该轮未到达产品入口，不计消费结果；恢复条件是向 frozen runner 传嵌套目录内 `drawclock.exe`，向 source runner 传嵌套包根，并从头执行。
 - 按正确参数从头消费通过：包内 frozen 完整工作流、7 个项目 Skill 和隔离 `python -I -S` 源码部署均成功。包内有 23 个自动布局 JSON、0 个 512/1024/2048/4096 高压力 JSON；包内程序生成第 28 号 SVG 的 SHA-256 为 `C7E59F79C4A18667AF2AF2627E2F79DDCDC0255A47C2AB2937B528958B5517C8`，公共 `from` 为 1 个显示设施、1 个 rendering anchor、6 条边、唯一纵向通道 `x=164.02`、0 交叉、0 异网重叠且无 split-rejoin。进入提交上传与远端滚动 Release。
 - 上传前 fetch 完成，`main` 与 `origin/main` 都在 `92090c2`；待提交内容仅为严格示例、测试、覆盖/设计/目标/工作记录与新鲜复现收据，未发现受跟踪的 `.env`、`mcp.json`、私钥、密钥模式、跨仓库路径或构建产物。领先/落后命令第一次未给 `HEAD...@{upstream}` 加引号，PowerShell 将 `@{}` 解释后导致 Git 报 ambiguous argument；该诊断项按加引号形式重跑，不影响 fetch 或工作区。证据白名单需从旧批次切换到红灯 `20260905T145709Z-57f6ac42` 和绿灯 `20260905T145850Z-cdfb0f14`。
+- 托管 Hook 为 staged tree `7a4b5c5ab75995e1f0798218d53d99d44bd43786` 签发新 challenge，提交 `6e054f3627149ea87d1d7075f7a78f76fd2df4d7` 推送后本地与远端 0 ahead/0 behind。Release run `33973881006` 的反馈门、Ubuntu 16.04 PyInstaller/staticx、publish 和发布后远程资产 frozen/source smoke 全部成功，`v1.0.0^{}` 指向该提交。
+- 本机从公开 Release 地址独立下载 Linux 资产，大小 17,159,536 字节，SHA-256 `c53bddb2e1bf58b4b5313dfc831abeb4e19165dff4694e7c947c8fd536ee746d` 与 GitHub API digest 一致；解包含第 28 号严格示例、23 个自动布局 JSON、0 个 512/1024/2048/4096 高压力 JSON。`FB-ROOT-015` 和 `META-CLAIM-009` 均关闭，本记录完成。
