@@ -1,0 +1,21 @@
+{
+  "common_from": {"kind": "from"},
+  "private_from_00": {"kind": "from"},
+  "mux_00": {"kind": "mux2", "source": {"0": "common_from", "1": "private_from_00"}},
+  "clock_00": {"kind": "clock", "source": "mux_00"},
+  "private_from_01": {"kind": "from"},
+  "mux_01": {"kind": "mux2", "source": {"0": "common_from", "1": "private_from_01"}},
+  "clock_01": {"kind": "clock", "source": "mux_01"},
+  "private_from_02": {"kind": "from"},
+  "mux_02": {"kind": "mux2", "source": {"0": "common_from", "1": "private_from_02"}},
+  "clock_02": {"kind": "clock", "source": "mux_02"},
+  "private_from_03": {"kind": "from"},
+  "mux_03": {"kind": "mux2", "source": {"0": "common_from", "1": "private_from_03"}},
+  "clock_03": {"kind": "clock", "source": "mux_03"},
+  "private_from_04": {"kind": "from"},
+  "mux_04": {"kind": "mux2", "source": {"0": "common_from", "1": "private_from_04"}},
+  "clock_04": {"kind": "clock", "source": "mux_04"},
+  "private_from_05": {"kind": "from"},
+  "mux_05": {"kind": "mux2", "source": {"0": "common_from", "1": "private_from_05"}},
+  "clock_05": {"kind": "clock", "source": "mux_05"}
+}

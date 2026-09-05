@@ -35,6 +35,7 @@ python src `
 | 端口顺序组合 | `25-mixed-root-port-order-torture.json` | 混合根类型、固定多输入端口、非对称链深和输入顺序交互 |
 | 反馈综合回归 | `26-feedback-reproduction-combined.json` | 公共根、低复用根、端口顺序、交叉区段与折点的综合质量场景 |
 | 交替公共主干 | `27-interleaved-common-root-mux3.json` | 一个公共根与六个私有 `from` 分别接入六个稀疏连接的 `mux3`（输入 2 空置），每组继续 `cell→clock`；公共根保持一个图形和一条纵向主干 |
+| 公共 `from` 复用数组 | `28-common-private-from-mux-clock-array.json` | 一个公共 `from` 与六个私人 `from` 分别接入六个 `mux2`，每个 mux 直接连接一路 clock；公共 `from` 使用一个图形和一条纵向总线 |
 
 代表性复杂示例包含少量晶振和 PLL、复用的 mux、分频器、gate、多类 clock cell 和末端 clock。13 至 14 改变连接顺序、链深、复用源和实例名，不只是放大同一种阵列。坐标由输入连接关系以及当前器件库的尺寸、标签和端口一次计算得到，不进行成图后的坐标校准。
 

@@ -536,6 +536,78 @@ def test_interleaved_common_root_mux3_uses_one_visible_vertical_trunk(
     assert "FB-ROOT-015" not in report["detected_issues"]
 
 
+def test_common_private_from_mux_clock_array_uses_one_vertical_bus(
+    tmp_path: Path,
+) -> None:
+    """An exact from/mux2/clock array must share the common vertical bus."""
+    input_path = (
+        ROOT / "example/auto-layout/28-common-private-from-mux-clock-array.json"
+    )
+    output = tmp_path / "common-private-from-mux-clock-array.svg"
+    config = json.loads(input_path.read_text(encoding="utf-8"))
+    mux_names = {f"mux_{index:02d}" for index in range(6)}
+    clock_names = {f"clock_{index:02d}" for index in range(6)}
+    private_names = {f"private_from_{index:02d}" for index in range(6)}
+
+    assert config["common_from"] == {"kind": "from"}
+    assert all(config[name] == {"kind": "from"} for name in private_names)
+    assert all(config[name]["kind"] == "mux2" for name in mux_names)
+    assert all(
+        config[f"mux_{index:02d}"]["source"]
+        == {"0": "common_from", "1": f"private_from_{index:02d}"}
+        for index in range(6)
+    )
+    assert all(
+        config[f"clock_{index:02d}"]
+        == {"kind": "clock", "source": f"mux_{index:02d}"}
+        for index in range(6)
+    )
+    assert not any(node.get("kind") in {"source", "mux3", "cell"} for node in config.values())
+
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+
+    report = oracle.analyze(input_path, output)
+    common_edges = [
+        edge for edge in report["edges"] if edge["source"] == "common_from"
+    ]
+    private_edges = [
+        edge for edge in report["edges"]
+        if edge["source"].startswith("private_from_")
+    ]
+    output_edges = [
+        edge for edge in report["edges"] if edge["source"] in mux_names
+    ]
+    vertical_channels = {
+        start[0]
+        for edge in common_edges
+        for start, end in zip(edge["points"], edge["points"][1:])
+        if abs(start[0] - end[0]) <= 0.01 and abs(start[1] - end[1]) > 0.01
+    }
+    network = report["networks"]["common_from:right"]
+
+    assert report["roots"]["common_from"]["rendered_copies"] == 1
+    assert network["rendering_anchors"] == 1
+    assert network["edges"] == len(common_edges) == 6
+    assert {edge["target"] for edge in common_edges} == mux_names
+    assert all(edge["target_port"] == "0" for edge in common_edges)
+    assert len(private_edges) == 6
+    assert {edge["target"] for edge in private_edges} == mux_names
+    assert all(edge["target_port"] == "1" for edge in private_edges)
+    assert len(output_edges) == 6
+    assert {edge["target"] for edge in output_edges} == clock_names
+    assert len(vertical_channels) == 1
+    assert network["split_rejoin"] is False
+    assert network["crossing_points"] == 0
+    assert report["totals"]["different_net_overlaps"] == 0
+    assert "FB-ROOT-015" not in report["detected_issues"]
+
+
 def test_single_route_root_without_crossed_trunk_is_clean_counterexample(
     tmp_path: Path,
 ) -> None:

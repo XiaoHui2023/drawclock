@@ -1,0 +1,1974 @@
+{
+  "schema_version": 1,
+  "input": "mux-r04-s00.json",
+  "svg": "output.svg",
+  "totals": {
+    "logical_nodes": 27,
+    "rendered_nodes": 27,
+    "logical_edges": 24,
+    "rendered_edges": 24,
+    "proper_crossing_events": 0,
+    "distinct_crossing_points": 0,
+    "different_net_overlaps": 0,
+    "bends": 4,
+    "manhattan_length_px": 2114.144
+  },
+  "roots": {
+    "local_00_0": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_00_1": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_01_0": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_01_1": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_02_0": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_02_1": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_03_0": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "local_03_1": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "shared_from": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "shared_gate": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "shared_wave": {
+      "kind": "source",
+      "outdegree": 2,
+      "rendered_copies": 1
+    }
+  },
+  "nodes": {
+    "clock_00": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_01": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_02": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_03": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "div_00": {
+      "kind": "div",
+      "incoming_edges": 1,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 64.348,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "div_01": {
+      "kind": "div",
+      "incoming_edges": 1,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 64.348,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "div_02": {
+      "kind": "div",
+      "incoming_edges": 1,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 64.348,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "div_03": {
+      "kind": "div",
+      "incoming_edges": 1,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 64.348,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "gate_00": {
+      "kind": "gate",
+      "incoming_edges": 1,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 60.938,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "gate_01": {
+      "kind": "gate",
+      "incoming_edges": 1,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 60.938,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "gate_02": {
+      "kind": "gate",
+      "incoming_edges": 1,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 60.938,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "gate_03": {
+      "kind": "gate",
+      "incoming_edges": 1,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 60.938,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "local_00_0": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 78.97,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "local_00_1": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.97,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "local_01_0": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.97,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "local_01_1": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.97,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "local_02_0": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.97,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "local_02_1": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 78.97,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "local_03_0": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 78.97,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "local_03_1": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.97,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_00": {
+      "kind": "mux3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 70.33,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_01": {
+      "kind": "mux3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 70.33,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_02": {
+      "kind": "mux3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 70.33,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_03": {
+      "kind": "mux3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 70.33,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "shared_from": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.97,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "shared_gate": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 72.97,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "shared_wave": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 2,
+      "direct_downstream_nodes": 2,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 583.98,
+      "bends_total": 4,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    }
+  },
+  "networks": {
+    "div_00:right": {
+      "source": "div_00",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 64.348,
+      "horizontal_length_px": 64.348,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "div_01:right": {
+      "source": "div_01",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 64.348,
+      "horizontal_length_px": 64.348,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "div_02:right": {
+      "source": "div_02",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 64.348,
+      "horizontal_length_px": 64.348,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "div_03:right": {
+      "source": "div_03",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 64.348,
+      "horizontal_length_px": 64.348,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "gate_00:right": {
+      "source": "gate_00",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 60.938,
+      "horizontal_length_px": 60.938,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "gate_01:right": {
+      "source": "gate_01",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 60.938,
+      "horizontal_length_px": 60.938,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "gate_02:right": {
+      "source": "gate_02",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 60.938,
+      "horizontal_length_px": 60.938,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "gate_03:right": {
+      "source": "gate_03",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 60.938,
+      "horizontal_length_px": 60.938,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "local_00_0:right": {
+      "source": "local_00_0",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 78.97,
+      "horizontal_length_px": 78.97,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "local_00_1:right": {
+      "source": "local_00_1",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "local_01_0:right": {
+      "source": "local_01_0",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "local_01_1:right": {
+      "source": "local_01_1",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "local_02_0:right": {
+      "source": "local_02_0",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "local_02_1:right": {
+      "source": "local_02_1",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 78.97,
+      "horizontal_length_px": 78.97,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "local_03_0:right": {
+      "source": "local_03_0",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 78.97,
+      "horizontal_length_px": 78.97,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "local_03_1:right": {
+      "source": "local_03_1",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_00:right": {
+      "source": "mux_00",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 70.33,
+      "horizontal_length_px": 70.33,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_01:right": {
+      "source": "mux_01",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 70.33,
+      "horizontal_length_px": 70.33,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_02:right": {
+      "source": "mux_02",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 70.33,
+      "horizontal_length_px": 70.33,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_03:right": {
+      "source": "mux_03",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 70.33,
+      "horizontal_length_px": 70.33,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "shared_from:right": {
+      "source": "shared_from",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "shared_gate:right": {
+      "source": "shared_gate",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "shared_wave:right": {
+      "source": "shared_wave",
+      "source_port": "right",
+      "edges": 2,
+      "rendering_anchors": 1,
+      "branch_count": 1,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 583.98,
+      "horizontal_length_px": 401.98,
+      "vertical_length_px": 182.0,
+      "bends_total": 4,
+      "bends_max_per_edge": 2,
+      "split_rejoin": false
+    }
+  },
+  "edges": [
+    {
+      "edge_id": "svg-edge-0000",
+      "source": "gate_02",
+      "target": "div_02",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          441.33,
+          146.0039
+        ],
+        [
+          502.268,
+          146.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 60.938,
+      "horizontal_length_px": 60.938,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0001",
+      "source": "gate_01",
+      "target": "div_01",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          441.33,
+          794.0039
+        ],
+        [
+          502.268,
+          794.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 60.938,
+      "horizontal_length_px": 60.938,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0002",
+      "source": "div_00",
+      "target": "clock_00",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          523.052,
+          379.0039
+        ],
+        [
+          587.4,
+          379.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 64.348,
+      "horizontal_length_px": 64.348,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0003",
+      "source": "mux_01",
+      "target": "gate_01",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          342.0,
+          794.0039
+        ],
+        [
+          412.33,
+          794.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 70.33,
+      "horizontal_length_px": 70.33,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0004",
+      "source": "gate_03",
+      "target": "div_03",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          441.33,
+          561.0039
+        ],
+        [
+          502.268,
+          561.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 60.938,
+      "horizontal_length_px": 60.938,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0005",
+      "source": "div_02",
+      "target": "clock_02",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          523.052,
+          146.0039
+        ],
+        [
+          587.4,
+          146.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 64.348,
+      "horizontal_length_px": 64.348,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0006",
+      "source": "shared_gate",
+      "target": "mux_02",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          245.03,
+          90.0025
+        ],
+        [
+          318.0,
+          90.0025
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0007",
+      "source": "local_02_0",
+      "target": "mux_02",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          245.03,
+          146.0039
+        ],
+        [
+          318.0,
+          146.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0008",
+      "source": "local_02_1",
+      "target": "mux_02",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          239.03,
+          202.0053
+        ],
+        [
+          318.0,
+          202.0053
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 78.97,
+      "horizontal_length_px": 78.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0009",
+      "source": "shared_from",
+      "target": "mux_01",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          245.03,
+          738.0025
+        ],
+        [
+          318.0,
+          738.0025
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0010",
+      "source": "local_01_1",
+      "target": "mux_01",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          245.03,
+          794.0039
+        ],
+        [
+          318.0,
+          794.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0011",
+      "source": "shared_wave",
+      "target": "mux_00",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          117.01,
+          414.0025
+        ],
+        [
+          164.02,
+          414.0025
+        ],
+        [
+          164.02,
+          323.0025
+        ],
+        [
+          318.0,
+          323.0025
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 291.99,
+      "horizontal_length_px": 200.99,
+      "vertical_length_px": 91.0,
+      "max_vertical_segment_px": 91.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 2,
+      "branch_siblings": 1
+    },
+    {
+      "edge_id": "svg-edge-0012",
+      "source": "local_01_0",
+      "target": "mux_01",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          245.03,
+          850.0053
+        ],
+        [
+          318.0,
+          850.0053
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0013",
+      "source": "mux_00",
+      "target": "gate_00",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          342.0,
+          379.0039
+        ],
+        [
+          412.33,
+          379.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 70.33,
+      "horizontal_length_px": 70.33,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0014",
+      "source": "shared_wave",
+      "target": "mux_03",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          117.01,
+          414.0025
+        ],
+        [
+          164.02,
+          414.0025
+        ],
+        [
+          164.02,
+          505.0025
+        ],
+        [
+          318.0,
+          505.0025
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 291.99,
+      "horizontal_length_px": 200.99,
+      "vertical_length_px": 91.0,
+      "max_vertical_segment_px": 91.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 2,
+      "branch_siblings": 1
+    },
+    {
+      "edge_id": "svg-edge-0015",
+      "source": "local_03_1",
+      "target": "mux_03",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          245.03,
+          561.0039
+        ],
+        [
+          318.0,
+          561.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0016",
+      "source": "local_03_0",
+      "target": "mux_03",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          239.03,
+          617.0053
+        ],
+        [
+          318.0,
+          617.0053
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 78.97,
+      "horizontal_length_px": 78.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0017",
+      "source": "local_00_0",
+      "target": "mux_00",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          239.03,
+          379.0039
+        ],
+        [
+          318.0,
+          379.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 78.97,
+      "horizontal_length_px": 78.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0018",
+      "source": "local_00_1",
+      "target": "mux_00",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          245.03,
+          435.0053
+        ],
+        [
+          318.0,
+          435.0053
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 72.97,
+      "horizontal_length_px": 72.97,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0019",
+      "source": "div_03",
+      "target": "clock_03",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          523.052,
+          561.0039
+        ],
+        [
+          587.4,
+          561.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 64.348,
+      "horizontal_length_px": 64.348,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0020",
+      "source": "div_01",
+      "target": "clock_01",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          523.052,
+          794.0039
+        ],
+        [
+          587.4,
+          794.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 64.348,
+      "horizontal_length_px": 64.348,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0021",
+      "source": "gate_00",
+      "target": "div_00",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          441.33,
+          379.0039
+        ],
+        [
+          502.268,
+          379.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 60.938,
+      "horizontal_length_px": 60.938,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0022",
+      "source": "mux_02",
+      "target": "gate_02",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          342.0,
+          146.0039
+        ],
+        [
+          412.33,
+          146.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 70.33,
+      "horizontal_length_px": 70.33,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0023",
+      "source": "mux_03",
+      "target": "gate_03",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          342.0,
+          561.0039
+        ],
+        [
+          412.33,
+          561.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 70.33,
+      "horizontal_length_px": 70.33,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    }
+  ],
+  "crossings": [],
+  "overlaps": [],
+  "witnesses": {
+    "mixed_root_kinds": [
+      "from",
+      "gate",
+      "source"
+    ],
+    "mixed_root_quality_failures": [],
+    "split_rejoin_roots": [],
+    "public_root_crossings": [],
+    "low_use_left_crossing_roots": [],
+    "root_relocation_witnesses": [],
+    "avoidable_bend_edges": [],
+    "port_order_inversions": [],
+    "root_facility_split_witnesses": [],
+    "physical_anchor_relocation_witnesses": [],
+    "vertical_root_facility_bend_witnesses": [],
+    "root_facility_column_lag_witnesses": [],
+    "crossing_free_intervals": {
+      "svg-edge-0000": [
+        {
+          "kind": "whole",
+          "start": [
+            441.33,
+            146.0039
+          ],
+          "end": [
+            502.268,
+            146.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 60.938,
+          "length_px": 60.938,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0001": [
+        {
+          "kind": "whole",
+          "start": [
+            441.33,
+            794.0039
+          ],
+          "end": [
+            502.268,
+            794.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 60.938,
+          "length_px": 60.938,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0002": [
+        {
+          "kind": "whole",
+          "start": [
+            523.052,
+            379.0039
+          ],
+          "end": [
+            587.4,
+            379.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 64.348,
+          "length_px": 64.348,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0003": [
+        {
+          "kind": "whole",
+          "start": [
+            342.0,
+            794.0039
+          ],
+          "end": [
+            412.33,
+            794.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 70.33,
+          "length_px": 70.33,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0004": [
+        {
+          "kind": "whole",
+          "start": [
+            441.33,
+            561.0039
+          ],
+          "end": [
+            502.268,
+            561.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 60.938,
+          "length_px": 60.938,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0005": [
+        {
+          "kind": "whole",
+          "start": [
+            523.052,
+            146.0039
+          ],
+          "end": [
+            587.4,
+            146.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 64.348,
+          "length_px": 64.348,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0006": [
+        {
+          "kind": "whole",
+          "start": [
+            245.03,
+            90.0025
+          ],
+          "end": [
+            318.0,
+            90.0025
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.97,
+          "length_px": 72.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0007": [
+        {
+          "kind": "whole",
+          "start": [
+            245.03,
+            146.0039
+          ],
+          "end": [
+            318.0,
+            146.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.97,
+          "length_px": 72.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0008": [
+        {
+          "kind": "whole",
+          "start": [
+            239.03,
+            202.0053
+          ],
+          "end": [
+            318.0,
+            202.0053
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 78.97,
+          "length_px": 78.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0009": [
+        {
+          "kind": "whole",
+          "start": [
+            245.03,
+            738.0025
+          ],
+          "end": [
+            318.0,
+            738.0025
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.97,
+          "length_px": 72.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0010": [
+        {
+          "kind": "whole",
+          "start": [
+            245.03,
+            794.0039
+          ],
+          "end": [
+            318.0,
+            794.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.97,
+          "length_px": 72.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0011": [
+        {
+          "kind": "whole",
+          "start": [
+            117.01,
+            414.0025
+          ],
+          "end": [
+            318.0,
+            323.0025
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 291.99,
+          "length_px": 291.99,
+          "internal_bends": 2
+        }
+      ],
+      "svg-edge-0012": [
+        {
+          "kind": "whole",
+          "start": [
+            245.03,
+            850.0053
+          ],
+          "end": [
+            318.0,
+            850.0053
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.97,
+          "length_px": 72.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0013": [
+        {
+          "kind": "whole",
+          "start": [
+            342.0,
+            379.0039
+          ],
+          "end": [
+            412.33,
+            379.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 70.33,
+          "length_px": 70.33,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0014": [
+        {
+          "kind": "whole",
+          "start": [
+            117.01,
+            414.0025
+          ],
+          "end": [
+            318.0,
+            505.0025
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 291.99,
+          "length_px": 291.99,
+          "internal_bends": 2
+        }
+      ],
+      "svg-edge-0015": [
+        {
+          "kind": "whole",
+          "start": [
+            245.03,
+            561.0039
+          ],
+          "end": [
+            318.0,
+            561.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.97,
+          "length_px": 72.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0016": [
+        {
+          "kind": "whole",
+          "start": [
+            239.03,
+            617.0053
+          ],
+          "end": [
+            318.0,
+            617.0053
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 78.97,
+          "length_px": 78.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0017": [
+        {
+          "kind": "whole",
+          "start": [
+            239.03,
+            379.0039
+          ],
+          "end": [
+            318.0,
+            379.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 78.97,
+          "length_px": 78.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0018": [
+        {
+          "kind": "whole",
+          "start": [
+            245.03,
+            435.0053
+          ],
+          "end": [
+            318.0,
+            435.0053
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 72.97,
+          "length_px": 72.97,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0019": [
+        {
+          "kind": "whole",
+          "start": [
+            523.052,
+            561.0039
+          ],
+          "end": [
+            587.4,
+            561.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 64.348,
+          "length_px": 64.348,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0020": [
+        {
+          "kind": "whole",
+          "start": [
+            523.052,
+            794.0039
+          ],
+          "end": [
+            587.4,
+            794.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 64.348,
+          "length_px": 64.348,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0021": [
+        {
+          "kind": "whole",
+          "start": [
+            441.33,
+            379.0039
+          ],
+          "end": [
+            502.268,
+            379.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 60.938,
+          "length_px": 60.938,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0022": [
+        {
+          "kind": "whole",
+          "start": [
+            342.0,
+            146.0039
+          ],
+          "end": [
+            412.33,
+            146.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 70.33,
+          "length_px": 70.33,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0023": [
+        {
+          "kind": "whole",
+          "start": [
+            342.0,
+            561.0039
+          ],
+          "end": [
+            412.33,
+            561.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 70.33,
+          "length_px": 70.33,
+          "internal_bends": 0
+        }
+      ]
+    },
+    "downstream_corridor_tail_bend_witnesses": [],
+    "adjacent_root_height_bend_witnesses": [],
+    "mergeable_root_facility_witnesses": []
+  },
+  "detected_issues": []
+}

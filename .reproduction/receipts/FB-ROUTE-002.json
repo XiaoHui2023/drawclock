@@ -8,12 +8,12 @@
   "output_mutated": false,
   "production_code_changed": false,
   "coverage_model": "many_to_many",
-  "corpus_id": "20260904T080323Z-ca29ae92",
+  "corpus_id": "20260905T145709Z-57f6ac42",
   "issue_contract_sha256": "8b0121b757d0fbbd3dd642232fe68ad096f2d22adb3864d451db58d8ec8038be",
   "attempts": [
     {
-      "run_id": "20260904T080323Z-ca29ae92:pad-weave-baseline:1",
-      "corpus_id": "20260904T080323Z-ca29ae92",
+      "run_id": "20260905T145709Z-57f6ac42:pad-weave-baseline:1",
+      "corpus_id": "20260905T145709Z-57f6ac42",
       "case_id": "pad-weave-baseline",
       "observed_issue_ids": [
         "FB-ROOT-001",
@@ -33,23 +33,23 @@
       "artifact_after_oracle_sha256": "ce57117351efad4034290dbc4190c6c3425ec3b712696e4ad951dea4e14f6062",
       "producer_tree_before_sha256": "b89bbda556b6ab76d515cd8185bdeec6af42a82f1ea44102ff6922ecd0ee3b85",
       "producer_tree_after_sha256": "b89bbda556b6ab76d515cd8185bdeec6af42a82f1ea44102ff6922ecd0ee3b85",
-      "command_sha256": "b81c217014a3ccaa9008386ddf20e11ea8db9dcd7446af280b410b9c3f1ec9b0",
+      "command_sha256": "bc8f87075fe84156d4cf380526a6f0adce2f2b6449b7a867cf17e17d110b8168",
       "input_sha256": "90a46ca8a251e363e1214eb2058489468a169a1a0dac2cc1619b0278c6e3f422",
       "runner_sha256": "f8a35b735920e4788273c4c6aa5b1139995869fef56e5ad234a9976ade614f7e",
       "oracle_sha256": "1a62818cf5cc3bf23c87f743a38a53ac2d3959a74b9a7739ecdd5d3640e3dd23",
-      "started_at": "2026-09-04T08:03:31.369013+00:00",
-      "ended_at": "2026-09-04T08:03:32.736354+00:00",
+      "started_at": "2026-09-05T14:57:16.230851+00:00",
+      "ended_at": "2026-09-05T14:57:17.552967+00:00",
       "evidence_files": {
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/pad-weave-baseline/attempt-1/output.svg": "ce57117351efad4034290dbc4190c6c3425ec3b712696e4ad951dea4e14f6062",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/pad-weave-baseline/attempt-1/producer.log": "025c29f71312950bd6dde9b40c8cfa766544a4957de15b72801afdc39bbe3705",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/pad-weave-baseline/attempt-1/report.json": "712e84dc52c33a607dec2bf693508644a9c4ebda23a286cef56b151e0979177d",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/pad-weave-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/pad-weave-baseline/attempt-1/FB-ROUTE-002.log": "27ac65f8c937385fa50ef9aa6d989722afe09fbfc91f98f3abdd2308269e9de7"
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/pad-weave-baseline/attempt-1/output.svg": "ce57117351efad4034290dbc4190c6c3425ec3b712696e4ad951dea4e14f6062",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/pad-weave-baseline/attempt-1/producer.log": "9db1fe6398cfbc067bc620202af17b61f46f8ff6b0eefe982a542dc30a302a01",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/pad-weave-baseline/attempt-1/report.json": "0c63ab2a6aa77c7af925ee611605559bd2a6dbbf69c0a9cadadcbebb690e12ec",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/pad-weave-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/pad-weave-baseline/attempt-1/FB-ROUTE-002.log": "3697afe5f94486273b6ea6d4bc6debbfba8a9b36a26f4f129ec1ea06f661a55a"
       }
     },
     {
-      "run_id": "20260904T080323Z-ca29ae92:pad-weave-baseline:2",
-      "corpus_id": "20260904T080323Z-ca29ae92",
+      "run_id": "20260905T145709Z-57f6ac42:pad-weave-baseline:2",
+      "corpus_id": "20260905T145709Z-57f6ac42",
       "case_id": "pad-weave-baseline",
       "observed_issue_ids": [
         "FB-ROOT-001",
@@ -69,18 +69,18 @@
       "artifact_after_oracle_sha256": "ce57117351efad4034290dbc4190c6c3425ec3b712696e4ad951dea4e14f6062",
       "producer_tree_before_sha256": "b89bbda556b6ab76d515cd8185bdeec6af42a82f1ea44102ff6922ecd0ee3b85",
       "producer_tree_after_sha256": "b89bbda556b6ab76d515cd8185bdeec6af42a82f1ea44102ff6922ecd0ee3b85",
-      "command_sha256": "66ded5b16a7c555190930a4bbd9c3f73af4caa1193f7cda5a95f7ace6c74306c",
+      "command_sha256": "363d829a2f85ad25ca026d2f400f41cac58815355ec53b122058be9428455483",
       "input_sha256": "90a46ca8a251e363e1214eb2058489468a169a1a0dac2cc1619b0278c6e3f422",
       "runner_sha256": "f8a35b735920e4788273c4c6aa5b1139995869fef56e5ad234a9976ade614f7e",
       "oracle_sha256": "1a62818cf5cc3bf23c87f743a38a53ac2d3959a74b9a7739ecdd5d3640e3dd23",
-      "started_at": "2026-09-04T08:03:33.187179+00:00",
-      "ended_at": "2026-09-04T08:03:34.568295+00:00",
+      "started_at": "2026-09-05T14:57:17.980590+00:00",
+      "ended_at": "2026-09-05T14:57:19.298230+00:00",
       "evidence_files": {
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/pad-weave-baseline/attempt-2/output.svg": "ce57117351efad4034290dbc4190c6c3425ec3b712696e4ad951dea4e14f6062",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/pad-weave-baseline/attempt-2/producer.log": "b330d050e1d246d4927c9762db225a15e12f808c8ea0daf7af7a09d1cbfdd795",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/pad-weave-baseline/attempt-2/report.json": "27ac65f8c937385fa50ef9aa6d989722afe09fbfc91f98f3abdd2308269e9de7",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/pad-weave-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/pad-weave-baseline/attempt-2/FB-ROUTE-002.log": "27ac65f8c937385fa50ef9aa6d989722afe09fbfc91f98f3abdd2308269e9de7"
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/pad-weave-baseline/attempt-2/output.svg": "ce57117351efad4034290dbc4190c6c3425ec3b712696e4ad951dea4e14f6062",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/pad-weave-baseline/attempt-2/producer.log": "46c7606d25dc7aff0e4b8af96fe981e9202d9ec38dd428cfcdc24bf349d79d94",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/pad-weave-baseline/attempt-2/report.json": "119250f8082130c0a8efd208ee3adb3c96db9f5717882007c1bb6453786f47df",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/pad-weave-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/pad-weave-baseline/attempt-2/FB-ROUTE-002.log": "27ac65f8c937385fa50ef9aa6d989722afe09fbfc91f98f3abdd2308269e9de7"
       }
     }
   ]

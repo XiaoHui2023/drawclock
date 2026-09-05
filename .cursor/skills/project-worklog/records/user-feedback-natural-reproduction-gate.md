@@ -11,9 +11,9 @@
 - 独立 Oracle 新增 `root_facility_split_witnesses` 与 `physical_anchor_relocation_witnesses`，判定只读取最终 SVG、逻辑零入度、物理端点归属和几何，不读取器件 kind、实例名、样例号或生产布局模块。正式双跑收据尚未签发。
 - Oracle 测试增加当前公开入口的两项自然红灯与一个同样含零入度根但无跨干线/无设施拆分收益的干净反例；测试产物只用于检测器校准，正式复现仍必须由冻结 revision 双跑收据授权。
 
-- status: done
+- status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-04 18:40 +08:00
+- updated: 2026-09-05 23:13 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
@@ -528,3 +528,21 @@
 - 18:30 复核闭环记录提交的“回执阻断”：直接运行 managed-only delivery command 的缺 challenge exit 2 是防伪负基线，不能代表外层 Hook 失败；Stop 已把 ready receipt 更新到当前树 `32b303bb4ce14d426815c1241c6bd307a508afc6` 并清除质量状态。项目脚本、单测、通用恢复知识库和独立分析记录已补充正确诊断顺序，闭环提交可以继续走受保护 push。
 - 18:35 真实受保护 commit `13227a4` 进一步证明当前 Codex 0.140.0 Code Mode 的嵌套 `exec_command` 未触发 PreToolUse：命令执行后回执仍为旧树，而新提交树为 `9f9e79e05f60840e3ff21c1642f6e9e697eba87e`。这与 OpenAI issue #23411 一致；前一条“可直接继续受保护 push”的范围被修正。当前 push 使用 managed 入口自行生成 challenge 的同操作桥接并先核对回执，上游修复前不宣称机器级覆盖已恢复。
 - 18:40 两次桥接故障注入分别在 policy 与 project-context owner 复现 WindowsApps `python.exe` 被误作目录、探测 `.codex/.cursor` 子路径而触发 WinError 1920；两次均在 push 前拒绝。共享 effective-root 新增 `discovery_start` 后，45/32/36 项回归、4/4 变异、staged/installed doctor 全部通过并热安装；第三次桥接签发树 `0d0120edaad41a4dda5a84b4977ad93658ea058f` 后成功把 main 推到 `4a28304`。本机运行时缺陷已解决，Code Mode 上游覆盖边界继续如实保留。
+- 2026-09-05 用户再次纠正验收输入：严格结构是一个公共 `from` 与每行一个私人 `from` 分别接入一个 `mux`，每个 `mux` 直接输出一路 `clock`。只读比较确认第 27 号输入实际为公共 `source`、`mux3` 与 `cell→clock`，对应测试也明确断言这些不同结构；旧几何结果不能扩大为严格场景已复现。`FB-ROOT-015` 已退回 `reproduction_in_progress`，新增开放事故 `META-CLAIM-009`，分类为 `coverage_escape + claim_escape + control_semantics_error`；`src/**` 保持冻结。
+- 首次尝试新增严格输入时，PreToolUse 以“上一笔项目修改尚未实时写入 project-worklog 的记录文件并同步 INDEX.md”拒绝。该阻止发生在文件写入前，原因是问题账本修改后没有先同步工作记录；现按项目工作记录规范先更新本文件与索引，再重试同一正常输入。该事件不影响产品，也不构成复现结果。
+- 第二次新增输入仍被五件套一致性检查拒绝：索引已写 `active`，记录元数据仍保留 `status: done`。现将记录元数据同步为 `active`；这说明只更新摘要和时间不足，状态字段也必须与索引逐项一致。
+- 第三次新增输入被实时记录门拒绝，因为上一笔只修正记录元数据，没有让索引更新时间随记录内容再次前进。现把记录与索引的更新时间共同推进到 00:01，确保两者表示同一版活动记录。
+- 严格正常输入 `28-common-private-from-mux-clock-array.json` 已新增：1 个公共 `from`、6 个私人 `from`、6 个 `mux2` 和 6 个直接下游 `clock`，没有 `source`、`mux3` 或 `cell`。当前公开 CLI 双跑输出 SHA-256 均为 `C7E59F79C4A18667AF2AF2627E2F79DDCDC0255A47C2AB2937B528958B5517C8`；独立 Oracle 统计公共根 1 个显示设施、1 个 rendering anchor、6 条边、唯一纵向通道 `x=164.02`、0 交叉、0 异网重叠、无 split-rejoin。
+- 冻结 `41a5e596` 用同一严格输入和其器件库公开双跑，输出哈希也均为 `C7E59F79C4A18667AF2AF2627E2F79DDCDC0255A47C2AB2937B528958B5517C8`，几何统计与当前版相同。结论是严格结构已经真实重建并满足用户期望，但它不是冻结旧版的自然红灯；旧第 27 号测试存在覆盖范围扩大错误。下一步把第 28 号输入、精确类型/直连关系和纵向总线判据固化为独立成功边界，生产 `src/**` 不修改。
+- 新增专项测试同时断言公共节点和私人节点均为 `from`、汇聚器件均为 `mux2`、`mux2` 直接连接 `clock`，并从最终 SVG 复算单一公共显示设施、精确输入 0/1、6 路直接输出、唯一纵向通道和零高优先级几何缺陷。覆盖登记把第 28 号输入纳入设施几何成功态与发行态；专项与覆盖门 4/4 通过，耗时 1.83 秒。
+- 用户示例索引、当前设计口径与变更记录同步严格结构：第 28 号示例专门承载公共/私人 `from→mux2→clock` 数组；近似输入不得扩大测试声明范围。正式 `FB-ROOT-015` 自然红灯仍由冻结 `mux-r04-s00` 提供，第 28 号只作为成功边界，不能伪装成旧版缺陷。
+- 问题账本保留 `mux-r04-s00` 作为 `FB-ROOT-015` 的正式冻结红灯入口，并追加第 28 号严格场景在冻结版与当前版均未出现症状的直接尝试。这样区分“缺陷的自然复现”和“用户指定结构的成功边界”，避免用绿图冒充红灯，也避免因成功边界改写既有缺陷血缘。
+- 查询修复验证 runner 用法时传入 `--help`，该脚本没有参数解析而是直接执行，约 25 秒生成当前验证组 `20260905T145459Z-48dc45bc` 且 `failures=[]`。这次执行顺序早于冻结自然语料重签，不单独作为完成依据；下一步从头运行冻结 corpus，再按 solve、当前验证、release 顺序取得同一账本的新鲜凭证。
+- 完整冻结自然语料约 63 秒通过，corpus `20260905T145709Z-57f6ac42` 对 13 个问题均有两次公开入口直接观测且 `missing_issues=[]`。`FB-ROOT-015` 仍由 `compact-root-fanout-baseline` 两次检出，均为 27 个逻辑节点、28 个显示节点、0 交叉、0 异网重叠；问题状态推进到 `reproduced`，随后运行 solve 门并重新生成当前修复收据。
+- solve 门通过 13 项；当前公开 CLI 修复验证约 25 秒完成，验证组 `20260905T145850Z-cdfb0f14`、`failures=[]`。`FB-ROOT-015` 推进为 `fixed_verified`，严格第 28 号成功边界与正式旧版红灯分账；下一步运行 release 门、完整测试和真实组包消费。
+- 首次 release 门非零退出，唯一错误为开放的 `META-CLAIM-009`；由于命令在前置门失败后立即退出，完整 pytest 没有启动。严格输入、逐字段语义断言、最终 SVG 总线断言和覆盖登记均已落地且专项 4/4 通过，现关闭该流程事故并记录修复证据，再重新执行同一 release 与全量命令。
+- `META-CLAIM-009` 关闭后 release 门通过 13 项；完整 pytest 约 59 秒完成，456 passed、5 skipped、0 failed。跳过项为既有目标环境条件测试；严格第 28 号输入、公开 CLI、独立 Oracle、覆盖登记、证据门和其它布局回归全部通过。下一步重建发行包并从全新解压目录消费第 28 号示例。
+- Windows 静态包重建通过，PyInstaller 6.22.2 / Python 3.11.9 生成 `drawclock-1.0.0-windows.zip`，大小 8,247,459 字节，SHA-256 `0E979CAA004D330E22A4104DB3111B286E7FBBAC07FE3CE5C0DE22B1AFE0AEA7`。构建前 release 门再次通过；下一步只在全新目录解压，运行 frozen/source 消费并单独复算第 28 号公共总线。
+- 首次全新解包消费在 2.5 秒内由 frozen runner 报 `missing release inputs` 并退出。解包检查确认 ZIP 含外层目录 `drawclock-1.0.0-windows/`；runner 参数实际要求可执行文件路径，我误传了外层解压目录。该轮未到达产品入口，不计消费结果；恢复条件是向 frozen runner 传嵌套目录内 `drawclock.exe`，向 source runner 传嵌套包根，并从头执行。
+- 按正确参数从头消费通过：包内 frozen 完整工作流、7 个项目 Skill 和隔离 `python -I -S` 源码部署均成功。包内有 23 个自动布局 JSON、0 个 512/1024/2048/4096 高压力 JSON；包内程序生成第 28 号 SVG 的 SHA-256 为 `C7E59F79C4A18667AF2AF2627E2F79DDCDC0255A47C2AB2937B528958B5517C8`，公共 `from` 为 1 个显示设施、1 个 rendering anchor、6 条边、唯一纵向通道 `x=164.02`、0 交叉、0 异网重叠且无 split-rejoin。进入提交上传与远端滚动 Release。
+- 上传前 fetch 完成，`main` 与 `origin/main` 都在 `92090c2`；待提交内容仅为严格示例、测试、覆盖/设计/目标/工作记录与新鲜复现收据，未发现受跟踪的 `.env`、`mcp.json`、私钥、密钥模式、跨仓库路径或构建产物。领先/落后命令第一次未给 `HEAD...@{upstream}` 加引号，PowerShell 将 `@{}` 解释后导致 Git 报 ambiguous argument；该诊断项按加引号形式重跑，不影响 fetch 或工作区。证据白名单需从旧批次切换到红灯 `20260905T145709Z-57f6ac42` 和绿灯 `20260905T145850Z-cdfb0f14`。

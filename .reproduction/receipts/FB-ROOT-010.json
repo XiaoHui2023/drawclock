@@ -8,12 +8,12 @@
   "output_mutated": false,
   "production_code_changed": false,
   "coverage_model": "many_to_many",
-  "corpus_id": "20260904T080323Z-ca29ae92",
+  "corpus_id": "20260905T145709Z-57f6ac42",
   "issue_contract_sha256": "0f3a70d664c50c78b923620ba944a0fd00faf983580b112f2d152ba7b35d0f96",
   "attempts": [
     {
-      "run_id": "20260904T080323Z-ca29ae92:physical-root-column-baseline:1",
-      "corpus_id": "20260904T080323Z-ca29ae92",
+      "run_id": "20260905T145709Z-57f6ac42:physical-root-column-baseline:1",
+      "corpus_id": "20260905T145709Z-57f6ac42",
       "case_id": "physical-root-column-baseline",
       "observed_issue_ids": [
         "FB-ROOT-010"
@@ -27,23 +27,23 @@
       "artifact_after_oracle_sha256": "883a7e00c4231418f1286efe8b65a81a871d4ed088cfedf286f9ae5dd940e60f",
       "producer_tree_before_sha256": "0196f16cb19078a04493409b06f98726bcfdb7f737cf275c5c59cecc74d3f36f",
       "producer_tree_after_sha256": "0196f16cb19078a04493409b06f98726bcfdb7f737cf275c5c59cecc74d3f36f",
-      "command_sha256": "76a5c349f9da496cfc716fcfa8180f2e258de6367f100a23e8e6f5b4344ae16a",
+      "command_sha256": "059fb16560715725b0639619fc8653ed1d485652c4439bbf77d71ef9ec0e3a2d",
       "input_sha256": "ab1d984c5da51e3ba700d3bf6958fcf3d475fae8df54a2a15f3ff8b238e71125",
       "runner_sha256": "f8a35b735920e4788273c4c6aa5b1139995869fef56e5ad234a9976ade614f7e",
       "oracle_sha256": "1a62818cf5cc3bf23c87f743a38a53ac2d3959a74b9a7739ecdd5d3640e3dd23",
-      "started_at": "2026-09-04T08:03:50.558821+00:00",
-      "ended_at": "2026-09-04T08:03:52.380038+00:00",
+      "started_at": "2026-09-05T14:57:34.168100+00:00",
+      "ended_at": "2026-09-05T14:57:35.893046+00:00",
       "evidence_files": {
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/physical-root-column-baseline/attempt-1/output.svg": "883a7e00c4231418f1286efe8b65a81a871d4ed088cfedf286f9ae5dd940e60f",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/physical-root-column-baseline/attempt-1/producer.log": "d8df54f31e1b27d7dfc6f0fc91b9a50b5e0c176a6e1edd23014871bc707a87d8",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/physical-root-column-baseline/attempt-1/report.json": "ca5a69a3bfa990dea30b9482478a2fc0b88dcebd516a57177d3c728e7fc094e0",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/physical-root-column-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/physical-root-column-baseline/attempt-1/FB-ROOT-010.log": "ca5a69a3bfa990dea30b9482478a2fc0b88dcebd516a57177d3c728e7fc094e0"
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/physical-root-column-baseline/attempt-1/output.svg": "883a7e00c4231418f1286efe8b65a81a871d4ed088cfedf286f9ae5dd940e60f",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/physical-root-column-baseline/attempt-1/producer.log": "6812ea91b6a74e1904f3c245b417802a90b585b263f6b86aeb35025618674f9c",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/physical-root-column-baseline/attempt-1/report.json": "ca5a69a3bfa990dea30b9482478a2fc0b88dcebd516a57177d3c728e7fc094e0",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/physical-root-column-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/physical-root-column-baseline/attempt-1/FB-ROOT-010.log": "ca5a69a3bfa990dea30b9482478a2fc0b88dcebd516a57177d3c728e7fc094e0"
       }
     },
     {
-      "run_id": "20260904T080323Z-ca29ae92:physical-root-column-baseline:2",
-      "corpus_id": "20260904T080323Z-ca29ae92",
+      "run_id": "20260905T145709Z-57f6ac42:physical-root-column-baseline:2",
+      "corpus_id": "20260905T145709Z-57f6ac42",
       "case_id": "physical-root-column-baseline",
       "observed_issue_ids": [
         "FB-ROOT-010"
@@ -57,18 +57,18 @@
       "artifact_after_oracle_sha256": "883a7e00c4231418f1286efe8b65a81a871d4ed088cfedf286f9ae5dd940e60f",
       "producer_tree_before_sha256": "0196f16cb19078a04493409b06f98726bcfdb7f737cf275c5c59cecc74d3f36f",
       "producer_tree_after_sha256": "0196f16cb19078a04493409b06f98726bcfdb7f737cf275c5c59cecc74d3f36f",
-      "command_sha256": "3cddb7286e985a3b4248ceea490d751e8affda7bf0142bf6f9a6ccf46b5350b7",
+      "command_sha256": "c814116af571c70d10fd3157b02ed8eea5f769577c6c2566df2e180f9726fcb2",
       "input_sha256": "ab1d984c5da51e3ba700d3bf6958fcf3d475fae8df54a2a15f3ff8b238e71125",
       "runner_sha256": "f8a35b735920e4788273c4c6aa5b1139995869fef56e5ad234a9976ade614f7e",
       "oracle_sha256": "1a62818cf5cc3bf23c87f743a38a53ac2d3959a74b9a7739ecdd5d3640e3dd23",
-      "started_at": "2026-09-04T08:03:52.393086+00:00",
-      "ended_at": "2026-09-04T08:03:54.244929+00:00",
+      "started_at": "2026-09-05T14:57:35.904840+00:00",
+      "ended_at": "2026-09-05T14:57:37.647072+00:00",
       "evidence_files": {
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/physical-root-column-baseline/attempt-2/output.svg": "883a7e00c4231418f1286efe8b65a81a871d4ed088cfedf286f9ae5dd940e60f",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/physical-root-column-baseline/attempt-2/producer.log": "8365565e4f4434d0642072ed09a78cff2ebfe6f8ce86ea58ef05df8a1bbe07b5",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/physical-root-column-baseline/attempt-2/report.json": "ca5a69a3bfa990dea30b9482478a2fc0b88dcebd516a57177d3c728e7fc094e0",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/physical-root-column-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/evidence/20260904T080323Z-ca29ae92/physical-root-column-baseline/attempt-2/FB-ROOT-010.log": "ca5a69a3bfa990dea30b9482478a2fc0b88dcebd516a57177d3c728e7fc094e0"
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/physical-root-column-baseline/attempt-2/output.svg": "883a7e00c4231418f1286efe8b65a81a871d4ed088cfedf286f9ae5dd940e60f",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/physical-root-column-baseline/attempt-2/producer.log": "f0c957f300cfd8a337eca5fe2b519b4db157439b64b3a37133059b8bb076c572",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/physical-root-column-baseline/attempt-2/report.json": "ca5a69a3bfa990dea30b9482478a2fc0b88dcebd516a57177d3c728e7fc094e0",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/physical-root-column-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260905T145709Z-57f6ac42/physical-root-column-baseline/attempt-2/FB-ROOT-010.log": "ca5a69a3bfa990dea30b9482478a2fc0b88dcebd516a57177d3c728e7fc094e0"
       }
     }
   ]

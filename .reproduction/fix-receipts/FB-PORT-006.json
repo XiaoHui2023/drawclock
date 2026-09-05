@@ -3,18 +3,18 @@
   "hash_mode": "sha256-normalized-text-v1",
   "issue_id": "FB-PORT-006",
   "result": "fixed_verified",
-  "verification_group": "20260904T080445Z-b2bcdb2c",
+  "verification_group": "20260905T145850Z-cdfb0f14",
   "baseline_fails": true,
   "current_passes": true,
   "baseline_receipt": ".reproduction/receipts/FB-PORT-006.json",
-  "baseline_receipt_sha256": "709c51b658bc3f6a9664548ce0eee3572656e275d3ade2ca80b94f4d0d7e92e7",
+  "baseline_receipt_sha256": "f0e2500ea7a285bf7c200afdc3d2e6bce08e42957624fd77d9675f4070ceeda3",
   "source_tree_sha256": "823c2dc95e1522db3f4d2d8c33704f53333af65d681593c676611d9fe8ac3422",
   "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
   "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
   "oracle_sha256": "1a62818cf5cc3bf23c87f743a38a53ac2d3959a74b9a7739ecdd5d3640e3dd23",
   "attempts": [
     {
-      "run_id": "20260904T080445Z-b2bcdb2c:asymmetric-port-baseline:1",
+      "run_id": "20260905T145850Z-cdfb0f14:asymmetric-port-baseline:1",
       "case_id": "asymmetric-port-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -27,18 +27,18 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
       "oracle_sha256": "1a62818cf5cc3bf23c87f743a38a53ac2d3959a74b9a7739ecdd5d3640e3dd23",
-      "started_at": "2026-09-04T08:04:49.830066+00:00",
-      "ended_at": "2026-09-04T08:04:50.319845+00:00",
+      "started_at": "2026-09-05T14:58:54.415985+00:00",
+      "ended_at": "2026-09-05T14:58:54.898322+00:00",
       "evidence_files": {
-        ".reproduction/fix-evidence/20260904T080445Z-b2bcdb2c/asymmetric-port-baseline/attempt-1/output.svg": "45c076fba577c7ffbdcf765c905364cfb499dd8fc660ac994833b347cd4cf949",
-        ".reproduction/fix-evidence/20260904T080445Z-b2bcdb2c/asymmetric-port-baseline/attempt-1/producer.log": "16ce12fa1832f507bac9cadf64bd3b7e12085caaa436d14fc9068ff4a6a0c298",
-        ".reproduction/fix-evidence/20260904T080445Z-b2bcdb2c/asymmetric-port-baseline/attempt-1/report.json": "8609e5887fbba0734ee94d5ce9d0915ddb36f00ac18abfe9038c93f165c3d09e",
-        ".reproduction/fix-evidence/20260904T080445Z-b2bcdb2c/asymmetric-port-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260904T080445Z-b2bcdb2c/asymmetric-port-baseline/attempt-1/FB-PORT-006.log": "88ca0ae11862e9c5ac9ee624df9828221bc7020e34f90bf317d66fa7ee91ddf1"
+        ".reproduction/fix-evidence/20260905T145850Z-cdfb0f14/asymmetric-port-baseline/attempt-1/output.svg": "45c076fba577c7ffbdcf765c905364cfb499dd8fc660ac994833b347cd4cf949",
+        ".reproduction/fix-evidence/20260905T145850Z-cdfb0f14/asymmetric-port-baseline/attempt-1/producer.log": "5a7580fc0c3857d02a747cc69b09673d681ee2f8ef0f44c25ff1a568aa798cfb",
+        ".reproduction/fix-evidence/20260905T145850Z-cdfb0f14/asymmetric-port-baseline/attempt-1/report.json": "8609e5887fbba0734ee94d5ce9d0915ddb36f00ac18abfe9038c93f165c3d09e",
+        ".reproduction/fix-evidence/20260905T145850Z-cdfb0f14/asymmetric-port-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260905T145850Z-cdfb0f14/asymmetric-port-baseline/attempt-1/FB-PORT-006.log": "88ca0ae11862e9c5ac9ee624df9828221bc7020e34f90bf317d66fa7ee91ddf1"
       }
     },
     {
-      "run_id": "20260904T080445Z-b2bcdb2c:asymmetric-port-baseline:2",
+      "run_id": "20260905T145850Z-cdfb0f14:asymmetric-port-baseline:2",
       "case_id": "asymmetric-port-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -51,14 +51,14 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
       "oracle_sha256": "1a62818cf5cc3bf23c87f743a38a53ac2d3959a74b9a7739ecdd5d3640e3dd23",
-      "started_at": "2026-09-04T08:04:50.329360+00:00",
-      "ended_at": "2026-09-04T08:04:50.816039+00:00",
+      "started_at": "2026-09-05T14:58:54.907860+00:00",
+      "ended_at": "2026-09-05T14:58:55.376266+00:00",
       "evidence_files": {
-        ".reproduction/fix-evidence/20260904T080445Z-b2bcdb2c/asymmetric-port-baseline/attempt-2/output.svg": "45c076fba577c7ffbdcf765c905364cfb499dd8fc660ac994833b347cd4cf949",
-        ".reproduction/fix-evidence/20260904T080445Z-b2bcdb2c/asymmetric-port-baseline/attempt-2/producer.log": "f8a8ed58a38dcc26f90f8dbd125f85d9ce340a954626d0000d5c773e301f719b",
-        ".reproduction/fix-evidence/20260904T080445Z-b2bcdb2c/asymmetric-port-baseline/attempt-2/report.json": "8609e5887fbba0734ee94d5ce9d0915ddb36f00ac18abfe9038c93f165c3d09e",
-        ".reproduction/fix-evidence/20260904T080445Z-b2bcdb2c/asymmetric-port-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260904T080445Z-b2bcdb2c/asymmetric-port-baseline/attempt-2/FB-PORT-006.log": "88ca0ae11862e9c5ac9ee624df9828221bc7020e34f90bf317d66fa7ee91ddf1"
+        ".reproduction/fix-evidence/20260905T145850Z-cdfb0f14/asymmetric-port-baseline/attempt-2/output.svg": "45c076fba577c7ffbdcf765c905364cfb499dd8fc660ac994833b347cd4cf949",
+        ".reproduction/fix-evidence/20260905T145850Z-cdfb0f14/asymmetric-port-baseline/attempt-2/producer.log": "1de096ee3ca6befbf1dc85770bbc185fc676bd9b0645ad9efbdcdac360402766",
+        ".reproduction/fix-evidence/20260905T145850Z-cdfb0f14/asymmetric-port-baseline/attempt-2/report.json": "8609e5887fbba0734ee94d5ce9d0915ddb36f00ac18abfe9038c93f165c3d09e",
+        ".reproduction/fix-evidence/20260905T145850Z-cdfb0f14/asymmetric-port-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260905T145850Z-cdfb0f14/asymmetric-port-baseline/attempt-2/FB-PORT-006.log": "88ca0ae11862e9c5ac9ee624df9828221bc7020e34f90bf317d66fa7ee91ddf1"
       }
     }
   ]
