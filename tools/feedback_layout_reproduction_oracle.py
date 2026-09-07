@@ -1041,7 +1041,13 @@ def _mergeable_root_facility_witnesses(
 def _regular_fanout_array_replication_witnesses(
     config: dict[str, Any], logical: list[LogicalEdge], boxes: list[Box]
 ) -> list[dict[str, Any]]:
-    """Find replicated roots that feed a regular asymmetric-depth merge array."""
+    """Find replicated roots that feed repeated one-route merge branches.
+
+    The shared network is defined by a qualifying subset of a root's outputs.
+    Two routes already form an array, unrelated extra consumers do not cancel
+    that identity, and branch/merge kinds or downstream signatures are not
+    semantic requirements for retaining one traceable distribution bus.
+    """
     incoming: dict[str, list[LogicalEdge]] = defaultdict(list)
     outgoing: dict[str, list[LogicalEdge]] = defaultdict(list)
     for edge in logical:
@@ -1065,21 +1071,15 @@ def _regular_fanout_array_replication_witnesses(
     witnesses: list[dict[str, Any]] = []
     for root in sorted(config):
         root_edges = outgoing[root]
-        if incoming[root] or len(root_edges) < 3 or len(boxes_by_node[root]) <= 1:
-            continue
-        children = [edge.target for edge in root_edges]
-        if len(set(children)) != len(children):
-            continue
-        child_kinds = {str(config[child].get("kind", "")) for child in children}
-        if len(child_kinds) != 1:
+        if incoming[root] or len(root_edges) < 2 or len(boxes_by_node[root]) <= 1:
             continue
         merge_edges: list[LogicalEdge] = []
         private_depths: list[int] = []
-        valid = True
-        for child in children:
+        children: list[str] = []
+        for root_edge in root_edges:
+            child = root_edge.target
             if len(incoming[child]) != 1 or len(outgoing[child]) != 1:
-                valid = False
-                break
+                continue
             merge_edge = outgoing[child][0]
             other_inputs = [
                 edge for edge in incoming[merge_edge.target]
@@ -1091,27 +1091,24 @@ def _regular_fanout_array_replication_witnesses(
                 if (depth := exclusive_root_depth(edge.source)) is not None
             ]
             if not depths or max(depths) <= 2:
-                valid = False
-                break
+                continue
+            children.append(child)
             merge_edges.append(merge_edge)
             private_depths.append(max(depths))
         merge_nodes = [edge.target for edge in merge_edges]
-        if not valid or len(set(merge_nodes)) != len(merge_nodes):
-            continue
-        if len({str(config[node].get("kind", "")) for node in merge_nodes}) != 1:
-            continue
-        downstream_signatures = {
-            tuple(sorted(str(config[edge.target].get("kind", "")) for edge in outgoing[node]))
-            for node in merge_nodes
-        }
-        if len(downstream_signatures) != 1:
+        if len(children) < 2 or len(set(merge_nodes)) != len(merge_nodes):
             continue
         witnesses.append({
             "root": root,
             "facilities": len(boxes_by_node[root]),
-            "branches": len(root_edges),
-            "intermediate_kind": next(iter(child_kinds)),
-            "merge_kind": str(config[merge_nodes[0]].get("kind", "")),
+            "branches": len(children),
+            "root_outputs": len(root_edges),
+            "intermediate_kinds": sorted({
+                str(config[child].get("kind", "")) for child in children
+            }),
+            "merge_kinds": sorted({
+                str(config[node].get("kind", "")) for node in merge_nodes
+            }),
             "common_depth": 2,
             "private_depths": private_depths,
             "children": sorted(children),

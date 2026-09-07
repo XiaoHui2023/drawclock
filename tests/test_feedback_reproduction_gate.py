@@ -16,6 +16,7 @@ POLICY = ROOT / ".codex/quality-gate.json"
 CHECKER = ROOT / "tools/check_feedback_reproduction_gate.py"
 WORKFLOW = ROOT / ".github/workflows/release.yml"
 DELIVERY_GATE = ROOT / "tools/run_agent_delivery_gate.py"
+RECURSIVE_RUNNER = ROOT / "tools/run_recursive_reproduction_rounds.py"
 USER_VALIDATOR = Path.home() / ".cursor/skills/agent-quality-workflow/scripts/validate_feedback_reproduction.py"
 
 
@@ -57,6 +58,21 @@ class FeedbackReproductionGateTest(unittest.TestCase):
             (Path(directory) / "PKG-INFO").write_text("generated\n", encoding="utf-8")
             self.assertEqual(module._tree_hash(ROOT / "src"), before)
         self.assertEqual(module._tree_hash(ROOT / "src"), before)
+
+    def test_recursive_runner_and_gate_share_source_tree_contract(self) -> None:
+        sys.path.insert(0, str(ROOT / "tools"))
+        try:
+            checker_spec = importlib.util.spec_from_file_location("drawclock_feedback_checker_contract", CHECKER)
+            runner_spec = importlib.util.spec_from_file_location("drawclock_recursive_runner_contract", RECURSIVE_RUNNER)
+            self.assertIsNotNone(checker_spec.loader)
+            self.assertIsNotNone(runner_spec.loader)
+            checker = importlib.util.module_from_spec(checker_spec)
+            runner = importlib.util.module_from_spec(runner_spec)
+            checker_spec.loader.exec_module(checker)
+            runner_spec.loader.exec_module(runner)
+            self.assertEqual(runner.source_tree_hash(), checker._tree_hash(ROOT / "src"))
+        finally:
+            sys.path.remove(str(ROOT / "tools"))
 
     def test_tree_hash_uses_platform_neutral_posix_order(self) -> None:
         spec = importlib.util.spec_from_file_location("drawclock_feedback_checker", CHECKER)
@@ -103,6 +119,10 @@ class FeedbackReproductionGateTest(unittest.TestCase):
     def test_release_workflow_cannot_build_or_publish_past_feedback_gate(self) -> None:
         workflow = WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("feedback-reproduction-gate:", workflow)
+        recursive_command = "python3 tools/run_recursive_reproduction_rounds.py --receipt .reproduction/receipts/recursive-attack.json"
+        checker_command = "python3 tools/check_feedback_reproduction_gate.py --phase release"
+        self.assertIn(recursive_command, workflow)
+        self.assertLess(workflow.index(recursive_command), workflow.index(checker_command))
         self.assertIn("needs: feedback-reproduction-gate", workflow)
         self.assertIn("needs: [feedback-reproduction-gate, build-linux-ubuntu16]", workflow)
         self.assertNotIn("if: always()", workflow)
@@ -123,7 +143,7 @@ class FeedbackReproductionGateTest(unittest.TestCase):
         spec.loader.exec_module(module)
         for command in ("cmd /c tools\\pack.bat", "bash tools/pack.sh", "gh release create v1.0.0"):
             self.assertEqual(module.delivery_phase([], command), "release", command)
-        self.assertEqual(module.delivery_phase(["src/auto_layout.py"], "git commit -m fix"), "solve")
+        self.assertEqual(module.delivery_phase(["src/auto_layout.py"], "git commit -m fix"), "release")
         self.assertEqual(module.delivery_phase(["tests/test_gate.py"], "git push"), "structure")
 
     def test_delivery_gate_direct_invocation_is_an_explicit_negative_control(self) -> None:
@@ -260,6 +280,35 @@ class FeedbackReproductionGateTest(unittest.TestCase):
             errors: list[str] = []
             module._validate_fix_receipt(changed_issue, errors)
         self.assertTrue(any("nondeterministic" in error for error in errors))
+
+    def test_recursive_attack_receipt_rejects_round_and_claim_escapes(self) -> None:
+        spec = importlib.util.spec_from_file_location("drawclock_feedback_checker", CHECKER)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        source = ROOT / ".reproduction/receipts/recursive-attack.json"
+        baseline = json.loads(source.read_text(encoding="utf-8"))
+        mutations = []
+        missing_round = json.loads(json.dumps(baseline))
+        missing_round["rounds"].pop()
+        mutations.append(missing_round)
+        false_clean = json.loads(json.dumps(baseline))
+        false_clean["rounds"][0]["cases"][0]["observed_issue_ids"] = ["FB-ROOT-016"]
+        mutations.append(false_clean)
+        stale_source = json.loads(json.dumps(baseline))
+        stale_source["source_tree_sha256"] = "0" * 64
+        mutations.append(stale_source)
+        short_streak = json.loads(json.dumps(baseline))
+        short_streak["consecutive_clean_rounds"] = 4
+        mutations.append(short_streak)
+        with tempfile.TemporaryDirectory(dir=ROOT) as directory:
+            for index, payload in enumerate(mutations):
+                path = Path(directory) / f"mutant-{index}.json"
+                path.write_text(json.dumps(payload), encoding="utf-8")
+                errors: list[str] = []
+                module._validate_recursive_attack_receipt(errors, path)
+                self.assertTrue(errors, index)
 
 
 if __name__ == "__main__":

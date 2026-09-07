@@ -77,18 +77,31 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--corpus", type=Path, default=ROOT / "tests/reproduction-corpus/evidence-corpus.json")
     parser.add_argument("--legacy-python", type=Path)
+    parser.add_argument("--issues", nargs="+", help="strict issue-ID subset to execute")
+    parser.add_argument(
+        "--corpus-receipt", type=Path,
+        default=ROOT / ".reproduction/receipts/corpus.json",
+    )
     args = parser.parse_args(argv)
     corpus = json.loads(args.corpus.read_text(encoding="utf-8-sig"))
     ledger = json.loads(LEDGER.read_text(encoding="utf-8-sig"))
     issues = {item["id"]: item for item in ledger["issues"]}
+    requested = set(args.issues or issues)
+    unknown = requested.difference(issues)
+    if unknown:
+        print(f"unknown issues: {sorted(unknown)}", file=sys.stderr)
+        return 2
     run_group = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + secrets.token_hex(4)
     evidence_root = ROOT / ".reproduction/evidence" / run_group
     evidence_root.mkdir(parents=True)
-    attempts_by_issue: dict[str, list[dict[str, Any]]] = {issue: [] for issue in issues}
+    attempts_by_issue: dict[str, list[dict[str, Any]]] = {issue: [] for issue in requested}
     case_summary = []
     env = dict(os.environ)
     env["PYTHONDONTWRITEBYTECODE"] = "1"
     for case in corpus["cases"]:
+        case_issues = [issue for issue in case["issues"] if issue in requested]
+        if not case_issues:
+            continue
         if case["python_role"] == "legacy" and args.legacy_python is None:
             print("legacy corpus case requires --legacy-python", file=sys.stderr)
             return 2
@@ -123,7 +136,7 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"oracle report failed: {case['id']} attempt {index + 1}", file=sys.stderr)
                     return 1
                 report = json.loads(report_path.read_text(encoding="utf-8"))
-                for issue_id in case["issues"]:
+                for issue_id in case_issues:
                     oracle_log = trial / f"{issue_id}.log"
                     oracle_command = [sys.executable, str(ORACLE), "--input", str(input_path), "--svg", str(svg), "--issue", issue_id]
                     oracle_exit = run(oracle_command, ROOT, oracle_log, env, redactions)
@@ -147,7 +160,14 @@ def main(argv: list[str] | None = None) -> int:
                 case_summary.append({"case_id": case["id"], "attempt": index + 1, "detected_issues": report["detected_issues"], "totals": report["totals"]})
     missing = [issue for issue, attempts in attempts_by_issue.items() if len(attempts) < 2 or any(item["oracle_exit_code"] != 0 for item in attempts)]
     corpus_receipt = {"schema_version": 1, "corpus_id": run_group, "coverage_model": "many_to_many", "cases": case_summary, "issue_attempt_counts": {key: len(value) for key, value in attempts_by_issue.items()}, "missing_issues": missing}
-    corpus_receipt_path = ROOT / ".reproduction/receipts/corpus.json"
+    corpus_receipt_path = args.corpus_receipt
+    if not corpus_receipt_path.is_absolute():
+        corpus_receipt_path = ROOT / corpus_receipt_path
+    try:
+        corpus_receipt_path.resolve().relative_to(ROOT.resolve())
+    except ValueError:
+        print("corpus receipt escapes repository", file=sys.stderr)
+        return 2
     corpus_receipt_path.parent.mkdir(parents=True, exist_ok=True)
     corpus_receipt_path.write_text(json.dumps(corpus_receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     for issue_id, attempts in attempts_by_issue.items():

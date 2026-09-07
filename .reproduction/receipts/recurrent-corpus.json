@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "corpus_id": "20260907T042130Z-b81cdab9",
+  "coverage_model": "many_to_many",
+  "cases": [
+    {
+      "case_id": "recurrent-mixed-depth-array-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-016"
+      ],
+      "totals": {
+        "logical_nodes": 33,
+        "rendered_nodes": 37,
+        "logical_edges": 32,
+        "rendered_edges": 32,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 0,
+        "manhattan_length_px": 4633.068
+      }
+    },
+    {
+      "case_id": "recurrent-mixed-depth-array-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-016"
+      ],
+      "totals": {
+        "logical_nodes": 33,
+        "rendered_nodes": 37,
+        "logical_edges": 32,
+        "rendered_edges": 32,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 0,
+        "manhattan_length_px": 4633.068
+      }
+    },
+    {
+      "case_id": "recurrent-staggered-four-source-bend-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROUTE-009",
+        "FB-ROOT-010",
+        "FB-ROOT-012",
+        "FB-BEND-017"
+      ],
+      "totals": {
+        "logical_nodes": 27,
+        "rendered_nodes": 28,
+        "logical_edges": 26,
+        "rendered_edges": 26,
+        "proper_crossing_events": 2,
+        "distinct_crossing_points": 2,
+        "different_net_overlaps": 0,
+        "bends": 16,
+        "manhattan_length_px": 4117.9716
+      }
+    },
+    {
+      "case_id": "recurrent-staggered-four-source-bend-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROUTE-009",
+        "FB-ROOT-010",
+        "FB-ROOT-012",
+        "FB-BEND-017"
+      ],
+      "totals": {
+        "logical_nodes": 27,
+        "rendered_nodes": 28,
+        "logical_edges": 26,
+        "rendered_edges": 26,
+        "proper_crossing_events": 2,
+        "distinct_crossing_points": 2,
+        "different_net_overlaps": 0,
+        "bends": 16,
+        "manhattan_length_px": 4117.9716
+      }
+    }
+  ],
+  "issue_attempt_counts": {
+    "FB-BEND-017": 2,
+    "FB-ROOT-016": 2
+  },
+  "missing_issues": []
+}

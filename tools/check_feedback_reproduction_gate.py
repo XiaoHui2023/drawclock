@@ -16,6 +16,10 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / ".cursor/skills/project-goals/issues/user-feedback-natural-reproduction.json"
 USER_VALIDATOR = Path.home() / ".cursor/skills/agent-quality-workflow/scripts/validate_feedback_reproduction.py"
 RELEASE_STATES = {"fixed_verified", "closed"}
+RECURSIVE_MANIFEST = ROOT / "tests/reproduction-corpus/recursive-attack-rounds.json"
+RECURSIVE_RECEIPT = ROOT / ".reproduction/receipts/recursive-attack.json"
+RECURSIVE_RUNNER = ROOT / "tools/run_recursive_reproduction_rounds.py"
+RECURSIVE_ORACLE = ROOT / "tools/feedback_layout_reproduction_oracle.py"
 
 
 def _sha(path: Path) -> str:
@@ -254,6 +258,66 @@ def _validate_fix_receipt(issue: dict[str, Any], errors: list[str]) -> None:
             errors.append(f"{issue_id}: fix case {case_id} is nondeterministic")
 
 
+def _validate_recursive_attack_receipt(
+    errors: list[str], receipt_path: Path = RECURSIVE_RECEIPT,
+) -> None:
+    try:
+        contract = json.loads(RECURSIVE_MANIFEST.read_text(encoding="utf-8"))
+        receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        errors.append(f"recursive attack evidence is invalid: {exc}")
+        return
+    expected_rounds = contract.get("rounds")
+    actual_rounds = receipt.get("rounds")
+    required = contract.get("required_consecutive_clean_rounds")
+    if not isinstance(expected_rounds, list) or required != len(expected_rounds):
+        errors.append("recursive attack manifest has an invalid round exact-set")
+        return
+    if receipt.get("schema_version") != 1 or receipt.get("status") != "clean":
+        errors.append("recursive attack receipt is not clean")
+    if receipt.get("issues") != contract.get("issues"):
+        errors.append("recursive attack issue scope differs from the contract")
+    if receipt.get("required_consecutive_clean_rounds") != required or receipt.get("consecutive_clean_rounds") != required:
+        errors.append("recursive attack consecutive clean round requirement is unmet")
+    expected_identity = [(item.get("id"), item.get("strategy")) for item in expected_rounds]
+    actual_identity = (
+        [(item.get("id"), item.get("strategy")) for item in actual_rounds]
+        if isinstance(actual_rounds, list) else []
+    )
+    if actual_identity != expected_identity:
+        errors.append("recursive attack executed round exact-set/order differs")
+    if receipt.get("source_tree_sha256") != _tree_hash(ROOT / "src"):
+        errors.append("recursive attack source tree is stale")
+    for key, path in (
+        ("manifest_sha256", RECURSIVE_MANIFEST),
+        ("runner_sha256", RECURSIVE_RUNNER),
+        ("oracle_sha256", RECURSIVE_ORACLE),
+    ):
+        if receipt.get(key) != _sha(path):
+            errors.append(f"recursive attack {key} is stale")
+    if not isinstance(actual_rounds, list):
+        return
+    for expected, actual in zip(expected_rounds, actual_rounds):
+        cases = actual.get("cases")
+        expected_count = len(expected.get("fixtures", [])) + len(expected.get("seeds", [])) + len(expected.get("bus_rows", []))
+        if actual.get("status") != "clean" or not isinstance(cases, list) or len(cases) != expected_count:
+            errors.append(f"recursive attack round {expected.get('id')} is incomplete")
+            continue
+        case_ids = [case.get("case_id") for case in cases if isinstance(case, dict)]
+        if len(case_ids) != len(set(case_ids)):
+            errors.append(f"recursive attack round {expected.get('id')} repeats a case")
+        for case in cases:
+            if not isinstance(case, dict):
+                errors.append(f"recursive attack round {expected.get('id')} has an invalid case")
+                continue
+            if case.get("public_entrypoint") != "public_cli" or case.get("producer_exit_code") != 0:
+                errors.append(f"recursive attack case {case.get('case_id')} did not use the public CLI")
+            if case.get("artifact_before_oracle_sha256") != case.get("artifact_after_oracle_sha256"):
+                errors.append(f"recursive attack case {case.get('case_id')} mutated the artifact")
+            if case.get("observed_issue_ids") != []:
+                errors.append(f"recursive attack case {case.get('case_id')} reproduced a target issue")
+
+
 def _release_gate() -> int:
     try:
         manifest = json.loads(MANIFEST.read_text(encoding="utf-8-sig"))
@@ -265,6 +329,7 @@ def _release_gate() -> int:
         print("feedback release gate: issue list is missing or empty", file=sys.stderr)
         return 2
     errors: list[str] = []
+    _validate_recursive_attack_receipt(errors)
     for issue in issues:
         if not isinstance(issue, dict):
             errors.append("issues[] must contain objects")

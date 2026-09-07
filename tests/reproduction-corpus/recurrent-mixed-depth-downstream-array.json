@@ -1,0 +1,39 @@
+{
+  "shared": {"kind": "from"},
+  "shared_gate_0": {"kind": "gate", "source": "shared"},
+  "private_0": {"kind": "from"},
+  "private_gate_0": {"kind": "gate", "source": "private_0"},
+  "private_div_0": {"kind": "div", "source": "private_gate_0"},
+  "mux_0": {"kind": "mux2", "source": {"0": "shared_gate_0", "1": "private_div_0"}},
+  "clock_0": {"kind": "clock", "source": "mux_0"},
+
+  "shared_gate_1": {"kind": "gate", "source": "shared"},
+  "private_1": {"kind": "from"},
+  "private_gate_1": {"kind": "gate", "source": "private_1"},
+  "private_div_1a": {"kind": "div", "source": "private_gate_1"},
+  "private_div_1b": {"kind": "div", "source": "private_div_1a"},
+  "mux_1": {"kind": "mux2", "source": {"0": "shared_gate_1", "1": "private_div_1b"}},
+  "post_gate_1": {"kind": "gate", "source": "mux_1"},
+  "clock_1": {"kind": "clock", "source": "post_gate_1"},
+
+  "shared_gate_2": {"kind": "gate", "source": "shared"},
+  "private_2": {"kind": "from"},
+  "private_gate_2": {"kind": "gate", "source": "private_2"},
+  "private_div_2a": {"kind": "div", "source": "private_gate_2"},
+  "private_div_2b": {"kind": "div", "source": "private_div_2a"},
+  "private_div_2c": {"kind": "div", "source": "private_div_2b"},
+  "mux_2": {"kind": "mux2", "source": {"0": "shared_gate_2", "1": "private_div_2c"}},
+  "post_div_2": {"kind": "div", "source": "mux_2"},
+  "post_gate_2": {"kind": "gate", "source": "post_div_2"},
+  "clock_2": {"kind": "clock", "source": "post_gate_2"},
+
+  "shared_gate_3": {"kind": "gate", "source": "shared"},
+  "private_3": {"kind": "from"},
+  "private_gate_3": {"kind": "gate", "source": "private_3"},
+  "private_div_3": {"kind": "div", "source": "private_gate_3"},
+  "mux_3": {"kind": "mux2", "source": {"0": "shared_gate_3", "1": "private_div_3"}},
+  "clock_3": {"kind": "clock", "source": "mux_3"},
+
+  "shared_aux": {"kind": "gate", "source": "shared"},
+  "shared_aux_clock": {"kind": "clock", "source": "shared_aux"}
+}

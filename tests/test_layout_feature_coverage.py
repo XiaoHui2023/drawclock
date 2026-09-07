@@ -59,3 +59,14 @@ def test_layout_feature_coverage_validator_kills_missing_role_interaction_and_te
         "missing test function" in error
         for error in validator.validate(fake_test, ROOT)
     )
+
+
+def test_layout_feature_coverage_validator_discovers_class_test_methods(tmp_path: Path) -> None:
+    path = tmp_path / "test_class_style.py"
+    path.write_text(
+        "class ContractTests:\n"
+        "    def test_machine_gate_contract(self):\n"
+        "        pass\n",
+        encoding="utf-8",
+    )
+    assert "test_machine_gate_contract" in _validator_module()._test_functions(path)

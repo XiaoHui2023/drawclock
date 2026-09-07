@@ -85,20 +85,20 @@
       "issues": ["FB-ROOT-015"]
     },
     {
-      "id": "asymmetric-depth-common-array-baseline",
-      "baseline_revision": "d686d74eb5c4d26cd23afa8e9c90c969f2345818",
+      "id": "recurrent-mixed-depth-array-baseline",
+      "baseline_revision": "93568f94d37bf62b642b5cb7c499dd1fbca27113",
       "python_role": "current",
       "cli_mode": "direct",
-      "input": "tests/reproduction-corpus/asymmetric-depth-common-private-mux.json",
+      "input": "tests/reproduction-corpus/recurrent-mixed-depth-downstream-array.json",
       "library": "drawio-lib",
       "issues": ["FB-ROOT-016"]
     },
     {
-      "id": "staggered-four-source-mux-baseline",
-      "baseline_revision": "d686d74eb5c4d26cd23afa8e9c90c969f2345818",
+      "id": "recurrent-staggered-four-source-bend-baseline",
+      "baseline_revision": "93568f94d37bf62b642b5cb7c499dd1fbca27113",
       "python_role": "current",
       "cli_mode": "direct",
-      "input": "tests/reproduction-corpus/staggered-four-source-mux.json",
+      "input": "tests/reproduction-corpus/recurrent-staggered-four-source-bend.json",
       "library": "drawio-lib",
       "issues": ["FB-BEND-017"]
     }

@@ -1,0 +1,25 @@
+{
+  "source_a": {"kind": "source"},
+  "a_gate": {"kind": "gate", "source": "source_a"},
+  "a_div": {"kind": "div", "source": "a_gate"},
+  "a_cell": {"kind": "cell", "source": "a_div"},
+  "a_clock": {"kind": "clock", "source": "a_cell"},
+
+  "source_b": {"kind": "source"},
+  "b_gate": {"kind": "gate", "source": "source_b"},
+  "b_div": {"kind": "div", "source": "b_gate"},
+  "b_clock": {"kind": "clock", "source": "b_div"},
+
+  "source_c": {"kind": "source"},
+  "c_gate": {"kind": "gate", "source": "source_c"},
+  "c_clock": {"kind": "clock", "source": "c_gate"},
+
+  "source_d": {"kind": "source"},
+  "d_gate": {"kind": "gate", "source": "source_d"},
+  "d_div": {"kind": "div", "source": "d_gate"},
+  "d_tap": {"kind": "mux2", "source": {"0": "d_div", "1": "source_a"}},
+  "d_clock": {"kind": "clock", "source": "d_tap"},
+
+  "mux": {"kind": "mux4", "source": {"0": "source_d", "1": "source_b", "2": "source_a", "3": "source_c"}},
+  "clock": {"kind": "clock", "source": "mux"}
+}

@@ -70,7 +70,7 @@ def delivery_phase(paths: list[str], trigger_command: str) -> str:
     release_trigger = bool(re.search(r"(?i)(?:^|[\\/\s])(pack(?:\.bat|\.sh)?|bundle_release\.py)(?:\s|$)|\bgh\s+release\b", trigger_command))
     if release_trigger:
         return "release"
-    return "solve" if any(path == "src" or path.startswith("src/") for path in paths) else "structure"
+    return "release" if any(path == "src" or path.startswith("src/") for path in paths) else "structure"
 
 
 def main() -> int:
@@ -115,7 +115,7 @@ def main() -> int:
         "artifact_hashes": {},
         "policy_sha256": os.environ["CODEX_GATE_POLICY_SHA256"],
         "delivery_command_sha256": os.environ["CODEX_GATE_COMMAND_SHA256"],
-        "validator_id": "drawclock-feedback-reproduction-gate-v1",
+        "validator_id": "drawclock-feedback-reproduction-gate-v2",
         "challenge": os.environ["CODEX_GATE_CHALLENGE"],
         "evidence": {
             "phase": phase,

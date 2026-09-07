@@ -1,0 +1,15 @@
+{
+  "common": {"kind": "from"},
+  "common_gate_a": {"kind": "gate", "source": "common"},
+  "private_a": {"kind": "from"},
+  "private_gate_a": {"kind": "gate", "source": "private_a"},
+  "private_div_a": {"kind": "div", "source": "private_gate_a"},
+  "mux_a": {"kind": "mux2", "source": {"0": "common_gate_a", "1": "private_div_a"}},
+  "clock_a": {"kind": "clock", "source": "mux_a"},
+  "common_gate_b": {"kind": "gate", "source": "common"},
+  "private_b": {"kind": "from"},
+  "private_gate_b": {"kind": "gate", "source": "private_b"},
+  "private_div_b": {"kind": "div", "source": "private_gate_b"},
+  "mux_b": {"kind": "mux2", "source": {"0": "common_gate_b", "1": "private_div_b"}},
+  "clock_b": {"kind": "clock", "source": "mux_b"}
+}

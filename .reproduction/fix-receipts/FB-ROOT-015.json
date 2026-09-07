@@ -3,18 +3,18 @@
   "hash_mode": "sha256-normalized-text-v1",
   "issue_id": "FB-ROOT-015",
   "result": "fixed_verified",
-  "verification_group": "20260907T020948Z-237cac89",
+  "verification_group": "20260907T044759Z-3347ff95",
   "baseline_fails": true,
   "current_passes": true,
   "baseline_receipt": ".reproduction/receipts/FB-ROOT-015.json",
   "baseline_receipt_sha256": "8ef6777d4f19fb0eea8769bd88f8f22b377dd75cb0a9d8c1fb507f23795a5090",
-  "source_tree_sha256": "2123ac0d2dc01e7e016fa863410e08f0f5b6376ed8e89424f6468ca7a480adf4",
+  "source_tree_sha256": "9c99e5da4860dac38931f09e6dfec82eaf67a2ae2cb26bdff23b0b9b49074967",
   "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
   "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
-  "oracle_sha256": "d8ca2966d0bb90171ad6403b5382c854d8f35214a73b566f606d44bbfd5a2e4e",
+  "oracle_sha256": "6532586a93ea2e1650c6140f209ccae64b82d16beed57a4d11ea7eb6e31af611",
   "attempts": [
     {
-      "run_id": "20260907T020948Z-237cac89:compact-root-fanout-baseline:1",
+      "run_id": "20260907T044759Z-3347ff95:compact-root-fanout-baseline:1",
       "case_id": "compact-root-fanout-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -23,22 +23,22 @@
       "artifact_before_oracle_sha256": "c3b77ca9399f66f6be51c246092573a4564a516e5b7043a2ac112c0ad2717de8",
       "artifact_after_oracle_sha256": "c3b77ca9399f66f6be51c246092573a4564a516e5b7043a2ac112c0ad2717de8",
       "input_sha256": "50dc5d7d70a046c59bc34f517da9885f07536fd6b1e54cee8ffd0a0101b10ddd",
-      "source_tree_sha256": "2123ac0d2dc01e7e016fa863410e08f0f5b6376ed8e89424f6468ca7a480adf4",
+      "source_tree_sha256": "9c99e5da4860dac38931f09e6dfec82eaf67a2ae2cb26bdff23b0b9b49074967",
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
-      "oracle_sha256": "d8ca2966d0bb90171ad6403b5382c854d8f35214a73b566f606d44bbfd5a2e4e",
-      "started_at": "2026-09-07T02:10:09.200123+00:00",
-      "ended_at": "2026-09-07T02:10:09.766332+00:00",
+      "oracle_sha256": "6532586a93ea2e1650c6140f209ccae64b82d16beed57a4d11ea7eb6e31af611",
+      "started_at": "2026-09-07T04:48:19.011764+00:00",
+      "ended_at": "2026-09-07T04:48:19.550634+00:00",
       "evidence_files": {
-        ".reproduction/fix-evidence/20260907T020948Z-237cac89/compact-root-fanout-baseline/attempt-1/output.svg": "c3b77ca9399f66f6be51c246092573a4564a516e5b7043a2ac112c0ad2717de8",
-        ".reproduction/fix-evidence/20260907T020948Z-237cac89/compact-root-fanout-baseline/attempt-1/producer.log": "59fb9b078823bd4e0bdf6d004585bbc512063e0e7d78cb8397b7d309810cffec",
-        ".reproduction/fix-evidence/20260907T020948Z-237cac89/compact-root-fanout-baseline/attempt-1/report.json": "242c957e403fea107d89dce6c0ca6ff1614a6903a5b5128e7f9ef6227060d26e",
-        ".reproduction/fix-evidence/20260907T020948Z-237cac89/compact-root-fanout-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260907T020948Z-237cac89/compact-root-fanout-baseline/attempt-1/FB-ROOT-015.log": "222ab612d1de0b563a9fba7596fa1634976fdc9ce635a83b587b229b89d65546"
+        ".reproduction/fix-evidence/20260907T044759Z-3347ff95/compact-root-fanout-baseline/attempt-1/output.svg": "c3b77ca9399f66f6be51c246092573a4564a516e5b7043a2ac112c0ad2717de8",
+        ".reproduction/fix-evidence/20260907T044759Z-3347ff95/compact-root-fanout-baseline/attempt-1/producer.log": "b6c8530490f6b47c68ecd3d76b9d61fec992994bce93bc839063d45cb06625f9",
+        ".reproduction/fix-evidence/20260907T044759Z-3347ff95/compact-root-fanout-baseline/attempt-1/report.json": "242c957e403fea107d89dce6c0ca6ff1614a6903a5b5128e7f9ef6227060d26e",
+        ".reproduction/fix-evidence/20260907T044759Z-3347ff95/compact-root-fanout-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260907T044759Z-3347ff95/compact-root-fanout-baseline/attempt-1/FB-ROOT-015.log": "222ab612d1de0b563a9fba7596fa1634976fdc9ce635a83b587b229b89d65546"
       }
     },
     {
-      "run_id": "20260907T020948Z-237cac89:compact-root-fanout-baseline:2",
+      "run_id": "20260907T044759Z-3347ff95:compact-root-fanout-baseline:2",
       "case_id": "compact-root-fanout-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -47,18 +47,18 @@
       "artifact_before_oracle_sha256": "c3b77ca9399f66f6be51c246092573a4564a516e5b7043a2ac112c0ad2717de8",
       "artifact_after_oracle_sha256": "c3b77ca9399f66f6be51c246092573a4564a516e5b7043a2ac112c0ad2717de8",
       "input_sha256": "50dc5d7d70a046c59bc34f517da9885f07536fd6b1e54cee8ffd0a0101b10ddd",
-      "source_tree_sha256": "2123ac0d2dc01e7e016fa863410e08f0f5b6376ed8e89424f6468ca7a480adf4",
+      "source_tree_sha256": "9c99e5da4860dac38931f09e6dfec82eaf67a2ae2cb26bdff23b0b9b49074967",
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
-      "oracle_sha256": "d8ca2966d0bb90171ad6403b5382c854d8f35214a73b566f606d44bbfd5a2e4e",
-      "started_at": "2026-09-07T02:10:09.778789+00:00",
-      "ended_at": "2026-09-07T02:10:10.350261+00:00",
+      "oracle_sha256": "6532586a93ea2e1650c6140f209ccae64b82d16beed57a4d11ea7eb6e31af611",
+      "started_at": "2026-09-07T04:48:19.565709+00:00",
+      "ended_at": "2026-09-07T04:48:20.095628+00:00",
       "evidence_files": {
-        ".reproduction/fix-evidence/20260907T020948Z-237cac89/compact-root-fanout-baseline/attempt-2/output.svg": "c3b77ca9399f66f6be51c246092573a4564a516e5b7043a2ac112c0ad2717de8",
-        ".reproduction/fix-evidence/20260907T020948Z-237cac89/compact-root-fanout-baseline/attempt-2/producer.log": "5c6e2e2b513e2b806c71c631773d044bea47e667f994cd08f9d19ee7b9e1a776",
-        ".reproduction/fix-evidence/20260907T020948Z-237cac89/compact-root-fanout-baseline/attempt-2/report.json": "242c957e403fea107d89dce6c0ca6ff1614a6903a5b5128e7f9ef6227060d26e",
-        ".reproduction/fix-evidence/20260907T020948Z-237cac89/compact-root-fanout-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260907T020948Z-237cac89/compact-root-fanout-baseline/attempt-2/FB-ROOT-015.log": "222ab612d1de0b563a9fba7596fa1634976fdc9ce635a83b587b229b89d65546"
+        ".reproduction/fix-evidence/20260907T044759Z-3347ff95/compact-root-fanout-baseline/attempt-2/output.svg": "c3b77ca9399f66f6be51c246092573a4564a516e5b7043a2ac112c0ad2717de8",
+        ".reproduction/fix-evidence/20260907T044759Z-3347ff95/compact-root-fanout-baseline/attempt-2/producer.log": "4452b1cab097daadb8ccd11885a7ed04794b763c781bb152b7091b1cf8b32e37",
+        ".reproduction/fix-evidence/20260907T044759Z-3347ff95/compact-root-fanout-baseline/attempt-2/report.json": "242c957e403fea107d89dce6c0ca6ff1614a6903a5b5128e7f9ef6227060d26e",
+        ".reproduction/fix-evidence/20260907T044759Z-3347ff95/compact-root-fanout-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260907T044759Z-3347ff95/compact-root-fanout-baseline/attempt-2/FB-ROOT-015.log": "222ab612d1de0b563a9fba7596fa1634976fdc9ce635a83b587b229b89d65546"
       }
     }
   ]

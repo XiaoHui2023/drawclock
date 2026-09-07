@@ -41,7 +41,11 @@ def _id_map(items: list[dict[str, Any]], owner: str, errors: list[str]) -> dict[
 
 def _test_functions(path: Path) -> set[str]:
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    return {node.name for node in tree.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    return {
+        node.name
+        for node in ast.walk(tree)
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
 
 
 def validate(data: dict[str, Any], project_root: Path | None = None) -> list[str]:

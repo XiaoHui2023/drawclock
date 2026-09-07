@@ -835,6 +835,23 @@ def test_two_regular_common_domains_remain_separate_single_bus_networks(
     assert report["totals"]["different_net_overlaps"] == 0
 
 
+def test_oracle_rejects_recurrent_shared_root_replication() -> None:
+    input_path = ROOT / "tests/reproduction-corpus/recurrent-mixed-depth-downstream-array.json"
+    svg_path = (
+        ROOT
+        / ".reproduction/evidence/20260907T042130Z-b81cdab9"
+        / "recurrent-mixed-depth-array-baseline/attempt-1/output.svg"
+    )
+    report = oracle.analyze(input_path, svg_path)
+    witnesses = report["witnesses"]["regular_fanout_array_replication_witnesses"]
+    assert "FB-ROOT-016" in report["detected_issues"]
+    assert any(
+        witness["facilities"] == 5
+        and witness["branches"] == 4
+        for witness in witnesses
+    )
+
+
 def test_single_route_root_without_crossed_trunk_is_clean_counterexample(
     tmp_path: Path,
 ) -> None:

@@ -2,7 +2,7 @@
   "version": 2,
   "delivery_command_windows": ["python", "tools/run_agent_delivery_gate.py"],
   "delivery_command": ["python3", "tools/run_agent_delivery_gate.py"],
-  "validator_id": "drawclock-feedback-reproduction-gate-v1",
+  "validator_id": "drawclock-feedback-reproduction-gate-v2",
   "ready_receipt": ".codex/evidence/delivery-ready.json",
   "blocked_receipt": ".codex/evidence/delivery-blocked.json",
   "artifact_paths": [],

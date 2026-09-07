@@ -3216,10 +3216,11 @@ def _visible_facility_opening_cost(vertex, profile) -> float:
 def _regular_fanout_array_roots(nodes, logical_edges) -> set[str]:
     """Identify shared roots whose one-to-one branches form a regular array.
 
-    A regular array has at least three distinct one-input/one-output branch
-    nodes, each feeding a distinct same-kind merge with the same downstream
-    kind signature.  Such a cohort is a single logical distribution network;
-    duplicating its root into row-local glyphs destroys the shared-bus trace
+    A repeated array has at least two distinct one-input/one-output branch
+    nodes, each feeding a distinct merge.  The cohort may be only a subset of
+    the root's outputs: unrelated consumers, mixed branch/merge shapes, or
+    different downstream depths do not erase the shared network's identity.
+    Duplicating its root into row-local glyphs destroys the shared-bus trace
     even when it saves per-edge ink.  The rule is structural and independent
     of component names, concrete kinds, row counts, and branch depth.
     """
@@ -3230,36 +3231,52 @@ def _regular_fanout_array_roots(nodes, logical_edges) -> set[str]:
         outgoing[edge.source].append(edge)
 
     result: set[str] = set()
+
+    def upstream_roots(name: str) -> set[str]:
+        roots: set[str] = set()
+        pending = [name]
+        visited: set[str] = set()
+        while pending:
+            current = pending.pop()
+            if current in visited:
+                continue
+            visited.add(current)
+            if not incoming[current]:
+                roots.add(current)
+            else:
+                pending.extend(edge.source for edge in incoming[current])
+        return roots
+
     for root in nodes:
         root_edges = outgoing[root]
-        if incoming[root] or len(root_edges) < 3:
-            continue
-        children = [edge.target for edge in root_edges]
-        if len(set(children)) != len(children):
-            continue
-        child_kinds = {nodes[child].item.get("kind") for child in children}
-        if len(child_kinds) != 1:
+        if incoming[root] or len(root_edges) < 2:
             continue
         merges = []
-        valid = True
-        for child in children:
+        for edge in root_edges:
+            child = edge.target
             if len(incoming[child]) != 1 or len(outgoing[child]) != 1:
-                valid = False
-                break
+                continue
             merge = outgoing[child][0].target
             if len(incoming[merge]) < 2:
-                valid = False
-                break
+                continue
+            competing_sources = [
+                candidate.source
+                for candidate in incoming[merge]
+                if candidate.source != child
+            ]
+            # A visual public/private array has a route-local counterpart for
+            # every merge.  If every counterpart descends from another shared
+            # root, this is a cross-coupled multi-root domain whose consumer
+            # bands may legitimately need separate facilities.
+            if not any(
+                len(outgoing[private_root]) == 1
+                for source in competing_sources
+                for private_root in upstream_roots(source)
+                if private_root != root
+            ):
+                continue
             merges.append(merge)
-        if not valid or len(set(merges)) != len(merges):
-            continue
-        if len({nodes[merge].item.get("kind") for merge in merges}) != 1:
-            continue
-        downstream_signatures = {
-            tuple(sorted(nodes[edge.target].item.get("kind") for edge in outgoing[merge]))
-            for merge in merges
-        }
-        if len(downstream_signatures) == 1:
+        if len(merges) >= 2 and len(set(merges)) == len(merges):
             result.add(root)
     return result
 
@@ -5856,7 +5873,6 @@ def generate_elk_layout(
         vertex.cell_id
         for vertex in document.vertices
         if (vertex.logical_name or vertex.name) in joint_root_names
-        and "layout_column" not in nodes[vertex.logical_name or vertex.name].item
     }
     document, root_joint_report = _refine_joint_coordinates(
         document,
@@ -6036,6 +6052,29 @@ def generate_elk_layout(
         report["selection"]["source_corridor_rollback_cycle_rank"] = 0
     accepted_assessment = tree_report.pop("_accepted_assessment")
     report["selection"].update(tree_report)
+    # Facility partitioning, corridor opening, anchor relocation and fanout
+    # normalization all own final root geometry after the earlier coordinate
+    # pass.  Re-run the same global dominance closure on the facilities that
+    # actually survived those owners; otherwise a later stage can recreate an
+    # avoidable mux-input dogleg while every earlier local gate remains green.
+    final_root_vertex_ids = {
+        vertex.cell_id
+        for vertex in document.vertices
+        if (vertex.logical_name or vertex.name) in joint_root_names
+    }
+    document, final_root_joint_report = _refine_joint_coordinates(
+        document,
+        logical_edges,
+        eligible_vertex_ids=final_root_vertex_ids,
+        route_clearance=profile.route_clearance,
+        minimum_route_bends=2,
+        require_nonincreasing_length=True,
+    )
+    report["selection"].update({
+        key.replace("joint_coordinate", "final_root_joint_coordinate"): value
+        for key, value in final_root_joint_report.items()
+    })
+    accepted_assessment = None
     report["selection"]["source_rendering_replicas"] = (
         len(document.vertices) - len(nodes)
     )
