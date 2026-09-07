@@ -1,0 +1,15 @@
+{
+  "capability_id": "drawclock-regular-array-and-root-axis-generalization",
+  "owner": "root facility creation and joint coordinate refinement",
+  "exact_cases": ["one shared root through per-route stages into merges against deeper private chains", "four naturally staggered roots directly feeding one merge while one root has a second consumer"],
+  "root_causes": ["facility opening optimized local edge ink without preserving a structurally regular shared network", "an even-target arithmetic midpoint tied on L1 length but lost to a real consumer axis on bend count", "three independent facility-creation stages could reintroduce aliases after an earlier stage preserved the root"],
+  "metrics": [
+    {"id":"regular-array-physical-facilities","scope":"final SVG logical source-output network","measurement":"count physical source boxes after topology identifies at least three regular one-to-one branches","success":"exactly 1","failure":"greater than 1","counterexample":"distant non-regular consumer domains","mutant":"allow any one facility-creation owner to ignore the structural cohort"},
+    {"id":"regular-array-vertical-channels","scope":"final SVG shared root edges","measurement":"distinct nonzero vertical segment x coordinates","success":"exactly 1","failure":"zero from row-local copies or greater than 1 from fragmented trunks","counterexample":"single-edge roots","mutant":"route each branch independently"},
+    {"id":"multi-target-axis-dominance","scope":"one physical root and all incident routes","measurement":"consumer-axis counterfactual quality vector","success":"no candidate preserves hard geometry/crossings/overlaps/length and strictly reduces total bends","failure":"at least one such candidate exists","counterexample":"explicit staggered columns whose four direct routes are already straight","mutant":"replace an actual median sample by the arithmetic midpoint of two target axes"},
+    {"id":"permutation-invariance","scope":"equivalent logical graph","measurement":"facility/channel/direct-edge-bend structural tuple","success":"unchanged under declaration reversal, stable rename and valid port permutation","failure":"tuple changes without a changed constraint","counterexample":"port permutation that changes a real fixed-port obstacle","mutant":"use dictionary insertion order as a semantic tie-break"}
+  ],
+  "adjacent_dimensions": {"branch_depth":["equal","private-plus-one"],"array_rows":[3,4,6,8],"columns":["natural-staggered","explicit-staggered"],"order":["forward","reverse","port-permuted"],"regularity":["regular-array","distant-non-regular"]},
+  "hard_gates": ["exact logical edges and ports", "no node or visible-content overlap regression", "no edge-node or different-net overlap regression", "crossings do not increase", "Manhattan length does not increase for a bend-only coordinate move", "frozen red and current green receipts remain separate"],
+  "evidence": ["parameterized public-CLI final-SVG tests", "frozen d686d74 many-to-many double-run receipts", "layout feature coverage validator", "full test and fresh package consumption before release"]
+}

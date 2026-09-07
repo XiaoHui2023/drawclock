@@ -1,0 +1,17 @@
+{
+  "source_0": {"kind": "source", "layout_column": 0},
+  "source_1": {"kind": "source", "layout_column": 1},
+  "source_2": {"kind": "source", "layout_column": 1},
+  "source_3": {"kind": "source", "layout_column": 2},
+  "mux": {
+    "kind": "mux4",
+    "layout_column": 3,
+    "source": {
+      "0": "source_0",
+      "1": "source_1",
+      "2": "source_2",
+      "3": "source_3"
+    }
+  },
+  "clock": {"kind": "clock", "layout_column": 4, "source": "mux"}
+}

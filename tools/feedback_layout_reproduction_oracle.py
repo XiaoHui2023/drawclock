@@ -36,6 +36,8 @@ ISSUES = (
     "FB-BEND-013",
     "FB-BEND-014",
     "FB-ROOT-015",
+    "FB-ROOT-016",
+    "FB-BEND-017",
 )
 
 
@@ -1036,6 +1038,210 @@ def _mergeable_root_facility_witnesses(
     return witnesses
 
 
+def _regular_fanout_array_replication_witnesses(
+    config: dict[str, Any], logical: list[LogicalEdge], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Find replicated roots that feed a regular asymmetric-depth merge array."""
+    incoming: dict[str, list[LogicalEdge]] = defaultdict(list)
+    outgoing: dict[str, list[LogicalEdge]] = defaultdict(list)
+    for edge in logical:
+        incoming[edge.target].append(edge)
+        outgoing[edge.source].append(edge)
+    boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+    for box in boxes:
+        boxes_by_node[box.node].append(box)
+
+    def exclusive_root_depth(node: str) -> int | None:
+        depth = 0
+        seen: set[str] = set()
+        while incoming[node]:
+            if len(incoming[node]) != 1 or node in seen:
+                return None
+            seen.add(node)
+            node = incoming[node][0].source
+            depth += 1
+        return depth
+
+    witnesses: list[dict[str, Any]] = []
+    for root in sorted(config):
+        root_edges = outgoing[root]
+        if incoming[root] or len(root_edges) < 3 or len(boxes_by_node[root]) <= 1:
+            continue
+        children = [edge.target for edge in root_edges]
+        if len(set(children)) != len(children):
+            continue
+        child_kinds = {str(config[child].get("kind", "")) for child in children}
+        if len(child_kinds) != 1:
+            continue
+        merge_edges: list[LogicalEdge] = []
+        private_depths: list[int] = []
+        valid = True
+        for child in children:
+            if len(incoming[child]) != 1 or len(outgoing[child]) != 1:
+                valid = False
+                break
+            merge_edge = outgoing[child][0]
+            other_inputs = [
+                edge for edge in incoming[merge_edge.target]
+                if edge.source != child
+            ]
+            depths = [
+                depth + 1
+                for edge in other_inputs
+                if (depth := exclusive_root_depth(edge.source)) is not None
+            ]
+            if not depths or max(depths) <= 2:
+                valid = False
+                break
+            merge_edges.append(merge_edge)
+            private_depths.append(max(depths))
+        merge_nodes = [edge.target for edge in merge_edges]
+        if not valid or len(set(merge_nodes)) != len(merge_nodes):
+            continue
+        if len({str(config[node].get("kind", "")) for node in merge_nodes}) != 1:
+            continue
+        downstream_signatures = {
+            tuple(sorted(str(config[edge.target].get("kind", "")) for edge in outgoing[node]))
+            for node in merge_nodes
+        }
+        if len(downstream_signatures) != 1:
+            continue
+        witnesses.append({
+            "root": root,
+            "facilities": len(boxes_by_node[root]),
+            "branches": len(root_edges),
+            "intermediate_kind": next(iter(child_kinds)),
+            "merge_kind": str(config[merge_nodes[0]].get("kind", "")),
+            "common_depth": 2,
+            "private_depths": private_depths,
+            "children": sorted(children),
+            "merges": sorted(merge_nodes),
+        })
+    return witnesses
+
+
+def _root_fanout_axis_dominance_witnesses(
+    config: dict[str, Any], roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Move one physical root facility to a consumer axis and compare all routes."""
+    boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+    for box in boxes:
+        boxes_by_node[box.node].append(box)
+    incoming_routes: dict[str, list[Route]] = defaultdict(list)
+    for route in routes:
+        incoming_routes[route.target].append(route)
+    witnesses: list[dict[str, Any]] = []
+    for merge, merge_routes in sorted(incoming_routes.items()):
+        if not str(config.get(merge, {}).get("kind", "")).startswith("mux"):
+            continue
+        direct_roots = [
+            route for route in merge_routes
+            if route.source in roots
+            and str(config.get(route.source, {}).get("kind", "")) == "source"
+        ]
+        if len(direct_roots) < 4:
+            continue
+        endpoint_boxes = [
+            _endpoint_box(route.points[0], boxes_by_node[route.source])
+            for route in direct_roots
+        ]
+        source_columns = sorted({round(box.x, 4) for box in endpoint_boxes if box})
+        if len(source_columns) < 2:
+            continue
+        for incident in direct_roots:
+            root = incident.source
+            root_boxes = boxes_by_node[root]
+            root_routes = [route for route in routes if route.source == root]
+            if len(root_boxes) != 1 or len(root_routes) < 2:
+                continue
+            source_box = root_boxes[0]
+            starts = {route.points[0] for route in root_routes}
+            if len(starts) != 1:
+                continue
+            start = next(iter(starts))
+            actual_bends = sum(max(0, len(route.points) - 2) for route in root_routes)
+            actual_length = sum(_route_length(route) for route in root_routes)
+            unaffected = [route for route in routes if route.source != root]
+            original_crossings, original_overlaps = route_crossings(routes)
+            for axis in sorted({route.points[-1][1] for route in root_routes}):
+                delta_y = axis - start[1]
+                if abs(delta_y) <= EPS:
+                    continue
+                moved = Box(
+                    source_box.node, source_box.x, source_box.y + delta_y,
+                    source_box.w, source_box.h, source_box.visible_x,
+                    None if source_box.visible_y is None else source_box.visible_y + delta_y,
+                    source_box.visible_w, source_box.visible_h,
+                )
+                if any(
+                    box.node != root and _visual_boxes_overlap(moved, box)
+                    for box in boxes
+                ):
+                    continue
+                if any(
+                    _visual_rect_interior_hit(a, b, moved)
+                    for route in unaffected
+                    for a, b in segments(route)
+                ):
+                    continue
+                candidate_routes: list[Route] = []
+                valid = True
+                for route in root_routes:
+                    end = route.points[-1]
+                    moved_start = (start[0], round(start[1] + delta_y, 4))
+                    vertical_xs = [
+                        a[0] for a, b in segments(route)
+                        if abs(a[0] - b[0]) <= EPS
+                    ]
+                    lane_x = vertical_xs[0] if vertical_xs else round((moved_start[0] + end[0]) / 2, 4)
+                    candidate = _copy_route(
+                        route,
+                        [moved_start, (lane_x, moved_start[1]), (lane_x, end[1]), end],
+                    )
+                    target_box = _endpoint_box(end, boxes_by_node[route.target])
+                    obstacles = [
+                        box for box in boxes
+                        if box.node != root and box is not target_box
+                    ]
+                    if any(
+                        _visual_rect_interior_hit(a, b, box)
+                        for a, b in segments(candidate)
+                        for box in obstacles
+                    ):
+                        valid = False
+                        break
+                    candidate_routes.append(candidate)
+                if not valid:
+                    continue
+                candidate_all = [*unaffected, *candidate_routes]
+                candidate_crossings, candidate_overlaps = route_crossings(candidate_all)
+                candidate_bends = sum(max(0, len(route.points) - 2) for route in candidate_routes)
+                candidate_length = sum(_route_length(route) for route in candidate_routes)
+                if (
+                    len(candidate_crossings) <= len(original_crossings)
+                    and len(candidate_overlaps) <= len(original_overlaps)
+                    and candidate_bends < actual_bends
+                    and candidate_length <= actual_length + EPS
+                ):
+                    witnesses.append({
+                        "root": root,
+                        "merge": merge,
+                        "source_columns": source_columns,
+                        "axis_before": round(start[1], 4),
+                        "axis_after": round(axis, 4),
+                        "bends_before": actual_bends,
+                        "bends_after": candidate_bends,
+                        "length_before": round(actual_length, 4),
+                        "length_after": round(candidate_length, 4),
+                        "crossing_events_before": len(original_crossings),
+                        "crossing_events_after": len(candidate_crossings),
+                        "overlaps_before": len(original_overlaps),
+                        "overlaps_after": len(candidate_overlaps),
+                    })
+                    break
+    return witnesses
+
+
 def _root_facility_column_lag_witnesses(
     roots: set[str], routes: list[Route], boxes: list[Box]
 ) -> list[dict[str, Any]]:
@@ -1708,6 +1914,12 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     mergeable_root_facility_witnesses = (
         _mergeable_root_facility_witnesses(roots, routes, boxes)
     )
+    regular_fanout_array_replication_witnesses = (
+        _regular_fanout_array_replication_witnesses(config, logical, boxes)
+    )
+    root_fanout_axis_dominance_witnesses = (
+        _root_fanout_axis_dominance_witnesses(config, roots, routes, boxes)
+    )
     detected = {
         # Mixed kinds are only a precondition.  A defect is present only when
         # an ordinary zero-indegree component also exhibits the measured root
@@ -1729,6 +1941,8 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         "FB-BEND-013": bool(downstream_corridor_tail_bend_witnesses),
         "FB-BEND-014": bool(adjacent_root_height_bend_witnesses),
         "FB-ROOT-015": bool(mergeable_root_facility_witnesses),
+        "FB-ROOT-016": bool(regular_fanout_array_replication_witnesses),
+        "FB-BEND-017": bool(root_fanout_axis_dominance_witnesses),
     }
     route_row_by_id = {row["edge_id"]: row for row in route_rows}
     node_statistics = {}
@@ -1839,6 +2053,12 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             ),
             "mergeable_root_facility_witnesses": (
                 mergeable_root_facility_witnesses
+            ),
+            "regular_fanout_array_replication_witnesses": (
+                regular_fanout_array_replication_witnesses
+            ),
+            "root_fanout_axis_dominance_witnesses": (
+                root_fanout_axis_dominance_witnesses
             ),
         },
         "detected_issues": [issue for issue in ISSUES if detected[issue]],

@@ -2543,6 +2543,8 @@ def _refine_joint_coordinates(
     *,
     eligible_vertex_ids: set[str] | None = None,
     route_clearance: float = 18.0,
+    minimum_route_bends: int = 4,
+    require_nonincreasing_length: bool = False,
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     """Accept only type-independent node/route moves that dominate globally."""
     accepted = copy.deepcopy(document)
@@ -2580,7 +2582,7 @@ def _refine_joint_coordinates(
             incident[edge.source_id].append(index)
             incident[edge.target_id].append(index)
             points = points_for(index)
-            if max(0, len(points) - 2) < 4:
+            if max(0, len(points) - 2) < minimum_route_bends:
                 continue
             axes = {
                 a[1]
@@ -2905,6 +2907,11 @@ def _refine_joint_coordinates(
                 <= accepted_report["ambiguous_overlaps"]
                 and candidate_report["crossings"] <= accepted_report["crossings"]
                 and candidate_report["bends_total"] < accepted_report["bends_total"]
+                and (
+                    not require_nonincreasing_length
+                    or candidate_report["manhattan_length"]
+                    <= accepted_report["manhattan_length"] + 1e-6
+                )
             )
             if not dominates:
                 checks = {
@@ -2916,6 +2923,11 @@ def _refine_joint_coordinates(
                     "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
                     "crossing": candidate_report["crossings"] <= accepted_report["crossings"],
                     "bend": candidate_report["bends_total"] < accepted_report["bends_total"],
+                    "length": (
+                        not require_nonincreasing_length
+                        or candidate_report["manhattan_length"]
+                        <= accepted_report["manhattan_length"] + 1e-6
+                    ),
                 }
                 blockers.update(name for name, passed in checks.items() if not passed)
                 continue
@@ -3201,6 +3213,57 @@ def _visible_facility_opening_cost(vertex, profile) -> float:
     return 2.0 * ((box.right - box.left) + (box.bottom - box.top))
 
 
+def _regular_fanout_array_roots(nodes, logical_edges) -> set[str]:
+    """Identify shared roots whose one-to-one branches form a regular array.
+
+    A regular array has at least three distinct one-input/one-output branch
+    nodes, each feeding a distinct same-kind merge with the same downstream
+    kind signature.  Such a cohort is a single logical distribution network;
+    duplicating its root into row-local glyphs destroys the shared-bus trace
+    even when it saves per-edge ink.  The rule is structural and independent
+    of component names, concrete kinds, row counts, and branch depth.
+    """
+    incoming: dict[str, list[Any]] = defaultdict(list)
+    outgoing: dict[str, list[Any]] = defaultdict(list)
+    for edge in logical_edges:
+        incoming[edge.target].append(edge)
+        outgoing[edge.source].append(edge)
+
+    result: set[str] = set()
+    for root in nodes:
+        root_edges = outgoing[root]
+        if incoming[root] or len(root_edges) < 3:
+            continue
+        children = [edge.target for edge in root_edges]
+        if len(set(children)) != len(children):
+            continue
+        child_kinds = {nodes[child].item.get("kind") for child in children}
+        if len(child_kinds) != 1:
+            continue
+        merges = []
+        valid = True
+        for child in children:
+            if len(incoming[child]) != 1 or len(outgoing[child]) != 1:
+                valid = False
+                break
+            merge = outgoing[child][0].target
+            if len(incoming[merge]) < 2:
+                valid = False
+                break
+            merges.append(merge)
+        if not valid or len(set(merges)) != len(merges):
+            continue
+        if len({nodes[merge].item.get("kind") for merge in merges}) != 1:
+            continue
+        downstream_signatures = {
+            tuple(sorted(nodes[edge.target].item.get("kind") for edge in outgoing[merge]))
+            for merge in merges
+        }
+        if len(downstream_signatures) == 1:
+            result.add(root)
+    return result
+
+
 def _replicate_dispersed_roots(
     document: LayoutDocument,
     nodes,
@@ -3251,6 +3314,7 @@ def _replicate_dispersed_roots(
     )
     max_intervening_rows = 3
     facility_costs: list[float] = []
+    regular_array_roots = _regular_fanout_array_roots(nodes, logical_edges)
 
     def edge_points(
         doc: LayoutDocument,
@@ -3277,7 +3341,11 @@ def _replicate_dispersed_roots(
         return edge, source, target, _simplify([start, *edge.waypoints, end])
 
     for root in sorted(nodes):
-        if indegree[root] or len(outgoing[root]) < 2:
+        if (
+            indegree[root]
+            or len(outgoing[root]) < 2
+            or root in regular_array_roots
+        ):
             continue
         by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
         accepted_edge_by_id = {
@@ -3516,6 +3584,7 @@ def _replicate_dispersed_roots(
             }
             if facility_costs else {"min": 0.0, "max": 0.0}
         ),
+        "source_structural_bus_roots": len(regular_array_roots),
     }
     if include_assessment:
         report["_accepted_assessment"] = accepted_report
@@ -4540,6 +4609,7 @@ def _split_root_rendering_anchors_by_local_rows(
     accepted_roots = 0
     accepted_replicas = 0
     blockers: Counter[str] = Counter()
+    regular_array_roots = _regular_fanout_array_roots(nodes, logical_edges)
 
     def metric(report: dict[str, Any]) -> tuple[float, ...]:
         return (
@@ -4552,7 +4622,11 @@ def _split_root_rendering_anchors_by_local_rows(
         )
 
     for root in sorted(nodes):
-        if indegree[root] or "layout_column" in nodes[root].item:
+        if (
+            indegree[root]
+            or "layout_column" in nodes[root].item
+            or root in regular_array_roots
+        ):
             continue
         by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
         edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
@@ -5099,9 +5173,11 @@ def _open_root_facility_corridors(
             b = (b[0], a[1])
         return _segment_hits_rect(a, b, rect)
 
+    regular_array_roots = _regular_fanout_array_roots(nodes, logical_edges)
     roots = {
         name for name in nodes
         if indegree[name] == 0 and "layout_column" not in nodes[name].item
+        and name not in regular_array_roots
     }
     anchor_ids = [
         vertex.cell_id for vertex in accepted.vertices
@@ -5765,6 +5841,35 @@ def generate_elk_layout(
         route_clearance=profile.route_clearance,
     )
     report["selection"].update(downstream_axis_report)
+    direct_root_fanins: dict[str, set[str]] = defaultdict(set)
+    for logical in logical_edges:
+        if indegree[logical.source] == 0:
+            direct_root_fanins[logical.target].add(logical.source)
+    joint_root_names = {
+        root
+        for roots in direct_root_fanins.values()
+        if len(roots) >= 4
+        for root in roots
+        if outdegree[root] > 1
+    }
+    root_vertex_ids = {
+        vertex.cell_id
+        for vertex in document.vertices
+        if (vertex.logical_name or vertex.name) in joint_root_names
+        and "layout_column" not in nodes[vertex.logical_name or vertex.name].item
+    }
+    document, root_joint_report = _refine_joint_coordinates(
+        document,
+        logical_edges,
+        eligible_vertex_ids=root_vertex_ids,
+        route_clearance=profile.route_clearance,
+        minimum_route_bends=2,
+        require_nonincreasing_length=True,
+    )
+    report["selection"].update({
+        key.replace("joint_coordinate", "root_joint_coordinate"): value
+        for key, value in root_joint_report.items()
+    })
     document, replica_report = _replicate_dispersed_roots(
         document,
         nodes,

@@ -17,6 +17,7 @@ description: 修改、评审或扩展 drawclock 自动布局算法时使用，�
    通用零入度源显示副本专项的边界、指标、反例和回退点见[源副本能力合同](references/source-replication-capability.json)。
    自由源列、逐元素统计和特性覆盖专项见[自由源与覆盖能力合同](references/free-source-coverage-capability.json)。
    当前可执行的特性、风险交互、场景、Oracle 与故障注入映射见[布局特性覆盖账本](references/layout-feature-coverage.json)。
+   从单一反馈推导精确复现、相邻组合和根因指标时，先使用用户级“举一反三” Skill；本项目的规则数组共享总线与多目标根轴指标见[举一反三能力合同](references/case-generalization-capability.json)。
    用户反馈的自然红灯、跨问题语料和独立最终 SVG 统计见[多对多复现与几何 Oracle](references/feedback-reproduction-and-geometry-oracle.md)。
 6. 选型或继续研究时查看[工具与资料](references/tools-and-sources.md)。
 

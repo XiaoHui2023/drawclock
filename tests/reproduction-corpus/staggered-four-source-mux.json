@@ -1,0 +1,25 @@
+{
+  "source_0": {"kind": "source"},
+  "source_0_gate": {"kind": "gate", "source": "source_0"},
+  "source_0_div": {"kind": "div", "source": "source_0_gate"},
+  "source_0_cell": {"kind": "cell", "source": "source_0_div"},
+  "source_0_clock": {"kind": "clock", "source": "source_0_cell"},
+  "source_1": {"kind": "source"},
+  "source_1_gate": {"kind": "gate", "source": "source_1"},
+  "source_1_div": {"kind": "div", "source": "source_1_gate"},
+  "source_1_clock": {"kind": "clock", "source": "source_1_div"},
+  "source_2": {"kind": "source"},
+  "source_2_gate": {"kind": "gate", "source": "source_2"},
+  "source_2_clock": {"kind": "clock", "source": "source_2_gate"},
+  "source_3": {"kind": "source"},
+  "mux": {
+    "kind": "mux4",
+    "source": {
+      "0": "source_0",
+      "1": "source_1",
+      "2": "source_2",
+      "3": "source_3"
+    }
+  },
+  "clock": {"kind": "clock", "source": "mux"}
+}

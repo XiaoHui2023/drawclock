@@ -277,6 +277,50 @@
           "asset_sha256": "C53BDDB2E1BF58B4B5313DFC831ABEB4E19165DFF4694E7C947C8FD536EE746D"
         }
       }
+    },
+    {
+      "id": "FB-ROOT-016",
+      "summary": "唯一公共 from 经每路独立 gate 进入 mux、与更深私人链汇聚时公共分发线碎裂或失去总线形态",
+      "expected": "唯一公共 from 分别连接每一路独立 gate_i，再由 gate_i 进入对应 mux_i；每个私人 from_i 经各自 private_gate_i 和 div_i 后进入同一 mux_i。公共 from 的同一输出端口必须形成可追踪的共享纵向分发主干；两侧链深和可行列不同不得成为公共线路碎裂、复制或外绕的理由",
+      "actual": "用户指出精确结构是每一路公共 from→gate_i→mux_i，gate_i 与 mux_i 一样按路独立，只有公共 from 唯一；私人路径为 from_i→gate_i→div_i→mux_i。旧的同深 from→mux2→clock 和单个公共 gate 扇出输入都未覆盖该组合",
+      "status": "fixed_verified",
+      "owner_paths": ["src/**"],
+      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
+      "baseline_revision": "d686d74eb5c4d26cd23afa8e9c90c969f2345818",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/asymmetric-depth-common-private-mux.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/asymmetric-depth-common-private-mux.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-016", "--input", "{project}/tests/reproduction-corpus/asymmetric-depth-common-private-mux.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "公开 CLI 原始 SVG 在精确异深度拓扑中把唯一公共 from 输出网络拆成多个设施或多条纵向主干，或产生被单一共享主干严格支配的外绕",
+      "reproduction_does_not_prove": "所有不同深度路径必须让根节点同列，也不证明远距消费簇不得按完整质量向量拆分",
+      "reproduction_attempts": [
+        {"attempted_at": "2026-09-07T09:31:00+08:00", "hypothesis": "一个公共 from 经单个公共 gate 后扇出到多个 mux 可代表用户所述异深度数组。", "method": "以公开 schema 建立单个 common_gate 扇出输入，通过当前和冻结 41a5e596 的公开 CLI 生成 SVG 并读取独立几何统计。", "result": "reproduction_blocked", "observed": "输入只有一个公共 gate；用户随后明确每一路都应有独立 gate_i，只有公共 from 唯一。", "analysis": "虽然该输入产生公共 gate 网络交叉，但控制语义不匹配，不能作为本问题证据。", "why_not_reproduced": "公共侧 gate 的实例数量错误，没有到达精确拓扑。", "evidence": "work/fb-016-017-current-baseline/depth.svg", "next_condition": "改为唯一 common_from 分别连接 common_gate_00..05，再让每个 gate_i 进入对应 mux_i。"},
+        {"attempted_at": "2026-09-07T09:38:00+08:00", "hypothesis": "唯一公共 from→逐路 gate_i→mux_i 与私人 from_i→gate_i→div_i→mux_i 的异深度数组会使设施成本策略把公共根复制到每行。", "method": "精确输入经当前公开 CLI 与冻结 41a5e596 公开 CLI 各独立运行两次；通用只读统计完整绑定 37 个节点和 36 条边，读取公共根副本与路由锚点。", "result": "reproduction_blocked", "observed": "当前与冻结四次结果确定一致，SVG SHA-256 均为 4B364ACD...B7B3B4；common_from 有 6 个渲染副本和 6 个锚点，6 条公共边均为独立直线，纵向总线不存在，0 交叉、0 异网重叠。", "analysis": "精确症状已自然出现；仍需新增直接判定结构规则与单总线反例的独立 Oracle，正式双跑收据签发前不升级为 reproduced。", "why_not_reproduced": "当时尚无经正反校准的结构 Oracle 和绑定发布提交的正式双跑收据，原始统计不能单独升级问题状态。", "evidence": "tests/reproduction-corpus/asymmetric-depth-common-private-mux.json; work/fb-016-017-current-baseline/depth-exact-1.svg; work/fb-016-017-baseline-41a5e596/depth-exact-1.svg", "next_condition": "建立规则数组 fanout cohort Oracle，证明六副本被拒绝、单设施纵干线被接受，再由冻结 d686d74 正式双跑签名。"},
+        {"attempted_at": "2026-09-07T09:58:00+08:00", "hypothesis": "结构 Oracle 正反校准后，发布提交 d686d74 的公开 CLI 双跑可正式证明公共根规则数组碎片化。", "method": "运行完整 many-to-many 冻结语料；目标输入由发布提交公开入口独立生成两次，独立 Oracle 按拓扑同构、分支深度与物理设施直接判定。", "result": "reproduced", "observed": "批次 20260907T014732Z-ff0a4ce1 中两次均检出 FB-ROOT-016；每次 37 个逻辑节点、42 个显示节点、36 条边、0 交叉、0 异网重叠、0 折点，missing_issues=[]。", "analysis": "算法把逐边短直线与根设施复制成本作局部权衡，却未识别规则数组中公共网络的共享总线语义；因此以六个副本换取零折点，视觉结构反而退化。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-016.json", "next_condition": "solve 门通过后，以结构 cohort 和共享线段成本约束根设施分区，同时保留远距非规则消费域可拆分。"}
+      ],
+      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-016.json",
+      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-016.json"}
+    },
+    {
+      "id": "FB-BEND-017",
+      "summary": "四个错列 source 直接进入同一 mux 时部分入边出现可避免的额外折点",
+      "expected": "四个 source 均直接连接同一多输入 mux 时，分层和坐标阶段应联合选择可行 source 列与行；若某条入边存在保持端口、碰撞、重叠、交叉和其它共享网络不退化的更少折点方案，最终路线必须采用该方案",
+      "actual": "用户指出四个 source 虽都直接连接 mux，但 source 不全在同一列时，部分 source 到 mux 的线路会出现多余拐点；现有固定端点路线 Oracle 和同列样例不足以覆盖坐标与路由联合问题",
+      "status": "fixed_verified",
+      "owner_paths": ["src/**"],
+      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
+      "baseline_revision": "d686d74eb5c4d26cd23afa8e9c90c969f2345818",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/staggered-four-source-mux.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/staggered-four-source-mux.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-017", "--input", "{project}/tests/reproduction-corpus/staggered-four-source-mux.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "公开 CLI 原始 SVG 中四条 source→mux 直连入边至少一条存在经完整节点坐标与正交路线反事实严格支配的额外折点",
+      "reproduction_does_not_prove": "所有错列 source 都应强制同列；真实器件、标签、端口或其它扇出造成的必要绕障仍可保留",
+      "reproduction_attempts": [
+        {"attempted_at": "2026-09-07T09:31:00+08:00", "hypothesis": "四个带不同 layout_column 的 source 直接进入 mux4 会自然产生额外折点。", "method": "公开 CLI 生成三列 source→mux4 最小图，独立统计逐边航点。", "result": "not_reproduced", "observed": "四条 source→mux 入边均为 0 折点、0 交叉、0 异网重叠。", "analysis": "错列本身不是充分条件；固定端口轴与不同 x 列完全兼容直线连接。", "why_not_reproduced": "每个 source 都能在自身列与对应 mux 端口同轴。", "evidence": "work/fb-016-017-current-baseline/sources.svg", "next_condition": "保持四条 source→mux 直接边，使用不同合法辅助链深自然约束 source 的列与纵向设施位置。"},
+        {"attempted_at": "2026-09-07T09:34:00+08:00", "hypothesis": "四个 source 同时直入 mux4、并由不同深度辅助下游链自然形成不同可行列时，中间化 source 纵坐标会让两条扇出边都折弯。", "method": "当前与冻结 41a5e596 公开 CLI 各双跑；独立统计绑定全部 15 个逻辑节点、14 条边和 source→mux 精确端口。", "result": "reproduction_blocked", "observed": "四次 SVG 均确定一致为 3C95AC79...A0EEC2；source_0/source_1/source_2/source_3 位于不同自然列，source_2→mux 输入 2 为 2 折点、0 交叉，其另一条出边也为 2 折点，source_2 网络合计 4 折点。", "analysis": "把单个 source_2 设施移动到任一消费者端口轴可让一条边直连、另一条保持两折点，总折点 4→2且纵向跨度不变；现有 Oracle 只处理单出边根，尚不能签发直接 witness。", "why_not_reproduced": "当时 Oracle 只评估单出边根，不能证明移动设施后其它出边及全图质量不退化，也没有发布提交的正式双跑收据。", "evidence": "tests/reproduction-corpus/staggered-four-source-mux.json; work/fb-016-017-current-baseline/sources-natural.svg; work/fb-016-017-baseline-41a5e596/staggered-four-source-mux-1.svg", "next_condition": "新增单设施多目标根的坐标—路由联合支配 Oracle，使用显式错列零折点图作干净反例，再由冻结 d686d74 正式双跑签名。"},
+        {"attempted_at": "2026-09-07T09:58:00+08:00", "hypothesis": "联合移动完整根设施并重路由其全部出边，可以在不牺牲长度与硬几何质量时直接证明中间轴坐标被消费端口轴严格支配。", "method": "运行完整冻结语料；发布提交 d686d74 对自然错列输入公开双跑，独立 Oracle 枚举消费者端口轴并检查节点、线路障碍、交叉、异网重叠、长度和总折点。", "result": "reproduced", "observed": "批次 20260907T014732Z-ff0a4ce1 两次均检出 FB-BEND-017；每次 15 个逻辑节点、17 个显示节点、14 条边、0 交叉、0 异网重叠、4 折点，missing_issues=[]。", "analysis": "根纵坐标使用偶数目标的中间值，落在两个消费者轴之间；L1 长度虽最优但没有把候选坐标限制到端口轴，也没有以同长度下折点更少作次级目标。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-017.json", "next_condition": "solve 门通过后，为多目标根枚举真实消费者轴并按硬门、交叉/重叠、折点、共享长度的词典序统一验收。"}
+      ],
+      "reproduction_receipt": ".reproduction/receipts/FB-BEND-017.json",
+      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-BEND-017.json"}
     }
   ],
   "process_incidents": [

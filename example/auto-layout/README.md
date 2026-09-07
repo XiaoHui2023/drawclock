@@ -36,6 +36,8 @@ python src `
 | 反馈综合回归 | `26-feedback-reproduction-combined.json` | 公共根、低复用根、端口顺序、交叉区段与折点的综合质量场景 |
 | 交替公共主干 | `27-interleaved-common-root-mux3.json` | 一个公共根与六个私有 `from` 分别接入六个稀疏连接的 `mux3`（输入 2 空置），每组继续 `cell→clock`；公共根保持一个图形和一条纵向主干 |
 | 公共 `from` 复用数组 | `28-common-private-from-mux-clock-array.json` | 一个公共 `from` 与六个私人 `from` 分别接入六个 `mux2`，每个 mux 直接连接一路 clock；公共 `from` 使用一个图形和一条纵向总线 |
+| 异深公共总线数组 | `29-asymmetric-depth-common-private-mux-array.json` | 唯一公共 `from` 分别经六个逐路 gate 进入 mux；私人侧逐路经 gate、div 再进入同一 mux，公共侧仍保持一个图形和一条纵向总线 |
+| 错列四源直入 mux | `30-staggered-four-source-mux.json` | 四个自然位于不同列的 source 直接进入一个 `mux4`；带第二消费者的 source 与所有 mux 入边不保留可支配折点 |
 
 代表性复杂示例包含少量晶振和 PLL、复用的 mux、分频器、gate、多类 clock cell 和末端 clock。13 至 14 改变连接顺序、链深、复用源和实例名，不只是放大同一种阵列。坐标由输入连接关系以及当前器件库的尺寸、标签和端口一次计算得到，不进行成图后的坐标校准。
 

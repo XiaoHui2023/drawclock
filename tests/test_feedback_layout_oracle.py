@@ -608,6 +608,233 @@ def test_common_private_from_mux_clock_array_uses_one_vertical_bus(
     assert "FB-ROOT-015" not in report["detected_issues"]
 
 
+def test_exact_asymmetric_depth_array_uses_one_common_vertical_bus(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "tests/reproduction-corpus/asymmetric-depth-common-private-mux.json"
+    output = tmp_path / "asymmetric-depth.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    common_edges = [
+        edge for edge in report["edges"] if edge["source"] == "common_from"
+    ]
+    vertical_channels = {
+        start[0]
+        for edge in common_edges
+        for start, end in zip(edge["points"], edge["points"][1:])
+        if abs(start[0] - end[0]) <= 0.01
+        and abs(start[1] - end[1]) > 0.01
+    }
+    assert len(common_edges) == 6
+    assert report["roots"]["common_from"]["rendered_copies"] == 1
+    assert report["networks"]["common_from:right"]["rendering_anchors"] == 1
+    assert len(vertical_channels) == 1
+    assert report["witnesses"]["regular_fanout_array_replication_witnesses"] == []
+    assert "FB-ROOT-016" not in report["detected_issues"]
+
+
+def test_same_depth_common_from_array_is_not_asymmetric_array_failure(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example/auto-layout/28-common-private-from-mux-clock-array.json"
+    output = tmp_path / "same-depth.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["witnesses"]["regular_fanout_array_replication_witnesses"] == []
+    assert "FB-ROOT-016" not in report["detected_issues"]
+
+
+def test_staggered_four_source_mux_removes_joint_axis_bend(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "tests/reproduction-corpus/staggered-four-source-mux.json"
+    output = tmp_path / "staggered-source.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    direct = [edge for edge in report["edges"] if edge["target"] == "mux"]
+    assert len(direct) == 4
+    assert len({edge["points"][0][0] for edge in direct}) >= 2
+    assert all(edge["bends"] == 0 for edge in direct)
+    assert report["networks"]["source_2:right"]["bends_total"] == 2
+    assert report["witnesses"]["root_fanout_axis_dominance_witnesses"] == []
+    assert "FB-BEND-017" not in report["detected_issues"]
+
+
+def test_staggered_four_source_mux_accepts_clean_different_columns(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "tests/fixtures/staggered-four-source-mux-clean.json"
+    output = tmp_path / "staggered-source-clean.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    direct = [edge for edge in report["edges"] if edge["target"] == "mux"]
+    assert len(direct) == 4
+    assert all(edge["bends"] == 0 for edge in direct)
+    assert report["witnesses"]["root_fanout_axis_dominance_witnesses"] == []
+    assert "FB-BEND-017" not in report["detected_issues"]
+
+
+@pytest.mark.parametrize(
+    ("rows", "private_extra_depth", "reverse_declaration"),
+    [(3, 0, False), (4, 1, True), (6, 0, True), (8, 1, False)],
+)
+def test_regular_common_array_generalizes_across_depth_size_and_order(
+    tmp_path: Path,
+    rows: int,
+    private_extra_depth: int,
+    reverse_declaration: bool,
+) -> None:
+    config: dict[str, dict[str, object]] = {"shared": {"kind": "from"}}
+    for index in range(rows):
+        suffix = f"{index:02d}"
+        config[f"public_stage_{suffix}"] = {
+            "kind": "gate", "source": "shared",
+        }
+        config[f"private_{suffix}"] = {"kind": "from"}
+        config[f"private_stage_{suffix}"] = {
+            "kind": "gate", "source": f"private_{suffix}",
+        }
+        private_parent = f"private_stage_{suffix}"
+        if private_extra_depth:
+            config[f"private_extra_{suffix}"] = {
+                "kind": "div", "source": private_parent,
+            }
+            private_parent = f"private_extra_{suffix}"
+        config[f"merge_{suffix}"] = {
+            "kind": "mux2",
+            "source": {"0": f"public_stage_{suffix}", "1": private_parent},
+        }
+        config[f"sink_{suffix}"] = {
+            "kind": "clock", "source": f"merge_{suffix}",
+        }
+    if reverse_declaration:
+        config = dict(reversed(config.items()))
+    input_path = tmp_path / "array.json"
+    output = tmp_path / "array.svg"
+    input_path.write_text(json.dumps(config), encoding="utf-8")
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    common_edges = [edge for edge in report["edges"] if edge["source"] == "shared"]
+    vertical_channels = {
+        start[0]
+        for edge in common_edges
+        for start, end in zip(edge["points"], edge["points"][1:])
+        if abs(start[0] - end[0]) <= 0.01
+        and abs(start[1] - end[1]) > 0.01
+    }
+    assert report["roots"]["shared"]["rendered_copies"] == 1
+    assert len(common_edges) == rows
+    assert len(vertical_channels) == 1
+
+
+@pytest.mark.parametrize(
+    "mux_sources",
+    [
+        {"0": "source_0", "1": "source_1", "2": "source_2", "3": "source_3"},
+        {"0": "source_2", "1": "source_1", "2": "source_0", "3": "source_3"},
+    ],
+)
+def test_staggered_mux_generalizes_across_order_and_port_permutation(
+    tmp_path: Path, mux_sources: dict[str, str],
+) -> None:
+    source_path = ROOT / "tests/reproduction-corpus/staggered-four-source-mux.json"
+    config = json.loads(source_path.read_text(encoding="utf-8"))
+    config["mux"]["source"] = mux_sources
+    config = dict(reversed(config.items()))
+    input_path = tmp_path / "permuted.json"
+    output = tmp_path / "permuted.svg"
+    input_path.write_text(json.dumps(config), encoding="utf-8")
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    direct = [edge for edge in report["edges"] if edge["target"] == "mux"]
+    assert len(direct) == 4
+    assert len({edge["points"][0][0] for edge in direct}) >= 2
+    assert all(edge["bends"] == 0 for edge in direct)
+    assert report["witnesses"]["root_fanout_axis_dominance_witnesses"] == []
+
+
+def test_two_regular_common_domains_remain_separate_single_bus_networks(
+    tmp_path: Path,
+) -> None:
+    config: dict[str, dict[str, object]] = {}
+    for domain in ("alpha", "beta"):
+        config[f"{domain}_shared"] = {"kind": "from"}
+        for index in range(3):
+            suffix = f"{domain}_{index}"
+            config[f"public_{suffix}"] = {
+                "kind": "gate", "source": f"{domain}_shared",
+            }
+            config[f"private_{suffix}"] = {"kind": "from"}
+            config[f"private_gate_{suffix}"] = {
+                "kind": "gate", "source": f"private_{suffix}",
+            }
+            config[f"merge_{suffix}"] = {
+                "kind": "mux2",
+                "source": {
+                    "0": f"public_{suffix}",
+                    "1": f"private_gate_{suffix}",
+                },
+            }
+            config[f"sink_{suffix}"] = {
+                "kind": "clock", "source": f"merge_{suffix}",
+            }
+    input_path = tmp_path / "two-domains.json"
+    output = tmp_path / "two-domains.svg"
+    input_path.write_text(json.dumps(config), encoding="utf-8")
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    channels = {}
+    for domain in ("alpha", "beta"):
+        root = f"{domain}_shared"
+        edges = [edge for edge in report["edges"] if edge["source"] == root]
+        channels[root] = {
+            start[0]
+            for edge in edges
+            for start, end in zip(edge["points"], edge["points"][1:])
+            if abs(start[0] - end[0]) <= 0.01
+            and abs(start[1] - end[1]) > 0.01
+        }
+        assert report["roots"][root]["rendered_copies"] == 1
+        assert report["networks"][f"{root}:right"]["rendering_anchors"] == 1
+        assert len(channels[root]) == 1
+    assert report["totals"]["different_net_overlaps"] == 0
+
+
 def test_single_route_root_without_crossed_trunk_is_clean_counterexample(
     tmp_path: Path,
 ) -> None:

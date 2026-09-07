@@ -14,7 +14,11 @@
     "root_column_alignment",
     "crossing_partitioned_bend",
     "adjacent_root_visible_clearance",
-    "root_facility_merge_cost"
+    "root_facility_merge_cost",
+    "regular_fanout_array",
+    "asymmetric_branch_depth",
+    "joint_root_axis_dominance",
+    "staggered_source_columns"
   ],
   "issues": [
     "FB-ROOT-001",
@@ -29,7 +33,9 @@
     "FB-ROOT-012",
     "FB-BEND-013",
     "FB-BEND-014",
-    "FB-ROOT-015"
+    "FB-ROOT-015",
+    "FB-ROOT-016",
+    "FB-BEND-017"
   ],
   "cases": [
     {
