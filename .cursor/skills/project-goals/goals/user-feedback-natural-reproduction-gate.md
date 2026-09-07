@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-09-07
 

@@ -283,7 +283,7 @@
       "summary": "唯一公共 from 经每路独立 gate 进入 mux、与更深私人链汇聚时公共分发线碎裂或失去总线形态",
       "expected": "唯一公共 from 分别连接每一路独立 gate_i，再由 gate_i 进入对应 mux_i；每个私人 from_i 经各自 private_gate_i 和 div_i 后进入同一 mux_i。公共 from 的同一输出端口必须形成可追踪的共享纵向分发主干；两侧链深和可行列不同不得成为公共线路碎裂、复制或外绕的理由",
       "actual": "用户指出精确结构是每一路公共 from→gate_i→mux_i，gate_i 与 mux_i 一样按路独立，只有公共 from 唯一；私人路径为 from_i→gate_i→div_i→mux_i。旧的同深 from→mux2→clock 和单个公共 gate 扇出输入都未覆盖该组合",
-      "status": "fixed_verified",
+      "status": "closed",
       "owner_paths": ["src/**"],
       "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
       "baseline_revision": "93568f94d37bf62b642b5cb7c499dd1fbca27113",
@@ -299,14 +299,14 @@
         {"attempted_at": "2026-09-07T12:21:30+08:00", "hypothesis": "两路边界及含不同私人深度、不同 mux 后级和额外公共消费者的复杂数组会穿透旧规则识别并再次拆散公共 from。", "method": "冻结 93568f94，使用公开 CLI 对复合合法输入独立运行两次；修正后的独立 Oracle 从合格分支子集判定物理设施数。", "result": "reproduced", "observed": "批次 20260907T042130Z-b81cdab9 两次均为 33 个逻辑节点、37 个显示节点、32 条边；唯一 shared 根形成 5 个显示设施，FB-ROOT-016 两次直接命中，SVG 哈希稳定为 040c749b...ae3b9。", "analysis": "旧生产识别器把最小三路、所有子女同 kind、merge 同 kind、下游签名相同和无额外消费者误作必要条件；任一条件变化都使后置设施 owner 重新复制公共根。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-016.json; .reproduction/receipts/recurrent-corpus.json", "next_condition": "solve 门通过后把共享数组语义改为合格分支子集，并让所有设施 owner 消费同一判定。"}
       ],
       "reproduction_receipt": ".reproduction/receipts/FB-ROOT-016.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-016.json"}
+      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-016.json", "release_verification": {"commit": "b648705dcb489a9b5667fd782752627b7a05b4c5", "run_id": 34085120202, "tag": "v1.0.0", "asset_sha256": "1876E4D9077C9F400FFB255041E7D14CF7ADF0BC6172AE2BC495602D753B2A97"}}
     },
     {
       "id": "FB-BEND-017",
       "summary": "四个错列 source 直接进入同一 mux 时部分入边出现可避免的额外折点",
       "expected": "四个 source 均直接连接同一多输入 mux 时，分层和坐标阶段应联合选择可行 source 列与行；若某条入边存在保持端口、碰撞、重叠、交叉和其它共享网络不退化的更少折点方案，最终路线必须采用该方案",
       "actual": "用户指出四个 source 虽都直接连接 mux，但 source 不全在同一列时，部分 source 到 mux 的线路会出现多余拐点；现有固定端点路线 Oracle 和同列样例不足以覆盖坐标与路由联合问题",
-      "status": "fixed_verified",
+      "status": "closed",
       "owner_paths": ["src/**"],
       "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
       "baseline_revision": "93568f94d37bf62b642b5cb7c499dd1fbca27113",
@@ -322,7 +322,7 @@
         {"attempted_at": "2026-09-07T12:21:30+08:00", "hypothesis": "显式错列与四条不同深度辅助链交互时，旧根联合坐标优化因列提示排除而再次留下可支配折点。", "method": "确定性复杂组合搜索在 seed 1 命中后冻结输入，并在 93568f94 的公开 CLI 上独立双跑；Oracle 联合平移完整根设施并重算全部出边。", "result": "reproduced", "observed": "批次 20260907T042130Z-b81cdab9 两次均为 27 节点、26 边、16 总折点；三条直入 main_mux 的边合计 8 折，source_0/source_2 各存在 4→2 且长度、交叉、重叠不退化的反事实，SVG 哈希稳定为 4e6fa23f...27f87。", "analysis": "layout_column 只约束 x 列，却被生产 owner 同时用于排除 y 轴联合优化；提示维度与优化维度错误耦合，导致显式错列场景逃逸。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-017.json; .reproduction/receipts/recurrent-corpus.json", "next_condition": "solve 门通过后保留 x 列约束，但允许完整根设施在 y 方向参与消费者轴反事实。"}
       ],
       "reproduction_receipt": ".reproduction/receipts/FB-BEND-017.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-BEND-017.json"}
+      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-BEND-017.json", "release_verification": {"commit": "b648705dcb489a9b5667fd782752627b7a05b4c5", "run_id": 34085120202, "tag": "v1.0.0", "asset_sha256": "1876E4D9077C9F400FFB255041E7D14CF7ADF0BC6172AE2BC495602D753B2A97"}}
     }
   ],
   "process_incidents": [

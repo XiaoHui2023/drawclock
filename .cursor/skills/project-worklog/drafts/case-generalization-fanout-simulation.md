@@ -1,6 +1,6 @@
-- status: active
+- status: done
 - created: 2026-09-07 10:24 +08:00
-- updated: 2026-09-07 16:14 +08:00
+- updated: 2026-09-07 16:28 +08:00
 - scene: 举一反三扇出数组模拟
 
 # 举一反三：扇出数组模拟总结草稿
@@ -32,6 +32,8 @@
 项目指标已登记到布局能力合同与覆盖账本；success/fault/boundary 三角色分别绑定当前公开 CLI、冻结双跑收据和相邻干净反例。双公共根域隔离边界要求每个逻辑网络分别一设施一纵线且异网重叠为零；两条不相交的纵线允许复用同一 x，不把坐标不同误当语义隔离。全量 467/467 通过，Windows 新鲜包与远端 Linux 回下载消费均确认 29/30 在包内、512+ 输入为 0；本草稿作为已验证模拟总结收敛。
 
 复发后的扩展结论：复杂基线覆盖公共根额外消费者、混合 gate/cell、私人链深变化、mux 后级变化以及四源三列辅助扇出。五轮递归攻击第一次在 R5 seed 018 找到后置 owner 重新制造的 017，修复后才取得连续 5 轮；全量又捕获交叉共享根误分类，并增加“逐路私有对侧根”边界。当前最终结果为 471 passed、5 skipped，Windows 包 25 个示例且无 512+；待远端发行成功后将草稿状态改为 done。
+
+远端 run `34085120202` 的反馈递归门、Ubuntu 16.04 PyInstaller/staticx、publish 与发布后回下载 frozen/source smoke 全部成功；该模拟草稿已转为完成记录。独立 Windows 主机再次下载 Linux 资产时，`Invoke-WebRequest` 长时间无响应后被主动中止，第二次 `curl --max-time 180` 在 0 字节处以 `schannel: failed to receive handshake` 退出 35；因此不把本机下载冒充成功，远端资产完整性由 GitHub digest 与 Linux CI 回下载运行证明。
 
 ## 复现尝试轮次闭环草稿
 
