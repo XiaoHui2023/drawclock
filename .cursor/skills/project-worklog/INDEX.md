@@ -2,8 +2,8 @@
 
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `drafts/case-generalization-fanout-simulation.md` | draft | active | 2026-09-07 10:24 +08:00 | 2026-09-07 10:45 +08:00 | 举一反三扇出数组模拟 | 双域边界已去除“x 必须不同”假约束，改以逻辑隔离和零异网重叠判定，待全量和发行消费。 |
-| `records/user-feedback-natural-reproduction-gate.md` | record | active | 2026-09-03 13:32 +08:00 | 2026-09-07 11:50 +08:00 | 用户反馈自然复现与防假完成门禁 | release gate 通过；聚焦命令的一处测试文件名错误已如实记录并按仓库真实路径重跑。 |
+| `drafts/case-generalization-fanout-simulation.md` | draft | done | 2026-09-07 10:24 +08:00 | 2026-09-07 11:55 +08:00 | 举一反三扇出数组模拟 | 相邻矩阵、根因指标、全量测试与双平台发行消费均已验证，模拟总结收敛。 |
+| `records/user-feedback-natural-reproduction-gate.md` | record | done | 2026-09-03 13:32 +08:00 | 2026-09-07 11:55 +08:00 | 用户反馈自然复现与防假完成门禁 | 016/017 冻结红灯、当前绿灯、全量、包消费与远端 Release 全闭环，15 项问题均关闭。 |
 | `analysis/managed-delivery-gate-invocation.md` | analysis | done | 2026-09-04 18:30 +08:00 | 2026-09-04 18:40 +08:00 | 闭环提交后的新鲜回执与 push 误阻断诊断 | 已修复绝对可执行文件路径发现崩溃，记录 Code Mode 剩余上游覆盖边界。 |
 | `analysis/user-feedback-reproduction-escape.md` | analysis | active | 2026-09-03 13:32 +08:00 | 2026-09-03 16:24 +08:00 | 人工故障冒充复现与声明逃逸根因 | 六项触发结构、直接观测、未命中反例和 current/06c 版本边界已归纳。 |
 | `records/free-source-coverage-observability.md` | record | active | 2026-09-02 14:42 +08:00 | 2026-09-03 12:42 +08:00 | 自由源分层、逐节点/逐边统计与特性覆盖闭环 | split-rejoin 双基线与 407 项全量门通过，准备补充上传并重发。 |

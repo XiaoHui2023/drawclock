@@ -11,9 +11,9 @@
 - 独立 Oracle 新增 `root_facility_split_witnesses` 与 `physical_anchor_relocation_witnesses`，判定只读取最终 SVG、逻辑零入度、物理端点归属和几何，不读取器件 kind、实例名、样例号或生产布局模块。正式双跑收据尚未签发。
 - Oracle 测试增加当前公开入口的两项自然红灯与一个同样含零入度根但无跨干线/无设施拆分收益的干净反例；测试产物只用于检测器校准，正式复现仍必须由冻结 revision 双跑收据授权。
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-07 11:50 +08:00
+- updated: 2026-09-07 11:55 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
@@ -585,3 +585,7 @@
 - 草稿四字段修正后，第三次在全新目录解包成功。包内 7 个项目 Skill 校验、冻结 draw 工作流及临时空 venv 的 `python -I -S` 隔离源码部署全部通过；Windows 短路径到真实用户路径的 venv 提示未影响执行。随后尝试生成包内 29/30 时，实时记录门在写入前再次阻止，因为刚完成的解包/消费结果尚未先写本记录；现已补记，下一次只执行剩余示例验收。
 - 新鲜解压包内的冻结二进制已分别生成公开示例 29/30，并由包外独立反馈 Oracle 回验：29 输出 SHA256 为 `70D77915CCCF3547AF26110E498EBB205E45E571F4BFFC57CEB8C48EAF052150`，30 为 `B36D8045F972455305715CC96259EA3494184299E5A412D6502A069D72699450`，两项目标症状均未观察到。包内自动布局 JSON 共 25 个，含 512/1024/2048/4096 的高压力示例为 0；两个 Oracle 退出码均为 1，按工具约定表示所选症状不存在。下一步执行提交与远端发行闭环。
 - 提交前 release gate 再验通过 15 个问题。随后一条聚焦 pytest 命令因误写不存在的 `tests/test_layout_coverage_manifest.py` 立即返回“file or directory not found”，0 项执行；这不是产品失败，也未被计为通过。已用 `rg --files` 找到实际文件名 `test_layout_feature_coverage.py`、`test_feedback_reproduction_corpus.py` 和 `test_feedback_reproduction_gate.py`，下一步按真实路径重跑。
+- 真实路径聚焦重跑 73/73 通过；prospective tree `1c64d49cdbd73341761ed3222904bcd271a019fd` 经一次性受控 managed Hook 新鲜回执精确绑定后提交为 `59fee21d287d282133e5fe5c918463fb60ae32f5`，同样经受控回执推送，远端同步为 0/0。
+- 本机缺少 `gh`，PowerShell 返回 “The term 'gh' is not recognized”；未静默跳过监控，按发布 skill 降级到 GitHub 官方 REST API。run `34076329108` 的反馈门、Ubuntu 16.04 PyInstaller/staticx 和 Publish 三个 job 全部 success。
+- `v1.0.0` 为 annotated tag，解引用后精确指向 `59fee21d287d282133e5fe5c918463fb60ae32f5`。公开资产大小 17,166,058 bytes，GitHub digest 与本机重新下载 SHA-256 均为 `48C56C1BE94C22B8F2B5D6863A5FFBC1F77A03A338D391AF5F9E644A640D5B27`；解压共 150 个文件、25 个自动布局 JSON，29/30 均存在且 512/1024/2048/4096 为 0。CI 的 publish job 已对公开下载资产重新执行 frozen/source smoke；本机 Windows 只做异平台结构与摘要审计，不冒充 Linux 宿主运行。
+- 016/017 均由冻结红灯、当前绿灯、相邻矩阵、全量测试、本地 Windows 包、远端 Linux CI 与公开回下载闭环后进入 `closed`；本记录完成。

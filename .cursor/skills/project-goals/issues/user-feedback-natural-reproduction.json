@@ -283,7 +283,7 @@
       "summary": "唯一公共 from 经每路独立 gate 进入 mux、与更深私人链汇聚时公共分发线碎裂或失去总线形态",
       "expected": "唯一公共 from 分别连接每一路独立 gate_i，再由 gate_i 进入对应 mux_i；每个私人 from_i 经各自 private_gate_i 和 div_i 后进入同一 mux_i。公共 from 的同一输出端口必须形成可追踪的共享纵向分发主干；两侧链深和可行列不同不得成为公共线路碎裂、复制或外绕的理由",
       "actual": "用户指出精确结构是每一路公共 from→gate_i→mux_i，gate_i 与 mux_i 一样按路独立，只有公共 from 唯一；私人路径为 from_i→gate_i→div_i→mux_i。旧的同深 from→mux2→clock 和单个公共 gate 扇出输入都未覆盖该组合",
-      "status": "fixed_verified",
+      "status": "closed",
       "owner_paths": ["src/**"],
       "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
       "baseline_revision": "d686d74eb5c4d26cd23afa8e9c90c969f2345818",
@@ -298,14 +298,14 @@
         {"attempted_at": "2026-09-07T09:58:00+08:00", "hypothesis": "结构 Oracle 正反校准后，发布提交 d686d74 的公开 CLI 双跑可正式证明公共根规则数组碎片化。", "method": "运行完整 many-to-many 冻结语料；目标输入由发布提交公开入口独立生成两次，独立 Oracle 按拓扑同构、分支深度与物理设施直接判定。", "result": "reproduced", "observed": "批次 20260907T014732Z-ff0a4ce1 中两次均检出 FB-ROOT-016；每次 37 个逻辑节点、42 个显示节点、36 条边、0 交叉、0 异网重叠、0 折点，missing_issues=[]。", "analysis": "算法把逐边短直线与根设施复制成本作局部权衡，却未识别规则数组中公共网络的共享总线语义；因此以六个副本换取零折点，视觉结构反而退化。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-016.json", "next_condition": "solve 门通过后，以结构 cohort 和共享线段成本约束根设施分区，同时保留远距非规则消费域可拆分。"}
       ],
       "reproduction_receipt": ".reproduction/receipts/FB-ROOT-016.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-016.json"}
+      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-016.json", "release_verification": {"commit": "59fee21d287d282133e5fe5c918463fb60ae32f5", "run_id": 34076329108, "tag": "v1.0.0", "asset_sha256": "48C56C1BE94C22B8F2B5D6863A5FFBC1F77A03A338D391AF5F9E644A640D5B27"}}
     },
     {
       "id": "FB-BEND-017",
       "summary": "四个错列 source 直接进入同一 mux 时部分入边出现可避免的额外折点",
       "expected": "四个 source 均直接连接同一多输入 mux 时，分层和坐标阶段应联合选择可行 source 列与行；若某条入边存在保持端口、碰撞、重叠、交叉和其它共享网络不退化的更少折点方案，最终路线必须采用该方案",
       "actual": "用户指出四个 source 虽都直接连接 mux，但 source 不全在同一列时，部分 source 到 mux 的线路会出现多余拐点；现有固定端点路线 Oracle 和同列样例不足以覆盖坐标与路由联合问题",
-      "status": "fixed_verified",
+      "status": "closed",
       "owner_paths": ["src/**"],
       "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
       "baseline_revision": "d686d74eb5c4d26cd23afa8e9c90c969f2345818",
@@ -320,7 +320,7 @@
         {"attempted_at": "2026-09-07T09:58:00+08:00", "hypothesis": "联合移动完整根设施并重路由其全部出边，可以在不牺牲长度与硬几何质量时直接证明中间轴坐标被消费端口轴严格支配。", "method": "运行完整冻结语料；发布提交 d686d74 对自然错列输入公开双跑，独立 Oracle 枚举消费者端口轴并检查节点、线路障碍、交叉、异网重叠、长度和总折点。", "result": "reproduced", "observed": "批次 20260907T014732Z-ff0a4ce1 两次均检出 FB-BEND-017；每次 15 个逻辑节点、17 个显示节点、14 条边、0 交叉、0 异网重叠、4 折点，missing_issues=[]。", "analysis": "根纵坐标使用偶数目标的中间值，落在两个消费者轴之间；L1 长度虽最优但没有把候选坐标限制到端口轴，也没有以同长度下折点更少作次级目标。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-017.json", "next_condition": "solve 门通过后，为多目标根枚举真实消费者轴并按硬门、交叉/重叠、折点、共享长度的词典序统一验收。"}
       ],
       "reproduction_receipt": ".reproduction/receipts/FB-BEND-017.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-BEND-017.json"}
+      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-BEND-017.json", "release_verification": {"commit": "59fee21d287d282133e5fe5c918463fb60ae32f5", "run_id": 34076329108, "tag": "v1.0.0", "asset_sha256": "48C56C1BE94C22B8F2B5D6863A5FFBC1F77A03A338D391AF5F9E644A640D5B27"}}
     }
   ],
   "process_incidents": [
