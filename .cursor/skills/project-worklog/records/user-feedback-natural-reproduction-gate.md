@@ -1,8 +1,8 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 12:00 +08:00
+- updated: 2026-09-08 12:10 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 2026-09-03：两项布局逃逸重新打开
@@ -736,3 +736,4 @@
 - 11:53 项目 checker 已将 reproduction 语义血缘要求收窄为仅对显式声明 required variants 的合同生效；新 fix runner 收据仍统一绑定语义脚本，旧 14 项自然红证据不被追溯改写。下一步把本轮 reproduction/fix 原始证据明确加入 Git 依赖闭包，再在干净可发布状态复验。
 - 11:57 本轮 reproduction/fix 原始证据强制纳入 Git 闭包后，release gate 16/16 PASS；全量 pytest 从头运行 496/496 PASS（68.91s），包含新增语义反作弊与攻击收据 mutant。继续执行全公开图与交付门，当前绿灯不替代后续门。
 - 12:00 全公开 SVG 新鲜生成门 27/27 PASS。正式红/绿证据各渲染公共 from 与直连 from→mux 结果图并目视复核；Edge headless 四次均写出非零 PNG，但 stderr 有 WSALookupServiceBegin 10108、QQBrowser 路径和账户图片获取告警，均不影响本地 SVG/PNG。用户根 `agent-quality-workflow` 与 `case-generalization` 已沉淀 per-case 确定性、语义 variant exact-set、coverage_failed 与三类新 mutant，两项 quick_validate 均 PASS。
+- 12:10 commit `35079e85d8532a922106aab01476bf27ed0c6520` 已推送 main；Release run `34184391740` 的反馈门、Ubuntu 16.04 PyInstaller/staticx、publish 与公开资产下载后 smoke 全部 success，`v1.0.0^{}` 指向该 commit。首次本地下载在 162,573 bytes 处 `curl (56)` 断流并产生截断归档，未计通过；断点有限重试成功取得 17,181,869-byte 资产，SHA-256 `abdb07ba...e8c72d` 与 GitHub digest 一致，177 条清单含 executable、src 与 drawio-lib。任务记录闭合；本条最终记录提交仍由同一滚动 workflow 再覆盖 tag。
