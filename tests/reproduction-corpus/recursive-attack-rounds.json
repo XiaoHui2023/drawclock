@@ -3,27 +3,33 @@
   "campaign_name": "defect-driven-adversarial-regression-loop",
   "risk_class": "high",
   "issues": ["FB-ROUTE-002", "FB-ROOT-003", "FB-ROOT-016", "FB-BEND-017", "FB-ROOT-020"],
+  "required_semantic_variants": [
+    "direct-from-column-clean",
+    "direct-source-column-clean",
+    "public-from-tree-clean"
+  ],
   "required_consecutive_clean_rounds": 7,
   "rounds": [
     {
       "id": "R1-exact-and-recurrent",
       "strategy": "frozen_exact_regression",
       "fixtures": [
-        "tests/reproduction-corpus/pad-r08-s00.json",
+        "tests/reproduction-corpus/pad-r08-s02.json",
         "example/auto-layout/25-mixed-root-port-order-torture.json",
         "tests/reproduction-corpus/asymmetric-depth-common-private-mux.json",
         "tests/reproduction-corpus/recurrent-two-row-common-private-mux.json",
         "tests/reproduction-corpus/recurrent-mixed-depth-downstream-array.json",
         "tests/reproduction-corpus/staggered-four-source-mux.json",
         "tests/reproduction-corpus/recurrent-staggered-four-source-bend.json",
-        "example/auto-layout/30-staggered-four-source-mux.json"
+        "example/auto-layout/30-staggered-four-source-mux.json",
+        "tests/reproduction-corpus/staggered-four-from-mux.json"
       ]
     },
     {
       "id": "R2-declaration-order",
       "strategy": "reverse_declaration_metamorphism",
       "fixtures": [
-        "tests/reproduction-corpus/pad-r08-s00.json",
+        "tests/reproduction-corpus/pad-r08-s02.json",
         "example/auto-layout/25-mixed-root-port-order-torture.json",
         "tests/reproduction-corpus/recurrent-two-row-common-private-mux.json",
         "tests/reproduction-corpus/recurrent-mixed-depth-downstream-array.json",
@@ -35,7 +41,7 @@
       "id": "R3-structural-renaming",
       "strategy": "whole_graph_rename_metamorphism",
       "fixtures": [
-        "tests/reproduction-corpus/pad-r08-s00.json",
+        "tests/reproduction-corpus/pad-r08-s02.json",
         "example/auto-layout/30-staggered-four-source-mux.json",
         "tests/reproduction-corpus/recurrent-mixed-depth-downstream-array.json",
         "tests/reproduction-corpus/recurrent-staggered-four-source-bend.json"

@@ -21,6 +21,7 @@ from search_recurrent_mux_bends import build_case as build_mux_case
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST = ROOT / "tests/reproduction-corpus/recursive-attack-rounds.json"
 ORACLE = ROOT / "tools/feedback_layout_reproduction_oracle.py"
+SEMANTICS = ROOT / "tools/reproduction_semantics.py"
 RISK_MINIMUM_ROUNDS = {"low": 3, "medium": 5, "high": 7, "critical": 9}
 
 
@@ -83,6 +84,41 @@ def build_bus_case(rows: int) -> dict[str, dict[str, object]]:
     return config
 
 
+def semantic_variants(config: dict[str, Any]) -> set[str]:
+    """Classify topology coverage independently of layout output."""
+    children: dict[str, list[str]] = {}
+    for target, item in config.items():
+        source = item.get("source")
+        values = ([source] if isinstance(source, str) else
+                  list(source.values()) if isinstance(source, dict) else [])
+        for value in values:
+            children.setdefault(str(value).split("[", 1)[0], []).append(target)
+    variants = {
+        "public-from-tree-clean"
+        for name, item in config.items()
+        if item.get("kind") == "from" and len(children.get(name, [])) >= 2
+    }
+    for item in config.values():
+        source = item.get("source")
+        if (not str(item.get("kind", "")).startswith("mux")
+                or not isinstance(source, dict) or len(source) < 4):
+            continue
+        roots = [config.get(str(value).split("[", 1)[0], {})
+                 for value in source.values()]
+        if roots and all(root.get("kind") == "source" for root in roots):
+            variants.add("direct-source-column-clean")
+        if roots and all(root.get("kind") == "from" for root in roots):
+            variants.add("direct-from-column-clean")
+    return variants
+
+
+def mux_case(seed: int, root_kind: str) -> dict[str, Any]:
+    config = build_mux_case(seed)
+    for index in range(4):
+        config[f"source_{index}"]["kind"] = root_kind
+    return config
+
+
 def case_configs(round_spec: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]:
     result = []
     for relative in round_spec.get("fixtures", []):
@@ -95,7 +131,9 @@ def case_configs(round_spec: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]
         result.append((Path(relative).stem, config))
     generator = round_spec.get("generator")
     if generator in {"mux", "mixed"}:
-        result.extend((f"mux-seed-{seed:03d}", build_mux_case(seed)) for seed in round_spec["seeds"])
+        for seed in round_spec["seeds"]:
+            result.append((f"mux-source-seed-{seed:03d}", mux_case(seed, "source")))
+            result.append((f"mux-from-seed-{seed:03d}", mux_case(seed, "from")))
     if generator == "mixed":
         result.extend((f"bus-rows-{rows:02d}", build_bus_case(rows)) for rows in round_spec["bus_rows"])
     return result
@@ -125,6 +163,8 @@ def main() -> int:
     completed_rounds = []
     consecutive_clean = 0
     target_issues = set(manifest["issues"])
+    required_variants = set(manifest["required_semantic_variants"])
+    covered_variants: set[str] = set()
     for round_spec in manifest["rounds"]:
         round_results = []
         for case_id, config in case_configs(round_spec):
@@ -142,6 +182,8 @@ def main() -> int:
             report = analyze(input_path, svg_path)
             after = sha(svg_path)
             observed = sorted(target_issues.intersection(report["detected_issues"]))
+            case_variants = semantic_variants(config)
+            covered_variants.update(case_variants)
             round_results.append({
                 "case_id": case_id,
                 "public_entrypoint": "public_cli",
@@ -150,17 +192,21 @@ def main() -> int:
                 "artifact_before_oracle_sha256": before,
                 "artifact_after_oracle_sha256": after,
                 "observed_issue_ids": observed,
+                "semantic_variants": sorted(case_variants),
             })
             if observed:
                 consecutive_clean = 0
                 completed_rounds.append({"id": round_spec["id"], "strategy": round_spec["strategy"], "status": "reproduced", "cases": round_results})
-                return write_receipt(args, manifest, group, source_hash, completed_rounds, consecutive_clean, "reproduction_found", 1)
+                return write_receipt(args, manifest, group, source_hash, completed_rounds, consecutive_clean, covered_variants, "reproduction_found", 1)
         consecutive_clean += 1
         completed_rounds.append({"id": round_spec["id"], "strategy": round_spec["strategy"], "status": "clean", "cases": round_results})
-    return write_receipt(args, manifest, group, source_hash, completed_rounds, consecutive_clean, "clean", 0)
+    if covered_variants != required_variants:
+        print("semantic coverage exact-set is incomplete", file=sys.stderr)
+        return write_receipt(args, manifest, group, source_hash, completed_rounds, consecutive_clean, covered_variants, "coverage_failed", 2)
+    return write_receipt(args, manifest, group, source_hash, completed_rounds, consecutive_clean, covered_variants, "clean", 0)
 
 
-def write_receipt(args: argparse.Namespace, manifest: dict[str, Any], group: str, source_hash: str, rounds: list[dict[str, Any]], consecutive: int, status: str, exit_code: int) -> int:
+def write_receipt(args: argparse.Namespace, manifest: dict[str, Any], group: str, source_hash: str, rounds: list[dict[str, Any]], consecutive: int, covered_variants: set[str], status: str, exit_code: int) -> int:
     receipt = {
         "schema_version": 1,
         "campaign_name": manifest.get("campaign_name"),
@@ -168,6 +214,8 @@ def write_receipt(args: argparse.Namespace, manifest: dict[str, Any], group: str
         "status": status,
         "run_id": group,
         "issues": manifest["issues"],
+        "required_semantic_variants": manifest["required_semantic_variants"],
+        "covered_semantic_variants": sorted(covered_variants),
         "required_consecutive_clean_rounds": manifest["required_consecutive_clean_rounds"],
         "consecutive_clean_rounds": consecutive,
         "restart_semantics": "any reproduction resets to zero and requires a new run from R1",
@@ -175,6 +223,7 @@ def write_receipt(args: argparse.Namespace, manifest: dict[str, Any], group: str
         "manifest_sha256": sha(args.manifest),
         "runner_sha256": sha(Path(__file__)),
         "oracle_sha256": sha(ORACLE),
+        "semantics_sha256": sha(SEMANTICS),
         "rounds": rounds,
     }
     args.receipt.parent.mkdir(parents=True, exist_ok=True)

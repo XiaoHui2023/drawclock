@@ -19,7 +19,29 @@
       "cli_mode": "direct",
       "input": "tests/reproduction-corpus/pad-r08-s00.json",
       "library": "drawio-lib",
-      "issues": ["FB-ROOT-001", "FB-ROUTE-002", "FB-BEND-005"]
+      "issues": ["FB-ROOT-001", "FB-BEND-005"]
+    },
+    {
+      "id": "public-from-split-rejoin-baseline",
+      "baseline_revision": "6c9f9f42d9e0912309197d47b4b4c245db25ff75",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "tests/reproduction-corpus/pad-r08-s02.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROUTE-002"],
+      "semantic_contracts": {
+        "FB-ROUTE-002": {
+          "variant_id": "public-from-split-rejoin",
+          "nodes": [
+            {"name": "public_from", "kind": "from", "root": true, "min_outdegree": 2}
+          ],
+          "symptom": {
+            "type": "split_rejoin",
+            "root": "public_from",
+            "port": "right"
+          }
+        }
+      }
     },
     {
       "id": "asymmetric-port-baseline",
@@ -109,10 +131,70 @@
       "cli_mode": "direct",
       "input": "example/auto-layout/30-staggered-four-source-mux.json",
       "library": "drawio-lib",
-      "issues": ["FB-ROOT-020"]
+      "issues": ["FB-ROOT-020"],
+      "semantic_contracts": {
+        "FB-ROOT-020": {
+          "variant_id": "direct-source-mux-column",
+          "direct_mux_fanin": {
+            "target": "mux",
+            "sources": ["source_0", "source_1", "source_2", "source_3"],
+            "source_kinds": ["source"]
+          },
+          "symptom": {
+            "type": "direct_root_fanin_columns",
+            "target": "mux",
+            "sources": ["source_0", "source_1", "source_2", "source_3"],
+            "min_distinct_columns": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "direct-from-mux-column-baseline",
+      "baseline_revision": "b648705dcb489a9b5667fd782752627b7a05b4c5",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "tests/reproduction-corpus/staggered-four-from-mux.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROOT-020"],
+      "semantic_contracts": {
+        "FB-ROOT-020": {
+          "variant_id": "direct-from-mux-column",
+          "direct_mux_fanin": {
+            "target": "mux",
+            "sources": ["from_0", "from_1", "from_2", "from_3"],
+            "source_kinds": ["from"]
+          },
+          "symptom": {
+            "type": "direct_root_fanin_columns",
+            "target": "mux",
+            "sources": ["from_0", "from_1", "from_2", "from_3"],
+            "min_distinct_columns": 2
+          }
+        }
+      }
     }
   ],
   "current_fix_cases": [
+    {
+      "id": "public-from-split-rejoin-current",
+      "input": "tests/reproduction-corpus/pad-r08-s02.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROUTE-002"],
+      "semantic_contracts": {
+        "FB-ROUTE-002": {
+          "variant_id": "public-from-split-rejoin",
+          "nodes": [
+            {"name": "public_from", "kind": "from", "root": true, "min_outdegree": 2}
+          ],
+          "symptom": {
+            "type": "split_rejoin",
+            "root": "public_from",
+            "port": "right"
+          }
+        }
+      }
+    },
     {
       "id": "combined-cross-feature-current",
       "input": "example/auto-layout/26-feedback-reproduction-combined.json",
@@ -123,7 +205,45 @@
       "id": "direct-source-mux-column-current",
       "input": "example/auto-layout/30-staggered-four-source-mux.json",
       "library": "drawio-lib",
-      "issues": ["FB-ROOT-020"]
+      "issues": ["FB-ROOT-020"],
+      "semantic_contracts": {
+        "FB-ROOT-020": {
+          "variant_id": "direct-source-mux-column",
+          "direct_mux_fanin": {
+            "target": "mux",
+            "sources": ["source_0", "source_1", "source_2", "source_3"],
+            "source_kinds": ["source"]
+          },
+          "symptom": {
+            "type": "direct_root_fanin_columns",
+            "target": "mux",
+            "sources": ["source_0", "source_1", "source_2", "source_3"],
+            "min_distinct_columns": 2
+          }
+        }
+      }
+    },
+    {
+      "id": "direct-from-mux-column-current",
+      "input": "tests/reproduction-corpus/staggered-four-from-mux.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROOT-020"],
+      "semantic_contracts": {
+        "FB-ROOT-020": {
+          "variant_id": "direct-from-mux-column",
+          "direct_mux_fanin": {
+            "target": "mux",
+            "sources": ["from_0", "from_1", "from_2", "from_3"],
+            "source_kinds": ["from"]
+          },
+          "symptom": {
+            "type": "direct_root_fanin_columns",
+            "target": "mux",
+            "sources": ["from_0", "from_1", "from_2", "from_3"],
+            "min_distinct_columns": 2
+          }
+        }
+      }
     }
   ]
 }

@@ -13,11 +13,14 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from reproduction_semantics import observe as observe_semantics
+
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / ".cursor/skills/project-goals/issues/user-feedback-natural-reproduction.json"
 CORPUS = ROOT / "tests/reproduction-corpus/evidence-corpus.json"
 ORACLE = ROOT / "tools/feedback_layout_reproduction_oracle.py"
+SEMANTICS = ROOT / "tools/reproduction_semantics.py"
 
 
 def sha(path: Path) -> str:
@@ -102,6 +105,7 @@ def main() -> int:
                 print(f"oracle report failed: {case['id']} attempt {index + 1}", file=sys.stderr)
                 return 1
             report = json.loads(report_path.read_text(encoding="utf-8"))
+            config = json.loads(input_path.read_text(encoding="utf-8-sig"))
             for issue_id in case["issues"]:
                 issue_log = trial / f"{issue_id}.log"
                 issue_exit = run(
@@ -109,6 +113,12 @@ def main() -> int:
                      "--svg", str(svg), "--issue", issue_id], issue_log, env,
                 )
                 evidence = (svg, producer_log, report_path, report_log, issue_log)
+                semantic_contract = case.get(
+                    "semantic_contracts", {}
+                ).get(issue_id)
+                semantic = observe_semantics(
+                    config, report, semantic_contract
+                )
                 attempts[issue_id].append({
                     "run_id": f"{group}:{case['id']}:{index + 1}",
                     "case_id": case["id"], "public_entrypoint": "public_cli",
@@ -124,6 +134,14 @@ def main() -> int:
                     "oracle_sha256": sha(ORACLE),
                     "started_at": started,
                     "ended_at": datetime.now(timezone.utc).isoformat(),
+                    "semantic_contract_sha256": (
+                        canonical(semantic_contract)
+                        if semantic_contract is not None else None
+                    ),
+                    "semantic_variant_id": semantic["variant_id"],
+                    "semantic_preconditions_met": semantic["preconditions_met"],
+                    "semantic_symptom_observed": semantic["symptom_observed"],
+                    "semantic_errors": semantic["errors"],
                     "evidence_files": {
                         path.relative_to(ROOT).as_posix(): sha(path) for path in evidence
                     },
@@ -138,12 +156,25 @@ def main() -> int:
             case_hashes.setdefault(item["case_id"], set()).add(
                 item["artifact_before_oracle_sha256"]
             )
+        required_variants = issues[issue_id].get(
+            "required_reproduction_variants", []
+        )
+        variants_pass = all(
+            len([
+                item for item in issue_attempts
+                if item.get("semantic_variant_id") == variant
+                and item.get("semantic_preconditions_met") is True
+                and item.get("semantic_symptom_observed") is False
+            ]) >= 2
+            for variant in required_variants
+        )
         passed = (
             len(issue_attempts) >= 2
             and all(item["producer_exit_code"] == 0 for item in issue_attempts)
             and all(item["issue_oracle_exit_code"] == 1 for item in issue_attempts)
             and all(issue_id not in item["detected_issue_ids"] for item in issue_attempts)
             and all(len(hashes) == 1 for hashes in case_hashes.values())
+            and variants_pass
         )
         if not passed:
             failures.append(issue_id)
@@ -156,9 +187,11 @@ def main() -> int:
             "baseline_fails": True, "current_passes": passed,
             "baseline_receipt": baseline_path.relative_to(ROOT).as_posix(),
             "baseline_receipt_sha256": sha(baseline_path),
+            "required_reproduction_variants": required_variants,
             "source_tree_sha256": source_hash,
             "library_tree_sha256": library_hash,
             "runner_sha256": sha(Path(__file__)), "oracle_sha256": sha(ORACLE),
+            "semantics_sha256": sha(SEMANTICS),
             "attempts": issue_attempts,
         }
         (receipt_root / f"{issue_id}.json").write_text(

@@ -328,6 +328,15 @@ class FeedbackReproductionGateTest(unittest.TestCase):
         short_streak = json.loads(json.dumps(baseline))
         short_streak["consecutive_clean_rounds"] = 4
         mutations.append(short_streak)
+        missing_variant = json.loads(json.dumps(baseline))
+        missing_variant["covered_semantic_variants"].pop()
+        mutations.append(missing_variant)
+        false_case_variant = json.loads(json.dumps(baseline))
+        false_case_variant["rounds"][0]["cases"][0]["semantic_variants"] = ["invented"]
+        mutations.append(false_case_variant)
+        stale_semantics = json.loads(json.dumps(baseline))
+        stale_semantics["semantics_sha256"] = "0" * 64
+        mutations.append(stale_semantics)
         with tempfile.TemporaryDirectory(dir=ROOT) as directory:
             for index, payload in enumerate(mutations):
                 path = Path(directory) / f"mutant-{index}.json"

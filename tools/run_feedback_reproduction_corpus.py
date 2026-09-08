@@ -18,10 +18,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from reproduction_semantics import observe as observe_semantics
+
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / ".cursor/skills/project-goals/issues/user-feedback-natural-reproduction.json"
 ORACLE = ROOT / "tools/feedback_layout_reproduction_oracle.py"
+SEMANTICS = ROOT / "tools/reproduction_semantics.py"
 
 
 def sha(path: Path) -> str:
@@ -37,7 +40,7 @@ def canonical(value: Any) -> str:
 
 
 def issue_contract(issue: dict[str, Any]) -> dict[str, Any]:
-    keys = ("id", "summary", "expected", "actual", "owner_paths", "reproduction_paths", "baseline_revision", "entrypoint", "oracle", "reproduction_proves", "reproduction_does_not_prove")
+    keys = ("id", "summary", "expected", "actual", "owner_paths", "reproduction_paths", "baseline_revision", "entrypoint", "oracle", "reproduction_proves", "reproduction_does_not_prove", "required_reproduction_variants")
     return {key: issue.get(key) for key in keys}
 
 
@@ -160,6 +163,7 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"oracle report failed: {case['id']} attempt {index + 1}", file=sys.stderr)
                     return 1
                 report = json.loads(report_path.read_text(encoding="utf-8"))
+                config = json.loads(input_path.read_text(encoding="utf-8-sig"))
                 for issue_id in case_issues:
                     oracle_log = trial / f"{issue_id}.log"
                     oracle_command = [sys.executable, str(ORACLE), "--input", str(input_path), "--svg", str(svg), "--issue", issue_id]
@@ -167,6 +171,12 @@ def main(argv: list[str] | None = None) -> int:
                     evidence = [svg, producer_log, report_path, report_log, oracle_log]
                     if source_archive is not None:
                         evidence.append(source_archive)
+                    semantic_contract = case.get(
+                        "semantic_contracts", {}
+                    ).get(issue_id)
+                    semantic = observe_semantics(
+                        config, report, semantic_contract
+                    )
                     attempts_by_issue[issue_id].append({
                         "run_id": f"{run_group}:{case['id']}:{index + 1}",
                         "corpus_id": run_group, "case_id": case["id"],
@@ -181,10 +191,42 @@ def main(argv: list[str] | None = None) -> int:
                         "command_sha256": canonical(command), "input_sha256": sha(input_path),
                         "runner_sha256": sha(Path(__file__)), "oracle_sha256": sha(ORACLE),
                         "started_at": started, "ended_at": datetime.now(timezone.utc).isoformat(),
+                        "semantic_contract_sha256": (
+                            canonical(semantic_contract)
+                            if semantic_contract is not None else None
+                        ),
+                        "semantic_variant_id": semantic["variant_id"],
+                        "semantic_preconditions_met": semantic["preconditions_met"],
+                        "semantic_symptom_observed": semantic["symptom_observed"],
+                        "semantic_errors": semantic["errors"],
                         "evidence_files": {path.relative_to(ROOT).as_posix(): sha(path) for path in evidence},
                     })
                 case_summary.append({"case_id": case["id"], "attempt": index + 1, "detected_issues": report["detected_issues"], "totals": report["totals"]})
-    missing = [issue for issue, attempts in attempts_by_issue.items() if len(attempts) < 2 or any(item["oracle_exit_code"] != 0 for item in attempts)]
+    def reproduced(issue_id: str, attempts: list[dict[str, Any]]) -> bool:
+        required = issues[issue_id].get("required_reproduction_variants", [])
+        if not required:
+            return (
+                len(attempts) >= 2
+                and all(item["oracle_exit_code"] == 0 for item in attempts)
+            )
+        for variant in required:
+            runs = [
+                item for item in attempts
+                if item.get("semantic_variant_id") == variant
+            ]
+            if (
+                len(runs) < 2
+                or any(item["oracle_exit_code"] != 0 for item in runs)
+                or any(item.get("semantic_preconditions_met") is not True for item in runs)
+                or any(item.get("semantic_symptom_observed") is not True for item in runs)
+            ):
+                return False
+        return True
+
+    missing = [
+        issue for issue, attempts in attempts_by_issue.items()
+        if not reproduced(issue, attempts)
+    ]
     corpus_receipt = {"schema_version": 1, "corpus_id": run_group, "coverage_model": "many_to_many", "cases": case_summary, "issue_attempt_counts": {key: len(value) for key, value in attempts_by_issue.items()}, "missing_issues": missing}
     corpus_receipt_path = args.corpus_receipt
     if not corpus_receipt_path.is_absolute():
@@ -226,10 +268,15 @@ def main(argv: list[str] | None = None) -> int:
             continue
         issue = issues[issue_id]
         receipt = {
-            "schema_version": 1, "issue_id": issue_id, "result": "reproduced" if len(attempts) >= 2 and all(item["oracle_exit_code"] == 0 for item in attempts) else "not_reproduced",
+            "schema_version": 1, "issue_id": issue_id,
+            "result": "reproduced" if reproduced(issue_id, attempts) else "not_reproduced",
             "evidence_class": "user_reproduction", "origin": "natural_user_workflow",
             "fault_injection": False, "output_mutated": False, "production_code_changed": False,
             "coverage_model": "many_to_many", "corpus_id": run_group,
+            "required_reproduction_variants": issue.get(
+                "required_reproduction_variants", []
+            ),
+            "semantics_sha256": sha(SEMANTICS),
             "issue_contract_sha256": canonical(issue_contract(issue)), "attempts": attempts,
         }
         (ROOT / issue["reproduction_receipt"]).write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

@@ -1,5 +1,10 @@
 # 用户反馈自然复现与防假完成门禁
 
+- status: active
+- created: 2026-09-03 13:32 +08:00
+- updated: 2026-09-08 12:00 +08:00
+- scene: 用户反馈自然复现与防假完成门禁
+
 ## 2026-09-03：两项布局逃逸重新打开
 
 - `FB-ROUTE-009`：用户指出 `final-combined.svg` 的公共零入度根到局部 mux 输入出现大绕行。独立统计确认 `weave__public_gate→weave__select_04` 为 4 拐点、934.1805px、1 次交叉；旧逐边 Oracle 只允许固定节点坐标换线，所有两拐点候选碰撞，漏掉“拆分/重分配根显示锚点”的联合反事实。
@@ -10,11 +15,6 @@
 - 临时只读计算确认：ROUTE-009 的 `weave__public_gate→select_04` 可由 4→0 拐点、1→0 交叉、934.1805→18px 的候选支配；ROOT-010 的六条单边锚点候选把全图交叉事件 226 降到 218–224、交叉点 52 降到 49–50，根边 85.33→24px，折点不增加。
 - 独立 Oracle 新增 `root_facility_split_witnesses` 与 `physical_anchor_relocation_witnesses`，判定只读取最终 SVG、逻辑零入度、物理端点归属和几何，不读取器件 kind、实例名、样例号或生产布局模块。正式双跑收据尚未签发。
 - Oracle 测试增加当前公开入口的两项自然红灯与一个同样含零入度根但无跨干线/无设施拆分收益的干净反例；测试产物只用于检测器校准，正式复现仍必须由冻结 revision 双跑收据授权。
-
-- status: done
-- created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 09:58 +08:00
-- scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
 
@@ -714,3 +714,25 @@
 - 09:48 第二次 push 的 run `34177628322` 已通过此前失败的反馈门，但 Ubuntu 16.04 `Pack` 步失败、publish skipped。匿名日志接口仍为 403，CUA 又被管理员 Hook 以未知写能力 fail-closed 拒绝；结合宿主 feedback job 成功、容器脚本包清单和新门首次调用 `git ls-files`，定位为 xenial 容器未安装 git。`ci_pack_ubuntu16.sh` 现显式安装 git；checker 捕获 `FileNotFoundError/OSError` 并输出可诊断 blocker，测试注入缺 git 环境锁定该行为。
 - 09:51 修复后聚焦 22/22、全量 493/493、release gate 与五件套通过，Python Release Skill 校验通过。尝试用本机 `bash -n` 校验容器脚本时，WindowsApps/WSL bash 因无 Linux 发行版返回 `execvpe(/bin/bash) failed`，Visual Studio 内置 Git 也不含 bash；实际影响仅为本机不能运行 shell parser。替代证据为该改动只在既有 apt 包列表加入 `git`、相关 Python 门禁全绿，最终语法与安装仍由下一轮真实 Ubuntu 16.04 job 验证。
 - 09:58 第三次 run `34178113943` 全绿：feedback、Ubuntu 16.04 PyInstaller/staticx、publish 和发布后公开资产回下载 frozen/source smoke 均 success。`v1.0.0^{}` 指向 `6a22c68c54381d73091ff6c23c04991b7cae3b63`；本机从公开 Release 独立下载 17,183,407-byte 归档，SHA-256 `8fdd4b6d5b9df1e3d43b97079702d418a6a7115a555463339e4fb755f6a15b3b` 与 GitHub digest 完全一致，tar 清单含冻结程序、源码、文档与器件库。该成功记录作为最后一笔项目修改提交后，再由同一不可旁路 workflow 覆盖滚动 tag。
+
+## 2026-09-08：严格语义复现重新打开
+
+- 10:58 用户确认两个可见问题仍存在：公共 `from` 纵线总线发生分叉—合并—再分叉，以及多个 `from/source` 直入同一 mux 时设施错列。此前 `FB-ROUTE-002` 的正式 case `pad-r08-s00` 实际 witness 为 `public_gate:right`，不能证明公共 `from`，归类为 `reproduction_escape + claim_escape`；旧完成声明对该精确范围撤销，生产 `src/**` 冻结。
+- 10:58 当前公开入口重放 12 个既有 PAD 语料均未命中 `public_from` split-rejoin，记为有证据的未复现轮次，不作为成功。冻结 `6c9f9f4` 对同一语料搜索后，`pad-r08-s02`、`pad-r12-s01`、`pad-r12-s02` 均自然命中 `public_from:right`，其中 `pad-r08-s02` 选为较小精确基线；下一步必须用正式 runner 双跑签收，替换旧 gate witness。
+- 10:58 本轮联网核验 ELK 分层阶段/固定端口/正交路由、NIST covering array、Hypothesis 属性生成与 shrinking、Google mutation testing；Find Skills 以 bug reproduction、property/metamorphic、graph layout QA、mutation Oracle 四组词成功返回候选，但现有用户根流程更严格，未安装第三方 skill。新增耐久结论候选：issue receipt 必须绑定 witness 的语义谓词，而不能只绑定宽泛 issue ID；攻击轮每个 case 还必须声明并验证适用 variant。
+- 11:01 首次新增全 `from` 夹具前，实时记录门因本轮学习/搜索事实尚未入账而拒绝；补记后五件套检查又发现该历史 record 原有一组位于正文中部的旧元数据，与新增顶部元数据重复。已删除旧重复组并让 `check_five_piece.py` 返回 PASS。两次拒绝均发生在复现输入写入前，没有改动生产或测试夹具。
+- 11:02 新增合法全 `from` 直入 mux4 夹具，保留四条深度 3/2/1/0 的非 mux 辅助消费者链。冻结 `b648705` 公开入口双跑均只命中 `FB-ROOT-020`，四个设施 x 为 361.01/65.96/65.96/302.95、输出 SHA-256 均为 `9BEDCC81...28E03`；当前入口同夹具无 column witness。至此 source 与 from 两种器件均有精确自然红灯，但正式账本尚未绑定 variant exact-set，不能关闭。
+- 11:08 新增独立 `reproduction_semantics.py`：从公开输入重建入/出度、节点 kind 和直连 mux 源集合，再从终态报告匹配指定 root/port 或指定 source exact-set 的直接 witness。复现与修复 runner 现写入 variant、合同哈希、前提结果、症状结果和错误；002 强制 `public-from-split-rejoin` 双跑，020 强制 source/from 两种 variant 各双跑，缺少任一项即失败。账本两项重新进入 `reproduction_in_progress`，旧收据按合同哈希失效。
+- 11:12 账本解析自检发现首次状态补丁因宽泛文本匹配误把 001/003 重开，002/020 仍 closed，且 020 的 required variants 错挂到 003。该状态没有通过任何 solve/release 门。已按稳定 issue ID 上下文恢复 001/003=closed、设置 002/020=reproduction_in_progress，并把 source/from variant exact-set 只绑定到 020；后续新增“状态/合同归属精确 ID”测试。
+- 11:18 正式复现批次 `20260908T030927Z-8159ddf2` 完成：002 的公共 from 精确 variant 双跑、020 的 source/from 两种精确 variant 各双跑全部满足公开入口、输入语义、直接症状、确定性和只读血缘，聚合 `missing_issues=[]`。语义 checker 进一步绑定独立脚本哈希，并将错 kind、错 direct source exact-set、缺 variant、假症状和陈旧语义实现纳入非零失败条件。
+- 11:20 账本 002/020 已由 `reproduction_in_progress` 推进到 `reproduced`，并分别写入 public_from 指定 witness 与 source/from 两变体 exact-set；其它 issue 状态保持不变。由于 runner/语义 checker 本轮又发生源码变化，11:13 的初次收据 lineage 已自动陈旧，必须用最终 checker 重新签发后才能通过 solve。
+- 11:25 语义 Oracle 反作弊单测首次发现自身将入度按 source 引用次数计算，导致合法直连根被误判为非根；改为按目标节点 source 数计算后 3/3 通过。最终语义 runner 正式重签批次 `20260908T031721Z-6bc9d000`：公共 from 变体双跑、source/from 直连 mux 两变体各双跑，全部满足精确前提、真实症状、稳定产物与只读血缘；该门禁自错没有被静默吞掉。
+- 11:27 实时记录门再次阻止攻击 runner 修改，因为正文/INDEX 更新时间先变而 record 顶部元数据仍为 11:20；修正三处为同一 11:27 后，五件套重新 PASS。该阻断只影响流程元数据，没有改动攻击 runner 或产品。
+- 11:32 当前公开入口修复验证批次 `20260908T031908Z-88c0b705` 完成，002 与 020 的全部精确变体均双跑为“前提成立、症状缺席”。攻击 runner 开始升级：每个 mux seed 同时生成 source/from 两种根，公共树按真实 from 扇出识别，整轮收据必须覆盖三种语义 exact-set；未覆盖任一变体即 `coverage_failed`，不能用大量不相关样例凑轮数。
+- 11:35 独立 release checker 同步强化：收据必须绑定语义实现哈希、required/covered variant exact-set，每轮 case 数按 source/from 双生成计算，每个 case 的变体声明必须去重且属于合同；任一血缘陈旧、伪造覆盖或 case 缺失均非零退出。
+- 11:40 强化后的高风险攻击 run `20260908T032631Z-63c686a8` 从 R1 开始连续 7/7 clean。覆盖冻结精确回放、声明顺序反转、全图改名、pairwise mux 深度/列/端口、跨特性递归和高交互确定性生成；所有 mux seed 同时跑 source/from，整轮 covered exact-set 等于三项 required。当前算法未再次复发，因此本轮不改 `src/**`，解决内容集中在纠正复现证据与让门禁无法再用邻近症状冒充。
+- 11:43 攻击收据新增三类 mutant：删除 covered variant、伪造 case variant、篡改语义实现哈希均必须被 checker 拒绝。聚焦首轮 21/25，通过项不继承；四个失败揭示用户级通用 validator 尚不理解多变体 issue，仍把不同 case 的合法 SVG 哈希误当不确定，并且账本 002/020 尚未推进 fixed_verified。先升级通用 validator，再重签因 runner 变化而陈旧的收据。
+- 11:48 用户级 validator 已改为 per-case 确定性并强制 required variant 双跑、精确前提和直接症状；Skill 校验 PASS，通用 release 16/16 PASS。账本 002/020 按真实绿收据推进 fixed_verified。项目 release checker 随后正确阻止：新 fix evidence 尚未 Git 跟踪；同时暴露新增语义哈希被错误追溯要求于无变体的 14 个历史收据，需收窄到声明 required variants 的新合同，不能强迫无该字段的旧证据伪造血缘。
+- 11:53 项目 checker 已将 reproduction 语义血缘要求收窄为仅对显式声明 required variants 的合同生效；新 fix runner 收据仍统一绑定语义脚本，旧 14 项自然红证据不被追溯改写。下一步把本轮 reproduction/fix 原始证据明确加入 Git 依赖闭包，再在干净可发布状态复验。
+- 11:57 本轮 reproduction/fix 原始证据强制纳入 Git 闭包后，release gate 16/16 PASS；全量 pytest 从头运行 496/496 PASS（68.91s），包含新增语义反作弊与攻击收据 mutant。继续执行全公开图与交付门，当前绿灯不替代后续门。
+- 12:00 全公开 SVG 新鲜生成门 27/27 PASS。正式红/绿证据各渲染公共 from 与直连 from→mux 结果图并目视复核；Edge headless 四次均写出非零 PNG，但 stderr 有 WSALookupServiceBegin 10108、QQBrowser 路径和账户图片获取告警，均不影响本地 SVG/PNG。用户根 `agent-quality-workflow` 与 `case-generalization` 已沉淀 per-case 确定性、语义 variant exact-set、coverage_failed 与三类新 mutant，两项 quick_validate 均 PASS。

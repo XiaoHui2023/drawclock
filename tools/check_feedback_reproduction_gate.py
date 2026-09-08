@@ -20,6 +20,7 @@ RECURSIVE_MANIFEST = ROOT / "tests/reproduction-corpus/recursive-attack-rounds.j
 RECURSIVE_RECEIPT = ROOT / ".reproduction/receipts/recursive-attack.json"
 RECURSIVE_RUNNER = ROOT / "tools/run_recursive_reproduction_rounds.py"
 RECURSIVE_ORACLE = ROOT / "tools/feedback_layout_reproduction_oracle.py"
+SEMANTICS = ROOT / "tools/reproduction_semantics.py"
 
 
 def _sha(path: Path) -> str:
@@ -180,6 +181,11 @@ def _validate_release_receipt(
         errors.append(f"{issue_id}: reproduction receipt is not natural user evidence")
     if receipt.get("coverage_model") != "many_to_many" or not _text(receipt.get("corpus_id")):
         errors.append(f"{issue_id}: reproduction receipt must bind a many-to-many corpus")
+    required_variants = issue.get("required_reproduction_variants", [])
+    if required_variants and receipt.get("semantics_sha256") != _sha(SEMANTICS):
+        errors.append(f"{issue_id}: reproduction semantics lineage is stale")
+    if receipt.get("required_reproduction_variants", []) != required_variants:
+        errors.append(f"{issue_id}: reproduction variant exact-set differs")
     for key in ("fault_injection", "output_mutated", "production_code_changed"):
         if receipt.get(key) is not False:
             errors.append(f"{issue_id}: {key} must be false")
@@ -188,6 +194,7 @@ def _validate_release_receipt(
         errors.append(f"{issue_id}: two independent natural reproduction runs are required")
         return
     run_ids: list[str] = []
+    variant_runs: dict[str, list[dict[str, Any]]] = {}
     for index, run in enumerate(runs):
         if not isinstance(run, dict):
             errors.append(f"{issue_id}: receipt attempt {index} is invalid")
@@ -204,8 +211,23 @@ def _validate_release_receipt(
             errors.append(f"{issue_id}: receipt attempt {index} lacks direct issue observation")
         if run.get("artifact_before_oracle_sha256") != run.get("artifact_after_oracle_sha256"):
             errors.append(f"{issue_id}: receipt attempt {index} changed the artifact")
+        variant = run.get("semantic_variant_id")
+        if _text(variant):
+            variant_runs.setdefault(variant, []).append(run)
     if not all(run_ids) or len(run_ids) != len(set(run_ids)):
         errors.append(f"{issue_id}: reproduction run IDs must be present and independent")
+    for variant in required_variants:
+        selected = variant_runs.get(variant, [])
+        if len(selected) < 2:
+            errors.append(f"{issue_id}: reproduction variant {variant} needs two runs")
+            continue
+        for run in selected:
+            if run.get("semantic_preconditions_met") is not True:
+                errors.append(f"{issue_id}: variant {variant} input semantics do not match")
+            if run.get("semantic_symptom_observed") is not True:
+                errors.append(f"{issue_id}: variant {variant} lacks its exact symptom")
+            if not _text(run.get("semantic_contract_sha256")):
+                errors.append(f"{issue_id}: variant {variant} lacks a contract hash")
 
 
 def _validate_fix_receipt(
@@ -250,12 +272,18 @@ def _validate_fix_receipt(
     oracle = ROOT / "tools/feedback_layout_reproduction_oracle.py"
     if receipt.get("runner_sha256") != _sha(runner) or receipt.get("oracle_sha256") != _sha(oracle):
         errors.append(f"{issue_id}: fix receipt runner/oracle lineage is stale")
+    if receipt.get("semantics_sha256") != _sha(SEMANTICS):
+        errors.append(f"{issue_id}: fix semantics lineage is stale")
+    required_variants = issue.get("required_reproduction_variants", [])
+    if receipt.get("required_reproduction_variants", []) != required_variants:
+        errors.append(f"{issue_id}: fix variant exact-set differs")
     attempts = receipt.get("attempts")
     if not isinstance(attempts, list) or len(attempts) < 2:
         errors.append(f"{issue_id}: fix receipt needs two current public runs")
         return
     run_ids = []
     case_runs: dict[str, list[dict[str, Any]]] = {}
+    variant_runs: dict[str, list[dict[str, Any]]] = {}
     for index, attempt in enumerate(attempts):
         if not isinstance(attempt, dict):
             errors.append(f"{issue_id}: invalid fix attempt {index}")
@@ -272,6 +300,9 @@ def _validate_fix_receipt(
             errors.append(f"{issue_id}: fix attempt {index} still observes the symptom")
         if attempt.get("artifact_before_oracle_sha256") != attempt.get("artifact_after_oracle_sha256"):
             errors.append(f"{issue_id}: fix attempt {index} mutated the output")
+        variant = attempt.get("semantic_variant_id")
+        if _text(variant):
+            variant_runs.setdefault(variant, []).append(attempt)
         evidence = attempt.get("evidence_files")
         if not isinstance(evidence, dict) or not evidence:
             errors.append(f"{issue_id}: fix attempt {index} has no evidence")
@@ -294,6 +325,18 @@ def _validate_fix_receipt(
             errors.append(f"{issue_id}: fix case {case_id} does not bind one input")
         if None in artifacts or len(artifacts) != 1:
             errors.append(f"{issue_id}: fix case {case_id} is nondeterministic")
+    for variant in required_variants:
+        selected = variant_runs.get(variant, [])
+        if len(selected) < 2:
+            errors.append(f"{issue_id}: fix variant {variant} needs two runs")
+            continue
+        for run in selected:
+            if run.get("semantic_preconditions_met") is not True:
+                errors.append(f"{issue_id}: fix variant {variant} input semantics do not match")
+            if run.get("semantic_symptom_observed") is not False:
+                errors.append(f"{issue_id}: fix variant {variant} still has its exact symptom")
+            if not _text(run.get("semantic_contract_sha256")):
+                errors.append(f"{issue_id}: fix variant {variant} lacks a contract hash")
 
 
 def _validate_recursive_attack_receipt(
@@ -323,6 +366,18 @@ def _validate_recursive_attack_receipt(
         errors.append("recursive attack receipt is not clean")
     if receipt.get("issues") != contract.get("issues"):
         errors.append("recursive attack issue scope differs from the contract")
+    required_variants = contract.get("required_semantic_variants")
+    if (
+        not isinstance(required_variants, list)
+        or not required_variants
+        or len(required_variants) != len(set(required_variants))
+    ):
+        errors.append("recursive attack semantic variant contract is invalid")
+        required_variants = []
+    if receipt.get("required_semantic_variants") != required_variants:
+        errors.append("recursive attack required semantic variants differ")
+    if receipt.get("covered_semantic_variants") != sorted(required_variants):
+        errors.append("recursive attack semantic coverage exact-set is incomplete")
     if (
         receipt.get("campaign_name") != contract.get("campaign_name")
         or receipt.get("risk_class") != risk_class
@@ -343,6 +398,7 @@ def _validate_recursive_attack_receipt(
         ("manifest_sha256", RECURSIVE_MANIFEST),
         ("runner_sha256", RECURSIVE_RUNNER),
         ("oracle_sha256", RECURSIVE_ORACLE),
+        ("semantics_sha256", SEMANTICS),
     ):
         if receipt.get(key) != _sha(path):
             errors.append(f"recursive attack {key} is stale")
@@ -350,7 +406,9 @@ def _validate_recursive_attack_receipt(
         return
     for expected, actual in zip(expected_rounds, actual_rounds):
         cases = actual.get("cases")
-        expected_count = len(expected.get("fixtures", [])) + len(expected.get("seeds", [])) + len(expected.get("bus_rows", []))
+        expected_count = (len(expected.get("fixtures", []))
+                          + 2 * len(expected.get("seeds", []))
+                          + len(expected.get("bus_rows", [])))
         if actual.get("status") != "clean" or not isinstance(cases, list) or len(cases) != expected_count:
             errors.append(f"recursive attack round {expected.get('id')} is incomplete")
             continue
@@ -367,6 +425,11 @@ def _validate_recursive_attack_receipt(
                 errors.append(f"recursive attack case {case.get('case_id')} mutated the artifact")
             if case.get("observed_issue_ids") != []:
                 errors.append(f"recursive attack case {case.get('case_id')} reproduced a target issue")
+            variants = case.get("semantic_variants")
+            if (not isinstance(variants, list)
+                    or len(variants) != len(set(variants))
+                    or not set(variants).issubset(set(required_variants))):
+                errors.append(f"recursive attack case {case.get('case_id')} has invalid semantic coverage")
 
 
 def _release_gate() -> int:

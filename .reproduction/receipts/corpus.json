@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "corpus_id": "merged:20260907T014732Z-ff0a4ce1+20260907T085940Z-f059a5ec",
+  "corpus_id": "merged:merged:merged:20260907T014732Z-ff0a4ce1+20260907T085940Z-f059a5ec+20260908T030927Z-8159ddf2+20260908T031721Z-6bc9d000",
   "coverage_model": "many_to_many",
   "cases": [
     {
@@ -430,6 +430,52 @@
       }
     },
     {
+      "case_id": "public-from-split-rejoin-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-001",
+        "FB-ROUTE-002",
+        "FB-ROOT-003",
+        "FB-ROOT-004",
+        "FB-ROUTE-009",
+        "FB-ROOT-010"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 43,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 107,
+        "distinct_crossing_points": 48,
+        "different_net_overlaps": 0,
+        "bends": 44,
+        "manhattan_length_px": 13288.2144
+      }
+    },
+    {
+      "case_id": "public-from-split-rejoin-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-001",
+        "FB-ROUTE-002",
+        "FB-ROOT-003",
+        "FB-ROOT-004",
+        "FB-ROUTE-009",
+        "FB-ROOT-010"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 43,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 107,
+        "distinct_crossing_points": 48,
+        "different_net_overlaps": 0,
+        "bends": 44,
+        "manhattan_length_px": 13288.2144
+      }
+    },
+    {
       "case_id": "direct-source-mux-column-baseline",
       "attempt": 1,
       "detected_issues": [
@@ -464,6 +510,42 @@
         "bends": 2,
         "manhattan_length_px": 2207.5241
       }
+    },
+    {
+      "case_id": "direct-from-mux-column-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-020"
+      ],
+      "totals": {
+        "logical_nodes": 15,
+        "rendered_nodes": 17,
+        "logical_edges": 14,
+        "rendered_edges": 14,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 2,
+        "manhattan_length_px": 2028.1544
+      }
+    },
+    {
+      "case_id": "direct-from-mux-column-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-020"
+      ],
+      "totals": {
+        "logical_nodes": 15,
+        "rendered_nodes": 17,
+        "logical_edges": 14,
+        "rendered_edges": 14,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 2,
+        "manhattan_length_px": 2028.1544
+      }
     }
   ],
   "issue_attempt_counts": {
@@ -473,16 +555,16 @@
     "FB-BEND-014": 4,
     "FB-BEND-017": 2,
     "FB-PORT-006": 2,
-    "FB-ROOT-001": 2,
-    "FB-ROOT-003": 4,
-    "FB-ROOT-004": 4,
-    "FB-ROOT-010": 8,
+    "FB-ROOT-001": 4,
+    "FB-ROOT-003": 6,
+    "FB-ROOT-004": 6,
+    "FB-ROOT-010": 10,
     "FB-ROOT-012": 4,
     "FB-ROOT-015": 2,
     "FB-ROOT-016": 2,
-    "FB-ROOT-020": 2,
-    "FB-ROUTE-002": 2,
-    "FB-ROUTE-009": 4
+    "FB-ROOT-020": 4,
+    "FB-ROUTE-002": 4,
+    "FB-ROUTE-009": 6
   },
   "missing_issues": []
 }
