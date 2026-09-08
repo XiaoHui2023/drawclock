@@ -19,7 +19,8 @@
     "asymmetric_branch_depth",
     "joint_root_axis_dominance",
     "staggered_source_columns",
-    "direct_source_mux_column"
+    "direct_source_mux_column",
+    "feasible_direct_root_fanin_column"
   ],
   "issues": [
     "FB-ROOT-001",
@@ -37,7 +38,8 @@
     "FB-ROOT-015",
     "FB-ROOT-016",
     "FB-BEND-017",
-    "FB-ROOT-020"
+    "FB-ROOT-020",
+    "FB-ROOT-021"
   ],
   "cases": [
     {

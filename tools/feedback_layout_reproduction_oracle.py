@@ -41,6 +41,7 @@ ISSUES = (
     "FB-ROOT-016",
     "FB-BEND-017",
     "FB-ROOT-020",
+    "FB-ROOT-021",
 )
 
 
@@ -1718,6 +1719,231 @@ def _direct_root_fanin_column_witnesses(
     return witnesses
 
 
+def _feasible_direct_root_fanin_column_witnesses(
+    config: dict[str, Any], roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Find any structurally direct root cohort with a safe common column.
+
+    The source and target kinds are deliberately irrelevant.  A witness is
+    emitted only after moving the complete set of physical source facilities
+    together and proving that the serialized-artifact quality vector does not
+    regress.
+    """
+    boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+    for box in boxes:
+        boxes_by_node[box.node].append(box)
+    incoming: dict[str, list[Route]] = defaultdict(list)
+    for route in routes:
+        if route.source in roots:
+            incoming[route.target].append(route)
+    crossings_before, overlaps_before = route_crossings(routes)
+    bends_before = sum(max(0, len(route.points) - 2) for route in routes)
+    witnesses: list[dict[str, Any]] = []
+
+    def material_overlap(left_box: Box, right_box: Box) -> bool:
+        """Ignore only the renderer's sub-8px conservative label halo."""
+        left = left_box.visual_bounds
+        right = right_box.visual_bounds
+        return (
+            min(left[2], right[2]) - max(left[0], right[0]) > 8.0
+            and min(left[3], right[3]) - max(left[1], right[1]) > 8.0
+        )
+
+    overlap_pairs_before = {
+        (index, other_index)
+        for index, left in enumerate(boxes)
+        for other_index, right in enumerate(boxes[index + 1:], index + 1)
+        if material_overlap(left, right)
+    }
+
+    for target, target_routes in sorted(incoming.items()):
+        sources = sorted({route.source for route in target_routes})
+        if len(sources) < 2:
+            continue
+        if any("layout_column" in config.get(source, {}) for source in sources):
+            continue
+        direct_by_source = {
+            source: next(route for route in target_routes if route.source == source)
+            for source in sources
+        }
+        facilities: dict[str, Box] = {}
+        for source, route in direct_by_source.items():
+            facility = _endpoint_box(route.points[0], boxes_by_node[source])
+            if facility is None:
+                break
+            facilities[source] = facility
+        if len(facilities) != len(sources):
+            continue
+        columns = {source: round(box.x, 4) for source, box in facilities.items()}
+        column_tolerance = median(
+            box.visual_bounds[2] - box.visual_bounds[0]
+            for box in facilities.values()
+        ) / 2.0
+        if max(columns.values()) - min(columns.values()) <= column_tolerance:
+            continue
+
+        # A physical facility can serve more than this target.  Every route
+        # starting there participates in the same transaction.
+        facility_routes: dict[str, list[Route]] = {}
+        for source, facility in facilities.items():
+            facility_routes[source] = [
+                route for route in routes
+                if route.source == source
+                and _endpoint_box(route.points[0], boxes_by_node[source]) == facility
+            ]
+
+        # Alignment may move earlier facilities to the latest occupied root
+        # layer, but it must not pull an already-later facility backwards.
+        # That violates the independent ALAP/root-layer hard gate even when
+        # crossings and bends happen to stay unchanged.
+        candidate_columns = [max(box.x for box in facilities.values())]
+        for common_x in candidate_columns:
+            moved_by_source: dict[str, Box] = {}
+            for source, box in facilities.items():
+                delta_x = common_x - box.x
+                left, top, right, bottom = box.visual_bounds
+                moved_by_source[source] = Box(
+                    box.node, common_x, box.y, box.w, box.h,
+                    left + delta_x, top, right - left, bottom - top,
+                )
+            candidate_boxes = [
+                moved_by_source.get(box.node, box)
+                if facilities.get(box.node) == box else box
+                for box in boxes
+            ]
+            overlap_pairs_after = {
+                (index, other_index)
+                for index, left in enumerate(candidate_boxes)
+                for other_index, right in enumerate(candidate_boxes[index + 1:], index + 1)
+                if material_overlap(left, right)
+            }
+            if not overlap_pairs_after.issubset(overlap_pairs_before):
+                continue
+
+            affected = {
+                route.index: source
+                for source, owned_routes in facility_routes.items()
+                for route in owned_routes
+            }
+            candidate_routes: list[Route] = []
+            candidate_valid = True
+            for route in routes:
+                source = affected.get(route.index)
+                if source is None:
+                    candidate_routes.append(Route(
+                        route.index, list(route.points), route.source, route.target,
+                        route.target_port, route.source_port,
+                    ))
+                    continue
+                delta_x = common_x - facilities[source].x
+                old_start = route.points[0]
+                moved_start = (round(old_start[0] + delta_x, 4), old_start[1])
+                first_vertical = next((
+                    offset
+                    for offset, (a, b) in enumerate(segments(route))
+                    if abs(a[0] - b[0]) <= EPS
+                    and abs(a[1] - b[1]) > EPS
+                ), None)
+                if len(facility_routes[source]) >= 2 and first_vertical is not None:
+                    source_right = moved_by_source[source].visual_bounds[2]
+                    target_box = _endpoint_box(
+                        route.points[-1], boxes_by_node[route.target]
+                    )
+                    if target_box is None:
+                        candidate_valid = False
+                        break
+                    lane = round(source_right + 18.0, 4)
+                    if lane > target_box.visual_bounds[0] - 18.0 + EPS:
+                        candidate_valid = False
+                        break
+                    branch_y = route.points[first_vertical + 1][1]
+                    points = simplify([
+                        moved_start,
+                        (lane, moved_start[1]),
+                        (lane, branch_y),
+                        *route.points[first_vertical + 2:],
+                    ])
+                else:
+                    points = simplify([
+                        moved_start,
+                        (old_start[0], moved_start[1]),
+                        *route.points[1:],
+                    ])
+                candidate_routes.append(Route(
+                    route.index, points, route.source, route.target,
+                    route.target_port, route.source_port,
+                ))
+            if not candidate_valid:
+                continue
+            if any(
+                abs(a[0] - b[0]) > EPS and abs(a[1] - b[1]) > EPS
+                for route in candidate_routes for a, b in segments(route)
+            ):
+                continue
+            candidate_boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+            for box in candidate_boxes:
+                candidate_boxes_by_node[box.node].append(box)
+            endpoint_clearance_failed = False
+            for route in candidate_routes:
+                if route.index not in affected:
+                    continue
+                verticals = [
+                    (a, b) for a, b in segments(route)
+                    if abs(a[0] - b[0]) <= EPS and abs(a[1] - b[1]) > EPS
+                ]
+                if not verticals:
+                    continue
+                source_box = _endpoint_box(
+                    route.points[0], candidate_boxes_by_node[route.source]
+                )
+                target_box = _endpoint_box(
+                    route.points[-1], candidate_boxes_by_node[route.target]
+                )
+                if (
+                    source_box is None or target_box is None
+                    or verticals[0][0][0] < source_box.visual_bounds[2] + 18.0 - EPS
+                    or verticals[-1][0][0] > target_box.visual_bounds[0] - 18.0 + EPS
+                ):
+                    endpoint_clearance_failed = True
+                    break
+            if endpoint_clearance_failed:
+                continue
+            if any(
+                _visual_rect_interior_hit(a, b, box)
+                for route in candidate_routes
+                for a, b in segments(route)
+                for box in candidate_boxes
+                if box.node not in {route.source, route.target}
+            ):
+                continue
+            candidate_crossings, candidate_overlaps = route_crossings(candidate_routes)
+            candidate_bends = sum(max(0, len(route.points) - 2) for route in candidate_routes)
+            if (
+                len(candidate_crossings) <= len(crossings_before)
+                and len(candidate_overlaps) <= len(overlaps_before)
+                and candidate_bends <= bends_before
+            ):
+                witnesses.append({
+                    "target": target,
+                    "sources": sources,
+                    "source_kinds": {
+                        source: str(config.get(source, {}).get("kind", ""))
+                        for source in sources
+                    },
+                    "source_columns": columns,
+                    "column_tolerance": round(column_tolerance, 4),
+                    "candidate_column": round(common_x, 4),
+                    "crossing_events_before": len(crossings_before),
+                    "crossing_events_after": len(candidate_crossings),
+                    "overlaps_before": len(overlaps_before),
+                    "overlaps_after": len(candidate_overlaps),
+                    "bends_before": bends_before,
+                    "bends_after": candidate_bends,
+                })
+                break
+    return witnesses
+
+
 def _root_facility_column_lag_witnesses(
     roots: set[str], routes: list[Route], boxes: list[Box]
 ) -> list[dict[str, Any]]:
@@ -2479,6 +2705,9 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     direct_root_fanin_column_witnesses = (
         _direct_root_fanin_column_witnesses(config, roots, routes, boxes)
     )
+    feasible_direct_root_fanin_column_witnesses = (
+        _feasible_direct_root_fanin_column_witnesses(config, roots, routes, boxes)
+    )
     detected = {
         # Mixed kinds are only a precondition.  A defect is present only when
         # an ordinary zero-indegree component also exhibits the measured root
@@ -2509,6 +2738,7 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         ),
         "FB-BEND-017": bool(root_fanout_axis_dominance_witnesses),
         "FB-ROOT-020": bool(direct_root_fanin_column_witnesses),
+        "FB-ROOT-021": bool(feasible_direct_root_fanin_column_witnesses),
     }
     route_row_by_id = {row["edge_id"]: row for row in route_rows}
     node_statistics = {}
@@ -2632,6 +2862,9 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             ),
             "direct_root_fanin_column_witnesses": (
                 direct_root_fanin_column_witnesses
+            ),
+            "feasible_direct_root_fanin_column_witnesses": (
+                feasible_direct_root_fanin_column_witnesses
             ),
         },
         "detected_issues": [issue for issue in ISSUES if detected[issue]],

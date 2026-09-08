@@ -3782,7 +3782,7 @@ def _refine_direct_root_fanin_arrays(
     *,
     route_clearance: float = 18.0,
 ) -> tuple[LayoutDocument, dict[str, Any]]:
-    """Jointly align direct source/from arrays to merge input axes.
+    """Jointly align direct zero-indegree facilities before one merge.
 
     A member-by-member move can be rejected by a temporary collision even
     when the complete ordered array is feasible.  Treat every direct fan-in
@@ -3794,18 +3794,16 @@ def _refine_direct_root_fanin_arrays(
     accepted_visible = _visible_layout_signature(accepted, logical_edges)
     indegree = Counter({name: 0 for name in nodes})
     direct_by_target: dict[str, list[int]] = defaultdict(list)
-    direct_mux_targets_by_root: dict[str, set[str]] = defaultdict(set)
     outgoing_by_root: dict[str, list[int]] = defaultdict(list)
     for index, logical in enumerate(logical_edges, 1):
         indegree[logical.target] += 1
         outgoing_by_root[logical.source].append(index)
-        source_kind = str(nodes[logical.source].item.get("kind", ""))
-        target_kind = str(nodes[logical.target].item.get("kind", ""))
-        if (
-            source_kind in {"source", "from"}
-            and target_kind.startswith("mux")
-        ):
+    for index, logical in enumerate(logical_edges, 1):
+        if indegree[logical.source] == 0:
             direct_by_target[logical.target].append(index)
+    direct_mux_targets_by_root: dict[str, set[str]] = defaultdict(set)
+    for logical in logical_edges:
+        if str(nodes[logical.target].item.get("kind", "")).startswith("mux"):
             direct_mux_targets_by_root[logical.source].add(logical.target)
 
     accepted_arrays = 0
@@ -3817,22 +3815,19 @@ def _refine_direct_root_fanin_arrays(
         roots = [
             root for root in roots
             if indegree[root] == 0
+            and "layout_column" not in nodes[root].item
+        ]
+        if len(roots) < 2:
+            continue
+        legacy_roots = [
+            root for root in roots
+            if str(nodes[target_name].item.get("kind", "")).startswith("mux")
+            and str(nodes[root].item.get("kind", "")) in {"source", "from"}
             and len(direct_mux_targets_by_root[root]) == 1
         ]
-        if len(roots) < 3:
-            continue
+        legacy_mux_array = len(legacy_roots) >= 3 and set(legacy_roots) == set(roots)
         by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
         edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
-        source_ids_by_root = {
-            root: {
-                edge_by_id[f"e{index}"].source_id
-                for index in outgoing_by_root[root]
-            }
-            for root in roots
-        }
-        if any(len(ids) != 1 for ids in source_ids_by_root.values()):
-            blockers["multiple-physical-facilities"] += 1
-            continue
         direct_index_by_root = {
             logical_edges[index - 1].source: index
             for index in direct_indices
@@ -3841,23 +3836,85 @@ def _refine_direct_root_fanin_arrays(
         if len(direct_index_by_root) != len(roots):
             blockers["ambiguous-direct-input"] += 1
             continue
+        if legacy_mux_array:
+            source_ids_by_root = {
+                root: {
+                    edge_by_id[f"e{index}"].source_id
+                    for index in outgoing_by_root[root]
+                }
+                for root in roots
+            }
+            if any(len(ids) != 1 for ids in source_ids_by_root.values()):
+                blockers["multiple-physical-facilities"] += 1
+                continue
+        else:
+            source_ids_by_root = {
+                root: {edge_by_id[f"e{direct_index_by_root[root]}"].source_id}
+                for root in roots
+            }
 
         candidate = _clone_layout_geometry(accepted)
         candidate_by_id = {vertex.cell_id: vertex for vertex in candidate.vertices}
         candidate_edges = {edge.cell_id: edge for edge in candidate.edges}
-        owned_by_root = {root: {root} for root in roots}
-        claimed = set(roots)
-        affected_indices = {
-            index
-            for index, logical in enumerate(logical_edges, 1)
-            if logical.source in claimed or logical.target in claimed
+        facility_ids = {
+            next(iter(source_ids_by_root[root])) for root in roots
         }
+        affected_indices = (
+            {
+                index for index, logical in enumerate(logical_edges, 1)
+                if logical.source in roots or logical.target in roots
+            }
+            if legacy_mux_array else
+            {
+                index for index in range(1, len(logical_edges) + 1)
+                if edge_by_id[f"e{index}"].source_id in facility_ids
+            }
+        )
         old_points: dict[int, list[tuple[float, float]]] = {}
         source_vertices = [
             by_id[next(iter(source_ids_by_root[root]))] for root in roots
         ]
-        common_source_x = min(vertex.x for vertex in source_vertices)
-        column_spread_before = max(vertex.x for vertex in source_vertices) - common_source_x
+        column_tolerance = median(
+            vertex_visual_box(vertex).right - vertex_visual_box(vertex).left
+            for vertex in source_vertices
+        ) / 2.0
+        physical_outdegree = Counter(edge.source_id for edge in accepted.edges)
+        if legacy_mux_array:
+            common_source_x = min(vertex.x for vertex in source_vertices)
+        else:
+            # A zero-indegree facility belongs at its latest feasible layer.
+            # Aligning an array may move earlier members right, but it must
+            # never pull a later member back to an avoidable earlier layer.
+            common_source_x = max(vertex.x for vertex in source_vertices)
+            # Project the desired latest column into the complete shared
+            # facility's endpoint-clearance interval.  This keeps the visual
+            # layer while leaving room for one legal source-side trunk.
+            shared_limits = []
+            for source_id in facility_ids:
+                if physical_outdegree[source_id] < 2:
+                    continue
+                source_vertex = by_id[source_id]
+                source_box = vertex_visual_box(source_vertex)
+                right_offset = source_box.right - source_vertex.x
+                for index in affected_indices:
+                    edge = edge_by_id[f"e{index}"]
+                    if edge.source_id != source_id:
+                        continue
+                    target_box = vertex_visual_box(by_id[edge.target_id])
+                    shared_limits.append(
+                        target_box.left - 2.0 * route_clearance - right_offset
+                    )
+            if shared_limits:
+                common_source_x = min(common_source_x, min(shared_limits))
+            if common_source_x < max(vertex.x for vertex in source_vertices) - 1e-6:
+                blockers["root-layer"] += 1
+                continue
+        column_spread_before = (
+            max(vertex.x for vertex in source_vertices)
+            - min(vertex.x for vertex in source_vertices)
+        )
+        if not legacy_mux_array and column_spread_before <= column_tolerance:
+            continue
         for index in affected_indices:
             logical = logical_edges[index - 1]
             edge = edge_by_id[f"e{index}"]
@@ -3881,29 +3938,33 @@ def _refine_direct_root_fanin_arrays(
             edge = edge_by_id[f"e{direct_index}"]
             source = by_id[edge.source_id]
             target = by_id[edge.target_id]
-            source_axis = abs_port_xy(
-                source.x, source.y, source.width, source.height,
-                source.style, source.drawclock_type, logical.source_port,
-            )[1]
-            target_axis = abs_port_xy(
-                target.x, target.y, target.width, target.height,
-                target.style, target.drawclock_type, logical.target_port,
-            )[1]
-            delta_y = target_axis - source_axis
             candidate_source = candidate_by_id[next(iter(source_ids_by_root[root]))]
             candidate_source.x = common_source_x
-            candidate_source.y += delta_y
+            if legacy_mux_array:
+                source_axis = abs_port_xy(
+                    source.x, source.y, source.width, source.height,
+                    source.style, source.drawclock_type, logical.source_port,
+                )[1]
+                target_axis = abs_port_xy(
+                    target.x, target.y, target.width, target.height,
+                    target.style, target.drawclock_type, logical.target_port,
+                )[1]
+                candidate_source.y += target_axis - source_axis
 
         valid = True
+        invalid_route: tuple[int, list[tuple[float, float]]] | None = None
+        clearance_blocked = False
         for root in roots:
             root_indices = [
                 index
                 for index in affected_indices
-                if logical_edges[index - 1].source in owned_by_root[root]
+                if edge_by_id[f"e{index}"].source_id
+                == next(iter(source_ids_by_root[root]))
             ]
             root_vertical_xs = [
                 a[0]
                 for index in outgoing_by_root[root]
+                if index in old_points
                 for a, b in zip(old_points[index], old_points[index][1:])
                 if abs(a[0] - b[0]) <= 1e-6 and abs(a[1] - b[1]) > 1e-6
             ]
@@ -3921,36 +3982,73 @@ def _refine_direct_root_fanin_arrays(
                     target.x, target.y, target.width, target.height,
                     target.style, target.drawclock_type, logical.target_port,
                 )
-                if abs(start[1] - end[1]) <= 1e-6:
-                    points = [start, end]
-                else:
-                    old_vertical_xs = [
-                        a[0]
-                        for a, b in zip(old_points[index], old_points[index][1:])
-                        if abs(a[0] - b[0]) <= 1e-6
-                        and abs(a[1] - b[1]) > 1e-6
-                    ]
-                    lane = old_vertical_xs[0] if old_vertical_xs else root_lane
-                    if lane is None:
-                        source_box = vertex_visual_box(source)
-                        target_box = vertex_visual_box(target)
-                        left = source_box.right + route_clearance
-                        right = target_box.left - route_clearance
-                        lane = (left + right) / 2.0
+                old_start = old_points[index][0]
+                old_route = old_points[index]
+                first_vertical = next((
+                    offset
+                    for offset, (a, b) in enumerate(zip(old_route, old_route[1:]))
+                    if abs(a[0] - b[0]) <= 1e-6
+                    and abs(a[1] - b[1]) > 1e-6
+                ), None)
+                if legacy_mux_array:
+                    if abs(start[1] - end[1]) <= 1e-6:
+                        points = [start, end]
+                    else:
+                        old_vertical_xs = [
+                            a[0]
+                            for a, b in zip(old_route, old_route[1:])
+                            if abs(a[0] - b[0]) <= 1e-6
+                            and abs(a[1] - b[1]) > 1e-6
+                        ]
+                        lane = old_vertical_xs[0] if old_vertical_xs else root_lane
+                        if lane is None:
+                            source_box = vertex_visual_box(source)
+                            target_box = vertex_visual_box(target)
+                            lane = (
+                                source_box.right + route_clearance
+                                + target_box.left - route_clearance
+                            ) / 2.0
+                        points = _simplify([
+                            start, (lane, start[1]), (lane, end[1]), end,
+                        ])
+                elif (
+                    physical_outdegree[edge.source_id] >= 2
+                    and first_vertical is not None
+                ):
+                    source_visible = vertex_visual_box(source)
+                    target_visible = vertex_visual_box(target)
+                    lane = source_visible.right + route_clearance
+                    if lane > target_visible.left - route_clearance + 1e-6:
+                        valid = False
+                        clearance_blocked = True
+                        break
+                    branch_y = old_route[first_vertical + 1][1]
                     points = _simplify([
-                        start, (lane, start[1]), (lane, end[1]), end,
+                        start,
+                        (lane, start[1]),
+                        (lane, branch_y),
+                        *old_route[first_vertical + 2:],
+                    ])
+                else:
+                    points = _simplify([
+                        start, (old_start[0], start[1]), *old_route[1:]
                     ])
                 if any(
                     abs(a[0] - b[0]) > 1e-6 and abs(a[1] - b[1]) > 1e-6
                     for a, b in zip(points, points[1:])
                 ):
                     valid = False
+                    invalid_route = (index, points)
                     break
                 edge.waypoints = tuple(points[1:-1])
             if not valid:
                 break
         if not valid:
-            blockers["non-orthogonal"] += 1
+            if clearance_blocked:
+                blockers["lane-clearance"] += 1
+            else:
+                suffix = f":e{invalid_route[0]}" if invalid_route else ""
+                blockers[f"non-orthogonal{suffix}"] += 1
             continue
 
         candidate_report = assess_layout(candidate, logical_edges, 0.0)
@@ -3970,9 +4068,20 @@ def _refine_direct_root_fanin_arrays(
             "endpoint-route": candidate_endpoint.issubset(accepted_endpoint),
             "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
             "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
-            "crossing": alignment_improves or candidate_report["crossings"] <= accepted_report["crossings"],
-            "bend": alignment_improves or candidate_report["bends_total"] <= accepted_report["bends_total"],
-            "length": alignment_improves or candidate_report["manhattan_length"] <= accepted_report["manhattan_length"] + 1e-6,
+            "crossing": (
+                legacy_mux_array
+                or candidate_report["crossings"] <= accepted_report["crossings"]
+            ),
+            "bend": (
+                legacy_mux_array
+                or candidate_report["bends_total"] <= accepted_report["bends_total"]
+            ),
+            "length": (
+                not legacy_mux_array
+                or candidate_report["manhattan_length"]
+                <= accepted_report["manhattan_length"] + 1e-6
+                or alignment_improves
+            ),
         }
         improves = (
             candidate_report["crossings"] < accepted_report["crossings"]
@@ -6704,6 +6813,19 @@ def generate_elk_layout(
         report["selection"]["final_fanout_tree_candidate_overlaps"] = (
             post_final_overlap
         )
+    # Close direct-root layer equivalence on the actual serialized geometry.
+    # Earlier routing owners can make a previously rejected column transaction
+    # feasible; no later placement/routing pass may overwrite this closure.
+    document, artifact_direct_array_report = _refine_direct_root_fanin_arrays(
+        document,
+        nodes,
+        logical_edges,
+        route_clearance=profile.route_clearance,
+    )
+    report["selection"].update({
+        key.replace("direct_root_array", "artifact_direct_root_array"): value
+        for key, value in artifact_direct_array_report.items()
+    })
     accepted_assessment = None
     report["selection"]["source_rendering_replicas"] = (
         len(document.vertices) - len(nodes)

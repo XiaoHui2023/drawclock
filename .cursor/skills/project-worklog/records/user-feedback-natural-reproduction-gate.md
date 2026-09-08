@@ -1,9 +1,91 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: done
+- status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 21:30 +08:00
+- updated: 2026-09-08 23:00 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 23:00 最终结果图由明确本地 Edge profile 成功生成 `pad-direct-roots-fixed.png`（86,371 bytes）并目视复核：pad_03 的 gate/from 根与 pad_07 的 source/gate 根分别形成同一视觉列，公共 from 仍为单设施纵向总线；合法边界没有被强制打散。Edge 首次未带隔离 profile 只报 WSALookupServiceBegin 10108 且未写文件，第二次写出成功但仍有 10108、QQBrowser 路径和账户图片获取告警，均不影响本地 file SVG/PNG。
+- 23:00 五件套首次误加 `--require-skills-manifest`，对这个明确的 legacy-absent 项目返回 missing `project-required-skills.json`；按脚本报告的兼容合同去掉该额外要求后 PASS，worklog_errors=[]，没有伪造空 manifest。期间一次工具调用对象语法错误未执行，另一次误拼不存在的账本路径只产生 pathspec fatal；INDEX 又被手误写入 `13 Downs` 和一段乱码，均由回读发现并立即精确恢复。学习目标和联网检索已完成，实际交付未受这些工具失败影响。
+- 23:00 本轮进入交付：最终证据为冻结 021 双红、current 双绿、递归攻击 7/7 clean、pytest 519/519、公开图 26/26×22=572、release issue 17/17、JSON/diff/五件套全绿；现在提交并推送 main，再值守滚动 v1.0.0 workflow、公开资产哈希与回下载 smoke。远端任一步失败则保持本记录 active 并继续修复，不把 push 当发布。
+
+- 22:48 最终候选全量 `python -m pytest -q` 为 519/519 PASS（65.56s）。全公开终态质量系统新鲜生成 26/26 PASS，每张图执行同一 22 项 exact-set，共 572 次指标执行、失败 0；六类 annotation profile 仍全覆盖。release feedback gate 17/17 PASS，所有相关 JSON 解析与 cached diff whitespace 检查通过。现把 `META-QUALITY-010` 的历史 21/546 发布证据升级为本轮 22/572，并再次复验 release 门；这是质量注册表新增指标后的账本同步，不改产品或 Oracle。
+
+- 22:38 最终源码与最终 Oracle 的递归攻击 run `20260908T113322Z-5f50c0be` 连续 7/7 clean；这次覆盖发生在 ALAP 回退修复和最终 021 收据之后，因此替代所有较早攻击回执。接下来暂存最终 source/Oracle/corpus/skill/账本/receipt 及精确 fix evidence 组，执行完整 pytest、全部公开图 22 项笛卡尔积、release gate、五件套与 diff/JSON 检查；任一结果不会被前一轮绿灯继承。
+
+- 22:27 最终 Oracle 的冻结自然复现已重签 corpus `...+20260908T113039Z-2d1afbd6`：021 双跑均精确命中、missing_issues=[]，solve gate 17/17 PASS。随后最终源码修复验证组 `20260908T113113Z-1ad9c2f8` 全部 issue failures=[]。本轮只更新 021 账本指向该新鲜组并纳入对应 evidence，随后再次执行七轮攻击。一次书写工作记录补丁时把日期键误写为 `2026-09-nth08`，apply_patch 因上下文不存在而拒绝；另一次工具输入含无效补丁标记且未产生文件变化，两次均不计修改。
+
+- 22:15 最右层定向 mutant、任意 kind 正例、已同列反例、交叉/障碍边界和旧 mux 数组共 5/5 PASS；混合根高交互图与 corpus exact-set 原失败 2/2 PASS，源码/Oracle 编译通过。失效的 shared-column 偏好参数与变量已删除，避免保留双重策略假象。由于 Oracle、生产源码与 corpus 合同均变化，21:22 的正式 fix 组和 21:38 的攻击组按哈希已陈旧；下一步顺序固定为冻结红灯重签 → current 绿灯重签 → 七轮攻击 → 全量/全公开 exact-set，任一步失败都重新回到对应阶段。
+
+- 22:06 ALAP 约束候选落地后，两项原失败与新 Oracle/legacy 专项合计 6/6 PASS；pad 当前图仍为 3 crossings/0 overlap/14 bends、021 witness=0。实现现统一选择 cohort 最右已有设施列，并在共享端点净空投影会落到更早层时以 `root-layer` 拒绝。下一步删除已失效的 `prefer_shared_facility` 参数和变量，并增加一个定向 mutant：最右列被障碍占用而更左共同列几何上安全时也必须拒绝，证明不会为同列美观牺牲最新可行根层。
+
+- 21:58 两个 Skill 均 `Skill is valid!`。直接调用 PATH 中 `pytest.exe` 使用了不同 Anaconda 环境，收集时 3 个项目模块导入失败；改用当前解释器 `python -m pytest` 后实际执行 518 项，516 pass/2 fail。第一项是 021 尚未加入 corpus 的 declared issue exact-set；第二项是真实跨特性回归：通用同列事务把 `local_a_02/local_b_02` 从最新可行根层拉回更左列，旧硬门以 `avoidable-root-layer` 拒绝，虽 0 交叉/0 overlap 仍不能接受。根因是早期候选偏爱少数共享设施列，质量向量却漏接既有 ALAP 根层不变量。修复统一采用不早于 cohort 最右现有层的候选；若共享端点净空投影迫使列左移则拒绝。独立 Oracle 同步此约束，corpus 加入 021，随后旧 fix/攻击回执按源码/Oracle 哈希自动作废并从头重签。
+
+- 21:47 渐进披露知识已同步到用户根 `clock-tree-layout` 与项目离线 `clock-layout-algorithms`：新增任意 kind/任意 merge 的可行直连根层、物理端点设施绑定、整 cohort+全关联路线联合事务、端点净空、共享首纵干线边界，以及“每个特性一个指标、每张公开图完整 exact-set、正/故障/边界+mutant”的强制质检合同。首次准备校验时实时记录 Hook 因这笔项目 skill 修改尚未入账而 fail-closed，命令未执行；现补记后再运行 skill 校验和全量测试。
+
+- 21:38 021 历史 attempt 已纠正为 endpoint-aware 的 pad_03/07 真 witness，并明确记录 pad_02/05 假阳性根因；不再遗留与正式收据冲突的学习材料。第一次调用递归 runner 漏传必需 `--receipt`，argparse exit=1、未启动任何轮次；补上明确路径后 run `20260908T111705Z-4dc63b33` 连续 7/7 clean，证明冻结回放、顺序/端口变换、成对组合、跨特性与高交互场景均未重新命中目标问题。下一步只把最终验证组与攻击收据的精确依赖闭包纳入暂存，再让 release checker 在 Git 视角复验。
+
+- 21:30 021 已按新鲜组推进 `fixed_verified`，状态归属复核确认 001 未被误改。首次 release gate 按设计 FAIL（244 errors）：新验证组的原始 evidence 尚未进入 Git 闭包，且 source/Oracle 变化使既有七轮攻击收据陈旧；这不是产品回归，也不计发布通过。审计同时发现 021 早期 attempt 文本仍写 Oracle 修正前的 pad_02/05 假阳性和固定多数列策略，虽正式 receipt 已正确重签，但历史分析会误导后续学习；现将其更正为 pad_03/07 真 witness、共享设施 endpoint-clearance 边界与“枚举并投影可行列”的最终算法合同，再执行新的七轮攻击。
+
+- 21:22 最终源码正式修复验证组 `20260908T111312Z-5fc2c9c9` 完成，全部 17 个 issue 双跑均无 failure；021 的公开 current CLI 两类 corpus case 均为 `issue_oracle_exit_code=1`、`detected_issues=[]`、Oracle 前后 SVG 哈希相同，回执绑定当前 source/library/runner/Oracle/semantics 哈希。现仅据该新鲜回执把 021 推进 `fixed_verified`，随后再跑 release checker；不会用 runner 的“全 issue 一次刷新”替代账本状态和 Git 依赖闭包审计。
+
+- 21:15 唯一布局覆盖清单新增 `feasible-direct-root-fanin-column` 特性、critical 交互及 success/fault/boundary 三角色，清单闭合测试连同 Oracle/legacy 专项 5/5、全 registry exact-set 1/1 通过。当前公开 CLI 对 pad 与 30 号各独立双跑确定：pad SHA-256 `846AC776...B414`、30 号 `B9F1FC49...5DA2`；pad 终态 43 个逻辑节点/52 个设施/48 条边、3 个异网真交叉、0 异网重叠、14 折点，021 可行错列 witness=0，22 项质量入口 exit=0。即将用最终源码正式双跑签发 current fix receipt；此前任何旧绿收据均不替代本次新鲜回执。
+
+- 21:05 通用根→汇聚节点专项回归完成：新增 Oracle 的任意 kind/任意 target 正例、已同列反例、交叉/障碍阻断反例全部通过；30 号既有 source/from→mux 专项也恢复通过，证明新 x 列事务没有吞掉旧 y→port 轴优化。全图 exact-set 测试确认第 22 项 `feasible_direct_root_fanin_column` 对每张制品均被执行。下一步把该特性及 success/fault/boundary 覆盖写入唯一布局覆盖清单，再跑新鲜公共 CLI、全量和发行门。
+
+- 20:58 分流后 30 号仍红，selection 显示 legacy cohort 0 moves 且无 blocker。定位为新增的“x spread≤半宽则跳过”在 legacy 分支之前执行；30 号四根已被早期层同列，spread=0，但旧 refiner 仍必须继续做 y→mux port axis 联合优化以消除交叉/折点。该提前返回只适用于新 x-column 事务，legacy mux 分支不得消费。首个专项 pytest 命令还把筛选词误写成 `root_root`，只得到 55 deselected；随后正确命令执行并暴露上述真实失败，未把空运行计为通过。
+
+- 20:51 新 Oracle 三个专项函数测试均通过，但联合命令第一次因两个 pytest 文件共用末尾 `-k` 只执行 1 项，拆开后才发现真实回归：30 号既有 source→mux 数组从绿图退化为 4 crossings/8 bends，并重新命中 FB-BEND-017。原因是直接在旧 mux 专项 refiner 内泛化时删除了其“设施 y 对齐 mux 端口轴”语义；pad 修复不能破坏成熟 mux owner。下一步在同一函数中显式分流：满足旧 source/from→mux≥3 合同的 cohort 完整保留原 y/route/验收策略；其它任意 kind/target 才走新的终态物理设施 x 同列事务。另发现阻断反例把 `a` 的 Box 误写成 `and`，导致它因缺少端点设施而空通过；同时修正，确保 mutant 真正经过交叉/障碍判定。
+
+- 20:43 修正 endpoint-aware Oracle 后，冻结自然 runner 已从头重签：基线只由 `pad_03/07` 两个无交叉退化的单设施 cohort 证明 021，`pad_02/05` 共享总线边界不再误报；17 项 solve gate 再次 PASS。下一步加入独立正例、已同列反例、交叉/障碍阻断反例与全 registry 第 22 指标执行测试，防止 Oracle 再次靠非法回头线或 kind 特判通过。
+
+- 20:38 独立 Oracle 已补齐共享物理设施事务：多边设施右移时同步移动首纵干线，逐出边检查源/目标 18px 端点净空，再复算实体重叠、穿框、异网交叉/重叠和折点。重新校准结果：冻结 f950283 基线只命中 `pad_03`、`pad_07` 两个真正安全的单边设施错列；当前产品候选两者均不命中，`pad_02/05` 在正反两侧都作为“完整安全反事实不存在”的合法边界。旧自然 receipt 因 Oracle hash 变化已陈旧，现从冻结基线重签后再补正/负/mutant 单测。
+
+- 20:31 可行区间投影后的共享网络候选仍被真实 crossing 门拒绝；这证明 `pad_02/05` 在当前完整布局中属于用户所说的“对齐会发生交叉/跨线”边界，不应强制。此前独立 Oracle 把共享设施右移却保留设施左侧旧纵干线，生成违反端点净空的回头线，才误报二者安全。Oracle 现必须与产品同样联合移动首纵干线、检查 source/target 两侧 18px 净空，并尝试候选后复算全图；冻结基线的合法红灯应收敛为单边物理副本 `pad_03/07`，当前产品已在不改变 3 crossings/0 overlap/14 bends 下对齐这两组。修改 Oracle 后旧 receipt 因 Oracle hash 自动陈旧，必须重新签发自然复现与修复证据。
+
+- 20:23 细化后发现 `invalid_route` 为空，说明此前 `non-orthogonal` 汇总标签实际来自 lane-clearance 提前退出，而非斜线；这是内部诊断名错误。几何值为：public_from 原可见右界 152.84，右移到多数 x=231.85 后右界 294.86，首纵线需 ≥312.86；pad 可见左界 324.04，末端净空要求纵线 ≤306.04，两侧差 6.82px。通用解是把共同层轴从多数 x 向左夹到完整共享设施所有目标的最大可行 x≈224.97；它与局部根 x=231.85 的差 6.88px，小于 43px 级设施半宽容差，视觉仍属同一列，同时保留双侧 18px 净空。候选列因此是“多数期望列投影到设施完整可行区间”，不是固定坐标；提前退出改记 `lane-clearance`。
+
+- 20:14 共享设施首纵干线联合移动后仍未落地，终态 blocker 从 endpoint 变为 `non-orthogonal: 2`，说明候选构造至少一条边在拼接旧后缀时丢失了必要正交拐点；产物保持上一候选不变，仍未假绿。先把 blocker 细化到具体 edge index 并保存候选点，定位哪一种首纵段拓扑未被覆盖，再修正通用拼接；该诊断字段只进入内部 selection report，不改变 SVG 或验收条件。
+
+- 20:07 终态多数列候选不再因 crossing 被拒，但被 `endpoint-route` 两次拒绝。根因确认：简单保留旧首纵干线会让右移后的共享设施先向左回走，再在设施左侧转纵线；独立 Oracle 只检查穿框/交叉/重叠/折点，漏了“首纵线必须位于源可见框右侧净空”和“末纵线必须位于目标左侧净空”，因此此前可行性证明不充分，属于本轮新发现的 Oracle 缺口。修复策略不是关闭 endpoint 门：共享物理设施右移时，把所有同设施出边的首个共享纵干线作为一个网络事务移到 `source visible right + route_clearance`，保持分支 y 与后续路线；无纵段的直连边仍直接连接。独立 Oracle随后同步加入端点净空并重新校准红/绿。
+
+- 19:58 终态再次闭合仍为 0 move / crossing blocker=2。对照独立 Oracle 可见它证明的是把共享 public_from 设施移到两条局部根的多数列仍保持 3 crossings，而当前生产策略只尝试固定共享列、把局部设施左移；这是两个不同反事实，后者确会增加生产 crossing。refiner 增加显式列候选策略参数：中间态仍优先保共享总线，终态闭合改用多数列；两者都走相同全图硬门，只有实际可行的方向才落地。
+
+- 19:51 共享物理设施列优先后，结果仍只接受 2 组、`pad_02/05` 因 early-stage crossing 检查各被回滚；终态 SVG 仍是 3 交叉，而独立终态 Oracle 明确证明在最终路由上两组共同列不会增加交叉。这不是放宽交叉门，而是验收阶段过早：direct-array refiner 位于 trunk separation 与最终 fanout normalization 之前，拿中间态较低 crossing 基线拒绝了最终态可行变换。新增同一通用事务在所有终态路由 owner 之后再闭合一次；仍执行相同硬门，且之后不再有布局阶段可覆盖它。
+
+- 19:43 删除跨设施 lane 残留后，公开 CLI 恢复正常，设施数 52、交叉 3、重叠 0、折点 14 均与基线相同，长度从 8367.95 降至 8065.91；`pad_03/07` 已同列，但 `pad_02/05` 仍被 Oracle 命中。原因是这两组的离群根是一个服务 5 条边的真实 public_from 共享总线设施，终态 refiner 只尝试多数局部列，把整条总线右移的候选被硬门回滚后没有尝试其现有共享列。列选择改为：若 cohort 含多边物理设施，优先固定该共享设施列并移动单边局部设施；否则采用多数列。该规则按物理 source_id 出度，不依赖 from 名称或 kind。
+
+- 19:37 上游保护集合已恢复旧边界，仅终态 refiner 保留通用结构和物理 source_id 所有权。首轮生成未产出 SVG，公开 CLI 以 `KeyError 14` 退出；Oracle 随后因文件不存在明确拒绝，未形成假绿。根因是 refiner 已把 `affected_indices` 改成当前物理设施边集，但一段已不再使用的旧 lane 计算仍遍历逻辑根全部出边，并访问未纳入 `old_points` 的其它设施边 14。删除该死代码后重跑，不扩宽 affected 集以免再次跨设施修改。
+
+- 19:31 首次产品候选未通过：把上游 `_direct_root_fanin_array_roots` 一并泛化后，设施复制策略把 52 个终态设施收缩到 43 个，最终交叉从 3 激增到 52、折点从 14 增至 44；新同列 Oracle 仍命中 5 组。虽然终态事务自身禁止交叉增加，但上游保护集合在事务之前改变了整个布局，暴露了 owner 边界错误。该候选不计修复。回滚上游集合到原有 mux/source 专项，仅保留终态物理设施级通用事务，让它在原来 3-crossing 几何上局部验收。
+
+- 19:24 产品第一步已把 direct fan-in root 识别从“source/from + mux + ≥3 + 唯一 mux”泛化为“任意 kind 的零入度根 + 任意共同目标 + ≥2”，并继续尊重显式 `layout_column`。这只统一了上游保护集合；终态设施事务仍需改造为按目标边的真实物理 source_id 分组、列容差、多候选和完整质量回滚，否则多副本逻辑根仍会被旧 `multiple-physical-facilities` 阻断。
+
+- 19:20 新 issue 已显式声明 `required_reproduction_variants=[]`，冻结自然 runner 从头双跑并重签 receipt；`check_feedback_reproduction_gate.py --phase solve` 现对 17 个 issue 全部 PASS。保护前提不再陈旧，接下来第一次真正允许修改产品布局代码。
+
+- 19:15 产品保护钩第二次仍拒绝，显式门禁复跑精确报错为 `FB-ROOT-021: receipt is stale for the current issue contract`。首次诊断命令误用 `--stage` 而非实际 `--phase`，argparse 立即退出且未改状态；改正后定位到通用 runner 总把缺省 `required_reproduction_variants` 序列化为 `null`，而用户级 validator 对缺失字段完全省略，二者合同规范化不一致。为避免放宽 validator，新 issue 显式声明空 exact-set `[]` 并从冻结基线重新签发收据，使两端 canonical contract 完全一致。
+
+- 19:10 正式冻结复现 runner 批次 `20260908T103837Z-5adce6c1` 成功：`arbitrary-direct-root-pad-column-baseline` 两次均由 f950283 公开 CLI 生成，均直接检测 `FB-ROOT-021`，43 个逻辑节点/52 个显示设施/48 条边/3 个交叉/0 异网重叠/14 折点；issue attempt=2、聚合 `missing_issues=[]`，独立 receipt 已写入 `.reproduction/receipts/FB-ROOT-021.json`。至此保护钩所需的正式自然红灯血缘齐全，可以解冻产品 owner。
+
+- 19:04 已把 `arbitrary-direct-root-pad-column-baseline` 正确加入自然 `cases`，绑定冻结 f950283、公开 direct CLI 和 pad-r08-s02。首次把 corpus 与 issue receipt 路径合并补丁时，账本长行上下文因文本不精确未命中，整笔原子补丁未落盘；随后拆成小补丁，corpus 已成功写入。下一步仅用邻近 `reproduction_attempts` 数组闭括号补入 receipt 路径，并先做 JSON 结构断言。
+
+- 18:59 第一次正式 runner 执行没有产生 021 attempt，聚合回执明确为 `FB-ROOT-021: 0 / missing`，因此仍未解冻。根因是新 case 误加到只供修复验证的 `current_fix_cases`，自然复现 runner 只消费带冻结 revision/运行角色/CLI 模式的 `cases`；PowerShell 展示该数组曾造成误判，Python 结构审计确认主 cases 仍为 14 项。保留 current fix case，并另在自然 corpus 加入绑定 f950283 的 baseline case；同时为新 issue 补齐正式 reproduction receipt 路径后重跑。
+
+- 18:53 尝试解冻修改 `src/elk_layout.py` 时，`feedback-natural-reproduction` 保护钩正确拒绝：虽然 issue 已为 reproduced 且手工双跑为红，但正式 corpus receipt 尚未包含 `FB-ROOT-021`。没有任何产品文件被修改。下一步先把当前 pad 作为正常公开输入加入 evidence corpus，并由通用 runner 双跑、绑定 Oracle/输入/基线血缘、写正式 issue receipt；只有项目 precondition 实际转绿后再改产品。
+
+- 18:48 `FB-ROOT-021` 自然复现正式成立：公开 CLI 在冻结产品上独立双跑，SVG SHA-256 均为 `82B69212...AA70EE`；经列等价容差校准后的独立 Oracle 两次均只命中 `pad_02/03/05/07` 四个真实离群组，错列跨度 142.02–160.02px、容差 34.65px，多数现有列反事实保持全图 3 交叉、0 异网重叠、14 折点不变，witness JSON 完全一致。其余仅由器件宽度造成的 4.36–13.64px 差异不再误报；至此产品解冻，可以修改统一布局 owner。
+
+- 18:42 修正 8px 保守标签 halo 后，Oracle 在未改产品的当前 SVG 上真实命中全部 8 个 pad cohort；关键四组 `pad_02/03/05/07` 的 outlier 与局部根列相差 142–160px，联合移动后的全图仍为 3 个交叉、0 异网重叠、14 折点，直接证明用户症状。另四组只有 4.36–13.64px 的器件宽度/标签边界差，视觉上属于同一层，不应作为错误；Oracle 下一小步用设施可见宽度的一半作为列等价容差，并优先选择多数设施所在的现有列，防止把不同宽度的同层器件误报或把多数根移向离群列。
+
+- 18:36 新指标注册行已修正为合法 `feasible_direct_root_fanin_column / has_direct_root_fanin`，JSON 与 Python 编译通过，registry 为 22 项。第一次自然 Oracle 运行仍返回“symptom not observed”，所以未计复现、未解冻产品。诊断显示 pad 输入端口相邻 56px，而现有保守可见框因标签安全外扩相邻约 6.77px；Oracle 把这段安全外扩接触当作真实节点重叠，导致所有共同列候选被拒。下一步把联合反事实的设施碰撞改成与渲染净空一致的 8px 实体侵入阈值，同时仍以逐段穿框、交叉、异网重叠和折点完整约束防止假阳性。
+
+- 18:28 全图质量执行器已加入 `has_direct_root_fanin` 结构适用性，保证每张图仍执行完整 registry 并对无适用 cohort 给出可验证 `not_applicable`。同次注册表补丁因输入污染把新 metric id 和 `applicability` 键写成了非法字符串；尚未运行或签发任何门禁回执，现按精确 JSON 行立即修正并增加注册表解析校验，不能把该中间状态计作有效红灯。
+
+- 18:25 独立终态 Oracle 已先于产品改动加入 `FB-ROOT-021`：按结构枚举任意 kind 的零入度根到任意目标，至少两路即形成候选 cohort；从 SVG 端点绑定真实物理设施，联合移动设施及其全部同设施出边，并以可见框、正交性、逐段穿框、交叉、异网重叠和全图折点不退化作为可行性证明。产品 `src/**` 仍未修改。随后一次准备修改质量注册器的补丁文本含无效匹配字符串，被实时记录 hook 在执行前拒绝，未改任何文件；现改用精确上下文小补丁。
+
+- 18:19 用户展示公开 `pad-r08-s02` 终态图仍把直接进入 `pad_*` 的零入度根设施排在不同 x 列；这些根包含 source、from、gate 等不同器件类型，且截图中存在不增加交叉/跨线即可共同对齐的目标。旧 `direct_root_mux_column` 指标只覆盖至少三个 `source/from`、唯一直入 `mux` 的窄语义，因此此前 21 项全图 exact-set 虽执行完整，指标定义本身仍有 `oracle_escape + coverage_escape + claim_escape`；旧 PASS 对“任意根→任意多输入汇聚节点的可行同列”范围立即撤销，`src/**` 冻结。
+- 18:19 联网学习已完成：Graphviz `rank=same`、yFiles hierarchical same-layer/port alignment、Purchase 等图美学研究与 NIST 组合覆盖共同支持“同层等价约束 + 交叉优先 + 组合覆盖”；ELK/Graphviz 社区反例同时证明盲目强制同层会造成不稳定或交叉。由此新增的独立终态指标必须做完整设施集合的联合反事实：只有存在不新增交叉、跨线、碰撞、异网重叠和折点的共同列时才报错，不能按 kind、名称、mux 或固定坐标打补丁。
+- 18:19 Find Skills 以 graph layout quality metrics、orthogonal graph drawing testing、visual regression geometry oracle、combinatorial test coverage 搜索成功；候选均不比现有 drawclock 专项全图 Oracle/质量工作流更贴合，未安装无关 Skill。一次只读 issue 摘要命令因 PowerShell 内嵌 Python 引号错误触发 `SyntaxError: unterminated string literal`，未改文件；已改用 `ConvertFrom-Json` 取得可验证账本状态，对交付无影响。
 
 - 21:30 产品/消费门提交 `8bf168f717a6f51392440ad1fa4b0f04256f3e59` 已推送；Release run `34209874760` 的反馈门、Ubuntu 16.04 PyInstaller/staticx、Publish 和发布后 smoke 全部 success，`v1.0.0^{}` 指向该提交。本机从公开 URL 独立下载 17,180,885-byte 资产，SHA-256 `7392ec11abb69f7f63c85bd73742d22c0ea22a36c3f37f277227c06db94f39d8` 与 GitHub digest 完全一致；全新解包后的 frozen draw（含单设施、逻辑出边同起点、唯一首纵轴）和 offline source smoke 均 PASS。首次解压命令因误用 `New-Item` 不支持的位置参数而退出，未创建或提取文件；修正后从空目录成功完成，不把失败尝试计为验证。闭环证据记录作为最后一笔项目修改，由同一滚动 Release 再覆盖最终 tag。
 

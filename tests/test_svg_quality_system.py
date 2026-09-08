@@ -42,6 +42,7 @@ def test_every_artifact_executes_exact_complete_registry() -> None:
     by_id = {item["metric_id"]: item for item in report["metric_results"]}
     assert by_id["annotation_geometry"]["status"] == "not_applicable"
     assert by_id["annotation_geometry"]["applicability_proof"] == "annotations=0"
+    assert "feasible_direct_root_fanin_column" in report["executed_metric_ids"]
 
 
 def test_registry_rejects_duplicate_or_missing_identity(tmp_path: Path) -> None:

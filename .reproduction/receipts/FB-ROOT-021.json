@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "issue_id": "FB-ROOT-021",
+  "result": "reproduced",
+  "evidence_class": "user_reproduction",
+  "origin": "natural_user_workflow",
+  "fault_injection": false,
+  "output_mutated": false,
+  "production_code_changed": false,
+  "coverage_model": "many_to_many",
+  "corpus_id": "20260908T113039Z-2d1afbd6",
+  "required_reproduction_variants": [],
+  "semantics_sha256": "d72cb36b0982807f5b7c4639cda7d608659ae2fe593ceb6375d1d82d22212165",
+  "issue_contract_sha256": "56fcc0321f977ca3541bb03f180080fa8d147bc26954c1845ed902b14fb1d3fa",
+  "attempts": [
+    {
+      "run_id": "20260908T113039Z-2d1afbd6:arbitrary-direct-root-pad-column-baseline:1",
+      "corpus_id": "20260908T113039Z-2d1afbd6",
+      "case_id": "arbitrary-direct-root-pad-column-baseline",
+      "observed_issue_ids": [
+        "FB-ROOT-021"
+      ],
+      "public_entrypoint": "public_cli",
+      "entrypoint_reached": true,
+      "producer_exit_code": 0,
+      "oracle_exit_code": 0,
+      "baseline_revision": "f950283222f2917896f610ee05c974487debf1d7",
+      "artifact_before_oracle_sha256": "82b69212fdc1b5d307f74bb7225ffc7d55826d343775ea83cddd1107acaa70ee",
+      "artifact_after_oracle_sha256": "82b69212fdc1b5d307f74bb7225ffc7d55826d343775ea83cddd1107acaa70ee",
+      "producer_tree_before_sha256": "21923c95561b44c7cedba6ec9f5c0c089bf08c8d110f4a94cd0cedd74ff54fd6",
+      "producer_tree_after_sha256": "21923c95561b44c7cedba6ec9f5c0c089bf08c8d110f4a94cd0cedd74ff54fd6",
+      "command_sha256": "7d3f166a9bb990df38a2a7fb932ee329b9fe073add4a972d7be33b07861e8d41",
+      "input_sha256": "950e46956ed8d508b823297ea6f2c727adc8c810f0f673a7f50b10837b6c7bc4",
+      "runner_sha256": "f3c96076e712af01962bd4cd100c04a55a4344ff4011b93d2315340a8867c1f2",
+      "oracle_sha256": "4985ab107e710cc63204c9866411f561741a46744d891387140b440ed6385caf",
+      "started_at": "2026-09-08T11:30:58.104477+00:00",
+      "ended_at": "2026-09-08T11:31:01.307886+00:00",
+      "semantic_contract_sha256": null,
+      "semantic_variant_id": null,
+      "semantic_preconditions_met": true,
+      "semantic_symptom_observed": null,
+      "semantic_errors": [],
+      "evidence_files": {
+        ".reproduction/evidence/20260908T113039Z-2d1afbd6/arbitrary-direct-root-pad-column-baseline/attempt-1/output.svg": "82b69212fdc1b5d307f74bb7225ffc7d55826d343775ea83cddd1107acaa70ee",
+        ".reproduction/evidence/20260908T113039Z-2d1afbd6/arbitrary-direct-root-pad-column-baseline/attempt-1/producer.log": "938ac57d25fc839d98a0ab842b643113f8c6d8605561458347890cabaf9302ed",
+        ".reproduction/evidence/20260908T113039Z-2d1afbd6/arbitrary-direct-root-pad-column-baseline/attempt-1/report.json": "9d46c4c432dde0ce0d41a3c18577be19ab5aec3c7f4a9367e7a7fe6c0aebe2d0",
+        ".reproduction/evidence/20260908T113039Z-2d1afbd6/arbitrary-direct-root-pad-column-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260908T113039Z-2d1afbd6/arbitrary-direct-root-pad-column-baseline/attempt-1/FB-ROOT-021.log": "9d46c4c432dde0ce0d41a3c18577be19ab5aec3c7f4a9367e7a7fe6c0aebe2d0"
+      }
+    },
+    {
+      "run_id": "20260908T113039Z-2d1afbd6:arbitrary-direct-root-pad-column-baseline:2",
+      "corpus_id": "20260908T113039Z-2d1afbd6",
+      "case_id": "arbitrary-direct-root-pad-column-baseline",
+      "observed_issue_ids": [
+        "FB-ROOT-021"
+      ],
+      "public_entrypoint": "public_cli",
+      "entrypoint_reached": true,
+      "producer_exit_code": 0,
+      "oracle_exit_code": 0,
+      "baseline_revision": "f950283222f2917896f610ee05c974487debf1d7",
+      "artifact_before_oracle_sha256": "82b69212fdc1b5d307f74bb7225ffc7d55826d343775ea83cddd1107acaa70ee",
+      "artifact_after_oracle_sha256": "82b69212fdc1b5d307f74bb7225ffc7d55826d343775ea83cddd1107acaa70ee",
+      "producer_tree_before_sha256": "21923c95561b44c7cedba6ec9f5c0c089bf08c8d110f4a94cd0cedd74ff54fd6",
+      "producer_tree_after_sha256": "21923c95561b44c7cedba6ec9f5c0c089bf08c8d110f4a94cd0cedd74ff54fd6",
+      "command_sha256": "38edd3370249c5b97c1a48e015a8d1a4a06a1abfa5e2d30e5fe890aba2746fcc",
+      "input_sha256": "950e46956ed8d508b823297ea6f2c727adc8c810f0f673a7f50b10837b6c7bc4",
+      "runner_sha256": "f3c96076e712af01962bd4cd100c04a55a4344ff4011b93d2315340a8867c1f2",
+      "oracle_sha256": "4985ab107e710cc63204c9866411f561741a46744d891387140b440ed6385caf",
+      "started_at": "2026-09-08T11:31:01.317208+00:00",
+      "ended_at": "2026-09-08T11:31:04.542148+00:00",
+      "semantic_contract_sha256": null,
+      "semantic_variant_id": null,
+      "semantic_preconditions_met": true,
+      "semantic_symptom_observed": null,
+      "semantic_errors": [],
+      "evidence_files": {
+        ".reproduction/evidence/20260908T113039Z-2d1afbd6/arbitrary-direct-root-pad-column-baseline/attempt-2/output.svg": "82b69212fdc1b5d307f74bb7225ffc7d55826d343775ea83cddd1107acaa70ee",
+        ".reproduction/evidence/20260908T113039Z-2d1afbd6/arbitrary-direct-root-pad-column-baseline/attempt-2/producer.log": "2ee8771e8a175f5b6582c4dd2d7f68f2b2041c52d4ae74fc625ec136a099ec4a",
+        ".reproduction/evidence/20260908T113039Z-2d1afbd6/arbitrary-direct-root-pad-column-baseline/attempt-2/report.json": "9d46c4c432dde0ce0d41a3c18577be19ab5aec3c7f4a9367e7a7fe6c0aebe2d0",
+        ".reproduction/evidence/20260908T113039Z-2d1afbd6/arbitrary-direct-root-pad-column-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260908T113039Z-2d1afbd6/arbitrary-direct-root-pad-column-baseline/attempt-2/FB-ROOT-021.log": "9d46c4c432dde0ce0d41a3c18577be19ab5aec3c7f4a9367e7a7fe6c0aebe2d0"
+      }
+    }
+  ]
+}

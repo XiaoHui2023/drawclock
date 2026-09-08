@@ -187,6 +187,15 @@
           }
         }
       }
+    },
+    {
+      "id": "arbitrary-direct-root-pad-column-baseline",
+      "baseline_revision": "f950283222f2917896f610ee05c974487debf1d7",
+      "python_role": "current",
+      "cli_mode": "direct",
+      "input": "tests/reproduction-corpus/pad-r08-s02.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROOT-021"]
     }
   ],
   "current_fix_cases": [
@@ -258,6 +267,12 @@
           }
         }
       }
+    },
+    {
+      "id": "arbitrary-direct-root-pad-column-current",
+      "input": "tests/reproduction-corpus/pad-r08-s02.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROOT-021"]
     }
   ]
 }

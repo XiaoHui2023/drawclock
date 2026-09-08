@@ -1100,6 +1100,86 @@ def test_staggered_source_array_passes_generic_final_svg_gate(tmp_path: Path) ->
     assert report["witnesses"]["root_fanout_axis_dominance_witnesses"] == []
 
 
+def test_feasible_direct_root_fanin_column_is_kind_and_target_independent() -> None:
+    config = {
+        "a": {"kind": "gate"},
+        "b": {"kind": "source"},
+        "c": {"kind": "from"},
+        "join": {"kind": "pad3"},
+    }
+    boxes = [
+        oracle.Box("a", 0, 0, 10, 10),
+        oracle.Box("b", 100, 30, 10, 10),
+        oracle.Box("c", 100, 60, 10, 10),
+        oracle.Box("join", 200, 0, 20, 80),
+    ]
+    routes = [
+        oracle.Route(0, [(10, 5), (200, 5)], "a", "join", "0"),
+        oracle.Route(1, [(110, 35), (200, 35)], "b", "join", "1"),
+        oracle.Route(2, [(110, 65), (200, 65)], "c", "join", "2"),
+    ]
+    witnesses = oracle._feasible_direct_root_fanin_column_witnesses(
+        config, {"a", "b", "c"}, routes, boxes
+    )
+    assert [item["target"] for item in witnesses] == ["join"]
+    assert witnesses[0]["candidate_column"] == 100
+    assert witnesses[0]["crossing_events_after"] == 0
+
+
+def test_feasible_direct_root_fanin_column_accepts_an_aligned_counterexample() -> None:
+    config = {"a": {"kind": "gate"}, "b": {"kind": "source"}, "join": {"kind": "custom"}}
+    boxes = [
+        oracle.Box("a", 100, 0, 10, 10),
+        oracle.Box("b", 100, 30, 10, 10),
+        oracle.Box("join", 200, 0, 20, 50),
+    ]
+    routes = [
+        oracle.Route(0, [(110, 5), (200, 5)], "a", "join", "0"),
+        oracle.Route(1, [(110, 35), (200, 35)], "b", "join", "1"),
+    ]
+    assert oracle._feasible_direct_root_fanin_column_witnesses(
+        config, {"a", "b"}, routes, boxes
+    ) == []
+
+
+def test_feasible_direct_root_fanin_column_rejects_crossing_or_obstacle_tradeoff() -> None:
+    config = {"a": {"kind": "gate"}, "b": {"kind": "source"}, "join": {"kind": "pad2"}}
+    boxes = [
+        oracle.Box("a", 0, 0, 10, 10),
+        oracle.Box("b", 100, 30, 10, 10),
+        oracle.Box("join", 200, 0, 20, 50),
+        oracle.Box("obstacle", 100, 0, 10, 10),
+    ]
+    routes = [
+        oracle.Route(0, [(10, 5), (200, 5)], "a", "join", "0"),
+        oracle.Route(1, [(110, 35), (200, 35)], "b", "join", "1"),
+        oracle.Route(2, [(50, 20), (50, 50)], "external", "external_sink", "0"),
+    ]
+    assert oracle._feasible_direct_root_fanin_column_witnesses(
+        config, {"a", "b"}, routes, boxes
+    ) == []
+
+
+def test_feasible_direct_root_fanin_column_never_regresses_latest_root_layer() -> None:
+    config = {"a": {"kind": "gate"}, "b": {"kind": "source"}, "join": {"kind": "pad2"}}
+    boxes = [
+        oracle.Box("a", 0, 0, 10, 10),
+        oracle.Box("b", 100, 30, 10, 10),
+        oracle.Box("join", 200, 0, 20, 50),
+        oracle.Box("right_column_blocker", 100, 0, 10, 10),
+    ]
+    routes = [
+        oracle.Route(0, [(10, 5), (200, 5)], "a", "join", "0"),
+        oracle.Route(1, [(110, 35), (200, 35)], "b", "join", "1"),
+    ]
+    # Moving b back to a's column is obstacle-free, but would regress b's
+    # already-latest feasible root layer.  The only admissible direction is
+    # toward b, where the blocker makes the joint transaction infeasible.
+    assert oracle._feasible_direct_root_fanin_column_witnesses(
+        config, {"a", "b"}, routes, boxes
+    ) == []
+
+
 def test_quality_oracle_keeps_output_ports_as_distinct_networks(tmp_path: Path) -> None:
     config = {
         "root": {"kind": "source"},

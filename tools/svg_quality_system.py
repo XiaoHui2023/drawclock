@@ -115,6 +115,13 @@ def _applicable(kind: str, report: dict[str, Any], config: dict[str, Any]) -> tu
                 direct[edge.target] += 1
         count = sum(value >= 3 for value in direct.values())
         return count > 0, f"direct_root_mux_arrays={count}"
+    if kind == "has_direct_root_fanin":
+        direct: Counter[str] = Counter()
+        for edge in logical:
+            if edge.source in roots:
+                direct[edge.target] += 1
+        count = sum(value >= 2 for value in direct.values())
+        return count > 0, f"direct_root_fanins={count}"
     raise ValueError(f"unknown applicability predicate: {kind}")
 
 

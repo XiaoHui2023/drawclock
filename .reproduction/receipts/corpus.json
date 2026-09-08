@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "corpus_id": "merged:merged:merged:merged:20260907T014732Z-ff0a4ce1+20260907T085940Z-f059a5ec+20260908T030927Z-8159ddf2+20260908T031721Z-6bc9d000+20260908T073913Z-51fb01e3",
+  "corpus_id": "merged:merged:merged:merged:merged:merged:merged:merged:merged:20260907T014732Z-ff0a4ce1+20260907T085940Z-f059a5ec+20260908T030927Z-8159ddf2+20260908T031721Z-6bc9d000+20260908T073913Z-51fb01e3+20260908T103521Z-73e55677+20260908T103837Z-5adce6c1+20260908T104123Z-ecee64b0+20260908T110042Z-f2b3e73f+20260908T113039Z-2d1afbd6",
   "coverage_model": "many_to_many",
   "cases": [
     {
@@ -548,6 +548,42 @@
         "bends": 2,
         "manhattan_length_px": 2028.1544
       }
+    },
+    {
+      "case_id": "arbitrary-direct-root-pad-column-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-021"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 52,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 3,
+        "distinct_crossing_points": 3,
+        "different_net_overlaps": 0,
+        "bends": 14,
+        "manhattan_length_px": 8367.9526
+      }
+    },
+    {
+      "case_id": "arbitrary-direct-root-pad-column-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-021"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 52,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 3,
+        "distinct_crossing_points": 3,
+        "different_net_overlaps": 0,
+        "bends": 14,
+        "manhattan_length_px": 8367.9526
+      }
     }
   ],
   "issue_attempt_counts": {
@@ -565,6 +601,7 @@
     "FB-ROOT-015": 2,
     "FB-ROOT-016": 4,
     "FB-ROOT-020": 4,
+    "FB-ROOT-021": 2,
     "FB-ROUTE-002": 4,
     "FB-ROUTE-009": 6
   },
