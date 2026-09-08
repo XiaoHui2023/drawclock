@@ -248,6 +248,17 @@ class FeedbackReproductionGateTest(unittest.TestCase):
             module._validate_fix_receipt(changed, errors)
             self.assertTrue(errors, issue["id"])
 
+    def test_release_gate_rejects_evidence_available_only_in_local_worktree(self) -> None:
+        manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+        spec = importlib.util.spec_from_file_location("drawclock_feedback_checker", CHECKER)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        errors: list[str] = []
+        module._validate_fix_receipt(manifest["issues"][0], errors, set())
+        self.assertTrue(any("not Git-tracked for a clean release checkout" in error for error in errors))
+
     def test_fix_determinism_is_scoped_to_each_input_case(self) -> None:
         manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
         route_issue = next(issue for issue in manifest["issues"] if issue["id"] == "FB-ROUTE-002")

@@ -11,9 +11,9 @@
 - 独立 Oracle 新增 `root_facility_split_witnesses` 与 `physical_anchor_relocation_witnesses`，判定只读取最终 SVG、逻辑零入度、物理端点归属和几何，不读取器件 kind、实例名、样例号或生产布局模块。正式双跑收据尚未签发。
 - Oracle 测试增加当前公开入口的两项自然红灯与一个同样含零入度根但无跨干线/无设施拆分收益的干净反例；测试产物只用于检测器校准，正式复现仍必须由冻结 revision 双跑收据授权。
 
-- status: done
+- status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 09:28 +08:00
+- updated: 2026-09-08 09:43 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
@@ -709,3 +709,5 @@
 - 22:10 本轮范围完成。学习与工具失败均已记录且有替代：CairoSVG 未安装、CUA 管理员 Hook 阻断，改用 Edge headless 生成 output-fixed.png；Edge 本地渲染成功，网络通知 10108 告警不影响产物。未执行 commit/push，保留用户现有脏工作树并等待明确上传指令。
 - 09:24 复盘“验收通过却未发布”：直接原因是把 `github-upload` 的当轮显式触发条款置于项目长期自动发布约定之上，造成 `delivery-ready` 后流程逃逸。用户根 `github-upload` 与 `commit-quality-gate` 已升级为常驻授权模型，并以单向证据链强制 `delivery-ready → commit → push → workflow → tag/assets → downloaded-asset smoke`；没有最新回执或任一后继失败时不得声称已发布。能力合同与两个 Skill 均通过机器校验，当前项目开始按该规则补做提交与滚动 Release。
 - 09:28 当前文件重新验收：pytest 491/491、全公开 SVG 27/27、feedback release gate 16/16、高风险对抗 campaign 连续 7/7 clean（run `20260908T012546Z-84296641`），五件套与 JSON/diff 检查通过。系统没有预装 `actionlint`，改由 GitHub 官方 API 获取 v1.7.12 Windows 资产并核对官方 SHA-256 后运行，Release workflow 静态检查通过；`gh` CLI 同样未安装，后续使用 GitHub REST API 值守发布。
+- 09:36 commit `218f44ea863e50ff4f18156b8e2013c9e61dd3e5` 已推送 `main`，但 Release run `34176902487` 的反馈门最后一步退出 1；递归攻击与全图门成功，Linux build 与 publish 按 `needs` 正确 skipped。未把 push 误报为发布成功。匿名 GitHub API 可读 job/step，却因缺少仓库 admin 权限以 HTTP 403 拒绝日志下载，本地同 commit 单独 release gate 仍通过；下一步在全新 checkout 精确重放 CI 三步以取得失败正文并修复。
+- 09:43 全新本地 clone 精确顺序重放得到与 CI 一致的 190 个错误：所有当前 fix receipt 指向的 150 个证据文件只存在于本地忽略目录，未被 Git 跟踪；原工作区通过、干净 checkout 失败。修复把当前 fix evidence 批次加入明确白名单，并让 release gate 通过 `git ls-files -z` 校验 reproduction receipt、fix receipt 及每个 evidence 文件的 Git 依赖闭包；新增空 tracked-set mutant 保证“本地存在但远端缺失”必红。远端同时报告 checkout v4 的 Node 20 弃用警告，workflow 升级为 checkout v5。

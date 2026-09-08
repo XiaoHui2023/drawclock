@@ -52,6 +52,30 @@ def _text(value: Any) -> str:
     return value.strip() if isinstance(value, str) else ""
 
 
+def _git_tracked_paths(errors: list[str]) -> set[str]:
+    result = subprocess.run(
+        ["git", "ls-files", "-z"],
+        cwd=ROOT,
+        capture_output=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        detail = result.stderr.decode("utf-8", errors="replace").strip()
+        errors.append(f"cannot enumerate Git-tracked release evidence: {detail or 'git ls-files failed'}")
+        return set()
+    return {
+        item.decode("utf-8", errors="surrogateescape").replace("\\", "/")
+        for item in result.stdout.split(b"\0")
+        if item
+    }
+
+
+def _require_tracked(relative_path: object, tracked_paths: set[str], label: str, errors: list[str]) -> None:
+    normalized = str(relative_path).replace("\\", "/")
+    if normalized not in tracked_paths:
+        errors.append(f"{label} is not Git-tracked for a clean release checkout: {normalized}")
+
+
 def _attempts(issue: dict[str, Any]) -> list[dict[str, Any]]:
     attempts = issue.get("reproduction_attempts")
     return [item for item in attempts if isinstance(item, dict)] if isinstance(attempts, list) else []
@@ -120,7 +144,9 @@ def _validate_attempt_log(issue: dict[str, Any], errors: list[str]) -> None:
             errors.append(f"{issue_id}: reproduction_attempts[{index}].why_not_reproduced is missing")
 
 
-def _validate_release_receipt(issue: dict[str, Any], errors: list[str]) -> None:
+def _validate_release_receipt(
+    issue: dict[str, Any], errors: list[str], tracked_paths: set[str] | None = None,
+) -> None:
     issue_id = issue.get("id", "<missing>")
     relative = issue.get("reproduction_receipt")
     if not _text(relative):
@@ -135,6 +161,8 @@ def _validate_release_receipt(issue: dict[str, Any], errors: list[str]) -> None:
     if not receipt_path.is_file():
         errors.append(f"{issue_id}: reproduction receipt is missing")
         return
+    if tracked_paths is not None:
+        _require_tracked(relative, tracked_paths, f"{issue_id}: reproduction receipt", errors)
     try:
         receipt = json.loads(receipt_path.read_text(encoding="utf-8-sig"))
     except (OSError, json.JSONDecodeError) as exc:
@@ -176,7 +204,9 @@ def _validate_release_receipt(issue: dict[str, Any], errors: list[str]) -> None:
         errors.append(f"{issue_id}: reproduction run IDs must be present and independent")
 
 
-def _validate_fix_receipt(issue: dict[str, Any], errors: list[str]) -> None:
+def _validate_fix_receipt(
+    issue: dict[str, Any], errors: list[str], tracked_paths: set[str] | None = None,
+) -> None:
     issue_id = issue.get("id", "<missing>")
     fix = issue.get("fix_verification")
     if not isinstance(fix, dict):
@@ -197,6 +227,8 @@ def _validate_fix_receipt(issue: dict[str, Any], errors: list[str]) -> None:
     except (OSError, json.JSONDecodeError) as exc:
         errors.append(f"{issue_id}: invalid fix verification receipt: {exc}")
         return
+    if tracked_paths is not None:
+        _require_tracked(relative, tracked_paths, f"{issue_id}: fix receipt", errors)
     if receipt.get("schema_version") != 1 or receipt.get("issue_id") != issue_id:
         errors.append(f"{issue_id}: fix receipt identity/schema mismatch")
     if receipt.get("hash_mode") != "sha256-normalized-text-v1":
@@ -244,6 +276,8 @@ def _validate_fix_receipt(issue: dict[str, Any], errors: list[str]) -> None:
                 evidence_path = ROOT / relative_path
                 if not evidence_path.is_file() or _sha(evidence_path) != expected:
                     errors.append(f"{issue_id}: fix evidence is missing or stale: {relative_path}")
+                if tracked_paths is not None:
+                    _require_tracked(relative_path, tracked_paths, f"{issue_id}: fix evidence", errors)
     if not all(run_ids) or len(run_ids) != len(set(run_ids)):
         errors.append(f"{issue_id}: fix run IDs must be independent")
     for case_id, runs in case_runs.items():
@@ -342,6 +376,7 @@ def _release_gate() -> int:
         print("feedback release gate: issue list is missing or empty", file=sys.stderr)
         return 2
     errors: list[str] = []
+    tracked_paths = _git_tracked_paths(errors)
     _validate_recursive_attack_receipt(errors)
     for issue in issues:
         if not isinstance(issue, dict):
@@ -352,8 +387,8 @@ def _release_gate() -> int:
         _validate_input_lineage(issue, errors)
         if issue.get("status") not in RELEASE_STATES:
             errors.append(f"{issue_id}: release blocked; status is {issue.get('status')}")
-        _validate_release_receipt(issue, errors)
-        _validate_fix_receipt(issue, errors)
+        _validate_release_receipt(issue, errors, tracked_paths)
+        _validate_fix_receipt(issue, errors, tracked_paths)
     incidents = manifest.get("process_incidents", [])
     if not isinstance(incidents, list):
         errors.append("process_incidents must be an array")
