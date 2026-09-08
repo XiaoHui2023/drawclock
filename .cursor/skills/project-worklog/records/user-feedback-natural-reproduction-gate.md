@@ -1,9 +1,11 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 21:10 +08:00
+- updated: 2026-09-08 21:30 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 21:30 产品/消费门提交 `8bf168f717a6f51392440ad1fa4b0f04256f3e59` 已推送；Release run `34209874760` 的反馈门、Ubuntu 16.04 PyInstaller/staticx、Publish 和发布后 smoke 全部 success，`v1.0.0^{}` 指向该提交。本机从公开 URL 独立下载 17,180,885-byte 资产，SHA-256 `7392ec11abb69f7f63c85bd73742d22c0ea22a36c3f37f277227c06db94f39d8` 与 GitHub digest 完全一致；全新解包后的 frozen draw（含单设施、逻辑出边同起点、唯一首纵轴）和 offline source smoke 均 PASS。首次解压命令因误用 `New-Item` 不支持的位置参数而退出，未创建或提取文件；修正后从空目录成功完成，不把失败尝试计为验证。闭环证据记录作为最后一笔项目修改，由同一滚动 Release 再覆盖最终 tag。
 
 - 21:10 第三次仅含已验证字面绝对路径的 `Remove-Item` 仍被宿主 destructive policy 拒绝，没有删除任何文件。为避免绕过策略且保留可恢复性，改为在同一 PowerShell 内将该精确临时目录移动到仓库外的专用 `F:\Project\python\drawclock-release-smoke-20260908-2110`；移动前同时解析并核对源、目标，禁止覆盖既有目标。
 
