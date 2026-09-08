@@ -111,7 +111,7 @@ def test_shared_bus_root_detection_is_name_independent_and_from_semantic() -> No
     assert module._shared_fanout_bus_roots(nodes, edges) == set()
 
 
-@pytest.mark.parametrize("seed", [0, 2, 3, 12])
+@pytest.mark.parametrize("seed", [0, 2, 3, 12, 24])
 def test_adversarial_from_mux_seeds_preserve_all_quality_metrics(
     seed: int, tmp_path: Path
 ) -> None:
@@ -132,13 +132,17 @@ def test_adversarial_from_mux_seeds_preserve_all_quality_metrics(
     report = quality.evaluate(input_path, svg_path)
     assert report["executed_metric_ids"] == report["required_metric_ids"]
     assert report["failed_metric_ids"] == []
-    if seed == 2:
+    if seed in {2, 24}:
         graph = inspector.inspect(input_path, svg_path)
-        network = next(
-            item for item in graph["networks"] if item["id"] == "source_0:right"
+        shared_from_networks = [
+            item for item in graph["networks"]
+            if item["source"].startswith("source_") and item["fanout"] >= 2
+        ]
+        assert shared_from_networks
+        assert all(
+            len(network["source_vertical_bus_xs"]) == 1
+            for network in shared_from_networks
         )
-        assert len(network["source_vertical_bus_xs"]) == 1
-        assert len(network["vertical_channel_xs"]) > 1
 
 
 def test_topology_identity_rejects_unknown_rendered_node(tmp_path: Path) -> None:

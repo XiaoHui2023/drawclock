@@ -2,8 +2,22 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 19:47 +08:00
+- updated: 2026-09-08 20:22 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 20:22 最终候选全量 pytest 513/513 PASS（62.89s），全公开终态门 26/26、21 指标 exact-set、546 次执行 failure=0。基于 08:43 正式 SVG 重新生成独立报告：`public_from:right` fanout=5、设施=1、起点=1、源侧首纵轴=[197.66]、split_rejoin=false，异网 overlap=0；完整 1600×2200 PNG `public-from-single-bus-final-0843.png` 由 Edge exit=0 写出 86,323 bytes 并目视确认。Edge 仍报告 WSALookupServiceBegin 10108，但本地 file SVG、PNG 和检查报告均成功，不影响证据；匿名 GitHub job log 403 与 CUA hook 阻断只影响早期日志读取，已通过 Linux 3.12 精确复现替代并完成根因修复。
+
+- 20:17 更新 `META-QUALITY-010` 最终组时，单行 JSON 补丁在 `fix_verification` 内混入重复/损坏键；该中间文件尚未解析、测试或暂存，不能计作有效状态。先如实入账，再用稳定 issue ID 上下文完整替换该对象并以 `ConvertFrom-Json` 校验，避免局部字符修补遗漏。
+
+- 20:14 最终源码全问题修复验证组 `20260908T084339Z-241f6340` 已经公共 CLI 逐案双跑，`failures=[]`；16 个 fix receipt 均由 runner 写入新的 source/oracle/semantics 哈希和原始证据路径。下一步只让账本 016 与质量事故指向该真实组并纳入完整 Git 闭包，再运行 release checker；不删除已发布的旧证据。
+
+- 20:10 seed 24 断言已完成为“复杂图中每个多扇出 `from` 都恰有一个源侧首纵轴”，聚焦 16/16 PASS。Linux Python 3.12/hash=1 完整递归攻击随后从 R1 重新连续 7/7 clean，receipt run `20260908T083741Z-e66db807`；release checker 仍按设计拒绝全部 16 个旧 fix receipt 的 source-tree 哈希，下一步必须在最终源码上重新签发全问题双跑，不能只刷新时间戳。
+
+- 20:06 常规质量参数集已先加入 seed 24；在扩大其断言为“所有多扇出 from 都恰有一条源侧总线”前，实时记录门因该参数修改尚未入账而阻断。当前测试文件处于可解析但尚未完成增强断言的中间状态，未执行、不计通过；本条记录后继续完成同一测试意图。
+
+- 20:04 已将共享总线保护从“当前首纵轴必须唯一，否则拒绝移动”改为“按端口从现有首纵轴中确定性选择离源端最近的源侧轴，并让候选分支共同使用”。同一冻结 seed-024 在 Linux Python 3.12/hash=1 重放后 016/017 witness 均清零；这同时保留已正确单轴时的原轴。下一步把 seed 24 加入常规质量参数集，再运行完整 7 轮 Linux 攻击，只有连续清洁才重新发布。
+
+- 20:00 commit `1dc1f6e` 推送后 Release run `34203535106` 在“Re-run bounded recursive reproduction attacks”失败，build/publish 均按依赖正确跳过。匿名 job-log API 返回 403，CUA 又被本地 fail-closed hook 拒绝，故没有猜测日志；同提交 Windows 与一次 Ubuntu 容器 7/7 clean 后，Linux Python 3.12 + `PYTHONHASHSEED=1` 精确命中 R6 `mux-from-seed-024` 的 016/017。固定输入在 3.12 任意已试 hash 均失败、当前 Python 通过。对比 selection 确认根因：共享根已有多条首纵轴时 `shared-bus-precondition` 直接拒绝坐标修复；不同解释器的先前根移动顺序决定它看到单轴还是双轴。正确修复应从现有轴中选择离源端最近的源侧轴并把所有分支收敛到它，而不是在坏状态上 fail-open/停修。
 
 - 19:47 两项实测指标修正后聚焦 mutant 15/15 PASS；全量 pytest 从零重跑 512/512 PASS（60.80s）；全公开终态门再次 26/26 PASS，每图仍执行同一 21 项 exact-set、总计 546 次且 failure=0。此前 510 项结果已由本轮覆盖，不作为最终新鲜回执。下一步只做不改文件的发布前闭包检查、提交、推送与远端发行消费验证。
 

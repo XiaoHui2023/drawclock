@@ -2798,10 +2798,12 @@ def _refine_joint_coordinates(
             protected_bus_x_by_port: dict[str, float] = {}
             if shared_bus_roots and logical_name in shared_bus_roots:
                 axes_by_port: dict[str, set[float]] = defaultdict(set)
+                start_xs_by_port: dict[str, list[float]] = defaultdict(list)
                 for edge_index, old_points in incident_old_points.items():
                     logical = logical_edges[edge_index - 1]
                     if logical.source != logical_name:
                         continue
+                    start_xs_by_port[logical.source_port].append(old_points[0][0])
                     first_axis = next((
                         a[0]
                         for a, b in zip(old_points, old_points[1:])
@@ -2810,11 +2812,15 @@ def _refine_joint_coordinates(
                     ), None)
                     if first_axis is not None:
                         axes_by_port[logical.source_port].add(first_axis)
-                if any(len(axes) != 1 for axes in axes_by_port.values()):
-                    blockers["shared-bus-precondition"] += 1
-                    continue
                 protected_bus_x_by_port = {
-                    port: next(iter(axes)) for port, axes in axes_by_port.items()
+                    port: min(
+                        axes,
+                        key=lambda axis: (
+                            min(abs(axis - start_x) for start_x in start_xs_by_port[port]),
+                            axis,
+                        ),
+                    )
+                    for port, axes in axes_by_port.items()
                 }
             valid_routes = True
             selected_candidate_segments: list[Segment] = []
