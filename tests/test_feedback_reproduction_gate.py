@@ -120,9 +120,12 @@ class FeedbackReproductionGateTest(unittest.TestCase):
         workflow = WORKFLOW.read_text(encoding="utf-8")
         self.assertIn("feedback-reproduction-gate:", workflow)
         recursive_command = "python3 tools/run_recursive_reproduction_rounds.py --receipt .reproduction/receipts/recursive-attack.json"
+        all_svg_command = "python3 tools/check_all_svg_quality.py --report .reproduction/receipts/all-svg-quality.json"
         checker_command = "python3 tools/check_feedback_reproduction_gate.py --phase release"
         self.assertIn(recursive_command, workflow)
+        self.assertIn(all_svg_command, workflow)
         self.assertLess(workflow.index(recursive_command), workflow.index(checker_command))
+        self.assertLess(workflow.index(all_svg_command), workflow.index(checker_command))
         self.assertIn("needs: feedback-reproduction-gate", workflow)
         self.assertIn("needs: [feedback-reproduction-gate, build-linux-ubuntu16]", workflow)
         self.assertNotIn("if: always()", workflow)

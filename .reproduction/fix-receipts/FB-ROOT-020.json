@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "hash_mode": "sha256-normalized-text-v1",
+  "issue_id": "FB-ROOT-020",
+  "result": "fixed_verified",
+  "verification_group": "20260907T115458Z-3e16fc41",
+  "baseline_fails": true,
+  "current_passes": true,
+  "baseline_receipt": ".reproduction/receipts/FB-ROOT-020.json",
+  "baseline_receipt_sha256": "be14da8faafc1361ad4ac812afd3604003634405ad00226977d391ae0ecea981",
+  "source_tree_sha256": "7225153983926324bb6532a61e599337a9823ec4b855baa5f0d84eb43cd4984b",
+  "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
+  "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
+  "oracle_sha256": "f306ac8a429415d132076dfc6f1e0ed9183587a89699d566af10e9de81cbb0da",
+  "attempts": [
+    {
+      "run_id": "20260907T115458Z-3e16fc41:direct-source-mux-column-baseline:1",
+      "case_id": "direct-source-mux-column-baseline",
+      "public_entrypoint": "public_cli",
+      "producer_exit_code": 0,
+      "issue_oracle_exit_code": 1,
+      "detected_issue_ids": [],
+      "artifact_before_oracle_sha256": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+      "artifact_after_oracle_sha256": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+      "input_sha256": "8f665d5ad110823d0c64483cafeca7981faf93bde82b83b6f05496f4672c6110",
+      "source_tree_sha256": "7225153983926324bb6532a61e599337a9823ec4b855baa5f0d84eb43cd4984b",
+      "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
+      "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
+      "oracle_sha256": "f306ac8a429415d132076dfc6f1e0ed9183587a89699d566af10e9de81cbb0da",
+      "started_at": "2026-09-07T11:55:24.396724+00:00",
+      "ended_at": "2026-09-07T11:55:24.952555+00:00",
+      "evidence_files": {
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-baseline/attempt-1/output.svg": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-baseline/attempt-1/producer.log": "7c3853b529c6e18737df2ee38bd6b23cf5ea65b73e7ea76ad241bb7a5703ebf2",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-baseline/attempt-1/report.json": "6aee9328fddde194623a8ec473f1fd1e2dfc02d4602b5f4ebab082fb994550a0",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-baseline/attempt-1/FB-ROOT-020.log": "6149c0a120bb832382fc6bdf851f6940ed9e60f282f5ff07575ffd521fc79e83"
+      }
+    },
+    {
+      "run_id": "20260907T115458Z-3e16fc41:direct-source-mux-column-baseline:2",
+      "case_id": "direct-source-mux-column-baseline",
+      "public_entrypoint": "public_cli",
+      "producer_exit_code": 0,
+      "issue_oracle_exit_code": 1,
+      "detected_issue_ids": [],
+      "artifact_before_oracle_sha256": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+      "artifact_after_oracle_sha256": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+      "input_sha256": "8f665d5ad110823d0c64483cafeca7981faf93bde82b83b6f05496f4672c6110",
+      "source_tree_sha256": "7225153983926324bb6532a61e599337a9823ec4b855baa5f0d84eb43cd4984b",
+      "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
+      "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
+      "oracle_sha256": "f306ac8a429415d132076dfc6f1e0ed9183587a89699d566af10e9de81cbb0da",
+      "started_at": "2026-09-07T11:55:24.965973+00:00",
+      "ended_at": "2026-09-07T11:55:25.481368+00:00",
+      "evidence_files": {
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-baseline/attempt-2/output.svg": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-baseline/attempt-2/producer.log": "946d817952acde1085c378754449deae498523ebf758fe5f54278c67f3316c40",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-baseline/attempt-2/report.json": "6aee9328fddde194623a8ec473f1fd1e2dfc02d4602b5f4ebab082fb994550a0",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-baseline/attempt-2/FB-ROOT-020.log": "6149c0a120bb832382fc6bdf851f6940ed9e60f282f5ff07575ffd521fc79e83"
+      }
+    },
+    {
+      "run_id": "20260907T115458Z-3e16fc41:direct-source-mux-column-current:1",
+      "case_id": "direct-source-mux-column-current",
+      "public_entrypoint": "public_cli",
+      "producer_exit_code": 0,
+      "issue_oracle_exit_code": 1,
+      "detected_issue_ids": [],
+      "artifact_before_oracle_sha256": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+      "artifact_after_oracle_sha256": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+      "input_sha256": "8f665d5ad110823d0c64483cafeca7981faf93bde82b83b6f05496f4672c6110",
+      "source_tree_sha256": "7225153983926324bb6532a61e599337a9823ec4b855baa5f0d84eb43cd4984b",
+      "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
+      "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
+      "oracle_sha256": "f306ac8a429415d132076dfc6f1e0ed9183587a89699d566af10e9de81cbb0da",
+      "started_at": "2026-09-07T11:55:30.278364+00:00",
+      "ended_at": "2026-09-07T11:55:30.802780+00:00",
+      "evidence_files": {
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-current/attempt-1/output.svg": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-current/attempt-1/producer.log": "c4f4d2ca9de2c41eef8d7968529fac99483f7e01cea419614e9c5b1b4665a888",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-current/attempt-1/report.json": "6aee9328fddde194623a8ec473f1fd1e2dfc02d4602b5f4ebab082fb994550a0",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-current/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-current/attempt-1/FB-ROOT-020.log": "6149c0a120bb832382fc6bdf851f6940ed9e60f282f5ff07575ffd521fc79e83"
+      }
+    },
+    {
+      "run_id": "20260907T115458Z-3e16fc41:direct-source-mux-column-current:2",
+      "case_id": "direct-source-mux-column-current",
+      "public_entrypoint": "public_cli",
+      "producer_exit_code": 0,
+      "issue_oracle_exit_code": 1,
+      "detected_issue_ids": [],
+      "artifact_before_oracle_sha256": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+      "artifact_after_oracle_sha256": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+      "input_sha256": "8f665d5ad110823d0c64483cafeca7981faf93bde82b83b6f05496f4672c6110",
+      "source_tree_sha256": "7225153983926324bb6532a61e599337a9823ec4b855baa5f0d84eb43cd4984b",
+      "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
+      "runner_sha256": "7dd57832a553616468f4d81b687b321521bac3b27b99386b7cc9276417b2de0c",
+      "oracle_sha256": "f306ac8a429415d132076dfc6f1e0ed9183587a89699d566af10e9de81cbb0da",
+      "started_at": "2026-09-07T11:55:30.812229+00:00",
+      "ended_at": "2026-09-07T11:55:31.317236+00:00",
+      "evidence_files": {
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-current/attempt-2/output.svg": "e3ceea607ccff4cc987813f32579e2a85f4367f02cc4388054de990c2fe62e75",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-current/attempt-2/producer.log": "b3d7b87bc2e8a0e94d7395a934a325d5a4a0e8bdee4e3503035f0916c2d48091",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-current/attempt-2/report.json": "6aee9328fddde194623a8ec473f1fd1e2dfc02d4602b5f4ebab082fb994550a0",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-current/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260907T115458Z-3e16fc41/direct-source-mux-column-current/attempt-2/FB-ROOT-020.log": "6149c0a120bb832382fc6bdf851f6940ed9e60f282f5ff07575ffd521fc79e83"
+      }
+    }
+  ]
+}

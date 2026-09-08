@@ -19,6 +19,9 @@ jobs:
       - name: Re-run bounded recursive reproduction attacks
         run: python3 tools/run_recursive_reproduction_rounds.py --receipt .reproduction/receipts/recursive-attack.json
 
+      - name: Fresh-generate and quality-gate every public SVG
+        run: python3 tools/check_all_svg_quality.py --report .reproduction/receipts/all-svg-quality.json
+
       - name: Require natural reproduction and verified fixes
         run: python3 tools/check_feedback_reproduction_gate.py --phase release
 

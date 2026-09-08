@@ -236,6 +236,12 @@ def _ranks(
     edges: list[LogicalEdge],
     layout_columns: dict[int, list[str]] | None = None,
 ) -> dict[str, int]:
+    kind_by_name: dict[str, str] = {}
+    if hasattr(names, "items"):
+        for node_name, value in names.items():
+            item = value.item if isinstance(value, ResolvedNode) else value
+            if isinstance(item, dict):
+                kind_by_name[node_name] = str(item.get("kind", ""))
     outgoing: dict[str, list[str]] = defaultdict(list)
     incoming: dict[str, list[str]] = defaultdict(list)
     indegree = {name: 0 for name in names}
@@ -270,6 +276,28 @@ def _ranks(
     root_outdegree = {
         name: len(outgoing[name]) for name in visited if not incoming[name]
     }
+    direct_mux_targets_by_root = {
+        root: {
+            target for target in outgoing[root]
+            if kind_by_name.get(target, "").startswith("mux")
+        }
+        for root in root_outdegree
+    }
+    direct_root_fanin_arrays = {
+        root
+        for target in visited
+        if kind_by_name.get(target, "").startswith("mux")
+        if len({
+            parent for parent in incoming[target]
+            if not incoming[parent]
+            and kind_by_name.get(parent, "") in {"source", "from"}
+            and len(direct_mux_targets_by_root[parent]) == 1
+        }) >= 3
+        for root in incoming[target]
+        if not incoming[root]
+        and kind_by_name.get(root, "") in {"source", "from"}
+        and len(direct_mux_targets_by_root[root]) == 1
+    }
     ancestor_roots: dict[str, frozenset[str]] = {}
     for name in visited:
         ancestor_roots[name] = (
@@ -284,6 +312,7 @@ def _ranks(
         for root, degree in root_outdegree.items()
         if degree == 1
         and root not in explicit_column_nodes
+        and root not in direct_root_fanin_arrays
         and any(
             other != root and root_outdegree.get(other, 0) > 1
             for other in ancestor_roots[outgoing[root][0]]
@@ -485,7 +514,9 @@ def _ranks(
             anchored[name] = min(
                 anchored[name], min(anchored[child] - 1 for child in children)
             )
-    for root in distribution_roots - explicit_column_nodes:
+    for root in (
+        distribution_roots | direct_root_fanin_arrays
+    ) - explicit_column_nodes:
         anchored[root] = earliest[root]
     return anchored
 

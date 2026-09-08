@@ -123,6 +123,49 @@ def test_frequency_fields_accept_strings_numbers_and_omission() -> None:
     assert len({vertex.y for vertex in terminals}) == len(terminals)
 
 
+@pytest.mark.parametrize("value", [None, True, 42, [], {}])
+def test_description_rejects_non_strings(value: object) -> None:
+    config = {"osc": {"kind": "source", "description": value}}
+
+    with pytest.raises(ValueError, match="description 必须是字符串"):
+        generate_elk_layout(config, library_path=LIBRARY)
+
+
+def test_description_is_available_on_every_node_kind() -> None:
+    config = {
+        "source": {"kind": "source", "description": "reference input"},
+        "gate": {"kind": "gate", "source": "source", "description": "power gate"},
+        "mux": {
+            "kind": "mux2", "source": {"0": "gate"},
+            "description": "clock selection",
+        },
+        "clock": {"kind": "clock", "source": "mux", "description": "CPU clock"},
+    }
+
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+
+    attrs = {vertex.name: vertex.object_attrs for vertex in document.vertices}
+    assert {name: attrs[name]["description"] for name in config} == {
+        name: item["description"] for name, item in config.items()
+    }
+
+
+def test_unconstrained_source_array_direct_to_one_mux_shares_a_column() -> None:
+    config = load_clock_tree(
+        ROOT / "example/auto-layout/30-staggered-four-source-mux.json"
+    )
+
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+
+    sources = {
+        vertex.name: vertex.x
+        for vertex in document.vertices
+        if vertex.name in {"source_0", "source_1", "source_2", "source_3"}
+    }
+    assert len(sources) == 4
+    assert len(set(sources.values())) == 1
+
+
 def test_linear_layout_is_deterministic() -> None:
     config = _linear_config()
     first, report = generate_layout(config, library_path=LIBRARY)

@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import ast
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -654,7 +655,7 @@ def test_same_depth_common_from_array_is_not_asymmetric_array_failure(
     assert "FB-ROOT-016" not in report["detected_issues"]
 
 
-def test_staggered_four_source_mux_removes_joint_axis_bend(
+def test_staggered_four_source_mux_aligns_direct_source_array(
     tmp_path: Path,
 ) -> None:
     input_path = ROOT / "tests/reproduction-corpus/staggered-four-source-mux.json"
@@ -668,11 +669,12 @@ def test_staggered_four_source_mux_removes_joint_axis_bend(
     report = oracle.analyze(input_path, output)
     direct = [edge for edge in report["edges"] if edge["target"] == "mux"]
     assert len(direct) == 4
-    assert len({edge["points"][0][0] for edge in direct}) >= 2
-    assert all(edge["bends"] == 0 for edge in direct)
+    assert len({edge["points"][0][0] for edge in direct}) == 1
     assert report["networks"]["source_2:right"]["bends_total"] == 2
     assert report["witnesses"]["root_fanout_axis_dominance_witnesses"] == []
+    assert report["witnesses"]["direct_root_fanin_column_witnesses"] == []
     assert "FB-BEND-017" not in report["detected_issues"]
+    assert "FB-ROOT-020" not in report["detected_issues"]
 
 
 def test_staggered_four_source_mux_accepts_clean_different_columns(
@@ -778,9 +780,10 @@ def test_staggered_mux_generalizes_across_order_and_port_permutation(
     report = oracle.analyze(input_path, output)
     direct = [edge for edge in report["edges"] if edge["target"] == "mux"]
     assert len(direct) == 4
-    assert len({edge["points"][0][0] for edge in direct}) >= 2
-    assert all(edge["bends"] == 0 for edge in direct)
+    assert len({edge["points"][0][0] for edge in direct}) == 1
     assert report["witnesses"]["root_fanout_axis_dominance_witnesses"] == []
+    assert report["witnesses"]["direct_root_fanin_column_witnesses"] == []
+    assert "FB-ROOT-020" not in report["detected_issues"]
 
 
 def test_two_regular_common_domains_remain_separate_single_bus_networks(
@@ -961,6 +964,135 @@ def test_generic_quality_cli_reports_every_node_edge_and_network(tmp_path: Path)
     assert len(report["edges"]) == report["totals"]["logical_edges"]
     assert report["networks"]
     assert all("crossed_edge_count" in edge for edge in report["edges"])
+
+
+def test_generic_quality_cli_rejects_decorated_or_missing_annotations(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example/auto-layout/31-node-descriptions.json"
+    output = tmp_path / "annotations.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    original = output.read_text(encoding="utf-8")
+    first = original.index('<g class="node-annotation"')
+    group_end = original.index('>', first) + 1
+    decorated = (
+        original[:group_end]
+        + '<rect x="0" y="0" width="1" height="1"/>'
+        + original[group_end:]
+    )
+    output.write_text(decorated, encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(QUALITY_ORACLE_PATH), "--input", str(input_path),
+         "--svg", str(output), "--require-pass"],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 1
+    assert "annotation-geometry" in result.stderr
+
+    end = original.index('</g>', first) + len('</g>')
+    output.write_text(original[:first] + original[end:], encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(QUALITY_ORACLE_PATH), "--input", str(input_path),
+         "--svg", str(output), "--require-pass"],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 1
+    assert "annotation-geometry" in result.stderr
+
+
+def test_annotation_text_stress_preserves_content_and_required_profiles(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example/auto-layout/32-annotation-text-stress.json"
+    output = tmp_path / "annotation-stress.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    quality = report["annotation_quality"]
+    assert quality["failure_count"] == 0
+    assert quality["expected"] == quality["rendered"] == 8
+    assert set(quality["profiles_present"]) == {
+        "short", "long", "multiline", "blank_line",
+        "trailing_line_break", "mixed_script",
+    }
+
+
+def test_annotation_oracle_rejects_silently_dropped_wrapped_line(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example/auto-layout/32-annotation-text-stress.json"
+    output = tmp_path / "annotation-mutant.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    original = output.read_text(encoding="utf-8")
+    start = original.index('<g class="node-annotation"')
+    text_start = original.index("<text ", start)
+    text_end = original.index("</text>", text_start) + len("</text>")
+    output.write_text(original[:text_start] + original[text_end:], encoding="utf-8")
+    report = oracle.analyze(input_path, output)
+    assert report["annotation_quality"]["line_mismatches"]
+    assert report["annotation_quality"]["failure_count"] > 0
+
+    output.write_text(original.replace(
+        "<title>短</title>", "<title>错</title>", 1
+    ), encoding="utf-8")
+    report = oracle.analyze(input_path, output)
+    assert report["annotation_quality"]["text_mismatches"] == ["ref_short"]
+    assert report["annotation_quality"]["failure_count"] > 0
+
+
+def test_all_svg_gate_rejects_missing_annotation_profile_coverage(
+    tmp_path: Path,
+) -> None:
+    input_dir = tmp_path / "inputs"
+    input_dir.mkdir()
+    shutil.copy2(ROOT / "example/auto-layout/01-linear.json", input_dir)
+    report_path = tmp_path / "all-svg.json"
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "tools/check_all_svg_quality.py"),
+         "--input-dir", str(input_dir), "--report", str(report_path)],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 1
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["batch_failures"] == ["annotation-profile-coverage"]
+    assert set(report["missing_annotation_profiles"]) == {
+        "short", "long", "multiline", "blank_line",
+        "trailing_line_break", "mixed_script",
+    }
+
+def test_staggered_source_array_passes_generic_final_svg_gate(tmp_path: Path) -> None:
+    input_path = ROOT / "example/auto-layout/30-staggered-four-source-mux.json"
+    output = tmp_path / "array.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    result = subprocess.run(
+        [sys.executable, str(QUALITY_ORACLE_PATH), "--input", str(input_path),
+         "--svg", str(output), "--require-pass"],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    report = oracle.analyze(input_path, output)
+    assert report["totals"]["different_net_overlaps"] == 0
+    assert report["witnesses"]["direct_root_fanin_column_witnesses"] == []
+    assert report["witnesses"]["root_fanout_axis_dominance_witnesses"] == []
 
 
 def test_quality_oracle_keeps_output_ports_as_distinct_networks(tmp_path: Path) -> None:

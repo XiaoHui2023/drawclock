@@ -1,18 +1,23 @@
 {
   "schema_version": 1,
+  "campaign_name": "defect-driven-adversarial-regression-loop",
+  "risk_class": "high",
   "status": "clean",
-  "run_id": "20260907T044849Z-d2a6d13e",
+  "run_id": "20260908T012546Z-84296641",
   "issues": [
+    "FB-ROUTE-002",
+    "FB-ROOT-003",
     "FB-ROOT-016",
-    "FB-BEND-017"
+    "FB-BEND-017",
+    "FB-ROOT-020"
   ],
-  "required_consecutive_clean_rounds": 5,
-  "consecutive_clean_rounds": 5,
+  "required_consecutive_clean_rounds": 7,
+  "consecutive_clean_rounds": 7,
   "restart_semantics": "any reproduction resets to zero and requires a new run from R1",
-  "source_tree_sha256": "9c99e5da4860dac38931f09e6dfec82eaf67a2ae2cb26bdff23b0b9b49074967",
-  "manifest_sha256": "b19406f496b7fedfac965603b453ccf361aa38cbc5005501de6aa1f86d0a7ed8",
-  "runner_sha256": "2f565086a52f19c04aec042065c878347178cdf43c824656f9ee29db3950e25e",
-  "oracle_sha256": "6532586a93ea2e1650c6140f209ccae64b82d16beed57a4d11ea7eb6e31af611",
+  "source_tree_sha256": "7225153983926324bb6532a61e599337a9823ec4b855baa5f0d84eb43cd4984b",
+  "manifest_sha256": "6da619a84b2d394fcbf23eb9736458fa20ffaceebfdf90f1e24ff727a87ba11d",
+  "runner_sha256": "24eda8ffb155824ad719759a72d57012824383c5133571cfc55ea6dc53b5c34e",
+  "oracle_sha256": "f306ac8a429415d132076dfc6f1e0ed9183587a89699d566af10e9de81cbb0da",
   "rounds": [
     {
       "id": "R1-exact-and-recurrent",
@@ -20,12 +25,30 @@
       "status": "clean",
       "cases": [
         {
+          "case_id": "pad-r08-s00",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "cc06ede31722cf9ab04cf165d9e8c5a79d0c02d512502417283697ea68b6afb6",
+          "artifact_before_oracle_sha256": "0556f1e80c280f89bfdce8697105797ac58507116fe1708ccad7aced822664ba",
+          "artifact_after_oracle_sha256": "0556f1e80c280f89bfdce8697105797ac58507116fe1708ccad7aced822664ba",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "25-mixed-root-port-order-torture",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "cfe902f95e318636e705fc9937007e359ed4323cbca3e8eb36ad4a0aa1fcb9cb",
+          "artifact_before_oracle_sha256": "393d18cca872eee33cbeacc928667735e9f1cce86216054601695fe7327dd184",
+          "artifact_after_oracle_sha256": "393d18cca872eee33cbeacc928667735e9f1cce86216054601695fe7327dd184",
+          "observed_issue_ids": []
+        },
+        {
           "case_id": "asymmetric-depth-common-private-mux",
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "1c341b8664d4d5eba5cf8576b398d5265795ffacb03c64747e037ef35f8e572c",
-          "artifact_before_oracle_sha256": "a9ac23a73f9294ae81abf146828be1f7bd994feba11d894c51f0ea2fe11684ef",
-          "artifact_after_oracle_sha256": "a9ac23a73f9294ae81abf146828be1f7bd994feba11d894c51f0ea2fe11684ef",
+          "artifact_before_oracle_sha256": "942f79b5fea79d61c7b0e72f3f5ed16ce7a3ef503670ab87389d44c4e1667880",
+          "artifact_after_oracle_sha256": "942f79b5fea79d61c7b0e72f3f5ed16ce7a3ef503670ab87389d44c4e1667880",
           "observed_issue_ids": []
         },
         {
@@ -33,8 +56,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3279d8860b1f4bb5dc065d3858e2f31d9231ca10abdf632ab4ece95f153762a0",
-          "artifact_before_oracle_sha256": "5ff314572f00467291b543ea32ad31328f8e3975939728eb7ddf352af508215a",
-          "artifact_after_oracle_sha256": "5ff314572f00467291b543ea32ad31328f8e3975939728eb7ddf352af508215a",
+          "artifact_before_oracle_sha256": "60d22f2f8e1aa3bbd29b993e494d520e0a246fdd50cf7b65d8378491317e271f",
+          "artifact_after_oracle_sha256": "60d22f2f8e1aa3bbd29b993e494d520e0a246fdd50cf7b65d8378491317e271f",
           "observed_issue_ids": []
         },
         {
@@ -42,8 +65,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "60e1272306302e1dcc66faf363e0fcac802346708d579a4b6cfccdca2f8af103",
-          "artifact_before_oracle_sha256": "883375f4fa95bbcf5c3b147bed28a1eb0952d1cf4ab3b1b3508969ac4028e666",
-          "artifact_after_oracle_sha256": "883375f4fa95bbcf5c3b147bed28a1eb0952d1cf4ab3b1b3508969ac4028e666",
+          "artifact_before_oracle_sha256": "023e06ad47a0008484c5faf258a9b82ddacf1a446837882047673b6808debdb8",
+          "artifact_after_oracle_sha256": "023e06ad47a0008484c5faf258a9b82ddacf1a446837882047673b6808debdb8",
           "observed_issue_ids": []
         },
         {
@@ -51,8 +74,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "31805210c835281375937e6ffc0a8952ed34f365080e79d95efcfffcd1238740",
-          "artifact_before_oracle_sha256": "578eb65d262edcd211e606049b2af361e4f51b1fb1cf1dfd13365e0bd91e2cbf",
-          "artifact_after_oracle_sha256": "578eb65d262edcd211e606049b2af361e4f51b1fb1cf1dfd13365e0bd91e2cbf",
+          "artifact_before_oracle_sha256": "80df28a22e53913c8eaa02fb7c51d19803f560fae404e8de6d7fb5b83606945c",
+          "artifact_after_oracle_sha256": "80df28a22e53913c8eaa02fb7c51d19803f560fae404e8de6d7fb5b83606945c",
           "observed_issue_ids": []
         },
         {
@@ -60,8 +83,17 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "272e1cd9bf382246c3f96249cd809c4c3f553a91c0318a0fcf45d3e4acbd4cbd",
-          "artifact_before_oracle_sha256": "2d312fb6e53fd56df8dab9989d4285caf4e4a6ab49c452787f7f7b83674b244b",
-          "artifact_after_oracle_sha256": "2d312fb6e53fd56df8dab9989d4285caf4e4a6ab49c452787f7f7b83674b244b",
+          "artifact_before_oracle_sha256": "4aa314bc2043f9352989c4bb4158f46e9a524b06144369d21f1071e00d84fc64",
+          "artifact_after_oracle_sha256": "4aa314bc2043f9352989c4bb4158f46e9a524b06144369d21f1071e00d84fc64",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "30-staggered-four-source-mux",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "31805210c835281375937e6ffc0a8952ed34f365080e79d95efcfffcd1238740",
+          "artifact_before_oracle_sha256": "80df28a22e53913c8eaa02fb7c51d19803f560fae404e8de6d7fb5b83606945c",
+          "artifact_after_oracle_sha256": "80df28a22e53913c8eaa02fb7c51d19803f560fae404e8de6d7fb5b83606945c",
           "observed_issue_ids": []
         }
       ]
@@ -72,12 +104,30 @@
       "status": "clean",
       "cases": [
         {
+          "case_id": "pad-r08-s00",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "ee6a3879d7e2fa3583b43a7d475b8b53fd0371b9b90b8b789b30ef9b728bc13e",
+          "artifact_before_oracle_sha256": "04bb0728d3017862a2c85023a74cbf18bdf86419f0e683c04073b4d149189533",
+          "artifact_after_oracle_sha256": "04bb0728d3017862a2c85023a74cbf18bdf86419f0e683c04073b4d149189533",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "25-mixed-root-port-order-torture",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "3c16dad73c88ac09539231671db701f709d71fb57530f5da1593232bc219e49c",
+          "artifact_before_oracle_sha256": "0255a6eb08b75e2e9eec2b1e3f5c33c792adbde3b4c958d6d4b497cfe31b95f2",
+          "artifact_after_oracle_sha256": "0255a6eb08b75e2e9eec2b1e3f5c33c792adbde3b4c958d6d4b497cfe31b95f2",
+          "observed_issue_ids": []
+        },
+        {
           "case_id": "recurrent-two-row-common-private-mux",
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "86fcf811d3aab909c9212ba8d67377b11d198ceb9fbc26584f9b92dc991dcffd",
-          "artifact_before_oracle_sha256": "3694002b955ae73783411e106161b236b4e15415aebb119875ac808a61cd7a35",
-          "artifact_after_oracle_sha256": "3694002b955ae73783411e106161b236b4e15415aebb119875ac808a61cd7a35",
+          "artifact_before_oracle_sha256": "1ba0d7e319ff784b0035b6b125ae650d283d9fc8450e19c3ad7440130b88661b",
+          "artifact_after_oracle_sha256": "1ba0d7e319ff784b0035b6b125ae650d283d9fc8450e19c3ad7440130b88661b",
           "observed_issue_ids": []
         },
         {
@@ -85,8 +135,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3376b415460f3b630cf1493c451bcbf6a876551773d5dd2a60635ec7f8b5f00d",
-          "artifact_before_oracle_sha256": "930b8cac3d61d13e9396c9ee8758f404bb532674f917b5962f2288c103e0fe2a",
-          "artifact_after_oracle_sha256": "930b8cac3d61d13e9396c9ee8758f404bb532674f917b5962f2288c103e0fe2a",
+          "artifact_before_oracle_sha256": "478a25e6930ac181ae4adaa813b5d26cb125c9ffc92af73329ee9a084b3fd3e2",
+          "artifact_after_oracle_sha256": "478a25e6930ac181ae4adaa813b5d26cb125c9ffc92af73329ee9a084b3fd3e2",
           "observed_issue_ids": []
         },
         {
@@ -94,8 +144,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "146efcfb9a69bedb3a0fca633b23fd71fd005aaa82628112ce4cebca842a66b6",
-          "artifact_before_oracle_sha256": "28fd599f09da204d097f40f4e28f3fdf9d5b5db7bd31c0529c9d268356c730e6",
-          "artifact_after_oracle_sha256": "28fd599f09da204d097f40f4e28f3fdf9d5b5db7bd31c0529c9d268356c730e6",
+          "artifact_before_oracle_sha256": "48b2aee025448f6f9ce07e8c8bdf3c1d0236304f5d4c5719e06fcc34defe87da",
+          "artifact_after_oracle_sha256": "48b2aee025448f6f9ce07e8c8bdf3c1d0236304f5d4c5719e06fcc34defe87da",
           "observed_issue_ids": []
         }
       ]
@@ -106,12 +156,30 @@
       "status": "clean",
       "cases": [
         {
+          "case_id": "pad-r08-s00",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "4a45f43e00967b86ed032c594a9123021b479e881baa7b53e7de31129160c4c1",
+          "artifact_before_oracle_sha256": "1960be9d7a08d09f43fd5b52da2f7a7e4f604da9c167eeaa870f25c9f13c2371",
+          "artifact_after_oracle_sha256": "1960be9d7a08d09f43fd5b52da2f7a7e4f604da9c167eeaa870f25c9f13c2371",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "30-staggered-four-source-mux",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "ca774ffb27167e0ebf43d38aa66f1cfd24061f5fec7f554d528f5ccf4debc126",
+          "artifact_before_oracle_sha256": "7d2a494ed4d1d102f074e91607ec5c565056abaadb350620249f8d8a68c0c373",
+          "artifact_after_oracle_sha256": "7d2a494ed4d1d102f074e91607ec5c565056abaadb350620249f8d8a68c0c373",
+          "observed_issue_ids": []
+        },
+        {
           "case_id": "recurrent-mixed-depth-downstream-array",
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3e8defa6f6d8148d371e8f02f4bbc6514b186ee5f2b0d6933c17dc4e75bf1b7e",
-          "artifact_before_oracle_sha256": "55e930156c789eddbfa0c883fb54395b0bca9703f0f1b63aed21b723906fd671",
-          "artifact_after_oracle_sha256": "55e930156c789eddbfa0c883fb54395b0bca9703f0f1b63aed21b723906fd671",
+          "artifact_before_oracle_sha256": "4d0a40e427a083533e5ba55381ab70e8691e10593b16be3f085e050738080aff",
+          "artifact_after_oracle_sha256": "4d0a40e427a083533e5ba55381ab70e8691e10593b16be3f085e050738080aff",
           "observed_issue_ids": []
         },
         {
@@ -119,8 +187,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "0499e91d1ab3a8f6ad0a377dfd69ea32be0be522625671fd617a442ca8d6a8e9",
-          "artifact_before_oracle_sha256": "7364b49bf487d99cc48a41cf4255b982fb1cc8a2eac6ef86afbd2552aad836d1",
-          "artifact_after_oracle_sha256": "7364b49bf487d99cc48a41cf4255b982fb1cc8a2eac6ef86afbd2552aad836d1",
+          "artifact_before_oracle_sha256": "df16fd25cf7fae6cea808d473a7bd3c7b019c36b3cf5a7943641ced50057c96c",
+          "artifact_after_oracle_sha256": "df16fd25cf7fae6cea808d473a7bd3c7b019c36b3cf5a7943641ced50057c96c",
           "observed_issue_ids": []
         }
       ]
@@ -135,8 +203,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "c08d85721888775208ce1adf98dd84508307dd99a32864f3c201b7c6106c3fdd",
-          "artifact_before_oracle_sha256": "80bfab024d1fe602777cf06f31ae498c87c74755c788c620b30dd8b5becf1003",
-          "artifact_after_oracle_sha256": "80bfab024d1fe602777cf06f31ae498c87c74755c788c620b30dd8b5becf1003",
+          "artifact_before_oracle_sha256": "4073b1cb1b2959f88271550039eda388a1a26fa0f701ea59949edfd5bb28e5c1",
+          "artifact_after_oracle_sha256": "4073b1cb1b2959f88271550039eda388a1a26fa0f701ea59949edfd5bb28e5c1",
           "observed_issue_ids": []
         },
         {
@@ -144,8 +212,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "272e1cd9bf382246c3f96249cd809c4c3f553a91c0318a0fcf45d3e4acbd4cbd",
-          "artifact_before_oracle_sha256": "2d312fb6e53fd56df8dab9989d4285caf4e4a6ab49c452787f7f7b83674b244b",
-          "artifact_after_oracle_sha256": "2d312fb6e53fd56df8dab9989d4285caf4e4a6ab49c452787f7f7b83674b244b",
+          "artifact_before_oracle_sha256": "4aa314bc2043f9352989c4bb4158f46e9a524b06144369d21f1071e00d84fc64",
+          "artifact_after_oracle_sha256": "4aa314bc2043f9352989c4bb4158f46e9a524b06144369d21f1071e00d84fc64",
           "observed_issue_ids": []
         },
         {
@@ -153,8 +221,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f23c3d109a03bec3199d902a12709d196286a0dcaeb9ba5f927d5de0a6e6f16e",
-          "artifact_before_oracle_sha256": "bf7e4f562938d7028d25003e8bf9532fbba600933c37f7a337d9a2ca4ea43ffc",
-          "artifact_after_oracle_sha256": "bf7e4f562938d7028d25003e8bf9532fbba600933c37f7a337d9a2ca4ea43ffc",
+          "artifact_before_oracle_sha256": "91332fea6c7ca68c790f9d3ee14fc8aaed8c96338f6a4d22a4bcd010b6f43248",
+          "artifact_after_oracle_sha256": "91332fea6c7ca68c790f9d3ee14fc8aaed8c96338f6a4d22a4bcd010b6f43248",
           "observed_issue_ids": []
         },
         {
@@ -162,8 +230,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "d009105141d4a3a4eae308b9eb20d7fcafdea84fa60ec988e974d90de6a5a937",
-          "artifact_before_oracle_sha256": "89df0bb5989500fd35f3d5ad48f5694853c7efe9409615e6038da937a99a74bf",
-          "artifact_after_oracle_sha256": "89df0bb5989500fd35f3d5ad48f5694853c7efe9409615e6038da937a99a74bf",
+          "artifact_before_oracle_sha256": "8712609d15245175ad1c03af4fa3db9ef0b9ab4a467a625d239fb517eaf0efaa",
+          "artifact_after_oracle_sha256": "8712609d15245175ad1c03af4fa3db9ef0b9ab4a467a625d239fb517eaf0efaa",
           "observed_issue_ids": []
         },
         {
@@ -171,8 +239,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "7fd75a249e58620ac1f363a2884b5bc8501e00f5cfddd441b51b0e28cff43c74",
-          "artifact_before_oracle_sha256": "78264af55d8114a0f80f641b9e2ebdf1bea0e4093a9ffb2d205cb68527dbad50",
-          "artifact_after_oracle_sha256": "78264af55d8114a0f80f641b9e2ebdf1bea0e4093a9ffb2d205cb68527dbad50",
+          "artifact_before_oracle_sha256": "90b1a818f93fa58b0db6f4cd85f37a2f3e036d6c259d8ea8e4e25c32cae71e82",
+          "artifact_after_oracle_sha256": "90b1a818f93fa58b0db6f4cd85f37a2f3e036d6c259d8ea8e4e25c32cae71e82",
           "observed_issue_ids": []
         },
         {
@@ -180,8 +248,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "1e87ddcf48081be89e7b74d5eb4c190c025ad3cdd3aa3a6b6fe8afb8812b2224",
-          "artifact_before_oracle_sha256": "2fe95529eff744be342368175c2bd4ac06ea70e31bee2ecc561017a34a6fe220",
-          "artifact_after_oracle_sha256": "2fe95529eff744be342368175c2bd4ac06ea70e31bee2ecc561017a34a6fe220",
+          "artifact_before_oracle_sha256": "1f3fec4aa4e3a6f8f1f65069bbb16c11d10c0265f6ee5b44a2d2e3442aa615a1",
+          "artifact_after_oracle_sha256": "1f3fec4aa4e3a6f8f1f65069bbb16c11d10c0265f6ee5b44a2d2e3442aa615a1",
           "observed_issue_ids": []
         },
         {
@@ -189,8 +257,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "2bf9116a3ecde849164b220cdcd9f8b9fdaa351f67e8a78825899b992a472a57",
-          "artifact_before_oracle_sha256": "483bbfa0b2b726d9a01b2e01192d5371fec6af634b64bbbc5692371eb89b5fbf",
-          "artifact_after_oracle_sha256": "483bbfa0b2b726d9a01b2e01192d5371fec6af634b64bbbc5692371eb89b5fbf",
+          "artifact_before_oracle_sha256": "a22fa1cbc7b99e3cd4a28578cf675d0e4740da2ea625680ea1432d958f002f4c",
+          "artifact_after_oracle_sha256": "a22fa1cbc7b99e3cd4a28578cf675d0e4740da2ea625680ea1432d958f002f4c",
           "observed_issue_ids": []
         },
         {
@@ -198,8 +266,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "4782469b29815c1c25cb8fb1f42d239680d1d73b112bbd6be1531a73279ec3a7",
-          "artifact_before_oracle_sha256": "9bc67e3fc4a6871b27bae23685a4a6220a075673d035118b819f90eb5db999c6",
-          "artifact_after_oracle_sha256": "9bc67e3fc4a6871b27bae23685a4a6220a075673d035118b819f90eb5db999c6",
+          "artifact_before_oracle_sha256": "985c784d6dc03ea1cbba656c62f1da2c6548776b26bac8518321abe714c4aa9e",
+          "artifact_after_oracle_sha256": "985c784d6dc03ea1cbba656c62f1da2c6548776b26bac8518321abe714c4aa9e",
           "observed_issue_ids": []
         },
         {
@@ -207,8 +275,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "2e6f2cfac7547df999d008608f1af0eacf28ffbbb9fe3d24bf1556daff6f665f",
-          "artifact_before_oracle_sha256": "212087976d463996bc28524f9f263eb91fd0021914efe2cbed338df4a42ff036",
-          "artifact_after_oracle_sha256": "212087976d463996bc28524f9f263eb91fd0021914efe2cbed338df4a42ff036",
+          "artifact_before_oracle_sha256": "85bc45ba0788fab9e22c93ad095e19e89bc5c1b77a75b8e97922089050a01822",
+          "artifact_after_oracle_sha256": "85bc45ba0788fab9e22c93ad095e19e89bc5c1b77a75b8e97922089050a01822",
           "observed_issue_ids": []
         },
         {
@@ -216,8 +284,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "16d7f1f999d3ad84fe02656bbd4097c589f7996bd5df9d90ae4f0513554df33f",
-          "artifact_before_oracle_sha256": "899abad115fb17dc99cff6b5baec6f6d734b79d9f0d950ab5fd86b8562dafaa9",
-          "artifact_after_oracle_sha256": "899abad115fb17dc99cff6b5baec6f6d734b79d9f0d950ab5fd86b8562dafaa9",
+          "artifact_before_oracle_sha256": "b30eacc20d676f4ec1ec406dcaf119522d339d0073441a232b067d01f7932129",
+          "artifact_after_oracle_sha256": "b30eacc20d676f4ec1ec406dcaf119522d339d0073441a232b067d01f7932129",
           "observed_issue_ids": []
         },
         {
@@ -225,8 +293,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "65d19718179bb136cf2074c61fa7c5a29feb6c7376c242c30df38a7bb16e3013",
-          "artifact_before_oracle_sha256": "39bfc71f2e6c3a3fffd855a5b8df7a3c749d65eb2d74e96d9812b8fcad637b8e",
-          "artifact_after_oracle_sha256": "39bfc71f2e6c3a3fffd855a5b8df7a3c749d65eb2d74e96d9812b8fcad637b8e",
+          "artifact_before_oracle_sha256": "62ca69d86793ed1014dcd71c70d6f20408a459929d2062f98f1436b2f17252f6",
+          "artifact_after_oracle_sha256": "62ca69d86793ed1014dcd71c70d6f20408a459929d2062f98f1436b2f17252f6",
           "observed_issue_ids": []
         },
         {
@@ -234,8 +302,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "8e845ebdfb7379f158a9f5ce1a3f69cdf8730f8bab31eea48d4a64de2f6367e4",
-          "artifact_before_oracle_sha256": "b99ca37920b52281f9327167be8f5df85070d3653c15e6e90cc9a36908f2e498",
-          "artifact_after_oracle_sha256": "b99ca37920b52281f9327167be8f5df85070d3653c15e6e90cc9a36908f2e498",
+          "artifact_before_oracle_sha256": "52e32ec3f4bb4a1558381ee17bfb4ffbedc4e6aa6c4479fa256e8fe1ec81be32",
+          "artifact_after_oracle_sha256": "52e32ec3f4bb4a1558381ee17bfb4ffbedc4e6aa6c4479fa256e8fe1ec81be32",
           "observed_issue_ids": []
         },
         {
@@ -243,8 +311,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5325d515f28640d73262e36977d47002508c58b1db672fd1779f930c1217b380",
-          "artifact_before_oracle_sha256": "78bb74d555c31c9b754d80bb9b219599f46e17c7f123fa5a14faaf0bdd67a7d1",
-          "artifact_after_oracle_sha256": "78bb74d555c31c9b754d80bb9b219599f46e17c7f123fa5a14faaf0bdd67a7d1",
+          "artifact_before_oracle_sha256": "613ba3095a52c3403c403f97b30c1a6dccba6e69e5ccd2cde0d7e928b9a00669",
+          "artifact_after_oracle_sha256": "613ba3095a52c3403c403f97b30c1a6dccba6e69e5ccd2cde0d7e928b9a00669",
           "observed_issue_ids": []
         },
         {
@@ -252,8 +320,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "25a86e0c3405fb9fa7ffb4d8e0d127036650433c51176be4f35aaf7603d2398e",
-          "artifact_before_oracle_sha256": "19e72582822a4b70fd60fc459acfdd8a70ff1fbcb1f3cc02e695c6c8f338554d",
-          "artifact_after_oracle_sha256": "19e72582822a4b70fd60fc459acfdd8a70ff1fbcb1f3cc02e695c6c8f338554d",
+          "artifact_before_oracle_sha256": "339913e095ea9246412ade401c535b02972dab4bb0a2c596b89120d1cd0412b5",
+          "artifact_after_oracle_sha256": "339913e095ea9246412ade401c535b02972dab4bb0a2c596b89120d1cd0412b5",
           "observed_issue_ids": []
         },
         {
@@ -261,8 +329,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "474d05c5391398b3f774b4f00cb7f2e0c572e5ebe32f1d277f78b66fc70945f0",
-          "artifact_before_oracle_sha256": "4863d8de7b4731f2f8beb4c3317908fa0b8d99e25ffec43481fb76428d45f6bb",
-          "artifact_after_oracle_sha256": "4863d8de7b4731f2f8beb4c3317908fa0b8d99e25ffec43481fb76428d45f6bb",
+          "artifact_before_oracle_sha256": "a9d102c2da98119625924044c5796949637ce3d6bce91dfc5b6a5afa480c25f1",
+          "artifact_after_oracle_sha256": "a9d102c2da98119625924044c5796949637ce3d6bce91dfc5b6a5afa480c25f1",
           "observed_issue_ids": []
         },
         {
@@ -270,8 +338,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "77883568fe3cd58f5cca4c4d31112810da1d27ad6e4d7b4ff6c843fd2e930e5e",
-          "artifact_before_oracle_sha256": "3227aa5f6a122359b640c029d86fee86b7daa697f19f881b422c0811fbcfe09c",
-          "artifact_after_oracle_sha256": "3227aa5f6a122359b640c029d86fee86b7daa697f19f881b422c0811fbcfe09c",
+          "artifact_before_oracle_sha256": "2c69defde7c816276a7e3264d6d31a77e9be5b4d8a96129428ede234bc8a3596",
+          "artifact_after_oracle_sha256": "2c69defde7c816276a7e3264d6d31a77e9be5b4d8a96129428ede234bc8a3596",
           "observed_issue_ids": []
         }
       ]
@@ -286,8 +354,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "6965e0806873f3c2f0f5b07cd64fe75c06800481dc46439ea619aff2f47935ef",
-          "artifact_before_oracle_sha256": "3a31396d75859c82f8aa6c2d8d77a9e2327ceae9792205dc46c9b24e2c34a887",
-          "artifact_after_oracle_sha256": "3a31396d75859c82f8aa6c2d8d77a9e2327ceae9792205dc46c9b24e2c34a887",
+          "artifact_before_oracle_sha256": "4033259947929db84d919f0853b5b0aaefe3b9a01397a88eefeb2f987e548ce6",
+          "artifact_after_oracle_sha256": "4033259947929db84d919f0853b5b0aaefe3b9a01397a88eefeb2f987e548ce6",
           "observed_issue_ids": []
         },
         {
@@ -295,8 +363,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "b14aada38e3468b3fbac8ded554df66e32fb6bcc28ebb9b9ae614e62ed247939",
-          "artifact_before_oracle_sha256": "84ec0ef68d504f96764a958c7e7e75941352e8ea720ac23400bf240cb2fd2a7d",
-          "artifact_after_oracle_sha256": "84ec0ef68d504f96764a958c7e7e75941352e8ea720ac23400bf240cb2fd2a7d",
+          "artifact_before_oracle_sha256": "b2c46932ca778a82c5a44690f3a45ec095c50bfaca6a93ae0b415065bbe8ea20",
+          "artifact_after_oracle_sha256": "b2c46932ca778a82c5a44690f3a45ec095c50bfaca6a93ae0b415065bbe8ea20",
           "observed_issue_ids": []
         },
         {
@@ -304,8 +372,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5b21d0cddadd192d88e5246fdd4e3b4746ee47a6a2d8ccd79493d24ac0d3f309",
-          "artifact_before_oracle_sha256": "70fab499ebd124b7b7491697981b0487aa7a08dcd102b616eae973cac25fa8d1",
-          "artifact_after_oracle_sha256": "70fab499ebd124b7b7491697981b0487aa7a08dcd102b616eae973cac25fa8d1",
+          "artifact_before_oracle_sha256": "b1c0c1dc4d408e429f39c6dc0d63f4a0a62e0cf0b279ea60c493bd66b900ec13",
+          "artifact_after_oracle_sha256": "b1c0c1dc4d408e429f39c6dc0d63f4a0a62e0cf0b279ea60c493bd66b900ec13",
           "observed_issue_ids": []
         },
         {
@@ -313,8 +381,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "0ea99ef5885cc22a9b59242f93c5ec8d49625410b4c3644f02176f6f1e026926",
-          "artifact_before_oracle_sha256": "569ef784321cd44a3d862cb89965a37881ab49a78a4aa095327b18476a79209b",
-          "artifact_after_oracle_sha256": "569ef784321cd44a3d862cb89965a37881ab49a78a4aa095327b18476a79209b",
+          "artifact_before_oracle_sha256": "c897684fb24e71072c165090fb8c9eb4e8738bf8c23423505967cd33947a5441",
+          "artifact_after_oracle_sha256": "c897684fb24e71072c165090fb8c9eb4e8738bf8c23423505967cd33947a5441",
           "observed_issue_ids": []
         },
         {
@@ -322,8 +390,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "c5f04c8d888abc0f081922828e8ff30c84c45be208e97a801c13c20c84a554e8",
-          "artifact_before_oracle_sha256": "a0dc78cbd1a040faa01d355bd754d4bc112ad0ed814d9705de26943f0463fcdf",
-          "artifact_after_oracle_sha256": "a0dc78cbd1a040faa01d355bd754d4bc112ad0ed814d9705de26943f0463fcdf",
+          "artifact_before_oracle_sha256": "c9c2805d8ca65cf6a69a114dedd4e38a6d5898ccb4344820174e8a8fdc602d0b",
+          "artifact_after_oracle_sha256": "c9c2805d8ca65cf6a69a114dedd4e38a6d5898ccb4344820174e8a8fdc602d0b",
           "observed_issue_ids": []
         },
         {
@@ -331,8 +399,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "92f7fdee94d87d420ae392b8e2bb5b35780fc80b1c7acfac2d7ee3f174970b57",
-          "artifact_before_oracle_sha256": "9a306fcc865e502ee402a995256d68f91bc2319f9aedbb23198b7a1ca56eb332",
-          "artifact_after_oracle_sha256": "9a306fcc865e502ee402a995256d68f91bc2319f9aedbb23198b7a1ca56eb332",
+          "artifact_before_oracle_sha256": "5de3568e908cfda21e918ff3d99b9c2a4479844d2d5f89d8ce32c171741e89d7",
+          "artifact_after_oracle_sha256": "5de3568e908cfda21e918ff3d99b9c2a4479844d2d5f89d8ce32c171741e89d7",
           "observed_issue_ids": []
         },
         {
@@ -340,8 +408,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "d03884b5df1c40421e27a853d6497fa267b6bc31ccbb61a6c43e48e5b6f68dab",
-          "artifact_before_oracle_sha256": "7ec56cf45506a5605f4e98a162112162a5e19386bd6fad826f1e2482dc2f884d",
-          "artifact_after_oracle_sha256": "7ec56cf45506a5605f4e98a162112162a5e19386bd6fad826f1e2482dc2f884d",
+          "artifact_before_oracle_sha256": "1d27b5394a6c9e5952317437b3fe311381477054680fe94719e6afea1f8917fe",
+          "artifact_after_oracle_sha256": "1d27b5394a6c9e5952317437b3fe311381477054680fe94719e6afea1f8917fe",
           "observed_issue_ids": []
         },
         {
@@ -349,8 +417,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "21240a48552abc411f9837dc05fdcc542dc34d554d8a7948a6ec4709d7b7f434",
-          "artifact_before_oracle_sha256": "851455ff4f446b9d4dd2fb85b58f80ef71bf2a630dbdb968f3776597c6abfef1",
-          "artifact_after_oracle_sha256": "851455ff4f446b9d4dd2fb85b58f80ef71bf2a630dbdb968f3776597c6abfef1",
+          "artifact_before_oracle_sha256": "149b15f82ff2109401780bf9dfc77385ef5fb04abd55c84623f80993979219a9",
+          "artifact_after_oracle_sha256": "149b15f82ff2109401780bf9dfc77385ef5fb04abd55c84623f80993979219a9",
           "observed_issue_ids": []
         },
         {
@@ -358,8 +426,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "93ae5ec93ed12c2ab8b421b67e83d346afc0d4a2b8a6fcc2b8c49acd6326cfdd",
-          "artifact_before_oracle_sha256": "1192dca46f95e593456dff89bebdaa07f2c27b2b66b064981fa685c7ebe3dc34",
-          "artifact_after_oracle_sha256": "1192dca46f95e593456dff89bebdaa07f2c27b2b66b064981fa685c7ebe3dc34",
+          "artifact_before_oracle_sha256": "af0899bb8edffdc7ffc5584ad897827ae7dd84955502098d424997aa4f394b0e",
+          "artifact_after_oracle_sha256": "af0899bb8edffdc7ffc5584ad897827ae7dd84955502098d424997aa4f394b0e",
           "observed_issue_ids": []
         },
         {
@@ -367,8 +435,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5c7239193b7c2d24ddcac54003929ed6ab07aafa9c7b89eebabbeea3a87860d6",
-          "artifact_before_oracle_sha256": "4360669c5b13ae3fa297ea650a4e8e900d79a8a0229f1700bcebd1b523972560",
-          "artifact_after_oracle_sha256": "4360669c5b13ae3fa297ea650a4e8e900d79a8a0229f1700bcebd1b523972560",
+          "artifact_before_oracle_sha256": "595c708ce29ac562db1c6749fa6d97a6159b8b0abf05f46113716b36b77b73f4",
+          "artifact_after_oracle_sha256": "595c708ce29ac562db1c6749fa6d97a6159b8b0abf05f46113716b36b77b73f4",
           "observed_issue_ids": []
         },
         {
@@ -376,8 +444,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "0a8575f4f5bee60c1d614dfbca3426261e854c965cd0b397ac258a7b7160a46f",
-          "artifact_before_oracle_sha256": "ec320bdc53c0ef903763c733c365fd9f0bde3ec181e814d7a719175fa3c9b86a",
-          "artifact_after_oracle_sha256": "ec320bdc53c0ef903763c733c365fd9f0bde3ec181e814d7a719175fa3c9b86a",
+          "artifact_before_oracle_sha256": "6d02571967b1eba107f9e6788cad05ce08e67eb82c5052957753e783b98f16b2",
+          "artifact_after_oracle_sha256": "6d02571967b1eba107f9e6788cad05ce08e67eb82c5052957753e783b98f16b2",
           "observed_issue_ids": []
         },
         {
@@ -385,8 +453,427 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "2446aec7c836d23d4b7b1eab2daf41bec0d33f1f7728f3463eb0f72f1fca1e72",
-          "artifact_before_oracle_sha256": "382b8b9586cc86fdf690807e4ec87a599671389305c2e9e5479c2b0d4af8e79e",
-          "artifact_after_oracle_sha256": "382b8b9586cc86fdf690807e4ec87a599671389305c2e9e5479c2b0d4af8e79e",
+          "artifact_before_oracle_sha256": "e2f96daa54da9443411ccfaa521ca9d4840b17dc391d85fe326eda5d43ef2f99",
+          "artifact_after_oracle_sha256": "e2f96daa54da9443411ccfaa521ca9d4840b17dc391d85fe326eda5d43ef2f99",
+          "observed_issue_ids": []
+        }
+      ]
+    },
+    {
+      "id": "R6-generated-high-interactions",
+      "strategy": "deterministic_property_generation_and_shrinking_seeds",
+      "status": "clean",
+      "cases": [
+        {
+          "case_id": "mux-seed-024",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "f9e5d0d299ae4dd6ee6503d986f8faf4f3f672d95de9fb26af90440486058c22",
+          "artifact_before_oracle_sha256": "36944c5b4ad90d02d8dc010fc6b841a9314bf43f7bcb08f9496989f56bca9423",
+          "artifact_after_oracle_sha256": "36944c5b4ad90d02d8dc010fc6b841a9314bf43f7bcb08f9496989f56bca9423",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-025",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "562311a09f9905341f61772521604196a78805e782ce92565495613373820b8c",
+          "artifact_before_oracle_sha256": "2fb7220e09353a241e4e6d45b7478b9eec9989690679a7407962875e7b66a7c8",
+          "artifact_after_oracle_sha256": "2fb7220e09353a241e4e6d45b7478b9eec9989690679a7407962875e7b66a7c8",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-026",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "54cc38b4f02803464ebf1846a70475ad372e82a85258de7cc1fe0c4a1bfd530c",
+          "artifact_before_oracle_sha256": "7b74b953041a03a278950175b817a91c974ed172a125b220d4cee4f3f3f45d4a",
+          "artifact_after_oracle_sha256": "7b74b953041a03a278950175b817a91c974ed172a125b220d4cee4f3f3f45d4a",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-027",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "d305068823813672c3c9caf44533585b456e5131e09b6e3d255b74ab909b2441",
+          "artifact_before_oracle_sha256": "807c83cfdd60a32daeea0da53f59a9d7612a462c8c9203f44c3fc9d9370fb937",
+          "artifact_after_oracle_sha256": "807c83cfdd60a32daeea0da53f59a9d7612a462c8c9203f44c3fc9d9370fb937",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-028",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "8458047cf97c0a8dd7de4804f7eb4a3968adb0ca8e0a33eb037eb9837fcb5713",
+          "artifact_before_oracle_sha256": "1d7cf8ee0e2d12a61ad58995a7cf85d981764127c3ab6fbbe67fe8c8091e1787",
+          "artifact_after_oracle_sha256": "1d7cf8ee0e2d12a61ad58995a7cf85d981764127c3ab6fbbe67fe8c8091e1787",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-029",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "4a2ae0cadf7963f5a6baf54e06c23a5da5ff2eefdf8dfe7ff2719095fed5328d",
+          "artifact_before_oracle_sha256": "858890537b49433c46abd3105128953afbc3aee4f590340e8384fc75d83fd8a2",
+          "artifact_after_oracle_sha256": "858890537b49433c46abd3105128953afbc3aee4f590340e8384fc75d83fd8a2",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-030",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "ed8a89c5c95b18d50b373f1c558522c54629e08e765c0db795edd3b2ad8c6aa5",
+          "artifact_before_oracle_sha256": "ce304ea261e2f0804a9770505e803a5ea3ebf57b8fc1bef26e2ea37af295bca2",
+          "artifact_after_oracle_sha256": "ce304ea261e2f0804a9770505e803a5ea3ebf57b8fc1bef26e2ea37af295bca2",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-031",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "ddae42773fedf6f5caed88fbc1d5db3fa15947794270c1f6b6c7873ec0a66f6b",
+          "artifact_before_oracle_sha256": "e4fca0e716010f9811351d04410f32574f84a0f30c8cd0881d27cc4cf29d18e2",
+          "artifact_after_oracle_sha256": "e4fca0e716010f9811351d04410f32574f84a0f30c8cd0881d27cc4cf29d18e2",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-032",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "1185a8832639867ffe9ea2552b55fbc824cf5ae8896ee29fee98922a6f4be9f8",
+          "artifact_before_oracle_sha256": "7b0514c09d0e2e21dd7a92ade982e41c5ae77537b0d28436c87fb8c7b892cb5e",
+          "artifact_after_oracle_sha256": "7b0514c09d0e2e21dd7a92ade982e41c5ae77537b0d28436c87fb8c7b892cb5e",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-033",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "ccefdd4edc167263a5a37485f5f79460f24eccf7b4c0c4c19bbb377651b7bea6",
+          "artifact_before_oracle_sha256": "650d7ef0ce5f3a83fd9d9c1a9bc97d81315244eb8021a810adb64048da898f49",
+          "artifact_after_oracle_sha256": "650d7ef0ce5f3a83fd9d9c1a9bc97d81315244eb8021a810adb64048da898f49",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-034",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "253f159630b2cda6ae226674f420911483ab75ec6b48f13c8d60b372bb7ea3b9",
+          "artifact_before_oracle_sha256": "17a945de2feede232064c8a801ad12c957debb5429c8669ec77aabba16c740f1",
+          "artifact_after_oracle_sha256": "17a945de2feede232064c8a801ad12c957debb5429c8669ec77aabba16c740f1",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-035",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "b86b815d35e989ffd860a43d8e47246c6ed416521c392e55e3af55c1caed972b",
+          "artifact_before_oracle_sha256": "9f47246d4bb29c34ada69660a4d73d5d334f939974fc6307f82bdf9167199007",
+          "artifact_after_oracle_sha256": "9f47246d4bb29c34ada69660a4d73d5d334f939974fc6307f82bdf9167199007",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-036",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "8dd0c181097be71cbccaeb46bc33b29a2fff290b156e0e259668c075905555be",
+          "artifact_before_oracle_sha256": "eb467ae1d47fb01aca7ed811c26471a85f2432c32547f45619f0ceb6451541fe",
+          "artifact_after_oracle_sha256": "eb467ae1d47fb01aca7ed811c26471a85f2432c32547f45619f0ceb6451541fe",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-037",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "d757bfc7338058aea2490b386e20e4ae0da8d2eac82682cb7447e07e0ebd01ab",
+          "artifact_before_oracle_sha256": "74c22097eb47c02061dfcd05860a2aca2ad165cf88aa738826de273a0c3ad691",
+          "artifact_after_oracle_sha256": "74c22097eb47c02061dfcd05860a2aca2ad165cf88aa738826de273a0c3ad691",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-038",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "74f75e2b9d38e3ea877abcfe09996f0b8a595d318ca89020a14b44c5e0150893",
+          "artifact_before_oracle_sha256": "da59119e1d3bd78277ad85671ef64e1f61d18aa8b94e226265c68e25b1005387",
+          "artifact_after_oracle_sha256": "da59119e1d3bd78277ad85671ef64e1f61d18aa8b94e226265c68e25b1005387",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-039",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "064cab4b377e8bbdaec9132ab4c599a08fe20ddd89520dd63d5a7ff0d03cd304",
+          "artifact_before_oracle_sha256": "8fcaba1ca476c8e6e259ec5aee83f50183a367123c47c51656eac5ace0261496",
+          "artifact_after_oracle_sha256": "8fcaba1ca476c8e6e259ec5aee83f50183a367123c47c51656eac5ace0261496",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-040",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "495b87f3a86dda9e7986862d1c3c168e3a206515a447d329f2be1f7be5d89736",
+          "artifact_before_oracle_sha256": "f42c393f50f53a00f66503b4300ac4ad64aaa87eee011abd869406c5661aaacf",
+          "artifact_after_oracle_sha256": "f42c393f50f53a00f66503b4300ac4ad64aaa87eee011abd869406c5661aaacf",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-041",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "a7ee59c3026d628a5d2c68b97db52c2fd81b872587d2ad7e98acd6a37c0c6e73",
+          "artifact_before_oracle_sha256": "6765351f18ccd9549bec95f70620f397d1357b79310d4c82237d51d6c5b1ee20",
+          "artifact_after_oracle_sha256": "6765351f18ccd9549bec95f70620f397d1357b79310d4c82237d51d6c5b1ee20",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-042",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "5f3ddfa80cfa111e54c61d8c9748f10522572bd34faefc1e00b079f7626db2d7",
+          "artifact_before_oracle_sha256": "ce23644192abdff64f26f96921bd9feb0119edff0753dcedc5b89b3f7f4640f3",
+          "artifact_after_oracle_sha256": "ce23644192abdff64f26f96921bd9feb0119edff0753dcedc5b89b3f7f4640f3",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-043",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "e69205ce55d038cec30a508a8d81c0a624216b250eebb52b1d3d02a1ee6f31b0",
+          "artifact_before_oracle_sha256": "330b0941dd6da749e2e8200907e9948ec6d006a884a9d56bae7328573378090b",
+          "artifact_after_oracle_sha256": "330b0941dd6da749e2e8200907e9948ec6d006a884a9d56bae7328573378090b",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-044",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "06b5256443f4cfd2c694c4caba6d883d650d1134e0e136793cc6dd69332c417d",
+          "artifact_before_oracle_sha256": "a4e2e9010a8640d9e7011a7b73bd223ad0dc037fe3198601f5cb040ea45b8a8c",
+          "artifact_after_oracle_sha256": "a4e2e9010a8640d9e7011a7b73bd223ad0dc037fe3198601f5cb040ea45b8a8c",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-045",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "ca0cf7917106faa3bcdd6ebcbbfe631cf0f8595c5c5310f170ea626ce607c04c",
+          "artifact_before_oracle_sha256": "ff1772fa578549ddc8cf3079dc2447dfaf22a8b90db466756c49f9732b92776b",
+          "artifact_after_oracle_sha256": "ff1772fa578549ddc8cf3079dc2447dfaf22a8b90db466756c49f9732b92776b",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-046",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "63fd6a5c619b71d51a2d32ac7ca024dc3478f9f92574e63f161a6e9895295545",
+          "artifact_before_oracle_sha256": "1bd02022ec129948210eedc32ff9d3701cb87be10500d49597ab097a5fad9d1d",
+          "artifact_after_oracle_sha256": "1bd02022ec129948210eedc32ff9d3701cb87be10500d49597ab097a5fad9d1d",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-047",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "282af64c77071f859ed1c7c5c09d772f2574491bdf6b7e8dce60a121244437da",
+          "artifact_before_oracle_sha256": "45f71891e59868c40dad5de9cc066bced67f94ce9abec780711881fe990adaa0",
+          "artifact_after_oracle_sha256": "45f71891e59868c40dad5de9cc066bced67f94ce9abec780711881fe990adaa0",
+          "observed_issue_ids": []
+        }
+      ]
+    },
+    {
+      "id": "R7-cross-owner-end-to-end",
+      "strategy": "root_cause_cross_owner_release_replay",
+      "status": "clean",
+      "cases": [
+        {
+          "case_id": "mux-seed-048",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "cd676bafab434581223ec704dce34ce94e1401fce396dc5709a4b2a1668785ca",
+          "artifact_before_oracle_sha256": "92f20be1a4bcbe95b52c9b251c93f8a7c524c3e3b7951b445699dea0c98475f9",
+          "artifact_after_oracle_sha256": "92f20be1a4bcbe95b52c9b251c93f8a7c524c3e3b7951b445699dea0c98475f9",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-049",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "71e8785cbd4d98216b7c6d6f6eadc390bafff4a5b662445490ff7e6e180bd598",
+          "artifact_before_oracle_sha256": "8c35069947b65312ebf3d5d36b9ec552b1c6da27d428c0fa77b388945db16d52",
+          "artifact_after_oracle_sha256": "8c35069947b65312ebf3d5d36b9ec552b1c6da27d428c0fa77b388945db16d52",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-050",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "b21dac23bdda8125548f9b07978ff1c22d4b4450b6ee37ac790396cf70ee8a93",
+          "artifact_before_oracle_sha256": "0609a5e0d316e9389e48be5ea64b6d71c63b7bcc2ce91921a7d96ce45f29a698",
+          "artifact_after_oracle_sha256": "0609a5e0d316e9389e48be5ea64b6d71c63b7bcc2ce91921a7d96ce45f29a698",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-051",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "8b6a17f18efc4d134898cb5bd259f7cdfb8a54b720fddc710e16e35ef24fe82b",
+          "artifact_before_oracle_sha256": "97979be91b3167604e85b69195194ca2ed0cd393885866e8457ac284e8afbf4d",
+          "artifact_after_oracle_sha256": "97979be91b3167604e85b69195194ca2ed0cd393885866e8457ac284e8afbf4d",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-052",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "b93e306cbface41a66f2d96993e78f0fda5dfa1584099b9ed683e2ab025ca831",
+          "artifact_before_oracle_sha256": "69deb0cc5f0d32ef6cb65457890be549a283d46cdcde1feb1e654e30958378f4",
+          "artifact_after_oracle_sha256": "69deb0cc5f0d32ef6cb65457890be549a283d46cdcde1feb1e654e30958378f4",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-053",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "6f97ec8edf3532f2da22e9eb5aef2c8ef467fc1c911ea4f0d8c58e1ecc48cece",
+          "artifact_before_oracle_sha256": "abce0172141c38047709cf7e2d27b3b08a1d71e9f1d088959e930d190b9afb21",
+          "artifact_after_oracle_sha256": "abce0172141c38047709cf7e2d27b3b08a1d71e9f1d088959e930d190b9afb21",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-054",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "dbdcceb36248f75c7056ad897f7a1e77595fcb8016a2f986118886bda0c78e76",
+          "artifact_before_oracle_sha256": "96d2b3855fea3b3601a49eebc0936385eb9a4e538bd2940087519b76a77f4466",
+          "artifact_after_oracle_sha256": "96d2b3855fea3b3601a49eebc0936385eb9a4e538bd2940087519b76a77f4466",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-055",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "30db8719ce5020839b73ff8987b3e59aabac40806e1c9d686f53c3eb992293a7",
+          "artifact_before_oracle_sha256": "73675f5e1f0fc68b78889a928ff74c1f1939487c34981d45a188a3ae58ccfce0",
+          "artifact_after_oracle_sha256": "73675f5e1f0fc68b78889a928ff74c1f1939487c34981d45a188a3ae58ccfce0",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-056",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "dd66525264fd197e1450ee082d40325c5ebe10c1af1b136b0d48f7ffc142d1df",
+          "artifact_before_oracle_sha256": "c3c9dfff27b15a0d776c2cbc80f34af6f4eece8e7929c5624d6da9f639eff269",
+          "artifact_after_oracle_sha256": "c3c9dfff27b15a0d776c2cbc80f34af6f4eece8e7929c5624d6da9f639eff269",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-057",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "5d7e395861258690d2da424a96af6c93cbc23242f11eb11f2eecaeb990543997",
+          "artifact_before_oracle_sha256": "5b4b8524c3d8dec173872eee4372def5461c3d968b99f95b2a7f6a35dafad873",
+          "artifact_after_oracle_sha256": "5b4b8524c3d8dec173872eee4372def5461c3d968b99f95b2a7f6a35dafad873",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-058",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "043dfa49a0d4dec517bbcedd61a9171811fdabf4928f4544df6f1b08c6bc1627",
+          "artifact_before_oracle_sha256": "3bd4334b5f15bec6be7a895037549ad4a9f836fa74ef6be1fdf8d15839641dc0",
+          "artifact_after_oracle_sha256": "3bd4334b5f15bec6be7a895037549ad4a9f836fa74ef6be1fdf8d15839641dc0",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-059",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "f4e0008c5cffcb36b28f8f3bc5ce3fd23af028929f9df5629bb70e54b163ecec",
+          "artifact_before_oracle_sha256": "c8f0ac59a02eb0b2d28a31845c74276269024701e5c55d134732415dde909952",
+          "artifact_after_oracle_sha256": "c8f0ac59a02eb0b2d28a31845c74276269024701e5c55d134732415dde909952",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-060",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "621f1cc03eb415b5d92e1ddd78080b0d606da615aa8170371ff76ee124e2f996",
+          "artifact_before_oracle_sha256": "ce8d09345ce789ca85eb7dee48b40fce7621d634d12e5fb592a3e334fe8d24dd",
+          "artifact_after_oracle_sha256": "ce8d09345ce789ca85eb7dee48b40fce7621d634d12e5fb592a3e334fe8d24dd",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-061",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "e7f46d579a74d8913b0ad1acef8fbaf4c254e3b4e739fb2406424279ea7b45fa",
+          "artifact_before_oracle_sha256": "cbb70e775e4f0a36ab09910deb8bf571b3084aa3358f05f8cd1b03da79c9472a",
+          "artifact_after_oracle_sha256": "cbb70e775e4f0a36ab09910deb8bf571b3084aa3358f05f8cd1b03da79c9472a",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-062",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "ffcf68bb47ff376e35da7744fe7e4100c9cc88df7a3e40d1e492fbc3b46c7353",
+          "artifact_before_oracle_sha256": "ba2f878c7668ee0780b097c6ae0bbe6eda37264caf2aa161142ba859ea0ba3c3",
+          "artifact_after_oracle_sha256": "ba2f878c7668ee0780b097c6ae0bbe6eda37264caf2aa161142ba859ea0ba3c3",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "mux-seed-063",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "f497c0eecad2e9b9449a618feb11dbd0f8b3d2b2b5073f5190351c9b26fb3526",
+          "artifact_before_oracle_sha256": "5d164875c74f768b3b48a3a75329247e05d16a62253bfc6d8f4e8d10f79ff016",
+          "artifact_after_oracle_sha256": "5d164875c74f768b3b48a3a75329247e05d16a62253bfc6d8f4e8d10f79ff016",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "bus-rows-05",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "16bf92fffa07ea2245e2f26135039148a1513cfc7fe09f107d0b695cf02f6bc2",
+          "artifact_before_oracle_sha256": "217d3ab84933768df25f7b3dd8c3bad173df479aac3203c5b23d41d2879f35cc",
+          "artifact_after_oracle_sha256": "217d3ab84933768df25f7b3dd8c3bad173df479aac3203c5b23d41d2879f35cc",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "bus-rows-06",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "48759b2e778fdaac3a2d8e03f123263be4193943dbdd6cb53be1b6f1ef611533",
+          "artifact_before_oracle_sha256": "f305d1a53b4ed73c43026d4a938a202283d21d4e8dcb797bd6f36d46d2f2bd13",
+          "artifact_after_oracle_sha256": "f305d1a53b4ed73c43026d4a938a202283d21d4e8dcb797bd6f36d46d2f2bd13",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "bus-rows-07",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "369dd12f0fda22cd3a9282fe62a7e4eb1bbe71f2ab0448615dd2b69cbb51a16d",
+          "artifact_before_oracle_sha256": "8fa1be0e9383151a55bf616002f5781c7de6a385c9e62db8ae87e492b95c285a",
+          "artifact_after_oracle_sha256": "8fa1be0e9383151a55bf616002f5781c7de6a385c9e62db8ae87e492b95c285a",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "bus-rows-12",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "11ccf43d3215c0ee30269f24f20030fcd4563bd2c99de21355c9e06a9ab68c82",
+          "artifact_before_oracle_sha256": "a985ff96fffbd7c94a4514853756bfd4278455721d505c373319632043d47f17",
+          "artifact_after_oracle_sha256": "a985ff96fffbd7c94a4514853756bfd4278455721d505c373319632043d47f17",
+          "observed_issue_ids": []
+        },
+        {
+          "case_id": "bus-rows-16",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "1c0729534aad8930b0622bb45ecd5572752ec099ae069d85711b3e6167ab1ce3",
+          "artifact_before_oracle_sha256": "fe546ab2e973ed11e5442b51e2cde21f178dcb766ecffc57d0c24e6e780b7bf9",
+          "artifact_after_oracle_sha256": "fe546ab2e973ed11e5442b51e2cde21f178dcb766ecffc57d0c24e6e780b7bf9",
           "observed_issue_ids": []
         }
       ]

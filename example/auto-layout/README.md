@@ -38,6 +38,8 @@ python src `
 | 公共 `from` 复用数组 | `28-common-private-from-mux-clock-array.json` | 一个公共 `from` 与六个私人 `from` 分别接入六个 `mux2`，每个 mux 直接连接一路 clock；公共 `from` 使用一个图形和一条纵向总线 |
 | 异深公共总线数组 | `29-asymmetric-depth-common-private-mux-array.json` | 唯一公共 `from` 分别经六个逐路 gate 进入 mux；私人侧逐路经 gate、div 再进入同一 mux，公共侧仍保持一个图形和一条纵向总线 |
 | 错列四源直入 mux | `30-staggered-four-source-mux.json` | 四个自然位于不同列的 source 直接进入一个 `mux4`；带第二消费者的 source 与所有 mux 入边不保留可支配折点 |
+| 节点说明 | `31-node-descriptions.json` | source、gate、mux、clock 均使用通用 `description`，输出自动避让的简单文字 |
+| 注释文本压力 | `32-annotation-text-stress.json` | 短文本、无空格长串、长中文、显式多行、空行、尾随换行、中英混排及密集终端/频率表组合 |
 
 代表性复杂示例包含少量晶振和 PLL、复用的 mux、分频器、gate、多类 clock cell 和末端 clock。13 至 14 改变连接顺序、链深、复用源和实例名，不只是放大同一种阵列。坐标由输入连接关系以及当前器件库的尺寸、标签和端口一次计算得到，不进行成图后的坐标校准。
 

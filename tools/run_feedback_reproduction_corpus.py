@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import secrets
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -55,6 +56,19 @@ def archive(revision: str, destination: Path) -> str:
     return commit
 
 
+def archive_worktree_producer(destination: Path, evidence_archive: Path) -> None:
+    """Freeze only the public producer and component library before a fix."""
+    destination.mkdir()
+    shutil.copytree(ROOT / "src", destination / "src", ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo", "*.egg-info"))
+    shutil.copytree(ROOT / "drawio-lib", destination / "drawio-lib")
+    with zipfile.ZipFile(evidence_archive, "w", compression=zipfile.ZIP_DEFLATED) as bundle:
+        for path in sorted(destination.rglob("*")):
+            if path.is_file():
+                info = zipfile.ZipInfo(path.relative_to(destination).as_posix(), (1980, 1, 1, 0, 0, 0))
+                info.compress_type = zipfile.ZIP_DEFLATED
+                bundle.writestr(info, path.read_bytes())
+
+
 def run(
     command: list[str],
     cwd: Path,
@@ -81,6 +95,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--corpus-receipt", type=Path,
         default=ROOT / ".reproduction/receipts/corpus.json",
+    )
+    parser.add_argument(
+        "--merge-existing", action="store_true",
+        help="merge a strict subset run into an existing aggregate receipt",
     )
     args = parser.parse_args(argv)
     corpus = json.loads(args.corpus.read_text(encoding="utf-8-sig"))
@@ -109,7 +127,13 @@ def main(argv: list[str] | None = None) -> int:
         case_dir.mkdir()
         with tempfile.TemporaryDirectory(prefix="drawclock-frozen-") as temporary:
             snapshot = Path(temporary) / "snapshot"
-            commit = archive(case["baseline_revision"], snapshot)
+            source_archive = None
+            if case["python_role"] == "worktree":
+                source_archive = case_dir / "producer-snapshot.zip"
+                archive_worktree_producer(snapshot, source_archive)
+                commit = case["baseline_revision"]
+            else:
+                commit = archive(case["baseline_revision"], snapshot)
             before_tree = tree_hash(snapshot)
             python = str(args.legacy_python if case["python_role"] == "legacy" else Path(sys.executable))
             input_path = ROOT / case["input"]
@@ -141,6 +165,8 @@ def main(argv: list[str] | None = None) -> int:
                     oracle_command = [sys.executable, str(ORACLE), "--input", str(input_path), "--svg", str(svg), "--issue", issue_id]
                     oracle_exit = run(oracle_command, ROOT, oracle_log, env, redactions)
                     evidence = [svg, producer_log, report_path, report_log, oracle_log]
+                    if source_archive is not None:
+                        evidence.append(source_archive)
                     attempts_by_issue[issue_id].append({
                         "run_id": f"{run_group}:{case['id']}:{index + 1}",
                         "corpus_id": run_group, "case_id": case["id"],
@@ -169,6 +195,31 @@ def main(argv: list[str] | None = None) -> int:
         print("corpus receipt escapes repository", file=sys.stderr)
         return 2
     corpus_receipt_path.parent.mkdir(parents=True, exist_ok=True)
+    if args.merge_existing and corpus_receipt_path.is_file():
+        existing = json.loads(corpus_receipt_path.read_text(encoding="utf-8-sig"))
+        replaced = {case["case_id"] for case in case_summary}
+        merged_cases = [
+            case for case in existing.get("cases", [])
+            if case.get("case_id") not in replaced
+        ] + case_summary
+        declared = set(issues)
+        counts = {
+            issue_id: sum(
+                issue_id in case.get("detected_issues", [])
+                for case in merged_cases
+            )
+            for issue_id in sorted(declared)
+        }
+        corpus_receipt = {
+            "schema_version": 1,
+            "corpus_id": f"merged:{existing.get('corpus_id')}+{run_group}",
+            "coverage_model": "many_to_many",
+            "cases": merged_cases,
+            "issue_attempt_counts": counts,
+            "missing_issues": [
+                issue_id for issue_id, count in counts.items() if count < 2
+            ],
+        }
     corpus_receipt_path.write_text(json.dumps(corpus_receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     for issue_id, attempts in attempts_by_issue.items():
         if not attempts:
@@ -183,7 +234,7 @@ def main(argv: list[str] | None = None) -> int:
         }
         (ROOT / issue["reproduction_receipt"]).write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(corpus_receipt, ensure_ascii=False, indent=2))
-    return 1 if missing else 0
+    return 1 if corpus_receipt["missing_issues"] else 0
 
 
 if __name__ == "__main__":

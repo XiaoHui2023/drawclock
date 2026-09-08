@@ -1,0 +1,326 @@
+{
+  "schema_version": 1,
+  "input_dir": "F:\\Project\\python\\drawclock\\example\\auto-layout",
+  "library": "F:\\Project\\python\\drawclock\\drawio-lib\\drawclock",
+  "expected_count": 27,
+  "observed_count": 27,
+  "failed_count": 0,
+  "annotation_profile_case_counts": {
+    "blank_line": 1,
+    "long": 1,
+    "mixed_script": 2,
+    "multiline": 1,
+    "short": 1,
+    "trailing_line_break": 1
+  },
+  "missing_annotation_profiles": [],
+  "batch_failures": [],
+  "cases": [
+    {
+      "input": "01-linear.json",
+      "producer_exit": 0,
+      "sha256": "8a2dd5597529dc5af3eca7b526d580e96abcda14ccc53d2183930f5223b78919",
+      "crossings": 0,
+      "bends": 0,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "02-branch-tree.json",
+      "producer_exit": 0,
+      "sha256": "12ce36512c0d10f73dafab3113732464ac49f8aa60d1b6d4952664e779b04979",
+      "crossings": 0,
+      "bends": 4,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "03-mux-dag.json",
+      "producer_exit": 0,
+      "sha256": "60bc3f8ce68e00f901534a64abbcbd88380cec736574bb35b838024b14fe94d9",
+      "crossings": 0,
+      "bends": 0,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "04-dual-pll.json",
+      "producer_exit": 0,
+      "sha256": "4db40ba9349a700cf40a95e03cecdb722360832d9b3e340bc9713d8635a8ae69",
+      "crossings": 0,
+      "bends": 4,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "05-dense-cross-root.json",
+      "producer_exit": 0,
+      "sha256": "3c2d62ea0f4225849c464489540d4cd228014881899229b9730be132351f685b",
+      "crossings": 6,
+      "bends": 24,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "06-simple-16-clocks.json",
+      "producer_exit": 0,
+      "sha256": "50d939811db48710b1d82fa764aa1e0ce8450f12cd8544a4a5d0aa30fbc9c864",
+      "crossings": 9,
+      "bends": 48,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "07-medium-64-clocks.json",
+      "producer_exit": 0,
+      "sha256": "5a5056edd8751d469fe0a8866961f120c7924151cfd5a0e47567fd5da1838aa9",
+      "crossings": 120,
+      "bends": 194,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "12-dual-from-reuse.json",
+      "producer_exit": 0,
+      "sha256": "8c00681edc5117abe053ceb86211d30fa7249ad380efa3f0a60253ff1c095c22",
+      "crossings": 0,
+      "bends": 0,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "13-label-clearance-weave.json",
+      "producer_exit": 0,
+      "sha256": "179a961d9763ed5a98587c7d4d5470e9d023507e30b47a0d97380b5e23e98282",
+      "crossings": 716,
+      "bends": 156,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "14-crossing-weave-128-clocks.json",
+      "producer_exit": 0,
+      "sha256": "c91af351f3e70a459f4927a3fea5e67cb4e8a8bc3dfdc0caa587703027435540",
+      "crossings": 19113,
+      "bends": 896,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "16-multi-from-clusters.json",
+      "producer_exit": 0,
+      "sha256": "e589ee844ce5494d148fee721db2fd728e3a6071a20fec606c339a87b20f9699",
+      "crossings": 0,
+      "bends": 6,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "17-terminal-fanout-order.json",
+      "producer_exit": 0,
+      "sha256": "2a7a345253bb2807e645be9a3b4a3780d920af71df099c64b590403a2886c356",
+      "crossings": 0,
+      "bends": 8,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "18-asymmetric-merge-columns.json",
+      "producer_exit": 0,
+      "sha256": "258dbee3aef99665d7f20441ee10f2f1b09d0acc1a446e83a140d55871789ca6",
+      "crossings": 0,
+      "bends": 0,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "19-dispersed-root-fanout.json",
+      "producer_exit": 0,
+      "sha256": "dafd2af5297477702270c2cfec3e782bebb294874c6b8d3dbc22ba657920fb73",
+      "crossings": 12,
+      "bends": 58,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "20-asymmetric-merge-route-bulge.json",
+      "producer_exit": 0,
+      "sha256": "ecc690cceb75a1eae2d590628542dc66e49cc1935b93301e619a648afd3a670c",
+      "crossings": 0,
+      "bends": 2,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "21-layout-column-preference.json",
+      "producer_exit": 0,
+      "sha256": "05a0e25f2cdf024382935876cd25be6836809f07fc386203947b4b281c0aeee1",
+      "crossings": 2,
+      "bends": 6,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "22-terminal-frequency-table.json",
+      "producer_exit": 0,
+      "sha256": "d9ece18b060804400da0c2fafffccc9de15dc76b573608659e48c426cfd78755",
+      "crossings": 0,
+      "bends": 4,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "23-middle-column-low-use-sources.json",
+      "producer_exit": 0,
+      "sha256": "b48867c2da117de4f03a1ee272c9e42f1f9d90306cb9a944ed82f7c3502b19ac",
+      "crossings": 0,
+      "bends": 14,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "24-single-source-rendering-alias.json",
+      "producer_exit": 0,
+      "sha256": "c759018b9ee69280a4dedc06201cf914a1237b0a04a88a3148dc7b561f7fc0de",
+      "crossings": 0,
+      "bends": 22,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "25-mixed-root-port-order-torture.json",
+      "producer_exit": 0,
+      "sha256": "a0c08a6ec5515101ace26c3b388fcdf89013ef3cb5d74e158081899126253604",
+      "crossings": 0,
+      "bends": 12,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "26-feedback-reproduction-combined.json",
+      "producer_exit": 0,
+      "sha256": "57ada9d319e5403fb73678d9cd7562a903b18d13ffaa754eeeb73b1363f25cd9",
+      "crossings": 1,
+      "bends": 2,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "27-interleaved-common-root-mux3.json",
+      "producer_exit": 0,
+      "sha256": "ea831498d383440b66582e3d5ee8b125f0c3bc5aa8c6fe24500aa16dbad450ef",
+      "crossings": 0,
+      "bends": 10,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "28-common-private-from-mux-clock-array.json",
+      "producer_exit": 0,
+      "sha256": "1d3ad731c7c0386e2230350c189255d93b82cd366043035d298be4d2dca36518",
+      "crossings": 0,
+      "bends": 10,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "29-asymmetric-depth-common-private-mux-array.json",
+      "producer_exit": 0,
+      "sha256": "a00ae4499e0b5d1e0cb8c577a3caa12a9cad648ff3bc5a9676102490e52662f1",
+      "crossings": 15,
+      "bends": 10,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "30-staggered-four-source-mux.json",
+      "producer_exit": 0,
+      "sha256": "b9f1fc4994911f7ee488e8c9f68266c876a5db4955764bbbb826d152838c5da2",
+      "crossings": 2,
+      "bends": 6,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [],
+      "failures": []
+    },
+    {
+      "input": "31-node-descriptions.json",
+      "producer_exit": 0,
+      "sha256": "b867f02675c28cf0e0c3e1f3853128ebacd534af131e2be13524330fec1727c4",
+      "crossings": 0,
+      "bends": 0,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [
+        "mixed_script"
+      ],
+      "failures": []
+    },
+    {
+      "input": "32-annotation-text-stress.json",
+      "producer_exit": 0,
+      "sha256": "db56ee456505f13b55752a338dfc898d2813c602ea4a40d7c71b430dc10e165c",
+      "crossings": 0,
+      "bends": 4,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_profiles": [
+        "blank_line",
+        "long",
+        "mixed_script",
+        "multiline",
+        "short",
+        "trailing_line_break"
+      ],
+      "failures": []
+    }
+  ]
+}

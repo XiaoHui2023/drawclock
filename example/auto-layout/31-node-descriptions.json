@@ -1,0 +1,24 @@
+{
+  "xtal": {
+    "kind": "source",
+    "description": "24 MHz 外部晶振，系统参考时钟"
+  },
+  "gate_cpu": {
+    "kind": "gate",
+    "source": "xtal",
+    "description": "CPU 时钟门控；低功耗模式关闭"
+  },
+  "mux_cpu": {
+    "kind": "mux2",
+    "source": {
+      "0": "gate_cpu"
+    },
+    "description": "CPU 时钟选择器，当前仅连接主时钟路径"
+  },
+  "clk_cpu": {
+    "kind": "clock",
+    "source": "mux_cpu",
+    "func_freq": "800 MHz",
+    "description": "CPU 子系统工作时钟"
+  }
+}

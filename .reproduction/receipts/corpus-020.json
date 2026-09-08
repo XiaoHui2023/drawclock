@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "corpus_id": "20260907T085608Z-35c3b399",
+  "coverage_model": "many_to_many",
+  "cases": [
+    {
+      "case_id": "direct-source-mux-column-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-020"
+      ],
+      "totals": {
+        "logical_nodes": 15,
+        "rendered_nodes": 17,
+        "logical_edges": 14,
+        "rendered_edges": 14,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 2,
+        "manhattan_length_px": 2207.5241
+      }
+    },
+    {
+      "case_id": "direct-source-mux-column-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-020"
+      ],
+      "totals": {
+        "logical_nodes": 15,
+        "rendered_nodes": 17,
+        "logical_edges": 14,
+        "rendered_edges": 14,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 2,
+        "manhattan_length_px": 2207.5241
+      }
+    }
+  ],
+  "issue_attempt_counts": {
+    "FB-ROOT-020": 2
+  },
+  "missing_issues": []
+}

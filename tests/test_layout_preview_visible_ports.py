@@ -16,6 +16,9 @@ from drawio_layout import EdgeLayout, LayoutDocument, VertexLayout
 from layout_preview import (
     HTML_LABEL_CONTENT_OFFSET_X,
     HTML_LABEL_CONTENT_OFFSET_Y,
+    _estimated_text_width,
+    _node_annotations,
+    _wrap_annotation,
     build_preview_svg,
 )
 from svg_native import render_native_label, validate_static_svg
@@ -82,6 +85,54 @@ def test_native_preview_visible_graphic_origin_equals_geometry_origin(spec) -> N
     assert graphic_y == vertex.y
     assert "foreignObject" not in svg
     validate_static_svg(svg)
+
+
+def test_description_renders_once_as_safe_plain_text_annotation() -> None:
+    primary = VertexLayout(
+        name="shared", cell_id="v1", drawclock_type="source",
+        x=20, y=30, width=80, height=40, style="",
+        object_attrs={"description": "公共参考<&>\n仅用于测试"},
+    )
+    alias = VertexLayout(
+        name="shared__alias", logical_name="shared", cell_id="v2",
+        drawclock_type="source", x=20, y=100, width=80, height=40,
+        style="", object_attrs={"description": "公共参考<&>\n仅用于测试"},
+    )
+
+    svg = build_preview_svg(
+        LayoutDocument(version=1, vertices=[primary, alias], edges=[])
+    )
+
+    assert svg.count('class="node-annotation" data-node-id="shared"') == 1
+    assert 'node-annotation-link' not in svg
+    annotation = svg.split('<g class="node-annotation"', 1)[1].split('</g>', 1)[0]
+    assert '<path' not in annotation
+    assert '<rect' not in annotation
+    assert "stroke-dasharray" not in svg
+    assert "公共参考&lt;&amp;&gt;" in svg
+    assert "<foreignObject" not in svg
+    validate_static_svg(svg)
+
+
+def test_annotation_wrap_preserves_empty_and_trailing_lines() -> None:
+    assert _wrap_annotation("短") == ("短",)
+    assert _wrap_annotation("一\r\n\r\n三\r") == ("一", "", "三", "")
+    long_text = "A_very_long_unbroken_ASCII_annotation_" * 4
+    lines = _wrap_annotation(long_text)
+    assert "".join(lines) == long_text
+    assert len(lines) > 1
+    assert all(_estimated_text_width(line) <= 230.0 for line in lines)
+
+
+def test_annotation_placement_fails_closed_when_no_safe_candidate() -> None:
+    vertex = VertexLayout(
+        name="blocked", cell_id="v1", drawclock_type="source",
+        x=20, y=30, width=80, height=40, style="",
+        object_attrs={"description": "必须失败"},
+    )
+    document = LayoutDocument(version=1, vertices=[vertex], edges=[])
+    with pytest.raises(ValueError, match="no collision-free candidate: blocked"):
+        _node_annotations(document, {}, reserved=((-500, -500, 500, 500),))
 
 
 @pytest.mark.parametrize("spec", ALL, ids=lambda spec: spec.module.TITLE)

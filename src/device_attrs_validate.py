@@ -4,6 +4,7 @@ from typing import Any
 
 
 FREQUENCY_FIELDS = ("func_freq", "scan_freq", "bist_freq")
+DESCRIPTION_FIELD = "description"
 
 
 def collect_device_attr_errors(config: dict[str, dict[str, Any]]) -> list[str]:
@@ -21,6 +22,9 @@ def collect_device_attr_errors(config: dict[str, dict[str, Any]]) -> list[str]:
             errors.append(
                 f"器件 {name} 的 layout_column 必须是整数"
             )
+        description = item.get(DESCRIPTION_FIELD)
+        if DESCRIPTION_FIELD in item and not isinstance(description, str):
+            errors.append(f"器件 {name} 的 description 必须是字符串")
         for field in FREQUENCY_FIELDS:
             value = item.get(field)
             if field in item and (

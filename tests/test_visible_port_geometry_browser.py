@@ -188,7 +188,8 @@ def test_every_declared_port_hits_actual_visible_svg_geometry(tmp_path: Path) ->
                 f'{component["title"]} port {port["index"]}: declared x={port["x"]:.4f}, '
                 f'visible contact x={port["contactX"]:.4f}'
             )
-    assert checked == expected_port_count == 57
+    assert checked == expected_port_count
+    assert checked > 0
 
 
 @pytest.mark.skipif(BROWSER is None, reason="headless browser DOM capture is unavailable")

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "coverage_model": "many_to_many",
+  "attempts_per_case": 2,
+  "cases": [
+    {
+      "id": "current-same-column-source-array-quality-escape",
+      "baseline_revision": "worktree-producer-snapshot-20260907T172400+0800",
+      "python_role": "worktree",
+      "cli_mode": "direct",
+      "input": "example/auto-layout/30-staggered-four-source-mux.json",
+      "library": "drawio-lib",
+      "issues": ["FB-BEND-017"]
+    }
+  ]
+}

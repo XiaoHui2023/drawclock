@@ -1,0 +1,45 @@
+{
+  "ref_short": {
+    "kind": "source",
+    "description": "短"
+  },
+  "ref_multiline": {
+    "kind": "from",
+    "description": "第一行\n第二行\n第三行\n第四行\n第五行\n第六行"
+  },
+  "gate_long_ascii": {
+    "kind": "gate",
+    "source": "ref_short",
+    "description": "A_very_long_unbroken_ASCII_annotation_used_to_verify_deterministic_wrapping_without_relying_on_browser_automatic_line_breaking_or_installed_fonts"
+  },
+  "div_long_cjk": {
+    "kind": "div",
+    "source": "ref_multiline",
+    "description": "这是一段用于验证中文长文本自动换行以及注释边界计算是否一致的说明文字同时还要避开节点线路频率表和其他注释"
+  },
+  "select_mixed": {
+    "kind": "mux2",
+    "source": {
+      "0": "gate_long_ascii",
+      "1": "div_long_cjk"
+    },
+    "description": "Mixed 中文 + ASCII 12345；第一段。\n\n第三段在显式空行之后，并继续增长以覆盖多段文本。"
+  },
+  "cell_trailing": {
+    "kind": "cell",
+    "source": "select_mixed",
+    "description": "保留显式换行\n并检查尾随换行\n"
+  },
+  "clock_dense_a": {
+    "kind": "clock",
+    "source": "cell_trailing",
+    "func_freq": "800 MHz",
+    "description": "相邻终端 A 的说明文本较长，用于制造标签、线路与频率表共同竞争空间的情况。"
+  },
+  "clock_dense_b": {
+    "kind": "clock",
+    "source": "cell_trailing",
+    "scan_freq": "200 MHz",
+    "description": "相邻终端 B\n多行说明\n靠近视口右侧\n必须完整显示且不能重叠"
+  }
+}

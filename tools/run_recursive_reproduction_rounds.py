@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run five fail-closed post-fix attempts to reproduce recurrent layout defects."""
+"""Run a fail-closed defect-driven adversarial regression campaign."""
 
 from __future__ import annotations
 
@@ -21,6 +21,7 @@ from search_recurrent_mux_bends import build_case as build_mux_case
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST = ROOT / "tests/reproduction-corpus/recursive-attack-rounds.json"
 ORACLE = ROOT / "tools/feedback_layout_reproduction_oracle.py"
+RISK_MINIMUM_ROUNDS = {"low": 3, "medium": 5, "high": 7, "critical": 9}
 
 
 def sha(path: Path) -> str:
@@ -107,7 +108,14 @@ def main() -> int:
     args = parser.parse_args()
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     required = manifest["required_consecutive_clean_rounds"]
-    if required != len(manifest["rounds"]) or required < 2:
+    risk_class = manifest.get("risk_class")
+    minimum = RISK_MINIMUM_ROUNDS.get(risk_class)
+    if (
+        required != len(manifest["rounds"])
+        or minimum is None
+        or required < minimum
+        or len({item.get("strategy") for item in manifest["rounds"]}) != required
+    ):
         print("invalid recursive round contract", file=sys.stderr)
         return 2
     group = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ") + "-" + secrets.token_hex(4)
@@ -155,6 +163,8 @@ def main() -> int:
 def write_receipt(args: argparse.Namespace, manifest: dict[str, Any], group: str, source_hash: str, rounds: list[dict[str, Any]], consecutive: int, status: str, exit_code: int) -> int:
     receipt = {
         "schema_version": 1,
+        "campaign_name": manifest.get("campaign_name"),
+        "risk_class": manifest.get("risk_class"),
         "status": status,
         "run_id": group,
         "issues": manifest["issues"],

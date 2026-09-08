@@ -3281,6 +3281,39 @@ def _regular_fanout_array_roots(nodes, logical_edges) -> set[str]:
     return result
 
 
+def _direct_root_fanin_array_roots(nodes, logical_edges) -> set[str]:
+    """Return unconstrained root cohorts that directly enter one merge.
+
+    Three or more direct roots are a visual source array even when unrelated
+    auxiliary consumers give the roots different depths.  Their merge-facing
+    facilities have one placement owner: the shared root rank.  Later facility
+    partition, relocation, and corridor passes must not stagger that column.
+    Explicit ``layout_column`` remains a user-authored override.
+    """
+    indegree = Counter(edge.target for edge in logical_edges)
+    incoming_roots: dict[str, set[str]] = defaultdict(set)
+    for edge in logical_edges:
+        if indegree[edge.source] == 0:
+            incoming_roots[edge.target].add(edge.source)
+    direct_mux_targets: dict[str, set[str]] = defaultdict(set)
+    for edge in logical_edges:
+        if str(nodes[edge.target].item.get("kind", "")).startswith("mux"):
+            direct_mux_targets[edge.source].add(edge.target)
+    result: set[str] = set()
+    for target, roots in incoming_roots.items():
+        if not str(nodes[target].item.get("kind", "")).startswith("mux"):
+            continue
+        unconstrained = {
+            root for root in roots
+            if "layout_column" not in nodes[root].item
+            and str(nodes[root].item.get("kind", "")) in {"source", "from"}
+            and len(direct_mux_targets[root]) == 1
+        }
+        if len(unconstrained) >= 3:
+            result.update(unconstrained)
+    return result
+
+
 def _replicate_dispersed_roots(
     document: LayoutDocument,
     nodes,
@@ -3332,6 +3365,9 @@ def _replicate_dispersed_roots(
     max_intervening_rows = 3
     facility_costs: list[float] = []
     regular_array_roots = _regular_fanout_array_roots(nodes, logical_edges)
+    direct_fanin_array_roots = _direct_root_fanin_array_roots(
+        nodes, logical_edges
+    )
 
     def edge_points(
         doc: LayoutDocument,
@@ -3362,6 +3398,7 @@ def _replicate_dispersed_roots(
             indegree[root]
             or len(outgoing[root]) < 2
             or root in regular_array_roots
+            or root in direct_fanin_array_roots
         ):
             continue
         by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
@@ -3615,6 +3652,406 @@ def _clone_layout_geometry(document: LayoutDocument) -> LayoutDocument:
         vertices=[copy.copy(vertex) for vertex in document.vertices],
         edges=[copy.copy(edge) for edge in document.edges],
     )
+
+
+def _refine_direct_root_fanin_arrays(
+    document: LayoutDocument,
+    nodes,
+    logical_edges,
+    *,
+    route_clearance: float = 18.0,
+) -> tuple[LayoutDocument, dict[str, Any]]:
+    """Jointly align direct source/from arrays to merge input axes.
+
+    A member-by-member move can be rejected by a temporary collision even
+    when the complete ordered array is feasible.  Treat every direct fan-in
+    cohort as one transaction, reroute every outgoing branch of every moved
+    root, and accept only a whole-diagram Pareto improvement.
+    """
+    accepted = _clone_layout_geometry(document)
+    accepted_report = assess_layout(accepted, logical_edges, 0.0)
+    accepted_visible = _visible_layout_signature(accepted, logical_edges)
+    indegree = Counter({name: 0 for name in nodes})
+    direct_by_target: dict[str, list[int]] = defaultdict(list)
+    direct_mux_targets_by_root: dict[str, set[str]] = defaultdict(set)
+    outgoing_by_root: dict[str, list[int]] = defaultdict(list)
+    for index, logical in enumerate(logical_edges, 1):
+        indegree[logical.target] += 1
+        outgoing_by_root[logical.source].append(index)
+        source_kind = str(nodes[logical.source].item.get("kind", ""))
+        target_kind = str(nodes[logical.target].item.get("kind", ""))
+        if (
+            source_kind in {"source", "from"}
+            and target_kind.startswith("mux")
+        ):
+            direct_by_target[logical.target].append(index)
+            direct_mux_targets_by_root[logical.source].add(logical.target)
+
+    accepted_arrays = 0
+    crossings_removed = 0
+    bends_removed = 0
+    blockers: Counter[str] = Counter()
+    for target_name, direct_indices in sorted(direct_by_target.items()):
+        roots = sorted({logical_edges[index - 1].source for index in direct_indices})
+        roots = [
+            root for root in roots
+            if indegree[root] == 0
+            and len(direct_mux_targets_by_root[root]) == 1
+        ]
+        if len(roots) < 3:
+            continue
+        by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+        edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+        source_ids_by_root = {
+            root: {
+                edge_by_id[f"e{index}"].source_id
+                for index in outgoing_by_root[root]
+            }
+            for root in roots
+        }
+        if any(len(ids) != 1 for ids in source_ids_by_root.values()):
+            blockers["multiple-physical-facilities"] += 1
+            continue
+        direct_index_by_root = {
+            logical_edges[index - 1].source: index
+            for index in direct_indices
+            if logical_edges[index - 1].source in roots
+        }
+        if len(direct_index_by_root) != len(roots):
+            blockers["ambiguous-direct-input"] += 1
+            continue
+
+        candidate = _clone_layout_geometry(accepted)
+        candidate_by_id = {vertex.cell_id: vertex for vertex in candidate.vertices}
+        candidate_edges = {edge.cell_id: edge for edge in candidate.edges}
+        owned_by_root = {root: {root} for root in roots}
+        claimed = set(roots)
+        affected_indices = {
+            index
+            for index, logical in enumerate(logical_edges, 1)
+            if logical.source in claimed or logical.target in claimed
+        }
+        old_points: dict[int, list[tuple[float, float]]] = {}
+        source_vertices = [
+            by_id[next(iter(source_ids_by_root[root]))] for root in roots
+        ]
+        common_source_x = min(vertex.x for vertex in source_vertices)
+        column_spread_before = max(vertex.x for vertex in source_vertices) - common_source_x
+        for index in affected_indices:
+            logical = logical_edges[index - 1]
+            edge = edge_by_id[f"e{index}"]
+            source = by_id[edge.source_id]
+            target = by_id[edge.target_id]
+            start = abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            )
+            end = abs_port_xy(
+                target.x, target.y, target.width, target.height,
+                target.style, target.drawclock_type, logical.target_port,
+            )
+            old_points[index] = _simplify([start, *edge.waypoints, end])
+
+        # Compute every delta from the same accepted snapshot; applying a
+        # partial array is deliberately never observable or assessed.
+        for root in roots:
+            direct_index = direct_index_by_root[root]
+            logical = logical_edges[direct_index - 1]
+            edge = edge_by_id[f"e{direct_index}"]
+            source = by_id[edge.source_id]
+            target = by_id[edge.target_id]
+            source_axis = abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            )[1]
+            target_axis = abs_port_xy(
+                target.x, target.y, target.width, target.height,
+                target.style, target.drawclock_type, logical.target_port,
+            )[1]
+            delta_y = target_axis - source_axis
+            candidate_source = candidate_by_id[next(iter(source_ids_by_root[root]))]
+            candidate_source.x = common_source_x
+            candidate_source.y += delta_y
+
+        valid = True
+        for root in roots:
+            root_indices = [
+                index
+                for index in affected_indices
+                if logical_edges[index - 1].source in owned_by_root[root]
+            ]
+            root_vertical_xs = [
+                a[0]
+                for index in outgoing_by_root[root]
+                for a, b in zip(old_points[index], old_points[index][1:])
+                if abs(a[0] - b[0]) <= 1e-6 and abs(a[1] - b[1]) > 1e-6
+            ]
+            root_lane = root_vertical_xs[0] if root_vertical_xs else None
+            for index in root_indices:
+                logical = logical_edges[index - 1]
+                edge = candidate_edges[f"e{index}"]
+                source = candidate_by_id[edge.source_id]
+                target = candidate_by_id[edge.target_id]
+                start = abs_port_xy(
+                    source.x, source.y, source.width, source.height,
+                    source.style, source.drawclock_type, logical.source_port,
+                )
+                end = abs_port_xy(
+                    target.x, target.y, target.width, target.height,
+                    target.style, target.drawclock_type, logical.target_port,
+                )
+                if abs(start[1] - end[1]) <= 1e-6:
+                    points = [start, end]
+                else:
+                    old_vertical_xs = [
+                        a[0]
+                        for a, b in zip(old_points[index], old_points[index][1:])
+                        if abs(a[0] - b[0]) <= 1e-6
+                        and abs(a[1] - b[1]) > 1e-6
+                    ]
+                    lane = old_vertical_xs[0] if old_vertical_xs else root_lane
+                    if lane is None:
+                        source_box = vertex_visual_box(source)
+                        target_box = vertex_visual_box(target)
+                        left = source_box.right + route_clearance
+                        right = target_box.left - route_clearance
+                        lane = (left + right) / 2.0
+                    points = _simplify([
+                        start, (lane, start[1]), (lane, end[1]), end,
+                    ])
+                if any(
+                    abs(a[0] - b[0]) > 1e-6 and abs(a[1] - b[1]) > 1e-6
+                    for a, b in zip(points, points[1:])
+                ):
+                    valid = False
+                    break
+                edge.waypoints = tuple(points[1:-1])
+            if not valid:
+                break
+        if not valid:
+            blockers["non-orthogonal"] += 1
+            continue
+
+        candidate_report = assess_layout(candidate, logical_edges, 0.0)
+        candidate_visible = _visible_layout_signature(candidate, logical_edges)
+        accepted_endpoint = _route_endpoint_signature(
+            accepted, logical_edges, affected_indices, route_clearance
+        )
+        candidate_endpoint = _route_endpoint_signature(
+            candidate, logical_edges, affected_indices, route_clearance
+        )
+        alignment_improves = column_spread_before > 1e-6
+        checks = {
+            "node-overlap": candidate_report["node_overlaps"] <= accepted_report["node_overlaps"],
+            "edge-node": candidate_report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
+            "visible-overlap": candidate_visible[4].issubset(accepted_visible[4]),
+            "visible-edge-node": candidate_visible[5].issubset(accepted_visible[5]),
+            "endpoint-route": candidate_endpoint.issubset(accepted_endpoint),
+            "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
+            "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
+            "crossing": alignment_improves or candidate_report["crossings"] <= accepted_report["crossings"],
+            "bend": alignment_improves or candidate_report["bends_total"] <= accepted_report["bends_total"],
+            "length": alignment_improves or candidate_report["manhattan_length"] <= accepted_report["manhattan_length"] + 1e-6,
+        }
+        improves = (
+            candidate_report["crossings"] < accepted_report["crossings"]
+            or candidate_report["bends_total"] < accepted_report["bends_total"]
+        )
+        if all(checks.values()) and (alignment_improves or improves):
+            crossings_removed += accepted_report["crossings"] - candidate_report["crossings"]
+            bends_removed += accepted_report["bends_total"] - candidate_report["bends_total"]
+            accepted = candidate
+            accepted_report = candidate_report
+            accepted_visible = candidate_visible
+            accepted_arrays += 1
+        else:
+            blockers.update(name for name, passed in checks.items() if not passed)
+            if all(checks.values()) and not (alignment_improves or improves):
+                blockers["not-dominant"] += 1
+    return accepted, {
+        "direct_root_array_moves": accepted_arrays,
+        "direct_root_array_crossings_removed": crossings_removed,
+        "direct_root_array_bends_removed": bends_removed,
+        "direct_root_array_blockers": dict(sorted(blockers.items())),
+    }
+
+
+def _separate_final_overlapping_trunks(
+    document: LayoutDocument,
+    logical_edges,
+    *,
+    route_clearance: float,
+    grid: float,
+) -> tuple[LayoutDocument, dict[str, Any]]:
+    """Shift complete same-net vertical trunks to remove final overlaps."""
+    accepted = _clone_layout_geometry(document)
+    accepted_report = assess_layout(accepted, logical_edges, 0.0)
+    accepted_overlap = _final_artifact_overlap_count(accepted, logical_edges)
+    moves = 0
+    blockers: Counter[str] = Counter()
+    while accepted_overlap:
+        by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+        edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+        points_by_index = {}
+        channels: dict[
+            tuple[str, float], list[tuple[float, float, tuple[str, str]]]
+        ] = defaultdict(list)
+        edge_indices_by_net: dict[tuple[str, str], set[int]] = defaultdict(set)
+        for index, logical in enumerate(logical_edges, 1):
+            edge = edge_by_id[f"e{index}"]
+            source = by_id[edge.source_id]
+            target = by_id[edge.target_id]
+            points = _simplify([
+                abs_port_xy(
+                    source.x, source.y, source.width, source.height,
+                    source.style, source.drawclock_type, logical.source_port,
+                ),
+                *edge.waypoints,
+                abs_port_xy(
+                    target.x, target.y, target.width, target.height,
+                    target.style, target.drawclock_type, logical.target_port,
+                ),
+            ])
+            points_by_index[index] = points
+            net = (logical.source, logical.source_port)
+            edge_indices_by_net[net].add(index)
+            for a, b in zip(points, points[1:]):
+                if abs(a[0] - b[0]) <= 1e-6 and abs(a[1] - b[1]) > 1e-6:
+                    low, high = sorted((a[1], b[1]))
+                    channels[("v", round(a[0], 4))].append((low, high, net))
+                elif abs(a[1] - b[1]) <= 1e-6 and abs(a[0] - b[0]) > 1e-6:
+                    low, high = sorted((a[0], b[0]))
+                    channels[("h", round(a[1], 4))].append((low, high, net))
+        culprits = set()
+        for (axis, coordinate), intervals in channels.items():
+            for offset, (low, high, net) in enumerate(intervals):
+                if any(
+                    other_net != net
+                    and max(low, other_low) < min(high, other_high) - 1e-6
+                    for other_low, other_high, other_net in intervals[offset + 1:]
+                ):
+                    culprits.add((net, axis, coordinate))
+                    culprits.update(
+                        (other_net, axis, coordinate)
+                        for other_low, other_high, other_net in intervals[offset + 1:]
+                        if other_net != net
+                        and max(low, other_low) < min(high, other_high) - 1e-6
+                    )
+        if not culprits:
+            blockers["non-vertical-overlap"] += 1
+            break
+        best = None
+        for net, axis, old_coordinate in sorted(culprits):
+            affected = edge_indices_by_net[net]
+            for step in (1, -1, 2, -2, 3, -3, 4, -4, 5, -5, 6, -6):
+                new_coordinate = old_coordinate + step * grid
+                candidate = _clone_layout_geometry(accepted)
+                candidate_edges = {edge.cell_id: edge for edge in candidate.edges}
+                changed = False
+                for index in affected:
+                    edge = candidate_edges[f"e{index}"]
+                    waypoints = []
+                    for x, y in edge.waypoints:
+                        if axis == "v" and abs(x - old_coordinate) <= 1e-5:
+                            x = new_coordinate
+                            changed = True
+                        elif axis == "h" and abs(y - old_coordinate) <= 1e-5:
+                            y = new_coordinate
+                            changed = True
+                        waypoints.append((x, y))
+                    edge.waypoints = tuple(waypoints)
+                if not changed:
+                    continue
+                candidate_report = assess_layout(candidate, logical_edges, 0.0)
+                candidate_overlap = _final_artifact_overlap_count(
+                    candidate, logical_edges
+                )
+                if (
+                    candidate_report["node_overlaps"] > accepted_report["node_overlaps"]
+                    or candidate_report["edge_node_intersections"] > accepted_report["edge_node_intersections"]
+                    or candidate_report["direction_violations"] > accepted_report["direction_violations"]
+                    or candidate_overlap >= accepted_overlap
+                    or candidate_report["bends_total"] > accepted_report["bends_total"]
+                    or candidate_report["manhattan_length"] > accepted_report["manhattan_length"] + 1e-6
+                ):
+                    continue
+                before_endpoint = _route_endpoint_signature(
+                    accepted, logical_edges, affected, route_clearance
+                )
+                after_endpoint = _route_endpoint_signature(
+                    candidate, logical_edges, affected, route_clearance
+                )
+                if not after_endpoint.issubset(before_endpoint):
+                    continue
+                score = (
+                    candidate_overlap,
+                    candidate_report["crossings"],
+                    candidate_report["bends_total"],
+                    candidate_report["manhattan_length"],
+                    abs(step), step, axis, net,
+                )
+                if best is None or score < best[0]:
+                    best = (score, candidate, candidate_report, candidate_overlap)
+        if best is None:
+            blockers["no-dominant-trunk-shift"] += 1
+            break
+        _, accepted, accepted_report, accepted_overlap = best
+        moves += 1
+    return accepted, {
+        "final_trunk_overlap_moves": moves,
+        "final_trunk_overlaps_remaining": accepted_overlap,
+        "final_trunk_overlap_blockers": dict(sorted(blockers.items())),
+    }
+
+
+def _final_artifact_overlap_count(
+    document: LayoutDocument,
+    logical_edges,
+) -> int:
+    """Count raw different-net overlaps at the SVG's visible precision."""
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    edge_by_id = {edge.cell_id: edge for edge in document.edges}
+    channels: dict[
+        tuple[str, float], list[tuple[float, float, tuple[str, str], str]]
+    ] = defaultdict(list)
+    for index, logical in enumerate(logical_edges, 1):
+        edge = edge_by_id[f"e{index}"]
+        source = by_id[edge.source_id]
+        target = by_id[edge.target_id]
+        points = _simplify([
+            abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            ),
+            *edge.waypoints,
+            abs_port_xy(
+                target.x, target.y, target.width, target.height,
+                target.style, target.drawclock_type, logical.target_port,
+            ),
+        ])
+        net = (logical.source, logical.source_port)
+        for a, b in zip(points, points[1:]):
+            if abs(a[0] - b[0]) <= 1e-6:
+                axis, coordinate = "v", round(a[0], 4)
+                low, high = sorted((a[1], b[1]))
+            elif abs(a[1] - b[1]) <= 1e-6:
+                axis, coordinate = "h", round(a[1], 4)
+                low, high = sorted((a[0], b[0]))
+            else:
+                continue
+            channels[(axis, coordinate)].append((low, high, net, edge.cell_id))
+    count = 0
+    for intervals in channels.values():
+        active: list[tuple[float, tuple[str, str], str]] = []
+        for low, high, net, edge_id in sorted(intervals):
+            active = [item for item in active if item[0] > low + 1e-6]
+            count += sum(
+                other_net != net and other_edge_id != edge_id
+                for other_high, other_net, other_edge_id in active
+                if min(high, other_high) > low + 1e-6
+            )
+            active.append((high, net, edge_id))
+    return count
 
 
 def _normalize_fanout_routes_as_trees(
@@ -4004,21 +4441,25 @@ def _normalize_fanout_routes_as_trees(
         routing_graph = target_leaf_graph(graph, indices)
         start = route_points(indices[0])[0]
         start_state = (start, "")
-        distances = {start_state: (0.0, 0, 0)}
+        # Orthogonal schematic readability is dominated by turns.  Choose a
+        # minimum-bend path inside the already fixed union graph, then break
+        # ties by length and segment count.  The whole-candidate acceptance
+        # gate below still requires aggregate Manhattan length not to grow.
+        distances = {start_state: (0, 0.0, 0)}
         previous: dict[
             tuple[tuple[float, float], str],
             tuple[tuple[float, float], str],
         ] = {}
-        queue = [(0.0, 0, 0, start, "")]
+        queue = [(0, 0.0, 0, start, "")]
         while queue:
-            distance, bends, hops, point, incoming_axis = heapq.heappop(queue)
+            bends, distance, hops, point, incoming_axis = heapq.heappop(queue)
             state = (point, incoming_axis)
-            if (distance, bends, hops) != distances.get(state):
+            if (bends, distance, hops) != distances.get(state):
                 continue
             for neighbour, length in sorted(routing_graph.get(point, {}).items()):
                 axis = "v" if abs(point[0] - neighbour[0]) <= 1e-6 else "h"
                 turn = int(bool(incoming_axis) and incoming_axis != axis)
-                candidate = (distance + length, bends + turn, hops + 1)
+                candidate = (bends + turn, distance + length, hops + 1)
                 neighbour_state = (neighbour, axis)
                 if candidate < distances.get(
                     neighbour_state, (math.inf, sys.maxsize, sys.maxsize)
@@ -4090,7 +4531,10 @@ def _normalize_fanout_routes_as_trees(
             "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
             "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
             "crossing": candidate_report["crossings"] <= accepted_report["crossings"],
-            "bend": candidate_report["bends_total"] <= accepted_report["bends_total"],
+            # A split-rejoin cycle is a structural wiring defect.  Its
+            # cycle-free subtree may need an extra turn at a destination,
+            # so bend count is a ranking cost, not a veto over acyclicity.
+            "bend": True,
             "length": candidate_report["manhattan_length"] <= accepted_report["manhattan_length"] + 1e-6,
         }
         # Every route now follows one predecessor map rooted at the physical
@@ -4191,6 +4635,9 @@ def _relocate_root_rendering_anchors(
     attempted_moves = 0
     accepted_moves = 0
     blockers: Counter[str] = Counter()
+    direct_fanin_array_roots = _direct_root_fanin_array_roots(
+        nodes, logical_edges
+    )
 
     def metric(report: dict[str, Any]) -> tuple[float, ...]:
         return (
@@ -4203,7 +4650,11 @@ def _relocate_root_rendering_anchors(
         )
 
     for root in sorted(nodes):
-        if indegree[root] or "layout_column" in nodes[root].item:
+        if (
+            indegree[root]
+            or "layout_column" in nodes[root].item
+            or root in direct_fanin_array_roots
+        ):
             continue
         logical_anchors = [
             vertex
@@ -4627,6 +5078,9 @@ def _split_root_rendering_anchors_by_local_rows(
     accepted_replicas = 0
     blockers: Counter[str] = Counter()
     regular_array_roots = _regular_fanout_array_roots(nodes, logical_edges)
+    direct_fanin_array_roots = _direct_root_fanin_array_roots(
+        nodes, logical_edges
+    )
 
     def metric(report: dict[str, Any]) -> tuple[float, ...]:
         return (
@@ -4643,6 +5097,7 @@ def _split_root_rendering_anchors_by_local_rows(
             indegree[root]
             or "layout_column" in nodes[root].item
             or root in regular_array_roots
+            or root in direct_fanin_array_roots
         ):
             continue
         by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
@@ -5191,10 +5646,14 @@ def _open_root_facility_corridors(
         return _segment_hits_rect(a, b, rect)
 
     regular_array_roots = _regular_fanout_array_roots(nodes, logical_edges)
+    direct_fanin_array_roots = _direct_root_fanin_array_roots(
+        nodes, logical_edges
+    )
     roots = {
         name for name in nodes
         if indegree[name] == 0 and "layout_column" not in nodes[name].item
         and name not in regular_array_roots
+        and name not in direct_fanin_array_roots
     }
     anchor_ids = [
         vertex.cell_id for vertex in accepted.vertices
@@ -6074,6 +6533,49 @@ def generate_elk_layout(
         key.replace("joint_coordinate", "final_root_joint_coordinate"): value
         for key, value in final_root_joint_report.items()
     })
+    document, direct_array_report = _refine_direct_root_fanin_arrays(
+        document,
+        nodes,
+        logical_edges,
+        route_clearance=profile.route_clearance,
+    )
+    report["selection"].update(direct_array_report)
+    document, final_trunk_report = _separate_final_overlapping_trunks(
+        document,
+        logical_edges,
+        route_clearance=profile.route_clearance,
+        grid=profile.grid,
+    )
+    report["selection"].update(final_trunk_report)
+    # Channel shifts happen after the main fanout-tree owner and can make two
+    # distant rendering aliases of one logical root split and rejoin.  Close
+    # the same invariant once more at the actual final geometry, but never
+    # trade the hard serialized different-net-overlap invariant for it.
+    pre_final_tree = document
+    pre_final_overlap = _final_artifact_overlap_count(document, logical_edges)
+    final_tree_candidate, final_tree_report = _normalize_fanout_routes_as_trees(
+        document,
+        nodes,
+        logical_edges,
+        route_clearance=profile.route_clearance,
+    )
+    post_final_overlap = _final_artifact_overlap_count(
+        final_tree_candidate, logical_edges
+    )
+    if post_final_overlap <= pre_final_overlap:
+        document = final_tree_candidate
+        report["selection"].update({
+            key.replace("fanout_", "final_fanout_"): value
+            for key, value in final_tree_report.items()
+            if key != "_accepted_assessment"
+        })
+        report["selection"]["final_fanout_tree_rollback_overlap"] = 0
+    else:
+        document = pre_final_tree
+        report["selection"]["final_fanout_tree_rollback_overlap"] = 1
+        report["selection"]["final_fanout_tree_candidate_overlaps"] = (
+            post_final_overlap
+        )
     accepted_assessment = None
     report["selection"]["source_rendering_replicas"] = (
         len(document.vertices) - len(nodes)

@@ -4,10 +4,12 @@ from bisect import bisect_left, bisect_right, insort
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
+import re
 
 from drawio_layout import LayoutDocument, VertexLayout
 from drawio_ports import abs_port_xy, edge_attachment, port_anchors
 from svg_native import render_native_label, validate_static_svg
+from visual_geometry import vertex_visual_box
 
 # draw.io places an html=1 label's content origin 2 px right and 7 px below
 # mxGeometry.  The component library deliberately applies the inverse offset
@@ -46,9 +48,202 @@ class FrequencyTable:
     max_y: float
 
 
+@dataclass(frozen=True)
+class NodeAnnotation:
+    logical_name: str
+    text: str
+    lines: tuple[str, ...]
+    x: float
+    y: float
+    width: float
+    height: float
+
+
+ANNOTATION_FONT_SIZE = 11.0
+ANNOTATION_LINE_HEIGHT = 15.0
+ANNOTATION_GAP = 8.0
+ANNOTATION_MAX_WIDTH = 230.0
+ANNOTATION_MAX_OWNER_DISTANCE = 90.0
+ANNOTATION_CLEARANCE = 2.0
+_OUTER_LABEL_HEIGHT_RE = re.compile(r"height:([0-9.]+)px")
+
+
+def _annotation_char_width(char: str) -> float:
+    return ANNOTATION_FONT_SIZE * (1.1 if ord(char) > 0x7F else 0.68)
+
+
+def _wrap_annotation(
+    text: str, max_width: float = ANNOTATION_MAX_WIDTH
+) -> tuple[str, ...]:
+    """Wrap Unicode text in pixels while preserving explicit empty lines."""
+    result: list[str] = []
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    for paragraph in normalized.split("\n"):
+        current = ""
+        width = 0.0
+        for char in paragraph:
+            char_width = _annotation_char_width(char)
+            if current and width + char_width > max_width:
+                result.append(current)
+                current = ""
+                width = 0.0
+            current += char
+            width += char_width
+        result.append(current)
+    return tuple(result or ("",))
+
+
+def _annotation_node_box(vertex: VertexLayout) -> tuple[float, float, float, float]:
+    """Return the final-render obstacle, including names below component art."""
+    box = vertex_visual_box(vertex)
+    label = str(vertex.object_attrs.get("label", ""))
+    match = _OUTER_LABEL_HEIGHT_RE.search(label)
+    outer_height = float(match.group(1)) if match else vertex.height
+    # Native labels extend at most 8.77 px below their declared outer height.
+    bottom = max(box.bottom, vertex.y + outer_height + 9.0)
+    return box.left, box.top, box.right, bottom
+
+
+def _node_annotations(
+    document: LayoutDocument,
+    edge_points: dict[str, list[tuple[float, float]]],
+    *,
+    reserved: tuple[tuple[float, float, float, float], ...] = (),
+) -> tuple[NodeAnnotation, ...]:
+    """Place simple text labels using deterministic collision-free candidates."""
+    primary: dict[str, VertexLayout] = {}
+    for vertex in document.vertices:
+        logical_name = vertex.logical_name or vertex.name
+        description = vertex.object_attrs.get("description", "")
+        if not description or logical_name in primary:
+            continue
+        primary[logical_name] = vertex
+    node_boxes = [
+        (left - ANNOTATION_CLEARANCE, top - ANNOTATION_CLEARANCE,
+         right + ANNOTATION_CLEARANCE, bottom + ANNOTATION_CLEARANCE)
+        for vertex in document.vertices
+        for left, top, right, bottom in (_annotation_node_box(vertex),)
+    ]
+    route_segments = [
+        (start, end)
+        for points in edge_points.values()
+        for start, end in zip(points, points[1:])
+    ]
+    occupied = [*node_boxes, *reserved]
+
+    def overlaps(a, b) -> bool:
+        return a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]
+
+    def segment_hits_box(start, end, box) -> bool:
+        if max(start[0], end[0]) < box[0] or min(start[0], end[0]) > box[2]:
+            return False
+        if max(start[1], end[1]) < box[1] or min(start[1], end[1]) > box[3]:
+            return False
+        if start[0] == end[0]:
+            return box[0] < start[0] < box[2]
+        if start[1] == end[1]:
+            return box[1] < start[1] < box[3]
+        return True
+
+    annotations: list[NodeAnnotation] = []
+    for logical_name, vertex in sorted(
+        primary.items(), key=lambda item: (item[1].y, item[0])
+    ):
+        text = vertex.object_attrs["description"]
+        wrapped = _wrap_annotation(text)
+        width = min(
+            ANNOTATION_MAX_WIDTH,
+            max(ANNOTATION_FONT_SIZE * 0.5,
+                max(_estimated_text_width(line) for line in wrapped)),
+        )
+        height = len(wrapped) * ANNOTATION_LINE_HEIGHT
+        owner_left, owner_top, owner_right, owner_bottom = _annotation_node_box(vertex)
+        cx = (owner_left + owner_right) / 2.0
+        cy = (owner_top + owner_bottom) / 2.0
+        candidates = []
+        ring_count = int(
+            (ANNOTATION_MAX_OWNER_DISTANCE - ANNOTATION_GAP)
+            // ANNOTATION_LINE_HEIGHT
+        ) + 1
+        for ring in range(ring_count):
+            gap = ANNOTATION_GAP + ring * ANNOTATION_LINE_HEIGHT
+            candidates.extend((
+                (cx - width / 2.0, owner_top - height - gap, 0, ring),
+                (cx - width / 2.0, owner_bottom + gap, 1, ring),
+                (owner_right + gap, cy - height / 2.0, 2, ring),
+                (owner_left - width - gap, cy - height / 2.0, 3, ring),
+                (owner_right + gap, owner_top - height - gap, 4, ring),
+                (owner_left - width - gap, owner_top - height - gap, 5, ring),
+                (owner_right + gap, owner_bottom + gap, 6, ring),
+                (owner_left - width - gap, owner_bottom + gap, 7, ring),
+            ))
+        valid = []
+        for x, y, preference, ring in candidates:
+            box = (x, y, x + width, y + height)
+            collision_box = (
+                x - ANNOTATION_CLEARANCE, y - ANNOTATION_CLEARANCE,
+                x + width + ANNOTATION_CLEARANCE,
+                y + height + ANNOTATION_CLEARANCE,
+            )
+            owner_distance = (
+                max(owner_left - box[2], box[0] - owner_right, 0.0)
+                + max(owner_top - box[3], box[1] - owner_bottom, 0.0)
+            )
+            if owner_distance > ANNOTATION_MAX_OWNER_DISTANCE:
+                continue
+            if any(overlaps(collision_box, obstacle) for obstacle in occupied):
+                continue
+            if any(segment_hits_box(start, end, collision_box)
+                   for start, end in route_segments):
+                continue
+            valid.append((owner_distance, ring, preference, x, y))
+        if not valid:
+            raise ValueError(
+                f"annotation placement has no collision-free candidate: {logical_name}"
+            )
+        _, _, _, x, y = min(valid)
+        annotations.append(NodeAnnotation(
+            logical_name=logical_name,
+            text=text,
+            lines=wrapped,
+            x=x,
+            y=y,
+            width=width,
+            height=height,
+        ))
+        occupied.append((
+            x - ANNOTATION_CLEARANCE, y - ANNOTATION_CLEARANCE,
+            x + width + ANNOTATION_CLEARANCE,
+            y + height + ANNOTATION_CLEARANCE,
+        ))
+    return tuple(annotations)
+
+
+def _render_node_annotations(
+    annotations: tuple[NodeAnnotation, ...]
+) -> list[str]:
+    lines = ['<g class="node-annotations">']
+    for note in annotations:
+        escaped_name = _escape(note.logical_name)
+        x0, y0 = note.x, note.y
+        lines.append(
+            f'<g class="node-annotation" data-node-id="{escaped_name}">'
+            f'<title>{_escape(note.text)}</title>'
+        )
+        for index, text in enumerate(note.lines):
+            lines.append(
+                f'<text x="{_svg_num(x0)}" '
+                f'y="{_svg_num(y0 + ANNOTATION_FONT_SIZE + index * ANNOTATION_LINE_HEIGHT)}">'
+                f'{_escape(text)}</text>'
+            )
+        lines.append('</g>')
+    lines.append('</g>')
+    return lines
+
+
 def _estimated_text_width(text: str) -> float:
     """Conservative SVG text width without depending on an installed font."""
-    return sum(12.0 if ord(char) > 0x7F else 7.2 for char in text)
+    return sum(_annotation_char_width(char) for char in text)
 
 
 def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
@@ -437,6 +632,17 @@ def build_preview_svg(
     if frequency_table is not None:
         all_x.extend((frequency_table.min_x, frequency_table.max_x))
         all_y.extend((frequency_table.min_y, frequency_table.max_y))
+    reserved = (
+        ((frequency_table.min_x, frequency_table.min_y,
+          frequency_table.max_x, frequency_table.max_y),)
+        if frequency_table is not None else ()
+    )
+    annotations = _node_annotations(
+        document, edge_points, reserved=reserved
+    )
+    for note in annotations:
+        all_x.extend((note.x, note.x + note.width))
+        all_y.extend((note.y, note.y + note.height))
     pad = 45.0
     min_x = min(all_x) - pad
     min_y = min(all_y) - pad
@@ -452,7 +658,7 @@ def build_preview_svg(
             f'{_svg_num(width)} {_svg_num(height)}" '
             f'width="{_svg_num(width)}" height="{_svg_num(height)}">'
         ),
-        "<style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}</style>",
+        "<style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}.node-annotation text{font-family:Arial,Noto Sans CJK SC,sans-serif;font-size:11px;fill:#4b5563}</style>",
         f'<rect x="{_svg_num(min_x)}" y="{_svg_num(min_y)}" '
         f'width="{_svg_num(width)}" height="{_svg_num(height)}" fill="#ffffff"/>',
         f'<text x="{_svg_num(min_x + 8)}" y="{_svg_num(min_y + 18)}" '
@@ -515,6 +721,8 @@ def build_preview_svg(
             )
     if frequency_table is not None:
         lines.extend(_render_frequency_table(frequency_table))
+    if annotations:
+        lines.extend(_render_node_annotations(annotations))
     lines.append("</svg>")
     result = "\n".join(lines) + "\n"
     validate_static_svg(result)

@@ -22,6 +22,8 @@ from typing import Any, Iterable
 
 NS = "{http://www.w3.org/2000/svg}"
 EPS = 1e-4
+ANNOTATION_FONT_SIZE = 11.0
+ANNOTATION_MAX_WIDTH = 230.0
 ISSUES = (
     "FB-ROOT-001",
     "FB-ROUTE-002",
@@ -38,6 +40,7 @@ ISSUES = (
     "FB-ROOT-015",
     "FB-ROOT-016",
     "FB-BEND-017",
+    "FB-ROOT-020",
 )
 
 
@@ -220,6 +223,215 @@ def parse_svg(path: Path, node_names: set[str] | None = None) -> tuple[list[Box]
     if not boxes or not routes:
         raise ValueError("SVG must contain component boxes and edge polylines")
     return boxes, routes
+
+
+def _annotation_char_width(char: str, size: float = ANNOTATION_FONT_SIZE) -> float:
+    return size * (1.1 if ord(char) > 0x7F else 0.68)
+
+
+def _wrap_annotation_text(text: str) -> tuple[str, ...]:
+    """Independent expected line model; intentionally does not import production."""
+    result: list[str] = []
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    for paragraph in normalized.split("\n"):
+        current = ""
+        width = 0.0
+        for char in paragraph:
+            char_width = _annotation_char_width(char)
+            if current and width + char_width > ANNOTATION_MAX_WIDTH:
+                result.append(current)
+                current = ""
+                width = 0.0
+            current += char
+            width += char_width
+        result.append(current)
+    return tuple(result or ("",))
+
+
+def _annotation_profiles(text: str) -> set[str]:
+    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
+    profiles = set()
+    if len(normalized) <= 4:
+        profiles.add("short")
+    if max((_annotation_char_width(char) for char in normalized), default=0.0) > 0 and (
+        len(normalized) >= 64
+        or any(sum(_annotation_char_width(char) for char in part) > ANNOTATION_MAX_WIDTH
+               for part in normalized.split("\n"))
+    ):
+        profiles.add("long")
+    if "\n" in normalized:
+        profiles.add("multiline")
+    if "\n\n" in normalized:
+        profiles.add("blank_line")
+    if normalized.endswith("\n"):
+        profiles.add("trailing_line_break")
+    if any(ord(char) > 0x7F for char in normalized) and any(
+        char.isascii() and char.isalnum() for char in normalized
+    ):
+        profiles.add("mixed_script")
+    return profiles
+
+
+def _annotation_quality(
+    svg_path: Path,
+    config: dict[str, dict[str, Any]],
+    boxes: list[Box],
+    routes: list[Route],
+) -> dict[str, Any]:
+    """Independently audit plain-text annotation identity and geometry."""
+    root = ET.parse(svg_path).getroot()
+    expected = {
+        name: item["description"] for name, item in config.items()
+        if isinstance(item.get("description"), str) and item["description"]
+    }
+    annotations: list[tuple[str, tuple[float, float, float, float]]] = []
+    observed_titles: list[tuple[str, str]] = []
+    observed_lines: list[tuple[str, tuple[str, ...]]] = []
+    decorative_elements = 0
+    for group in root.iter(f"{NS}g"):
+        if "node-annotation" not in (group.get("class") or "").split():
+            continue
+        node = group.get("data-node-id", "")
+        text_boxes = []
+        title = group.find(f"{NS}title")
+        observed_titles.append((node, "" if title is None else "".join(title.itertext())))
+        line_values = []
+        for element in group.iter():
+            local = element.tag.rsplit("}", 1)[-1]
+            if element is not group and local not in {"title", "text"}:
+                decorative_elements += 1
+            if local != "text":
+                continue
+            value = "".join(element.itertext())
+            line_values.append(value)
+            size = float(element.get("font-size", "11"))
+            x = float(element.get("x", "0"))
+            baseline = float(element.get("y", "0"))
+            width = sum(size * (1.1 if ord(char) > 0x7F else 0.68) for char in value)
+            text_boxes.append((x, baseline - size, x + max(size * 0.5, width), baseline + size * 0.25))
+        if text_boxes:
+            observed_lines.append((node, tuple(line_values)))
+            annotations.append((node, (
+                min(box[0] for box in text_boxes),
+                min(box[1] for box in text_boxes),
+                max(box[2] for box in text_boxes),
+                max(box[3] for box in text_boxes),
+            )))
+
+    def overlap(left, right) -> bool:
+        return (
+            max(left[0], right[0]) < min(left[2], right[2]) - EPS
+            and max(left[1], right[1]) < min(left[3], right[3]) - EPS
+        )
+
+    annotation_overlaps = []
+    for index, (left_name, left_box) in enumerate(annotations):
+        for right_name, right_box in annotations[index + 1:]:
+            if overlap(left_box, right_box):
+                annotation_overlaps.append(sorted((left_name, right_name)))
+    node_overlaps = []
+    edge_intersections = []
+    owner_distances = {}
+    for name, annotation_box in annotations:
+        for box in boxes:
+            if overlap(annotation_box, box.visual_bounds):
+                node_overlaps.append([name, box.node])
+        for route in routes:
+            if any(
+                _segment_rect_interior_hit(a, b, annotation_box)
+                for a, b in segments(route)
+            ):
+                edge_intersections.append([name, route.edge_id])
+        owners = [box.visual_bounds for box in boxes if box.node == name]
+        if owners:
+            owner_distances[name] = round(min(
+                max(owner[0] - annotation_box[2], annotation_box[0] - owner[2], 0.0)
+                + max(owner[1] - annotation_box[3], annotation_box[1] - owner[3], 0.0)
+                for owner in owners
+            ), 4)
+
+    view = _numbers(root.get("viewBox", ""))
+    outside_viewport = []
+    if len(view) == 4:
+        viewport = (view[0], view[1], view[0] + view[2], view[1] + view[3])
+        outside_viewport = [
+            name for name, box in annotations
+            if box[0] < viewport[0] - EPS or box[1] < viewport[1] - EPS
+            or box[2] > viewport[2] + EPS or box[3] > viewport[3] + EPS
+        ]
+    counts = Counter(name for name, _ in annotations)
+    missing = sorted(set(expected) - set(counts))
+    unexpected = sorted(set(counts) - set(expected))
+    duplicates = sorted(name for name, count in counts.items() if count != 1)
+    text_mismatches = sorted(
+        name for name, value in observed_titles
+        if name in expected and value.replace("\r\n", "\n").replace("\r", "\n")
+        != expected[name].replace("\r\n", "\n").replace("\r", "\n")
+    )
+    line_mismatches = sorted(
+        name for name, values in observed_lines
+        if name in expected and values != _wrap_annotation_text(expected[name])
+    )
+    profile_counts = Counter(
+        profile for text in expected.values() for profile in _annotation_profiles(text)
+    )
+    too_far = sorted(name for name, distance in owner_distances.items() if distance > 90.0)
+    failures = (
+        len(missing) + len(unexpected) + len(duplicates)
+        + len(annotation_overlaps) + len(node_overlaps)
+        + len(edge_intersections) + len(outside_viewport)
+        + len(too_far) + decorative_elements
+        + len(text_mismatches) + len(line_mismatches)
+    )
+    return {
+        "expected": len(expected),
+        "rendered": len(annotations),
+        "missing": missing,
+        "unexpected": unexpected,
+        "duplicates": duplicates,
+        "text_mismatches": text_mismatches,
+        "line_mismatches": line_mismatches,
+        "profile_counts": dict(sorted(profile_counts.items())),
+        "profiles_present": sorted(profile_counts),
+        "annotation_overlaps": annotation_overlaps,
+        "node_overlaps": node_overlaps,
+        "edge_intersections": edge_intersections,
+        "outside_viewport": outside_viewport,
+        "owner_distances_px": owner_distances,
+        "too_far": too_far,
+        "decorative_elements": decorative_elements,
+        "failure_count": failures,
+    }
+
+
+def _segment_rect_interior_hit(a, b, rect) -> bool:
+    left, top, right, bottom = rect
+    if abs(a[0] - b[0]) <= EPS:
+        return left + EPS < a[0] < right - EPS and max(min(a[1], b[1]), top) < min(max(a[1], b[1]), bottom) - EPS
+    if abs(a[1] - b[1]) <= EPS:
+        return top + EPS < a[1] < bottom - EPS and max(min(a[0], b[0]), left) < min(max(a[0], b[0]), right) - EPS
+    return True
+
+
+def generic_quality_failures(report: dict[str, Any]) -> list[str]:
+    """Return release-blocking final-artifact failures for every diagram."""
+    failures = []
+    if report["totals"]["different_net_overlaps"]:
+        failures.append("different-net-overlap")
+    witness_keys = (
+        "split_rejoin_roots",
+        "avoidable_bend_edges",
+        "root_fanout_axis_dominance_witnesses",
+        "direct_root_fanin_column_witnesses",
+        "regular_fanout_array_replication_witnesses",
+    )
+    failures.extend(
+        f"witness:{key}" for key in witness_keys
+        if report["witnesses"][key]
+    )
+    if report["annotation_quality"]["failure_count"]:
+        failures.append("annotation-geometry")
+    return failures
 
 
 def _source_reference(reference: str) -> tuple[str, str]:
@@ -407,6 +619,20 @@ def _candidate_quality(
     points: list[tuple[float, float]], route: Route, routes: list[Route], boxes: list[Box]
 ) -> tuple[int, int, float] | None:
     candidate = simplify(points)
+    verticals = [
+        (a, b) for a, b in zip(candidate, candidate[1:])
+        if abs(a[0] - b[0]) <= EPS
+    ]
+    source_box = _endpoint_box(candidate[0], [box for box in boxes if box.node == route.source])
+    target_box = _endpoint_box(candidate[-1], [box for box in boxes if box.node == route.target])
+    if verticals and source_box is not None:
+        first_vertical_x = verticals[0][0][0]
+        if first_vertical_x < source_box.visual_bounds[2] + EPS:
+            return None
+    if verticals and target_box is not None:
+        last_vertical_x = verticals[-1][0][0]
+        if last_vertical_x > target_box.visual_bounds[0] - EPS:
+            return None
     if any(
         _rect_interior_hit(a, b, box)
         for a, b in zip(candidate, candidate[1:])
@@ -432,20 +658,27 @@ def _candidate_quality(
     return crossings, overlaps, length
 
 
-def _fewer_bend_witness(
+def _dominated_route_witness(
     route: Route,
     routes: list[Route],
     boxes: list[Box],
     actual_crossings: int,
     actual_overlaps: int,
-) -> list[tuple[float, float]] | None:
+) -> dict[str, Any] | None:
     start, end = route.points[0], route.points[-1]
     candidates: list[list[tuple[float, float]]] = []
     if abs(start[1] - end[1]) <= EPS:
         candidates.append([start, end])
-    if len(route.points) - 2 >= 3 and abs(start[1] - end[1]) > EPS:
+    if len(route.points) - 2 >= 2 and abs(start[1] - end[1]) > EPS:
         xs = {round((start[0] + end[0]) / 2, 4)}
         xs.update(point[0] for candidate in routes for point in candidate.points)
+        xs.update(value for box in boxes for value in (box.visual_bounds[0], box.visual_bounds[2]))
+        ordered_xs = sorted(xs)
+        xs.update(
+            round((left + right) / 2.0, 4)
+            for left, right in zip(ordered_xs, ordered_xs[1:])
+            if right - left > 2 * EPS
+        )
         for x in sorted(xs):
             if min(start[0], end[0]) + EPS < x < max(start[0], end[0]) - EPS:
                 candidates.append([start, (x, start[1]), (x, end[1]), end])
@@ -453,14 +686,30 @@ def _fewer_bend_witness(
     actual_length = sum(abs(b[0] - a[0]) + abs(b[1] - a[1]) for a, b in segments(route))
     for candidate in candidates:
         compact = simplify(candidate)
-        if len(compact) - 2 >= actual_bends:
+        candidate_bends = len(compact) - 2
+        if candidate_bends > actual_bends:
             continue
         quality = _candidate_quality(compact, route, routes, boxes)
         if quality is None:
             continue
         crossings, overlaps, length = quality
-        if crossings <= actual_crossings and overlaps <= actual_overlaps and length <= actual_length + EPS:
-            return compact
+        if (
+            crossings <= actual_crossings
+            and overlaps <= actual_overlaps
+            and length <= actual_length + EPS
+            and (candidate_bends < actual_bends or crossings < actual_crossings)
+        ):
+            return {
+                "candidate": [list(point) for point in compact],
+                "bends_before": actual_bends,
+                "bends_after": candidate_bends,
+                "crossing_events_before": actual_crossings,
+                "crossing_events_after": crossings,
+                "overlaps_before": actual_overlaps,
+                "overlaps_after": overlaps,
+                "length_before": round(actual_length, 4),
+                "length_after": round(length, 4),
+            }
     return None
 
 
@@ -1066,7 +1315,7 @@ def _regular_fanout_array_replication_witnesses(
             seen.add(node)
             node = incoming[node][0].source
             depth += 1
-        return depth
+        return depth if len(outgoing[node]) == 1 else None
 
     witnesses: list[dict[str, Any]] = []
     for root in sorted(config):
@@ -1134,22 +1383,136 @@ def _root_fanout_axis_dominance_witnesses(
         direct_roots = [
             route for route in merge_routes
             if route.source in roots
-            and str(config.get(route.source, {}).get("kind", "")) == "source"
+            and str(config.get(route.source, {}).get("kind", "")) in {"source", "from"}
         ]
-        if len(direct_roots) < 4:
+        if len(direct_roots) < 3:
             continue
         endpoint_boxes = [
             _endpoint_box(route.points[0], boxes_by_node[route.source])
             for route in direct_roots
         ]
         source_columns = sorted({round(box.x, 4) for box in endpoint_boxes if box})
-        if len(source_columns) < 2:
-            continue
+
+        # A same-column source array is one placement transaction.  Moving a
+        # single member can create a temporary label collision even when the
+        # complete ordered array fits exactly on the mux port axes.  Evaluate
+        # that complete counterfactual before the per-root candidates below.
+        cohort = sorted(direct_roots, key=lambda route: route.points[-1][1])
+        if all(len(boxes_by_node[route.source]) == 1 for route in cohort):
+            moved_boxes: dict[str, Box] = {}
+            moved_starts: dict[str, tuple[float, float]] = {}
+            for route in cohort:
+                root = route.source
+                source_box = boxes_by_node[root][0]
+                root_routes = [item for item in routes if item.source == root]
+                starts = {item.points[0] for item in root_routes}
+                if len(starts) != 1:
+                    moved_boxes = {}
+                    break
+                start = next(iter(starts))
+                axis = route.points[-1][1]
+                delta_y = axis - start[1]
+                moved_boxes[root] = Box(
+                    source_box.node, source_box.x, source_box.y + delta_y,
+                    source_box.w, source_box.h, source_box.visible_x,
+                    None if source_box.visible_y is None else source_box.visible_y + delta_y,
+                    source_box.visible_w, source_box.visible_h,
+                )
+                moved_starts[root] = (start[0], round(axis, 4))
+            fixed_boxes = [box for box in boxes if box.node not in moved_boxes]
+            moved_values = list(moved_boxes.values())
+            collision = any(
+                _box_overlap(left, right)
+                for index, left in enumerate(moved_values)
+                for right in moved_values[index + 1:]
+            ) or any(
+                _visual_boxes_overlap(moved, fixed)
+                for moved in moved_values
+                for fixed in fixed_boxes
+            )
+            unaffected = [route for route in routes if route.source not in moved_boxes]
+            if not collision:
+                collision = any(
+                    _visual_rect_interior_hit(a, b, moved)
+                    for route in unaffected
+                    for a, b in segments(route)
+                    for moved in moved_values
+                    if moved.node not in {route.source, route.target}
+                )
+            candidate_routes: list[Route] = []
+            if not collision:
+                candidate_boxes = [*fixed_boxes, *moved_values]
+                for root in sorted(moved_boxes):
+                    for route in [item for item in routes if item.source == root]:
+                        moved_start = moved_starts[root]
+                        end = route.points[-1]
+                        vertical_xs = [
+                            a[0] for a, b in segments(route)
+                            if abs(a[0] - b[0]) <= EPS
+                        ]
+                        lane_x = (
+                            vertical_xs[0]
+                            if vertical_xs
+                            else round((moved_start[0] + end[0]) / 2, 4)
+                        )
+                        candidate = _copy_route(
+                            route,
+                            [moved_start, (lane_x, moved_start[1]),
+                             (lane_x, end[1]), end],
+                        )
+                        target_box = _endpoint_box(end, boxes_by_node[route.target])
+                        obstacles = [
+                            box for box in candidate_boxes
+                            if box.node != root and box is not target_box
+                        ]
+                        if any(
+                            _visual_rect_interior_hit(a, b, box)
+                            for a, b in segments(candidate)
+                            for box in obstacles
+                        ):
+                            collision = True
+                            break
+                        candidate_routes.append(candidate)
+                    if collision:
+                        break
+            if not collision:
+                original_crossings, original_overlaps = route_crossings(routes)
+                candidate_all = [*unaffected, *candidate_routes]
+                candidate_crossings, candidate_overlaps = route_crossings(candidate_all)
+                actual_routes = [route for route in routes if route.source in moved_boxes]
+                actual_bends = sum(max(0, len(route.points) - 2) for route in actual_routes)
+                candidate_bends = sum(max(0, len(route.points) - 2) for route in candidate_routes)
+                actual_length = sum(_route_length(route) for route in actual_routes)
+                candidate_length = sum(_route_length(route) for route in candidate_routes)
+                if (
+                    len(candidate_crossings) <= len(original_crossings)
+                    and len(candidate_overlaps) <= len(original_overlaps)
+                    and candidate_bends <= actual_bends
+                    and candidate_length <= actual_length + EPS
+                    and (
+                        len(candidate_crossings) < len(original_crossings)
+                        or candidate_bends < actual_bends
+                    )
+                ):
+                    witnesses.append({
+                        "roots": sorted(moved_boxes),
+                        "merge": merge,
+                        "source_columns": source_columns,
+                        "mode": "ordered-array-to-merge-port-axes",
+                        "bends_before": actual_bends,
+                        "bends_after": candidate_bends,
+                        "length_before": round(actual_length, 4),
+                        "length_after": round(candidate_length, 4),
+                        "crossing_events_before": len(original_crossings),
+                        "crossing_events_after": len(candidate_crossings),
+                        "overlaps_before": len(original_overlaps),
+                        "overlaps_after": len(candidate_overlaps),
+                    })
         for incident in direct_roots:
             root = incident.source
             root_boxes = boxes_by_node[root]
             root_routes = [route for route in routes if route.source == root]
-            if len(root_boxes) != 1 or len(root_routes) < 2:
+            if len(root_boxes) != 1 or not root_routes:
                 continue
             source_box = root_boxes[0]
             starts = {route.points[0] for route in root_routes}
@@ -1217,8 +1580,12 @@ def _root_fanout_axis_dominance_witnesses(
                 if (
                     len(candidate_crossings) <= len(original_crossings)
                     and len(candidate_overlaps) <= len(original_overlaps)
-                    and candidate_bends < actual_bends
+                    and candidate_bends <= actual_bends
                     and candidate_length <= actual_length + EPS
+                    and (
+                        candidate_bends < actual_bends
+                        or len(candidate_crossings) < len(original_crossings)
+                    )
                 ):
                     witnesses.append({
                         "root": root,
@@ -1236,6 +1603,56 @@ def _root_fanout_axis_dominance_witnesses(
                         "overlaps_after": len(candidate_overlaps),
                     })
                     break
+    return witnesses
+
+
+def _direct_root_fanin_column_witnesses(
+    config: dict[str, Any], roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Find staggered physical facilities that directly feed one merge.
+
+    The check is deliberately based on final endpoint boxes rather than logical
+    ranks.  Three or more unconstrained roots that enter the same merge without
+    intermediate nodes form a visual source array and should share one column.
+    Explicit ``layout_column`` values remain an intentional user override.
+    """
+    boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+    for box in boxes:
+        boxes_by_node[box.node].append(box)
+    incoming_routes: dict[str, list[Route]] = defaultdict(list)
+    direct_mux_targets: dict[str, set[str]] = defaultdict(set)
+    for route in routes:
+        if route.source in roots:
+            incoming_routes[route.target].append(route)
+            if str(config.get(route.target, {}).get("kind", "")).startswith("mux"):
+                direct_mux_targets[route.source].add(route.target)
+    witnesses: list[dict[str, Any]] = []
+    for target, incoming in sorted(incoming_routes.items()):
+        if not str(config.get(target, {}).get("kind", "")).startswith("mux"):
+            continue
+        sources = sorted({
+            route.source for route in incoming
+            if str(config.get(route.source, {}).get("kind", "")) in {"source", "from"}
+            and len(direct_mux_targets[route.source]) == 1
+        })
+        if len(sources) < 3:
+            continue
+        if any("layout_column" in config.get(source, {}) for source in sources):
+            continue
+        columns: dict[str, float] = {}
+        for source in sources:
+            source_route = next(route for route in incoming if route.source == source)
+            endpoint = _endpoint_box(source_route.points[0], boxes_by_node[source])
+            if endpoint is not None:
+                columns[source] = round(endpoint.x, 4)
+        distinct_columns = sorted(set(columns.values()))
+        if len(columns) == len(sources) and len(distinct_columns) > 1:
+            witnesses.append({
+                "target": target,
+                "sources": sources,
+                "source_columns": columns,
+                "distinct_columns": distinct_columns,
+            })
     return witnesses
 
 
@@ -1747,6 +2164,7 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     for box in boxes:
         boxes_by_node[box.node].append(box)
     crossings, overlaps = route_crossings(routes)
+    annotation_quality = _annotation_quality(svg_path, config, boxes, routes)
     incident = Counter(edge for event in crossings for edge in event["edges"])
     overlap_incident = Counter(edge for event in overlaps for edge in event["edges"])
     crossing_points_by_edge: dict[str, set[tuple[float, float]]] = defaultdict(set)
@@ -1773,11 +2191,19 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         ]
         vertical_length = sum(vertical_segments)
         bends = max(0, len(route.points) - 2)
-        witness = _fewer_bend_witness(
-            route, routes, boxes, incident[route.edge_id], overlap_incident[route.edge_id]
+        # An individual branch is not a valid counterfactual for a shared
+        # source-port network: moving it alone can fragment the public trunk.
+        # Fanout geometry is assessed by the joint network/array witnesses.
+        witness = (
+            _dominated_route_witness(
+                route, routes, boxes,
+                incident[route.edge_id], overlap_incident[route.edge_id],
+            )
+            if fanout[(route.source, route.source_port)] == 1
+            else None
         )
         if witness is not None:
-            avoidable.append({"edge_id": route.edge_id, "candidate": [list(point) for point in witness]})
+            avoidable.append({"edge_id": route.edge_id, **witness})
         route_rows.append({
             "edge_id": route.edge_id, "source": route.source, "target": route.target,
             "source_port": route.source_port, "target_port": route.target_port,
@@ -1810,6 +2236,32 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         ])
     )
     root_kinds = {name: str(config[name].get("kind", "")) for name in roots}
+    protected_direct_mux_roots: set[str] = set()
+    protected_direct_mux_pairs: set[frozenset[str]] = set()
+    direct_mux_incoming: dict[str, set[str]] = defaultdict(set)
+    direct_mux_targets: dict[str, set[str]] = defaultdict(set)
+    for route in routes:
+        if route.source in roots and str(config.get(route.target, {}).get("kind", "")).startswith("mux"):
+            direct_mux_incoming[route.target].add(route.source)
+            direct_mux_targets[route.source].add(route.target)
+    for cohort in direct_mux_incoming.values():
+        cohort_members = {
+            root for root in cohort
+            if str(config.get(root, {}).get("kind", "")) in {"source", "from"}
+            and len(direct_mux_targets[root]) == 1
+        }
+        if len(cohort_members) < 3:
+            continue
+        protected_direct_mux_roots.update(cohort_members)
+        protected_direct_mux_pairs.update(
+            frozenset((left, right))
+            for left in cohort_members
+            for right in cohort_members
+            if left < right
+        )
+    explicit_column_roots = {
+        root for root in roots if "layout_column" in config.get(root, {})
+    }
     first_x = min(box.x for name in roots for box in boxes_by_node[name]) if roots else 0.0
     x_values = sorted({round(box.x, 3) for box in boxes})
     low_use_left_crossing = []
@@ -1824,7 +2276,11 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         intervening_columns = sum(root_x + EPS < x < target_x - EPS for x in x_values)
         if abs(root_x - first_x) <= 1.0 and intervening_columns >= 1 and incident[route.edge_id] > 0:
             low_use_left_crossing.append(name)
-        relocation = _root_relocation_witness(route, routes, boxes, boxes_by_node)
+        relocation = (
+            None
+            if name in protected_direct_mux_roots or name in explicit_column_roots
+            else _root_relocation_witness(route, routes, boxes, boxes_by_node)
+        )
         if relocation is not None:
             root_relocation_witnesses.append(relocation)
     port_inversions = []
@@ -1883,7 +2339,11 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             if public_edges.intersection(event["edges"]):
                 other_id = next(edge for edge in event["edges"] if edge not in public_edges)
                 other = next(route for route in routes if route.edge_id == other_id)
-                if other.source in roots and outdegree[other.source] == 1:
+                if (
+                    other.source in roots
+                    and outdegree[other.source] == 1
+                    and frozenset((public, other.source)) not in protected_direct_mux_pairs
+                ):
                     public_root_crossings.append({"public_root": public, "other_root": other.source, "edges": event["edges"]})
     mixed_root_quality_failures = [
         witness
@@ -1896,6 +2356,16 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     physical_anchor_relocation_witnesses = (
         _physical_anchor_relocation_witnesses(roots, routes, boxes)
     )
+    # A direct source/from array is a single visual column contract.  Moving
+    # one member horizontally may remove a crossing, but it is not an
+    # admissible counterfactual because it breaks that higher-priority array
+    # invariant.  Array members are evaluated jointly by the axis-dominance
+    # witness below instead.
+    physical_anchor_relocation_witnesses = [
+        witness for witness in physical_anchor_relocation_witnesses
+        if witness["root"] not in protected_direct_mux_roots
+        and witness["root"] not in explicit_column_roots
+    ]
     vertical_root_facility_bend_witnesses = (
         _vertical_root_facility_bend_witnesses(roots, routes, boxes)
     )
@@ -1917,6 +2387,19 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     root_fanout_axis_dominance_witnesses = (
         _root_fanout_axis_dominance_witnesses(config, roots, routes, boxes)
     )
+    # A direct mux array is one placement transaction.  Moving one already
+    # port-aligned member to an auxiliary consumer axis is not admissible,
+    # because it breaks the array's merge-facing axis contract.  Keep joint
+    # array witnesses (which carry ``roots``), and suppress only the scalar
+    # ``root`` counterfactual for protected members.
+    root_fanout_axis_dominance_witnesses = [
+        witness for witness in root_fanout_axis_dominance_witnesses
+        if "root" not in witness
+        or witness["root"] not in protected_direct_mux_roots
+    ]
+    direct_root_fanin_column_witnesses = (
+        _direct_root_fanin_column_witnesses(config, roots, routes, boxes)
+    )
     detected = {
         # Mixed kinds are only a precondition.  A defect is present only when
         # an ordinary zero-indegree component also exhibits the measured root
@@ -1929,7 +2412,10 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         "FB-ROUTE-002": bool(split_rejoin),
         "FB-ROOT-003": bool(public_root_crossings),
         "FB-ROOT-004": bool(root_relocation_witnesses),
-        "FB-BEND-005": bool(avoidable),
+        "FB-BEND-005": any(
+            witness["bends_after"] < witness["bends_before"]
+            for witness in avoidable
+        ),
         "FB-PORT-006": bool(port_inversions),
         "FB-ROUTE-009": bool(root_facility_split_witnesses),
         "FB-ROOT-010": bool(physical_anchor_relocation_witnesses),
@@ -1940,6 +2426,7 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         "FB-ROOT-015": bool(mergeable_root_facility_witnesses),
         "FB-ROOT-016": bool(regular_fanout_array_replication_witnesses),
         "FB-BEND-017": bool(root_fanout_axis_dominance_witnesses),
+        "FB-ROOT-020": bool(direct_root_fanin_column_witnesses),
     }
     route_row_by_id = {row["edge_id"]: row for row in route_rows}
     node_statistics = {}
@@ -2019,6 +2506,7 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         "nodes": node_statistics,
         "networks": network_statistics,
         "edges": route_rows, "crossings": crossings, "overlaps": overlaps,
+        "annotation_quality": annotation_quality,
         "witnesses": {
             "mixed_root_kinds": sorted(set(root_kinds.values())),
             "mixed_root_quality_failures": mixed_root_quality_failures,
@@ -2056,6 +2544,9 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             ),
             "root_fanout_axis_dominance_witnesses": (
                 root_fanout_axis_dominance_witnesses
+            ),
+            "direct_root_fanin_column_witnesses": (
+                direct_root_fanin_column_witnesses
             ),
         },
         "detected_issues": [issue for issue in ISSUES if detected[issue]],

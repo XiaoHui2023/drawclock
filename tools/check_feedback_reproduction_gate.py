@@ -270,13 +270,26 @@ def _validate_recursive_attack_receipt(
     expected_rounds = contract.get("rounds")
     actual_rounds = receipt.get("rounds")
     required = contract.get("required_consecutive_clean_rounds")
-    if not isinstance(expected_rounds, list) or required != len(expected_rounds):
+    risk_minimum = {"low": 3, "medium": 5, "high": 7, "critical": 9}
+    risk_class = contract.get("risk_class")
+    if (
+        not isinstance(expected_rounds, list)
+        or required != len(expected_rounds)
+        or risk_class not in risk_minimum
+        or required < risk_minimum[risk_class]
+        or len({item.get("strategy") for item in expected_rounds}) != required
+    ):
         errors.append("recursive attack manifest has an invalid round exact-set")
         return
     if receipt.get("schema_version") != 1 or receipt.get("status") != "clean":
         errors.append("recursive attack receipt is not clean")
     if receipt.get("issues") != contract.get("issues"):
         errors.append("recursive attack issue scope differs from the contract")
+    if (
+        receipt.get("campaign_name") != contract.get("campaign_name")
+        or receipt.get("risk_class") != risk_class
+    ):
+        errors.append("recursive attack campaign/risk profile differs")
     if receipt.get("required_consecutive_clean_rounds") != required or receipt.get("consecutive_clean_rounds") != required:
         errors.append("recursive attack consecutive clean round requirement is unmet")
     expected_identity = [(item.get("id"), item.get("strategy")) for item in expected_rounds]

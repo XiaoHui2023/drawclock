@@ -50,7 +50,8 @@
       "reproduction_proves": "根纵序相对目标端口反转并产生可避免交叉", "reproduction_does_not_prove": "所有根布局最优",
       "reproduction_attempts": [{"attempted_at": "2026-09-03T13:40:00+08:00", "hypothesis": "example 25 会自然生成公共根从下方向上穿过单连接 pad 输入根的交叉。", "method": "审计该样例的输入拓扑、目标端口与旧质量结果，搜索直接归因到根纵序反转的原始 SVG 收据。", "result": "reproduction_blocked", "observed": "样例意图覆盖该结构，但没有冻结旧实现输出、两次直接 Oracle 红灯或反事实重排证据。", "analysis": "测试意图和复杂结构存在不能代替实际生成几何的可重复失败。", "why_not_reproduced": "缺少可验证的自然失败产物和逐交叉归因，无法排除交叉来自另一条边。", "evidence": "example/auto-layout/25-mixed-root-port-order-torture.json; receipt missing", "next_condition": "冻结基线运行公开 CLI，两次记录同一根纵序反转和交叉边对，并用只读 Oracle 验证。"},{"attempted_at":"2026-09-03T15:41:10+08:00","hypothesis":"公共根的纵向干线会与同批消费者附近的低复用根横线产生可归因交叉。","method":"冻结当前 revision，对 example 25 连续运行两次，并以线段内部交点而非端点接触统计根网络对。","result":"reproduced","observed":"两次均得到 4 个交叉事件、2 个交叉坐标；common_source 分别与 local_a_03、local_b_03 的两条边交叉。","analysis":"交叉由公共纵干线与低复用根过早放置后的横向接入共同触发，可逐边对归因。","why_not_reproduced":"","evidence":".reproduction/receipts/FB-ROOT-003.json","next_condition":"修复阶段以根位置和支路顺序的全局交叉代价共同优化。"}],
       "reproduction_receipt": ".reproduction/receipts/FB-ROOT-003.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-003.json"}
+      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-003.json"},
+      "reopened_feedback": {"reported_at": "2026-09-07T17:24:00+08:00", "status": "oracle_escape", "summary": "用户展示 30 号当前图仍有可消除交叉；旧专用 Oracle 返回 symptom not observed，而通用统计直接报告 4 个交叉事件、3 个交叉坐标。", "evidence": "work/rejection-baseline/attempt-1/output.svg; work/rejection-baseline/attempt-1/quality.json; SHA256 28B3E60492321366A1FED79A5E91BD81C30C3A7A1A8FDD6187C3000295C20F94", "next_condition": "先扩展独立整图坐标—路由反事实并证明该产物被拒绝，再修改布局 owner。"}
     },
     {
       "id": "FB-ROOT-004",
@@ -303,17 +304,17 @@
     },
     {
       "id": "FB-BEND-017",
-      "summary": "四个错列 source 直接进入同一 mux 时部分入边出现可避免的额外折点",
-      "expected": "四个 source 均直接连接同一多输入 mux 时，分层和坐标阶段应联合选择可行 source 列与行；若某条入边存在保持端口、碰撞、重叠、交叉和其它共享网络不退化的更少折点方案，最终路线必须采用该方案",
-      "actual": "用户指出四个 source 虽都直接连接 mux，但 source 不全在同一列时，部分 source 到 mux 的线路会出现多余拐点；现有固定端点路线 Oracle 和同列样例不足以覆盖坐标与路由联合问题",
-      "status": "closed",
+      "summary": "多个 source 直接进入同一 mux 时最终图保留被更少折点或更少交叉方案支配的路线",
+      "expected": "多个 source 均直接连接同一多输入 mux 时，分层、坐标和通道阶段必须联合选择；任何保持端口、碰撞和异网重叠不退化，且使折点或交叉严格下降的最终图候选都必须支配当前结果",
+      "actual": "四个 source 已被强制同列，但当前 30 号图仍有 8 个折点、4 个交叉事件；完整数组端口轴反事实可降为 6 折/2 交叉，visibility-channel 反事实还能在不改变折点和长度时消除 source_0/source_1 的矩形互穿",
+      "status": "fixed_verified",
       "owner_paths": ["src/**"],
       "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "93568f94d37bf62b642b5cb7c499dd1fbca27113",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/recurrent-staggered-four-source-bend.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/recurrent-staggered-four-source-bend.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-017", "--input", "{project}/tests/reproduction-corpus/recurrent-staggered-four-source-bend.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "baseline_revision": "worktree-producer-snapshot-20260907T172400+0800",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/30-staggered-four-source-mux.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/30-staggered-four-source-mux.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-017", "--input", "{project}/example/auto-layout/30-staggered-four-source-mux.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
       "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 原始 SVG 中四条 source→mux 直连入边至少一条存在经完整节点坐标与正交路线反事实严格支配的额外折点",
+      "reproduction_proves": "公开 CLI 原始 SVG 存在由最终可见通道或完整数组坐标反事实严格支配的额外折点或交叉",
       "reproduction_does_not_prove": "所有错列 source 都应强制同列；真实器件、标签、端口或其它扇出造成的必要绕障仍可保留",
       "reproduction_attempts": [
         {"attempted_at": "2026-09-07T09:31:00+08:00", "hypothesis": "四个带不同 layout_column 的 source 直接进入 mux4 会自然产生额外折点。", "method": "公开 CLI 生成三列 source→mux4 最小图，独立统计逐边航点。", "result": "not_reproduced", "observed": "四条 source→mux 入边均为 0 折点、0 交叉、0 异网重叠。", "analysis": "错列本身不是充分条件；固定端口轴与不同 x 列完全兼容直线连接。", "why_not_reproduced": "每个 source 都能在自身列与对应 mux 端口同轴。", "evidence": "work/fb-016-017-current-baseline/sources.svg", "next_condition": "保持四条 source→mux 直接边，使用不同合法辅助链深自然约束 source 的列与纵向设施位置。"},
@@ -322,12 +323,34 @@
         {"attempted_at": "2026-09-07T12:21:30+08:00", "hypothesis": "显式错列与四条不同深度辅助链交互时，旧根联合坐标优化因列提示排除而再次留下可支配折点。", "method": "确定性复杂组合搜索在 seed 1 命中后冻结输入，并在 93568f94 的公开 CLI 上独立双跑；Oracle 联合平移完整根设施并重算全部出边。", "result": "reproduced", "observed": "批次 20260907T042130Z-b81cdab9 两次均为 27 节点、26 边、16 总折点；三条直入 main_mux 的边合计 8 折，source_0/source_2 各存在 4→2 且长度、交叉、重叠不退化的反事实，SVG 哈希稳定为 4e6fa23f...27f87。", "analysis": "layout_column 只约束 x 列，却被生产 owner 同时用于排除 y 轴联合优化；提示维度与优化维度错误耦合，导致显式错列场景逃逸。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-017.json; .reproduction/receipts/recurrent-corpus.json", "next_condition": "solve 门通过后保留 x 列约束，但允许完整根设施在 y 方向参与消费者轴反事实。"}
       ],
       "reproduction_receipt": ".reproduction/receipts/FB-BEND-017.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-BEND-017.json", "release_verification": {"commit": "b648705dcb489a9b5667fd782752627b7a05b4c5", "run_id": 34085120202, "tag": "v1.0.0", "asset_sha256": "1876E4D9077C9F400FFB255041E7D14CF7ADF0BC6172AE2BC495602D753B2A97"}}
+      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-BEND-017.json", "release_verification": {"commit": "b648705dcb489a9b5667fd782752627b7a05b4c5", "run_id": 34085120202, "tag": "v1.0.0", "asset_sha256": "1876E4D9077C9F400FFB255041E7D14CF7ADF0BC6172AE2BC495602D753B2A97"}},
+      "reopened_feedback": {"reported_at": "2026-09-07T17:24:00+08:00", "status": "fixed_verified", "summary": "用户展示 30 号当前图仍有多余折返和交叉；修正后的独立 Oracle 在 worktree producer 冻结快照公开双跑中稳定命中，当前修复以同一 Oracle 双跑清零。", "evidence": ".reproduction/receipts/FB-BEND-017.json; .reproduction/fix-receipts/FB-BEND-017.json; verification group 20260907T110614Z-86f32691; baseline SHA256 28B3E60492321366A1FED79A5E91BD81C30C3A7A1A8FDD6187C3000295C20F94; current SHA256 faa91f92a3aa327fca431eba6377ad3f883b551867dcbb7100829709c98fabfe", "next_condition": "发布门持续要求回执绑定当前源码、器件库、runner、Oracle，并先通过全公开图片新鲜生成门。"}
+    },
+    {
+      "id": "FB-ROOT-020",
+      "summary": "多个直入同一 mux 的 source/from 因辅助消费者深度不同而错列",
+      "expected": "至少三个未显式定列的 source/from 若唯一的直接 mux 目标相同，则其 mux-facing 物理设施必须同列；非 mux 辅助消费者可以有不同深度，服务多个 mux 的公共总线不属于该数组",
+      "actual": "四个 source 都直接进入同一 mux4，但辅助链深度不同使最终设施分处四列，形成参差阵列",
+      "status": "closed",
+      "owner_paths": ["src/**"],
+      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
+      "baseline_revision": "b648705dcb489a9b5667fd782752627b7a05b4c5",
+      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/30-staggered-four-source-mux.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/30-staggered-four-source-mux.json", "drawio-lib/**"], "deterministic": true},
+      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-020", "--input", "{project}/example/auto-layout/30-staggered-four-source-mux.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
+      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
+      "reproduction_proves": "冻结公开 CLI 的原始 SVG 中至少三路 source/from 直入同一 mux，且各路实际端点所属物理设施分处不同 x 列",
+      "reproduction_does_not_prove": "显式 layout_column 必须被覆盖，或服务多个 mux 的公共总线必须与每个局部数组同列",
+      "reproduction_attempts": [
+        {"attempted_at": "2026-09-07T16:30:00+08:00", "hypothesis": "四个 source 直入同一 mux 且具有不同深度辅助消费者时，设施复制和 ALAP 会让 mux-facing source 错列。", "method": "当前公开 CLI 生成未改写 SVG；独立 Oracle 从最终边端点反查物理框 x 列并连续运行两次。", "result": "reproduced", "observed": "两次均命中；source_0..3 的物理列为 401.93、201.39、72.78、337.05，报告哈希一致。", "analysis": "低使用根 promotion、ALAP 和后置设施 owner 分别拥有同一 x 坐标，辅助链深度因此覆盖了直入 mux 数组的视觉列不变量。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-020.json", "next_condition": "分层阶段建立 direct source/from fan-in cohort，并由独立发行门覆盖声明顺序、端口排列和辅助深度。"}
+      ],
+      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-020.json",
+      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-020.json"}
     }
   ],
   "process_incidents": [
     {"id": "META-CLAIM-007", "status": "closed", "release_blocking": true, "summary": "未完整自然复现却声称全部完成并提交发布", "classification": ["reproduction_escape", "claim_escape", "oracle_escape"], "evidence": "corrected FB-ROOT-001 precondition/outcome Oracle; frozen corpus 20260903T095028Z-9c31e607; current verification 20260903T100531Z-98de36d8; 432 passed", "analysis": "旧的器件种类前提假通过已撤销并永久记录；owner 写入、release、complete 分阶段消费自然红灯和当前双跑哈希收据，开放流程事故也会阻断 release。", "fix_verification": {"oracle_positive_negative_calibration": true, "stale_receipt_rejected": true, "release_incident_gate_tested": true}},
     {"id": "META-RELEASE-008", "status": "closed", "release_blocking": true, "summary": "发布工作流未执行反馈复现门且 always 条件允许发布链继续", "evidence": "escape: run 33720713223 published 0a2f48b; verification: run 33724488973 failed feedback gate and skipped build/publish for 291274e", "analysis": "交付门曾依据 src 变化选择 structure 阶段，远端 build 没有 feedback gate 且 publish 使用 always。现在本地 pack 和受保护 release 命令强制 release 阶段，CI build/publish 显式依赖反馈门。", "fix_verification": {"current_run": 33724488973, "feedback_gate": "failure", "build": "skipped", "publish": "skipped", "tag_target_unchanged": "0a2f48b295133aa97aed05baa6cf75209f1c4378"}},
-    {"id": "META-CLAIM-009", "status": "closed", "release_blocking": true, "summary": "公共 from 复用数组被近似样例替代并误报为已精确复现", "classification": ["coverage_escape", "claim_escape", "control_semantics_error"], "evidence": "example/auto-layout/28-common-private-from-mux-clock-array.json；tests/test_feedback_layout_oracle.py::test_common_private_from_mux_clock_array_uses_one_vertical_bus；冻结与当前四次 SVG 哈希 C7E59F79...B5517C8；专项 4 passed", "analysis": "几何 Oracle 原来检查了一个显示设施和一条纵向主干，但夹具把公共 from 换成 source，并增加 mux3 空端口和 cell 中间级。现由严格公开输入、逐字段结构断言和最终 SVG 直接判据共同限制声明范围；第 27 号保留为不同边界，第 28 号才证明公共/私人 from→mux2→clock 数组。", "fix_verification": {"exact_input_semantics": true, "exact_edge_binding": true, "single_common_facility": true, "single_vertical_bus": true, "frozen_and_current_public_cli_runs": 4}}
+    {"id": "META-CLAIM-009", "status": "closed", "release_blocking": true, "summary": "公共 from 复用数组被近似样例替代并误报为已精确复现", "classification": ["coverage_escape", "claim_escape", "control_semantics_error"], "evidence": "example/auto-layout/28-common-private-from-mux-clock-array.json；tests/test_feedback_layout_oracle.py::test_common_private_from_mux_clock_array_uses_one_vertical_bus；冻结与当前四次 SVG 哈希 C7E59F79...B5517C8；专项 4 passed", "analysis": "几何 Oracle 原来检查了一个显示设施和一条纵向主干，但夹具把公共 from 换成 source，并增加 mux3 空端口和 cell 中间级。现由严格公开输入、逐字段结构断言和最终 SVG 直接判据共同限制声明范围；第 27 号保留为不同边界，第 28 号才证明公共/私人 from→mux2→clock 数组。", "fix_verification": {"exact_input_semantics": true, "exact_edge_binding": true, "single_common_facility": true, "single_vertical_bus": true, "frozen_and_current_public_cli_runs": 4}},
+    {"id": "META-QUALITY-010", "status": "closed", "release_blocking": true, "summary": "逐问题 Oracle 与同列门放过了最终图中的多余交叉和折返，且所有发行图片未走统一几何质量门", "classification": ["oracle_escape", "coverage_escape", "claim_escape"], "evidence": "用户截图与冻结坏图 SHA256 28B3E604...C20F94；当前双跑修复组 20260907T110614Z-86f32691；全公开图片 exact-set 门 26/26；128-clock 终态 crossing=19113、bends=896、异网 overlap=0、split-rejoin=0", "analysis": "根因是专用 issue witness 没有消费全图联合反事实、终态序列化 overlap owner 与注释几何，且后置 owner 可重新引入树环。现由独立终态 SVG Oracle、26 图新鲜生成 CLI、阵列联合 x/y 事务、完整网络 channel 移轨、终态 fanout 树闭包和纯文字注释 mutant 共同 fail-closed。", "fix_verification": {"all_public_images_passed": 26, "fix_verification_group": "20260907T110614Z-86f32691", "annotation_mutants_rejected": true, "release_workflow_gate": "tools/check_all_svg_quality.py", "final_artifact_precision_digits": 4}}
   ]
 }

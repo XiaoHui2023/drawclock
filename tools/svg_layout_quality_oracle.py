@@ -17,6 +17,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--input", required=True, type=Path)
     parser.add_argument("--svg", required=True, type=Path)
     parser.add_argument("--report", type=Path)
+    parser.add_argument(
+        "--require-pass", action="store_true",
+        help="fail when the final artifact violates any generic quality invariant",
+    )
     args = parser.parse_args(argv)
     try:
         report = geometry.analyze(args.input, args.svg)
@@ -29,6 +33,14 @@ def main(argv: list[str] | None = None) -> int:
         args.report.write_text(payload, encoding="utf-8")
     else:
         print(payload, end="")
+    if args.require_pass:
+        failures = geometry.generic_quality_failures(report)
+        if failures:
+            print(
+                "svg layout quality oracle: rejected: " + ", ".join(failures),
+                file=sys.stderr,
+            )
+            return 1
     return 0
 
 
