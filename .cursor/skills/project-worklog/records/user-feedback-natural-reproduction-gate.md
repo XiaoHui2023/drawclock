@@ -1,9 +1,11 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 23:00 +08:00
+- updated: 2026-09-08 23:15 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 23:15 产品提交 `5b460a295d80b60bb02fd9c6964438c0a4901ed3` 已推送 main；Release run `34222137595` 的反馈门、Ubuntu 16.04 PyInstaller/staticx 与 publish 三个 job 全部 success，`v1.0.0^{}` 精确指向该提交。公开资产 17,183,395 bytes；本机独立下载 SHA-256 `CDB8EBA6570F9374DBCE5BBEAB2082B903B5662C04E7AB65C78F909373B7DE9D` 与 GitHub digest 一致，归档含冻结程序、源码、器件库和升级后的离线布局 Skill。最终结果图 86,371 bytes 已目视确认。本条完成记录作为最后一个只含账本的提交，再由同一滚动 workflow 覆盖 tag；产品、Oracle 和测试证据不再变化。
 
 - 23:00 最终结果图由明确本地 Edge profile 成功生成 `pad-direct-roots-fixed.png`（86,371 bytes）并目视复核：pad_03 的 gate/from 根与 pad_07 的 source/gate 根分别形成同一视觉列，公共 from 仍为单设施纵向总线；合法边界没有被强制打散。Edge 首次未带隔离 profile 只报 WSALookupServiceBegin 10108 且未写文件，第二次写出成功但仍有 10108、QQBrowser 路径和账户图片获取告警，均不影响本地 file SVG/PNG。
 - 23:00 五件套首次误加 `--require-skills-manifest`，对这个明确的 legacy-absent 项目返回 missing `project-required-skills.json`；按脚本报告的兼容合同去掉该额外要求后 PASS，worklog_errors=[]，没有伪造空 manifest。期间一次工具调用对象语法错误未执行，另一次误拼不存在的账本路径只产生 pathspec fatal；INDEX 又被手误写入 `13 Downs` 和一段乱码，均由回读发现并立即精确恢复。学习目标和联网检索已完成，实际交付未受这些工具失败影响。
