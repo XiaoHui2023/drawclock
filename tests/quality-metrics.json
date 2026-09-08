@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "policy": "Every generated artifact executes exactly this complete registry; cases cannot select subsets.",
+  "metrics": [
+    {"id": "topology_identity", "witness": null, "applicability": "always"},
+    {"id": "orthogonal_segments", "witness": null, "applicability": "has_edges"},
+    {"id": "different_net_overlap", "witness": "overlaps", "applicability": "has_edges"},
+    {"id": "split_rejoin", "witness": "split_rejoin_roots", "applicability": "has_root_fanout"},
+    {"id": "avoidable_bends", "witness": "avoidable_bend_edges", "applicability": "has_edges"},
+    {"id": "port_order", "witness": "port_order_inversions", "applicability": "has_merge"},
+    {"id": "root_fanout_axis_dominance", "witness": "root_fanout_axis_dominance_witnesses", "applicability": "has_root_fanout"},
+    {"id": "direct_root_mux_column", "witness": "direct_root_fanin_column_witnesses", "applicability": "has_direct_root_mux_array"},
+    {"id": "regular_array_single_facility", "witness": "regular_fanout_array_replication_witnesses", "applicability": "has_root_fanout"},
+    {"id": "shared_root_single_bus", "witness": "shared_root_bus_fragmentation_witnesses", "applicability": "has_root_fanout"},
+    {"id": "annotation_geometry", "witness": "annotation_quality", "applicability": "has_annotations"}
+    ,{"id": "mixed_root_quality", "witness": "mixed_root_quality_failures", "applicability": "has_roots"}
+    ,{"id": "public_root_crossing", "witness": "public_root_crossings", "applicability": "has_roots"}
+    ,{"id": "root_relocation_dominance", "witness": "root_relocation_witnesses", "applicability": "has_roots"}
+    ,{"id": "root_facility_split_dominance", "witness": "root_facility_split_witnesses", "applicability": "has_root_fanout"}
+    ,{"id": "physical_anchor_relocation", "witness": "physical_anchor_relocation_witnesses", "applicability": "has_roots"}
+    ,{"id": "vertical_root_facility_bend", "witness": "vertical_root_facility_bend_witnesses", "applicability": "has_roots"}
+    ,{"id": "root_facility_column_lag", "witness": "root_facility_column_lag_witnesses", "applicability": "has_roots"}
+    ,{"id": "downstream_corridor_tail_bend", "witness": "downstream_corridor_tail_bend_witnesses", "applicability": "has_edges"}
+    ,{"id": "adjacent_root_height_bend", "witness": "adjacent_root_height_bend_witnesses", "applicability": "has_roots"}
+    ,{"id": "mergeable_root_facility", "witness": "mergeable_root_facility_witnesses", "applicability": "has_root_fanout"}
+  ]
+}

@@ -92,6 +92,23 @@ def observe(
         observed = token in report.get("witnesses", {}).get(
             "split_rejoin_roots", []
         )
+    elif symptom_type == "shared_root_bus_fragmentation":
+        for witness in report.get("witnesses", {}).get(
+            "shared_root_bus_fragmentation_witnesses", []
+        ):
+            if (
+                witness.get("root") == symptom.get("root")
+                and witness.get("source_port") == symptom.get("port", "right")
+                and int(witness.get("fanout", 0))
+                >= int(symptom.get("min_fanout", 2))
+            ):
+                observed = (
+                    int(witness.get("physical_facilities", 0)) != 1
+                    or len(witness.get("vertical_channel_xs", []))
+                    != int(witness.get("expected_vertical_channels", 1))
+                )
+                if observed:
+                    break
     elif symptom_type == "direct_root_fanin_columns":
         expected_sources = set(symptom.get("sources", []))
         for witness in report.get("witnesses", {}).get(

@@ -24,7 +24,6 @@ EXAMPLES = (
     "07-medium-64-clocks",
     "12-dual-from-reuse",
     "13-label-clearance-weave",
-    "14-crossing-weave-128-clocks",
     "16-multi-from-clusters",
     "17-terminal-fanout-order",
     "18-asymmetric-merge-columns",

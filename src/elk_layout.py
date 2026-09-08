@@ -778,6 +778,10 @@ def _generate_scalable_layout(
     route_lane_key: dict[str, tuple[str, str, int]] = {}
     source_trunk_lane_key: dict[str, tuple[str, str, int]] = {}
     fanout_trunk_clusters: dict[tuple[str, str], int] = {}
+    shared_bus_roots = _shared_fanout_bus_roots(nodes, logical_edges)
+    dedicated_suffix_roots = shared_bus_roots - _regular_fanout_array_roots(
+        nodes, logical_edges
+    )
     for net, net_edges in edges_by_net.items():
         ordered = sorted(
             net_edges,
@@ -798,7 +802,12 @@ def _generate_scalable_layout(
         for index, edge in enumerate(ordered):
             if index and gaps[index - 1] > split_threshold:
                 cluster += 1
-            route_lane_key[edge.key] = (*net, cluster)
+            route_lane_key[edge.key] = (
+                (*net, index)
+                if net[0] in dedicated_suffix_roots
+                and rank[edge.target] - rank[edge.source] > 1
+                else (*net, cluster)
+            )
             source_trunk_lane_key[edge.key] = (
                 (*net, -1) if len(ordered) > 1 else (*net, cluster)
             )
@@ -871,8 +880,15 @@ def _generate_scalable_layout(
             while active and active[0][0] <= lo:
                 _, released = heapq.heappop(active)
                 heapq.heappush(free, released)
-            lane = heapq.heappop(free) if free else next_lane
-            if lane == next_lane:
+            dedicated_suffix = (
+                source in dedicated_suffix_roots and cluster >= 0
+            )
+            lane = (
+                next_lane
+                if dedicated_suffix
+                else heapq.heappop(free) if free else next_lane
+            )
+            if lane >= next_lane:
                 next_lane += 1
             lane_index[(gap, source, port, cluster)] = lane
             heapq.heappush(active, (hi, lane))
@@ -2545,6 +2561,7 @@ def _refine_joint_coordinates(
     route_clearance: float = 18.0,
     minimum_route_bends: int = 4,
     require_nonincreasing_length: bool = False,
+    shared_bus_roots: set[str] | None = None,
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     """Accept only type-independent node/route moves that dominate globally."""
     accepted = copy.deepcopy(document)
@@ -2774,6 +2791,31 @@ def _refine_joint_coordinates(
                 edge.cell_id: edge for edge in candidate.edges
             }
             candidate_by_id[vertex_id].y += delta
+            logical_name = (
+                candidate_by_id[vertex_id].logical_name
+                or candidate_by_id[vertex_id].name
+            )
+            protected_bus_x_by_port: dict[str, float] = {}
+            if shared_bus_roots and logical_name in shared_bus_roots:
+                axes_by_port: dict[str, set[float]] = defaultdict(set)
+                for edge_index, old_points in incident_old_points.items():
+                    logical = logical_edges[edge_index - 1]
+                    if logical.source != logical_name:
+                        continue
+                    first_axis = next((
+                        a[0]
+                        for a, b in zip(old_points, old_points[1:])
+                        if abs(a[0] - b[0]) <= 1e-6
+                        and abs(a[1] - b[1]) > 1e-6
+                    ), None)
+                    if first_axis is not None:
+                        axes_by_port[logical.source_port].add(first_axis)
+                if any(len(axes) != 1 for axes in axes_by_port.values()):
+                    blockers["shared-bus-precondition"] += 1
+                    continue
+                protected_bus_x_by_port = {
+                    port: next(iter(axes)) for port, axes in axes_by_port.items()
+                }
             valid_routes = True
             selected_candidate_segments: list[Segment] = []
             for edge_index in incident[vertex_id]:
@@ -2796,6 +2838,12 @@ def _refine_joint_coordinates(
                     if abs(a[0] - b[0]) <= 1e-6
                     and abs(a[1] - b[1]) > 1e-6
                 ]
+                protected_bus_x = (
+                    protected_bus_x_by_port.get(logical.source_port)
+                    if logical.source == logical_name else None
+                )
+                if protected_bus_x is not None:
+                    vertical_xs = [protected_bus_x]
                 if abs(start[1] - end[1]) <= 1e-6:
                     options = [[start, end]]
                 else:
@@ -2805,7 +2853,10 @@ def _refine_joint_coordinates(
                     target_box = vertex_visual_box(target)
                     channel_left = source_box.right + route_clearance
                     channel_right = target_box.left - route_clearance
-                    if channel_left <= channel_right + 1e-6:
+                    if (
+                        protected_bus_x is None
+                        and channel_left <= channel_right + 1e-6
+                    ):
                         vertical_xs.extend((
                             channel_left,
                             (channel_left + channel_right) / 2.0,
@@ -2875,6 +2926,34 @@ def _refine_joint_coordinates(
                 ])
                 for edge_index in incident[vertex_id]
             }
+            if shared_bus_roots and logical_name in shared_bus_roots:
+                candidate_bus_axes: dict[str, set[float]] = defaultdict(set)
+                candidate_target_axes: dict[str, set[float]] = defaultdict(set)
+                for edge_index, candidate_points in candidate_incident_points.items():
+                    logical = logical_edges[edge_index - 1]
+                    if logical.source != logical_name:
+                        continue
+                    candidate_target_axes[logical.source_port].add(
+                        round(candidate_points[-1][1], 6)
+                    )
+                    first_axis = next((
+                        a[0]
+                        for a, b in zip(candidate_points, candidate_points[1:])
+                        if abs(a[0] - b[0]) <= 1e-6
+                        and abs(a[1] - b[1]) > 1e-6
+                    ), None)
+                    if first_axis is not None:
+                        candidate_bus_axes[logical.source_port].add(
+                            round(first_axis, 6)
+                        )
+                if any(
+                    len(target_axes) > 1
+                    and len(candidate_bus_axes.get(port, set())) != 1
+                    for port, target_axes in candidate_target_axes.items()
+                ):
+                    blockers["shared-bus-candidate"] += 1
+                    blockers[f"shared-bus-candidate:{logical_name}"] += 1
+                    continue
             candidate_incident_bends = sum(
                 max(0, len(points) - 2)
                 for points in candidate_incident_points.values()
@@ -2930,6 +3009,18 @@ def _refine_joint_coordinates(
                     ),
                 }
                 blockers.update(name for name, passed in checks.items() if not passed)
+                blockers.update(
+                    f"{name}:{logical_name}"
+                    for name, passed in checks.items() if not passed
+                )
+                if not checks["length"]:
+                    length_delta = round(
+                        candidate_report["manhattan_length"]
+                        - accepted_report["manhattan_length"], 3
+                    )
+                    blockers[
+                        f"length-delta:{logical_name}:{delta:+.3f}:{length_delta:+.3f}"
+                    ] += 1
                 continue
             bends_removed += (
                 accepted_report["bends_total"]
@@ -3314,6 +3405,28 @@ def _direct_root_fanin_array_roots(nodes, logical_edges) -> set[str]:
     return result
 
 
+def _shared_fanout_bus_roots(nodes, logical_edges) -> set[str]:
+    """Return roots whose one output port represents one shared network.
+
+    A logical source-port with two or more consumers is one electrical/visual
+    network. It may branch through one distribution trunk, but it must not be
+    converted into row-local copies merely to reduce individual edge ink.
+    """
+    indegree = Counter(edge.target for edge in logical_edges)
+    source_ports = Counter(
+        (edge.source, edge.source_port) for edge in logical_edges
+    )
+    return {
+        name for name in nodes
+        if indegree[name] == 0
+        and str(nodes[name].item.get("kind", "")) == "from"
+        and any(
+            source == name and count >= 2
+            for (source, _port), count in source_ports.items()
+        )
+    }
+
+
 def _replicate_dispersed_roots(
     document: LayoutDocument,
     nodes,
@@ -3368,6 +3481,7 @@ def _replicate_dispersed_roots(
     direct_fanin_array_roots = _direct_root_fanin_array_roots(
         nodes, logical_edges
     )
+    shared_bus_roots = _shared_fanout_bus_roots(nodes, logical_edges)
 
     def edge_points(
         doc: LayoutDocument,
@@ -3399,6 +3513,7 @@ def _replicate_dispersed_roots(
             or len(outgoing[root]) < 2
             or root in regular_array_roots
             or root in direct_fanin_array_roots
+            or root in shared_bus_roots
         ):
             continue
         by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
@@ -4835,8 +4950,8 @@ def _relocate_root_rendering_anchors(
                         position_choices.append((
                             len(reverse_hits),
                             abs(anchor.y - wanted),
-                            column_displacement,
                             -column_x,
+                            column_displacement,
                             column_x,
                             anchor.y,
                         ))
@@ -5081,6 +5196,7 @@ def _split_root_rendering_anchors_by_local_rows(
     direct_fanin_array_roots = _direct_root_fanin_array_roots(
         nodes, logical_edges
     )
+    shared_bus_roots = _shared_fanout_bus_roots(nodes, logical_edges)
 
     def metric(report: dict[str, Any]) -> tuple[float, ...]:
         return (
@@ -5098,6 +5214,7 @@ def _split_root_rendering_anchors_by_local_rows(
             or "layout_column" in nodes[root].item
             or root in regular_array_roots
             or root in direct_fanin_array_roots
+            or root in shared_bus_roots
         ):
             continue
         by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
@@ -5649,11 +5766,13 @@ def _open_root_facility_corridors(
     direct_fanin_array_roots = _direct_root_fanin_array_roots(
         nodes, logical_edges
     )
+    shared_bus_roots = _shared_fanout_bus_roots(nodes, logical_edges)
     roots = {
         name for name in nodes
         if indegree[name] == 0 and "layout_column" not in nodes[name].item
         and name not in regular_array_roots
         and name not in direct_fanin_array_roots
+        and name not in shared_bus_roots
     }
     anchor_ids = [
         vertex.cell_id for vertex in accepted.vertices
@@ -6321,6 +6440,7 @@ def generate_elk_layout(
     for logical in logical_edges:
         if indegree[logical.source] == 0:
             direct_root_fanins[logical.target].add(logical.source)
+    shared_bus_roots = _shared_fanout_bus_roots(nodes, logical_edges)
     joint_root_names = {
         root
         for roots in direct_root_fanins.values()
@@ -6340,6 +6460,7 @@ def generate_elk_layout(
         route_clearance=profile.route_clearance,
         minimum_route_bends=2,
         require_nonincreasing_length=True,
+        shared_bus_roots=shared_bus_roots,
     )
     report["selection"].update({
         key.replace("joint_coordinate", "root_joint_coordinate"): value
@@ -6528,6 +6649,7 @@ def generate_elk_layout(
         route_clearance=profile.route_clearance,
         minimum_route_bends=2,
         require_nonincreasing_length=True,
+        shared_bus_roots=shared_bus_roots,
     )
     report["selection"].update({
         key.replace("joint_coordinate", "final_root_joint_coordinate"): value

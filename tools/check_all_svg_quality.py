@@ -12,6 +12,7 @@ import tempfile
 from pathlib import Path
 
 import feedback_layout_reproduction_oracle as geometry
+import svg_quality_system as quality_system
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -63,7 +64,11 @@ def main(argv: list[str] | None = None) -> int:
                 continue
             try:
                 report = geometry.analyze(input_path, output_path)
-                failures = geometry.generic_quality_failures(report)
+                quality = quality_system.evaluate(input_path, output_path)
+                failures = [
+                    f"metric:{metric_id}"
+                    for metric_id in quality["failed_metric_ids"]
+                ]
             except (OSError, ValueError, json.JSONDecodeError) as exc:
                 rows.append({
                     "input": input_path.name,
@@ -81,6 +86,9 @@ def main(argv: list[str] | None = None) -> int:
                 "different_net_overlaps": report["totals"]["different_net_overlaps"],
                 "annotation_failures": report["annotation_quality"]["failure_count"],
                 "annotation_profiles": report["annotation_quality"]["profiles_present"],
+                "required_metric_ids": quality["required_metric_ids"],
+                "executed_metric_ids": quality["executed_metric_ids"],
+                "metric_results": quality["metric_results"],
                 "failures": failures,
             })
     profile_counts = {
@@ -90,6 +98,18 @@ def main(argv: list[str] | None = None) -> int:
     missing_profiles = sorted(
         profile for profile, count in profile_counts.items() if count == 0
     )
+    registry_ids = [
+        metric["id"] for metric in quality_system.load_registry()
+    ]
+    metric_execution_failures = [
+        row.get("input", "<unknown>")
+        for row in rows
+        if row.get("producer_exit") == 0
+        and (
+            row.get("required_metric_ids") != registry_ids
+            or row.get("executed_metric_ids") != registry_ids
+        )
+    ]
     payload = {
         "schema_version": 1,
         "input_dir": str(args.input_dir.resolve()),
@@ -99,8 +119,11 @@ def main(argv: list[str] | None = None) -> int:
         "failed_count": sum(bool(row["failures"]) for row in rows),
         "annotation_profile_case_counts": profile_counts,
         "missing_annotation_profiles": missing_profiles,
+        "quality_metric_registry_ids": registry_ids,
+        "metric_execution_failures": metric_execution_failures,
         "batch_failures": (
-            ["annotation-profile-coverage"] if missing_profiles else []
+            (["annotation-profile-coverage"] if missing_profiles else [])
+            + (["full-metric-execution"] if metric_execution_failures else [])
         ),
         "cases": rows,
     }

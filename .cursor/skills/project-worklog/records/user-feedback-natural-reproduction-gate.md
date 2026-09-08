@@ -1,9 +1,96 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: done
+- status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 12:10 +08:00
+- updated: 2026-09-08 19:47 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 19:47 两项实测指标修正后聚焦 mutant 15/15 PASS；全量 pytest 从零重跑 512/512 PASS（60.80s）；全公开终态门再次 26/26 PASS，每图仍执行同一 21 项 exact-set、总计 546 次且 failure=0。此前 510 项结果已由本轮覆盖，不作为最终新鲜回执。下一步只做不改文件的发布前闭包检查、提交、推送与远端发行消费验证。
+
+- 19:43 实测指标首轮聚焦 13/15：未知 SVG 节点在完整 analyzer 内先触发现有 identity exception，证明发布会 fail-closed，但测试需同时直接校准新结构化 topology witness；seed 0 的合法水平线因四位序列化产生 0.0001px y 差，被 1e-6 计算 EPS 误判对角。修正采用与终态精度匹配的 0.001px 轴容差，1px 对角 mutant 仍应被拒绝，不通过删除测试或硬编码样例豁免放行。
+
+- 19:39 新增终态 topology/orthogonal witness 分支时，状态表达式误混入非 ASCII 后缀 `witnessesیسک`；尚未运行或暂存，实时记录 hook 已阻止直接覆盖。该中间状态不计门禁尝试，先入账后只修正为 `witnesses` 并由 mutant 校准。
+
+- 19:36 提交前逐实现复核发现质量注册表中的 `topology_identity` 与 `orthogonal_segments` 虽然逐图签收，但执行器分支直接返回 PASS；底层 bind/path 解析能拒绝一部分错误仍不足以证明两项各自产生 witness，属于潜在“注册了但未测量”逃逸。发布冻结并重新打开本地门，先增加终态 SVG 实测与未知节点/对角段 mutant，再从头重跑。期间五件套命令又两次误用了旧的 agent-project-worklog 路径，均仅非零退出；使用实际 project-skill-manifest-policy 路径后 PASS，错误调用不计通过。
+
+- 19:32 最终候选状态重跑：独立全图门 26/26，每图同一 21 指标、共 546 次执行、failure=0；全量 pytest 510/510 PASS（62.81s）；Git 与上游计数 0/0、cached diff check 通过、五件套按正确路径和必需项目根参数重跑 PASS。五件套此前两次调用分别因误认脚本目录、遗漏必需项目根参数而非零退出，均未改项目且未冒充通过。此后不再改代码/合同/记录，进入反馈 release gate、暂存边界审计与远端滚动发布。
+
+- 19:28 发布前一致性审计发现 `META-QUALITY-010` 仍引用已删除的 128-clock 压力图和旧验证组，已改为最终 07:40 修复组及 26×21=546 次统一指标执行证据；分析口径明确为独立事实提取器与 artifact×metric 笛卡尔积签收。同期一次误输 `git addennials` 仅返回未知子命令，另一次 PowerShell 未引用 `HEAD...@{u}` 导致参数被解析为 `dQA=`；两次均非零退出、未改文件。后续改用明确 `git add` 与单引号引用 revision range，不把失败命令算作同步成功。
+
+- 19:24 Edge 使用独立临时 profile 和 1600×2200 viewport 成功输出完整 86,323-byte PNG。目视确认唯一 public_from 与连续 x=197.66 纵向总线；独立报告中 public_root_crossings、split_rejoin、different_net_overlaps、avoidable_bend_edges 和全部根搬移/拆分/列滞后 witness 均为空。Edge 的 10108、QQBrowser 和账户图片告警不影响本地 SVG 渲染或输出文件。
+
+- 19:20 独立检查器已对 07:40 的 016 current SVG 写出终态报告：`public_from:right` fanout=5、physical_source_facilities=1、start_points=1、source_vertical_bus_xs=[197.66]、split_rejoin=false；全路径后续仍有 413.96/423.96/433.96 三条目标侧绕障纵段，但不属于源侧总线碎裂，分别由折点/交叉指标继续审计。Edge headless 首次返回时 PNG 尚未出现并被当场判失败；随后只读检查发现进程异步写出了 45,588-byte PNG，目视图仅截到 1000px 高度。下一步用 2200px viewport 重截完整图，不把半图作为交付截图。另有一次误执行不存在的 `/zZZ` 命令，exit nonzero、未改文件，已记录为编排噪音。
+
+- 19:12 项目 changelog/design-notes 已同步最终口径：独立终态检查器、每图完整 21 指标 exact-set、共享 from 单设施/单总线、七轮 restart-on-hit、排除 512 及以上。提交范围已暂存，唯一 fix evidence 组为 07:40，约 11.7MB；没有暂存旧 07:35 组。下一步生成最终检查报告和结果图；首次执行被实时工作记录门正常阻断，尚未写出图片。
+
+- 19:02 最终 07:40 fix evidence 和 07:39 semantic baseline evidence 已进入精确 Git 闭包，feedback release gate 16/16 PASS。独立全图系统随后新鲜生成 26/26 公开输入，每图 `required_metric_ids == executed_metric_ids == receipted_metric_ids` 为同一 21 项 exact-set，共 546 次指标执行，失败 0；全量 pytest 从头 510/510 PASS（60.66s）。发布技能回读又发现项目 design-notes/changelog 仍写“五轮”和“16/64/128”，与当前七轮合同及已删除 520 节点 128-clock 图冲突；提交前必须按本轮最新口径同步，不能让过时文档进入发行包。
+
+- 18:44 更新 016 最终 verification group 时手工补丁把 receipt 路径误写成截断的 `.reproduction/fix `；JSON 语法仍合法但依赖闭包语义无效，尚未运行任何门禁。源码回读立即识别，下一补丁恢复唯一正确路径 `.reproduction/fix-receipts/FB-ROOT-016.json`，不把该中间状态计作通过。
+
+- 18:42 release gate 首次在状态推进后仍正确拒绝：002 的自然红灯收据绑定旧 semantics 哈希，且新绿证据未跟踪。已仅重跑带语义合同的 002/020 自然基线，批次 `20260908T073913Z-51fb01e3` missing_issues=[]；因为红收据哈希变化，随后重新签发修复双跑组 `20260908T074000Z-022fa34b`，failures=[]。旧 07:35 绿组从暂存区撤销、保留本地可追溯，不纳入发行；账本和 Git 闭包只指向最终 07:40 组。
+
+- 18:38 最终工作树高风险递归攻击 `20260908T073507Z-7438d14f` 按七种策略从 R1 连续 7/7 clean；没有继承 16:00–16:50 五次捕获后的任何旧轮次。随后正式公共 CLI 双跑组 `20260908T073553Z-575d88e3` 对全部反馈问题逐项验证，`failures=[]`。016 当前两次均为单设施、单起点、五目标轴、单源侧纵总线；下一步让账本指向新组并将其精确 evidence 闭包加入 Git 后重跑 release gate。
+
+- 18:10 已修复能力清单错误文案并为 source-replication 合同增加“零入度多扇出 from 必须单设施、单源侧总线”的硬约束；两份 JSON 解析通过，边界聚焦 11/11。当前正式 fix receipt 已是 `fixed_verified` 且绑定组 `20260908T071452Z-4853693a`，但 issue 账本仍停在 reproduced/invalidated，release 测试按设计拒绝；下一步只按稳定 issue ID 更新 016 状态和当前收据，不改其它 issue。
+
+- 18:02 已从两个生成清单移除 520 节点的 14 号压力示例，防止后续脚本把已删除产物重新带回。同步能力文档时一次补丁误把预期的 `sub-512-node` 文案写成无意义的 `sub- outdoors`；JSON 仍可解析但语义错误，尚未运行门禁，立即记录并在下一补丁精确修正，同时更新 source-replication 能力合同的维护范围。
+
+- 17:56 边界迁移聚焦复跑 11/11。进一步全库检索发现 520 节点的 14 号示例虽已从公开输入/输出删除，仍在两个生成脚本和两份能力文档中作为 128-clock 维护范围出现；这会被后续生成命令重新带回并与用户明确排除 512 及以上节点冲突。下一步从生成清单移除该项，并把维护表述统一为 sub-512 exact-set，不删除仍处范围内的复杂组合覆盖。
+
+- 17:52 边界迁移聚焦首轮 9/11。普通 gate 的显示复制、序列化、mutant 和多 from 单设施断言全部通过；两个测试维护错误是局部直连测试未开启 statistics 却读取 statistics，以及 coverage manifest 仍引用已重命名测试。两者均不涉及放宽产品质量：直连边已由 `waypoints == ()` 直接证明 0 折点，manifest 改为新测试名后重跑。
+
+- 17:47 已迁移显示复制测试边界：多带、四行、序列化与 fault-injection 均改用普通 gate 根，继续覆盖通用副本能力；多 `from` 测试反向锁定每个逻辑 from 仅一个设施且副本数为零；亚像素用例只检查其目标边的逐边折点为零，不再错误要求包含其他公共总线的全图折点总数为零。第一次测试补丁因手误包含错误期望文本而未应用，第二次精确补丁成功；随后 coverage manifest 补丁被实时记录门按设计拒绝，尚未改清单。
+
+- 17:42 全量测试首轮为 499 passed/11 failed。2 项是 016 尚处 reproduced 的预期发布账本红灯，1 项是已按用户范围删除的 520 节点示例仍被 coverage manifest 引用；其余 8 项揭示旧测试把零入度 fanout `from` 的显示复制当成正确语义。回读逐项确认：普通根显示复制能力应继续由 gate 类根覆盖，而共享 `from` 必须统一验证一个物理设施和一个源侧纵总线。亚像素测试目标边本身仍为 0 折点且整图质量通过，旧的“全图总折点为 0”断言把邻近公共总线的必要折线混入了该局部性质。迁移前先记录此边界，禁止以简单删断言方式放行。
+
+- 17:20 新增 seed 0/2/3/12 参数化回归，要求每个最终 SVG 执行完整 21 指标且零失败；检查器首纵段提取改为单次线性扫描。初版另一个 seed 2 校准测试硬编码了失败 campaign 的 ignored evidence 路径，会在干净 checkout 缺文件，尚未运行即由依赖闭包审查发现；改为在参数化测试当场公开生成 seed 2 后同时断言一个源侧 bus 和多个合法目标侧 detour，不依赖本地历史文件。
+
+- 17:15 protected bus-x 不再追加普通逐边通道后，聚焦 73/73、全公开 26/26×21 通过；高风险递归 run 20260908T071007Z-68dc98d 从 R1 连续 7/7 clean，seed 0/2/3/12 均未再命中。五次中途捕获均已清零而未继承旧轮次。下一步把四个最小 seed 固化进常规测试，并重签当前源码/Oracle 的正式 fix receipt。
+
+- 16:50 delta 级诊断显示 length 拒绝仅对应移动到 aux 轴 +107.338（总长 +32.670）；真正应选的 +37.336 side_mux 轴落入 shared-bus-candidate。源码回读找到直接原因：先把 vertical_xs 收敛到 protected bus-x 后，又无条件追加 channel-left/mid/right 三个普通备选，逐边 local score 再次可选不同轴。修复为 protected shared bus 禁止追加逐边通道备选；候选后 exact-set 作第二道防线。
+
+- 16:45 joint blocker 已细化：seed 12 的全部拒绝只归因 source_3，分别为 length:source_3=2 与 shared-bus-candidate:source_3=4；没有 node/crossing/overlap/direction 失败。由于独立 Oracle 对 y=558 候选给出长度下降 37.34px，生产 length 判定与终态几何事实矛盾，下一步记录每个 delta 的候选长度差，定位是候选构造还是 accepted baseline 陈旧，禁止直接放宽 length 硬门。
+
+- 16:40 第五次 run 20260908T065952Z-aea8667d 到 R4 seed 12 才命中 BEND-017 并清零。source_3 当前三分支共享首轴 153.56；独立反事实把设施 y=520.6641 移到 side_mux 轴 558，可使总 bends 6→4、length 717.10→679.76，crossing=3/overlap=0 不变且仍保持单 bus，因此是合法漏优化。当前 joint 汇总只给 length/shared-bus blocker，无法归因到根；先把 blocker 细化为 reason:logical-root，复跑确定具体拒绝条件，再修改 owner。
+
+- 16:30 第四次 run 20260908T065641Z-b4999211 在 R4 seed 0 再次命中 ROOT-016 并清零。联合重路由只约束了每条非直线边的候选 bus-x，却没在候选完成后复算全部出边首纵轴；一条变直后，另两条仍可形成 143.56/148.56 两轴。新增候选后 exact-set 硬断言：按 source-port 聚合全部出边，目标轴不同则首纵轴集合必须恰为一个，否则 joint move 直接拒绝并记录 shared-bus-candidate blocker。
+
+- 16:20 第三次 run 20260908T064617Z-559f8c45 在 R4 seed 3 命中相邻 FB-BEND-017，再次清零；总线指标未复发。严格 witness 显示 source_3/source_1 对 main_mux 的单根纵轴对齐可令各自 4→2 bends、总长度与 crossing/overlap 不变。此前“把所有 shared from 排除 joint owner”修复过宽，保护总线却禁止了可证明安全的折点优化。通用解改为 joint owner 对 shared from 使用同一旧源侧 bus-x 联合重路由全部出边，并把“候选首纵轴 exact-set 仍为一个”加入硬接受条件；不再永久排除该 owner。
+
+- 16:12 首纵段 Oracle 小补丁落盘时残留无效注释并漏定义 `vertical_channels`，源码回读前即识别；该版本不运行、不计进展。先实时记录，再补成完整实现并以语法/正负样本校准。
+
+- 16:10 重启 run `20260908T064153Z-21032358` 又在 R4 seed 2 清零，但全路径回读证明这是 Oracle 假阳性：source_0 两条边的首个源侧纵段同为 143.56，source_1 同为 346.68，已经是一条共享总线；458.24/559.8/569.8 是跨多级链绕障所需的目标侧后缀。旧二扇出特例把“全路径任意纵轴”都算成总线，违反首段归属。统一改为检查每条分支的首个源侧纵轴 exact-set：共同首轴只能一个，后缀纵轴继续由折点/交叉/重叠指标独立约束，不能冒充第二总线。
+
+- 16:00 第一层归因“终态 overlap 移轨拆总线”经产品重放证伪：该 seed 报告 `final_trunk_overlap_moves=0`，加入整网首纵段平移后产物也未变化，不能保留无效复杂度。真实改变 owner 是更早的 `root_joint_coordinate_moves=4`：它把直入四源 mux 且另有消费者的根逐根当作折点优化对象，未排除 shared from，总线从 143.56 被单边改成 148.56。现完整撤回无效终态尝试，并让 joint-root 优化不接管共享 from；数组整体对齐仍由专属事务 owner 负责。
+
+- 15:50 高风险递归 run `20260908T062230Z-f803e776` 在 R4 seed 0 真实重现 ROOT-016，连续 clean 清零；前三轮 clean 不继承。命中为 `source_3:right` 一个 from 设施扇出 side_mux、main_mux、aux gate，终态纵轴被拆为 143.56/148.56。根因定位到最后的异网 overlap 消除器按“单一坐标通道”移动同网 waypoint，虽然 overlap 下降，却把原共享总线的一段单独平移；该 owner 没有把 shared-from 单总线列为硬约束。修复必须把共享 from 的整个轴向网络作为同一平移事务，之后从 R1 重启攻击。
+
+- 15:40 exact-set 校验加入五类故障注入：少跑、额外、重复、乱序、结果未收据均必须抛错，防止正常路径自证完整。一次探查命令误把不支持 `--help` 的 fix runner 当普通脚本启动；后续只读取入口源码确认参数，任何因此产生的批次必须按正常完整验收而不能冒充帮助输出。
+
+- 15:35 独立 evaluator 新增 exact ordered receipt 校验 owner：required、executed、receipted 三组 ID 均需非空、唯一且顺序完全相等；全图 26/26 仍通过。下一步补入五类逃逸 mutant，确保该校验不是只在正常路径自证。
+
+- 15:30 用户级 `agent-quality-workflow` 新增“全制品 × 全指标独立质量系统”渐进专题，固化终态 SVG 全图观察、artifact×metric 笛卡尔积、N/A 结构证明、exact-set 收据与 7 轮异质攻击；联网依据绑定 ELK/Graphviz/W3C/NIST 官方资料，Skill 校验通过。随后项目 21 项指标对移除 520 节点超范围演示后的 26 张公开合格图全部执行，首轮 26/26 PASS。下一笔 exact-set 逃逸 mutant 修改被实时工作记录门拒绝，因为该 Skill 改动尚未同步本记录与 INDEX；本条即为补齐的阻断收据，未将拒绝算作产品失败。
+
+- 15:25 21 项全图门首轮 25/27。14 号失败图为 520 节点，超过用户明确排除的 512 节点范围，且公开索引明确称其故意制造“大量允许跨线”；继续同合格图统一跑质量后它必然红，已从公开输入与生成物删除（Git 历史可恢复），不再以压力演示污染合格图片集合。21 号失败来自全部相关根均有显式 `layout_column=10`，需把违反硬列约束的根移动反事实判为不适用，而非取消该图其它 20 项检查。
+
+- 14:36 第五轮 55/56；目标 pad 已满足单设施单共享主干，唯一 combined 回退来自通道染色仍对既有规则数组启用了专用后缀 lane。已把 lane 分配条件同步收窄到 `shared_bus_roots - regular_array_roots`，消除路由键与通道分配 owner 范围不一致。
+- 14:44 全公开图完整指标首轮 26/27；每图 required/executed 都是相同 11 项且无缺项。唯一 24 号失败为二扇出表示边界：两条边的树形 SVG 中，一条拥有纵段、另一条在端点接入，纵干线不可能同时出现在两条 edge path；旧“至少两条边共同占轴”只适用于三扇出以上。二扇出改为精确要求唯一纵轴，三扇出以上仍要求恰一条由多分支共同占用的主干。
+- 15:00 冻结 HEAD 对比确认 combined 旧图以 6 个 `weave__public_from` 副本取得 1 交叉/2 折点，但违反新合同；新图为 1 公共设施/1 主干，同时暴露 `roots__common_gate_root` 的一个局部设施停在 x=123.93，其直线跨 x=255.86 干线。Oracle 证明右移到 x=265.86 可把该边 1 交叉降 0、长度 500.46→358.53。生产 relocation 的候选排序却在同为零反向碰撞和同 y 时优先“移动最小”，因此选回原位；改为优先最右可行列，再以位移作末级稳定 tie-break，整图硬约束与质量向量仍负责最终验收。
+- 15:12 relocation 修复后 combined 的 ROOT-009/010/012 全部清零，交叉 4→3、折点 28→26、线长 32978→29612；剩余 3 交叉没有任一已登记严格反事实见证。旧测试的 1 交叉/2 折点基线来自 6 个非法 public_from 副本，已改为单设施总线的 3/26 上界且仍强制全部缺陷 witness 为空。为消除“11 项子集假绿”，质量注册表加入其余 10 个已有根设施/位置/走线见证，扩为 21 项；每张图仍执行完全相同的精确集合。
+
+- 12:45 编辑复现 corpus 时误加入无语义的临时标记；实时记录门正确阻止下一次项目修改，尚未运行 runner 或签发证据。先记录该操作，再移除标记并以完整 JSON 解析和 corpus runner 校验。
+- 13:00 将 `pad-r08-s02.json` 的当前失败登记为 `public-from-single-vertical-bus` 正式语义变体；合同明确同一 `public_from:right` 扇出必须只有一个物理设施，目标轴不同时必须只有一条共享纵向分发干线。生产源码仍保持冻结，下一步由 worktree 生产快照双跑签收红灯。
+- 13:06 正式双跑批次 `20260908T050053Z-ce58b64c` 签收红灯：两次 current worktree 产物哈希均为 `e7d618f9...c7368c1df`，语义前置与症状均为 true；`public_from:right` 为 5 设施、5 起点、5 目标轴、0 共享纵通道，合同期望 1 设施与 1 纵通道。`FB-ROOT-016` 恢复为 reproduced，生产修复现已解冻。
+- 13:18 新增独立 `svg_graph_inspector.py`：从最终 SVG+公开 JSON 输出节点每个物理框/中心/行列、边的全部点/折点/逐段方向与长度/交叉伙伴/异网重叠，以及网络设施数、纵通道、分支和 split-rejoin。新增 11 项质量注册表与独立 evaluator；每个产物只能执行精确完整有序集合，条件指标也必须给出 N/A 证明。当前红图的机器测试要求 public_from=5 设施且 shared_root_single_bus 必须失败。
+- 13:35 首次生产补丁被自然复现前置门拒绝。根因不是 017/020 复发，而是 016 新收据同时保留旧 baseline case 与新 required variant case，通用 validator 会对每个 attempt 强制同一 issue baseline，旧两次因此 baseline mismatch。删除已被新精确变体取代的旧 corpus 映射后从头重签；不绕过 validator。
+- 13:46 修正后的单 case 双跑批次 `20260908T051011Z-5708f11f` 使 solve 门 16/16 PASS。随后首次小补丁误写了无效的生成式表达式 `edge:req.target`，未运行代码且未作为进展；已立即纠正并完成通用共享根端口集合、三个设施/路径 owner 保护、全图 11 指标接线及名称/kind 无关单测。
+- 13:54 聚焦测试首轮 38/60 通过、22 失败；共同根因是机械补丁把 `shared_bus_roots` 初始化插入 relocation 而非 local-row split，运行时统一报 NameError，后续生成/检查失败均是级联，不能计作 22 个产品缺陷。名称/kind 无关单测另误用了本模块不存在的 `LogicalEdge` 类型。已将初始化移到正确 owner，并用最小结构对象表达边合同；下一轮从头运行。
+- 14:01 第二轮 54/60 通过，剩余 6 项仍由同类 NameError 级联：上轮通用上下文删除了 replicate owner 的初始化，却保留其 guard；local-row owner 已正确。已按函数名和局部 `facility_costs` 锚定补回 replicate 初始化，并移除 relocation 中未使用变量；继续从头验证。
+- 14:15 第三轮 57/60 且无崩溃；全禁 gate/source/from 根复制使旧复杂图交叉 130→291，语义过宽。现收窄为任意名称的零入度 `kind=from` 同端口扇出，并将其远层分支改为单一源侧主干加逐边独立绕障后缀，禁止多个后缀合成第二条公共总线。
+- 14:18 Oracle 同步按 from 语义筛选，并把“共享纵干线”定义为至少两条同网分支共同占用的纵轴；单条分支绕过中间节点所需的局部竖段仍被完整报告，但不误算为第二条总线。交叉、折点、节点碰撞指标仍独立全量执行，不能被该语义豁免。
+- 14:30 第四轮目标 pad 已达到 1 个 public_from 设施、1 条共享纵干线、0 split-rejoin、0 异网重叠；三条远层绕障后缀使用互异局部竖段，ROOT-016 清零。聚焦 55/56，唯一失败为 combined：该规则数组原本已有正确单干线，却被新的独立后缀重复处理，交叉/折点回退。已将新后缀策略限制为共享 from 但非既有规则数组，避免双 owner；复制共享 from 设施不再作为 ROOT-009 合法反事实。
+- 14:25 第四轮 55/56，pad 当前图从 50 交叉/44 折降到 3 交叉/14 折且 from 只剩一个设施，但多个不相交的远层后缀被通道着色器复用同一 x=413.96，仍形成第二条共享纵轴；综合图的旧 ROOT-009/010 也复发，故本轮不通过。修正为 from 主干之外的每个远层后缀在同一 rank gap 使用专用 lane，不允许区间不重叠时复用成伪总线。
+- 12:57 检查发现工作日志索引行被误写成额外的 `record` 列，五件套门因此正确拒绝继续修改；已只修复索引结构并同步记录时间，随后重新运行结构门。
 
 ## 2026-09-03：两项布局逃逸重新打开
 
@@ -737,3 +824,18 @@
 - 11:57 本轮 reproduction/fix 原始证据强制纳入 Git 闭包后，release gate 16/16 PASS；全量 pytest 从头运行 496/496 PASS（68.91s），包含新增语义反作弊与攻击收据 mutant。继续执行全公开图与交付门，当前绿灯不替代后续门。
 - 12:00 全公开 SVG 新鲜生成门 27/27 PASS。正式红/绿证据各渲染公共 from 与直连 from→mux 结果图并目视复核；Edge headless 四次均写出非零 PNG，但 stderr 有 WSALookupServiceBegin 10108、QQBrowser 路径和账户图片获取告警，均不影响本地 SVG/PNG。用户根 `agent-quality-workflow` 与 `case-generalization` 已沉淀 per-case 确定性、语义 variant exact-set、coverage_failed 与三类新 mutant，两项 quick_validate 均 PASS。
 - 12:10 commit `35079e85d8532a922106aab01476bf27ed0c6520` 已推送 main；Release run `34184391740` 的反馈门、Ubuntu 16.04 PyInstaller/staticx、publish 与公开资产下载后 smoke 全部 success，`v1.0.0^{}` 指向该 commit。首次本地下载在 162,573 bytes 处 `curl (56)` 断流并产生截断归档，未计通过；断点有限重试成功取得 17,181,869-byte 资产，SHA-256 `abdb07ba...e8c72d` 与 GitHub digest 一致，177 条清单含 executable、src 与 drawio-lib。任务记录闭合；本条最终记录提交仍由同一滚动 workflow 再覆盖 tag。
+
+## 2026-09-08：全指标终态质量系统与公共 from 总线重新打开
+
+- 12:50 无语义临时标记已删除；下一步再以完整小补丁加入正式 current reproduction case，避免大补丁命中歧义。
+
+- 12:39 语义门新增正向校准：只有 exact public_from 根和直接 bus fragmentation witness 同时存在才算命中，防止仅凭节点名、扇出或宽泛 issue ID 冒充复现。
+- 12:40 回读新增测试时发现构造配置含一次无意义的临时字典覆盖；虽不改变断言结果，但属于测试噪音，已删除并保留直接合法输入。
+
+- 12:36 精确语义层新增 `shared_root_bus_fragmentation`：同时绑定 `public_from` 的真实 kind、零入度、最小扇出、输出端口、物理设施数和纵向通道数。首次补丁出现方法名拼写错误，被源码回读发现并立即修正；该次未运行、未产生复现收据，不能计作有效尝试。
+
+- 12:20 用户明确指出当前“修复后”公共 `from` 仍被拆成多个物理设施和分散横线，正确结果必须是一个公共设施、一个共享纵向总线；旧门只要求 `split_rejoin=false`，因此把“消除环但拆散总线”错误签为绿。`FB-ROOT-016` 与 `META-QUALITY-010` 重新打开，旧完成/发布声明对该范围撤销，生产 `src/**` 冻结到新的当前自然红灯被独立 Oracle 双跑签收。
+- 12:20 本轮学习采用 W3C SVG 2 path 的完整路径段模型、ELK JSON 的 node/port/label/edge-section/bendpoint/junctionPoint 结构、ELK Layered 的分层—排序—坐标—路由阶段边界、Graphviz JSON/xdot 的终态绘制操作与 NIST t-way 组合覆盖度量。直接结论是：终态检查器必须逐节点、逐边、逐网保存可归因事实；质量注册表必须由独立 runner 对每张图执行 exact-set，而不能由 case 自选部分指标。
+- 12:20 计划新增通用 SVG 全图检查脚本，输出节点方位/入出边、边的完整点段/方向/折点/交叉伙伴、网络分支/汇合/环/设施/共享纵干线；同时给每图回执写 `required_metric_ids == executed_metric_ids == receipted_metric_ids`。条件指标也必须执行并产生经证明的适用或不适用结果，语料层再强制每项指标至少有适用正例与 mutant，避免用 `not_applicable` 集体逃逸。
+- 12:22 首次状态补丁使用了过宽的 `"status": "closed"` 上下文，误把 `FB-ROOT-001` 重开而没有重开 016；JSON 自检立即发现。已按稳定 issue ID 上下文恢复 001=closed、设置 016=reproduction_in_progress，并把这类“补丁命中错误对象”继续保留为状态归属反作弊回归。
+- 12:31 当前 `c1a953f` 对 `pad-r08-s02.json` 经公开 CLI 独立双跑，两个原始 SVG SHA-256 均为 `e81cd21f6bf8db57683f60a48b98b57005159ad803e5229b349954158fc59ed1`；独立终态统计显示 `public_from:right` 扇出 5、渲染设施/起点 5、纵向通道 0，全部变成互不相连的行内横线。旧规则数组 witness 与 split-rejoin 都为空，因而错误放行。Oracle 现新增通用共享根总线判据，只按零入度、多目标、同输出端口、物理起点和终态纵段判断。

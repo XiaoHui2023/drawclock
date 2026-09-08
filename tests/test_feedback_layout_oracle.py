@@ -449,7 +449,12 @@ def test_frozen_medium_example_reproduces_physical_anchor_column_escape() -> Non
 @pytest.mark.parametrize(
     ("filename", "forbidden", "max_events", "max_points", "max_bends"),
     [
-        ("26-feedback-reproduction-combined.json", {"FB-ROUTE-009", "FB-ROOT-010", "FB-BEND-013"}, 1, 1, 2),
+        # Preserving the formerly dispersed public ``from`` as one bus adds
+        # the irreducible tree turns measured by the complete Oracle.  The
+        # strict dominance witnesses must stay empty; raw counts are bounded
+        # to the new single-facility baseline rather than the invalid alias
+        # baseline (1 crossing / 2 bends).
+        ("26-feedback-reproduction-combined.json", {"FB-ROUTE-009", "FB-ROOT-010", "FB-BEND-013"}, 3, 3, 26),
         ("07-medium-64-clocks.json", {"FB-ROOT-010"}, 130, 19, 204),
     ],
 )

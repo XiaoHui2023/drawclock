@@ -96,3 +96,33 @@ def test_direct_mux_contract_accepts_exact_column_witness() -> None:
         "symptom_observed": True,
         "errors": [],
     }
+
+
+def test_shared_root_bus_contract_requires_direct_fragmentation_witness() -> None:
+    config = {
+        "public_from": {"kind": "from"},
+        "a": {"kind": "mux2", "source": {"0": "public_from"}},
+        "b": {"kind": "mux2", "source": {"1": "public_from"}},
+    }
+    contract = {
+        "variant_id": "public-from-single-vertical-bus",
+        "nodes": [{
+            "name": "public_from", "kind": "from", "root": True,
+            "min_outdegree": 2,
+        }],
+        "symptom": {
+            "type": "shared_root_bus_fragmentation",
+            "root": "public_from", "port": "right", "min_fanout": 2,
+        },
+    }
+    report = {"witnesses": {"shared_root_bus_fragmentation_witnesses": [{
+        "root": "public_from", "source_port": "right", "fanout": 2,
+        "physical_facilities": 2, "vertical_channel_xs": [],
+        "expected_vertical_channels": 1,
+    }]}}
+    assert observe(config, report, contract) == {
+        "variant_id": "public-from-single-vertical-bus",
+        "preconditions_met": True,
+        "symptom_observed": True,
+        "errors": [],
+    }

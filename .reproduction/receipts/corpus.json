@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "corpus_id": "merged:merged:merged:20260907T014732Z-ff0a4ce1+20260907T085940Z-f059a5ec+20260908T030927Z-8159ddf2+20260908T031721Z-6bc9d000",
+  "corpus_id": "merged:merged:merged:merged:20260907T014732Z-ff0a4ce1+20260907T085940Z-f059a5ec+20260908T030927Z-8159ddf2+20260908T031721Z-6bc9d000+20260908T073913Z-51fb01e3",
   "coverage_model": "many_to_many",
   "cases": [
     {
@@ -515,6 +515,7 @@
       "case_id": "direct-from-mux-column-baseline",
       "attempt": 1,
       "detected_issues": [
+        "FB-ROOT-016",
         "FB-ROOT-020"
       ],
       "totals": {
@@ -533,6 +534,7 @@
       "case_id": "direct-from-mux-column-baseline",
       "attempt": 2,
       "detected_issues": [
+        "FB-ROOT-016",
         "FB-ROOT-020"
       ],
       "totals": {
@@ -561,7 +563,7 @@
     "FB-ROOT-010": 10,
     "FB-ROOT-012": 4,
     "FB-ROOT-015": 2,
-    "FB-ROOT-016": 2,
+    "FB-ROOT-016": 4,
     "FB-ROOT-020": 4,
     "FB-ROUTE-002": 4,
     "FB-ROUTE-009": 6

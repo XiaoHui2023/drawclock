@@ -107,13 +107,27 @@
       "issues": ["FB-ROOT-015"]
     },
     {
-      "id": "recurrent-mixed-depth-array-baseline",
-      "baseline_revision": "93568f94d37bf62b642b5cb7c499dd1fbca27113",
-      "python_role": "current",
+      "id": "public-from-dispersed-bus-current-baseline",
+      "baseline_revision": "worktree-producer-snapshot-20260908T122300+0800",
+      "python_role": "worktree",
       "cli_mode": "direct",
-      "input": "tests/reproduction-corpus/recurrent-mixed-depth-downstream-array.json",
+      "input": "tests/reproduction-corpus/pad-r08-s02.json",
       "library": "drawio-lib",
-      "issues": ["FB-ROOT-016"]
+      "issues": ["FB-ROOT-016"],
+      "semantic_contracts": {
+        "FB-ROOT-016": {
+          "variant_id": "public-from-single-vertical-bus",
+          "nodes": [
+            {"name": "public_from", "kind": "from", "root": true, "min_outdegree": 2}
+          ],
+          "symptom": {
+            "type": "shared_root_bus_fragmentation",
+            "root": "public_from",
+            "port": "right",
+            "min_fanout": 2
+          }
+        }
+      }
     },
     {
       "id": "recurrent-staggered-four-source-bend-baseline",

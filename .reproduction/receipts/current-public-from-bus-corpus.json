@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "corpus_id": "20260908T051011Z-5708f11f",
+  "coverage_model": "many_to_many",
+  "cases": [
+    {
+      "case_id": "public-from-dispersed-bus-current-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-016"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 56,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 0,
+        "manhattan_length_px": 4972.08
+      }
+    },
+    {
+      "case_id": "public-from-dispersed-bus-current-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-016"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 56,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 0,
+        "manhattan_length_px": 4972.08
+      }
+    }
+  ],
+  "issue_attempt_counts": {
+    "FB-ROOT-016": 2
+  },
+  "missing_issues": []
+}

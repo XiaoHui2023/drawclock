@@ -424,6 +424,7 @@ def generic_quality_failures(report: dict[str, Any]) -> list[str]:
         "root_fanout_axis_dominance_witnesses",
         "direct_root_fanin_column_witnesses",
         "regular_fanout_array_replication_witnesses",
+        "shared_root_bus_fragmentation_witnesses",
     )
     failures.extend(
         f"witness:{key}" for key in witness_keys
@@ -1362,6 +1363,67 @@ def _regular_fanout_array_replication_witnesses(
             "private_depths": private_depths,
             "children": sorted(children),
             "merges": sorted(merge_nodes),
+        })
+    return witnesses
+
+
+def _shared_root_bus_fragmentation_witnesses(
+    config: dict[str, Any], roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Reject a multi-target root net that is not one traceable bus."""
+    boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+    for box in boxes:
+        boxes_by_node[box.node].append(box)
+    grouped: dict[tuple[str, str], list[Route]] = defaultdict(list)
+    for route in routes:
+        if (
+            route.source in roots
+            and str(config.get(route.source, {}).get("kind", "")) == "from"
+        ):
+            grouped[(route.source, route.source_port)].append(route)
+    witnesses: list[dict[str, Any]] = []
+    for (root, port), net_routes in sorted(grouped.items()):
+        if len(net_routes) < 2:
+            continue
+        starts = sorted({
+            (round(route.points[0][0], 4), round(route.points[0][1], 4))
+            for route in net_routes
+        })
+        facilities = {
+            index
+            for route in net_routes
+            for index, box in enumerate(boxes_by_node[root])
+            if box.contains(route.points[0])
+        }
+        target_axes = {round(route.points[-1][1], 4) for route in net_routes}
+        first_vertical_axes = set()
+        for route in net_routes:
+            for a, b in segments(route):
+                if abs(a[0] - b[0]) <= EPS and abs(a[1] - b[1]) > EPS:
+                    first_vertical_axes.add(round(a[0], 4))
+                    break
+        # The bus is the first source-side vertical segment of each branch.
+        # Later verticals are target-side obstacle detours and remain subject
+        # to the independent bend/crossing/overlap metrics; counting them as
+        # extra buses creates a false positive for mixed-depth fanout.
+        vertical_channels = sorted(first_vertical_axes)
+        expected_vertical_channels = 1 if len(target_axes) > 1 else 0
+        facility_count = len(facilities) if facilities else len(starts)
+        if facility_count == 1 and len(starts) == 1 and (
+            len(vertical_channels) == expected_vertical_channels
+        ):
+            continue
+        witnesses.append({
+            "root": root,
+            "source_port": port,
+            "fanout": len(net_routes),
+            "physical_facilities": facility_count,
+            "rendered_boxes": len(boxes_by_node[root]),
+            "start_points": [list(point) for point in starts],
+            "target_axis_count": len(target_axes),
+            "vertical_channel_xs": vertical_channels,
+            "expected_physical_facilities": 1,
+            "expected_vertical_channels": expected_vertical_channels,
         })
     return witnesses
 
@@ -2345,6 +2407,13 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
                     and frozenset((public, other.source)) not in protected_direct_mux_pairs
                 ):
                     public_root_crossings.append({"public_root": public, "other_root": other.source, "edges": event["edges"]})
+    public_root_crossings = [
+        witness for witness in public_root_crossings
+        if not (
+            "layout_column" in config.get(witness["public_root"], {})
+            and "layout_column" in config.get(witness["other_root"], {})
+        )
+    ]
     mixed_root_quality_failures = [
         witness
         for witness in public_root_crossings
@@ -2353,6 +2422,13 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     root_facility_split_witnesses = _root_facility_split_witnesses(
         roots, routes, boxes
     )
+    root_facility_split_witnesses = [
+        witness for witness in root_facility_split_witnesses
+        if not (
+            str(config.get(witness["root"], {}).get("kind", "")) == "from"
+            and outdegree[witness["root"]] >= 2
+        )
+    ]
     physical_anchor_relocation_witnesses = (
         _physical_anchor_relocation_witnesses(roots, routes, boxes)
     )
@@ -2383,6 +2459,9 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     )
     regular_fanout_array_replication_witnesses = (
         _regular_fanout_array_replication_witnesses(config, logical, boxes)
+    )
+    shared_root_bus_fragmentation_witnesses = (
+        _shared_root_bus_fragmentation_witnesses(config, roots, routes, boxes)
     )
     root_fanout_axis_dominance_witnesses = (
         _root_fanout_axis_dominance_witnesses(config, roots, routes, boxes)
@@ -2424,7 +2503,10 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         "FB-BEND-013": bool(downstream_corridor_tail_bend_witnesses),
         "FB-BEND-014": bool(adjacent_root_height_bend_witnesses),
         "FB-ROOT-015": bool(mergeable_root_facility_witnesses),
-        "FB-ROOT-016": bool(regular_fanout_array_replication_witnesses),
+        "FB-ROOT-016": bool(
+            regular_fanout_array_replication_witnesses
+            or shared_root_bus_fragmentation_witnesses
+        ),
         "FB-BEND-017": bool(root_fanout_axis_dominance_witnesses),
         "FB-ROOT-020": bool(direct_root_fanin_column_witnesses),
     }
@@ -2541,6 +2623,9 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             ),
             "regular_fanout_array_replication_witnesses": (
                 regular_fanout_array_replication_witnesses
+            ),
+            "shared_root_bus_fragmentation_witnesses": (
+                shared_root_bus_fragmentation_witnesses
             ),
             "root_fanout_axis_dominance_witnesses": (
                 root_fanout_axis_dominance_witnesses

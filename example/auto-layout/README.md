@@ -22,7 +22,6 @@ python src `
 | 中等压力 | `07-medium-64-clocks.json` | 136 nodes / 64 clocks |
 | 复用回归 | `12-dual-from-reuse.json` | 两个共享 `from` / 16 条非对称 mux 分支；检查中间源分层与局部布线 |
 | 文字与乱序 | `13-label-clearance-weave.json` | 136 nodes / 32 clocks；长实例名、双输出 PLL、两级 mux、交错复用 |
-| 高交叉 | `14-crossing-weave-128-clocks.json` | 520 nodes / 128 clocks；多根、多级重汇合和大量允许跨线 |
 | 多源簇 | `16-multi-from-clusters.json` | 多个共享输入源连接多组相似支路 |
 | 末端排序 | `17-terminal-fanout-order.json` | 一分二末端与相邻单支路的交叉顺序 |
 | 非对称列 | `18-asymmetric-merge-columns.json` | 长短不同的 mux 输入支路与汇聚列 |

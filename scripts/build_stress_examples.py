@@ -558,7 +558,6 @@ def main() -> int:
         print(f"{name}: nodes={len(config)}, clocks={clocks}")
     adversarial = (
         ("13-label-clearance-weave", 16, 2, True),
-        ("14-crossing-weave-128-clocks", 64, 2, False),
     )
     for name, domains, clocks_per_domain, long_names in adversarial:
         config = build_adversarial_weave(

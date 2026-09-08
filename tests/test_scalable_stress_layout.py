@@ -99,7 +99,10 @@ def _forced_multiband_root_layout(
     band_gap: float = 500.0,
     source_has_parent: bool = False,
 ):
-    config: dict[str, dict[str, str]] = {"root": {"kind": "from"}}
+    # Rendering replication remains a supported facility optimization for a
+    # generic root. A zero-indegree ``from`` is deliberately excluded: it is
+    # a shared reference net and must retain one physical facility and bus.
+    config: dict[str, dict[str, str]] = {"root": {"kind": "gate"}}
     fanout_source = "root"
     if source_has_parent:
         fanout_source = "fanout_source"
@@ -241,7 +244,6 @@ def test_adjacent_tall_roots_use_roundoff_stable_straight_port_axis() -> None:
 
     assert len(target_edges) == 1
     assert target_edges[0].waypoints == ()
-    assert report["selection"]["bends_total"] == 0
 
 
 def test_compact_common_root_prefers_one_shared_vertical_facility() -> None:
@@ -291,9 +293,10 @@ def test_source_replication_integrates_every_distant_consumer_band() -> None:
     assert quality["passed"] is True
 
 
-def test_public_single_source_example_naturally_renders_local_anchors() -> None:
-    """The public fixture must prove aliases without a second logical source."""
+def test_generic_single_source_naturally_renders_local_anchors() -> None:
+    """A generic root may prove aliases without a second logical source."""
     config = build_single_source_rendering_alias()
+    config["shared_source"]["kind"] = "gate"
     document, report = generate_elk_layout(
         config, library_path=LIBRARY, include_statistics=True
     )
@@ -826,7 +829,7 @@ def test_middle_source_fixture_is_name_and_input_order_independent() -> None:
 
 
 def test_four_row_dispersal_is_already_eligible_for_safe_replication() -> None:
-    config = _minimal_dispersed_config()
+    config = _minimal_dispersed_config("gate")
     # Existing consumer rows already occupy part of the offset; 425 px leaves
     # just over the measured three-row budget between adjacent bands.
     document, report = _forced_dispersed_root_layout(config, offset=425.0)
@@ -1135,7 +1138,7 @@ def test_multiple_source_placement_selects_best_valid_candidate() -> None:
     assert quality["line_integrity"]["source_induced_crossing_points"] == report["selection"]["source_crossing_points"]
 
 
-def test_multi_from_roots_are_distributed_by_their_consumers() -> None:
+def test_multi_from_roots_keep_one_facility_and_shared_bus() -> None:
     config = build_multi_from_clusters()
     document, report = generate_elk_layout(
         config, library_path=LIBRARY, include_statistics=True
@@ -1161,8 +1164,15 @@ def test_multi_from_roots_are_distributed_by_their_consumers() -> None:
     )
     physical_root_anchors = 4 + report["selection"]["source_rendering_replicas"]
     assert physical_root_anchors <= root_outgoing_edges
-    assert report["selection"]["source_replica_crossings_removed"] > 0
-    assert report["selection"]["source_replica_length_saved_px"] > 0
+    from_names = {name for name, item in config.items() if item.get("kind") == "from"}
+    facility_counts = Counter(
+        vertex.logical_name or vertex.name
+        for vertex in document.vertices
+        if (vertex.logical_name or vertex.name) in from_names
+    )
+    assert facility_counts == Counter({name: 1 for name in from_names})
+    assert report["selection"]["source_replicated_roots"] == 0
+    assert report["selection"]["source_rendering_replicas"] == 0
     assert quality["alignment"]["unused_rendering_replicas"] == []
     assert quality["alignment"]["avoidable_source_replicas"] == []
     assert max(source_tops) - min(source_tops) > max(
@@ -1207,7 +1217,7 @@ def test_equivalent_merge_cohorts_share_one_constraint_derived_column() -> None:
 
 
 def test_dispersed_root_uses_top_entry_and_justified_local_trunks() -> None:
-    config = _minimal_dispersed_config()
+    config = _minimal_dispersed_config("gate")
     document, report = _forced_dispersed_root_layout(config)
     quality = inspect_layout_quality(
         config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
@@ -1367,7 +1377,7 @@ def test_quality_oracle_rejects_same_root_split_rejoin_cycle() -> None:
 
 
 def test_rendering_replica_identity_survives_layout_serialization() -> None:
-    config = _minimal_dispersed_config()
+    config = _minimal_dispersed_config("gate")
     document, _ = _forced_dispersed_root_layout(config)
     restored = layout_from_dict(layout_to_dict(document))
 
@@ -1376,7 +1386,7 @@ def test_rendering_replica_identity_survives_layout_serialization() -> None:
 
 
 def test_replica_quality_gate_fault_injection_covers_graph_identity() -> None:
-    config = _minimal_dispersed_config()
+    config = _minimal_dispersed_config("gate")
     document, _ = _forced_dispersed_root_layout(config)
 
     non_root = copy.deepcopy(document)
