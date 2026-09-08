@@ -10,7 +10,7 @@ rm -rf .venv build dist
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get -o Acquire::Retries=5 update
-apt-get install -o Acquire::Retries=5 -y --no-install-recommends ca-certificates wget bzip2 xz-utils binutils patchelf build-essential musl-tools
+apt-get install -o Acquire::Retries=5 -y --no-install-recommends ca-certificates wget bzip2 xz-utils binutils git patchelf build-essential musl-tools
 
 MINICONDA=Miniconda3-py310_23.5.2-0-Linux-x86_64.sh
 MINICONDA_URL="https://repo.anaconda.com/miniconda/${MINICONDA}"

@@ -13,7 +13,7 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 09:43 +08:00
+- updated: 2026-09-08 09:51 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
@@ -711,3 +711,5 @@
 - 09:28 当前文件重新验收：pytest 491/491、全公开 SVG 27/27、feedback release gate 16/16、高风险对抗 campaign 连续 7/7 clean（run `20260908T012546Z-84296641`），五件套与 JSON/diff 检查通过。系统没有预装 `actionlint`，改由 GitHub 官方 API 获取 v1.7.12 Windows 资产并核对官方 SHA-256 后运行，Release workflow 静态检查通过；`gh` CLI 同样未安装，后续使用 GitHub REST API 值守发布。
 - 09:36 commit `218f44ea863e50ff4f18156b8e2013c9e61dd3e5` 已推送 `main`，但 Release run `34176902487` 的反馈门最后一步退出 1；递归攻击与全图门成功，Linux build 与 publish 按 `needs` 正确 skipped。未把 push 误报为发布成功。匿名 GitHub API 可读 job/step，却因缺少仓库 admin 权限以 HTTP 403 拒绝日志下载，本地同 commit 单独 release gate 仍通过；下一步在全新 checkout 精确重放 CI 三步以取得失败正文并修复。
 - 09:43 全新本地 clone 精确顺序重放得到与 CI 一致的 190 个错误：所有当前 fix receipt 指向的 150 个证据文件只存在于本地忽略目录，未被 Git 跟踪；原工作区通过、干净 checkout 失败。修复把当前 fix evidence 批次加入明确白名单，并让 release gate 通过 `git ls-files -z` 校验 reproduction receipt、fix receipt 及每个 evidence 文件的 Git 依赖闭包；新增空 tracked-set mutant 保证“本地存在但远端缺失”必红。远端同时报告 checkout v4 的 Node 20 弃用警告，workflow 升级为 checkout v5。
+- 09:48 第二次 push 的 run `34177628322` 已通过此前失败的反馈门，但 Ubuntu 16.04 `Pack` 步失败、publish skipped。匿名日志接口仍为 403，CUA 又被管理员 Hook 以未知写能力 fail-closed 拒绝；结合宿主 feedback job 成功、容器脚本包清单和新门首次调用 `git ls-files`，定位为 xenial 容器未安装 git。`ci_pack_ubuntu16.sh` 现显式安装 git；checker 捕获 `FileNotFoundError/OSError` 并输出可诊断 blocker，测试注入缺 git 环境锁定该行为。
+- 09:51 修复后聚焦 22/22、全量 493/493、release gate 与五件套通过，Python Release Skill 校验通过。尝试用本机 `bash -n` 校验容器脚本时，WindowsApps/WSL bash 因无 Linux 发行版返回 `execvpe(/bin/bash) failed`，Visual Studio 内置 Git 也不含 bash；实际影响仅为本机不能运行 shell parser。替代证据为该改动只在既有 apt 包列表加入 `git`、相关 Python 门禁全绿，最终语法与安装仍由下一轮真实 Ubuntu 16.04 job 验证。

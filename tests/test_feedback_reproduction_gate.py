@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -258,6 +259,17 @@ class FeedbackReproductionGateTest(unittest.TestCase):
         errors: list[str] = []
         module._validate_fix_receipt(manifest["issues"][0], errors, set())
         self.assertTrue(any("not Git-tracked for a clean release checkout" in error for error in errors))
+
+    def test_release_gate_reports_missing_git_as_a_blocker(self) -> None:
+        spec = importlib.util.spec_from_file_location("drawclock_feedback_checker", CHECKER)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        errors: list[str] = []
+        with mock.patch.object(module.subprocess, "run", side_effect=FileNotFoundError("git")):
+            self.assertEqual(module._git_tracked_paths(errors), set())
+        self.assertTrue(any("cannot enumerate Git-tracked release evidence" in error for error in errors))
 
     def test_fix_determinism_is_scoped_to_each_input_case(self) -> None:
         manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))

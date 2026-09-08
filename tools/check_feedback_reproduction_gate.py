@@ -53,12 +53,16 @@ def _text(value: Any) -> str:
 
 
 def _git_tracked_paths(errors: list[str]) -> set[str]:
-    result = subprocess.run(
-        ["git", "ls-files", "-z"],
-        cwd=ROOT,
-        capture_output=True,
-        check=False,
-    )
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "-z"],
+            cwd=ROOT,
+            capture_output=True,
+            check=False,
+        )
+    except OSError as exc:
+        errors.append(f"cannot enumerate Git-tracked release evidence: {exc}")
+        return set()
     if result.returncode != 0:
         detail = result.stderr.decode("utf-8", errors="replace").strip()
         errors.append(f"cannot enumerate Git-tracked release evidence: {detail or 'git ls-files failed'}")
