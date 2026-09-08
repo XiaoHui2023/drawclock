@@ -3,7 +3,7 @@
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
 | `drafts/case-generalization-fanout-simulation.md` | draft | done | 2026-09-07 10:24 +08:00 | 2026-09-07 16:28 +08:00 | 举一反三扇出数组模拟 | 五轮递归 epoch 实际捕获复发后重启通过，复杂组合、结构边界与远端发行均已闭合。 |
-| `records/user-feedback-natural-reproduction-gate.md` | record | active | 2026-09-03 13:32 +08:00 | 2026-09-08 09:51 +08:00 | 用户反馈自然复现与防假完成门禁 | 493 测试与本地门通过；等待真实 xenial job 验证新增 git 依赖并继续发布。 |
+| `records/user-feedback-natural-reproduction-gate.md` | record | done | 2026-09-03 13:32 +08:00 | 2026-09-08 09:58 +08:00 | 用户反馈自然复现与防假完成门禁 | 493 测试、干净证据闭包、xenial 构建、发布及公开资产回下载均已闭合。 |
 | `analysis/managed-delivery-gate-invocation.md` | analysis | done | 2026-09-04 18:30 +08:00 | 2026-09-04 18:40 +08:00 | 闭环提交后的新鲜回执与 push 误阻断诊断 | 已修复绝对可执行文件路径发现崩溃，记录 Code Mode 剩余上游覆盖边界。 |
 | `analysis/user-feedback-reproduction-escape.md` | analysis | active | 2026-09-03 13:32 +08:00 | 2026-09-03 16:24 +08:00 | 人工故障冒充复现与声明逃逸根因 | 六项触发结构、直接观测、未命中反例和 current/06c 版本边界已归纳。 |
 | `records/free-source-coverage-observability.md` | record | active | 2026-09-02 14:42 +08:00 | 2026-09-03 12:42 +08:00 | 自由源分层、逐节点/逐边统计与特性覆盖闭环 | split-rejoin 双基线与 407 项全量门通过，准备补充上传并重发。 |

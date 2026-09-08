@@ -11,9 +11,9 @@
 - 独立 Oracle 新增 `root_facility_split_witnesses` 与 `physical_anchor_relocation_witnesses`，判定只读取最终 SVG、逻辑零入度、物理端点归属和几何，不读取器件 kind、实例名、样例号或生产布局模块。正式双跑收据尚未签发。
 - Oracle 测试增加当前公开入口的两项自然红灯与一个同样含零入度根但无跨干线/无设施拆分收益的干净反例；测试产物只用于检测器校准，正式复现仍必须由冻结 revision 双跑收据授权。
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 09:51 +08:00
+- updated: 2026-09-08 09:58 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
 
 ## 11:17 相邻高根器件折点反馈
@@ -713,3 +713,4 @@
 - 09:43 全新本地 clone 精确顺序重放得到与 CI 一致的 190 个错误：所有当前 fix receipt 指向的 150 个证据文件只存在于本地忽略目录，未被 Git 跟踪；原工作区通过、干净 checkout 失败。修复把当前 fix evidence 批次加入明确白名单，并让 release gate 通过 `git ls-files -z` 校验 reproduction receipt、fix receipt 及每个 evidence 文件的 Git 依赖闭包；新增空 tracked-set mutant 保证“本地存在但远端缺失”必红。远端同时报告 checkout v4 的 Node 20 弃用警告，workflow 升级为 checkout v5。
 - 09:48 第二次 push 的 run `34177628322` 已通过此前失败的反馈门，但 Ubuntu 16.04 `Pack` 步失败、publish skipped。匿名日志接口仍为 403，CUA 又被管理员 Hook 以未知写能力 fail-closed 拒绝；结合宿主 feedback job 成功、容器脚本包清单和新门首次调用 `git ls-files`，定位为 xenial 容器未安装 git。`ci_pack_ubuntu16.sh` 现显式安装 git；checker 捕获 `FileNotFoundError/OSError` 并输出可诊断 blocker，测试注入缺 git 环境锁定该行为。
 - 09:51 修复后聚焦 22/22、全量 493/493、release gate 与五件套通过，Python Release Skill 校验通过。尝试用本机 `bash -n` 校验容器脚本时，WindowsApps/WSL bash 因无 Linux 发行版返回 `execvpe(/bin/bash) failed`，Visual Studio 内置 Git 也不含 bash；实际影响仅为本机不能运行 shell parser。替代证据为该改动只在既有 apt 包列表加入 `git`、相关 Python 门禁全绿，最终语法与安装仍由下一轮真实 Ubuntu 16.04 job 验证。
+- 09:58 第三次 run `34178113943` 全绿：feedback、Ubuntu 16.04 PyInstaller/staticx、publish 和发布后公开资产回下载 frozen/source smoke 均 success。`v1.0.0^{}` 指向 `6a22c68c54381d73091ff6c23c04991b7cae3b63`；本机从公开 Release 独立下载 17,183,407-byte 归档，SHA-256 `8fdd4b6d5b9df1e3d43b97079702d418a6a7115a555463339e4fb755f6a15b3b` 与 GitHub digest 完全一致，tar 清单含冻结程序、源码、文档与器件库。该成功记录作为最后一笔项目修改提交后，再由同一不可旁路 workflow 覆盖滚动 tag。
