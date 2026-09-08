@@ -46,35 +46,81 @@ def test_direct_draw_requires_input_library_and_output() -> None:
     assert "output" in combined
 
 
-def test_frozen_single_source_gate_identifies_zero_indegree_root(
-    tmp_path: Path,
-) -> None:
+def _load_frozen_example_gate():
     spec = importlib.util.spec_from_file_location(
         "run_frozen_example", ROOT / "tools" / "run_frozen_example.py"
     )
     assert spec is not None and spec.loader is not None
     gate = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(gate)
+    return gate
 
-    config = tmp_path / "single-source.json"
-    config.write_text(
+
+def _write_shared_source_config(path: Path) -> None:
+    path.write_text(
         json.dumps({
             "shared_source": {"kind": "from"},
-            "terminal": {"kind": "clock", "source": "shared_source"},
+            "terminal_a": {"kind": "clock", "source": "shared_source"},
+            "terminal_b": {"kind": "clock", "source": "shared_source"},
         }),
         encoding="utf-8",
     )
+
+
+def test_frozen_single_source_gate_requires_one_facility_and_one_bus(
+    tmp_path: Path,
+) -> None:
+    gate = _load_frozen_example_gate()
+
+    config = tmp_path / "single-source.json"
+    _write_shared_source_config(config)
     svg = tmp_path / "single-source.svg"
     svg.write_text(
         '<svg xmlns="http://www.w3.org/2000/svg">'
-        '<g class="component" data-node-id="shared_source"/>'
-        '<g class="component" data-node-id="shared_source"/>'
+        '<g class="component" data-node-id="shared_source">'
+        '<rect class="component-graphic" x="10" y="10" width="20" height="20"/>'
+        '</g>'
+        '<polyline class="edge" points="30,14 40,14 40,50 60,50"/>'
+        '<polyline class="edge" points="30,20 40,20 40,60 60,60"/>'
         '</svg>',
         encoding="utf-8",
     )
-    gate._assert_single_logical_source_has_rendering_anchors(
-        svg, config, "shared_source"
+    gate._assert_single_logical_source_has_shared_bus(svg, config, "shared_source")
+
+
+@pytest.mark.parametrize(
+    "duplicate_facility,second_axis",
+    ((True, 40), (False, 45)),
+)
+def test_frozen_single_source_gate_rejects_fragmented_facility_or_bus(
+    tmp_path: Path, duplicate_facility: bool, second_axis: int,
+) -> None:
+    gate = _load_frozen_example_gate()
+    config = tmp_path / "single-source.json"
+    _write_shared_source_config(config)
+    duplicate = (
+        '<g class="component" data-node-id="shared_source">'
+        '<rect class="component-graphic" x="70" y="10" width="20" height="20"/>'
+        '</g>'
+        if duplicate_facility else ""
     )
+    svg = tmp_path / "fragmented-source.svg"
+    svg.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg">'
+        '<g class="component" data-node-id="shared_source">'
+        '<rect class="component-graphic" x="10" y="10" width="20" height="20"/>'
+        '</g>'
+        f'{duplicate}'
+        '<polyline class="edge" points="30,14 40,14 40,50 60,50"/>'
+        f'<polyline class="edge" points="30,20 {second_axis},20 '
+        f'{second_axis},60 60,60"/>'
+        '</svg>',
+        encoding="utf-8",
+    )
+    with pytest.raises(SystemExit):
+        gate._assert_single_logical_source_has_shared_bus(
+            svg, config, "shared_source"
+        )
 
 
 def test_removed_subcommands_are_rejected() -> None:

@@ -148,7 +148,7 @@ def _assert_named_nodes_same_x(path: Path, names: tuple[str, ...]) -> float:
     return next(iter(x_by_name.values()))
 
 
-def _assert_single_logical_source_has_rendering_anchors(
+def _assert_single_logical_source_has_shared_bus(
     path: Path, config_path: Path, logical_name: str,
 ) -> None:
     config = json.loads(config_path.read_text(encoding="utf-8"))
@@ -164,9 +164,61 @@ def _assert_single_logical_source_has_rendering_anchors(
         if element.get("class") == "component"
         and element.get("data-node-id") == logical_name
     ]
-    if len(anchors) < 2:
+    if len(anchors) != 1:
         raise SystemExit(
-            f"single logical source was not rendered near distant consumers: {len(anchors)}"
+            f"shared from must have exactly one physical facility: {len(anchors)}"
+        )
+    graphic = next(
+        element for element in anchors[0].iter()
+        if element.get("class") == "component-graphic"
+    )
+    graphic_x = float(graphic.get("x", "0"))
+    graphic_y = float(graphic.get("y", "0"))
+    graphic_width = float(graphic.get("width", "0"))
+    graphic_height = float(graphic.get("height", "0"))
+    root_exit_x = graphic_x + graphic_width
+    logical_outdegree = 0
+    for item in config.values():
+        source = item.get("source")
+        values = source.values() if isinstance(source, dict) else (source,)
+        logical_outdegree += sum(
+            isinstance(value, str)
+            and value.split("[", 1)[0] == logical_name
+            for value in values
+        )
+    routes = []
+    for element in root.iter():
+        if element.tag != f"{{{SVG_NS}}}polyline" or element.get("class") != "edge":
+            continue
+        values = [
+            tuple(map(float, token.split(",")))
+            for token in element.get("points", "").split()
+        ]
+        if (
+            values
+            and abs(values[0][0] - root_exit_x) <= 0.01
+            and graphic_y - 0.01 <= values[0][1] <= graphic_y + graphic_height + 0.01
+        ):
+            routes.append(values)
+    if len(routes) != logical_outdegree:
+        raise SystemExit(
+            f"shared from fanout lost its common start: rendered={len(routes)} "
+            f"logical={logical_outdegree}"
+        )
+    first_vertical_axes = set()
+    for points in routes:
+        axis = next((
+            start[0]
+            for start, end in zip(points, points[1:])
+            if abs(start[0] - end[0]) <= 0.01
+            and abs(start[1] - end[1]) > 0.01
+        ), None)
+        if axis is not None:
+            first_vertical_axes.add(round(axis, 4))
+    if len(first_vertical_axes) != 1:
+        raise SystemExit(
+            f"shared from must have exactly one source-side vertical bus: "
+            f"{sorted(first_vertical_axes)}"
         )
 
 
@@ -408,8 +460,11 @@ def main() -> int:
     _draw(binary, MULTI_SOURCE, multi_source_output)
     _assert_multi_source_row_patterns(multi_source_output, MULTI_SOURCE)
     single_alias_output = out / "single-source-alias-frozen.svg"
-    _draw(binary, SINGLE_ALIAS, single_alias_output)
-    _assert_single_logical_source_has_rendering_anchors(
+    _draw(
+        binary, SINGLE_ALIAS, single_alias_output,
+        "--crossing-style", "none",
+    )
+    _assert_single_logical_source_has_shared_bus(
         single_alias_output, SINGLE_ALIAS, "shared_source"
     )
     middle_output = out / "middle-source-frozen.svg"
