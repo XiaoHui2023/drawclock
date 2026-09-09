@@ -173,6 +173,24 @@ def test_frozen_first_column_gate_rejects_root_misalignment_or_later_column(
         gate._assert_unconstrained_roots_are_first_column(svg, config)
 
 
+def test_frozen_first_column_gate_rejects_duplicated_root_facility(
+    tmp_path: Path,
+) -> None:
+    gate = _load_frozen_example_gate()
+    config = tmp_path / "first-column.json"
+    svg = tmp_path / "first-column.svg"
+    _write_first_column_gate_fixture(config, svg)
+    content = svg.read_text(encoding="utf-8")
+    svg.write_text(content.replace(
+        '</svg>',
+        '<g class="component" data-node-id="shared_root">'
+        '<rect class="component-graphic" x="10" y="70" width="20" height="20"/>'
+        '</g></svg>',
+    ), encoding="utf-8")
+    with pytest.raises(SystemExit):
+        gate._assert_unconstrained_roots_are_first_column(svg, config)
+
+
 def test_removed_subcommands_are_rejected() -> None:
     for command in ("draw", "extract", "reload", "run", "drawio-to-json"):
         proc = subprocess.run(

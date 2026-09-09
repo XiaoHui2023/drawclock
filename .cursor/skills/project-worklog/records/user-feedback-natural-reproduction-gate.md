@@ -2,8 +2,14 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-09 15:34 +08:00
+- updated: 2026-09-09 16:04 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 2026-09-09 16:04 第二次冻结门修正后，聚焦 first-column/single-bus 正负校准 7/7 PASS；更关键的是复用 `afdc895` 隔离 clone 中由 Ubuntu 16.04 构建的真实 staticx 归档，在全新 `python:3.12-slim` 消费容器挂载当前最终 gate，完整输出 `frozen draw workflow passed`。不是只运行局部 helper。随后最终全量 pytest 528/528 PASS、26 张公开图统一 23 指标门 26/26 PASS、17 项 feedback release gate PASS，发布踩坑 Skill 再次校验通过；准备提交并触发第三轮滚动发布。
+
+- 2026-09-09 15:56 多源冻结门已从“必须产生额外本地设施锚点”反转为可见物理设施 exact-once：渲染设施总数必须严格等于逻辑节点数，且节点 ID exact-set 一致；19 号复杂多源样例随后执行同一个无约束根第一列门。第一列单测新增同一 root 重复设施 mutant，连同错列、同列但非最左两类反例共同防止“复制后看似对齐”逃逸。
+
+- 2026-09-09 15:52 第二轮 Release run `34311121289` 再次在冻结示例阻断，公开 annotations 仍只有 exit=1。没有继续猜测：从 GitHub 重新 clone `afdc895` 到隔离临时目录，在本机 Docker 中完整执行 Ubuntu 16.04 pack，再在全新 Python Linux 容器解压运行同一冻结脚本，真实 stderr 为 `dispersed sources did not produce local rendering anchors`。这是第二个被新合同废止的旧发布断言：19 号样例要求渲染设施数大于逻辑节点数，实质强迫根源复制；当前“每个逻辑根一个设施 + 第一列对齐”正确地使设施数等于逻辑数。下一步将该门改为 root physical exact-once + first-column，并加入复制设施 mutant 后重新全闭环。
 
 - 2026-09-09 15:34 旧冻结断言已用当前公开入口自然复现为 exit=1：`common_source` 与八个 `local_source` 实际全在 x=96.65 第一列，旧判词仍要求 `common_source < local_source < mux`。升级后聚焦正负校准 6/6 PASS，真实动态双输出根图与历史复杂图分别签出 first-column x=86.42/96.65；Python 发布踩坑专题已记录“产品合同升级而冻结消费者仍断言旧布局”模式并通过 Skill 校验。随后全量 pytest 527/527 PASS、26 张公开图统一 23 指标门 26/26 PASS、反馈 release gate 17/17 PASS；当前进入 exact diff/commit/push 和新一轮远端冻结消费验证。
 

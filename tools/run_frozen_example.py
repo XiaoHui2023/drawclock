@@ -360,8 +360,11 @@ def _assert_multi_source_row_patterns(path: Path, config_path: Path) -> None:
     ]
     if len(rendered_pad_nodes) != 8:
         raise SystemExit(f"multi-input pad rendering is invalid: {len(rendered_pad_nodes)}")
-    if len(rendered_ids) <= len(config):
-        raise SystemExit("dispersed sources did not produce local rendering anchors")
+    if len(rendered_ids) != len(config):
+        raise SystemExit(
+            "multi-source rendering duplicated physical facilities: "
+            f"rendered={len(rendered_ids)} logical={len(config)}"
+        )
 
 
 def _assert_frequency_table(path: Path, config_path: Path) -> None:
@@ -524,6 +527,7 @@ def main() -> int:
     multi_source_output = out / "multi-source-rows-frozen.svg"
     _draw(binary, MULTI_SOURCE, multi_source_output)
     _assert_multi_source_row_patterns(multi_source_output, MULTI_SOURCE)
+    _assert_unconstrained_roots_are_first_column(multi_source_output, MULTI_SOURCE)
     single_alias_output = out / "single-source-alias-frozen.svg"
     _draw(
         binary, SINGLE_ALIAS, single_alias_output,
