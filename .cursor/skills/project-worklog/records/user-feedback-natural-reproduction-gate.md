@@ -1,9 +1,11 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-09 16:04 +08:00
+- updated: 2026-09-09 16:55 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 2026-09-09 16:55 最终功能/发布合同 commit `620bc10520cf2985e2413941a0bb19705f9bfb4f` 的 Release run `34312375681` 全部 success：反馈门、Ubuntu 16.04 PyInstaller/staticx、解压冻结示例、离线源码、librsvg、publish 和发布后公开资产回下载 smoke 均通过。滚动 tag `v1.0.0^{}` 精确指向该 commit；独立再次下载公开资产 17,186,853 bytes，SHA-256 `c24fe2dff7cef4445e7f06c4eba2f91d9511e02a1b64d9cd21f1d5eb80f0abaa` 与 GitHub digest 一致，176 个归档条目无绝对路径或 `..` 穿越；全新 Linux 容器对该下载件再次输出 `frozen draw workflow passed` 与 `offline source deployment passed`。本记录转 done；该最后记录提交仍由同一不可旁路滚动 workflow 再覆盖 tag 后才交付。
 
 - 2026-09-09 16:04 第二次冻结门修正后，聚焦 first-column/single-bus 正负校准 7/7 PASS；更关键的是复用 `afdc895` 隔离 clone 中由 Ubuntu 16.04 构建的真实 staticx 归档，在全新 `python:3.12-slim` 消费容器挂载当前最终 gate，完整输出 `frozen draw workflow passed`。不是只运行局部 helper。随后最终全量 pytest 528/528 PASS、26 张公开图统一 23 指标门 26/26 PASS、17 项 feedback release gate PASS，发布踩坑 Skill 再次校验通过；准备提交并触发第三轮滚动发布。
 
