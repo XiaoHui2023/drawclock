@@ -191,6 +191,76 @@ def test_frozen_first_column_gate_rejects_duplicated_root_facility(
         gate._assert_unconstrained_roots_are_first_column(svg, config)
 
 
+def _write_conditional_root_fixture(
+    config: Path,
+    svg: Path,
+    *,
+    protected_root_x: int = 40,
+    crossing: bool = False,
+) -> None:
+    config.write_text(json.dumps({
+        "safe_root": {"kind": "source"},
+        "protected_root": {"kind": "from"},
+        "target_a": {"kind": "clock", "source": "safe_root"},
+        "target_b": {"kind": "clock", "source": "protected_root"},
+    }), encoding="utf-8")
+    routes = (
+        '<polyline class="edge" points="10,30 80,30"/>'
+        '<polyline class="edge" points="40,0 40,60"/>'
+        if crossing else
+        '<polyline class="edge" points="30,20 80,20"/>'
+        '<polyline class="edge" points="60,60 80,60"/>'
+    )
+    svg.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg">'
+        '<g class="component" data-node-id="safe_root"><rect class="component-graphic" x="10" y="10" width="20" height="20"/></g>'
+        f'<g class="component" data-node-id="protected_root"><rect class="component-graphic" x="{protected_root_x}" y="50" width="20" height="20"/></g>'
+        '<g class="component" data-node-id="target_a"><rect class="component-graphic" x="80" y="10" width="20" height="20"/></g>'
+        '<g class="component" data-node-id="target_b"><rect class="component-graphic" x="80" y="50" width="20" height="20"/></g>'
+        f'{routes}</svg>',
+        encoding="utf-8",
+    )
+
+
+def test_frozen_conditional_root_gate_accepts_safe_first_and_protected_later(
+    tmp_path: Path,
+) -> None:
+    gate = _load_frozen_example_gate()
+    config = tmp_path / "conditional-root.json"
+    svg = tmp_path / "conditional-root.svg"
+    _write_conditional_root_fixture(config, svg)
+    assert gate._assert_conditional_root_columns(
+        svg,
+        config,
+        first_column=("safe_root",),
+        later=("protected_root",),
+    ) == 10
+
+
+@pytest.mark.parametrize("protected_root_x,crossing", ((10, False), (40, True)))
+def test_frozen_conditional_root_gate_rejects_policy_or_crossing_regression(
+    tmp_path: Path,
+    protected_root_x: int,
+    crossing: bool,
+) -> None:
+    gate = _load_frozen_example_gate()
+    config = tmp_path / "conditional-root.json"
+    svg = tmp_path / "conditional-root.svg"
+    _write_conditional_root_fixture(
+        config,
+        svg,
+        protected_root_x=protected_root_x,
+        crossing=crossing,
+    )
+    with pytest.raises(SystemExit):
+        gate._assert_conditional_root_columns(
+            svg,
+            config,
+            first_column=("safe_root",),
+            later=("protected_root",),
+        )
+
+
 def test_removed_subcommands_are_rejected() -> None:
     for command in ("draw", "extract", "reload", "run", "drawio-to-json"):
         proc = subprocess.run(

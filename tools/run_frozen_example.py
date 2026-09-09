@@ -198,6 +198,90 @@ def _assert_unconstrained_roots_are_first_column(
     return next(iter(root_xs))
 
 
+def _orthogonal_crossing_count(path: Path) -> int:
+    root = ET.fromstring(path.read_text(encoding="utf-8"))
+    routes: list[list[tuple[float, float]]] = []
+    for element in root.iter():
+        if element.tag != f"{{{SVG_NS}}}polyline" or element.get("class") != "edge":
+            continue
+        routes.append([
+            tuple(float(value) for value in token.split(","))
+            for token in element.get("points", "").split()
+        ])
+    segments = [
+        (route_index, start, end)
+        for route_index, route in enumerate(routes)
+        for start, end in zip(route, route[1:])
+    ]
+    count = 0
+    epsilon = 1e-6
+    for index, (left_route, left_start, left_end) in enumerate(segments):
+        for right_route, right_start, right_end in segments[index + 1:]:
+            if left_route == right_route:
+                continue
+            left_horizontal = abs(left_start[1] - left_end[1]) <= epsilon
+            right_horizontal = abs(right_start[1] - right_end[1]) <= epsilon
+            if left_horizontal == right_horizontal:
+                continue
+            horizontal = (left_start, left_end) if left_horizontal else (right_start, right_end)
+            vertical = (right_start, right_end) if left_horizontal else (left_start, left_end)
+            x = vertical[0][0]
+            y = horizontal[0][1]
+            if (
+                min(horizontal[0][0], horizontal[1][0]) + epsilon < x
+                < max(horizontal[0][0], horizontal[1][0]) - epsilon
+                and min(vertical[0][1], vertical[1][1]) + epsilon < y
+                < max(vertical[0][1], vertical[1][1]) - epsilon
+            ):
+                count += 1
+    return count
+
+
+def _assert_conditional_root_columns(
+    path: Path,
+    config_path: Path,
+    *,
+    first_column: tuple[str, ...],
+    later: tuple[str, ...],
+) -> float:
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    roots = {
+        name for name, item in config.items()
+        if not item.get("source") and item.get("layout_column") is None
+    }
+    expected = set(first_column) | set(later)
+    if roots != expected:
+        raise SystemExit(
+            f"conditional root exact-set differs: {sorted(roots)=}, {sorted(expected)=}"
+        )
+    component_xs = _component_xs_by_node_id(path)
+    invalid = {
+        name: component_xs.get(name, [])
+        for name in roots
+        if len(component_xs.get(name, [])) != 1
+    }
+    if invalid:
+        raise SystemExit(f"conditional root facilities are invalid: {invalid}")
+    all_xs = [x for values in component_xs.values() for x in values]
+    first_xs = {component_xs[name][0] for name in first_column}
+    if len(first_xs) != 1 or not all_xs or next(iter(first_xs)) != min(all_xs):
+        raise SystemExit(f"safe roots are not aligned in the first column: {first_xs}")
+    first_x = next(iter(first_xs))
+    misplaced = {
+        name: component_xs[name][0]
+        for name in later
+        if component_xs[name][0] <= first_x
+    }
+    if misplaced:
+        raise SystemExit(
+            f"quality-protected roots were forced into the first column: {misplaced}"
+        )
+    crossings = _orthogonal_crossing_count(path)
+    if crossings:
+        raise SystemExit(f"conditional root layout still has {crossings} proper crossings")
+    return first_x
+
+
 def _write_direct_mux_multi_output_root_input(path: Path) -> None:
     path.write_text(json.dumps({
         "shared_root": {"kind": "source"},
@@ -537,8 +621,37 @@ def main() -> int:
         single_alias_output, SINGLE_ALIAS, "shared_source"
     )
     middle_output = out / "middle-source-frozen.svg"
-    _draw(binary, MIDDLE_SOURCE, middle_output)
-    _assert_unconstrained_roots_are_first_column(middle_output, MIDDLE_SOURCE)
+    _draw(binary, MIDDLE_SOURCE, middle_output, "--crossing-style", "none")
+    _assert_conditional_root_columns(
+        middle_output,
+        MIDDLE_SOURCE,
+        first_column=("common_source", "local_source_07"),
+        later=tuple(f"local_source_{index:02d}" for index in range(7)),
+    )
+    forced_middle_input = out / "middle-source-forced-first-column.json"
+    forced_middle_config = json.loads(MIDDLE_SOURCE.read_text(encoding="utf-8"))
+    for item in forced_middle_config.values():
+        if not item.get("source") and item.get("layout_column") is None:
+            item["layout_column"] = 0
+    forced_middle_input.write_text(
+        json.dumps(forced_middle_config, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    forced_middle_output = out / "middle-source-forced-first-column.svg"
+    _draw(
+        binary,
+        forced_middle_input,
+        forced_middle_output,
+        "--crossing-style",
+        "none",
+    )
+    natural_crossings = _orthogonal_crossing_count(middle_output)
+    forced_crossings = _orthogonal_crossing_count(forced_middle_output)
+    if natural_crossings != 0 or forced_crossings <= natural_crossings:
+        raise SystemExit(
+            "conditional root policy lost its frozen counterexample: "
+            f"{natural_crossings=}, {forced_crossings=}"
+        )
 
     multi_output_root_input = out / "direct-mux-multi-output-root.json"
     multi_output_root_output = out / "direct-mux-multi-output-root.svg"

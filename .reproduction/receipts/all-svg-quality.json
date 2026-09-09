@@ -17,12 +17,15 @@
   "quality_metric_registry_ids": [
     "topology_identity",
     "orthogonal_segments",
+    "crossing_treatment",
     "different_net_overlap",
     "split_rejoin",
     "avoidable_bends",
     "port_order",
     "root_fanout_axis_dominance",
     "direct_root_mux_column",
+    "feasible_direct_root_fanin_column",
+    "root_first_column",
     "regular_array_single_facility",
     "shared_root_single_bus",
     "annotation_geometry",
@@ -43,7 +46,7 @@
     {
       "input": "01-linear.json",
       "producer_exit": 0,
-      "sha256": "7fa09476acd9a2845380aabe19a45f7e30a2a4b69a287ad4b7d81859fb2eae10",
+      "sha256": "8a2dd5597529dc5af3eca7b526d580e96abcda14ccc53d2183930f5223b78919",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -52,12 +55,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -75,12 +81,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -104,6 +113,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -142,6 +157,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=1",
           "witnesses": []
         },
         {
@@ -228,7 +255,7 @@
     {
       "input": "02-branch-tree.json",
       "producer_exit": 0,
-      "sha256": "da0c35ef78917932837ea41465006e96a474ff4c80ddaf47371b9f6dfe8e8fcc",
+      "sha256": "12ce36512c0d10f73dafab3113732464ac49f8aa60d1b6d4952664e779b04979",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -237,12 +264,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -260,12 +290,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -289,6 +322,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -327,6 +366,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=1",
           "witnesses": []
         },
         {
@@ -422,12 +473,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -445,12 +499,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -474,6 +531,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -512,6 +575,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=2",
           "witnesses": []
         },
         {
@@ -598,7 +673,7 @@
     {
       "input": "04-dual-pll.json",
       "producer_exit": 0,
-      "sha256": "5d94c6ee317b05ce2e3d8abd8ed6cbc1eebb19f8af2da0f48948c0edd89d50b2",
+      "sha256": "4db40ba9349a700cf40a95e03cecdb722360832d9b3e340bc9713d8635a8ae69",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -607,12 +682,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -630,12 +708,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -659,6 +740,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -697,6 +784,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=1",
           "witnesses": []
         },
         {
@@ -783,21 +882,24 @@
     {
       "input": "05-dense-cross-root.json",
       "producer_exit": 0,
-      "sha256": "47c06b1d272793fbea8ba655a3a1424a32df191ff05497a4c85834b8ccb2b299",
+      "sha256": "99f7a402ae3bf8ef55d7b190952be075faa4db811cae31e80d882153d213ebf4",
       "crossings": 6,
-      "bends": 24,
+      "bends": 22,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -815,12 +917,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -844,6 +949,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -882,6 +993,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=3",
           "witnesses": []
         },
         {
@@ -968,21 +1091,24 @@
     {
       "input": "06-simple-16-clocks.json",
       "producer_exit": 0,
-      "sha256": "9d4e4af103cc8aba758f5b4d566b87081185af78607c06d8d55f32c51c5005a7",
-      "crossings": 9,
-      "bends": 48,
+      "sha256": "8233d6f1dea8da550ac2f42ca812b486483dfa757ee0a5ea992f4c0c2c38786a",
+      "crossings": 27,
+      "bends": 68,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1000,12 +1126,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1029,6 +1158,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -1067,6 +1202,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=2",
           "witnesses": []
         },
         {
@@ -1153,21 +1300,24 @@
     {
       "input": "07-medium-64-clocks.json",
       "producer_exit": 0,
-      "sha256": "a40617f88b2137f1e8aeacaea927a590490ef5c63f7285249fc7af834028aaef",
-      "crossings": 120,
-      "bends": 194,
+      "sha256": "faec2f624027cf301a72e79a6629a7466fd466a6cf28067081b60da19988a760",
+      "crossings": 291,
+      "bends": 230,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1185,12 +1335,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1214,6 +1367,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -1252,6 +1411,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=2",
           "witnesses": []
         },
         {
@@ -1338,8 +1509,8 @@
     {
       "input": "12-dual-from-reuse.json",
       "producer_exit": 0,
-      "sha256": "67d649b16c7906c0b6ddddb1eddade44edffd8704eac00094ac6915201e9d53e",
-      "crossings": 120,
+      "sha256": "2f85be0c6ac95a655ca345c4eacbe84ecbffd68d098014398befa7d046fba63b",
+      "crossings": 192,
       "bends": 60,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
@@ -1347,12 +1518,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1370,12 +1544,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1399,6 +1576,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -1437,6 +1620,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=2",
           "witnesses": []
         },
         {
@@ -1523,21 +1718,24 @@
     {
       "input": "13-label-clearance-weave.json",
       "producer_exit": 0,
-      "sha256": "59ba5d36684d129e554567d60101fa02d016ce728321ce8a73d3810a188da179",
-      "crossings": 716,
-      "bends": 156,
+      "sha256": "f07be7a0823db13dc6a37821119621eaf4af74b2f483631849d4aaaa51363998",
+      "crossings": 1563,
+      "bends": 252,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1555,12 +1753,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1584,6 +1785,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -1622,6 +1829,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=4",
           "witnesses": []
         },
         {
@@ -1708,7 +1927,7 @@
     {
       "input": "16-multi-from-clusters.json",
       "producer_exit": 0,
-      "sha256": "173623ec6d9be7b496919c36d053bac64b29f6087b3d9753ff1db4bc51e2d31b",
+      "sha256": "d7ad5a06aa170f6fccd67c89239b8e58314cd59637a54c57e18de4f8e8cd292b",
       "crossings": 276,
       "bends": 88,
       "different_net_overlaps": 0,
@@ -1717,12 +1936,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1740,12 +1962,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1769,6 +1994,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -1807,6 +2038,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=4",
           "witnesses": []
         },
         {
@@ -1902,12 +2145,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1925,12 +2171,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -1954,6 +2203,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -1992,6 +2247,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=1",
           "witnesses": []
         },
         {
@@ -2078,8 +2345,8 @@
     {
       "input": "18-asymmetric-merge-columns.json",
       "producer_exit": 0,
-      "sha256": "88c4433382fdc50ba494055a6433b53c6a586c025ac66a5fbc2318ac3afaa779",
-      "crossings": 28,
+      "sha256": "28dc71156fa609a679cb179e377efa1514e63206ee1d5890f843b92b902d3f82",
+      "crossings": 48,
       "bends": 28,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
@@ -2087,12 +2354,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -2110,12 +2380,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -2139,6 +2412,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -2177,6 +2456,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=2",
           "witnesses": []
         },
         {
@@ -2263,21 +2554,24 @@
     {
       "input": "19-dispersed-root-fanout.json",
       "producer_exit": 0,
-      "sha256": "18b495cb892ae53e41475f869800eda8bea997261571a54c4b45897029eeaff9",
-      "crossings": 12,
-      "bends": 58,
+      "sha256": "faeb605633a5911550fcf5c4786b701a718d70e253edca0d1255356168acf13b",
+      "crossings": 908,
+      "bends": 128,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -2295,12 +2589,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -2324,6 +2621,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -2362,6 +2665,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "pass",
+          "applicability_proof": "direct_root_fanins=8",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=8",
           "witnesses": []
         },
         {
@@ -2448,7 +2763,7 @@
     {
       "input": "20-asymmetric-merge-route-bulge.json",
       "producer_exit": 0,
-      "sha256": "b4c5c0fff66e093926e0f62a8541a9403a0cd2d76e347a58840243df6a8d61c5",
+      "sha256": "f49e8dd298b1a4f7b0e0e2902770a67ac9d3321ae1a7c929aadc6f485063c2c9",
       "crossings": 0,
       "bends": 2,
       "different_net_overlaps": 0,
@@ -2457,12 +2772,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -2480,12 +2798,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -2509,6 +2830,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -2547,6 +2874,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=2",
           "witnesses": []
         },
         {
@@ -2633,7 +2972,7 @@
     {
       "input": "21-layout-column-preference.json",
       "producer_exit": 0,
-      "sha256": "05a0e25f2cdf024382935876cd25be6836809f07fc386203947b4b281c0aeee1",
+      "sha256": "7cb7a213c6c950590710116aac282083cbdbc9b63b5e56f71c987e330a74acaa",
       "crossings": 2,
       "bends": 6,
       "different_net_overlaps": 0,
@@ -2642,12 +2981,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -2665,12 +3007,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -2694,6 +3039,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -2732,6 +3083,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=4",
           "witnesses": []
         },
         {
@@ -2827,12 +3190,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -2850,12 +3216,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -2879,6 +3248,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -2917,6 +3292,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=1",
           "witnesses": []
         },
         {
@@ -3003,7 +3390,7 @@
     {
       "input": "23-middle-column-low-use-sources.json",
       "producer_exit": 0,
-      "sha256": "f23f9523dc307152e796f4121ec7300976ebf9333f85dffb69eacc25c516a2e7",
+      "sha256": "d50165c365109f13ca5e8f6e2b1ba4f1f665e75e699d94f88022a554ea548759",
       "crossings": 0,
       "bends": 14,
       "different_net_overlaps": 0,
@@ -3012,12 +3399,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3035,12 +3425,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3064,6 +3457,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -3102,6 +3501,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=9",
           "witnesses": []
         },
         {
@@ -3197,12 +3608,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3220,12 +3634,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3249,6 +3666,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -3287,6 +3710,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=1",
           "witnesses": []
         },
         {
@@ -3373,7 +3808,7 @@
     {
       "input": "25-mixed-root-port-order-torture.json",
       "producer_exit": 0,
-      "sha256": "e58a8574a29134e5f2669e4d112bf54e86c9b3a0b7942bd01a7d07b6f4967207",
+      "sha256": "a4b1250d80c42a9d206a211dd5f9ec0d7c9d3992740a05588d559192f8c6be2f",
       "crossings": 0,
       "bends": 18,
       "different_net_overlaps": 0,
@@ -3382,12 +3817,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3405,12 +3843,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3434,6 +3875,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -3472,6 +3919,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "pass",
+          "applicability_proof": "direct_root_fanins=12",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=27",
           "witnesses": []
         },
         {
@@ -3558,21 +4017,24 @@
     {
       "input": "26-feedback-reproduction-combined.json",
       "producer_exit": 0,
-      "sha256": "e0b5ac8749ac9ce53516484b624163266b4257c76dbacadad81ca477dd8828fb",
-      "crossings": 3,
-      "bends": 26,
+      "sha256": "fbe22dd537ddedfc15e9bba82f721bd9e2229ba6596e4b25121ded239a43b63a",
+      "crossings": 78,
+      "bends": 66,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3590,12 +4052,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3619,6 +4084,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -3657,6 +4128,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "pass",
           "applicability_proof": "direct_root_mux_arrays=20",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "pass",
+          "applicability_proof": "direct_root_fanins=20",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=48",
           "witnesses": []
         },
         {
@@ -3743,7 +4226,7 @@
     {
       "input": "27-interleaved-common-root-mux3.json",
       "producer_exit": 0,
-      "sha256": "413949621480cc2df91c3b26aaecf5d01bdf53bc6a315fdd904c5fc77e21cc6c",
+      "sha256": "bd6f3fae07724ec9ed30a4a5c3fb1d6d0aee8bff2000e9f3a50ffa99446d2289",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -3752,12 +4235,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3775,12 +4261,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3804,6 +4293,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -3842,6 +4337,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "pass",
+          "applicability_proof": "direct_root_fanins=6",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=7",
           "witnesses": []
         },
         {
@@ -3928,7 +4435,7 @@
     {
       "input": "28-common-private-from-mux-clock-array.json",
       "producer_exit": 0,
-      "sha256": "8c52c00f76bb1b377da75b75d976dbcd6a2629b3b769a5bc0f7350379f2e7472",
+      "sha256": "e591f9df69da6c82d7ccfd144df2b7aec56690b2c4e6d26d31add206b3979a0c",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -3937,12 +4444,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3960,12 +4470,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -3989,6 +4502,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -4027,6 +4546,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "pass",
+          "applicability_proof": "direct_root_fanins=6",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=7",
           "witnesses": []
         },
         {
@@ -4113,8 +4644,8 @@
     {
       "input": "29-asymmetric-depth-common-private-mux-array.json",
       "producer_exit": 0,
-      "sha256": "bca78a5c8a952c57aca7a647301fe335b0b25c7148437980a9e0d6483a951909",
-      "crossings": 15,
+      "sha256": "cf3ee5bb2b1a612e452683bb919bb14e1d5818327375732eb0730bf761934b94",
+      "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
@@ -4122,12 +4653,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -4145,12 +4679,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -4174,6 +4711,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -4212,6 +4755,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=7",
           "witnesses": []
         },
         {
@@ -4298,7 +4853,7 @@
     {
       "input": "30-staggered-four-source-mux.json",
       "producer_exit": 0,
-      "sha256": "b9f1fc4994911f7ee488e8c9f68266c876a5db4955764bbbb826d152838c5da2",
+      "sha256": "fe2f098a93131c8ebe9782815fd49c4a607491ab2e9351999f05816863202e8c",
       "crossings": 2,
       "bends": 6,
       "different_net_overlaps": 0,
@@ -4307,12 +4862,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -4330,12 +4888,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -4359,6 +4920,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -4397,6 +4964,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "pass",
           "applicability_proof": "direct_root_mux_arrays=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "pass",
+          "applicability_proof": "direct_root_fanins=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=4",
           "witnesses": []
         },
         {
@@ -4483,7 +5062,7 @@
     {
       "input": "31-node-descriptions.json",
       "producer_exit": 0,
-      "sha256": "46bb8c881e5ac98a654fcda2599d071c48ba37c17e0c136e88ff1ff2cb5a4a9a",
+      "sha256": "b867f02675c28cf0e0c3e1f3853128ebacd534af131e2be13524330fec1727c4",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -4494,12 +5073,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -4517,12 +5099,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -4546,6 +5131,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -4584,6 +5175,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=1",
           "witnesses": []
         },
         {
@@ -4697,7 +5300,7 @@
     {
       "input": "32-annotation-text-stress.json",
       "producer_exit": 0,
-      "sha256": "84af1b113854d810776655bc1dc37573eb9d98a4fddf23fd9e0c351cebd83b2c",
+      "sha256": "db56ee456505f13b55752a338dfc898d2813c602ea4a40d7c71b430dc10e165c",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -4713,12 +5316,15 @@
       "required_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -4736,12 +5342,15 @@
       "executed_metric_ids": [
         "topology_identity",
         "orthogonal_segments",
+        "crossing_treatment",
         "different_net_overlap",
         "split_rejoin",
         "avoidable_bends",
         "port_order",
         "root_fanout_axis_dominance",
         "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
         "regular_array_single_facility",
         "shared_root_single_bus",
         "annotation_geometry",
@@ -4765,6 +5374,12 @@
         },
         {
           "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
           "status": "pass",
           "applicability_proof": "logical_edges",
           "witnesses": []
@@ -4803,6 +5418,18 @@
           "metric_id": "direct_root_mux_column",
           "status": "not_applicable",
           "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=2",
           "witnesses": []
         },
         {
@@ -4852,7 +5479,7 @@
             "owner_distances_px": {
               "clock_dense_a": 9.25,
               "gate_long_ascii": 9.25,
-              "ref_short": 11.54,
+              "ref_short": 9.25,
               "select_mixed": 9.23,
               "cell_trailing": 45.01,
               "clock_dense_b": 10.01,
