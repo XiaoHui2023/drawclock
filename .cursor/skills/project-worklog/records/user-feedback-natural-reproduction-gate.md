@@ -2,8 +2,14 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-09 14:58 +08:00
+- updated: 2026-09-09 15:34 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 2026-09-09 15:34 旧冻结断言已用当前公开入口自然复现为 exit=1：`common_source` 与八个 `local_source` 实际全在 x=96.65 第一列，旧判词仍要求 `common_source < local_source < mux`。升级后聚焦正负校准 6/6 PASS，真实动态双输出根图与历史复杂图分别签出 first-column x=86.42/96.65；Python 发布踩坑专题已记录“产品合同升级而冻结消费者仍断言旧布局”模式并通过 Skill 校验。随后全量 pytest 527/527 PASS、26 张公开图统一 23 指标门 26/26 PASS、反馈 release gate 17/17 PASS；当前进入 exact diff/commit/push 和新一轮远端冻结消费验证。
+
+- 2026-09-09 15:27 冻结消费者门已移除被需求废止的“低使用率根移到中间列”断言，新增按 `data-node-id` 读取终态物理设施的通用第一列检查：所有无 `layout_column` 的零入度根必须各有唯一设施、同 x，且该 x 是全图最左列。发布 smoke 还会现场生成“shared source 直连 mux 且另经 gate→div 输出、private from 同时直连 mux”的输入并执行同一门；单测加入根错列和虽同列但左侧仍有非根两类 mutant，防止仅替换旧期望而弱化门禁。
+
+- 2026-09-09 15:19 commit `868b4e610354d1b16123f83ecd43eeaba79ab34d` 已推送 main；Release run `34310174082` 的反馈门（递归攻击、全图统一质检、17 项发行复现门）全部成功，Ubuntu 16.04 打包成功，但“Run extracted dependency-free frozen examples”失败并正确阻断 publish。匿名 Actions 日志下载接口返回 HTTP 403，未把无日志权限冒充无故障；按发布踩坑规范回读冻结 smoke，已定位其仍断言旧合同“低使用率 roots 移到中间列”，与本轮新硬合同“所有无约束起点固定第一列”直接冲突。下一步先让冻结发布样例自然重现该旧断言失败，再把 smoke 升级为第一列与多输出直连 mux 的发布级合同，完整重跑本地门和远端滚动发布。
 
 - 2026-09-09 14:58 staged 文本审查发现 13:56 条目有一次工具生成的中英文串扰（`source/from mux mux: tense variants...`），已恢复为实际七轮覆盖描述：类型变体、mux 复杂覆盖数组与跨特性组合。`git diff --cached --check` 无空白错误；新增行的私人绝对路径、仓外相对路径、密钥和冲突标记扫描为 0。该修订只影响工作记录，不使算法/Oracle/收据血缘陈旧；重新 stage 后再做 exact diff 门。
 

@@ -123,6 +123,56 @@ def test_frozen_single_source_gate_rejects_fragmented_facility_or_bus(
         )
 
 
+def _write_first_column_gate_fixture(
+    config: Path, svg: Path, *, shared_root_x: int = 10, nonroot_x: int = 60,
+) -> None:
+    config.write_text(json.dumps({
+        "shared_root": {"kind": "source"},
+        "private_root": {"kind": "from"},
+        "shared_gate": {"kind": "gate", "source": "shared_root"},
+        "mux": {
+            "kind": "mux2",
+            "source": {"0": "shared_root", "1": "private_root"},
+        },
+    }), encoding="utf-8")
+    svg.write_text(
+        '<svg xmlns="http://www.w3.org/2000/svg">'
+        f'<g class="component" data-node-id="shared_root"><rect class="component-graphic" x="{shared_root_x}" y="10" width="20" height="20"/></g>'
+        '<g class="component" data-node-id="private_root"><rect class="component-graphic" x="10" y="40" width="20" height="20"/></g>'
+        f'<g class="component" data-node-id="shared_gate"><rect class="component-graphic" x="{nonroot_x}" y="10" width="20" height="20"/></g>'
+        f'<g class="component" data-node-id="mux"><rect class="component-graphic" x="{nonroot_x}" y="40" width="20" height="20"/></g>'
+        '</svg>',
+        encoding="utf-8",
+    )
+
+
+def test_frozen_first_column_gate_covers_direct_mux_root_with_second_output(
+    tmp_path: Path,
+) -> None:
+    gate = _load_frozen_example_gate()
+    config = tmp_path / "first-column.json"
+    svg = tmp_path / "first-column.svg"
+    _write_first_column_gate_fixture(config, svg)
+    assert gate._assert_unconstrained_roots_are_first_column(svg, config) == 10
+
+
+@pytest.mark.parametrize(
+    "shared_root_x,nonroot_x",
+    ((30, 60), (10, 5)),
+)
+def test_frozen_first_column_gate_rejects_root_misalignment_or_later_column(
+    tmp_path: Path, shared_root_x: int, nonroot_x: int,
+) -> None:
+    gate = _load_frozen_example_gate()
+    config = tmp_path / "first-column.json"
+    svg = tmp_path / "first-column.svg"
+    _write_first_column_gate_fixture(
+        config, svg, shared_root_x=shared_root_x, nonroot_x=nonroot_x,
+    )
+    with pytest.raises(SystemExit):
+        gate._assert_unconstrained_roots_are_first_column(svg, config)
+
+
 def test_removed_subcommands_are_rejected() -> None:
     for command in ("draw", "extract", "reload", "run", "drawio-to-json"):
         proc = subprocess.run(

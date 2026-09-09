@@ -148,6 +148,71 @@ def _assert_named_nodes_same_x(path: Path, names: tuple[str, ...]) -> float:
     return next(iter(x_by_name.values()))
 
 
+def _component_xs_by_node_id(path: Path) -> dict[str, list[float]]:
+    root = ET.fromstring(path.read_text(encoding="utf-8"))
+    result: dict[str, list[float]] = {}
+    for element in root.iter():
+        if "component" not in element.get("class", "").split():
+            continue
+        node_id = element.get("data-node-id")
+        if not node_id:
+            continue
+        graphic = next((
+            child for child in element.iter()
+            if "component-graphic" in child.get("class", "").split()
+        ), None)
+        if graphic is not None:
+            result.setdefault(node_id, []).append(float(graphic.get("x", "nan")))
+    return result
+
+
+def _assert_unconstrained_roots_are_first_column(
+    path: Path, config_path: Path,
+) -> float:
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    roots = {
+        name for name, item in config.items()
+        if not item.get("source") and item.get("layout_column") is None
+    }
+    if not roots:
+        raise SystemExit("first-column example has no unconstrained roots")
+    component_xs = _component_xs_by_node_id(path)
+    missing = roots - component_xs.keys()
+    duplicated = {
+        name: component_xs[name] for name in roots & component_xs.keys()
+        if len(component_xs[name]) != 1
+    }
+    if missing or duplicated:
+        raise SystemExit(
+            f"first-column root facilities are invalid: "
+            f"{sorted(missing)=}, {duplicated=}"
+        )
+    root_xs = {component_xs[name][0] for name in roots}
+    all_xs = [x for values in component_xs.values() for x in values]
+    if len(root_xs) != 1 or not all_xs or next(iter(root_xs)) != min(all_xs):
+        raise SystemExit(
+            f"unconstrained roots are not aligned in the first column: "
+            f"roots={{{', '.join(f'{name!r}: {component_xs[name][0]}' for name in sorted(roots))}}}, "
+            f"leftmost={min(all_xs) if all_xs else None}"
+        )
+    return next(iter(root_xs))
+
+
+def _write_direct_mux_multi_output_root_input(path: Path) -> None:
+    path.write_text(json.dumps({
+        "shared_root": {"kind": "source"},
+        "private_root": {"kind": "from"},
+        "shared_gate": {"kind": "gate", "source": "shared_root"},
+        "shared_div": {"kind": "div", "source": "shared_gate"},
+        "mux": {
+            "kind": "mux2",
+            "source": {"0": "shared_root", "1": "private_root"},
+        },
+        "clock": {"kind": "clock", "source": "mux"},
+        "aux_clock": {"kind": "clock", "source": "shared_div"},
+    }, indent=2), encoding="utf-8")
+
+
 def _assert_single_logical_source_has_shared_bus(
     path: Path, config_path: Path, logical_name: str,
 ) -> None:
@@ -469,24 +534,15 @@ def main() -> int:
     )
     middle_output = out / "middle-source-frozen.svg"
     _draw(binary, MIDDLE_SOURCE, middle_output)
-    source_x = _named_node_xs(
-        middle_output,
-        (
-            "common_source", "local_source_00", "local_source_01",
-            "local_source_02", "local_source_03", "local_source_04",
-            "local_source_05", "local_source_06", "local_source_07",
-            "mux_00", "mux_01", "mux_02", "mux_03", "mux_04",
-            "mux_05", "mux_06", "mux_07",
-        ),
+    _assert_unconstrained_roots_are_first_column(middle_output, MIDDLE_SOURCE)
+
+    multi_output_root_input = out / "direct-mux-multi-output-root.json"
+    multi_output_root_output = out / "direct-mux-multi-output-root.svg"
+    _write_direct_mux_multi_output_root_input(multi_output_root_input)
+    _draw(binary, multi_output_root_input, multi_output_root_output)
+    _assert_unconstrained_roots_are_first_column(
+        multi_output_root_output, multi_output_root_input,
     )
-    local_xs = {source_x[name] for name in source_x if name.startswith("local_source_")}
-    mux_xs = {source_x[name] for name in source_x if name.startswith("mux_")}
-    if (
-        len(local_xs) != 1
-        or len(mux_xs) != 1
-        or not source_x["common_source"] < next(iter(local_xs)) < next(iter(mux_xs))
-    ):
-        raise SystemExit(f"low-use roots did not move to a middle column: {source_x}")
 
     strict_json = out / "frozen-input.json"
     strict_json.write_text('{"osc":{"kind":"source"}}', encoding="utf-8")
