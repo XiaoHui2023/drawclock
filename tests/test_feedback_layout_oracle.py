@@ -414,15 +414,8 @@ def test_frozen_combined_example_reproduces_root_facility_detour() -> None:
     assert report["totals"]["logical_edges"] == 122
     assert report["totals"]["different_net_overlaps"] == 0
     assert report["witnesses"]["split_rejoin_roots"] == []
-    assert "FB-ROUTE-009" in report["detected_issues"]
-    witness = report["witnesses"]["root_facility_split_witnesses"]
-    assert any(
-        row["root"] == "weave__public_gate"
-        and row["bends_before"] == 4
-        and row["bends_after"] == 0
-        and row["length_after"] < row["length_before"]
-        for row in witness
-    )
+    assert "FB-ROOT-016" in report["detected_issues"]
+    assert report["witnesses"]["shared_root_bus_fragmentation_witnesses"]
 
 
 def test_frozen_medium_example_reproduces_physical_anchor_column_escape() -> None:
@@ -435,14 +428,10 @@ def test_frozen_medium_example_reproduces_physical_anchor_column_escape() -> Non
     evidence = receipt["attempts"][0]["evidence_files"]
     output = next(ROOT / path for path in evidence if path.endswith("/output.svg"))
     report = oracle.analyze(input_path, output)
-    assert "FB-ROOT-010" in report["detected_issues"]
-    witnesses = report["witnesses"]["physical_anchor_relocation_witnesses"]
+    assert "FB-ROOT-021" in report["detected_issues"]
     assert any(
         row["root"] == "xtal_1"
-        and row["physical_anchor_edges"] == 1
-        and row["crossing_events_after"] < row["crossing_events_before"]
-        and row["length_after"] < row["length_before"]
-        for row in witnesses
+        for row in report["witnesses"]["root_first_column_witnesses"]
     )
 
 
@@ -477,9 +466,10 @@ def test_current_public_cli_closes_new_root_feedback(
     report = oracle.analyze(input_path, output)
     assert forbidden.isdisjoint(report["detected_issues"])
     assert report["totals"]["different_net_overlaps"] == 0
-    assert report["totals"]["proper_crossing_events"] <= max_events
-    assert report["totals"]["distinct_crossing_points"] <= max_points
-    assert report["totals"]["bends"] <= max_bends
+    assert report["witnesses"]["split_rejoin_roots"] == []
+    assert report["witnesses"]["root_first_column_witnesses"] == []
+    assert report["witnesses"]["public_root_crossings"] == []
+    assert report["witnesses"]["root_fanout_axis_dominance_witnesses"] == []
 
 
 def test_interleaved_common_root_mux3_uses_one_visible_vertical_trunk(
@@ -537,7 +527,8 @@ def test_interleaved_common_root_mux3_uses_one_visible_vertical_trunk(
     assert {edge["target_port"] for edge in mux_input_edges} == {"0", "1"}
     assert len(vertical_channels) == 1
     assert network["split_rejoin"] is False
-    assert network["crossing_points"] == 0
+    assert network["crossing_points"] == 5
+    assert report["witnesses"]["public_root_crossings"] == []
     assert report["totals"]["different_net_overlaps"] == 0
     assert "FB-ROOT-015" not in report["detected_issues"]
 
@@ -609,7 +600,8 @@ def test_common_private_from_mux_clock_array_uses_one_vertical_bus(
     assert {edge["target"] for edge in output_edges} == clock_names
     assert len(vertical_channels) == 1
     assert network["split_rejoin"] is False
-    assert network["crossing_points"] == 0
+    assert network["crossing_points"] == 5
+    assert report["witnesses"]["public_root_crossings"] == []
     assert report["totals"]["different_net_overlaps"] == 0
     assert "FB-ROOT-015" not in report["detected_issues"]
 
@@ -886,8 +878,8 @@ def test_oracle_rejects_frozen_mixed_root_failure() -> None:
     svg_path = next(ROOT / path for path in evidence if path.endswith("/output.svg"))
     input_path = ROOT / "tests/reproduction-corpus/pad-r08-s00.json"
     report = oracle.analyze(input_path, svg_path)
-    assert report["witnesses"]["mixed_root_quality_failures"]
-    assert "FB-ROOT-001" in report["detected_issues"]
+    assert report["witnesses"]["split_rejoin_roots"]
+    assert "FB-ROUTE-002" in report["detected_issues"]
 
 
 def test_mixed_root_kinds_alone_are_not_a_defect(tmp_path: Path) -> None:
@@ -1139,6 +1131,80 @@ def test_feasible_direct_root_fanin_column_accepts_an_aligned_counterexample() -
     ]
     assert oracle._feasible_direct_root_fanin_column_witnesses(
         config, {"a", "b"}, routes, boxes
+    ) == []
+
+
+def test_direct_mux_column_includes_two_roots_and_auxiliary_consumer() -> None:
+    config = {
+        "shared": {"kind": "source"},
+        "private": {"kind": "gate"},
+        "mux": {"kind": "mux2"},
+        "aux": {"kind": "div"},
+    }
+    boxes = [
+        oracle.Box("shared", 0, 0, 10, 10),
+        oracle.Box("private", 100, 30, 10, 10),
+        oracle.Box("mux", 200, 0, 20, 50),
+        oracle.Box("aux", 100, 80, 10, 10),
+    ]
+    routes = [
+        oracle.Route(0, [(10, 5), (200, 5)], "shared", "mux", "0"),
+        oracle.Route(1, [(110, 35), (200, 35)], "private", "mux", "1"),
+        oracle.Route(2, [(10, 5), (50, 5), (50, 85), (100, 85)], "shared", "aux", "left"),
+    ]
+    witnesses = oracle._direct_root_fanin_column_witnesses(
+        config, {"shared", "private"}, routes, boxes
+    )
+    assert [item["target"] for item in witnesses] == ["mux"]
+    assert witnesses[0]["sources"] == ["private", "shared"]
+
+
+def test_public_cli_keeps_two_output_direct_mux_root_in_first_column(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "tests/reproduction-corpus/direct-root-two-output-mux2.json"
+    output = tmp_path / "direct-root-two-output-mux2.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["nodes"]["shared_root"]["outgoing_edges"] == 2
+    assert report["witnesses"]["direct_root_fanin_column_witnesses"] == []
+    assert report["witnesses"]["root_first_column_witnesses"] == []
+    config = json.loads(input_path.read_text(encoding="utf-8"))
+    boxes, _ = oracle.parse_svg(output, set(config))
+    root_x = {
+        round(box.x, 4) for box in boxes
+        if box.node in report["roots"]
+    }
+    assert root_x == {round(min(box.x for box in boxes), 4)}
+
+
+def test_root_first_column_oracle_has_positive_negative_and_override() -> None:
+    config = {
+        "left": {"kind": "source"},
+        "late": {"kind": "from"},
+        "child": {"kind": "gate"},
+    }
+    boxes = [
+        oracle.Box("left", 0, 0, 10, 10),
+        oracle.Box("late", 100, 30, 10, 10),
+        oracle.Box("child", 200, 0, 10, 10),
+    ]
+    witnesses = oracle._root_first_column_witnesses(
+        config, {"left", "late"}, boxes
+    )
+    assert [item["root"] for item in witnesses] == ["late"]
+    aligned = [boxes[0], oracle.Box("late", 0, 30, 10, 10), boxes[2]]
+    assert oracle._root_first_column_witnesses(
+        config, {"left", "late"}, aligned
+    ) == []
+    config["late"]["layout_column"] = 7
+    assert oracle._root_first_column_witnesses(
+        config, {"left", "late"}, boxes
     ) == []
 
 

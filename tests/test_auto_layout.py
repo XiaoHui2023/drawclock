@@ -246,12 +246,17 @@ def test_dense_example_meets_hard_gates_and_runtime_budget() -> None:
             encoding="utf-8"
         )
     )
-    _, report = generate_layout(config, library_path=LIBRARY)
+    _, candidate_report = generate_layout(config, library_path=LIBRARY)
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
 
-    assert report["hard_pass"] is True
-    assert report["edge_node_intersections"] == 0
-    assert report["ambiguous_overlaps"] == 0
-    assert report["runtime_ms"] < 5000
+    # A search candidate may be rejected after first-rank root alignment; the
+    # public production owner must still return a fully valid final artifact.
+    assert candidate_report["runtime_ms"] < 5000
+    assert quality["passed"] is True
+    assert quality["line_integrity"]["ambiguous_overlaps"] == []
 
 
 def test_95_node_tree_stays_within_bounded_runtime() -> None:

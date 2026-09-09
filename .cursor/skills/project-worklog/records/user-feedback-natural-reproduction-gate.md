@@ -1,9 +1,155 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: done
+- status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-08 23:15 +08:00
+- updated: 2026-09-09 14:58 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 2026-09-09 14:58 staged 文本审查发现 13:56 条目有一次工具生成的中英文串扰（`source/from mux mux: tense variants...`），已恢复为实际七轮覆盖描述：类型变体、mux 复杂覆盖数组与跨特性组合。`git diff --cached --check` 无空白错误；新增行的私人绝对路径、仓外相对路径、密钥和冲突标记扫描为 0。该修订只影响工作记录，不使算法/Oracle/收据血缘陈旧；重新 stage 后再做 exact diff 门。
+
+- 2026-09-09 14:54 上传审查已 fetch origin，main 与 origin/main 指向同一 `a739054`；前次 `@{u}` 在 PowerShell 被语法解释导致 `git rev-list` 收到无效 revision `dQA=`，不影响 fetch/status，下一步改用显式 `origin/main`。敏感路径扫描无 `.env/mcp.json/llm.json` 跟踪或历史输出。为避免依赖 `git add -f`，`.gitignore` 已正式白名单本次唯一有效 fix evidence group `20260909T040233Z-c6363a1e`；未闭合 `040101` 与本地 final-results 继续被忽略。下一步重新 stage、检查 exact diff/密钥/跨仓路径与提交合同。
+
+- 2026-09-09 14:47 新 fix evidence 已强制纳入 Git 索引并替换旧 staged 批次；release gate 17/17 PASS。随后全量 pytest 从头运行 524/524 PASS（46.13s），全公开 SVG 又以最终报告路径新鲜生成并逐图执行 23 项指标，26/26 PASS。一次工具包装 JavaScript 尾部不完整导致命令未启动、未改文件，随后正确调用通过。现在满足本地发布前条件，进入 commit-quality 与 GitHub 发布技能规定的提交、推送、远端 workflow/资产验证。
+
+- 2026-09-09 14:40 新血缘递归对抗从 R1 完整重启并连续 7/7 clean：run `20260909T040508Z-c37e415c`，status=clean、exit=0。覆盖精确回放、声明顺序、结构改名、source/from 类型变化、mux 复杂组合、列提示以及跨特性组合；没有继承 13:56 的旧成功轮次。runner 使用默认正式 receipt 路径成功写入收据。下一步重新强制纳入新证据，跑 release/full/all-SVG 最终门。
+
+- 2026-09-09 14:34 正式 fix verification 已以新 Oracle 血缘完成：group `20260909T040233Z-c6363a1e`，17 个 issue failures=[]、命令 exit=0。此前未闭合目录继续标记为无效，不参与任何完成声明。下一步从 R1 启动全新 7 轮递归对抗。
+
+- 2026-09-09 14:29 误把 `--help` 传给无 argparse 的 fix verifier 后，脚本实际启动并产生未完成 evidence 目录 `20260909T040101Z-88b67e8b`（150 文件），但没有打印最终 JSON、没有更新 fix receipts，故它不是有效 verification；同一串命令中的 recursive runner 未更新正式收据。该尝试不能计 PASS。下一步单独执行 verifier、显式输出 `$LASTEXITCODE` 捕获崩溃或最终 failures，再决定是否修复。
+
+- 2026-09-09 14:25 物理交叉点口径修正后，聚焦回归 4/4 PASS；全公开 SVG 重新新鲜生成并由独立系统逐图执行同一 23 项指标，26/26 PASS，注释 short/long/multiline/blank/trailing/mixed-script 六档覆盖齐全。combined 的 root-fanout-axis witness 现为空，说明旧 203→199 只是共享逻辑边对重复计数变化，不是用户能看到的少交叉方案。下一步重签全部 issue 的双跑 fix evidence，并把递归对抗从 R1 完整重启。
+
+- 2026-09-09 14:21 根因确认是 Oracle 与生产接受函数使用了不同的 crossing 基元：生产按用户可见的去重物理交叉点，Oracle 的 root-axis 反事实却按同一交叉点上的逻辑边对数；共享总线多条逻辑边重合时，移动主干只把 203 个 pair 变成 199 个，并不必然减少图上交叉点，却被误签成改进。已新增 `_distinct_crossing_count`，root-axis 的 joint/scalar 两条路径统一以物理点作硬比较和严格改进条件，同时仍在收据保留 event 数与新增 point 数；当前 combined 公共例加入明确空 witness 回归断言。因 Oracle 改动，旧 fix/7轮收据全部按血缘陈旧处理，验证通过后必须重签并从 R1 重启。
+
+- 2026-09-09 14:16 全公开 SVG 新鲜生成门拒绝 1/26：`26-feedback-reproduction-combined.json` 的 `root_fanout_axis_dominance` 给出 5 个 witness，建议把 `roots__common_source` 的扇出 y 轴从 2653.0565 移到 3352.0781；逻辑 crossing events 203→199，bends/length/overlaps 不变。其余 25 图通过且所有图都执行完整 23 项注册表。此结果撤销当前“可发布”状态，必须区分真实少交叉改进与逻辑边共线重复计数；如真实复发，则修复并将 7 轮从 R1 重启。
+
+- 2026-09-09 14:12 已用两个独立 Edge profile 重新渲染，两个 PNG 时间戳一致更新：公共图 61,137 bytes、双输出根图 18,031 bytes。目视确认公共 from 从第一列单一设施进入一条贯穿六行的纵向主干，每个 T 分支有实心结点，未出现分支后重合；私人线穿越主干处使用跨线弧且没有连接点，属于“所有根第一列 + 主干位于其右侧”硬合同下的必要跨越。双输出根与 private_root 同在第一列，shared_root 的分叉点唯一且两条路线清晰，0 跨线。先前 14:08 对旧 PNG 的来源判断不严谨，已由本次明确命令、独立 profile、相同新时间戳纠正。下一步全公开 SVG 新鲜生成门。
+
+- 2026-09-09 14:08 Edge headless 已写出公共总线 PNG（61,137 bytes）；同一 `--user-data-dir` 的第二次调用复用浏览器会话而没有生成双输出根 PNG，故不计第二张渲染成功。stderr 仍有 Windows `WSALookupServiceBegin 10108`，不影响已生成文件；下一步用独立 profile 重试第二张并目视两图。
+
+- 2026-09-09 14:06 独立 SVG graph inspector 与 reproduction Oracle 已为两张最终图写出结构报告。公共图 37/37 节点、36/36 边，common_from 仅 1 个设施且 shared-root fragmentation、split-rejoin、root-first、direct-fanin、avoidable-bend、异网重叠 witness 全为空；总线首纵干线唯一，但复杂异深度数组仍有 5 个不同交叉点（15 个逻辑边对事件），不是公共根可避免交叉 witness。双输出根图 7/7 节点、6/6 边，两个 source 均第一列，所有缺陷 witness 为空，0 交叉、0 异网重叠。下一步渲染并目视判定复杂图的 5 个跨线是否影响交付；如观感不合格则换用同功能、零交叉的最小展示图，但复杂图仍留在机器覆盖中。
+
+- 2026-09-09 14:03 当前公开 CLI 已生成两张最终 SVG：`public-from-single-bus.svg` 为唯一 common_from→每路独立 gate 与不同深度私人链汇聚；`direct-root-two-output-first-column.svg` 为两根直入 mux2 且 shared_root 另有 gate→div 输出。两个命令 exit=0；PowerShell 控制台对中文“已写入”显示为乱码，仅是终端编码，不影响 SVG 文件。下一步独立全指标检查并渲染 PNG 目视。
+
+- 2026-09-09 14:00 新 fix evidence 强制进入 Git 索引后，独立 release gate 17/17 PASS；全量 pytest 从头运行 524/524 PASS（53.05s）。这次没有把首次 523/524 隐去或折算为绿灯；下一步生成最终用户图，并让统一 SVG 全指标系统重新检查所有公开样例和交付图。
+
+- 2026-09-09 13:57 全量 pytest 实际为 523/524，通过项覆盖功能与几何质检；唯一失败是 release gate 正确拒绝新 fix verification `20260909T034027Z-dc3947a4` 的 208 个证据文件尚未进入 Git 索引（240 条 issue→evidence 引用错误），不是算法绿灯。已用 `git add -f` 将整个新证据目录纳入候选提交；随后手工调用 checker 时误写成位置参数 `release`，argparse 明确要求 `--phase` 并非门禁结果。下一步用正确参数重跑发布门，再从头跑全量测试。
+
+- 2026-09-09 13:56 重启后的递归对抗 run `20260909T034212Z-201085e4` 已从 R1 连续 7/7 clean。覆盖原始精确回放、声明顺序、结构改名、source/from 类型变体、mux 复杂覆盖数组与跨特性组合；status=clean、consecutive_clean_rounds=7，未继承失败 run。下一步跑 release checker mutant/血缘和全量 pytest。
+
+- 2026-09-09 13:51 复发 case 在修正后已无 detected issue；SVG/Oracle 全指标 75/75 再次通过。由于 Oracle 哈希变化，fix verification 已重签为 `20260909T034027Z-dc3947a4`，failures=[]。接下来按 restart semantics 从 R1 开始新的完整七轮，不继承上一次前三轮。首次 worklog 补丁因 INDEX 摘要上下文陈旧被拒绝，未改文件。
+
+- 2026-09-09 13:47 FB-BEND-017 的 scalar root counterfactual 现同时排除 direct-mux array protected roots 和任何 explicit layout_column root；joint array witness 仍保留。这样反事实只能在不破坏显式列/首列硬约束的可行域内支配当前图。修改后一次误目标空补丁被实时 worklog hook 正确阻止，没有改文件。
+
+- 2026-09-09 13:43 递归对抗 run `20260909T033717Z-e08b92ca` 在 R4 `mux-source-seed-003` 命中 FB-BEND-017，status=reproduction_found、consecutive_clean=0，流程按规则失败而非跳过。输入四个 source 都有显式 layout_column 0/1/2/3；witness 却建议把 source_1 从其显式列移动到 axis 589.7157，虽把 bends 4→2、crossings 11→9，却违反用户显式列硬约束。根因是 root_fanout_axis_dominance 仅过滤 direct-mux protected roots，没有过滤 explicit_column_roots；修正应收窄反事实可行域，而非改布局迁就错误 Oracle。首次 worklog 补丁因时间上下文陈旧被拒绝，未改文件。
+
+- 2026-09-09 13:38 正式 fix verification 批次 `20260909T033551Z-78149662` 完成，全部 issue failures=[]；每项均经当前公开 CLI 双跑、独立 Oracle、确定性哈希和当前 source/library/runner/oracle/semantics 血缘重签。下一步在本批源码不变前提下执行 7 轮递归对抗；一次 worklog 调用因 JavaScript 字符串语法错误未执行工具、未改文件。
+
+- 2026-09-09 13:34 scalable 全集 59/59 通过（9.62s）；随后 feedback SVG/Oracle 与全指标系统 75/75 通过（13.26s）。这证明首列/单设施迁移、人工 alias mutant、single-bus、split-rejoin、direct mux、注释与每图完整指标注册表在聚焦范围同时绿。下一步仅处理正式 fix/attack 收据的源码与 Oracle 血缘陈旧，不改 checker 放宽哈希。两次 worklog 补丁分别因旧时间上下文和路径拼写错误被拒绝，均未改文件。
+
+- 2026-09-09 13:29 已精确修正：合格 multi-from 的 fragmented exact-set 为空，手工强制 wide_root 为 2；exclusive-chain 收益要求至少移除 2 折而非锁死实现迭代数。下一步重跑 scalable 全集。
+
+- 2026-09-09 13:27 scalable 重跑 56/59 通过。两项 fragmented 断言因上次宽泛匹配写反：合格 multi-from 应为空，手工强制 wide_root 应为 2；第三项仅是 bends_removed 从 2 提升到 6，最终 bends_total 仍由后继断言锁定。下一步精确交换两处并把内部收益计数改为下界。
+
+- 2026-09-09 13:22 scalable 最后七项已迁移：禁用的 relocation/partition owner 与 monkeypatch baseline 必须产生相同 totals 和零 moves；强制碎片化 helper 明确要求 Oracle 报 `wide_root:right:2`；combined 要求零 replica、无环而非 corridor 次数；序列化要求无 alias logical_name；replica identity mutant 改为测试中人工注入并绑定一条边，仍须被拒绝；refinement 只要求至少一次有效 move，不锁死内部迭代数。尚未重跑。
+
+- 2026-09-09 13:15 scalable 专集已从 17 个旧策略失败降至 7 个（52/59 通过）。余下两项 monkeypatch 仍要求后移/复制优化产生 moves，两个 helper 测试仍要求真实 replica identity，一项手工强制布局正确暴露 fragmented fanout，一项 combined 仍要求 corridor move 计数，一项把优化次数锁死为 1。它们不代表当前终态缺陷；迁移将保留“无 alias、无环、完整终态 quality”和人工注入 replica 必须被拒绝的能力，而不再要求生产先生成非法 alias 才能测试 Oracle。
+
+- 2026-09-09 13:09 已迁移第一批 12 个明确过时的策略断言：强制/自然远距 root 均保持单物理设施和零 replica；低使用根与公共根 rank=0、x 同列；显式 column=0 与默认 first-rank 终态统计相同；重命名/输入逆序保持首列；多端口 mux 在没有 layout_column 时已由结构权重自动同列；dual from 同 x；低使用根不再 promotion。原拓扑覆盖、边数、终态 quality 和无可避免 detour 等非冲突断言保留。第一次含不存在上下文的批量补丁整体失败，第二次精确补丁成功；随后一次 worklog 脚本语法错误未写入。
+
+- 2026-09-09 12:58 Oracle 策略迁移完成一层：当 root_first_column witness 为空 时，任何 legacy root-facility-split 反事实清空，避免 from seed 把复制到后列当改进；历史后移图仍保留红灯。三项冻结测试从已撤销的 issue owner 迁到同一原始 SVG 当前可直接证明的语义：combined→shared-root bus fragmentation (016)，medium→root-first violation (021)，旧 mixed→split-rejoin (002)。current 大图不再用 raw crossing/bend 固定阈值验收，改为无环、首列、无可避免 public crossing 和无异网重叠。一次空参数工具调用及一次上下文不匹配补丁均未改文件。
+
+- 2026-09-09 12:50 第二次全量为 496 通过、28 失败（42.30s），比前轮减少 10。剩余 17 项集中在已撤销的 root replica/middle-column/ALAP 合同，3 项为冻结旧 issue 编号需迁移到新首列/单总线语义，2 项 raw crossing 固定阈值，2 项陈旧 fix/attack 收据，1 项结构 cohort 使原本三列 mux 自动同列，1 项 refinement move 精确计数，1 项 from seed 的旧设施拆分 witness，另有若干同组辅助断言。下一步先修正式 Oracle 的 first-rank 判断和测试语义，再重签收据；不会把陈旧收据测试禁用。一次空文件补丁被拒绝且未改项目。
+
+- 2026-09-09 12:43 两项测试已按 owner 职责迁移：dense 继续测基础搜索运行预算，但 hard quality 改由公开生产 `generate_elk_layout` 终态和独立 `inspect_layout_quality` 决定；mixed 同时锁定 raw root port-order inversion 非空与可避免 inversion exact-set 为空。一次跨文件补丁因把 scalable 断言误写在 auto 文件上下文而整体拒绝，随后按真实文件拆分成功。
+
+- 2026-09-09 12:43 首次 INDEX 补丁把稳定路径误写为 `user-feedback-natural-natural-...`；回读上下文后立即恢复真实文件名，未运行任何依赖该错误索引的门禁。
+
+- 2026-09-09 12:39 五项代表回归为 3 通过、2 失败。mixed 终态 quality 已整体通过且 `avoidable_root_merge_input_crossings=[]`，仅旧断言仍要求 raw order inversions 也为零；它应改为同时保存 raw 非空和可避免 exact-set 为空。dense 的低层 `generate_layout` 候选因 first-rank 后 e1/e2 在 x=210 有异网纵段重合而 hard_pass=false；完整 `generate_elk_layout` 后处理会拒绝/修复该候选。测试应验证“基础候选可失败但生产终态必须绿”，而非要求每个中间候选本身可发布。
+
+- 2026-09-09 12:34 layout_quality 注释已与真实行为一致：旧字段仅作稳定接口空 exact-set，不再声称计算 ALAP 诊断。
+
+- 2026-09-09 12:32 已完全移除只为 free-root ALAP 生成 hard witness 的局部 rank/axis/candidate 块；`avoidable_root_layer_positions` 字段仍以空 exact-set 输出，保证消费者接口稳定。没有用恒假分支隐藏执行。注释中“独立 ALAP ranks 保留诊断”措辞已过时，下一次小补丁改为“字段保留用于策略兼容”。
+
+- 2026-09-09 12:29 代表回归 0/5 通过，原因是临时 `if False and (...)` 使循环体反而对所有节点执行，并在 rank 0 上 `max(empty)` 崩溃；这不是产品几何结论。该失败证明临时逻辑不可保留。下一步完全删除不再适用的 ALAP root-layer 候选构造（其变量仅在该块使用），保留输出字段为空 exact-set，再重跑同五项。
+
+- 2026-09-09 12:25 三张代表图 hard-failure owner 已量化：dense/asymmetric 各仅 `avoidable-root-layer` 1 项，mixed 为 12 项同类加 9 项 root-merge crossing。通用 layout_quality 现保留独立 ALAP rank 诊断但禁止把“根向内移动”作为首列模式 hard counterfactual；root merge 顺序只有两端都为单用根时才可通过垂直重排判为可避免，公共多用干线与私人引线的组合交叉交给单总线/物理树指标。尚需重跑代表图并清理临时 `False and` 表达为明确策略分支。
+
+- 2026-09-09 12:18 全量 pytest 为 486 通过、38 失败（43.98s），未进入发布。失败簇包括：旧 root replica/middle-column/ALAP07 正向测试与新 first-rank/单设施合同直接冲突；旧冻结 issue 009/010/001 语义被当前 Oracle 策略迁移影响；多张图由旧 layout_quality 把首列导致的设施/短引线反事实判为 hard failure；source/oracle 哈希变化令所有旧 fix/attack receipts 正确陈旧。另有 current combined/64 图 raw crossing 固定上限失效。下一步先从代表 hard_fail failures 做 owner 归因，再改通用质量系统与策略迁移，收据最后统一重签。
+
+- 2026-09-09 12:12 用户根技能完成两项渐进披露升级：主动学习新增“失败/阻塞后的成熟项目基准学习”，强制冻结自然红灯、至少三方法族对标、失败限制来源、研究回执、默认 7 连续 clean epoch 与 mutant；clock-tree-layout 新增“布局美学与结构强调”，固化首列根、单物理树/T 结点、多端口结构 cohort、raw/avoidable crossing 分层及正反例，并修正旧 free-root 契约冲突和 >=512 压力措辞。quick_validate 首次因 Windows 默认 GBK 读取 UTF-8 抛 UnicodeDecodeError；设置 `PYTHONUTF8=1` 后两个 Skill 均 valid，该环境降级已明确保留。
+
+- 2026-09-09 12:00 CLI 首列测试已改用独立 SVG parser 的真实 component Box：根节点 x exact-set 必须等于全图最小物理 x exact-set；仍同时要求 shared_root 实际两条出边、直连 mux 同列和 root-first 两类 witness 为空。
+
+- 2026-09-09 11:57 新增三门执行为 2/3 通过：两个多端口结构 cohort 正/反例均绿；公开 CLI 图的两个核心 witness 也已为空，但测试额外读取了 report 不存在的 `roots.rendering_columns` 字段而 KeyError。Oracle 对根列的正式接口是终态 Box/root_first witness；下一步改为从独立 parse_svg 的 Box x exact-set 断言，不在报告中虚构字段。
+
+- 2026-09-09 11:53 新增三项产品/算法门：真实公开 CLI 生成“双输出 shared_root + direct mux2”，要求该根出边数为 2、直连 mux 同列 witness 与全图首列 witness 均为空且所有根共享一列；两个独立 mux2 cohort 要按结构权重同列并保持四个根 rank=0；因果相连的 mux2 必须严格不同层。尚未运行，下一步收集并验证。
+
+- 2026-09-09 11:46 修正测试名后，PAD 独立 Oracle、27/28 单总线、双输出根直连 mux witness 和多端口 merge 对齐代表图 5/5 通过（1.10s）。此前一次使用不存在测试名的 pytest 调用返回 no tests ran，未计入覆盖；本次使用实际收集名重跑。下一步补产品 CLI 终态首列与结构 cohort 正反例，不能只依赖 helper 单测。
+
+- 2026-09-09 11:41 已仅修复两个总线测试的缩进与契约：27/28 均要求 raw crossing_points=5，同时要求 public_root_crossings=[]；其它不同网重叠、单纵轴、无环与设施数断言保持不变。一次格式头错误的 worklog 补丁被 apply_patch 拒绝且未改文件。
+
+- 2026-09-09 11:39 聚焦测试在 collection 阶段被 Python `IndentationError` 强制阻断：第一次替换把第 540 行两个断言多缩进一级，并且第二个相同断言仍为旧值 0。没有任何测试计为通过；下一步只修正这两处测试语法/契约后重跑。
+
+- 2026-09-09 11:36 public_root_crossing 的 defect witness 现只保留至少一个根不在物理第一列、因而仍存在合法列移动反事实的事件；两个根都由 first-rank 硬约束固定时，事件只留在 raw per-edge/per-net crossing 统计。简单公共总线测试同步要求 raw=5 且可避免 witness exact-set 为空，防止通过删除观测作弊。首次大补丁因上下文内手误 `in in` 未命中，未改文件；随后小补丁成功。
+
+- 2026-09-09 11:31 幂等修正后结构对齐代表图恢复通过；PAD 仍由旧 mixed_root_quality 判 16 项 public_gate crossing。该指标把“公共网结构是否单干线”和“首列根之间是否存在 raw 几何交叉”混在一起：根已同列时，右移/复制任一根都违反更高优先级，故这些 crossing 没有可行反事实；公共 from 的单干线与无环已由独立 shared_root_single_bus/split_rejoin 指标负责。下一步按指标单一职责分离，不删除 raw crossing 统计。
+
+- 2026-09-09 11:25 单干线正规化已增加幂等前置 Oracle：从每条实际终态 route 提取第一条 source-side 纵段；当同网无环且目标同行或第一纵轴 exact-set 仅一项时不改任何坐标。只有有环或 source-side 纵干线碎片化才进入候选重建，目标侧为绕障产生的后续纵段不误算成第二主干。
+
+- 2026-09-09 11:22 结构 cohort 聚焦为 1/3 通过：旧“低使用根后移”测试按新首列合同如实失败（local 已为 rank 0），应迁移契约；既有不对称 merge 图保持列对齐，但单干线步骤又重写了两个本已合格的 fanout，造成 7 个 source-lead-clearance-short，说明正规化缺少幂等前置判据。修正方向是：若现有网已无环且第一条 source-side 纵轴唯一，必须保持不动；仅处理真正碎片化/有环的网，防止测试不再制造回归或修复合格几何。
+
+- 2026-09-09 11:17 分层器新增多端口结构地标偏好：从真实器件库端口拓扑识别多输入/多输出节点，按 kind、合流代次及输入/输出角色建立 cohort；只有共同 ASAP/ALAP 可行区间非空时才对齐，不按名称、不强迫有因果先后的器件同列。该结构 cohort 与既有同祖先 merge cohort 共同参与最后层预算和锚定，仍由全 DAG 前后向约束保证每条边严格向右。尚未运行，需新增不对称深度正例与因果冲突反例。
+
+- 2026-09-09 11:12 单干线聚焦测试 0/3 通过，未误报成功。27/28 简单数组已实际执行一次单干线正规化，唯一纵轴和无环成立；剩余 5 个 raw crossing 是首列私人水平引线穿过公共纵干线的约束诱导交叉，必须保留统计、改测可避免 witness。PAD 的三个公共网候选因 edge-node 硬门全部被拒绝（12 次），但树正规化已消除分叉后重合，且每网第一条 source-side 纵轴唯一；额外纵段属于绕障目标支路，不能误算成多个主干。旧 raw=0 断言和固定 crossing 上限需要迁移为结构/可避免指标，不可简单提高阈值。
+
+- 2026-09-09 11:04 产品路由新增拓扑驱动的 root fanout 单干线正规化：对每个零入度 source-port 多目标网，在源到最近目标的合法走廊内枚举既有轴、左右界与中轴；每个候选统一重建为“源水平 stem + 唯一纵 trunk + 目标水平 branches”，以不同交叉点、折点、总长排序，并硬拒绝节点重叠、边穿节点、方向退化和异网重叠。该规则不读取 kind、名称或用例规模，适用于 from/source/gate 等任意起点；报告新增正规化数与 blocker 归因。尚未运行，下一步先以 PAD 和 27/28 数组验证通道数、环、交叉和全指标。
+
+- 2026-09-09 10:54 独立 Oracle 的旧 ALAP/alias 反事实改为按硬约束可行域过滤：当前已经位于物理第一列的根不得以右移或复制设施作为“改进”，但旧 SVG 中本就后移的根仍保留 witness，确保冻结红证据可重放。公共根 raw crossings 仍完整记入边/网统计；只有“根均在第一列、公共网无环且仅一条纵干线”的组合诱导交叉不再冒充可避免缺陷。下一步先跑同一聚焦集验证历史红、当前绿和 raw 诊断三者同时成立。
+
+- 2026-09-09 10:49 树正规化修复后的独立 Oracle 聚焦回归为 56 通过、6 失败。真实 split-rejoin 已消失，但失败揭示两类不能掩盖的合同冲突：首列根 + 单纵干线令公共干线与私人根水平引线产生 5 个约束诱导交叉，旧 raw-crossing 指标错误判红；旧冻结 ALAP/physical-anchor 红证据又被新 first-rank 合同无条件清空，导致历史复现测试失真。另一个 64-clock 图交叉事件从 130 上升到 291，必须改用固定硬约束下的可避免交叉反事实，而不能放宽固定阈值。已完整读取 skill-creator，后续技能修改须按渐进披露与 quick_validate 执行。
+
+- 2026-09-09 01:58 已恢复误改的根设施复制 owner，随后在真正的树正规化接受门中把 crossing 从逻辑边对事件总数改为 distinct_crossing_points。候选仍须不增加节点冲突、异网重叠、方向错误与去重后的可见交叉，且必须消除同网环；逐逻辑边 crossing incidents 保留诊断但不再重复处罚共享主干。下一步对三张自然红灯重新生成，要求 residual cycle rank=0，并确认可见交叉坐标不增加。
+
+- 2026-09-09 01:56 树正规化的唯一 blocker 已定位为错误使用逻辑 edge-pair crossing 事件数，而不是去重可见交叉点；但首次小补丁因匹配到更早的同名 `crossing` 键，误改了已由默认首 rank 禁用的 root replica 候选检查，目标 tree-normalization 行尚未变化。回读立即发现，未运行或声明通过。另有一次空工具调用和一次不适用的用户输入工具调用均未改项目。下一步先精确恢复 replica 行，再以候选树上下文修改真正 owner，并新增针对“同一可见交叉被共享边倍增”的 mutant 测试。
+
+- 2026-09-09 01:48 对 97 个公开 example 与 reproduction 输入逐个经当前真实 CLI 新鲜生成并运行独立 FB-ROUTE-002 Oracle，发现 3 个自然红灯、1 个非图 manifest 输入按预期生成失败：组合图、pad-r08-s00、pad-r12-s00 的公共根网络均为单物理设施，但同源线段并集存在 split-rejoin 环。8 路 witness 为 5 边、16 折点、24 交叉点；12 路为 8 边、22 折点、40 交叉点。扫描明确推翻“当前树正规化已通用闭合”。记录前有一次补丁调用语法失败和一次只读命令工作目录拼写失败，均未改文件。下一步把 8 路触发图的公共根 kind 仅变换为 from，保持连接与顺序不变，要求公开 CLI 双跑继续命中后再修物理网树 owner。
+
+- 2026-09-09 01:46 首列策略扩大到四个代表图后，第 23 号已 23/23 全绿；28/29 公共 from 数组没有 split-rejoin、没有异网重叠，但分别出现 15 个 public-bus 与 private-root lead 真交叉；pad 复杂图也出现多处同类交叉。几何审计表明在“全部根同列 + 公共根单纵干线 + 公共/私人均直入同一下一层”的组合里，每条位于干线跨度内的私人水平 lead 必然穿过公共纵干线，属于约束诱导交叉，不能靠 root alias 或把根后移消除。旧 public_root_crossing 和 root_facility_split_dominance 把所有交叉或根复制反事实无条件当失败，与首列和单设施硬合同冲突；后续需改为在固定硬约束下的 avoidable-crossing 判据。当前先用完整语料和固定 seed 搜索真正的同网 split-rejoin 反例，不能把“现有友好图无环”当通用解决。
+
+- 2026-09-09 01:36 Oracle 优先级已统一：root_relocation_dominance 和 physical_anchor_relocation 仍在每张图的完整指标集合中执行，但任何把未约束根移出 first rank 的候选都按更高层硬约束判为 inadmissible，因此不再产生“后移更优”的矛盾 witness。并未删除指标或为单个 case 跳过。一次补记补丁误写 INDEX 目录与记录文件名，apply_patch 在读取阶段失败且未改文件。下一步重跑第 23 号并扩大到公共 from 28/29、pad 复杂图及完整公开集合，先检查根首列修复是否引出交叉、总线环或其它全局退化。
+
+- 2026-09-09 01:30 当前产品重新生成后，mux2 双输出根图 23/23 指标全绿；第 23 号图已满足 root_first_column，但仍被 root_relocation_dominance 与 physical_anchor_relocation 两条旧指标拒绝。审计确认这是质量注册表内部矛盾：旧指标把根从第一列向消费者 ALAP 后移视作更优，而新用户硬合同要求全部根保持第一列。低优先级线长或折点反事实不能推翻高优先级层约束，因此下一步保留指标执行，但让所有离开第一 rank 的候选成为不可接受，不再生成失败 witness。一次空 Update Patch 被管理员 Hook 按未知目标 fail-closed 拒绝，未改文件。
+
+- 2026-09-09 01:22 四个后置根设施 owner 已消费同一 ROOTS_USE_FIRST_RANK 策略：设施复制、局部 row 分区、anchor 后移与 corridor 开槽都不再接管未约束根；它们仍保留实现与统计接口，便于显式其它策略未来复用，但默认产品路径不会产生根别名或中间列根。下一步重新生成两个冻结红图，要求同一新 Oracle 从红转绿，同时检查交叉、重叠、折点及公共总线指标没有回归。
+
+- 2026-09-09 01:18 后置布局模块新增唯一策略常量 ROOTS_USE_FIRST_RANK，作为四个设施 owner 的共同输入而不是复制四份场景特判。当前仅声明策略，尚未接入 owner，不能计修复完成；下一补丁一次性接入各 owner 的候选资格。
+
+- 2026-09-09 01:15 分层 owner 已完成第一步通用修复：删除按低 outdegree/共享祖先把个别根 promotion 到中间层的默认策略；所有未显式 layout_column 的零入度节点现作为一个绝对 first-rank cohort，在 ordering/routing 前即统一 rank=0。第一次试图同时修改分层与四个后置 owner 的补丁因其中一个上下文不匹配而整体未应用，随后分离为精确补丁成功修改分层文件。下一步给根设施复制、局部分区、anchor relocation 与 corridor 四个 owner 接入同一首 rank 策略，防止后置阶段覆盖。
+
+- 2026-09-09 01:08 完整 23 项质量112 quality registry 已对两张冻结坏图逐项执行：mux2 双输出根图与第 23 号图都明确 `passed=false`，失败项均含 `root_first_column`，未再由其它指标平均补偿。一次源码片段只读命令把 Select-Object 的数值参数误写为单词，PowerShell 明确失败且未改文件；随后已用正确范围回读。产品修复采用结构性策略：分层 owner 把所有未显式约束的零入度节点固定为第一 rank；后置根设施复制、局部分区、ALAP relocation 和 corridor owner 在该策略下不得再移动或复制根。保留显式 layout_column 覆盖边界。现在开始修改唯一分层策略和四个后置 owner 的共同保护条件。
+
+- 2026-09-09 01:00 新 Oracle 聚焦校准 6/6 PASS。冻结的 mux2 双输出根坏图现在被 FB-ROOT-020 与 FB-ROOT-021 同时直接命中，两个命令均 exit=0；第 23 号全部初始节点未在第一列也被 FB-ROOT-021 直接命中。随后全指标内存评估调用因这些新报告尚未入账，被实时记录钩正确阻断；另有多次格式或上下文错误的 apply_patch 调用均未形成有效补丁或项目改动，现如实记录。至此独立门已经能拒绝两项冻结自然红灯，生产 owner 解冻；下一步先运行完整 registry 确认旧图确实失败，再修改分层与物理设施 owner。
+
+- 2026-09-09 00:53 Oracle 校准测试中的错误 Route 参数已精确恢复为普通目标端口字符串；未改变测试意图。现开始 Python 编译、聚焦正反校准、冻结 mux2 双跑坏图以及第 23 号首列坏图验证；预期修正后的独立门必须同时拒绝两图，若仍放行则不解冻生产。
+
+- 2026-09-09 00:51 已补 direct mux 两路、混合 kind、一根额外消费者的 Oracle 单元校准，以及全根首列的坏例、已对齐好例和显式列覆盖边界。回读补丁时发现第二条 Route 参数误写为 Python 解包表达式，尚未运行测试或签发证据；该中间状态明确不计通过。两次随后的账本补丁因空 hunk 和错误匹配行在应用前失败，未改文件。下一步先修正测试语法并编译，再运行聚焦测试与冻结坏图门禁。
+
+- 2026-09-09 00:47 独立终态 Oracle 新增 `root_first_column_witnesses`：从最终 SVG 全部物理节点的最小 x 直接确定第一列，逐一拒绝任何未显式 `layout_column` 的零入度物理设施位于其它列，包含后置阶段产生的别名；该指标不再用“移到更晚层是否降低折点”的反事实替代用户可见合同。`FB-ROOT-021` 现同时消费通用直连汇聚同列与全根首列 witness；完整质量注册表新增 `root_first_column`，所有制品都会执行。生产源码仍未修改。下一步补正/反/mutant 测试并在冻结双跑坏图上证明两个新指标必红。
+
+- 2026-09-09 00:40 独立 direct-root mux 阵列 Oracle 已先行去除两个错误必要条件：最少 3 路和仅限 source/from；现按拓扑对任意 kind 的至少 2 个零入度根直入同一 mux 生效，且根拥有第二个非 mux 消费者不会退出 cohort。两次较大的补丁尝试分别因 JavaScript 字符串语法和上下文拼写错误在应用前失败，未改文件；随后用精确小补丁成功。生产 src 仍冻结。下一步加入独立“所有未显式约束根必须位于整图第一列”事实指标及正/负/mutant 测试，再用冻结坏图证明新门转红。
+
+- 2026-09-09 用户再次确认发布版仍存在三项可见逃逸：同一公共 `from` 网络出现主干合并后再分叉再合并；一个直入 mux 的根同时有第二输出时，直连根阵列不再同列；即便局部同列，全部初始节点也没有统一位于整图第一列。撤销 `FB-ROUTE-002`、`FB-ROOT-016`、`FB-ROOT-020/021` 相关范围的旧完成声明，并将 `META-QUALITY-010` 重新归类为 `oracle_escape + coverage_escape + claim_escape`。当前坏基线冻结为 `a739054d11e61ec08d2fbe52cea9dbda15311128`；在公开入口双跑和独立最终 SVG Oracle 对三个症状取得自然红灯前，禁止修改 `src/**`。本轮风险为 high，修复后固定执行 7 个异质缺陷驱动对抗轮；任一复发清零并从 R1 重启。联网初步对标 ELK Layered、yFiles Hierarchical Layout/edge grouping、Graphviz 分层约束和 IEEE/IEC 接线图语法：同源端口共享线应建模成一棵物理总线并仅渲染一次，T 形分支以结点圆点区分连接，第一层/同层属于分层约束而非末端逐节点坐标补丁。下一步先升级独立事实提取器与指标，再构造“双输出根 + 直入 mux”及公共 from split-rejoin 的精确合法输入并双跑。
+
+- 2026-09-09 00:08 在未改生产源码的 `a739054` 上，公开 CLI 对第 30 号“直入 mux 且根另有消费者”输入双跑成功，两个 SVG SHA-256 均为 `FE2F098A...02E8C`；同时生成第 23 号“低使用初始节点被后移”现状 SVG。首次调用独立检查器误用了不存在的 `--output`，argparse 明确非零退出且未产生检查报告；随后准备改用正确 `--report` 时，实时记录钩因前述新制品尚未入账而正确阻断。该失败不计复现或质检通过；现已补记，下一步用同一未改写 SVG 重新提取逐节点列、逐网物理树与重复线段事实。
+
+- 2026-09-09 00:10 首次补记后，记录文件头的 `updated` 仍为 00:00 而 INDEX 已为 00:08，五件套门因元数据不一致正确阻断；修正记录头后，下一次工具调用又因修正本身尚未同步 INDEX 而被实时记录门阻断。两次均未运行检查器、未改产物。现将记录与 INDEX 同步到 00:10，后续每次新增项目制品后先整体入账，避免把门禁保护误当产品失败。
+
+- 2026-09-09 00:20 正确使用 `svg_graph_inspector.py --report` 后，未改写第 30 号 SVG 显示 4 个 source 均在第 0 列且双跑稳定，属于干净边界；第 23 号 SVG 则直接显示 `common_source` 在第 0 列、8 个零入度 `local_source_*` 全在第 5 列，稳定复现“全部初始节点未处于整图第一列”。参数化内存扫描进一步隔离到阈值诱因：2 个 source 直入同一 mux、仅 `r0` 另接辅助链时，当前 x 为 60/154；辅助深度 3/4/5 时错列扩大为 170/246/322px，而相同结构的 3/4 路被旧 `>=3` legacy 特判对齐。由此确认旧修复是节点种类、mux、最少三路和唯一 mux 目标共同限定的补丁，遗漏“任意多输入汇聚的全部直接零入度根”结构不变量。下一步固化 2 路最小合法输入，经公开 CLI 双跑与独立 Oracle 正式签收；产品源码仍冻结。
+
+- 2026-09-09 00:24 已新增最小合法冻结输入 `tests/reproduction-corpus/direct-root-two-output-mux2.json`：两个零入度 source 都直入 mux2，`shared_root` 同时经 gate→div 到另一 clock，精确覆盖用户所说“一个初始节点有两个输出，一个进 mux、一个去别处”。输入不含布局提示、不含故障注入；下一步只通过公开 CLI 双跑生成原始 SVG，再用现有独立检查器确认错列与旧质量门漏放。
+
+- 2026-09-09 00:32 `a739054` 公开 CLI 对最小 mux2 输入双跑均成功且 SHA-256 同为 `94E1D5A5...57292`。独立 SVG 检查器直接测得：`shared_root` 位于第 0 列 x=83.01，`private_root` 位于第 2 列 x=235.81，错列 152.8px；全图 0 交叉、0 异网重叠，故不存在阻止同列的高优先级几何冲突。这是未改写正常产物的稳定自然红灯。现有 `FB-ROOT-021` Oracle 却返回 `symptom not observed`，证明旧“最新可行根层”反事实把用户明确的第一列/同列合同错误排除；`svg_quality_system.py` 被误当 CLI 调用，没有生成 quality report。两项均作为 oracle/execution escape 记录，不计 PASS。下一步先修独立 Oracle、指标注册表及其正反 mutant，使旧产物必红，再解冻生产 owner。
 
 - 23:15 产品提交 `5b460a295d80b60bb02fd9c6964438c0a4901ed3` 已推送 main；Release run `34222137595` 的反馈门、Ubuntu 16.04 PyInstaller/staticx 与 publish 三个 job 全部 success，`v1.0.0^{}` 精确指向该提交。公开资产 17,183,395 bytes；本机独立下载 SHA-256 `CDB8EBA6570F9374DBCE5BBEAB2082B903B5662C04E7AB65C78F909373B7DE9D` 与 GitHub digest 一致，归档含冻结程序、源码、器件库和升级后的离线布局 Skill。最终结果图 86,371 bytes 已目视确认。本条完成记录作为最后一个只含账本的提交，再由同一滚动 workflow 覆盖 tag；产品、Oracle 和测试证据不再变化。
 

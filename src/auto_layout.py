@@ -307,17 +307,10 @@ def _ranks(
                 *(ancestor_roots[parent] for parent in incoming[name])
             )
         )
-    promoted_roots = {
-        root
-        for root, degree in root_outdegree.items()
-        if degree == 1
-        and root not in explicit_column_nodes
-        and root not in direct_root_fanin_arrays
-        and any(
-            other != root and root_outdegree.get(other, 0) > 1
-            for other in ancestor_roots[outgoing[root][0]]
-        )
-    }
+    # Roots are an absolute first-rank cohort. Mature layered layout engines
+    # model this as a layer constraint; promoting individual low-use roots is
+    # a different policy and breaks whole-diagram source alignment.
+    promoted_roots: set[str] = set()
     distribution_roots = {
         root
         for root, degree in root_outdegree.items()
@@ -358,6 +351,29 @@ def _ranks(
     for name in visited:
         if len(incoming[name]) > 1:
             cohorts[(root_ancestors[name], merge_generation[name])].append(name)
+
+    # Multi-port symbols are structural landmarks.  Repeated landmarks with
+    # the same component kind, merge generation and port role prefer one
+    # layer even when their ancestor sets differ.  This mirrors a layered
+    # engine's node-type alignment preference: it is applied only inside the
+    # common ASAP/ALAP feasibility interval and never reverses a dependency.
+    structural_cohorts: dict[tuple[str, int, bool, bool], list[str]] = defaultdict(list)
+    if hasattr(names, "items"):
+        for name, value in names.items():
+            if not isinstance(value, ResolvedNode):
+                continue
+            topology = port_topology_from_style(value.shape.style)
+            multi_input = len(topology.inputs) > 1
+            multi_output = len(topology.outputs) > 1
+            if not (multi_input or multi_output):
+                continue
+            structural_cohorts[
+                (kind_by_name.get(name, ""), merge_generation[name], multi_input, multi_output)
+            ].append(name)
+    alignment_cohorts = [
+        cohort for cohort in (*cohorts.values(), *structural_cohorts.values())
+        if len(cohort) > 1
+    ]
 
     downstream_depth: dict[str, int] = {}
     for name in reversed(visited):
@@ -475,13 +491,12 @@ def _ranks(
     # different branch is longer after it.  Add exactly that constraint-derived
     # slack; this is not a node-count or component-kind threshold.
     last_layer = max(earliest.values(), default=0)
-    for cohort in cohorts.values():
-        if len(cohort) > 1:
-            last_layer = max(
-                last_layer,
-                max(earliest[name] for name in cohort)
-                + max(downstream_depth[name] for name in cohort),
-            )
+    for cohort in alignment_cohorts:
+        last_layer = max(
+            last_layer,
+            max(earliest[name] for name in cohort)
+            + max(downstream_depth[name] for name in cohort),
+        )
     for cohort in feasible_columns.values():
         last_layer = max(
             last_layer,
@@ -495,9 +510,7 @@ def _ranks(
             latest[name] = min(latest[child] - 1 for child in children)
 
     anchored = dict(latest)
-    for cohort in cohorts.values():
-        if len(cohort) < 2:
-            continue
+    for cohort in alignment_cohorts:
         lower = max(earliest[name] for name in cohort)
         upper = min(latest[name] for name in cohort)
         if lower <= upper:
@@ -514,9 +527,9 @@ def _ranks(
             anchored[name] = min(
                 anchored[name], min(anchored[child] - 1 for child in children)
             )
-    for root in (
-        distribution_roots | direct_root_fanin_arrays
-    ) - explicit_column_nodes:
+    for root in {
+        name for name in visited if not incoming[name]
+    } - explicit_column_nodes:
         anchored[root] = earliest[root]
     return anchored
 

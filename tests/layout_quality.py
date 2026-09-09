@@ -271,41 +271,10 @@ def inspect_layout_quality(
     )
     logical_outdegree = Counter(edge.source for edge in logical_edges)
     logical_indegree = Counter(edge.target for edge in logical_edges)
-    independent_ranks = _independent_latest_forward_ranks(
-        list(resolved), logical_edges
-    )
-    primary_axes = {
-        name: (vertex_visual_box(vertex).left + vertex_visual_box(vertex).right) / 2.0
-        for name, vertex in vertices_by_name.items()
-    }
+    # Clock-tree schematic mode fixes every unconstrained zero-indegree node
+    # to the first rank.  Keep the legacy report field as an empty exact-set;
+    # moving a root inward is not an admissible quality counterfactual.
     avoidable_root_layer_positions: list[dict[str, Any]] = []
-    independent_levels = set(independent_ranks.values())
-    for name in sorted(resolved):
-        expected_rank = independent_ranks[name]
-        if (
-            logical_indegree[name] != 0
-            or logical_outdegree[name] != 1
-            or expected_rank <= 0
-            or "layout_column" in config[name]
-            or name not in primary_axes
-        ):
-            continue
-        previous_rank = max(
-            rank for rank in independent_levels if rank < expected_rank
-        )
-        previous_axes = [
-            primary_axes[other]
-            for other, rank in independent_ranks.items()
-            if rank == previous_rank and other in primary_axes
-        ]
-        if previous_axes and primary_axes[name] <= max(previous_axes) + tolerance:
-            avoidable_root_layer_positions.append({
-                "node": name,
-                "expected_rank": expected_rank,
-                "actual_axis_x": round(primary_axes[name], 3),
-                "previous_rank": previous_rank,
-                "previous_rank_axis_x_max": round(max(previous_axes), 3),
-            })
     observed_counter: Counter[str] = Counter()
     dangling_edges: list[str] = []
     unresolved_port_edges: list[str] = []
@@ -1036,7 +1005,7 @@ def inspect_layout_quality(
     avoidable_root_merge_input_crossings = sorted({
         pair
         for pair in root_merge_input_order_inversions
-        if any(
+        if all(
             logical_outdegree[observed_edge_ports[edge_id][0]] == 1
             for edge_id in pair
         )

@@ -11,6 +11,7 @@
     {"id": "root_fanout_axis_dominance", "witness": "root_fanout_axis_dominance_witnesses", "applicability": "has_root_fanout"},
     {"id": "direct_root_mux_column", "witness": "direct_root_fanin_column_witnesses", "applicability": "has_direct_root_mux_array"},
     {"id": "feasible_direct_root_fanin_column", "witness": "feasible_direct_root_fanin_column_witnesses", "applicability": "has_direct_root_fanin"},
+    {"id": "root_first_column", "witness": "root_first_column_witnesses", "applicability": "has_roots"},
     {"id": "regular_array_single_facility", "witness": "regular_fanout_array_replication_witnesses", "applicability": "has_root_fanout"},
     {"id": "shared_root_single_bus", "witness": "shared_root_bus_fragmentation_witnesses", "applicability": "has_root_fanout"},
     {"id": "annotation_geometry", "witness": "annotation_quality", "applicability": "has_annotations"}

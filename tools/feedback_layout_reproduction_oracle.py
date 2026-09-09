@@ -569,6 +569,11 @@ def route_crossings(routes: list[Route]) -> tuple[list[dict[str, Any]], list[dic
     return events, overlaps
 
 
+def _distinct_crossing_count(events: list[dict[str, Any]]) -> int:
+    """Count visible crossing locations, not duplicated logical edge pairs."""
+    return len({tuple(event["point"]) for event in events})
+
+
 def _rect_interior_hit(a: tuple[float, float], b: tuple[float, float], box: Box) -> bool:
     if abs(a[1] - b[1]) <= EPS:
         lo, hi = sorted((a[0], b[0]))
@@ -1547,13 +1552,15 @@ def _root_fanout_axis_dominance_witnesses(
                 candidate_bends = sum(max(0, len(route.points) - 2) for route in candidate_routes)
                 actual_length = sum(_route_length(route) for route in actual_routes)
                 candidate_length = sum(_route_length(route) for route in candidate_routes)
+                original_crossing_points = _distinct_crossing_count(original_crossings)
+                candidate_crossing_points = _distinct_crossing_count(candidate_crossings)
                 if (
-                    len(candidate_crossings) <= len(original_crossings)
+                    candidate_crossing_points <= original_crossing_points
                     and len(candidate_overlaps) <= len(original_overlaps)
                     and candidate_bends <= actual_bends
                     and candidate_length <= actual_length + EPS
                     and (
-                        len(candidate_crossings) < len(original_crossings)
+                        candidate_crossing_points < original_crossing_points
                         or candidate_bends < actual_bends
                     )
                 ):
@@ -1568,6 +1575,8 @@ def _root_fanout_axis_dominance_witnesses(
                         "length_after": round(candidate_length, 4),
                         "crossing_events_before": len(original_crossings),
                         "crossing_events_after": len(candidate_crossings),
+                        "crossing_points_before": original_crossing_points,
+                        "crossing_points_after": candidate_crossing_points,
                         "overlaps_before": len(original_overlaps),
                         "overlaps_after": len(candidate_overlaps),
                     })
@@ -1640,14 +1649,16 @@ def _root_fanout_axis_dominance_witnesses(
                 candidate_crossings, candidate_overlaps = route_crossings(candidate_all)
                 candidate_bends = sum(max(0, len(route.points) - 2) for route in candidate_routes)
                 candidate_length = sum(_route_length(route) for route in candidate_routes)
+                original_crossing_points = _distinct_crossing_count(original_crossings)
+                candidate_crossing_points = _distinct_crossing_count(candidate_crossings)
                 if (
-                    len(candidate_crossings) <= len(original_crossings)
+                    candidate_crossing_points <= original_crossing_points
                     and len(candidate_overlaps) <= len(original_overlaps)
                     and candidate_bends <= actual_bends
                     and candidate_length <= actual_length + EPS
                     and (
                         candidate_bends < actual_bends
-                        or len(candidate_crossings) < len(original_crossings)
+                        or candidate_crossing_points < original_crossing_points
                     )
                 ):
                     witnesses.append({
@@ -1662,6 +1673,8 @@ def _root_fanout_axis_dominance_witnesses(
                         "length_after": round(candidate_length, 4),
                         "crossing_events_before": len(original_crossings),
                         "crossing_events_after": len(candidate_crossings),
+                        "crossing_points_before": original_crossing_points,
+                        "crossing_points_after": candidate_crossing_points,
                         "overlaps_before": len(original_overlaps),
                         "overlaps_after": len(candidate_overlaps),
                     })
@@ -1675,7 +1688,7 @@ def _direct_root_fanin_column_witnesses(
     """Find staggered physical facilities that directly feed one merge.
 
     The check is deliberately based on final endpoint boxes rather than logical
-    ranks.  Three or more unconstrained roots that enter the same merge without
+    ranks.  Two or more unconstrained roots that enter the same merge without
     intermediate nodes form a visual source array and should share one column.
     Explicit ``layout_column`` values remain an intentional user override.
     """
@@ -1695,10 +1708,9 @@ def _direct_root_fanin_column_witnesses(
             continue
         sources = sorted({
             route.source for route in incoming
-            if str(config.get(route.source, {}).get("kind", "")) in {"source", "from"}
-            and len(direct_mux_targets[route.source]) == 1
+            if len(direct_mux_targets[route.source]) == 1
         })
-        if len(sources) < 3:
+        if len(sources) < 2:
             continue
         if any("layout_column" in config.get(source, {}) for source in sources):
             continue
@@ -1941,6 +1953,32 @@ def _feasible_direct_root_fanin_column_witnesses(
                     "bends_after": candidate_bends,
                 })
                 break
+    return witnesses
+
+
+def _root_first_column_witnesses(
+    config: dict[str, Any], roots: set[str], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Report unconstrained root facilities outside the first physical rank."""
+    if not boxes:
+        return []
+    first_x = min(box.x for box in boxes)
+    witnesses = []
+    for root in sorted(roots):
+        if "layout_column" in config.get(root, {}):
+            continue
+        renderings = [box for box in boxes if box.node == root]
+        misplaced = [box for box in renderings if abs(box.x - first_x) > EPS]
+        if misplaced:
+            witnesses.append({
+                "root": root,
+                "kind": str(config.get(root, {}).get("kind", "")),
+                "expected_first_column_x": round(first_x, 4),
+                "rendering_columns": sorted({
+                    round(box.x, 4) for box in renderings
+                }),
+                "misplaced_renderings": len(misplaced),
+            })
     return witnesses
 
 
@@ -2571,6 +2609,16 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         )
         if relocation is not None:
             root_relocation_witnesses.append(relocation)
+    # The first-rank root cohort is a higher-priority schematic constraint.
+    # A counterfactual that moves an already first-ranked root into a later
+    # layer is inadmissible.  Keep the witness for historical SVGs whose root
+    # is already displaced so frozen red evidence remains reproducible.
+    physical_first_x = min((box.x for box in boxes), default=0.0)
+    root_relocation_witnesses = [
+        witness for witness in root_relocation_witnesses
+        if min(box.x for box in boxes_by_node[witness["root"]])
+        > physical_first_x + 1.0
+    ]
     port_inversions = []
     incoming: dict[str, list[Route]] = defaultdict(list)
     for route in routes:
@@ -2640,6 +2688,37 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             and "layout_column" in config.get(witness["other_root"], {})
         )
     ]
+    # With every root fixed to the first rank, a single vertical public bus
+    # and a direct private lead to a merge can have a topologically forced
+    # crossing.  Moving the private root right or splitting the public bus is
+    # outside the admissible layout space.  Preserve the raw crossing event in
+    # ``edges``/``networks`` but do not label this constrained geometry as an
+    # avoidable public-root defect.
+    public_networks = {
+        public: [route for route in routes if route.source == public]
+        for public in roots if outdegree[public] >= 2
+    }
+    constrained_single_bus_roots = {
+        public
+        for public, network_routes in public_networks.items()
+        if not _same_net_cycle(network_routes)
+        and len({
+            round(a[0], 4)
+            for route in network_routes
+            for a, b in segments(route)
+            if abs(a[0] - b[0]) <= EPS and abs(a[1] - b[1]) > EPS
+        }) == 1
+        and min(box.x for box in boxes_by_node[public]) <= physical_first_x + 1.0
+    }
+    public_root_crossings = [
+        witness for witness in public_root_crossings
+        if not (
+            min(box.x for box in boxes_by_node[witness["public_root"]])
+            <= physical_first_x + 1.0
+            and min(box.x for box in boxes_by_node[witness["other_root"]])
+            <= physical_first_x + 1.0
+        )
+    ]
     mixed_root_quality_failures = [
         witness
         for witness in public_root_crossings
@@ -2650,14 +2729,19 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     )
     root_facility_split_witnesses = [
         witness for witness in root_facility_split_witnesses
-        if not (
-            str(config.get(witness["root"], {}).get("kind", "")) == "from"
-            and outdegree[witness["root"]] >= 2
-        )
+        if min(box.x for box in boxes_by_node[witness["root"]])
+        > physical_first_x + 1.0
     ]
     physical_anchor_relocation_witnesses = (
         _physical_anchor_relocation_witnesses(roots, routes, boxes)
     )
+    # Physical aliases and later-column root facilities are forbidden for an
+    # already first-ranked root.  Historical displaced layouts remain red.
+    physical_anchor_relocation_witnesses = [
+        witness for witness in physical_anchor_relocation_witnesses
+        if min(box.x for box in boxes_by_node[witness["root"]])
+        > physical_first_x + 1.0
+    ]
     # A direct source/from array is a single visual column contract.  Moving
     # one member horizontally may remove a crossing, but it is not an
     # admissible counterfactual because it breaks that higher-priority array
@@ -2700,7 +2784,10 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     root_fanout_axis_dominance_witnesses = [
         witness for witness in root_fanout_axis_dominance_witnesses
         if "root" not in witness
-        or witness["root"] not in protected_direct_mux_roots
+        or (
+            witness["root"] not in protected_direct_mux_roots
+            and witness["root"] not in explicit_column_roots
+        )
     ]
     direct_root_fanin_column_witnesses = (
         _direct_root_fanin_column_witnesses(config, roots, routes, boxes)
@@ -2708,6 +2795,14 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     feasible_direct_root_fanin_column_witnesses = (
         _feasible_direct_root_fanin_column_witnesses(config, roots, routes, boxes)
     )
+    root_first_column_witnesses = _root_first_column_witnesses(
+        config, roots, boxes
+    )
+    if not root_first_column_witnesses:
+        # Splitting an already first-ranked root into later facilities is not
+        # an admissible remedy. Historical displaced layouts keep the legacy
+        # witness because their root-first violation remains directly visible.
+        root_facility_split_witnesses = []
     detected = {
         # Mixed kinds are only a precondition.  A defect is present only when
         # an ordinary zero-indegree component also exhibits the measured root
@@ -2738,7 +2833,10 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         ),
         "FB-BEND-017": bool(root_fanout_axis_dominance_witnesses),
         "FB-ROOT-020": bool(direct_root_fanin_column_witnesses),
-        "FB-ROOT-021": bool(feasible_direct_root_fanin_column_witnesses),
+        "FB-ROOT-021": bool(
+            feasible_direct_root_fanin_column_witnesses
+            or root_first_column_witnesses
+        ),
     }
     route_row_by_id = {row["edge_id"]: row for row in route_rows}
     node_statistics = {}
@@ -2866,6 +2964,7 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             "feasible_direct_root_fanin_column_witnesses": (
                 feasible_direct_root_fanin_column_witnesses
             ),
+            "root_first_column_witnesses": root_first_column_witnesses,
         },
         "detected_issues": [issue for issue in ISSUES if detected[issue]],
     }

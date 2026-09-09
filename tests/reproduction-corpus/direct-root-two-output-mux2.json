@@ -1,0 +1,15 @@
+{
+  "shared_root": {"kind": "source"},
+  "private_root": {"kind": "source"},
+  "aux_gate": {"kind": "gate", "source": "shared_root"},
+  "aux_div": {"kind": "div", "source": "aux_gate"},
+  "aux_clock": {"kind": "clock", "source": "aux_div"},
+  "mux": {
+    "kind": "mux2",
+    "source": {
+      "0": "shared_root",
+      "1": "private_root"
+    }
+  },
+  "clock": {"kind": "clock", "source": "mux"}
+}

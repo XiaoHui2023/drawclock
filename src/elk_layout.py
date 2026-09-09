@@ -34,6 +34,9 @@ from validate_config import validate_config
 from visual_geometry import estimated_label_width, vertex_visual_box, visual_box
 
 
+ROOTS_USE_FIRST_RANK = True
+
+
 @dataclass(frozen=True)
 class LayoutPlan:
     mode: str
@@ -3516,6 +3519,7 @@ def _replicate_dispersed_roots(
     for root in sorted(nodes):
         if (
             indegree[root]
+            or ROOTS_USE_FIRST_RANK
             or len(outgoing[root]) < 2
             or root in regular_array_roots
             or root in direct_fanin_array_roots
@@ -4658,6 +4662,104 @@ def _normalize_fanout_routes_as_trees(
     for index, logical in enumerate(logical_edges, 1):
         groups[(edge_by_id[f"e{index}"].source_id, logical.source_port)].append(index)
 
+    # A zero-indegree fanout is drawn as one rectilinear bus: one horizontal
+    # stem from the source, one vertical trunk, and horizontal branches to the
+    # consumers.  This is a physical-net invariant, not a fixture-specific
+    # route tweak.  Candidate trunk axes are searched inside the legal
+    # source-to-nearest-target corridor and ranked by visible geometry.
+    logical_indegree: Counter[str] = Counter(
+        logical.target for logical in logical_edges
+    )
+    single_trunk_normalized = 0
+    single_trunk_blockers: Counter[str] = Counter()
+    for indices in groups.values():
+        if len(indices) < 2:
+            continue
+        logical_source = logical_edges[indices[0] - 1].source
+        if logical_indegree[logical_source] != 0:
+            continue
+        current_paths = [route_points(index) for index in indices]
+        first_vertical_axes = set()
+        for points in current_paths:
+            for left, right in zip(points, points[1:]):
+                if abs(left[0] - right[0]) <= 1e-6 and abs(left[1] - right[1]) > 1e-6:
+                    first_vertical_axes.add(canonical(left)[0])
+                    break
+        target_rows = {canonical(points[-1])[1] for points in current_paths}
+        if not has_cycle(union_graph(indices)) and (
+            len(target_rows) <= 1 or len(first_vertical_axes) == 1
+        ):
+            continue
+        endpoints = [route_endpoints(index) for index in indices]
+        starts = {canonical(start) for start, _ in endpoints}
+        if len(starts) != 1:
+            single_trunk_blockers["multiple-physical-starts"] += 1
+            continue
+        start = next(iter(starts))
+        ends = [end for _, end in endpoints]
+        corridor_right = min(end[0] for end in ends)
+        if corridor_right <= start[0] + 1e-6:
+            single_trunk_blockers["no-forward-corridor"] += 1
+            continue
+        inset = min(
+            max(route_clearance, 4.0),
+            max(0.0, (corridor_right - start[0]) / 3.0),
+        )
+        low = start[0] + inset
+        high = corridor_right - inset
+        if high < low:
+            low = high = (start[0] + corridor_right) / 2.0
+        existing_axes = {
+            point[0]
+            for index in indices
+            for point in route_points(index)[1:-1]
+            if low - 1e-6 <= point[0] <= high + 1e-6
+        }
+        axis_candidates = sorted({
+            canonical((low, 0.0))[0],
+            canonical((high, 0.0))[0],
+            canonical(((low + high) / 2.0, 0.0))[0],
+            *existing_axes,
+        })
+        candidates = []
+        for axis_x in axis_candidates:
+            candidate = _clone_layout_geometry(accepted)
+            candidate_edges = {edge.cell_id: edge for edge in candidate.edges}
+            for index, (_, end) in zip(indices, endpoints):
+                points = _simplify([
+                    start,
+                    (axis_x, start[1]),
+                    (axis_x, end[1]),
+                    end,
+                ])
+                candidate_edges[f"e{index}"].waypoints = tuple(points[1:-1])
+            candidate_report = assess_layout(candidate, logical_edges, 0.0)
+            checks = {
+                "node-overlap": candidate_report["node_overlaps"] <= accepted_report["node_overlaps"],
+                "edge-node": candidate_report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
+                "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
+                "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
+            }
+            if all(checks.values()):
+                score = (
+                    candidate_report["distinct_crossing_points"],
+                    candidate_report["bends_total"],
+                    candidate_report["manhattan_length"],
+                    axis_x,
+                )
+                candidates.append((score, candidate, candidate_report))
+            else:
+                single_trunk_blockers.update(
+                    name for name, passed in checks.items() if not passed
+                )
+        if not candidates:
+            single_trunk_blockers["no-admissible-axis"] += 1
+            continue
+        _, accepted, accepted_report = min(candidates, key=lambda item: item[0])
+        by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+        edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+        single_trunk_normalized += 1
+
     normalized = 0
     cycles_before = 0
     blockers: Counter[str] = Counter()
@@ -4760,7 +4862,13 @@ def _normalize_fanout_routes_as_trees(
             "edge-node": candidate_report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
             "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
             "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
-            "crossing": candidate_report["crossings"] <= accepted_report["crossings"],
+            # Shared-tree routes can multiply logical edge-pair incidents at
+            # one unchanged visible crossing. The reader sees one point, so
+            # tree normalization compares deduplicated physical crossings.
+            "crossing": (
+                candidate_report["distinct_crossing_points"]
+                <= accepted_report["distinct_crossing_points"]
+            ),
             # A split-rejoin cycle is a structural wiring defect.  Its
             # cycle-free subtree may need an extra turn at a destination,
             # so bend count is a ranking cost, not a veto over acyclicity.
@@ -4787,6 +4895,8 @@ def _normalize_fanout_routes_as_trees(
     return accepted, {
         "fanout_alias_consolidations": alias_consolidations,
         "fanout_alias_consolidation_blockers": dict(sorted(alias_blockers.items())),
+        "fanout_single_trunks_normalized": single_trunk_normalized,
+        "fanout_single_trunk_blockers": dict(sorted(single_trunk_blockers.items())),
         "fanout_cycle_candidates": cycles_before,
         "fanout_cycles_normalized": normalized,
         "fanout_residual_logical_cycle_rank": residual_logical_cycle_rank,
@@ -4882,6 +4992,7 @@ def _relocate_root_rendering_anchors(
     for root in sorted(nodes):
         if (
             indegree[root]
+            or ROOTS_USE_FIRST_RANK
             or "layout_column" in nodes[root].item
             or root in direct_fanin_array_roots
         ):
@@ -5326,6 +5437,7 @@ def _split_root_rendering_anchors_by_local_rows(
     for root in sorted(nodes):
         if (
             indegree[root]
+            or ROOTS_USE_FIRST_RANK
             or "layout_column" in nodes[root].item
             or root in regular_array_roots
             or root in direct_fanin_array_roots
@@ -5884,7 +5996,8 @@ def _open_root_facility_corridors(
     shared_bus_roots = _shared_fanout_bus_roots(nodes, logical_edges)
     roots = {
         name for name in nodes
-        if indegree[name] == 0 and "layout_column" not in nodes[name].item
+        if not ROOTS_USE_FIRST_RANK
+        and indegree[name] == 0 and "layout_column" not in nodes[name].item
         and name not in regular_array_roots
         and name not in direct_fanin_array_roots
         and name not in shared_bus_roots
