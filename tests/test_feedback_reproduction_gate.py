@@ -105,7 +105,8 @@ class FeedbackReproductionGateTest(unittest.TestCase):
 
     def test_open_process_incident_blocks_generic_release_gate(self) -> None:
         manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-        manifest["process_incidents"][0]["status"] = "open"
+        incident = manifest["process_incidents"][0]
+        incident["status"] = "open"
         with tempfile.TemporaryDirectory() as directory:
             mutated = Path(directory) / "manifest.json"
             mutated.write_text(json.dumps(manifest), encoding="utf-8")
@@ -115,7 +116,7 @@ class FeedbackReproductionGateTest(unittest.TestCase):
                 cwd=ROOT, capture_output=True, text=True, check=False,
             )
         self.assertEqual(result.returncode, 1)
-        self.assertIn("META-CLAIM-007", result.stderr)
+        self.assertIn(incident["id"], result.stderr)
 
     def test_release_workflow_cannot_build_or_publish_past_feedback_gate(self) -> None:
         workflow = WORKFLOW.read_text(encoding="utf-8")

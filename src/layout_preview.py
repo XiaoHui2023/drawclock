@@ -606,7 +606,15 @@ def build_preview_svg(
             target.x + target.width * entry_xy[0],
             target.y + target.height * entry_xy[1],
         )
-        edge_points[edge.cell_id] = [start, *edge.waypoints, end]
+        # Crossing classification and the visible SVG must use the same
+        # coordinate domain. Canonicalizing at the four-decimal serialization
+        # boundary removes binary floating tails without changing visible
+        # geometry, preventing a rendered horizontal segment from being
+        # misclassified as diagonal before bridge insertion.
+        edge_points[edge.cell_id] = [
+            (float(_svg_num(x)), float(_svg_num(y)))
+            for x, y in (start, *edge.waypoints, end)
+        ]
 
     # The scalable router may reserve channels outside the node rectangle.
     # The viewport therefore derives from the complete rendered geometry,

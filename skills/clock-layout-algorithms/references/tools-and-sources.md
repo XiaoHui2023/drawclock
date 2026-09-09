@@ -22,6 +22,9 @@
 - [精确 handle 位置与 FIXED_POS 讨论](https://github.com/xyflow/xyflow/discussions/5125)
 - [ELK T 形共享交汇限制案例](https://github.com/kieler/elkjs/issues/54)
 - [yFiles Hierarchical Layout 官方说明](https://docs.yworks.com/yfiles-html/dguide/layout/hierarchical_layout.html)
+- [yFiles Node Types 官方说明](https://docs.yworks.com/yfiles-html/dguide/node_types/)（同类节点相邻是次级准则，不能新增交叉或冲突）
+- [yFiles Hierarchical Layout API](https://docs.yworks.com/yfiles-html/api/HierarchicalLayout/)（约束优先级、边分组、crossing cost 与端口候选）
+- [Graphviz rank 官方说明](https://graphviz.org/docs/attrs/rank/)（`rank=source` 是强制最小层，不能误作无代价美观偏好）
 - [NIST 组合测试与覆盖数组项目](https://csrc.nist.gov/projects/automated-combinatorial-testing-for-software)
 - [Hypothesis 属性测试文档](https://hypothesis.readthedocs.io/en/latest/)
 - [coverage.py 分支覆盖文档](https://coverage.readthedocs.io/en/latest/branch.html)

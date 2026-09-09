@@ -127,7 +127,7 @@ def test_adversarial_from_mux_seeds_preserve_all_quality_metrics(
     subprocess.run(
         [sys.executable, str(ROOT / "src"), "-i", str(input_path),
          "-l", str(ROOT / "drawio-lib"), "-o", str(svg_path),
-         "--crossing-style", "none"],
+         "--crossing-style", "arc"],
         cwd=ROOT, check=True, capture_output=True,
     )
     report = quality.evaluate(input_path, svg_path)
@@ -185,3 +185,70 @@ def test_orthogonal_segments_rejects_diagonal_polyline(tmp_path: Path) -> None:
     )
     assert result["status"] == "fail"
     assert result["witnesses"]
+
+
+def _write_crossing_fixture(
+    tmp_path: Path, horizontal: str, vertical: str, *, junction: bool = False,
+) -> tuple[Path, Path]:
+    input_path = tmp_path / "crossing.json"
+    svg_path = tmp_path / "crossing.svg"
+    input_path.write_text(json.dumps({
+        "a": {"kind": "source"},
+        "b": {"kind": "clock", "source": "a"},
+        "c": {"kind": "source"},
+        "d": {"kind": "clock", "source": "c"},
+    }), encoding="utf-8")
+    dot = '<circle cx="50" cy="50" r="3" fill="#000000"/>' if junction else ""
+    svg_path.write_text(
+        '<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg">'
+        '<g class="component" data-node-id="a"><svg class="component-graphic" x="0" y="45" width="10" height="10"/></g>'
+        '<g class="component" data-node-id="b"><svg class="component-graphic" x="90" y="45" width="10" height="10"/></g>'
+        '<g class="component" data-node-id="c"><svg class="component-graphic" x="45" y="0" width="10" height="10"/></g>'
+        '<g class="component" data-node-id="d"><svg class="component-graphic" x="45" y="90" width="10" height="10"/></g>'
+        f'{horizontal}{vertical}{dot}</svg>', encoding="utf-8",
+       )
+    return input_path, svg_path
+
+
+@pytest.mark.parametrize(
+    ("horizontal", "vertical", "junction", "expected_kind"),
+    [
+        ('<polyline class="edge" points="10,50 90,50"/>',
+         '<polyline class="edge" points="50,10 50,90"/>', False, "missing_bridge"),
+        ('<path class="edge" d="M 10 50 L 46 50 A 4 4 0 0 0 54 50 L 90 50"/>',
+         '<path class="edge" d="M 50 10 L 50 46 A 4 4 0 0 0 50 54 L 50 90"/>', False, "multiple_bridges"),
+        ('<polyline class="edge" points="10,50 90,50"/>',
+         '<polyline class="edge" points="50,10 50,90"/>', True, "junction_at_different_net_crossing"),
+        ('<path class="edge" d="M 10 50 L 26 50 A 4 4 0 0 0 34 50 L 90 50"/>',
+         '<polyline class="edge" points="50,10 50,90"/>', False, "orphan_bridge"),
+    ],
+)
+def test_crossing_treatment_rejects_bridge_mutants(
+    tmp_path: Path, horizontal: str, vertical: str,
+    junction: bool, expected_kind: str,
+) -> None:
+    input_path, svg_path = _write_crossing_fixture(
+        tmp_path, horizontal, vertical, junction=junction,
+    )
+    report = quality.evaluate(input_path, svg_path)
+    metric = next(
+        item for item in report["metric_results"]
+        if item["metric_id"] == "crossing_treatment"
+    )
+    assert metric["status"] == "fail"
+    assert expected_kind in {row["kind"] for row in metric["witnesses"]}
+
+
+def test_crossing_treatment_accepts_exactly_one_bridge(tmp_path: Path) -> None:
+    input_path, svg_path = _write_crossing_fixture(
+        tmp_path,
+        '<path class="edge" d="M 10 50 L 46 50 A 4 4 0 0 0 54 50 L 90 50"/>',
+        '<polyline class="edge" points="50,10 50,90"/>',
+    )
+    report = quality.evaluate(input_path, svg_path)
+    metric = next(
+        item for item in report["metric_results"]
+        if item["metric_id"] == "crossing_treatment"
+    )
+    assert metric["status"] == "pass"
+    assert metric["witnesses"] == []

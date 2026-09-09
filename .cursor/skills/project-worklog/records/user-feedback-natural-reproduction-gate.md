@@ -1,9 +1,67 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: done
+- status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-09 16:55 +08:00
+- updated: 2026-09-09 19:25 +08:00
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 2026-09-09 19:25 按项目变更治理要求，changelog 顶部新增 2026-09-09 决议，明确废弃无条件首列、采用完整根/cohort 条件式首列、最终桥完整性与 24 指标统一门；design-notes 同步为当前有效口径。旧历史保留为可追溯记录但不再控制实现。
+
+- 2026-09-09 19:22 联网对标官方资料后，将成熟做法固化进项目 Skill：yFiles 明确“同类节点相邻”只能作为不新增 crossing/constraint conflict 的次级准则，支持 constraint priority、edge grouping 与 crossing costs；Graphviz `rank=source` 是强制最小层，不能误当无代价审美偏好；ELK Layered 保持分层、排序、正交路由分阶段。质量规范现明确条件式首列的双向事务规则，并新增最终 SVG 每个异网真交叉恰一桥、以序列化精度判定的硬门。
+
+- 2026-09-09 19:20 第二次全量为 533/534 PASS；唯一失败是 incident mutant 测试把数组首项写死为历史 `META-CLAIM-007`。新增 011/012 后首项已合法变为 `META-QUALITY-011`，实际 release validator 正确 exit=1 并报告被打开的首项。测试已改为断言它刚刚变异的 incident ID，继续证明任意 release-blocking incident 都会阻断，而非锁死列表顺序。
+
+- 2026-09-09 19:17 精确 verification group 已纳入索引（208 个唯一证据文件；首次 240 条错误包含多 issue 对同一证据的重复引用），release gate 随即 PASS `issues=17`。未修改门禁逻辑。下一步从头运行全量 pytest，确认流程、Oracle、产品与证据共同闭合。
+
+- 2026-09-09 19:15 release gate 首次正确拒绝 240 条：新 verification group `20260909T062835Z-36899fa6` 的证据尚未 Git-tracked，干净发布检出不可消费。没有放宽 checker；`.gitignore` 已仅对白名单中的该精确 group 开口，下一步纳入索引并重跑发布门。
+
+- 2026-09-09 19:12 `META-QUALITY-011` 与 `META-POLICY-012` 已在保留原始失败证据的前提下转 closed。前者绑定 4 位最终坐标、零/双/孤立桥及 junction 四类 mutant、26×24 统一门和 7 轮攻击；后者绑定同输入自然 0 交叉对强制首列 7 交叉、完整 root/cohort 事务、首列安全正例与后移必要反例。现在运行 release gate 验证关闭记录和当前收据是否真正可消费。
+
+- 2026-09-09 19:09 当前源码与 Oracle 血缘的正式 fix verification 已完成：group `20260909T062835Z-36899fa6`，全部 issue `failures=[]`、exit=0。此前陈旧收据没有复用；下一步把本轮两个 process incident 写入可审计的修复验证并转 closed，然后运行 release gate。
+
+- 2026-09-09 19:06 全图统一 SVG 门新鲜生成 26/26 PASS，所有图均执行完整 24 指标（含 crossing_treatment）；随后递归攻击 run `20260909T062544Z-99d5a3f0` 从 R1 起连续 7/7 clean，exit=0。任何复发均未被折算或豁免。攻击收据已因当前源码血缘刷新；下一步重签全部 issue 的 fix evidence，再关闭本轮两个 release-blocking incident。
+
+- 2026-09-09 19:04 coverage 首次重跑仍以 1 项失败拒绝：同一旧测试名在 `middle-source-success` 还有第二个引用。该引用已同步更新；这证明覆盖清单检查不会因只修第一处而假绿。
+
+- 2026-09-09 19:02 首次全量为 529/534 PASS，5 个失败全部保留：4 个是 active incident/新源码导致收据血缘陈旧而发布门正确阻断，1 个是 coverage manifest 仍引用已重命名的旧测试。覆盖清单现已更新到条件式首列测试名；尚未关闭 incident 或重签收据，必须先完成全图 24 指标和递归攻击。
+
+- 2026-09-09 19:00 旧测试合同已按用户纠正迁移，但没有降低质量要求：27/28 公共单主干数组由“容许 5 个交叉”升级为 0 交叉；23 号场景明确锁定 `common_source/local_source_07` 在首列、其余七个根靠近 mux，且自然布局 0 交叉而强制首列为 7 个交叉；mixed 图要求端口序无倒置；combined 不再锁死 corridor 内部迭代次数，仍锁定单设施、无分裂重合与最终质量。首次跨文件补丁因末尾字段名上下文不符整体拒绝、未改文件，回读后精确应用。
+
+- 2026-09-09 18:55 direct-fanin 同列 Oracle 已与新质量优先级统一：`raw_direct_root_fanin_column_witnesses` 继续保留错列事实；只有同一目标也存在完整联合、全图不退化的 feasible witness 时，`direct_root_fanin_column_witnesses` 才作为缺陷进入注册指标。combined 当前 raw=1、feasible=0、缺陷=0；23 号与异深度图三者均无 detected issue。这样不是删除覆盖，而是分离事实提取与缺陷判定。
+
+- 2026-09-09 18:49 corridor 后再次运行 direct-fanin 联合对齐仍正确拒绝 combined 的 `weave__sparse_04/11` 同列候选，因为完整可行性 Oracle 证明它没有无退化共同列；但旧 `direct_root_mux_column` 仍仅凭错列就报 FB-ROOT-020，与用户新澄清冲突。同列也必须服从相同条件式质量优先级：保留错列事实，但只有完整设施联合同列反事实可行时才判缺陷；否则错列是为避免交叉的合法边界。
+
+- 2026-09-09 18:44 回第一列 helper 已把共享直入目标的根合并为原子 cohort，但 combined 仍检出同一对根错列。追踪顺序确认错列不是 cohort 回列产生，而是 final corridor 在最后一次 direct-fanin 对齐之后单独后移了其中一个单边根；cohort 回列因整体候选会增加硬质量而正确拒绝，无法顺带修复该先后顺序。下一步在所有 corridor/回列事务之后再执行一次 direct-fanin 联合对齐 closure，使最后写入者仍受同列完整事务控制。
+
+- 2026-09-09 18:38 终态安全回第一列 closure 对 23 号和异深度图均保持 0 交叉/0 witness，但 combined 暴露原子性缺口：它单独把 `weave__sparse_11` 拉回第一列，却把与其共同直入 `weave__merge_02` 的 `weave__sparse_04` 留在后列，触发 FB-ROOT-020。说明回列事务不能按单根串行，直接汇入同一多输入节点的根必须作为一个 cohort 原子移动。下一步把相互重叠的 direct-fanin 关系做并集合并，以 cohort+其全部设施/边统一候选验收，避免修复一个审美指标破坏另一个。
+
+- 2026-09-09 18:30 全量首轮为 523/534 PASS，11 项失败已分类且没有折算为绿灯。除 active incident/陈旧血缘外，终态出现“后移时曾有硬收益、后续路由变化后回第一列已无退化”的二次状态变化。新增 `_restore_safe_roots_to_first_column`：按逻辑根一次移动其全部物理设施，给所有所属边补回源侧延伸，再以节点/线碰撞、可见重叠、方向、异网重叠及 crossing/bend 分量逐项不退化验收；长度和面积不参与否决。函数已通过 py_compile/diff-check，下一步接入终态并用 combined 正例与 23/异深度反例校准。
+
+- 2026-09-09 18:20 删除 final corridor 的错误参数后，异深度公共总线图已通过统一 24 指标：`failed_metric_ids=[]`，可见异网交叉从 5 点/15 对事件降为 0，跨线桥完整性自然 PASS；公共 from 仍保留单设施、单纵向主干。实际腾位由重新启用的 corridor 完成，final closure 无需额外动作。终态 36 边、0 crossing、0 overlap、10 bends；下一步跑全量回归，迁移被新需求废止的无条件 first-column 测试与冻结门。
+
+- 2026-09-09 18:13 final corridor 已接入、root 集合改为条件式参与、质量比较移除长度/面积软成本、且仅允许单设施单出边 job；代码审查同时发现调用时误传了该函数不存在的 `continuous_physical_search` 参数，尚未执行产品测试，先删除错误参数再运行，不能把未运行代码记为通过。
+
+- 2026-09-09 18:10 在最终主干后补跑完整 anchor relocation 仍未移动异深度图的私人 from：final attempts=7、quality-vector=6、edge-node=1。独立 Oracle 给出的理想位置没有计入完整标签宽度；生产正确地拒绝把标签挤进 gate，但当前级间距又不足以容纳“主干右侧的 from + 标签 + gate”。通用解法不是放宽碰撞门，而是复用现有 corridor owner：对带交叉的单设施单出边根，必要时整体右移其目标及后缀腾出可见走廊，再把根移到目标旁直连；仍要求全图交叉/折点硬向量严格改善。多输出根不允许因此复制，继续由完整设施 relocation 事务处理。
+
+- 2026-09-09 18:03 首轮产品修复后聚焦 87/87 PASS；浮点尾差 bridge 指标已 PASS。23 号条件式第一列场景从 7 交叉降为 0、14 折不变、长度 13512.896→9301.976，root relocation/first-column witness 均清零。异深度公共总线图的桥虽然完整，但统一门仍拒绝 `public_root_crossing/root_relocation_dominance/physical_anchor_relocation`：5 个私人 from 仍留在第一列并穿越后置公共总线。根因是主干规范化发生在主 anchor relocation 之后，后者评估的是尚未形成这些交叉的旧几何。不能把“桥已画”当完成；下一步在最终主干/数组 closure 后执行同一完整设施 relocation 事务，再跑全指标。
+
+- 2026-09-09 17:56 两项独立红灯均在产品未改状态成立：条件式第一列 Oracle 对 23 号当前 样例检出 7 个 root relocation witness（7 个可见交叉），detected=`FB-ROOT-004,FB-ROOT-010`；跨线桥 Oracle 双跑仍命中 missing_bridge。聚焦 Oracle/全指标测试在修正 `physical_first_x` 作用域与撤销“第一列交叉天然合法”的旧抑制后 22/22 PASS。现在才进入产品修复。
+
+- 2026-09-09 17:50 条件式 first-column Oracle 的单元夹具已迁移到新签名，并加入终态路线，使“后列但回到第一列只增加软长度”的正例可被直接校准。一次补丁上下文因坐标与实际夹具不一致被拒绝，随后回读真实内容后完成；未跳过失败。
+
+- 2026-09-09 17:46 条件式第一列独立 Oracle 已改为双向合同：当前位于第一列但存在严格减少交叉/折点的内移反事实会被 root-relocation 指标拒绝；位于后列的根只有在向第一列延长所有所属路线且不增加交叉、异网重叠、折点、节点碰撞和线穿节点时才被 root-first 指标拒绝。Oracle 通过语法编译与 diff whitespace 检查，尚未改产品。
+
+- 2026-09-09 17:43 五个 adversarial 全指标测试已从 `crossing-style none` 迁到最终用户可见的 `arc` 模式；这保证新 crossing-treatment 指标不是只在专用变异夹具执行，而是每个复杂组合也执行同一完整注册表。条件式第一列 Oracle 补丁将拆分为小步，避免一次过宽修改难以审查。
+
+- 2026-09-09 17:40 条件式第一列 Oracle 补丁首次被实时工作记录门阻止：上一笔只同步了记录文件时间、没有在同一写操作触及 INDEX，产品与 Oracle 均未改。现补齐记录/索引同笔同步后再继续。
+
+- 2026-09-09 17:38 Oracle-first 红灯已成立，产品尚未修改：新增终态 `crossing_treatment` 指标直接解析 SVG arc 中心，对 `asymmetric-depth-common-private-mux` 当前公开 CLI 连续两次得到相同 SHA-256 `91563C96...1FA9D94`，均以 `missing_bridge` 命中 x=191.3 的 private_from_00 交叉。零桥、双桥、孤立桥、异网交叉处 junction 四类变异单测均通过；原五个 adversarial 测试因仍显式生成 `crossing-style none` 被新指标正确拒绝，暴露的是测试调用仍绕过最终视觉合同，下一步改为 arc 后校准，不能删除指标或豁免用例。
+
+- 2026-09-09 17:31 当前 `09e5d27` 与强制第一列策略引入前 `a739054` 已对公开 `23-middle-column-low-use-sources.json` 做同输入冻结对比。当前版为 7 个可见交叉/28 个逻辑边对事件、14 折、13512.896 px；旧版为 0 交叉、14 折、8675.596 px，稳定证明“无条件第一列”会制造可避免交叉且显著拉长线路。目标账本新增 release-blocking `META-QUALITY-011`（缺桥假绿）与 `META-POLICY-012`（第一列优先级错误）；下一步先实现独立正反 Oracle 和注册指标，再改生产。
+
+- 2026-09-09 17:25 用户纠正“所有无约束源头必须第一列”的过强合同。新语义是受完整质量向量约束的第一列偏好：若联合移到第一列不增加可见交叉/跨线、异网重叠、折点、碰撞等硬退化，则应第一列对齐；若会产生不可避免的交叉或跨线，则允许设施靠近直连下级并优先直线。必须新增正反场景和联合反事实门，迁移旧的无条件 first-column 断言；上一轮发布合同在该需求闭合前撤销。
+
+- 2026-09-09 17:19 用户指出 `private_from_00` 与公共纵向主干相交处跨线桥不明显。回查终态 SVG 和布局几何确认这不是视觉错觉，而是桥完全缺失：该水平边两端 y 为 `146.00250000000003` 与 `146.0025`，生产 `_arc_crossings` 在序列化前用浮点精确相等判定水平线而漏检；SVG 格式化后两端却显示为同一 y，形成真实可见交叉。现有 23 项全图注册指标又没有“每个可见异网正交交叉必须恰好一个桥”的统一指标，所以历史全图门产生假绿。记录重新转 active；先升级独立 Oracle 并在未改产品的当前版本双跑稳定复现红灯，再修产品、补变异与多轮攻击，旧发布结论在本轮闭合前不再有效。
 
 - 2026-09-09 16:55 最终功能/发布合同 commit `620bc10520cf2985e2413941a0bb19705f9bfb4f` 的 Release run `34312375681` 全部 success：反馈门、Ubuntu 16.04 PyInstaller/staticx、解压冻结示例、离线源码、librsvg、publish 和发布后公开资产回下载 smoke 均通过。滚动 tag `v1.0.0^{}` 精确指向该 commit；独立再次下载公开资产 17,186,853 bytes，SHA-256 `c24fe2dff7cef4445e7f06c4eba2f91d9511e02a1b64d9cd21f1d5eb80f0abaa` 与 GitHub digest 一致，176 个归档条目无绝对路径或 `..` 穿越；全新 Linux 容器对该下载件再次输出 `frozen draw workflow passed` 与 `offline source deployment passed`。本记录转 done；该最后记录提交仍由同一不可旁路滚动 workflow 再覆盖 tag 后才交付。
 

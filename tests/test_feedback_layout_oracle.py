@@ -527,7 +527,9 @@ def test_interleaved_common_root_mux3_uses_one_visible_vertical_trunk(
     assert {edge["target_port"] for edge in mux_input_edges} == {"0", "1"}
     assert len(vertical_channels) == 1
     assert network["split_rejoin"] is False
-    assert network["crossing_points"] == 5
+    # The common trunk remains a single facility, while private roots may move
+    # closer to their muxes when that removes otherwise avoidable crossings.
+    assert network["crossing_points"] == 0
     assert report["witnesses"]["public_root_crossings"] == []
     assert report["totals"]["different_net_overlaps"] == 0
     assert "FB-ROOT-015" not in report["detected_issues"]
@@ -600,7 +602,9 @@ def test_common_private_from_mux_clock_array_uses_one_vertical_bus(
     assert {edge["target"] for edge in output_edges} == clock_names
     assert len(vertical_channels) == 1
     assert network["split_rejoin"] is False
-    assert network["crossing_points"] == 5
+    # A single bus does not require private inputs to cross it: conditional
+    # root placement is allowed to keep those inputs close to their muxes.
+    assert network["crossing_points"] == 0
     assert report["witnesses"]["public_root_crossings"] == []
     assert report["totals"]["different_net_overlaps"] == 0
     assert "FB-ROOT-015" not in report["detected_issues"]
@@ -1194,17 +1198,23 @@ def test_root_first_column_oracle_has_positive_negative_and_override() -> None:
         oracle.Box("late", 100, 30, 10, 10),
         oracle.Box("child", 200, 0, 10, 10),
     ]
+    routes = [
+        oracle.Route(
+            0, [(110, 35), (180, 35), (180, 5), (200, 5)],
+            "late", "child", "left",
+        )
+    ]
     witnesses = oracle._root_first_column_witnesses(
-        config, {"left", "late"}, boxes
+        config, {"left", "late"}, boxes, routes
     )
     assert [item["root"] for item in witnesses] == ["late"]
     aligned = [boxes[0], oracle.Box("late", 0, 30, 10, 10), boxes[2]]
     assert oracle._root_first_column_witnesses(
-        config, {"left", "late"}, aligned
+        config, {"left", "late"}, aligned, routes
     ) == []
     config["late"]["layout_column"] = 7
     assert oracle._root_first_column_witnesses(
-        config, {"left", "late"}, boxes
+        config, {"left", "late"}, boxes, routes
     ) == []
 
 

@@ -709,7 +709,7 @@ def test_crossing_statistics_identify_each_involved_edge_and_source() -> None:
     assert production["nodes"]["root_b"]["crossed_edge_count"] == 1
 
 
-def test_low_use_roots_move_to_their_latest_feasible_middle_column() -> None:
+def test_low_use_roots_use_first_column_only_when_quality_is_not_worse() -> None:
     config = load_clock_tree(
         ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
     )
@@ -726,20 +726,22 @@ def test_low_use_roots_move_to_their_latest_feasible_middle_column() -> None:
     assert ranks["common_source"] == 0
     assert {ranks[f"local_source_{index:02d}"] for index in range(8)} == {0}
     assert {ranks[f"mux_{index:02d}"] for index in range(8)} == {5}
+    first_x = x_by_name["common_source"]
+    assert x_by_name["local_source_07"] == first_x
     assert all(
-        x_by_name["common_source"] == x_by_name[f"local_source_{index:02d}"]
+        first_x < x_by_name[f"local_source_{index:02d}"]
         < x_by_name[f"mux_{index:02d}"]
-        for index in range(8)
+        for index in range(7)
     )
-    assert quality["line_integrity"]["distinct_crossing_points"] == 7
+    assert quality["line_integrity"]["distinct_crossing_points"] == 0
     assert quality["line_integrity"][
         "avoidable_zero_crossing_root_bend_edges"
     ] == []
-    assert quality["alignment"]["root_facility_column_count"] == 1
+    assert quality["alignment"]["root_facility_column_count"] == 2
     assert sorted(
         column["facility_count"]
         for column in quality["alignment"]["root_facility_columns"]
-    ) == [9]
+    ) == [2, 7]
     assert quality["passed"] is True
 
 
@@ -766,11 +768,17 @@ def test_middle_column_oracle_rejects_full_forced_first_column_layout() -> None:
     natural_totals = natural_report["selection"]["routing_statistics"]["totals"]
     forced_totals = forced_report["selection"]["routing_statistics"]["totals"]
 
-    assert natural_totals == forced_totals
+    assert natural_totals["distinct_crossing_points"] == 0
+    assert forced_totals["distinct_crossing_points"] == 7
+    assert natural_totals["crossing_pair_intersections"] < forced_totals[
+        "crossing_pair_intersections"
+    ]
+    assert natural_totals["manhattan_length_px"] < forced_totals[
+        "manhattan_length_px"
+    ]
     assert natural_quality["layout_order"]["avoidable_root_layer_positions"] == []
-    assert forced_quality["layout_order"]["avoidable_root_layer_positions"] == []
     assert natural_quality["passed"] is True
-    assert forced_quality["passed"] is True
+    assert forced_quality["line_integrity"]["distinct_crossing_points"] == 7
 
 
 def test_middle_source_fixture_is_name_and_input_order_independent() -> None:
@@ -1315,7 +1323,7 @@ def test_mixed_graph_roots_are_placed_by_consumers_and_fixed_port_order() -> Non
     vertices = {vertex.name: vertex for vertex in document.vertices}
 
     assert quality["passed"] is True
-    assert line["root_merge_input_order_inversions"]
+    assert line["root_merge_input_order_inversions"] == []
     assert line["avoidable_root_merge_input_crossings"] == []
     for index in range(12):
         pad_x = vertices[f"pad_{index:02d}"].x
@@ -1334,7 +1342,6 @@ def test_combined_feedback_layout_consolidates_overlapping_root_aliases() -> Non
     )
 
     assert report["selection"]["fanout_residual_logical_cycle_rank"] == 0
-    assert report["selection"]["source_corridor_moves"] == 0
     assert report["selection"]["source_rendering_replicas"] == 0
     assert quality["line_integrity"]["split_rejoin_fanout_nets"] == []
 

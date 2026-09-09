@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import json
+import re
+import xml.etree.ElementTree as ET
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -14,6 +16,102 @@ import feedback_layout_reproduction_oracle as geometry
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REGISTRY = ROOT / "tests" / "quality-metrics.json"
 SERIALIZED_AXIS_TOLERANCE = 0.001
+NS = "{http://www.w3.org/2000/svg}"
+
+
+def _svg_edge_bridge_centers(root: ET.Element) -> list[list[tuple[float, float]]]:
+    """Read arc centers from serialized edge paths without production imports."""
+    result: list[list[tuple[float, float]]] = []
+    token_pattern = re.compile(
+        r"[A-Za-z]|[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?"
+    )
+    for element in root.iter():
+        if "edge" not in (element.get("class") or "").split():
+            continue
+        centers: list[tuple[float, float]] = []
+        if element.tag == f"{NS}path":
+            tokens = token_pattern.findall(element.get("d", ""))
+            index = 0
+            command = ""
+            current: tuple[float, float] | None = None
+
+            def take(count: int) -> list[float]:
+                nonlocal index
+                values = tokens[index:index + count]
+                if len(values) != count or any(value.isalpha() for value in values):
+                    raise ValueError("invalid serialized SVG edge path")
+                index += count
+                return [float(value) for value in values]
+
+            while index < len(tokens):
+                if tokens[index].isalpha():
+                    command = tokens[index]
+                    index += 1
+                if command in {"M", "L"}:
+                    current = tuple(take(2))
+                    command = "L"
+                elif command == "A":
+                    _rx, _ry, _rotation, _large, _sweep, x, y = take(7)
+                    if current is None:
+                        raise ValueError("arc appears before an edge start")
+                    centers.append((
+                        round((current[0] + x) / 2.0, 4),
+                        round((current[1] + y) / 2.0, 4),
+                    ))
+                    current = (x, y)
+                else:
+                    raise ValueError(f"unsupported serialized SVG edge command: {command}")
+        result.append(centers)
+    return result
+
+
+def _crossing_treatment_witnesses(
+    root: ET.Element, routes: list[geometry.Route]
+) -> list[dict[str, Any]]:
+    """Require exactly one bridge and no junction at each visible cross-net cross."""
+    bridges = _svg_edge_bridge_centers(root)
+    if len(bridges) != len(routes):
+        raise ValueError("edge/bridge extraction count mismatch")
+    bridge_by_edge = {
+        route.edge_id: set(bridges[index]) for index, route in enumerate(routes)
+    }
+    crossings, _ = geometry.route_crossings(routes)
+    junctions = {
+        (round(float(element.get("cx", "nan")), 4),
+         round(float(element.get("cy", "nan")), 4))
+        for element in root
+        if element.tag == f"{NS}circle" and element.get("r") == "3"
+    }
+    witnesses: list[dict[str, Any]] = []
+    used: set[tuple[str, tuple[float, float]]] = set()
+    for event in crossings:
+        point = tuple(event["point"])
+        participating = [
+            edge_id for edge_id in event["edges"]
+            if point in bridge_by_edge[edge_id]
+        ]
+        used.update((edge_id, point) for edge_id in participating)
+        if len(participating) != 1:
+            witnesses.append({
+                "kind": "missing_bridge" if not participating else "multiple_bridges",
+                "point": list(point),
+                "edges": event["edges"],
+                "bridge_edges": participating,
+            })
+        if point in junctions:
+            witnesses.append({
+                "kind": "junction_at_different_net_crossing",
+                "point": list(point),
+                "edges": event["edges"],
+            })
+    for edge_id, points in bridge_by_edge.items():
+        for point in sorted(points):
+            if (edge_id, point) not in used:
+                witnesses.append({
+                    "kind": "orphan_bridge", "point": list(point),
+                    "edge": edge_id,
+                })
+    return witnesses
 
 
 def load_registry(path: Path = DEFAULT_REGISTRY) -> list[dict[str, Any]]:
@@ -49,6 +147,7 @@ def _artifact_metric_witnesses(
 ) -> dict[str, Any]:
     """Measure identity and segment shape from the serialized artifact itself."""
     config, logical = geometry.parse_topology(input_path)
+    root = ET.parse(svg_path).getroot()
     boxes, routes = geometry.parse_svg(svg_path, set(config))
     geometry.bind_routes(routes, boxes, logical)
     rendered_nodes = {box.node for box in boxes}
@@ -82,6 +181,7 @@ def _artifact_metric_witnesses(
     return {
         "topology_identity": topology_failures,
         "orthogonal_segments": non_orthogonal,
+        "crossing_treatment": _crossing_treatment_witnesses(root, routes),
     }
 
 

@@ -386,3 +386,28 @@ def test_preview_default_draws_real_arc_bridge_at_crossing() -> None:
     assert re.search(r'<path class="edge" d="[^"]* A 4 4 ', arc_svg)
     assert 'class="edge-gap"' not in arc_svg
     assert 'class="edge-gap"' in gap_svg
+
+
+def test_arc_bridge_uses_final_visible_coordinate_precision() -> None:
+    style = "points=[[0,0.5,0,0,0],[1,0.5,0,0,0]];"
+    vertices = [
+        VertexLayout("left", "v1", "x", 0, 80.00000000000003, 40, 40, style),
+        VertexLayout("right", "v2", "x", 360, 80, 40, 40, style),
+        VertexLayout("top", "v3", "x", 100, 0, 40, 40, style),
+        VertexLayout("bottom", "v4", "x", 260, 180, 40, 40, style),
+    ]
+    edge_style = "exitX=1;exitY=0.5;entryX=0;entryY=0.5;"
+    document = LayoutDocument(
+        version=1, vertices=vertices,
+        edges=[
+            EdgeLayout("e1", "v1", "v2", edge_style),
+            EdgeLayout(
+                "e2", "v3", "v4", edge_style,
+                waypoints=((200, 20), (200, 200)),
+            ),
+        ],
+    )
+
+    svg = build_preview_svg(document)
+
+    assert re.search(r'<path class="edge" d="[^\"]* A 4 4 ', svg)

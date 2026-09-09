@@ -4,6 +4,7 @@
   "metrics": [
     {"id": "topology_identity", "witness": null, "applicability": "always"},
     {"id": "orthogonal_segments", "witness": null, "applicability": "has_edges"},
+    {"id": "crossing_treatment", "witness": null, "applicability": "has_edges"},
     {"id": "different_net_overlap", "witness": "overlaps", "applicability": "has_edges"},
     {"id": "split_rejoin", "witness": "split_rejoin_roots", "applicability": "has_root_fanout"},
     {"id": "avoidable_bends", "witness": "avoidable_bend_edges", "applicability": "has_edges"},

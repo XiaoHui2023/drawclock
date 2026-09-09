@@ -4985,14 +4985,11 @@ def _relocate_root_rendering_anchors(
             report["distinct_crossing_points"],
             report["crossings"],
             report["bends_total"],
-            report["manhattan_length"],
-            report["area"],
         )
 
     for root in sorted(nodes):
         if (
             indegree[root]
-            or ROOTS_USE_FIRST_RANK
             or "layout_column" in nodes[root].item
             or root in direct_fanin_array_roots
         ):
@@ -5008,8 +5005,9 @@ def _relocate_root_rendering_anchors(
         # partitioner.  Reassessing its complete edge set here duplicates
         # global work.  This stage adds the formerly missing one-use-root case
         # and still relocates every independently created physical facility.
-        if len(logical_anchors) == 1 and outdegree[root] > 1:
-            continue
+        # One physical multi-output root is still one transaction: move the
+        # facility and reroute every owned edge together. Fanout does not make
+        # an avoidable first-column crossing acceptable.
         anchor_ids = {anchor.cell_id for anchor in logical_anchors}
         edge_indices_by_anchor: dict[str, list[int]] = defaultdict(list)
         for edge in accepted.edges:
@@ -5374,6 +5372,130 @@ def _relocate_root_rendering_anchors(
     return accepted, report
 
 
+def _restore_safe_roots_to_first_column(
+    document: LayoutDocument,
+    nodes,
+    logical_edges,
+) -> tuple[LayoutDocument, dict[str, Any]]:
+    """Prefer column one only when moving a complete root does not regress."""
+    accepted = _clone_layout_geometry(document)
+    accepted_report = assess_layout(accepted, logical_edges, 0.0)
+    indegree = Counter(edge.target for edge in logical_edges)
+    first_x = min((vertex.x for vertex in accepted.vertices), default=0.0)
+    attempts = 0
+    moves = 0
+    blockers: Counter[str] = Counter()
+
+    direct_by_target: dict[str, set[str]] = defaultdict(set)
+    for logical in logical_edges:
+        if indegree[logical.source] == 0:
+            direct_by_target[logical.target].add(logical.source)
+    groups: list[set[str]] = []
+    for members in direct_by_target.values():
+        if len(members) < 2:
+            continue
+        touching = [group for group in groups if group.intersection(members)]
+        merged = set(members)
+        for group in touching:
+            merged.update(group)
+            groups.remove(group)
+        groups.append(merged)
+    grouped = set().union(*groups) if groups else set()
+    units = [tuple(sorted(group)) for group in groups]
+    units.extend(
+        (root,) for root in sorted(nodes)
+        if indegree[root] == 0 and root not in grouped
+    )
+
+    def hard_vector(report: dict[str, Any]) -> tuple[float, ...]:
+        return (
+            report["source_crossing_points"],
+            report["distinct_crossing_points"],
+            report["crossings"],
+            report["bends_total"],
+        )
+
+    for roots in units:
+        if any("layout_column" in nodes[root].item for root in roots):
+            continue
+        anchors = [
+            vertex for vertex in accepted.vertices
+            if (vertex.logical_name or vertex.name) in roots
+        ]
+        if not anchors or all(abs(vertex.x - first_x) <= 1e-6 for vertex in anchors):
+            continue
+        attempts += 1
+        candidate = _clone_layout_geometry(accepted)
+        accepted_by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+        candidate_by_id = {vertex.cell_id: vertex for vertex in candidate.vertices}
+        candidate_edges = {edge.cell_id: edge for edge in candidate.edges}
+        moved_ids = {vertex.cell_id for vertex in anchors}
+        affected_edges: set[int] = set()
+        old_paths: dict[int, list[tuple[float, float]]] = {}
+        for edge in accepted.edges:
+            if edge.source_id not in moved_ids:
+                continue
+            index = int(edge.cell_id[1:])
+            logical = logical_edges[index - 1]
+            source = accepted_by_id[edge.source_id]
+            target = accepted_by_id[edge.target_id]
+            start = abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            )
+            end = abs_port_xy(
+                target.x, target.y, target.width, target.height,
+                target.style, target.drawclock_type, logical.target_port,
+            )
+            old_paths[index] = _simplify([start, *edge.waypoints, end])
+            affected_edges.add(index)
+        for anchor in anchors:
+            candidate_by_id[anchor.cell_id].x = first_x
+        for index, old_points in old_paths.items():
+            edge = candidate_edges[f"e{index}"]
+            logical = logical_edges[index - 1]
+            source = candidate_by_id[edge.source_id]
+            new_start = abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            )
+            points = _simplify([new_start, old_points[0], *old_points[1:]])
+            edge.waypoints = tuple(points[1:-1])
+
+        candidate_report = assess_layout(candidate, logical_edges, 0.0)
+        accepted_visible = _visible_layout_signature(
+            accepted, logical_edges, affected_edges, moved_ids
+        )
+        candidate_visible = _visible_layout_signature(
+            candidate, logical_edges, affected_edges, moved_ids
+        )
+        checks = {
+            "node-overlap": candidate_report["node_overlaps"] <= accepted_report["node_overlaps"],
+            "edge-node": candidate_report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
+            "visible-overlap": candidate_visible[4].issubset(accepted_visible[4]),
+            "visible-edge-node": candidate_visible[5].issubset(accepted_visible[5]),
+            "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
+            "route-overlap": candidate_report["ambiguous_overlaps"] <= accepted_report["ambiguous_overlaps"],
+            "hard-quality": all(
+                after <= before
+                for after, before in zip(
+                    hard_vector(candidate_report), hard_vector(accepted_report)
+                )
+            ),
+        }
+        if all(checks.values()):
+            accepted = candidate
+            accepted_report = candidate_report
+            moves += 1
+        else:
+            blockers.update(name for name, passed in checks.items() if not passed)
+    return accepted, {
+        "root_first_column_restore_attempts": attempts,
+        "root_first_column_restores": moves,
+        "root_first_column_restore_blockers": dict(sorted(blockers.items())),
+    }
+
+
 def _split_root_rendering_anchors_by_local_rows(
     document: LayoutDocument,
     nodes,
@@ -5430,8 +5552,6 @@ def _split_root_rendering_anchors_by_local_rows(
             report["distinct_crossing_points"],
             report["crossings"],
             report["bends_total"],
-            report["manhattan_length"],
-            report["area"],
         )
 
     for root in sorted(nodes):
@@ -5996,8 +6116,7 @@ def _open_root_facility_corridors(
     shared_bus_roots = _shared_fanout_bus_roots(nodes, logical_edges)
     roots = {
         name for name in nodes
-        if not ROOTS_USE_FIRST_RANK
-        and indegree[name] == 0 and "layout_column" not in nodes[name].item
+        if indegree[name] == 0 and "layout_column" not in nodes[name].item
         and name not in regular_array_roots
         and name not in direct_fanin_array_roots
         and name not in shared_bus_roots
@@ -6021,6 +6140,8 @@ def _open_root_facility_corridors(
             int(edge.cell_id[1:])
             for edge in accepted.edges if edge.source_id == anchor_id
         ]
+        if len(owned) != 1:
+            continue
         for edge_index in owned:
             route = points_for(
                 accepted, edge_index, job_by_id, job_edge_by_id
@@ -6029,7 +6150,7 @@ def _open_root_facility_corridors(
                 len(route) - 2 >= 4
                 or job_statistics[f"e{edge_index}"]["crossing_pair_incidents"] > 0
             ):
-                jobs.append((anchor_id, edge_index, len(owned) > 1))
+                jobs.append((anchor_id, edge_index, False))
 
     jobs.sort(key=lambda job: (
         -job_statistics[f"e{job[1]}"]["crossing_pair_incidents"],
@@ -6938,6 +7059,43 @@ def generate_elk_layout(
     report["selection"].update({
         key.replace("direct_root_array", "artifact_direct_root_array"): value
         for key, value in artifact_direct_array_report.items()
+    })
+    document, final_corridor_report = _open_root_facility_corridors(
+        document,
+        nodes,
+        logical_edges,
+        profile,
+    )
+    report["selection"].update({
+        key.replace("source_corridor", "final_source_corridor"): value
+        for key, value in final_corridor_report.items()
+    })
+    # Fanout trunk normalization can create crossings that did not exist when
+    # the earlier root-placement pass ran. Re-evaluate the actual serialized
+    # geometry once, moving each physical root and every edge it owns as one
+    # transaction. Only a strict crossing/bend improvement can move a root;
+    # line length alone never pulls it off column one.
+    document, final_anchor_report = _relocate_root_rendering_anchors(
+        document,
+        nodes,
+        logical_edges,
+        profile,
+        continuous_physical_search=precise_root_search_allowed,
+    )
+    report["selection"].update({
+        key.replace("source_anchor", "final_source_anchor"): value
+        for key, value in final_anchor_report.items()
+    })
+    document, root_first_report = _restore_safe_roots_to_first_column(
+        document, nodes, logical_edges
+    )
+    report["selection"].update(root_first_report)
+    document, closing_direct_array_report = _refine_direct_root_fanin_arrays(
+        document, nodes, logical_edges, route_clearance=profile.route_clearance
+    )
+    report["selection"].update({
+        key.replace("direct_root_array", "closing_direct_root_array"): value
+        for key, value in closing_direct_array_report.items()
     })
     accepted_assessment = None
     report["selection"]["source_rendering_replicas"] = (

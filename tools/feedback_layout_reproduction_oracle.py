@@ -1957,9 +1957,9 @@ def _feasible_direct_root_fanin_column_witnesses(
 
 
 def _root_first_column_witnesses(
-    config: dict[str, Any], roots: set[str], boxes: list[Box]
+    config: dict[str, Any], roots: set[str], boxes: list[Box], routes: list[Route]
 ) -> list[dict[str, Any]]:
-    """Report unconstrained root facilities outside the first physical rank."""
+    """Report later roots only when extending them to the first column is safe."""
     if not boxes:
         return []
     first_x = min(box.x for box in boxes)
@@ -1968,16 +1968,83 @@ def _root_first_column_witnesses(
         if "layout_column" in config.get(root, {}):
             continue
         renderings = [box for box in boxes if box.node == root]
-        misplaced = [box for box in renderings if abs(box.x - first_x) > EPS]
-        if misplaced:
+        for rendering in renderings:
+            if abs(rendering.x - first_x) <= EPS:
+                continue
+            owned = [
+                route for route in routes
+                if route.source == root
+                and _endpoint_box(route.points[0], renderings) is rendering
+            ]
+            if not owned:
+                continue
+            delta_x = first_x - rendering.x
+            left, top, right, bottom = rendering.visual_bounds
+            moved = Box(
+                rendering.node, first_x, rendering.y, rendering.w, rendering.h,
+                left + delta_x, top, right - left, bottom - top,
+            )
+            if any(
+                other is not rendering and _visual_boxes_overlap(moved, other)
+                for other in boxes
+            ):
+                continue
+            owned_ids = {route.index for route in owned}
+            candidate_routes: list[Route] = []
+            invalid = False
+            for route in routes:
+                if route.index not in owned_ids:
+                    candidate_routes.append(route)
+                    continue
+                new_start = (route.points[0][0] + delta_x, route.points[0][1])
+                candidate = _copy_route(
+                    route, [new_start, route.points[0], *route.points[1:]]
+                )
+                target_box = _endpoint_box(
+                    route.points[-1],
+                    [box for box in boxes if box.node == route.target],
+                )
+                if any(
+                    box is not rendering and box is not target_box
+                    and _visual_rect_interior_hit(a, b, box)
+                    for a, b in segments(candidate)
+                    for box in boxes
+                ):
+                    invalid = True
+                    break
+                candidate_routes.append(candidate)
+            if invalid or any(
+                _visual_rect_interior_hit(a, b, moved)
+                for route in candidate_routes
+                if route.index not in owned_ids
+                for a, b in segments(route)
+            ):
+                continue
+            before_crossings, before_overlaps = route_crossings(routes)
+            after_crossings, after_overlaps = route_crossings(candidate_routes)
+            before_bends = sum(max(0, len(route.points) - 2) for route in routes)
+            after_bends = sum(
+                max(0, len(route.points) - 2) for route in candidate_routes
+            )
+            if (
+                _distinct_crossing_count(after_crossings)
+                > _distinct_crossing_count(before_crossings)
+                or len(after_overlaps) > len(before_overlaps)
+                or after_bends > before_bends
+            ):
+                continue
             witnesses.append({
                 "root": root,
                 "kind": str(config.get(root, {}).get("kind", "")),
                 "expected_first_column_x": round(first_x, 4),
-                "rendering_columns": sorted({
-                    round(box.x, 4) for box in renderings
-                }),
-                "misplaced_renderings": len(misplaced),
+                "rendering_column": round(rendering.x, 4),
+                "crossing_points_before": _distinct_crossing_count(before_crossings),
+                "crossing_points_after": _distinct_crossing_count(after_crossings),
+                "overlaps_before": len(before_overlaps),
+                "overlaps_after": len(after_overlaps),
+                "bends_before": before_bends,
+                "bends_after": after_bends,
+                "only_soft_cost_grows": True,
             })
     return witnesses
 
@@ -2592,6 +2659,7 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     x_values = sorted({round(box.x, 3) for box in boxes})
     low_use_left_crossing = []
     root_relocation_witnesses = []
+    physical_first_x = min((box.x for box in boxes), default=0.0)
     for name in sorted(roots):
         related = [route for route in routes if route.source == name]
         if outdegree[name] != 1 or not related:
@@ -2609,16 +2677,9 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         )
         if relocation is not None:
             root_relocation_witnesses.append(relocation)
-    # The first-rank root cohort is a higher-priority schematic constraint.
-    # A counterfactual that moves an already first-ranked root into a later
-    # layer is inadmissible.  Keep the witness for historical SVGs whose root
-    # is already displaced so frozen red evidence remains reproducible.
-    physical_first_x = min((box.x for box in boxes), default=0.0)
-    root_relocation_witnesses = [
-        witness for witness in root_relocation_witnesses
-        if min(box.x for box in boxes_by_node[witness["root"]])
-        > physical_first_x + 1.0
-    ]
+    # First-column placement is only a tie-break. An inward move is admissible
+    # when this independent complete-route counterfactual improves hard
+    # geometry; a shorter line alone is intentionally insufficient.
     port_inversions = []
     incoming: dict[str, list[Route]] = defaultdict(list)
     for route in routes:
@@ -2688,37 +2749,9 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             and "layout_column" in config.get(witness["other_root"], {})
         )
     ]
-    # With every root fixed to the first rank, a single vertical public bus
-    # and a direct private lead to a merge can have a topologically forced
-    # crossing.  Moving the private root right or splitting the public bus is
-    # outside the admissible layout space.  Preserve the raw crossing event in
-    # ``edges``/``networks`` but do not label this constrained geometry as an
-    # avoidable public-root defect.
-    public_networks = {
-        public: [route for route in routes if route.source == public]
-        for public in roots if outdegree[public] >= 2
-    }
-    constrained_single_bus_roots = {
-        public
-        for public, network_routes in public_networks.items()
-        if not _same_net_cycle(network_routes)
-        and len({
-            round(a[0], 4)
-            for route in network_routes
-            for a, b in segments(route)
-            if abs(a[0] - b[0]) <= EPS and abs(a[1] - b[1]) > EPS
-        }) == 1
-        and min(box.x for box in boxes_by_node[public]) <= physical_first_x + 1.0
-    }
-    public_root_crossings = [
-        witness for witness in public_root_crossings
-        if not (
-            min(box.x for box in boxes_by_node[witness["public_root"]])
-            <= physical_first_x + 1.0
-            and min(box.x for box in boxes_by_node[witness["other_root"]])
-            <= physical_first_x + 1.0
-        )
-    ]
+    # A first-column placement does not by itself make a crossing necessary.
+    # The relocation counterfactual decides whether moving the complete root
+    # facility inward strictly improves hard visible geometry.
     mixed_root_quality_failures = [
         witness
         for witness in public_root_crossings
@@ -2735,13 +2768,6 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     physical_anchor_relocation_witnesses = (
         _physical_anchor_relocation_witnesses(roots, routes, boxes)
     )
-    # Physical aliases and later-column root facilities are forbidden for an
-    # already first-ranked root.  Historical displaced layouts remain red.
-    physical_anchor_relocation_witnesses = [
-        witness for witness in physical_anchor_relocation_witnesses
-        if min(box.x for box in boxes_by_node[witness["root"]])
-        > physical_first_x + 1.0
-    ]
     # A direct source/from array is a single visual column contract.  Moving
     # one member horizontally may remove a crossing, but it is not an
     # admissible counterfactual because it breaks that higher-priority array
@@ -2789,14 +2815,22 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             and witness["root"] not in explicit_column_roots
         )
     ]
-    direct_root_fanin_column_witnesses = (
+    raw_direct_root_fanin_column_witnesses = (
         _direct_root_fanin_column_witnesses(config, roots, routes, boxes)
     )
     feasible_direct_root_fanin_column_witnesses = (
         _feasible_direct_root_fanin_column_witnesses(config, roots, routes, boxes)
     )
+    feasible_direct_targets = {
+        witness["target"]
+        for witness in feasible_direct_root_fanin_column_witnesses
+    }
+    direct_root_fanin_column_witnesses = [
+        witness for witness in raw_direct_root_fanin_column_witnesses
+        if witness["target"] in feasible_direct_targets
+    ]
     root_first_column_witnesses = _root_first_column_witnesses(
-        config, roots, boxes
+        config, roots, boxes, routes
     )
     if not root_first_column_witnesses:
         # Splitting an already first-ranked root into later facilities is not
@@ -2960,6 +2994,9 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             ),
             "direct_root_fanin_column_witnesses": (
                 direct_root_fanin_column_witnesses
+            ),
+            "raw_direct_root_fanin_column_witnesses": (
+                raw_direct_root_fanin_column_witnesses
             ),
             "feasible_direct_root_fanin_column_witnesses": (
                 feasible_direct_root_fanin_column_witnesses

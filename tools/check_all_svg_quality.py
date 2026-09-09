@@ -47,7 +47,7 @@ def main(argv: list[str] | None = None) -> int:
                 [
                     sys.executable, str(ROOT / "src"),
                     "-i", str(input_path), "-l", str(args.library),
-                    "-o", str(output_path), "--crossing-style", "none",
+                    "-o", str(output_path), "--crossing-style", "arc",
                 ],
                 cwd=ROOT,
                 capture_output=True,
