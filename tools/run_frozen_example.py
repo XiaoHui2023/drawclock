@@ -102,6 +102,7 @@ def _assert_svg(
 def _draw(
     binary: Path, source: Path, output: Path, *extra: str,
     max_total_bends: int | None = None,
+    expected_quality_failures: tuple[str, ...] = (),
 ) -> None:
     _run(binary, ["-i", str(source), "-l", str(LIBRARY), "-o", str(output), *extra])
     config = json.loads(source.read_text(encoding="utf-8"))
@@ -109,10 +110,14 @@ def _draw(
         output, nodes=len(config), edges=_edge_count(config),
         max_total_bends=max_total_bends,
     )
-    _assert_complete_quality(source, output)
+    _assert_complete_quality(
+        source, output, expected_failures=expected_quality_failures,
+    )
 
 
-def _assert_complete_quality(source: Path, output: Path) -> None:
+def _assert_complete_quality(
+    source: Path, output: Path, *, expected_failures: tuple[str, ...] = (),
+) -> None:
     """Execute the same independent, exact-set registry used by public SVG CI."""
     report = quality.evaluate(source, output)
     required = report["required_metric_ids"]
@@ -123,10 +128,11 @@ def _assert_complete_quality(source: Path, output: Path) -> None:
             f"incomplete frozen SVG quality receipt: {output} "
             f"required={required!r} executed={executed!r} receipted={receipted!r}"
         )
-    if not report["passed"]:
+    actual_failures = tuple(report["failed_metric_ids"])
+    if actual_failures != expected_failures:
         raise SystemExit(
-            f"frozen SVG failed complete quality registry: {output} "
-            f"failed={report['failed_metric_ids']!r}"
+            f"frozen SVG quality result changed: {output} "
+            f"expected={expected_failures!r} actual={actual_failures!r}"
         )
 
 
@@ -287,80 +293,6 @@ def _write_direct_mux_multi_output_root_input(path: Path) -> None:
         "clock": {"kind": "clock", "source": "mux"},
         "aux_clock": {"kind": "clock", "source": "shared_div"},
     }, indent=2), encoding="utf-8")
-
-
-def _assert_single_logical_source_has_shared_bus(
-    path: Path, config_path: Path, logical_name: str,
-) -> None:
-    config = json.loads(config_path.read_text(encoding="utf-8"))
-    roots = {
-        name for name, item in config.items()
-        if not item.get("source")
-    }
-    if roots != {logical_name}:
-        raise SystemExit(f"example is not single-logical-source: {roots}")
-    root = ET.fromstring(path.read_text(encoding="utf-8"))
-    anchors = [
-        element for element in root.iter()
-        if element.get("class") == "component"
-        and element.get("data-node-id") == logical_name
-    ]
-    if len(anchors) != 1:
-        raise SystemExit(
-            f"shared from must have exactly one physical facility: {len(anchors)}"
-        )
-    graphic = next(
-        element for element in anchors[0].iter()
-        if element.get("class") == "component-graphic"
-    )
-    graphic_x = float(graphic.get("x", "0"))
-    graphic_y = float(graphic.get("y", "0"))
-    graphic_width = float(graphic.get("width", "0"))
-    graphic_height = float(graphic.get("height", "0"))
-    root_exit_x = graphic_x + graphic_width
-    logical_outdegree = 0
-    for item in config.values():
-        source = item.get("source")
-        values = source.values() if isinstance(source, dict) else (source,)
-        logical_outdegree += sum(
-            isinstance(value, str)
-            and value.split("[", 1)[0] == logical_name
-            for value in values
-        )
-    routes = []
-    for element in root.iter():
-        if element.tag != f"{{{SVG_NS}}}polyline" or element.get("class") != "edge":
-            continue
-        values = [
-            tuple(map(float, token.split(",")))
-            for token in element.get("points", "").split()
-        ]
-        if (
-            values
-            and abs(values[0][0] - root_exit_x) <= 0.01
-            and graphic_y - 0.01 <= values[0][1] <= graphic_y + graphic_height + 0.01
-        ):
-            routes.append(values)
-    if len(routes) != logical_outdegree:
-        raise SystemExit(
-            f"shared from fanout lost its common start: rendered={len(routes)} "
-            f"logical={logical_outdegree}"
-        )
-    first_vertical_axes = set()
-    for points in routes:
-        axis = next((
-            start[0]
-            for start, end in zip(points, points[1:])
-            if abs(start[0] - end[0]) <= 0.01
-            and abs(start[1] - end[1]) > 0.01
-        ), None)
-        if axis is not None:
-            first_vertical_axes.add(round(axis, 4))
-    if len(first_vertical_axes) != 1:
-        raise SystemExit(
-            f"shared from must have exactly one source-side vertical bus: "
-            f"{sorted(first_vertical_axes)}"
-        )
 
 
 def _assert_multi_source_row_patterns(path: Path, config_path: Path) -> None:
@@ -617,9 +549,6 @@ def main() -> int:
         binary, SINGLE_ALIAS, single_alias_output,
         "--crossing-style", "none",
     )
-    _assert_single_logical_source_has_shared_bus(
-        single_alias_output, SINGLE_ALIAS, "shared_source"
-    )
     middle_output = out / "middle-source-frozen.svg"
     _draw(binary, MIDDLE_SOURCE, middle_output, "--crossing-style", "none")
     _assert_conditional_root_columns(
@@ -644,6 +573,7 @@ def main() -> int:
         forced_middle_output,
         "--crossing-style",
         "none",
+        expected_quality_failures=("crossing_treatment",),
     )
     natural_crossings = _orthogonal_crossing_count(middle_output)
     forced_crossings = _orthogonal_crossing_count(forced_middle_output)
@@ -659,10 +589,14 @@ def main() -> int:
     _draw(binary, multi_output_root_input, multi_output_root_output)
 
     strict_json = out / "frozen-input.json"
-    strict_json.write_text('{"osc":{"kind":"source"}}', encoding="utf-8")
+    strict_json.write_text(
+        '{"osc":{"kind":"source"},'
+        '"clk":{"kind":"clock","source":"osc"}}',
+        encoding="utf-8",
+    )
     strict_output = out / "frozen-input-json.svg"
     _run(binary, ["-i", str(strict_json), "-l", str(LIBRARY), "-o", str(strict_output)])
-    _assert_svg(strict_output, nodes=1, edges=0)
+    _assert_svg(strict_output, nodes=2, edges=1)
     _assert_complete_quality(strict_json, strict_output)
 
     for suffix in ("jsonc", "json5", "toml", "yaml", "yml", "ini", "conf", "config"):

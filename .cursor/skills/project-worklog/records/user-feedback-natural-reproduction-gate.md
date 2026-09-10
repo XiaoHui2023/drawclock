@@ -2,7 +2,25 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-10 22:35 +08:00
+- updated: 2026-09-10 23:35 +08:00
+
+- 2026-09-10 23:35 Final second release-fix evidence is green: the complete frozen workflow passes through the source wrapper; targeted tests pass 35/35; the complete suite passes 545/545 in 227.30s; quality retention passes 25/25; public SVGs pass 26/26; the feedback release gate passes 19/19; and the diff check is clean.
+
+- 2026-09-10 23:25 Replaced the zero-edge strict JSON fixture with a minimal connected `osc -> clk` diagram. This preserves the strict-extension/parser claim, keeps the missing-edge Oracle fail-closed, and makes the accepted output eligible for the same full 25-metric evaluation. Rerun the wrapper end to end; any further legacy proxy is another failure, not a partial pass.
+
+- 2026-09-10 23:20 Applied the exact `crossing_treatment` expectation only to the forced-first-column negative counterexample. The next wrapper run advanced to the strict-JSON smoke and exposed its zero-edge input outside the geometry Oracle domain. Keep the Oracle fail-closed for missing edges; replace that parser-only fixture with a minimal connected `source -> clock` strict JSON diagram so it still exercises all 25 metrics.
+
+- 2026-09-10 23:15 Added a unit calibration proving an explicitly declared negative SVG passes only when its complete receipt contains exactly the expected `crossing_treatment` failure. The existing failed-metric mutant proves the same receipt is rejected without the negative declaration. Apply that declaration only to the forced-first-column counterexample and rerun the wrapper.
+
+- 2026-09-10 23:10 The forced-first-column negative counterexample now declares exactly one expected failing metric, `crossing_treatment`. All 25 metrics are still receipted; zero failures, a different failure, or any additional failure is a contract change and terminates the release smoke.
+
+- 2026-09-10 23:05 The complete wrapper advanced past the alias case and then correctly reported `crossing_treatment` on `middle-source-forced-first-column.svg`. That SVG is a deliberate negative counterexample, not an accepted artifact. The universal registry must still execute all 25 metrics on it, but the smoke contract must require the exact expected failure set rather than demand green or skip quality. Add an explicit expected-failure channel with exact ordered comparison; any missing or additional failure remains blocking.
+
+- 2026-09-10 23:00 Removed the unit fixtures for the deleted one-facility helper. Those fixtures tested a rendering implementation rather than accepted behavior; the independent registry retains positive calibration plus fragmentation, split/rejoin, facility-dominance, and mergeability mutants. Rerun the complete frozen workflow through the source wrapper before another commit.
+
+- 2026-09-10 22:55 Removed the reproduced single-facility proxy and its call. The release smoke now relies on the universal metrics for logical identity, valid shared trunks, justified facility splitting, and mergeability instead of imposing a contradictory physical count.
+
+- 2026-09-10 22:50 Release run `34466374949` again failed in extracted frozen examples after the universal registry was added. GitHub's unauthenticated log endpoint returns HTTP 403 (`Must have admin rights to Repository`), so the exact step stdout is unavailable; this acquisition failure is explicit, not hidden. A local public-operation reproduction using a temporary `.cmd` wrapper reached the same stage and failed with `shared from must have exactly one physical facility: 2`. The remaining stale `_assert_single_logical_source_has_shared_bus` proxy conflicts with the accepted geometry-qualified alias contract already owned by `shared_root_single_bus`, `root_facility_split_dominance`, and related registry metrics. Remove this duplicate proxy and its tests, then rerun the actual frozen workflow locally through the wrapper before another release.
 
 - 2026-09-10 22:35 Final local release-fix evidence is green: targeted frozen/quality tests 37/37, complete suite 547/547 in 233.53s, quality-contract retention 25/25, all public SVGs 26/26 with exact 25-metric execution, feedback release gate 19/19, and `git diff --check` has no content errors. Stage only the frozen smoke, its tests, and synchronized worklog metadata for the repair commit.
 
