@@ -23,6 +23,8 @@ RECURSIVE_RECEIPT = ROOT / ".reproduction/receipts/recursive-attack.json"
 RECURSIVE_RUNNER = ROOT / "tools/run_recursive_reproduction_rounds.py"
 RECURSIVE_ORACLE = ROOT / "tools/feedback_layout_reproduction_oracle.py"
 SEMANTICS = ROOT / "tools/reproduction_semantics.py"
+QUALITY_SYSTEM = ROOT / "tools/svg_quality_system.py"
+QUALITY_REGISTRY = ROOT / "tests/quality-metrics.json"
 
 
 def _sha(path: Path) -> str:
@@ -401,10 +403,18 @@ def _validate_recursive_attack_receipt(
         ("runner_sha256", RECURSIVE_RUNNER),
         ("oracle_sha256", RECURSIVE_ORACLE),
         ("semantics_sha256", SEMANTICS),
+        ("quality_system_sha256", QUALITY_SYSTEM),
+        ("quality_registry_sha256", QUALITY_REGISTRY),
     ):
         if receipt.get(key) != _sha(path):
             errors.append(f"recursive attack {key} is stale")
     if not isinstance(actual_rounds, list):
+        return
+    try:
+        quality_contract_payload = json.loads(QUALITY_REGISTRY.read_text(encoding="utf-8"))
+        required_metric_ids = [item["id"] for item in quality_contract_payload["metrics"]]
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+        errors.append(f"recursive attack quality registry is invalid: {exc}")
         return
     for expected, actual in zip(expected_rounds, actual_rounds):
         cases = actual.get("cases")
@@ -432,6 +442,26 @@ def _validate_recursive_attack_receipt(
                     or len(variants) != len(set(variants))
                     or not set(variants).issubset(set(required_variants))):
                 errors.append(f"recursive attack case {case.get('case_id')} has invalid semantic coverage")
+            metric_results = case.get("metric_results")
+            receipted_metric_ids = (
+                [item.get("metric_id") for item in metric_results]
+                if isinstance(metric_results, list)
+                and all(isinstance(item, dict) for item in metric_results)
+                else []
+            )
+            if not (
+                case.get("required_metric_ids") == required_metric_ids
+                and case.get("executed_metric_ids") == required_metric_ids
+                and receipted_metric_ids == required_metric_ids
+            ):
+                errors.append(f"recursive attack case {case.get('case_id')} lacks the full metric exact-set")
+            statuses = [item.get("status") for item in metric_results] if isinstance(metric_results, list) else []
+            if (
+                case.get("quality_passed") is not True
+                or case.get("failed_metric_ids") != []
+                or any(status not in {"pass", "not_applicable"} for status in statuses)
+            ):
+                errors.append(f"recursive attack case {case.get('case_id')} failed full artifact quality")
 
 
 def _release_gate() -> int:

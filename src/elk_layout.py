@@ -2156,6 +2156,201 @@ def _restore_root_outer_detours(
     }
 
 
+def _refine_final_single_edge_channels(
+    document: LayoutDocument,
+    logical_edges,
+    *,
+    route_clearance: float,
+) -> tuple[LayoutDocument, dict[str, Any]]:
+    """Re-route non-shared H-V-H edges on final visibility channels."""
+    fanout = Counter((edge.source, edge.source_port) for edge in logical_edges)
+    accepted = _clone_layout_geometry(document)
+    attempts = 0
+    moves = 0
+    blockers: Counter[str] = Counter()
+
+    while True:
+        by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
+        edge_by_id = {edge.cell_id: edge for edge in accepted.edges}
+        points_by_index: dict[int, list[tuple[float, float]]] = {}
+        segments_by_index: dict[int, list[Segment]] = {}
+        channel_xs: set[float] = set()
+        for index, logical in enumerate(logical_edges, 1):
+            edge = edge_by_id[f"e{index}"]
+            source = by_id[edge.source_id]
+            target = by_id[edge.target_id]
+            start = abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            )
+            end = abs_port_xy(
+                target.x, target.y, target.width, target.height,
+                target.style, target.drawclock_type, logical.target_port,
+            )
+            points = _simplify([start, *edge.waypoints, end])
+            points_by_index[index] = points
+            segments_by_index[index] = [
+                Segment(logical.key, (logical.source, logical.source_port), a, b)
+                for a, b in zip(points, points[1:])
+                if a != b
+            ]
+            channel_xs.update(point[0] for point in points)
+        visible = _visible_layout_signature(accepted, logical_edges)
+        visible_boxes = {
+            vertex.cell_id: vertex_visual_box(vertex)
+            for vertex in accepted.vertices
+        }
+        accepted_report = assess_layout(accepted, logical_edges, 0.0)
+        accepted_overlap = _final_artifact_overlap_count(accepted, logical_edges)
+        ordered_channel_xs = sorted(channel_xs)
+        visibility_channel_xs = {
+            *ordered_channel_xs,
+            *(
+                (left + right) / 2.0
+                for left, right in zip(
+                    ordered_channel_xs, ordered_channel_xs[1:]
+                )
+                if right - left > 1e-6
+            ),
+        }
+        best = None
+
+        for index, logical in enumerate(logical_edges, 1):
+            if fanout[(logical.source, logical.source_port)] != 1:
+                continue
+            points = points_by_index[index]
+            start, end = points[0], points[-1]
+            candidates = (
+                [[start, end]]
+                if abs(start[1] - end[1]) <= 1e-6
+                else [
+                    [start, (x, start[1]), (x, end[1]), end]
+                    for x in sorted({
+                        *visibility_channel_xs,
+                        (start[0] + end[0]) / 2.0,
+                    })
+                    if min(start[0], end[0]) + 1e-6
+                    < x < max(start[0], end[0]) - 1e-6
+                ]
+            )
+            old_bends = max(0, len(points) - 2)
+            old_length = sum(
+                abs(b[0] - a[0]) + abs(b[1] - a[1])
+                for a, b in zip(points, points[1:])
+            )
+            other_segments = [
+                segment
+                for other_index, segments in segments_by_index.items()
+                if other_index != index
+                for segment in segments
+                if segment.source_net != (logical.source, logical.source_port)
+            ]
+            shortlisted = []
+            for raw_candidate in candidates:
+                candidate_points = _simplify(raw_candidate)
+                if candidate_points == points:
+                    continue
+                bends = max(0, len(candidate_points) - 2)
+                length = sum(
+                    abs(b[0] - a[0]) + abs(b[1] - a[1])
+                    for a, b in zip(candidate_points, candidate_points[1:])
+                )
+                if bends > old_bends or length > old_length + 1e-6:
+                    continue
+                candidate_segments = [
+                    Segment(logical.key, (logical.source, logical.source_port), a, b)
+                    for a, b in zip(candidate_points, candidate_points[1:])
+                    if a != b
+                ]
+                endpoint_ids = {
+                    edge_by_id[f"e{index}"].source_id,
+                    edge_by_id[f"e{index}"].target_id,
+                }
+                if any(
+                    _segment_hits_rect(
+                        segment.a,
+                        segment.b,
+                        (box.left, box.top, box.right, box.bottom),
+                    )
+                    for segment in candidate_segments
+                    for cell_id, box in visible_boxes.items()
+                    if cell_id not in endpoint_ids
+                ):
+                    continue
+                local_overlaps = sum(
+                    _overlap_length(segment, other) > 1e-6
+                    for segment in candidate_segments for other in other_segments
+                )
+                local_crossings = sum(
+                    _proper_cross(segment, other)
+                    for segment in candidate_segments for other in other_segments
+                )
+                shortlisted.append((
+                    (local_overlaps, local_crossings, bends, length),
+                    candidate_points,
+                ))
+            for _, candidate_points in sorted(shortlisted)[:3]:
+                attempts += 1
+                candidate = _clone_layout_geometry(accepted)
+                candidate_edge = {edge.cell_id: edge for edge in candidate.edges}[f"e{index}"]
+                candidate_edge.waypoints = tuple(candidate_points[1:-1])
+                candidate_report = assess_layout(candidate, logical_edges, 0.0)
+                candidate_visible = _visible_layout_signature(candidate, logical_edges)
+                before_endpoint = _route_endpoint_signature(
+                    accepted, logical_edges, {index}, route_clearance
+                )
+                after_endpoint = _route_endpoint_signature(
+                    candidate, logical_edges, {index}, route_clearance
+                )
+                crossing_before = (
+                    accepted_report["distinct_crossing_points"],
+                    accepted_report["crossings"],
+                )
+                crossing_after = (
+                    candidate_report["distinct_crossing_points"],
+                    candidate_report["crossings"],
+                )
+                checks = {
+                    "node-overlap": candidate_report["node_overlaps"] <= accepted_report["node_overlaps"],
+                    "edge-node": candidate_report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
+                    "visible-overlap": candidate_visible[4].issubset(visible[4]),
+                    "visible-edge-node": candidate_visible[5].issubset(visible[5]),
+                    "endpoint": after_endpoint.issubset(before_endpoint),
+                    "direction": candidate_report["direction_violations"] <= accepted_report["direction_violations"],
+                    "different-net-overlap": _final_artifact_overlap_count(candidate, logical_edges) <= accepted_overlap,
+                    "crossing": crossing_after <= crossing_before,
+                    "bend": candidate_report["bends_total"] <= accepted_report["bends_total"],
+                    "length": candidate_report["manhattan_length"] <= accepted_report["manhattan_length"] + 1e-6,
+                }
+                improves = (
+                    crossing_after < crossing_before
+                    or candidate_report["bends_total"] < accepted_report["bends_total"]
+                )
+                if not all(checks.values()) or not improves:
+                    blockers.update(name for name, passed in checks.items() if not passed)
+                    if all(checks.values()) and not improves:
+                        blockers["not-dominant"] += 1
+                    continue
+                score = (
+                    *crossing_after,
+                    candidate_report["bends_total"],
+                    candidate_report["manhattan_length"],
+                    index,
+                )
+                if best is None or score < best[0]:
+                    best = (score, candidate)
+        if best is None:
+            break
+        accepted = best[1]
+        moves += 1
+
+    return accepted, {
+        "final_single_edge_channel_attempts": attempts,
+        "final_single_edge_channel_moves": moves,
+        "final_single_edge_channel_blockers": dict(sorted(blockers.items())),
+    }
+
+
 def _edges_hitting_focus_vertices(
     document: LayoutDocument,
     logical_edges,
@@ -8286,11 +8481,11 @@ def _route_root_branches_through_boundary_corridors(
                 ("bottom", bottom_inner_lane),
                 *(
                     candidate
-                    for offset in lane_offsets
-                    for candidate in (
-                        ("top", top_lane - profile.grid * offset),
-                        ("bottom", bottom_lane + profile.grid * offset),
-                    )
+                for offset in lane_offsets
+                for candidate in (
+                    ("top", top_lane - profile.grid * offset),
+                    ("bottom", bottom_lane + profile.grid * offset),
+                )
                 ),
             )
             source_net = (logical.source, logical.source_port)
@@ -9027,6 +9222,12 @@ def generate_elk_layout(
         route_clearance=profile.route_clearance,
     )
     report["selection"].update(source_lead_report)
+    document, single_edge_channel_report = _refine_final_single_edge_channels(
+        document,
+        logical_edges,
+        route_clearance=profile.route_clearance,
+    )
+    report["selection"].update(single_edge_channel_report)
     accepted_assessment = None
     report["selection"]["source_rendering_replicas"] = (
         len(document.vertices) - len(nodes)

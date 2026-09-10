@@ -2,7 +2,57 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-10 23:35 +08:00
+- updated: 2026-09-11 02:18 +08:00
+
+- 2026-09-11 02:18 三张最终代表 SVG（29 公共 from 非对称层级、30 多源直连 mux 含条件式同名设施、32 注释压力）均由同一质量系统逐张执行 25/25 指标并 `passed=true`、`failed=[]`；转为稳定路径 PNG 后，媒体完整性、哈希一致性与人工终态复核通过。29 为单一公共设施、单条纵向主干和圆点分叉；30 的 mux 直连 cohort 同列，额外远端消费者只保留必要的近端同名设施；32 覆盖短/长/多行/空行尾换行/中英混排且文字不与节点、线路或其它注释重叠。Edge headless 仅报告账户头像获取失败，不参与本地 file SVG 渲染，三个 PNG 均非零且由独立媒体脚本解析成功。会话交付别名已按内容哈希建立并原生预览；最终仍只能声明文件已验证、显示尝试已完成，是否在用户端可见需用户确认。
+
+- 2026-09-11 02:18 暂存统计脚本最初用 PowerShell `-like '??*'` 识别 Git `??` 前缀，两个问号被解释为任意字符，遂把全部 260 个 staged 条目误报成 untracked；已撤销该解释并改用 `git ls-files --others --exclude-standard`，结果为空。260 是当前 staged 文件总数，所有预期证据均已进入索引，没有未跟踪项目文件。
+
+- 2026-09-11 02:12 最终独立门完成：质量合同保留 `metrics=25 requirements=25`、feedback release `issues=19`、五件套 `status=PASS`。首次调用 release checker 漏传必需的 `--phase`、五件套沿用了另一个 checker 的 `--project-root --json` 参数，两者均由 argparse 在执行检查前非零拒绝；按各自 `--help` 契约改为 `--phase release` 与位置参数后通过。错误调用不计绿灯；最终暂存后将再跑同一正确命令与 cached diff 检查。
+
+- 2026-09-11 02:08 首次最终暂存命令把记录文件名误写为 `userBel-feedback...`，Git 以 `pathspec did not match` 非零退出且没有修改工作树或索引；未把该轮算作暂存成功。随后一次记录补丁自身因 INDEX 上下文误写而在校验阶段整体拒绝，也没有修改文件。现改为对全部当前预期修改执行一次精确暂存，并由 `git status` 与 cached diff 复核实际集合。
+
+- 2026-09-11 02:06 issuer 回归加入后从头执行完整 pytest，PTY 会话明确以退出码 0 收敛：`550 passed in 338.50s`。本轮没有复用 01:40 的 549 项结果，也没有把 100% 点阵当作完成；至此产品、Oracle、全指标执行、mutant、证据链与四流发布身份均处于同一次源码状态。下一步重跑 release/五件套/diff 门并提交，远端 workflow、滚动 tag、公开资产回下载复验仍是完成条件。
+
+- 2026-09-11 01:58 四流 Git 状态指纹 issuer 修复后，受保护的真实 `tools/pack.bat` 不再出现“子门 PASS、宿主身份不匹配”，完整生成 `dist/drawclock.exe` 与 `dist/drawclock-1.0.0-windows.zip`。随后从全新临时目录解包，包内 7 个项目 Skill 校验、冻结 executable draw 工作流和零依赖源码工作流均以退出码 0 通过；Windows venv 对短路径映射给出提示但没有改变消费结果。该结果只证明本地发行候选可消费，新增 issuer 回归尚未纳入一次从头全量 pytest，故仍不签发最终发布结论。
+
+- 2026-09-11 01:51 发布保护钩子连续两次拒绝实际 `pack.bat`，但子门日志同时显示 `PASS phase=release`。逐字段比较发现项目 issuer 写的是旧版裸 `git write-tree` SHA，宿主管理门当前要求绑定 staged/unstaged/untracked 状态的 `git-state-sha256:...`，因此挑战与检查均通过、回执身份仍不相等。项目 `prospective_tree()` 已改为与管理门相同的 HEAD/tracked/cached/status 四流二进制摘要，并新增独立复算回归；不手写 challenge、不放宽门禁，修复最早的不兼容 owner 后再重试打包。
+
+- 2026-09-11 01:40 完整回归以可轮询 PTY 会话取得真实退出码 0：`549 passed in 295.31s`。此前一轮带 JUnit 的执行已显示 100% 但解释器在会话结束阶段静止且 XML 仍为 0 字节，不能作为证据，已终止该自有测试进程并从头运行；第二轮保存 session ID、持续轮询到 pytest 明确打印汇总和 `exit_code=0`，没有继承第一次的点阵输出。
+
+- 2026-09-11 01:31 用户根渐进专题已沉淀本轮两个可迁移根因：全制品质量系统要求同名物理 alias 按“逻辑 identity + 输出 port”归网、不同输出端口保持异网，并将标量偷跑/覆盖显式约束/局部改善导致整图退化加入反事实 Oracle mutant；时钟树阵列专题明确显式 `layout_column` 禁止 x 反事实、允许守 x 的 y 优化，非约束阵列只能整组交易。两份用户根 Skill 将用官方 validator 校验，项目仍以自身 25 指标门作实际执行证据。
+
+- 2026-09-11 01:24 独立 release checker 在最终证据加入 Git 索引后通过 19/19；质量合同保留门通过 `metrics=25 requirements=25`。全公开 SVG 门随后从 26 份 JSON 经公共 CLI 新鲜生成 26/26，`failed_count=0`、`metric_execution_failures=0`、`batch_failures=0`，每图 exact-set 执行 25 项指标；注释覆盖 short/long/multiline/blank-line/trailing-line-break/mixed-script 六类文本画像，未用旧图片替代。
+
+- 2026-09-11 01:16 当前源码/Oracle 的全 19 issue 修复验证组 `20260910T152557Z-0e313a24` 已生成 228 个证据文件并刷新全部 fix receipts；release gate 随即以 260 项“证据未被 Git 跟踪”正确拒绝。`.gitignore` 只对白名单中的这一完整最终组开放，保留两次并行误启动产生的较早/不完整临时组为忽略态，防止本地存在的证据冒充干净 checkout 可验证证据。
+
+- 2026-09-11 01:08 显式列/阵列事务边界修复后，正式攻击收据 `20260910T152017Z-05b5ca2f` 从 R1 重新执行并达到连续 7/7 clean：共 155 个 case，每个 case 均有同一份 25 项 `required == executed == receipted` 指标回执，`failed_quality_cases=0`。该轮没有从先前 R4 续算，满足“再次复位后达到上限仍未复现”的闭环语义；下一步仍需以独立 checker、mutant、全公开图和全量测试验证收据与产品。
+
+- 2026-09-11 01:00 全指标攻击推进到 R4 `mux-source-seed-015` 后以 `root_facility_column_lag` 红灯；终态回读证明四个 source 显式声明 `layout_column=0/1/2/3`，误报来自标量设施反事实绕过用户列约束和 direct-mux 阵列事务边界。Oracle 现统一禁止对显式列根或受保护直连 mux 队列成员签发单设施 column-lag witness；这两类布局分别由显式约束和整组阵列反事实审计。新增 seed 015 自然回归，锁定多输出源存在显示副本时也不能用一个副本的局部 crossing 改善推翻显式列。
+
+- 2026-09-11 00:54 可见框预筛后 seed 009 仍剩一条 x=533.075 witness。对比生产 endpoint gate 与 Oracle 发现后者只要求纵段离开图形边界 `EPS`，却没有要求项目声明的 18px route clearance；该候选会把首纵段放进源端净空区，不能作为合格反事实。独立 Oracle 增加 `ROUTE_CLEARANCE=18.0` 并对源/目标纵段对称检查。首次小补丁把常量名误写成 `ROUTE_CLEAR Lie`，在运行前源码回读即发现，已修正为 `ROUTE_CLEARANCE`，未生成或接受任何制品。
+
+- 2026-09-11 00:48 补齐相邻轴中点后闭包仍只接受 1 次移动；统计为 30 次昂贵评估，其中 14 个被 edge-node/visible-edge-node 拒绝，说明“每边前三名”的廉价排序没有先排除穿节点候选，合法 x=533.075 被无效候选挤出。候选预筛新增对最终可见节点框的独立逐段碰撞检查（排除本边端点），保持三候选成本上限同时让合法 visibility channel 进入全图门。
+
+- 2026-09-11 00:43 首次终态单边闭包只消除了 seed 009 的一条 witness，另一条仍需要 x=533.075；该轴不是现有路线坐标，而是相邻 visibility channels 的中点，Oracle 的通用候选族包含它。生产候选集补齐相邻终态 x 轴中点，同时仍以每边前三个廉价候选限制整图评估成本；回归测试名称改为直接表达“终态闭包消除全图支配通道”。
+
+- 2026-09-11 00:38 修正后的全图 Oracle 证明 seed 009 是真实产品缺陷：两个 H-V-H 辅助链候选分别让整图 9→7 crossing points/events，bends 28 保持、长度保持、overlap 0。新增终态 `_refine_final_single_edge_channels` owner：只处理逻辑 source-port fanout=1，候选来自终态已有 x 通道和端点中点；先以局部 overlap/crossing 排序每边最多三个，再由全图节点/可见框/端点/方向/序列化异网重叠/crossing/bend/length 向量严格支配接受，避免恢复曾被删除的共享 fanout 单边重路由。
+
+- 2026-09-11 00:29 alias net 修复后攻击推进到 R4 的第 20 case `mux-from-seed-009`，全指标门以 `avoidable_bends` 红灯；两个 witness 都没有减少折点（2→2），只声称单边 crossing events 2→0。根因与 023 相同：通用单边支配 Oracle 仍用 route-local proxy，未证明整图改善。现对每个可行候选替换完整 route set，强制全图唯一 crossing points、events、overlap 均不增，且折点或全图 crossing 至少一项严格下降；witness 记录全局量纲。新增 seed 009 的自然回归，禁止局部 crossing 转移冒充通用美观提升。
+
+- 2026-09-11 00:22 全指标攻击继续到 R4 seed 002 后捕获 `crossing_treatment/orphan_bridge`。根因位于最终 SVG renderer：跨线分类以物理 `source_id` 当 net 身份，因此同一个逻辑根的两个合规显示设施互相跨过时被误画桥；独立 Oracle 按逻辑 root+port 正确把它识别为同网，从而报告孤立桥。renderer 现以 `vertex.logical_name or name` 加输出 anchor 定义 net，新增两物理 alias 同逻辑网相交不得生成桥的直接单测。此前一次错误 runner 文件名、一次不受支持 `--json` 参数、一次 Windows `rg tests/test_*` glob 均已由正确入口恢复且未改产品状态。
+
+- 2026-09-11 00:16 Oracle 聚焦测试首次以 NameError 红灯：补丁上下文命中了更早的同名 `before = _route_interactions`，全局基线变量没有进入 023 函数；已删除误插入并按 `_premature_interior_trunk_entry_witnesses` 的端点上下文放到唯一 owner。另一个聚焦测试的动态 import 缺少 `tools` 搜索路径是单测独立运行环境问题，后续以显式 `PYTHONPATH=tools` 重跑，不把它算作产品失败。
+
+- 2026-09-11 00:12 第二版产品搜索仍被同一红灯拒绝；独立终态对照证明该“更优”支路虽把自身 crossing points 7→4，却把整图唯一 crossing points 16→18，events 保持 46，属于 route-local proxy 冒充全图美观的 Oracle 假阳性。按质量优先级撤回两次未生效的产品改动，修复真正 owner：提前入行 Oracle 现在把候选替换回完整 route set，要求全图 points/events/overlap 均不增且全图 crossing 严格改善；witness 同时报告局部与全局量纲。新增声明反转自然对照，冻结当前正确图为 16 points 且必须无 023 witness，防止以后再次用局部改善恶化整图。
+
+- 2026-09-11 00:02 第一版子网格搜索仍由全指标攻击拒绝，R2 同一 witness 完全未变，不能计修复。诊断确认边界阶段的廉价预筛只统计 edge-pair crossing incidents，并只向整图门提交每侧一个候选；这与注册表/Oracle 以用户可见 `distinct_crossing_points` 优先、pair incidents 仅诊断的合同不一致，可能在昂贵门前淘汰真正更美观通道。预筛现同时计算序列化精度的唯一交叉坐标，并以 overlap→distinct points→incidents→bend→length 排序；仍要求 points/incidents 均不增。一次工具调用 JavaScript 拼写损坏、一次错误导入不存在的 `parse_edges`、一次无效 PowerShell here-string 均在执行/写入前失败，未形成产品证据，后续诊断已改用真实 `build_logical_edges` 路径。
+
+- 2026-09-10 23:56 `arc` 全指标攻击在 R2 声明顺序反转的 `pad-r08-s02` 自然复现 `premature_interior_trunk_entry`：公共 `public_gate` 到 `mux_after_07` 的终态路线有 7 个 crossing points，完整外边界候选为 4 个，crossing events 同为 12、overlap 同为 0、折点同为 4。生产 owner 虽已有边界走廊阶段，却只枚举净空边界与整网格线，恰好漏掉二者之间的可见通道；现增加由 `route_clearance + [0..1]*grid` 推导的有界子网格 visibility sweep，只把每侧最佳候选送入昂贵整图交易，不依赖节点名、声明顺序或固定坐标。
+
+- 2026-09-10 23:50 新的全指标攻击器首次运行即在 R1 `pad-r08-s02` 正确红灯：25/25 指标均执行，但 `crossing_treatment` 报多个 `missing_bridge`。根因不是布局器回归，而是攻击 runner 强制使用公开 CLI 的 `--crossing-style none`，与正式合格制品要求的可见跨线桥冲突；攻击入口改为与全图发行门一致的 `arc`，历史问题 Oracle 仍读取同一终态路线。一次误输入不存在的 `lasso` 管道命令以及随后检索不存在 `docs` 目录均非零且未改状态，已用限定于真实路径的 `rg` 恢复。
+
+- 2026-09-10 23:45 发布后递归复核暴露新的 `oracle/coverage escape`：现有 7 轮攻击对 155 个公开 CLI 产物仅运行历史 issue Oracle，完整 25 指标收据为 0/155；独立 exact-set 检查以退出码 1 报 `FULL_ARTIFACT_METRIC_GATE_FAIL`。按 NIST t-way 覆盖、ELK edge section/junction point 与 W3C SVG path 终态几何模型，攻击 runner 现对每个 case 强制执行同一质量注册表并保存 required/executed/receipted exact-set，release checker 同时校验 Oracle/注册表哈希，并新增缺指标、重排指标、伪造质量 PASS 三类 mutant。旧 7/7 clean 凭证作废，必须从 R1 重新开始。
 
 - 2026-09-10 23:35 Final second release-fix evidence is green: the complete frozen workflow passes through the source wrapper; targeted tests pass 35/35; the complete suite passes 545/545 in 227.30s; quality retention passes 25/25; public SVGs pass 26/26; the feedback release gate passes 19/19; and the diff check is clean.
 

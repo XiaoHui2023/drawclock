@@ -983,6 +983,83 @@ def test_premature_interior_trunk_entry_keeps_clean_control(
     assert "FB-ROUTE-023" not in report["detected_issues"]
 
 
+def test_premature_corridor_rejects_local_gain_that_worsens_global_crossings(
+    tmp_path: Path,
+) -> None:
+    source = ROOT / "tests/reproduction-corpus/pad-r08-s02.json"
+    config = json.loads(source.read_text(encoding="utf-8"))
+    reversed_input = tmp_path / "pad-r08-s02-reversed.json"
+    reversed_input.write_text(
+        json.dumps(dict(reversed(config.items())), indent=2) + "\n",
+        encoding="utf-8",
+    )
+    output = tmp_path / "pad-r08-s02-reversed.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(reversed_input),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "arc"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(reversed_input, output)
+    assert report["totals"]["distinct_crossing_points"] == 16
+    assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
+    assert "FB-ROUTE-023" not in report["detected_issues"]
+
+
+def test_final_route_closure_removes_globally_dominated_local_channels(
+    tmp_path: Path,
+) -> None:
+    search_path = ROOT / "tools" / "search_recurrent_mux_bends.py"
+    search_spec = importlib.util.spec_from_file_location(
+        "route_dominance_seed_builder", search_path
+    )
+    assert search_spec is not None and search_spec.loader is not None
+    search = importlib.util.module_from_spec(search_spec)
+    search_spec.loader.exec_module(search)
+    config = search.build_case(9)
+    for index in range(4):
+        config[f"source_{index}"]["kind"] = "from"
+    input_path = tmp_path / "mux-from-seed-009.json"
+    input_path.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+    output = tmp_path / "mux-from-seed-009.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "arc"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["witnesses"]["avoidable_bend_edges"] == []
+
+
+def test_explicit_direct_mux_columns_reject_scalar_facility_lag_move(
+    tmp_path: Path,
+) -> None:
+    search_path = ROOT / "tools" / "search_recurrent_mux_bends.py"
+    search_spec = importlib.util.spec_from_file_location(
+        "explicit_column_seed_builder", search_path
+    )
+    assert search_spec is not None and search_spec.loader is not None
+    search = importlib.util.module_from_spec(search_spec)
+    search_spec.loader.exec_module(search)
+    config = search.build_case(15)
+    assert {
+        config[f"source_{index}"]["layout_column"] for index in range(4)
+    } == {0, 1, 2, 3}
+    input_path = tmp_path / "mux-source-seed-015.json"
+    input_path.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+    output = tmp_path / "mux-source-seed-015.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "arc"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["witnesses"]["root_facility_column_lag_witnesses"] == []
+    assert "FB-ROOT-012" not in report["detected_issues"]
+
+
 def test_oracle_rejects_frozen_mixed_root_failure() -> None:
     receipt = json.loads(
         (ROOT / ".reproduction/receipts/FB-ROOT-001.json").read_text(encoding="utf-8")

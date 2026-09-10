@@ -3,7 +3,7 @@
   "hash_mode": "sha256-normalized-text-v1",
   "issue_id": "FB-ROOT-022",
   "result": "fixed_verified",
-  "verification_group": "20260910T093625Z-08aa041d",
+  "verification_group": "20260910T152557Z-0e313a24",
   "baseline_fails": true,
   "current_passes": true,
   "baseline_receipt": ".reproduction/receipts/FB-ROOT-022.json",
@@ -11,14 +11,14 @@
   "required_reproduction_variants": [
     "distant-root-two-bands"
   ],
-  "source_tree_sha256": "0fdcdaee7658b5c25573c899431a25bdc38cdc0475fb4117ca925ca49010820a",
+  "source_tree_sha256": "89bc74410fffaf93592f8bcb17fa277a38242b831c13f074a3a6e56f8b2984bb",
   "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
   "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
-  "oracle_sha256": "6be39784b2d8b1a394ee2ad136e70309d5617e38e6fb8cc67bcb2e49678b1fc3",
+  "oracle_sha256": "d1ea06cb322dca8df00c6aee26a6b00bbfb583e26634805e7a5da0e938dc49a8",
   "semantics_sha256": "9110e75d06071f93bc9837b695a63d9cbefb5e336210a8fca32b8a146b37bb0e",
   "attempts": [
     {
-      "run_id": "20260910T093625Z-08aa041d:distant-root-two-bands-baseline:1",
+      "run_id": "20260910T152557Z-0e313a24:distant-root-two-bands-baseline:1",
       "case_id": "distant-root-two-bands-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -27,27 +27,27 @@
       "artifact_before_oracle_sha256": "fa4fb22b3113bb48e68a6312fbaa49cace2c3931742d702ecd03bc06d6291044",
       "artifact_after_oracle_sha256": "fa4fb22b3113bb48e68a6312fbaa49cace2c3931742d702ecd03bc06d6291044",
       "input_sha256": "9475399853a63eb0c157cc2162a4e349957af0e71749792724cdc539ebb9e38a",
-      "source_tree_sha256": "0fdcdaee7658b5c25573c899431a25bdc38cdc0475fb4117ca925ca49010820a",
+      "source_tree_sha256": "89bc74410fffaf93592f8bcb17fa277a38242b831c13f074a3a6e56f8b2984bb",
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
-      "oracle_sha256": "6be39784b2d8b1a394ee2ad136e70309d5617e38e6fb8cc67bcb2e49678b1fc3",
-      "started_at": "2026-09-10T09:37:43.238547+00:00",
-      "ended_at": "2026-09-10T09:37:43.759057+00:00",
+      "oracle_sha256": "d1ea06cb322dca8df00c6aee26a6b00bbfb583e26634805e7a5da0e938dc49a8",
+      "started_at": "2026-09-10T15:28:21.732244+00:00",
+      "ended_at": "2026-09-10T15:28:22.402971+00:00",
       "semantic_contract_sha256": "f1e1654a05fbd9e49e3f17edcb480a0a831608884a05e0a564788d04a7bdc62b",
       "semantic_variant_id": "distant-root-two-bands",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/distant-root-two-bands-baseline/attempt-1/output.svg": "fa4fb22b3113bb48e68a6312fbaa49cace2c3931742d702ecd03bc06d6291044",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/distant-root-two-bands-baseline/attempt-1/producer.log": "d362c3b65ee9d60b21b782149236fac7ad8fdc18de87ab8d704fdad300cf0965",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/distant-root-two-bands-baseline/attempt-1/report.json": "a7a635d327caf45129ec2f849e3dfb17ceffd41fa689af13656a154faa3072d6",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/distant-root-two-bands-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/distant-root-two-bands-baseline/attempt-1/FB-ROOT-022.log": "de41a9934da1869402bf2196c8ad852bca898998c03485e77a01f048a0c94541"
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/distant-root-two-bands-baseline/attempt-1/output.svg": "fa4fb22b3113bb48e68a6312fbaa49cace2c3931742d702ecd03bc06d6291044",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/distant-root-two-bands-baseline/attempt-1/producer.log": "d3f70850cdab248ac5b460978243c3c3801ff50e12a891336b4f5a70f0ef7fa7",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/distant-root-two-bands-baseline/attempt-1/report.json": "a7a635d327caf45129ec2f849e3dfb17ceffd41fa689af13656a154faa3072d6",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/distant-root-two-bands-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/distant-root-two-bands-baseline/attempt-1/FB-ROOT-022.log": "de41a9934da1869402bf2196c8ad852bca898998c03485e77a01f048a0c94541"
       }
     },
     {
-      "run_id": "20260910T093625Z-08aa041d:distant-root-two-bands-baseline:2",
+      "run_id": "20260910T152557Z-0e313a24:distant-root-two-bands-baseline:2",
       "case_id": "distant-root-two-bands-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -56,23 +56,23 @@
       "artifact_before_oracle_sha256": "fa4fb22b3113bb48e68a6312fbaa49cace2c3931742d702ecd03bc06d6291044",
       "artifact_after_oracle_sha256": "fa4fb22b3113bb48e68a6312fbaa49cace2c3931742d702ecd03bc06d6291044",
       "input_sha256": "9475399853a63eb0c157cc2162a4e349957af0e71749792724cdc539ebb9e38a",
-      "source_tree_sha256": "0fdcdaee7658b5c25573c899431a25bdc38cdc0475fb4117ca925ca49010820a",
+      "source_tree_sha256": "89bc74410fffaf93592f8bcb17fa277a38242b831c13f074a3a6e56f8b2984bb",
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
-      "oracle_sha256": "6be39784b2d8b1a394ee2ad136e70309d5617e38e6fb8cc67bcb2e49678b1fc3",
-      "started_at": "2026-09-10T09:37:43.770523+00:00",
-      "ended_at": "2026-09-10T09:37:44.309597+00:00",
+      "oracle_sha256": "d1ea06cb322dca8df00c6aee26a6b00bbfb583e26634805e7a5da0e938dc49a8",
+      "started_at": "2026-09-10T15:28:22.418457+00:00",
+      "ended_at": "2026-09-10T15:28:23.134768+00:00",
       "semantic_contract_sha256": "f1e1654a05fbd9e49e3f17edcb480a0a831608884a05e0a564788d04a7bdc62b",
       "semantic_variant_id": "distant-root-two-bands",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/distant-root-two-bands-baseline/attempt-2/output.svg": "fa4fb22b3113bb48e68a6312fbaa49cace2c3931742d702ecd03bc06d6291044",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/distant-root-two-bands-baseline/attempt-2/producer.log": "10bb9357cbc169fa31d3cbdec60dd637c351b77e3a097e59b62f4872b2001fa3",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/distant-root-two-bands-baseline/attempt-2/report.json": "a7a635d327caf45129ec2f849e3dfb17ceffd41fa689af13656a154faa3072d6",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/distant-root-two-bands-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/distant-root-two-bands-baseline/attempt-2/FB-ROOT-022.log": "de41a9934da1869402bf2196c8ad852bca898998c03485e77a01f048a0c94541"
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/distant-root-two-bands-baseline/attempt-2/output.svg": "fa4fb22b3113bb48e68a6312fbaa49cace2c3931742d702ecd03bc06d6291044",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/distant-root-two-bands-baseline/attempt-2/producer.log": "6e133fd834e0391527421fe74593a0413530c6d9deab289ebb09dddbafb3cbcf",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/distant-root-two-bands-baseline/attempt-2/report.json": "a7a635d327caf45129ec2f849e3dfb17ceffd41fa689af13656a154faa3072d6",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/distant-root-two-bands-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/distant-root-two-bands-baseline/attempt-2/FB-ROOT-022.log": "de41a9934da1869402bf2196c8ad852bca898998c03485e77a01f048a0c94541"
       }
     }
   ]

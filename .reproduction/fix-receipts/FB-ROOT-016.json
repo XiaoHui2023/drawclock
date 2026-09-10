@@ -3,7 +3,7 @@
   "hash_mode": "sha256-normalized-text-v1",
   "issue_id": "FB-ROOT-016",
   "result": "fixed_verified",
-  "verification_group": "20260910T093625Z-08aa041d",
+  "verification_group": "20260910T152557Z-0e313a24",
   "baseline_fails": true,
   "current_passes": true,
   "baseline_receipt": ".reproduction/receipts/FB-ROOT-016.json",
@@ -11,14 +11,14 @@
   "required_reproduction_variants": [
     "public-from-single-vertical-bus"
   ],
-  "source_tree_sha256": "0fdcdaee7658b5c25573c899431a25bdc38cdc0475fb4117ca925ca49010820a",
+  "source_tree_sha256": "89bc74410fffaf93592f8bcb17fa277a38242b831c13f074a3a6e56f8b2984bb",
   "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
   "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
-  "oracle_sha256": "6be39784b2d8b1a394ee2ad136e70309d5617e38e6fb8cc67bcb2e49678b1fc3",
+  "oracle_sha256": "d1ea06cb322dca8df00c6aee26a6b00bbfb583e26634805e7a5da0e938dc49a8",
   "semantics_sha256": "9110e75d06071f93bc9837b695a63d9cbefb5e336210a8fca32b8a146b37bb0e",
   "attempts": [
     {
-      "run_id": "20260910T093625Z-08aa041d:public-from-dispersed-bus-current-baseline:1",
+      "run_id": "20260910T152557Z-0e313a24:public-from-dispersed-bus-current-baseline:1",
       "case_id": "public-from-dispersed-bus-current-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -27,27 +27,27 @@
       "artifact_before_oracle_sha256": "696f108cdde9475ee4578a9036671fa91ad8d9bdcb9943a8a21ee69a95befc25",
       "artifact_after_oracle_sha256": "696f108cdde9475ee4578a9036671fa91ad8d9bdcb9943a8a21ee69a95befc25",
       "input_sha256": "2ac1478b80793aeab8b0d2c1fc97667e1b5f3a69e46e1919a6d4c4845108126d",
-      "source_tree_sha256": "0fdcdaee7658b5c25573c899431a25bdc38cdc0475fb4117ca925ca49010820a",
+      "source_tree_sha256": "89bc74410fffaf93592f8bcb17fa277a38242b831c13f074a3a6e56f8b2984bb",
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
-      "oracle_sha256": "6be39784b2d8b1a394ee2ad136e70309d5617e38e6fb8cc67bcb2e49678b1fc3",
-      "started_at": "2026-09-10T09:37:34.541108+00:00",
-      "ended_at": "2026-09-10T09:37:35.957079+00:00",
+      "oracle_sha256": "d1ea06cb322dca8df00c6aee26a6b00bbfb583e26634805e7a5da0e938dc49a8",
+      "started_at": "2026-09-10T15:28:08.236926+00:00",
+      "ended_at": "2026-09-10T15:28:10.648847+00:00",
       "semantic_contract_sha256": "76b2747a495331a17674e86625af608dbddcc475bba3a00114b9f34c13d26c6a",
       "semantic_variant_id": "public-from-single-vertical-bus",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/public-from-dispersed-bus-current-baseline/attempt-1/output.svg": "696f108cdde9475ee4578a9036671fa91ad8d9bdcb9943a8a21ee69a95befc25",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/public-from-dispersed-bus-current-baseline/attempt-1/producer.log": "d932fed428239d0c73250fcfc42d738bf415e965d5d7ac1f9562a42887d4a65c",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/public-from-dispersed-bus-current-baseline/attempt-1/report.json": "804ef669fd8bb915ffa7e2e898e0bb5643ca3bf4b70b79447b74d8d8cbc03b70",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/public-from-dispersed-bus-current-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/public-from-dispersed-bus-current-baseline/attempt-1/FB-ROOT-016.log": "11301e434f142a33331e5647346af05ab6b67bb79f7dedb10bbc610a8083b888"
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/public-from-dispersed-bus-current-baseline/attempt-1/output.svg": "696f108cdde9475ee4578a9036671fa91ad8d9bdcb9943a8a21ee69a95befc25",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/public-from-dispersed-bus-current-baseline/attempt-1/producer.log": "9f7eec1de22a3230849d5401b1c9d5b14b7eab5b04fe3c571f48233c7826a3bd",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/public-from-dispersed-bus-current-baseline/attempt-1/report.json": "804ef669fd8bb915ffa7e2e898e0bb5643ca3bf4b70b79447b74d8d8cbc03b70",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/public-from-dispersed-bus-current-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/public-from-dispersed-bus-current-baseline/attempt-1/FB-ROOT-016.log": "11301e434f142a33331e5647346af05ab6b67bb79f7dedb10bbc610a8083b888"
       }
     },
     {
-      "run_id": "20260910T093625Z-08aa041d:public-from-dispersed-bus-current-baseline:2",
+      "run_id": "20260910T152557Z-0e313a24:public-from-dispersed-bus-current-baseline:2",
       "case_id": "public-from-dispersed-bus-current-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -56,23 +56,23 @@
       "artifact_before_oracle_sha256": "696f108cdde9475ee4578a9036671fa91ad8d9bdcb9943a8a21ee69a95befc25",
       "artifact_after_oracle_sha256": "696f108cdde9475ee4578a9036671fa91ad8d9bdcb9943a8a21ee69a95befc25",
       "input_sha256": "2ac1478b80793aeab8b0d2c1fc97667e1b5f3a69e46e1919a6d4c4845108126d",
-      "source_tree_sha256": "0fdcdaee7658b5c25573c899431a25bdc38cdc0475fb4117ca925ca49010820a",
+      "source_tree_sha256": "89bc74410fffaf93592f8bcb17fa277a38242b831c13f074a3a6e56f8b2984bb",
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
-      "oracle_sha256": "6be39784b2d8b1a394ee2ad136e70309d5617e38e6fb8cc67bcb2e49678b1fc3",
-      "started_at": "2026-09-10T09:37:35.967881+00:00",
-      "ended_at": "2026-09-10T09:37:37.385153+00:00",
+      "oracle_sha256": "d1ea06cb322dca8df00c6aee26a6b00bbfb583e26634805e7a5da0e938dc49a8",
+      "started_at": "2026-09-10T15:28:10.660147+00:00",
+      "ended_at": "2026-09-10T15:28:12.974330+00:00",
       "semantic_contract_sha256": "76b2747a495331a17674e86625af608dbddcc475bba3a00114b9f34c13d26c6a",
       "semantic_variant_id": "public-from-single-vertical-bus",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/public-from-dispersed-bus-current-baseline/attempt-2/output.svg": "696f108cdde9475ee4578a9036671fa91ad8d9bdcb9943a8a21ee69a95befc25",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/public-from-dispersed-bus-current-baseline/attempt-2/producer.log": "cd6e5b548a520e464105a83454c6ccd8e5ca886660bc7a58d4c36dd3618f400b",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/public-from-dispersed-bus-current-baseline/attempt-2/report.json": "804ef669fd8bb915ffa7e2e898e0bb5643ca3bf4b70b79447b74d8d8cbc03b70",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/public-from-dispersed-bus-current-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260910T093625Z-08aa041d/public-from-dispersed-bus-current-baseline/attempt-2/FB-ROOT-016.log": "11301e434f142a33331e5647346af05ab6b67bb79f7dedb10bbc610a8083b888"
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/public-from-dispersed-bus-current-baseline/attempt-2/output.svg": "696f108cdde9475ee4578a9036671fa91ad8d9bdcb9943a8a21ee69a95befc25",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/public-from-dispersed-bus-current-baseline/attempt-2/producer.log": "57d7c55278d17817c35e7e673f8055906b8d48efd389d27ac5e8aaac23d99f8a",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/public-from-dispersed-bus-current-baseline/attempt-2/report.json": "804ef669fd8bb915ffa7e2e898e0bb5643ca3bf4b70b79447b74d8d8cbc03b70",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/public-from-dispersed-bus-current-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260910T152557Z-0e313a24/public-from-dispersed-bus-current-baseline/attempt-2/FB-ROOT-016.log": "11301e434f142a33331e5647346af05ab6b67bb79f7dedb10bbc610a8083b888"
       }
     }
   ]

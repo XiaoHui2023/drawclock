@@ -16,12 +16,15 @@ from typing import Any
 
 from feedback_layout_reproduction_oracle import analyze
 from search_recurrent_mux_bends import build_case as build_mux_case
+from svg_quality_system import evaluate as evaluate_quality
 
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MANIFEST = ROOT / "tests/reproduction-corpus/recursive-attack-rounds.json"
 ORACLE = ROOT / "tools/feedback_layout_reproduction_oracle.py"
 SEMANTICS = ROOT / "tools/reproduction_semantics.py"
+QUALITY_SYSTEM = ROOT / "tools/svg_quality_system.py"
+QUALITY_REGISTRY = ROOT / "tests/quality-metrics.json"
 RISK_MINIMUM_ROUNDS = {"low": 3, "medium": 5, "high": 7, "critical": 9}
 
 
@@ -173,13 +176,14 @@ def main() -> int:
             input_path = case_dir / "input.json"
             svg_path = case_dir / "output.svg"
             input_path.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
-            command = [sys.executable, str(ROOT / "src"), "-i", str(input_path), "-l", str(ROOT / "drawio-lib"), "-o", str(svg_path), "--crossing-style", "none"]
+            command = [sys.executable, str(ROOT / "src"), "-i", str(input_path), "-l", str(ROOT / "drawio-lib"), "-o", str(svg_path), "--crossing-style", "arc"]
             run = subprocess.run(command, cwd=ROOT, capture_output=True, check=False)
             if run.returncode or not svg_path.is_file():
                 print(f"public CLI failed: {round_spec['id']}:{case_id}", file=sys.stderr)
                 return 2
             before = sha(svg_path)
             report = analyze(input_path, svg_path)
+            quality = evaluate_quality(input_path, svg_path, QUALITY_REGISTRY)
             after = sha(svg_path)
             observed = sorted(target_issues.intersection(report["detected_issues"]))
             case_variants = semantic_variants(config)
@@ -193,7 +197,16 @@ def main() -> int:
                 "artifact_after_oracle_sha256": after,
                 "observed_issue_ids": observed,
                 "semantic_variants": sorted(case_variants),
+                "required_metric_ids": quality["required_metric_ids"],
+                "executed_metric_ids": quality["executed_metric_ids"],
+                "metric_results": quality["metric_results"],
+                "failed_metric_ids": quality["failed_metric_ids"],
+                "quality_passed": quality["passed"],
             })
+            if not quality["passed"]:
+                consecutive_clean = 0
+                completed_rounds.append({"id": round_spec["id"], "strategy": round_spec["strategy"], "status": "quality_failure", "cases": round_results})
+                return write_receipt(args, manifest, group, source_hash, completed_rounds, consecutive_clean, covered_variants, "quality_failure", 1)
             if observed:
                 consecutive_clean = 0
                 completed_rounds.append({"id": round_spec["id"], "strategy": round_spec["strategy"], "status": "reproduced", "cases": round_results})
@@ -224,6 +237,8 @@ def write_receipt(args: argparse.Namespace, manifest: dict[str, Any], group: str
         "runner_sha256": sha(Path(__file__)),
         "oracle_sha256": sha(ORACLE),
         "semantics_sha256": sha(SEMANTICS),
+        "quality_system_sha256": sha(QUALITY_SYSTEM),
+        "quality_registry_sha256": sha(QUALITY_REGISTRY),
         "rounds": rounds,
     }
     args.receipt.parent.mkdir(parents=True, exist_ok=True)

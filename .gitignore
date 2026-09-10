@@ -32,6 +32,8 @@ __pycache__/
 !.reproduction/fix-evidence/20260909T040233Z-c6363a1e/**
 !.reproduction/fix-evidence/20260909T062835Z-36899fa6/
 !.reproduction/fix-evidence/20260909T062835Z-36899fa6/**
+!.reproduction/fix-evidence/20260910T152557Z-0e313a24/
+!.reproduction/fix-evidence/20260910T152557Z-0e313a24/**
 .mypy_cache/
 .ruff_cache/
 dist/

@@ -383,10 +383,12 @@ def _arc_crossings(
     edge_points: dict[str, list[tuple[float, float]]],
 ) -> dict[str, dict[int, list[float]]]:
     """Choose the horizontal wire as the deterministic bridge at each crossing."""
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
     nets: dict[str, tuple[str, tuple[float, float] | None]] = {}
     for edge in document.edges:
+        source = by_id[edge.source_id]
         nets[edge.cell_id] = (
-            edge.source_id,
+            source.logical_name or source.name,
             edge_attachment(edge.style, end="exit"),
         )
     horizontal_by_id: dict[int, tuple[str, int, float, tuple[str, tuple[float, float] | None]]] = {}

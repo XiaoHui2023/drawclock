@@ -24,6 +24,7 @@ NS = "{http://www.w3.org/2000/svg}"
 EPS = 1e-4
 ANNOTATION_FONT_SIZE = 11.0
 ANNOTATION_MAX_WIDTH = 230.0
+ROUTE_CLEARANCE = 18.0
 ISSUES = (
     "FB-ROOT-001",
     "FB-ROUTE-002",
@@ -636,11 +637,17 @@ def _candidate_quality(
     target_box = _endpoint_box(candidate[-1], [box for box in boxes if box.node == route.target])
     if verticals and source_box is not None:
         first_vertical_x = verticals[0][0][0]
-        if first_vertical_x < source_box.visual_bounds[2] + EPS:
+        if (
+            first_vertical_x
+            < source_box.visual_bounds[2] + ROUTE_CLEARANCE - EPS
+        ):
             return None
     if verticals and target_box is not None:
         last_vertical_x = verticals[-1][0][0]
-        if last_vertical_x > target_box.visual_bounds[0] - EPS:
+        if (
+            last_vertical_x
+            > target_box.visual_bounds[0] - ROUTE_CLEARANCE + EPS
+        ):
             return None
     if any(
         _rect_interior_hit(a, b, box)
@@ -673,6 +680,8 @@ def _dominated_route_witness(
     boxes: list[Box],
     actual_crossings: int,
     actual_overlaps: int,
+    global_crossings: list[dict[str, Any]],
+    global_overlaps: list[dict[str, Any]],
 ) -> dict[str, Any] | None:
     start, end = route.points[0], route.points[-1]
     candidates: list[list[tuple[float, float]]] = []
@@ -702,11 +711,30 @@ def _dominated_route_witness(
         if quality is None:
             continue
         crossings, overlaps, length = quality
+        candidate_route = _copy_route(route, compact)
+        candidate_routes = [
+            candidate_route if item.index == route.index else item
+            for item in routes
+        ]
+        candidate_global_crossings, candidate_global_overlaps = route_crossings(
+            candidate_routes
+        )
+        global_points_before = _distinct_crossing_count(global_crossings)
+        global_points_after = _distinct_crossing_count(
+            candidate_global_crossings
+        )
         if (
             crossings <= actual_crossings
             and overlaps <= actual_overlaps
+            and global_points_after <= global_points_before
+            and len(candidate_global_crossings) <= len(global_crossings)
+            and len(candidate_global_overlaps) <= len(global_overlaps)
             and length <= actual_length + EPS
-            and (candidate_bends < actual_bends or crossings < actual_crossings)
+            and (
+                candidate_bends < actual_bends
+                or global_points_after < global_points_before
+                or len(candidate_global_crossings) < len(global_crossings)
+            )
         ):
             return {
                 "candidate": [list(point) for point in compact],
@@ -716,6 +744,10 @@ def _dominated_route_witness(
                 "crossing_events_after": crossings,
                 "overlaps_before": actual_overlaps,
                 "overlaps_after": overlaps,
+                "global_crossing_points_before": global_points_before,
+                "global_crossing_points_after": global_points_after,
+                "global_crossing_events_before": len(global_crossings),
+                "global_crossing_events_after": len(candidate_global_crossings),
                 "length_before": round(actual_length, 4),
                 "length_after": round(length, 4),
             }
@@ -2855,6 +2887,10 @@ def _premature_interior_trunk_entry_witnesses(
         source_index = _endpoint_box_index(route.points[0], route.source, boxes)
         target_index = _endpoint_box_index(route.points[-1], route.target, boxes)
         before = _route_interactions(route, routes)
+        global_crossings_before, global_overlaps_before = route_crossings(routes)
+        global_crossing_points_before = _distinct_crossing_count(
+            global_crossings_before
+        )
         before_bends = len(route.points) - 2
         for side, lane_y in (("top", top_lane), ("bottom", bottom_lane)):
             candidate = _copy_route(
@@ -2873,13 +2909,31 @@ def _premature_interior_trunk_entry_witnesses(
             ):
                 continue
             after = _route_interactions(candidate, routes)
+            candidate_routes = [
+                candidate if item.index == route.index else item
+                for item in routes
+            ]
+            global_crossings_after, global_overlaps_after = route_crossings(
+                candidate_routes
+            )
+            global_crossing_points_after = _distinct_crossing_count(
+                global_crossings_after
+            )
             after_bends = len(candidate.points) - 2
             if not (
                 after[0] <= before[0]
                 and after[1] <= before[1]
                 and after[2] <= before[2]
+                and global_crossing_points_after
+                <= global_crossing_points_before
+                and len(global_crossings_after) <= len(global_crossings_before)
+                and len(global_overlaps_after) <= len(global_overlaps_before)
                 and after_bends <= before_bends
-                and (after[0] < before[0] or after[1] < before[1])
+                and (
+                    global_crossing_points_after
+                    < global_crossing_points_before
+                    or len(global_crossings_after) < len(global_crossings_before)
+                )
             ):
                 continue
             witnesses.append({
@@ -2896,6 +2950,10 @@ def _premature_interior_trunk_entry_witnesses(
                 "crossing_events_after": after[1],
                 "overlaps_before": before[2],
                 "overlaps_after": after[2],
+                "global_crossing_points_before": global_crossing_points_before,
+                "global_crossing_points_after": global_crossing_points_after,
+                "global_crossing_events_before": len(global_crossings_before),
+                "global_crossing_events_after": len(global_crossings_after),
                 "bends_before": before_bends,
                 "bends_after": after_bends,
                 "length_before": round(_route_length(route), 4),
@@ -3169,6 +3227,7 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             _dominated_route_witness(
                 route, routes, boxes,
                 incident[route.edge_id], overlap_incident[route.edge_id],
+                crossings, overlaps,
             )
             if fanout[(route.source, route.source_port)] == 1
             else None
@@ -3369,6 +3428,16 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     root_facility_column_lag_witnesses = (
         _root_facility_column_lag_witnesses(roots, routes, boxes)
     )
+    # A scalar facility move is not an admissible counterfactual when the
+    # logical root has an explicit column contract or belongs to a direct-mux
+    # source array.  Those placements must be evaluated as complete cohort
+    # transactions; otherwise one copied facility can "improve" crossings by
+    # silently overriding the user's column and breaking the array invariant.
+    root_facility_column_lag_witnesses = [
+        witness for witness in root_facility_column_lag_witnesses
+        if witness["root"] not in protected_direct_mux_roots
+        and witness["root"] not in explicit_column_roots
+    ]
     downstream_corridor_tail_bend_witnesses = (
         _downstream_corridor_tail_bend_witnesses(logical, routes, boxes)
     )

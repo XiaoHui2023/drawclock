@@ -18,6 +18,7 @@ from layout_preview import (
     HTML_LABEL_CONTENT_OFFSET_Y,
     _estimated_text_width,
     _node_annotations,
+    _arc_crossings,
     _wrap_annotation,
     build_preview_svg,
 )
@@ -112,6 +113,41 @@ def test_description_renders_once_as_safe_plain_text_annotation() -> None:
     assert "公共参考&lt;&amp;&gt;" in svg
     assert "<foreignObject" not in svg
     validate_static_svg(svg)
+
+
+def test_crossing_renderer_treats_physical_aliases_as_one_logical_net() -> None:
+    primary = VertexLayout(
+        name="shared", cell_id="v1", drawclock_type="from",
+        x=0, y=0, width=10, height=10, style="",
+    )
+    alias = VertexLayout(
+        name="shared__alias", logical_name="shared", cell_id="v2",
+        drawclock_type="from", x=0, y=20, width=10, height=10, style="",
+    )
+    left_target = VertexLayout(
+        name="left_target", cell_id="v3", drawclock_type="clock",
+        x=100, y=0, width=10, height=10, style="",
+    )
+    lower_target = VertexLayout(
+        name="lower_target", cell_id="v4", drawclock_type="clock",
+        x=100, y=20, width=10, height=10, style="",
+    )
+    document = LayoutDocument(
+        version=1,
+        vertices=[primary, alias, left_target, lower_target],
+        edges=[
+            EdgeLayout("e1", "v1", "v3", ""),
+            EdgeLayout("e2", "v2", "v4", ""),
+        ],
+    )
+    crossings = _arc_crossings(
+        document,
+        {
+            "e1": [(0.0, 50.0), (100.0, 50.0)],
+            "e2": [(50.0, 0.0), (50.0, 100.0)],
+        },
+    )
+    assert crossings == {}
 
 
 def test_annotation_wrap_preserves_empty_and_trailing_lines() -> None:

@@ -151,6 +151,40 @@ class FeedbackReproductionGateTest(unittest.TestCase):
         self.assertEqual(module.delivery_phase(["src/auto_layout.py"], "git commit -m fix"), "release")
         self.assertEqual(module.delivery_phase(["tests/test_gate.py"], "git push"), "structure")
 
+    def test_delivery_gate_uses_managed_git_state_fingerprint(self) -> None:
+        spec = importlib.util.spec_from_file_location("drawclock_delivery_gate_tree", DELIVERY_GATE)
+        self.assertIsNotNone(spec)
+        self.assertIsNotNone(spec.loader)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        observed = module.prospective_tree()
+        self.assertRegex(observed, r"^git-state-sha256:[0-9a-f]{64}$")
+
+        head = subprocess.run(
+            ["git", "rev-parse", "--verify", "HEAD"], cwd=ROOT,
+            capture_output=True, check=False,
+        )
+        tracked = subprocess.run(
+            ["git", "diff", "--binary", "--no-ext-diff", "HEAD"], cwd=ROOT,
+            capture_output=True, check=True,
+        )
+        cached = subprocess.run(
+            ["git", "diff", "--cached", "--binary", "--no-ext-diff"], cwd=ROOT,
+            capture_output=True, check=True,
+        )
+        status = subprocess.run(
+            ["git", "status", "--porcelain=v2", "-z", "--untracked-files=normal"], cwd=ROOT,
+            capture_output=True, check=True,
+        )
+        import hashlib
+        digest = hashlib.sha256()
+        for label, value in (
+            (b"head", head.stdout), (b"tracked", tracked.stdout),
+            (b"cached", cached.stdout), (b"status", status.stdout),
+        ):
+            digest.update(label + b"\0" + value + b"\0")
+        self.assertEqual(observed, "git-state-sha256:" + digest.hexdigest())
+
     def test_delivery_gate_direct_invocation_is_an_explicit_negative_control(self) -> None:
         environment = os.environ.copy()
         for name in (
@@ -338,6 +372,16 @@ class FeedbackReproductionGateTest(unittest.TestCase):
         stale_semantics = json.loads(json.dumps(baseline))
         stale_semantics["semantics_sha256"] = "0" * 64
         mutations.append(stale_semantics)
+        missing_metric = json.loads(json.dumps(baseline))
+        missing_metric["rounds"][0]["cases"][0]["executed_metric_ids"].pop()
+        mutations.append(missing_metric)
+        reordered_metrics = json.loads(json.dumps(baseline))
+        reordered_metrics["rounds"][0]["cases"][0]["metric_results"].reverse()
+        mutations.append(reordered_metrics)
+        false_quality_pass = json.loads(json.dumps(baseline))
+        false_quality_pass["rounds"][0]["cases"][0]["quality_passed"] = False
+        false_quality_pass["rounds"][0]["cases"][0]["failed_metric_ids"] = ["split_rejoin"]
+        mutations.append(false_quality_pass)
         with tempfile.TemporaryDirectory(dir=ROOT) as directory:
             for index, payload in enumerate(mutations):
                 path = Path(directory) / f"mutant-{index}.json"

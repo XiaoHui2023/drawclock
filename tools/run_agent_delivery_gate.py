@@ -9,7 +9,6 @@ import os
 import re
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
 
@@ -41,20 +40,34 @@ def changed_paths() -> list[str]:
 
 
 def prospective_tree() -> str:
-    with tempfile.NamedTemporaryFile(delete=False) as index:
-        index_path = Path(index.name)
-    try:
-        environment = os.environ.copy()
-        environment["GIT_INDEX_FILE"] = str(index_path)
-        head = subprocess.run(["git", "rev-parse", "--verify", "HEAD"], cwd=ROOT, capture_output=True, check=False)
-        if head.returncode == 0:
-            subprocess.run(["git", "read-tree", "HEAD"], cwd=ROOT, env=environment, check=True)
-        subprocess.run(["git", "add", "-A"], cwd=ROOT, env=environment, check=True)
-        return subprocess.run(
-            ["git", "write-tree"], cwd=ROOT, env=environment, capture_output=True, text=True, check=True
-        ).stdout.strip()
-    finally:
-        index_path.unlink(missing_ok=True)
+    """Match the managed hard-gate Git-state fingerprint exactly."""
+    head = subprocess.run(
+        ["git", "rev-parse", "--verify", "HEAD"],
+        cwd=ROOT, capture_output=True, check=False,
+    )
+    tracked = subprocess.run(
+        (["git", "diff", "--binary", "--no-ext-diff", "HEAD"]
+         if head.returncode == 0 else
+         ["git", "diff", "--binary", "--no-ext-diff"]),
+        cwd=ROOT, check=True, capture_output=True,
+    )
+    cached = subprocess.run(
+        ["git", "diff", "--cached", "--binary", "--no-ext-diff"],
+        cwd=ROOT, check=True, capture_output=True,
+    )
+    status = subprocess.run(
+        ["git", "status", "--porcelain=v2", "-z", "--untracked-files=normal"],
+        cwd=ROOT, check=True, capture_output=True,
+    )
+    digest = hashlib.sha256()
+    for label, value in (
+        (b"head", head.stdout if head.returncode == 0 else b"<unborn>"),
+        (b"tracked", tracked.stdout),
+        (b"cached", cached.stdout),
+        (b"status", status.stdout),
+    ):
+        digest.update(label + b"\0" + value + b"\0")
+    return "git-state-sha256:" + digest.hexdigest()
 
 
 def write_blocked(phase: str, detail: str) -> None:
