@@ -1,8 +1,14 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-11 02:45 +08:00
+- updated: 2026-09-11 03:01 +08:00
+
+- 2026-09-11 03:01 关闭补丁虽然成功应用，但 INDEX 摘要尾部混入无意义字符串 `gbe?`，且第一版纠正说明本身出现重复字；回读后在任何校验、暂存或提交前一并修正，并同步本记录与 INDEX 更新时间。这些中间文本状态均不计为关闭通过。
+
+- 2026-09-11 02:58 最终账本提交 `c3c3b8cb6cb607df5b42858de7128066ba2fdb0e` 的 Release run `34505402969` 已由 GitHub 公开页面确认 `completed successfully`，`v1.0.0^{}` 精确指向该提交，本地/远端分支 0 ahead/0 behind。最终更新资产重新独立下载，大小 17,223,492 bytes、SHA-256 `d87e3c3b95ad82a91a6a6a5f3997095932ef8e5a0accc85b8d839f6c5346a1af`，tar 全量完整性、151 文件解包结构与包内离线源码部署均通过；远端同 run 已执行公开资产 frozen/source 双 smoke。本记录及索引改为 `done`，该关闭提交仍必须经过同一滚动 Release，成功后不再修改项目账本。
+
+- 2026-09-11 02:58 前三次关闭补丁分别在送入补丁器前发生 JavaScript 语法错误，或因错误上下文在校验阶段整体拒绝；均未执行文件修改，不计记录关闭。随后先独立复算最终资产真实 SHA-256，再用无占位、仅锚定顶部元数据的精确补丁完成本条。
 
 - 2026-09-11 02:45 产品/质量提交 `857a3d081a02a961f3161b11a05faf4386b087cd` 已推送 `main`。第一次 push 在 TLS handshake 前失败；第二次上传后收到 HTTP 408，`ls-remote` 证明远端仍是旧提交；第三次保持同一提交并切到 HTTP/1.1 后明确成功。Release run `34503391056` 的反馈门、Ubuntu 16.04 PyInstaller/staticx 与 Publish 三个 job 全部 success，`v1.0.0^{}` 精确指向该提交；workflow 在构建包与公开 Release 回下载后均执行 frozen/source smoke。
 
