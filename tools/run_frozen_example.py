@@ -13,7 +13,12 @@ from collections import Counter
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
+CHECKOUT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(CHECKOUT_ROOT / "tools"))
+import svg_quality_system as quality
+
+
+ROOT = CHECKOUT_ROOT
 LIBRARY = ROOT / "drawio-lib" / "drawclock"
 DRAW_EXAMPLE = ROOT / "example" / "draw.json"
 LINEAR = ROOT / "example" / "auto-layout" / "01-linear.json"
@@ -104,6 +109,25 @@ def _draw(
         output, nodes=len(config), edges=_edge_count(config),
         max_total_bends=max_total_bends,
     )
+    _assert_complete_quality(source, output)
+
+
+def _assert_complete_quality(source: Path, output: Path) -> None:
+    """Execute the same independent, exact-set registry used by public SVG CI."""
+    report = quality.evaluate(source, output)
+    required = report["required_metric_ids"]
+    executed = report["executed_metric_ids"]
+    receipted = [item["metric_id"] for item in report["metric_results"]]
+    if required != executed or required != receipted:
+        raise SystemExit(
+            f"incomplete frozen SVG quality receipt: {output} "
+            f"required={required!r} executed={executed!r} receipted={receipted!r}"
+        )
+    if not report["passed"]:
+        raise SystemExit(
+            f"frozen SVG failed complete quality registry: {output} "
+            f"failed={report['failed_metric_ids']!r}"
+        )
 
 
 def _write_mixed_library_inputs(target: Path) -> tuple[Path, Path]:
@@ -164,38 +188,6 @@ def _component_xs_by_node_id(path: Path) -> dict[str, list[float]]:
         if graphic is not None:
             result.setdefault(node_id, []).append(float(graphic.get("x", "nan")))
     return result
-
-
-def _assert_unconstrained_roots_are_first_column(
-    path: Path, config_path: Path,
-) -> float:
-    config = json.loads(config_path.read_text(encoding="utf-8"))
-    roots = {
-        name for name, item in config.items()
-        if not item.get("source") and item.get("layout_column") is None
-    }
-    if not roots:
-        raise SystemExit("first-column example has no unconstrained roots")
-    component_xs = _component_xs_by_node_id(path)
-    missing = roots - component_xs.keys()
-    duplicated = {
-        name: component_xs[name] for name in roots & component_xs.keys()
-        if len(component_xs[name]) != 1
-    }
-    if missing or duplicated:
-        raise SystemExit(
-            f"first-column root facilities are invalid: "
-            f"{sorted(missing)=}, {duplicated=}"
-        )
-    root_xs = {component_xs[name][0] for name in roots}
-    all_xs = [x for values in component_xs.values() for x in values]
-    if len(root_xs) != 1 or not all_xs or next(iter(root_xs)) != min(all_xs):
-        raise SystemExit(
-            f"unconstrained roots are not aligned in the first column: "
-            f"roots={{{', '.join(f'{name!r}: {component_xs[name][0]}' for name in sorted(roots))}}}, "
-            f"leftmost={min(all_xs) if all_xs else None}"
-        )
-    return next(iter(root_xs))
 
 
 def _orthogonal_crossing_count(path: Path) -> int:
@@ -444,10 +436,19 @@ def _assert_multi_source_row_patterns(path: Path, config_path: Path) -> None:
     ]
     if len(rendered_pad_nodes) != 8:
         raise SystemExit(f"multi-input pad rendering is invalid: {len(rendered_pad_nodes)}")
-    if len(rendered_ids) != len(config):
+    counts = Counter(rendered_ids)
+    invalid_nonroots = {
+        name: counts[name] for name in set(config) - roots
+        if counts[name] != 1
+    }
+    invalid_roots = {
+        name: counts[name] for name in roots
+        if counts[name] < 1
+    }
+    if invalid_nonroots or invalid_roots:
         raise SystemExit(
-            "multi-source rendering duplicated physical facilities: "
-            f"rendered={len(rendered_ids)} logical={len(config)}"
+            "multi-source logical/physical identity is invalid: "
+            f"nonroots={invalid_nonroots!r} roots={invalid_roots!r}"
         )
 
 
@@ -611,7 +612,6 @@ def main() -> int:
     multi_source_output = out / "multi-source-rows-frozen.svg"
     _draw(binary, MULTI_SOURCE, multi_source_output)
     _assert_multi_source_row_patterns(multi_source_output, MULTI_SOURCE)
-    _assert_unconstrained_roots_are_first_column(multi_source_output, MULTI_SOURCE)
     single_alias_output = out / "single-source-alias-frozen.svg"
     _draw(
         binary, SINGLE_ALIAS, single_alias_output,
@@ -657,15 +657,13 @@ def main() -> int:
     multi_output_root_output = out / "direct-mux-multi-output-root.svg"
     _write_direct_mux_multi_output_root_input(multi_output_root_input)
     _draw(binary, multi_output_root_input, multi_output_root_output)
-    _assert_unconstrained_roots_are_first_column(
-        multi_output_root_output, multi_output_root_input,
-    )
 
     strict_json = out / "frozen-input.json"
     strict_json.write_text('{"osc":{"kind":"source"}}', encoding="utf-8")
     strict_output = out / "frozen-input-json.svg"
     _run(binary, ["-i", str(strict_json), "-l", str(LIBRARY), "-o", str(strict_output)])
     _assert_svg(strict_output, nodes=1, edges=0)
+    _assert_complete_quality(strict_json, strict_output)
 
     for suffix in ("jsonc", "json5", "toml", "yaml", "yml", "ini", "conf", "config"):
         config_path = out / f"rejected-input.{suffix}"
@@ -695,6 +693,7 @@ def main() -> int:
         nodes=len(split_config),
         edges=_edge_count(split_config),
     )
+    _assert_complete_quality(DRAW_EXAMPLE, split_output)
 
     for removed in ("draw", "extract", "reload", "run", "drawio-to-json"):
         _run(binary, [removed], expect_success=False)

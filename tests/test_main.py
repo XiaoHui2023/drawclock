@@ -56,6 +56,68 @@ def _load_frozen_example_gate():
     return gate
 
 
+def _quality_receipt(
+    *, required: list[str] | None = None,
+    executed: list[str] | None = None,
+    receipted: list[str] | None = None,
+    failed: list[str] | None = None,
+) -> dict[str, object]:
+    required = required or ["identity", "routing"]
+    executed = executed or list(required)
+    receipted = receipted or list(required)
+    failed = failed or []
+    return {
+        "required_metric_ids": required,
+        "executed_metric_ids": executed,
+        "metric_results": [
+            {"metric_id": metric_id, "status": "fail" if metric_id in failed else "pass"}
+            for metric_id in receipted
+        ],
+        "failed_metric_ids": failed,
+        "passed": not failed,
+    }
+
+
+def test_frozen_draw_runs_complete_quality_registry(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    gate = _load_frozen_example_gate()
+    source = tmp_path / "input.json"
+    output = tmp_path / "output.svg"
+    source.write_text("{}", encoding="utf-8")
+    observed: list[tuple[Path, Path]] = []
+    monkeypatch.setattr(gate, "_run", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(gate, "_assert_svg", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(
+        gate.quality,
+        "evaluate",
+        lambda input_path, svg_path: (
+            observed.append((input_path, svg_path)) or _quality_receipt()
+        ),
+    )
+    gate._draw(tmp_path / "binary", source, output)
+    assert observed == [(source, output)]
+
+
+@pytest.mark.parametrize("mutation", ["missing", "reordered", "unreceipted", "failed"])
+def test_frozen_complete_quality_gate_rejects_registry_escape(
+    mutation: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    gate = _load_frozen_example_gate()
+    receipt = _quality_receipt()
+    if mutation == "missing":
+        receipt["executed_metric_ids"] = ["identity"]
+    elif mutation == "reordered":
+        receipt["executed_metric_ids"] = ["routing", "identity"]
+    elif mutation == "unreceipted":
+        receipt["metric_results"] = [{"metric_id": "identity", "status": "pass"}]
+    else:
+        receipt = _quality_receipt(failed=["routing"])
+    monkeypatch.setattr(gate.quality, "evaluate", lambda *_args: receipt)
+    with pytest.raises(SystemExit):
+        gate._assert_complete_quality(tmp_path / "input.json", tmp_path / "output.svg")
+
+
 def _write_shared_source_config(path: Path) -> None:
     path.write_text(
         json.dumps({
@@ -121,74 +183,6 @@ def test_frozen_single_source_gate_rejects_fragmented_facility_or_bus(
         gate._assert_single_logical_source_has_shared_bus(
             svg, config, "shared_source"
         )
-
-
-def _write_first_column_gate_fixture(
-    config: Path, svg: Path, *, shared_root_x: int = 10, nonroot_x: int = 60,
-) -> None:
-    config.write_text(json.dumps({
-        "shared_root": {"kind": "source"},
-        "private_root": {"kind": "from"},
-        "shared_gate": {"kind": "gate", "source": "shared_root"},
-        "mux": {
-            "kind": "mux2",
-            "source": {"0": "shared_root", "1": "private_root"},
-        },
-    }), encoding="utf-8")
-    svg.write_text(
-        '<svg xmlns="http://www.w3.org/2000/svg">'
-        f'<g class="component" data-node-id="shared_root"><rect class="component-graphic" x="{shared_root_x}" y="10" width="20" height="20"/></g>'
-        '<g class="component" data-node-id="private_root"><rect class="component-graphic" x="10" y="40" width="20" height="20"/></g>'
-        f'<g class="component" data-node-id="shared_gate"><rect class="component-graphic" x="{nonroot_x}" y="10" width="20" height="20"/></g>'
-        f'<g class="component" data-node-id="mux"><rect class="component-graphic" x="{nonroot_x}" y="40" width="20" height="20"/></g>'
-        '</svg>',
-        encoding="utf-8",
-    )
-
-
-def test_frozen_first_column_gate_covers_direct_mux_root_with_second_output(
-    tmp_path: Path,
-) -> None:
-    gate = _load_frozen_example_gate()
-    config = tmp_path / "first-column.json"
-    svg = tmp_path / "first-column.svg"
-    _write_first_column_gate_fixture(config, svg)
-    assert gate._assert_unconstrained_roots_are_first_column(svg, config) == 10
-
-
-@pytest.mark.parametrize(
-    "shared_root_x,nonroot_x",
-    ((30, 60), (10, 5)),
-)
-def test_frozen_first_column_gate_rejects_root_misalignment_or_later_column(
-    tmp_path: Path, shared_root_x: int, nonroot_x: int,
-) -> None:
-    gate = _load_frozen_example_gate()
-    config = tmp_path / "first-column.json"
-    svg = tmp_path / "first-column.svg"
-    _write_first_column_gate_fixture(
-        config, svg, shared_root_x=shared_root_x, nonroot_x=nonroot_x,
-    )
-    with pytest.raises(SystemExit):
-        gate._assert_unconstrained_roots_are_first_column(svg, config)
-
-
-def test_frozen_first_column_gate_rejects_duplicated_root_facility(
-    tmp_path: Path,
-) -> None:
-    gate = _load_frozen_example_gate()
-    config = tmp_path / "first-column.json"
-    svg = tmp_path / "first-column.svg"
-    _write_first_column_gate_fixture(config, svg)
-    content = svg.read_text(encoding="utf-8")
-    svg.write_text(content.replace(
-        '</svg>',
-        '<g class="component" data-node-id="shared_root">'
-        '<rect class="component-graphic" x="10" y="70" width="20" height="20"/>'
-        '</g></svg>',
-    ), encoding="utf-8")
-    with pytest.raises(SystemExit):
-        gate._assert_unconstrained_roots_are_first_column(svg, config)
 
 
 def _write_conditional_root_fixture(

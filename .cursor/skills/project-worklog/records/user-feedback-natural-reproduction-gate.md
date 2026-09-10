@@ -2,7 +2,21 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-10 21:50 +08:00
+- updated: 2026-09-10 22:35 +08:00
+
+- 2026-09-10 22:35 Final local release-fix evidence is green: targeted frozen/quality tests 37/37, complete suite 547/547 in 233.53s, quality-contract retention 25/25, all public SVGs 26/26 with exact 25-metric execution, feedback release gate 19/19, and `git diff --check` has no content errors. Stage only the frozen smoke, its tests, and synchronized worklog metadata for the repair commit.
+
+- 2026-09-10 22:25 Added release-smoke unit proof that every `_draw` delegates the exact input/output pair to the independent registry. Four escape mutants—missing metric, reordered metrics, unreceipted metric, and an executed failing metric—must all terminate the frozen gate. This converts the CI repair from a removed assertion into an enforced universal behavior contract.
+
+- 2026-09-10 22:20 Removed the three tests that encoded unconditional first-column placement. The surviving conditional-root tests require safe roots in the first column, allow a later root only when it avoids crossings, and reject both needless later placement and crossing regressions. Next add exact-registry release-smoke mutants.
+
+- 2026-09-10 22:15 Deleted the dormant `_assert_unconstrained_roots_are_first_column` implementation proxy instead of merely bypassing it. This prevents a later release edit from accidentally restoring an unconditional policy; explicit `layout_column` assertions and the conditional root counterexample remain, while general roots are governed only by the full artifact metric registry.
+
+- 2026-09-10 22:10 Frozen smoke implementation is now behavior-contract based. `_draw` and the two manual accepted-output paths require ordered `required == executed == receipted` and fail on any metric. The multi-source topology assertion permits extra facilities only for zero-indegree roots while requiring every non-root exactly once. The independent `feasible_root_first_column` metric owns the safe-versus-crossing-protected decision.
+
+- 2026-09-10 22:05 Frozen output generation now invokes the independent SVG quality system immediately after structural SVG validation. Strict-JSON and split-library outputs also pass through the same exact 25-metric registry, and the obsolete unconditional first-column assertions were removed from the executable release path. Next narrow the multi-source identity assertion so geometry-justified root facilities remain legal without weakening non-root identity.
+
+- 2026-09-10 22:00 First pushed release run `34463573535` built the Ubuntu 16.04 frozen package, then failed in `Run extracted dependency-free frozen examples`. Diagnosis found that the frozen smoke script retained obsolete implementation proxies: every unconstrained root had to be a unique physical facility in the first column. That contradicts the current behavioral contract, which permits geometry-justified same-name root facilities and later-column roots only for strict crossing avoidance. Upgrade the frozen smoke path to execute the independent exact 25-metric registry on every generated SVG, while keeping logical topology identity strict and permitting duplicates only for zero-indegree roots.
 
 - 2026-09-10 21:50 Whitespace-clean fix verification group `20260910T093625Z-08aa041d` completed all 19 issues with `failures=[]`. Track this group and rerun the release gate plus the complete suite from the exact staged source/corpus state.
 
