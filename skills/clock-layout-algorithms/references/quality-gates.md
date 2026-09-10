@@ -85,3 +85,15 @@ fail closed。详细流程见 `feedback-reproduction-and-geometry-oracle.md`。
 
 修改精确/可扩展候选资格后必须运行 64 与 128 终端的代表性质量门。若当前列 y-only 候选泄漏到
 可扩展层，逐设施全图评估会出现不必要的工作放大；这种性能失败和几何失败同样禁止发布，但不据此声明 512 及以上规模能力。
+
+## 同名设施、结构化总线与边界主干
+
+- 一个逻辑根的不同物理设施分别按 `cell_id` 绑定所属边。直入同一 mux 的只比较 mux-facing 设施；辅助输出可由同名局部设施服务，不能因逻辑根另有消费者而错列整个 cohort。
+- 共享单总线只约束结构化重复汇合子集，例如同类多输入器件阵列。任意横向或纵向远距消费者仍执行逐边设施反事实；若新增 glyph 后的同网正交并集成本更低，且交叉、折点、碰撞、端点和异网重叠均不退化，就必须开同名设施。
+- 多行公共根路线若在内部行间过早切入并沿不同 x 通道下行，独立 Oracle 比较完整图上/下边界 backbone。外侧候选不增加节点/文字命中、异网重叠或折点且严格减少真交叉时，内部路线失败；同一逻辑根复用稳定边界 lane，不同根分 lane。
+
+## 需求与指标保留门
+
+`tests/quality-contract-baseline.json` 冻结稳定 requirement ID 到 metric ID、witness 与 applicability 的映射，canonical 哈希由独立 checker 保护。任何删除、重排、重复、改义、适用范围收窄或无用户证据 conflict 都失败。每张公开图仍执行 `tests/quality-metrics.json` 的完整 exact-set；case 内私有代理断言不得成为绕过注册表的第二套合同。
+
+全图门与 release gate 都先调用同一 retention checker。mutant 必须证明：删指标、改 applicability、复制 ID、篡改 baseline，以及分别从全图入口和 release 入口绕过，全部非零退出。

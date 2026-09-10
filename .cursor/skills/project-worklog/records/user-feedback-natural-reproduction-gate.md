@@ -1,9 +1,442 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: complete
+- status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-09 19:55 +08:00
+- updated: 2026-09-10 21:50 +08:00
+
+- 2026-09-10 21:50 Whitespace-clean fix verification group `20260910T093625Z-08aa041d` completed all 19 issues with `failures=[]`. Track this group and rerun the release gate plus the complete suite from the exact staged source/corpus state.
+
+- 2026-09-10 21:42 Complete suite passes 546/546 in 227.26s and the release gate passes 19/19. `git diff --check` then caught two redundant blank lines at the EOF of the new premature-interior-trunk-entry corpus JSON. Remove them and reissue the affected all-19 fix lineage because evidence hashes are fail-closed; no earlier fix receipt may be reused after even a whitespace input change.
+
+- 2026-09-10 21:30 Final Oracle lineage closes cleanly: quality-contract retention is 25/25, every public SVG is 26/26 with the same exact 25-metric registry, recursive adversarial run `20260910T092607Z-78a43620` completes seven consecutive clean rounds, and fix verification group `20260910T092711Z-1f059082` reports `failures=[]` for all 19 issues. Track this exact evidence lineage, then rerun the complete suite and release gate.
+
+- 2026-09-10 20:48 Exact seed-24 geometry proves both reported split anchors overlap the visible source/target label bounds even though their bare symbol rectangles do not. Product assessment correctly rejected them as `edge-node`/`visible-edge-node`; the independent Oracle used bare-box overlap and therefore manufactured false counterfactuals. Revert the ineffective extra product closure and make the split Oracle apply visible-box overlap and visible route-box intersection to the complete candidate, matching the all-metric serialized-artifact contract.
+
+- 2026-09-10 20:38 The earlier edge-facility closure was not the final placement owner: subsequent boundary, fanout-tree, safe-first, direct-array, outer-detour, and source-lead transactions could recreate a dominated shared facility. Add a serialized edge-facility closure after every placement/routing owner. This preserves first-column alignment by contract and permits a later target-local direct-mux alias only for strict crossing reduction.
+
+- 2026-09-10 20:30 Seed 24 exposes an inconsistent transaction boundary: the Oracle permits a later-column direct-mux facility only when it strictly removes crossings, but the product skipped every direct mux edge of a root serving two muxes. The product now evaluates that protected edge at a target-local facility and permits only strict crossing reduction; ordinary direct-array edges still remain on the global first-root column and may improve bends, while length alone remains insufficient.
+
+- 2026-09-10 20:20 Complete pytest ran 546 tests and correctly failed two gates: one release-lineage failure because the final 260 evidence files are not yet Git-tracked, and one real all-metric recurrence at adversarial from/mux seed 24 (`root_facility_split_dominance`). Treat seed 24 as a product/Oracle defect, inspect its exact witness, repair the general transaction, and restart every final receipt from round one; staging evidence alone may not hide the real failure.
+
+- 2026-09-10 20:08 Final-lineage fix group `20260910T085026Z-56532e44` completed all 19 issues with `failures=[]`. Add this group and the final all-SVG/recursive receipts to the tracked evidence closure, then rerun the complete suite and release checker.
+
+- 2026-09-10 20:02 Final product/Oracle recursive campaign `20260910T075958Z-13a5bcd9` completed seven consecutive clean rounds from R1. The failed R4 seed-8 campaign remains diagnostic evidence, and this new receipt is the only current release lineage. Reissue all 19 fix receipts against the same hashes.
+
+- 2026-09-10 19:45 The regenerated every-public-artifact receipt records expected=26, observed=26, failed=0; each case executed all 25 registered metrics. A follow-up display command contained a PowerShell cmdlet typo after these three values were already read, so it did not alter the receipt or pass decision. Reissue the seven-round and 19-issue receipts once more because both product and Oracle changed since their previous lineage.
+
+- 2026-09-10 19:40 The protected-cohort Oracle is restored to the exact user exception: only a strict crossing reduction may justify a later-column scalar facility. Product/Oracle compilation and 15 focused contracts pass, including the frozen bad alias, six zero-bend same-column mux edges, shared-from facility minimality, and 12 property seeds. Rerun all-artifact exact-set from this state.
+
+- 2026-09-10 19:35 The final full-artifact rerun rejected combined example 26 on two scalar split witnesses for a public source feeding mixed mux2/mux3 arrays. Both candidates reduce bends but require abandoning the first-column/shared-root placement for a target-local facility; crossings remain 0→0. This is not an admissible exception under the user's rule: leaving column one is justified by unavoidable crossing growth, not bend or length savings alone. The product may create a same-first-column target-axis facility to remove bends when space exists, but the Oracle must not propose a later-column scalar facility merely for bend reduction. Restore the protected-cohort exception to strict crossing reduction only.
+
+- 2026-09-10 19:28 The final protected-cohort rule now admits strict bend or crossing reductions and rejects only wire-length-only facility splits. The two former full-suite failures, shared-from facility-minimality regression, root-first positive/negative/override calibration, and 12-property corpus pass 16/16. Regenerate the every-artifact receipt from this final Oracle before reissuing attack/fix lineage.
+
+- 2026-09-10 19:22 The direct-array product refinement and exact root-first facility-pair counterfactual compile and the two prior full-suite failures plus positive/negative/override calibration pass 3/3. The multi-output graph now has six straight direct mux edges and truly no raw column mismatch, so the stale assertion requiring a raw mismatch was replaced by zero. Before broad rerun, align protected-cohort facility Oracle semantics with the product: preserve both strict crossing reduction and strict bend reduction, suppress only pure length/display-cost wins.
+
+- 2026-09-10 19:15 Product direct-array facilities now stay on the first root column and open only for a strict bend/crossing improvement, never for length alone. The multi-output/side-mux graph reaches six direct zero-bend edges, zero crossings, zero overlaps, and now also has zero raw column mismatch; the old test expectation that a harmless raw mismatch must remain is superseded by the user's stronger first-column preference. Separately, replace the broad root-first skip with the exact L1-plus-three-row opening-cost pair check so only candidates that introduce an avoidably mergeable facility pair are rejected and the frozen bad alias remains detectable.
+
+- 2026-09-10 19:06 Full pytest completed 544 passed/2 failed in 228.68s. One frozen calibration proves the root-first logical-scope shortcut was too broad: an artifact may already have one first-column facility while another alias is still safely movable and non-mergeable. Replace the shortcut with an exact facility-minimality check on the complete candidate. The second failure is a real zero-bend regression for roots feeding main and side muxes: forbidding every non-crossing direct-array facility removed the target-axis facilities needed for six straight mux edges. General resolution: direct-array facilities may be created for strict bend or crossing reduction, but their x coordinate must remain the global first root column; length-only local-column facilities remain forbidden. Oracle protected-cohort filtering must retain both strict bend and strict crossing counterfactuals.
+
+- 2026-09-10 18:58 Final-lineage fix verification group `20260910T064333Z-744856e7` completed all 19 issues with `failures=[]`. Its referenced evidence directory, fix receipts, recursive attack receipt, and all-SVG receipt must now enter the Git dependency closure before the release/full-test gates; untracked local files are intentionally insufficient.
+
+- 2026-09-10 18:50 Final-Oracle recursive campaign `20260910T063941Z-17cd4031` completed seven consecutive clean rounds from R1. The prior R4 seed-8 recurrence remains in diagnostic history, while this receipt alone is eligible for release lineage. Regenerate all fix receipts against the same Oracle before the full suite.
+
+- 2026-09-10 17:25 Boundary routing now enumerates the complete adjacent-lane set with a cached per-edge segment model, rejects locally dominated changed-edge overlap/crossing candidates, and sends only the best top and bottom lane to the unchanged whole-layout acceptance gate. The two maintained 264-node stress cases completed 2/2 in 111.21s; this is valid correctness evidence and a large improvement over the interrupted 520-node run, but remains a performance warning rather than a release blocker because 520 nodes are outside the user-declared <512-node scope and no contractual runtime limit exists.
+- 2026-09-10 17:30 Full-suite run completed 543 passed/3 failed in 227.54s. Two failures are expected stale-evidence lineage gates; the real regression is three shared `from` roots where the late dominant-edge facility pass opens a seventh effective group although the independent L1-plus-opening-cost oracle proves six suffice. The product pass is being constrained by the same global facility-minimality predicate; an immediate source reread caught that the first patch referenced the geometry-derived cost before assignment, so that patch is not counted as runnable evidence and will be corrected before testing.
+- 2026-09-10 17:34 The corrected facility-opening guard compiled, but the focused test remained red and the late pass still reported three moves. Stage tracing showed the new facilities are irreducible when opened at local columns; the regression is introduced later when the first-column preference moves them onto the shared column, making adjacent groups mergeable. The root cause is therefore metric-retention loss across layout owners: the first-column transaction checked crossings/bends/overlap but not facility minimality. The fix must add the independent partition metric to that transaction, preserving the user's conditional first-column rule rather than disabling first-column placement globally.
+- 2026-09-10 17:40 First-column restoration now compares the full affected-root facility-minimality set before and after the group move, using the same geometry-derived three-row opening cost as the independent oracle. The previously red shared-from case is green, and 22 adjacent first-column/multi-output/direct-mux/property checks plus the focused case pass. An attempted `--help` on the no-argument fix runner actually executed it and created immediately stale evidence before this final source change; those files are explicitly not accepted and the final verification campaign will be regenerated from the finished source.
+- 2026-09-10 17:48 Fresh fix verification correctly failed `FB-ROUTE-009`. The witness shows `weave__public_source/svg-edge-0030` still has a legal facility split reducing 4→0 bends and 932.42→24px edge length without crossing regression. Root cause is over-applying the new minimality predicate to the facility-opening stage itself; that stage must be allowed to open a globally cheaper facility, while only the later first-column transaction must be prevented from collapsing distinct local columns into an avoidably mergeable same-column partition. The opening-stage guard will be removed and the first-column guard retained.
+- 2026-09-10 17:54 After removing only the opening-stage guard, the shared-from facility-minimality regression remains green and the current combined public CLI artifact reports `FB-ROUTE-009` absent. This validates the owner boundary: facility creation may improve total cost, while first-column restoration must preserve partition irreducibility. The failed fix group `20260910T055516Z-6498a14f` is retained as diagnostic evidence but cannot satisfy release; regenerate all fix receipts from this source state.
+- 2026-09-10 18:05 Fresh verification then completed all 19 issues with `failures=[]`, but recursive attack reset to zero after reproducing `FB-ROOT-020` at R4 seed 8. Four unconstrained roots each have a direct mux output plus an auxiliary chain; their mux-facing replicas align at x=483.99 even though a joint x=72.78 first-column placement preserves 0 crossings/0 overlaps/0 bends. The edge-facility stage opened those replicas solely for shorter wires. This violates the conditional first-column contract: a direct-mux cohort may leave column one only to remove a crossing, not merely to shorten a straight segment. Apply that rule at the facility-opening transaction while retaining the general display-cost rule for non-cohort edges.
+- 2026-09-10 18:12 The product now forbids a direct-array mux edge from opening a local display facility on length alone, while still allowing a strict crossing reduction. Seed 8 clears `FB-ROOT-020`, but the independent scalar facility Oracle then reports `FB-ROUTE-009/FB-ROOT-022` for two of the same protected array roots because it still treats wire-length/display-cost savings as sufficient. This is an Oracle transaction-boundary conflict: direct-mux cohorts are already protected from scalar relocation and axis witnesses, but not from scalar facility-split witnesses. Apply the same contract there—suppress scalar length-only splits for protected cohort members, but keep witnesses that strictly reduce crossing events.
+- 2026-09-10 18:15 The independent facility-split witness now inherits the protected direct-mux cohort boundary and retains only strict crossing-removal exceptions. Source reread found a stray token in the explanatory comment introduced by the patch; it does not alter Python parsing because it is commented, but it must be removed before any test so review quality and generated documentation remain clean.
+- 2026-09-10 18:20 Reread showed the stray token was not actually commented and would have caused a SyntaxError; it was removed before any Oracle execution, so no false result was produced. Both product and Oracle compile. The exact seed-8 artifact now has no detected issue, no scalar facility-split witness, and no direct-mux column witness, while the earlier combined 009 case remains covered separately. The invalid R4 campaign receipt is preserved as the required recurrence evidence; restart the complete seven-round campaign from R1.
+- 2026-09-10 18:30 Final-source fix verification group `20260910T062503Z-ff4a6867` completed all 19 issues with `failures=[]`; every case used the public CLI twice with deterministic artifact hashes and the final Oracle lineage. Continue with contract retention, every-public-artifact × every-metric quality, complete tests, and release gate; none of these may inherit an earlier green result.
+- 2026-09-10 18:38 Contract retention passed with 25 metrics/25 requirements. The every-public-artifact gate then correctly rejected 1/26: example 16 has a valid first-column primary facility plus local aliases, but the root-first Oracle tested each alias independently and proposed moving three aliases onto the primary column; that counterfactual contradicts facility minimality by creating mergeable same-column groups. Root-first semantics must be evaluated at logical-root scope: once a logical root already owns a first-column facility, its justified local aliases are governed by facility split/merge metrics rather than each being reclassified as a missing first-column root.
+- 2026-09-10 18:42 Root-first Oracle now applies at logical-root scope: any existing first-column facility satisfies the preference, while other facilities remain fully audited by split, merge, relocation, bend, and column-lag metrics. Positive/negative/override root-first calibration, the shared-from regression, direct-mux auxiliary-output case, and 12 property seeds pass 15/15. Rerun the complete exact-set gate because its previous 1/26 result is stale after the Oracle correction.
+- 2026-09-10 18:47 Every-public-artifact quality gate passes 26/26. Each case executes the exact same 25-metric registry and records applicability proof, so the result is not a per-example subset. Because the Oracle changed after the previous fix and recursive receipts, both lineages are intentionally stale; rerun seven adversarial rounds and the 19-issue double-run verifier again before full pytest/release.
+- 2026-09-10 18:25 The restarted adversarial campaign completed seven consecutive clean rounds under run `20260910T062145Z-403db474`, covering frozen regressions, declaration reversal, whole-graph rename metamorphism, mux depth/column/port pairwise cases, cross-feature compositions, and deterministic high-interaction cases. Because product and Oracle changed after the previous 19-issue green batch, all fix receipts are now stale by design and must be regenerated once more before release.
+
+- 2026-09-10 17:10 The two reintroduced 520-node stress inputs are now replaced by a 32-domain, 264-node, 64-clock boundary inside the retained scope. Their combined run still exceeded 170 CPU seconds and was explicitly stopped by verified PID 99856; no PASS was inferred. The bottleneck remains boundary-corridor enumeration, whose lane count grows with every fanout root although only the nearest inner/outer lanes are structurally distinct before the full overlap/crossing gate. Cap expansion to a small deterministic neighbourhood and retain the same whole-layout acceptance Oracle.
+
+- 2026-09-10 17:03 A timing rerun was mistakenly started before the planned 64-to-32 domain test edit existed, so it was still the excluded 520-node input: the first duplicate test emitted one pass marker after roughly 150s and the second was stopped at the bounded 180s limit. No 264-node performance claim is made. The subsequent test edit was correctly blocked by the live worklog gate because the immediately preceding source/test eligibility transaction had not yet been recorded; this entry closes that evidence ordering before applying the explicit sub-512 test change.
+
+- 2026-09-10 16:58 The blocked-facility list is now private-by-default and enabled only for the final post-route transaction; the strict-length assertion is corrected to non-increasing because fresh safe-first restores the exact inherited optimum. Targeted root-column, two-output mux, dual-from alignment, combined feedback, dispersed comparison, and the 12-seed property corpus show no regression. Performance sampling then proved the supposedly “128-clock” stress case has 520 logical nodes (64 domains × 8 plus 8 roots), which is explicitly outside the user-retained `<512 node` scope and had already been removed from public examples. A 180s phase trace spent 164.226s in boundary-corridor enumeration before interruption. Remove the two reintroduced 520-node tests from the maintained exact set by replacing their 64-domain inputs with the adjacent 32-domain/264-node, 64-clock boundary; do not claim 520-node validation.
+
+- 2026-09-10 16:48 Fresh same-geometry safe-first eligibility removes all four broad-suite layout regressions: five targeted cases pass, and the dispersed comparison now has exactly equal final length and hard metrics rather than a strict length reduction. Equality is correct because the fresh safe-first pass restores the previously moved facility to the shorter inherited geometry; change the test from strict to non-increasing length. The private blocked-facility ID list is currently leaking into earlier public selection reports; make it opt-in only for the final locality transaction.
+
+- 2026-09-10 16:42 A broad suite excluding the two known 128-node slow tests completed 537 passed, 4 layout failures, 2 expected stale-evidence failures in 134.24s. All four layout failures are caused by the new post-safe-first length tiebreak moving facilities that either were already eligible for the first root column or were judged against a previous geometry generation: combined root-first witnesses, a two-output direct-mux root shifted to a second column, `local_source_07` shifted from the first column, and `from_b` no longer aligned with `from_a`. The repair must bind locality eligibility to physical facilities that fail a fresh safe-first attempt on the same final geometry; stale release/fix receipts remain correctly rejected until final evidence is regenerated.
+
+- 2026-09-10 16:34 The retained-proxy migration now passes all seven focused regressions (7/7, 10.33s). The exact statistics-key correction changed no threshold or product behavior. These tests preserve the old semantic requirements while allowing geometry-justified aliases and straight zero-waypoint branches.
+
+- 2026-09-10 16:29 The compact test now invokes the independent quality inspector. Six of seven migrated regressions pass; the relocation comparison fails only because the routing-statistics key is `bends_total`, not `bends`. This is a test-contract spelling error rather than a layout result. Correct the exact key and rerun the same seven-case set.
+
+- 2026-09-10 16:24 Replaced six stale implementation proxies with direct final contracts: one physical compact facility plus clean fanout grammar; replica accounting by final vertex delta with all facilities used and valid; final hard-vector nonregression plus strict length improvement; far-band from facilities all used and nonavoidable; forced dispersed root exact two-facility result; and serialized identity tuple preservation. Immediate source reread found the compact test now references `quality` without constructing it; no execution claim is made. Add the same independent inspector call used by adjacent tests before running the focused set.
+
+- 2026-09-10 16:18 Added a post-safe-first locality transaction: the ordinary relocation rule still requires a strict crossing/bend improvement, while this final pass may use total Manhattan length only as a tiebreak after safe-first has already failed under hard geometry. On the dispersed weave it moves two non-first facilities nearer consumers, preserves every hard metric, and reduces final length from 127821.064 to 127247.144 px; the 12-seed property corpus remains green. The old test still fails because it asserts the internal early-pass move count is zero; replace that proxy with final hard-vector nonregression and strict route-length dominance.
+
+- 2026-09-10 16:14 Six retained legacy assertions were audited. They assume zero aliases, one facility per far-separated root, no serialized `logical_name`, or a waypoint on every nearby branch. Current independent artifacts are clean: compact branches are one straight plus one vertical from one facility; the public weave has three used/nonavoidable aliases; the four from roots have 12 used facilities each and the exact SVG Oracle reports no merge-dominant pair; the forced dispersed root has one used alias; serialization preserves the full identity tuple. These proxies must be replaced with direct final topology/geometry/identity contracts without deleting the underlying requirements.
+
+- 2026-09-10 16:10 The independent facility-split Oracle now treats a user-supplied `layout_column` as an applicability constraint, alongside structural shared-bus protections. Both previously failing from/mux seeds pass all metrics, while the unconstrained distant-root alias case remains clean with more than one rendered facility (focused 3/3). This resolves the conflict by separating domains rather than deleting either requirement: explicit placement is preserved; unconstrained far-separated consumers still require a geometry-dominant same-name facility split.
+
+- 2026-09-10 16:04 The corrected combined assertion and all 12 property cases pass (13/13, 17.77s). Focused all-metric SVG tests for from/mux seeds 2 and 3 still fail only `root_facility_split_dominance`. Their configs explicitly assign `layout_column` to every root; the independent Oracle currently proposes moving/duplicating those constrained roots as if they were unconstrained. This is an Oracle applicability escape: explicit user placement is the stronger contract, while the restored distant-facility split applies to unconstrained roots. Add explicit-column roots to the metric's protected applicability set and calibrate both constrained clean and unconstrained failing controls before changing production.
+
+- 2026-09-10 15:56 The first replacement assertion used `logical_name` count as the replica count and failed 19 versus 21. Two primary facilities also carry logical identity after consolidation, so `logical_name` is not a replica marker. The stable accounting identity is `len(final vertices) - len(logical config nodes)`; retain the stronger used-facility check over every logical-name rendering, then rerun.
+
+- 2026-09-10 15:52 The complete 12-seed property corpus is now green. The adjacent combined regression reaches a fully clean independent quality result (`passed=true`, no hard failures or split-rejoin nets) but retains an obsolete assertion that every logical root must have zero rendering aliases; it reports 19 used aliases across five far-separated roots, which conflicts with the restored geometry-dominance requirement. Replace only that implementation-proxy assertion with the direct final-artifact quality contract.
+
+- 2026-09-10 15:48 The first runtime probe showed zero outer-detour attempts because the candidate was incorrectly restricted to physical facilities with fanout one; the two failing aliases still shared their source facility with another branch. That restriction was an over-broad proxy for preserving bus structure. The transaction now preserves the existing first and last channels while judging each complete branch under whole-layout nonregression, so a shared source stub is retained without exempting a dominated downstream excursion. Exact property seeds 5 and 8 now pass (2/2, 2.22s).
+
+- 2026-09-10 15:42 Added a final root outer-detour dominance transaction before source-lead closure. It considers only single-consumer physical root facilities, preserves the allocated first/last vertical channels, enumerates lanes inside the endpoint y band from endpoint axes and visible obstacle boundaries, and accepts only strict total-length/outer-excursion improvement with whole-layout node, edge, visibility, direction, overlap, crossing, bend, and endpoint-clearance nonregression. No runtime result is claimed yet; compile and rerun the two exact red property seeds next.
+
+- 2026-09-10 15:36 The source-lead closure is now wired after the final serialized direct-array owner. It compiles and the exact seed-4 property plus combined case pass: the former `e3/e22` first vertical lane now clears the complete visible source box, not merely the electrical port. Seeds 5 and 8 remain red only for `avoidable-outer-detour` on six-segment root branches whose lane exits the endpoint y interval; inspect their exact routes and add a separate final whole-route dominance transaction rather than weakening the metric.
+
+- 2026-09-10 15:27 The malformed source-lead tail is replaced by a bounded whole-trunk transaction. It groups final routes by physical root facility, output port, and first vertical lane; moves every branch sharing that lane together to the visible-box-plus-clearance boundary; and accepts only when the endpoint-failure set strictly shrinks while node/edge visibility, direction, overlap, crossing, bend, and total-length metrics are all nonworse. The function is not yet invoked and therefore has no behavior evidence; wire it after the final serialized direct-array owner, then compile and rerun seed 4.
+
+- 2026-09-10 15:20 The first source-lead closure insertion was interrupted after candidate-group discovery and left the literal invalid suffix `accepted_report = = assessupal`. It has not compiled or run and cannot count as a repair. Preserve the valid structural prefix, replace the malformed tail with the complete transaction and return report, then compile before any behavior claim.
+
+- 2026-09-10 15:14 The second inter-rank gap lookup now resolves each logical rank name through its selected physical primary vertex before computing visible bounds. Focused rerun removes both `KeyError` failures. Seeds 4/5/8 now reach the independent quality verdict and expose concrete route defects instead: two too-short/inside-visible source leads and two avoidable outer detours. These are real product-quality failures, not helper exceptions; keep them red while analyzing the facility/routing owner. The combined helper case is expected to be rechecked after the same correction.
+
+- 2026-09-10 15:08 The stray prefix is removed. The production guard and first logical-to-physical quality-box correction compile. Focused property execution confirms seeds 0 and 11 no longer crash, reducing the property failures to seeds 4/5 quality reds plus seed 8 and combined helper `KeyError` at the second inter-rank `visual_boxes[name]` site. This proves the empty-domain repair is effective but the independent helper needs the same logical-primary mapping at every rank-gap lookup before any expectation migration.
+
+- 2026-09-10 15:02 The first empty-domain guard patch was visually reread before compilation and found to contain a literal extra `++` prefix on the blocker line. It is syntax-invalid, has not been run, and counts as no fix attempt. Record this exact intermediate failure, then remove only the stray prefix before any other production edit.
+
+- 2026-09-10 14:55 A complete 546-test run was obtained with the normal pytest plugin set after a bounded environment workaround: import pytest while temporarily stubbing `platform.system()` to avoid a reproducible Windows `platform._wmi_query` hang in pyreadline3, then restore it before test execution. Result is red, 532 passed / 14 failed. Five property seeds expose a real empty-domain crash in the direct fan-in bus transaction (`max()` over an all-bus-root cohort); two from-mux seeds expose facility-split Oracle false positives; one test-quality helper indexes physical aliases by logical rank name and raises `KeyError`; remaining assertions preserve the superseded blanket “zero replicas / one facility for every root” policy instead of the retained geometric-benefit split contract. Two 128-node tests also take about 29 minutes each, so performance remains a release concern even though 512+ cases are excluded. Reopen release; no previous gate or receipt may be treated as final after the next source/Oracle/test correction.
+
+- 2026-09-10 13:48 Evidence dependency closure is complete: the superseded `20260909T164413Z-e4743d94` fix group was removed from the index only (working files preserved), tracked changes were refreshed, and only final group `20260909T195856Z-63b42e09` was force-added from the ignored evidence store. The release checker now passes all 19 issues with current source/Oracle/runner/semantic hashes. Full repository tests and release packaging remain before completion.
+
+- 2026-09-10 13:41 `FB-ROOT-020`'s ledger dependency now names the final successful verification group `20260909T195856Z-63b42e09`; no issue status, requirement, metric, or prior attempt was removed. The release dependency graph can now be staged and checked against exactly the current receipts.
+
+- 2026-09-10 13:37 The formal all-SVG receipt is freshly regenerated with `failed_count=0`, exact 26/26 inputs, and no metric-execution gap across all 25 registry IDs. The release checker intentionally remains red with 260 errors, all reporting that the new `20260909T195856Z-63b42e09` fix-evidence files are not Git-tracked; this is evidence dependency closure, not a layout or test failure. Before staging, update the one ledger field still naming the superseded verification group, then stage only the final group/current receipts and preserve unrelated user changes.
+
+- 2026-09-10 13:29 Fresh recursive adversarial run `20260909T200452Z-0ff6ad14` started at R1 and completed the required 7/7 consecutive clean rounds. Its exact-set covers frozen recurrence, declaration-order and renaming metamorphs, source/from semantic variants, mux depth/column/port covering arrays, auxiliary multi-output consumers, bus row combinations, and cross-feature compositions. No previous clean round was inherited; the machine receipt is bound to the final source, manifest, runner, Oracle, and semantic contract hashes.
+
+- 2026-09-10 13:22 Final-source fix verification group `20260909T195856Z-63b42e09` passes all 19 retained issue contracts with `failures=[]`. Every issue has at least two current public-CLI attempts, independent issue-oracle rejection of the old symptom, deterministic artifact hashes, and required semantic variants where declared. These receipts replace—not inherit—the pre-change group. The next mandatory mutable step is a fresh seven-round recursive attack from R1.
+
+- 2026-09-10 13:15 Post-change independent gates are green: all 63 feedback-layout Oracle tests pass; regenerated cases 21, 29, and 26 each report no detected issue; the quality-contract retention gate passes exact 25/25; and the fresh all-public-SVG runner passes 26/26 while executing the complete metric set for every image. No case-specific metric exemption was added. Because production changed after the previous receipts, fix verification and recursive attack evidence remain stale and must now be regenerated rather than inherited.
+
+- 2026-09-10 13:08 The complete explicit-column transaction compiles and naturally regenerates case 21 green: `root_a` now has three same-name physical facilities all at column 0, with 0 proper crossings, 0 different-net overlaps, and 0 bends across the 21 rendered edges; the independent Oracle reports no issue. The transaction keeps x immutable, axis-aligns only one-edge facilities, rejects any node collision, and requires the whole-layout crossing/bend/length vector to be nonworse with a strict improvement. This is targeted evidence only; all-example and recursive gates must still be rerun from R1 after this source change.
+
+- 2026-09-10 13:02 The interrupted fixed-column condition is now repaired and source reread confirms the intended guard: explicit `layout_column` roots keep their authored x while non-explicit replicas still require a consumer-side x improvement. The finite collision walk also stops instead of shifting an explicit-column replica left. This is only an intermediate source repair: it has not been compiled or counted green, and the remaining one-edge facility axis-alignment transaction plus fresh gates are still mandatory.
+
+- 2026-09-10 12:38 The first fixed-column patch was interrupted mid-condition and left literal `ifRealm = false` in production; it has not been compiled or counted as an attempt. Record the edit failure before touching source again, then replace the malformed line with the intended `if not explicit_column and candidate_x <= source.x` guard and complete the bounded same-column transaction. No green evidence may be inherited across this syntax-invalid intermediate state.
+
+- 2026-09-10 12:33 The regular intermediate-array Oracle correction clears case 29. Simply forbidding facility splitting for explicit `layout_column` is not valid: case 21 regresses to one `root_a` facility whose vertical trunk crosses `root_b/root_c` inputs (2 crossings, 6 bends). The column contract constrains x, not the number or y of same-name facilities. The valid transaction is to split crossing branches at the same explicit x column, never target-local x, then axis-align each resulting one-edge facility at fixed x when all hard metrics improve. This preserves the authored column while closing crossing/bend metrics instead of exempting them.
+
+- 2026-09-10 12:19 Fresh explicit all-SVG report rejects exactly 2/26 while executing all 25 metrics on every case. `21-layout-column-preference` exposes a real product omission: `_split_dominated_root_facility_edges` does not honor explicit `layout_column`, splitting `root_a` into three x columns and leaving one avoidable two-bend branch. `29-asymmetric-depth-common-private-mux-array` exposes an Oracle composition omission: product correctly preserves the one-facility common-from bus through six distinct gates/muxes, while facility-split dominance fails to classify this regular intermediate branch array as a protected bus and proposes six aliases. Fix both structurally; neither case nor metric may be excluded.
+
+- 2026-09-10 12:04 Quality-contract retention passes exact 25/25. The first all-public-SVG invocation reports 26 observed and complete 25-metric execution with no metric-set gaps, but its stdout header says `failed_count=2`; because no explicit `--report` was supplied, the existing receipt remains old and cannot identify or validate those failures. Treat the run as red and rerun to a fresh explicit report, then inspect only failing case/metric pairs before any production change.
+
+- 2026-09-10 11:55 The adversarial campaign restarted at R1 and completed seven distinct consecutive clean rounds as run `20260909T193136Z-e4cafe92`, including frozen recurrence, ordering/renaming metamorphs, mux covering arrays, cross-feature recursion and high-interaction deterministic cases. No recurrence was hidden or resumed from the stale partial R4 receipt. Proceed to exact quality-contract retention, all-public-SVG full-metric generation, full pytest and release dependency closure.
+
+- 2026-09-10 11:51 `FB-ROOT-020` advances to `fixed_verified` only against successful group `20260909T192649Z-299b9646`; its fix record explicitly includes both source/from natural variants and the multi-output/two-mux R4 topology. No other issue state is changed. The next mandatory action is a fresh seven-round recursive attack from R1; stale or partial previous lineage is intentionally rejected.
+
+- 2026-09-10 11:44 Final-source fix verification group `20260909T192649Z-299b9646` passes all 19 issue contracts with `failures=[]`; the failed 11:03 group is not reused. Advance 020 from `fix_in_progress` only against this fresh receipt, then restart the seven-round adversarial campaign from R1. Release remains deliberately red until the new evidence dependency closure is Git-tracked and the attack receipt is fresh and clean.
+
+- 2026-09-10 11:29 Whole-bus axis optimization closes the adjacent regression without breaking the new cases. Compact `shared_wave` is one facility, 0 crossings/overlaps, and 2 bends with `detected_issues=[]`; combined remains one public-from facility, 0 public crossings, 1 unrelated crossing, 8 bends and no issue; focused compact/combined/multi-output/shared-bus/frozen-negative tests pass 5/5. The prior failed verification group remains invalid evidence; rerun all 19 issues from the current source and Oracle.
+
+- 2026-09-10 11:17 Structural splitter protection restores `shared_wave` to one facility, removing 015, but the full all-metric Oracle correctly exposes adjacent `FB-BEND-017`: its single bus anchor sits between both mux target axes, so both branches bend (4 total); moving that same facility to either mux axis keeps one facility/one trunk, 0 crossings/overlaps, equal total length, and reduces the pair to 2 bends. This is not an Oracle conflict. Add a whole-bus axis transaction that enumerates actual consumer port axes, reroutes every branch through the same existing lane, and accepts only complete hard-metric non-regression plus strict crossing/bend improvement.
+
+- 2026-09-10 11:03 Full 19-issue fix verification group `20260909T191614Z-ff58d6a3` is rejected with exactly one recurrence, `FB-ROOT-015`. In compact `mux-r04-s00`, `shared_wave` directly feeds two mux3 nodes and is split into two facilities; Oracle proves a one-facility route lowers display cost 1116.0211→898.27 and removes two bends with crossings/overlaps fixed at zero. The cause is a remaining kind-specific splitter exemption that protects direct-array edges only when the root kind is `from`. Generalize protection to graph structure: any zero-indegree root directly serving at least two multi-input targets of one kind owns a repeated merge-service facility; protect those merge-facing edges regardless of root kind, while mixed mux-kind multi-output R4 roots remain splittable.
+
+- 2026-09-10 10:31 Oracle transaction ownership is now calibrated by both directions: the current 121-node combined graph has `detected_issues=[]`, while frozen medium evidence again detects `FB-ROOT-021` on `xtal_1`. Full feedback-layout Oracle tests pass 63/63. Frozen R4 multi-output/two-mux/aux-chain seed remains clean: 0 crossings, 0 overlaps, 4 total bends, and all six direct merge inputs have 0 bends. This closes the local implementation/Oracle correction; all evidence and adversarial receipts must now be regenerated from the final source/Oracle lineage.
+
+- 2026-09-10 10:22 Narrowing the scalar skip alone does not restore the frozen `xtal_1` witness because the reference-column builder also removed every repeated-merge root box; in that graph the true first-column anchor is itself an `xtal_1` facility that additionally serves a non-merge PLL. Excluding by logical root is therefore too coarse at both evaluation and reference selection. Restore the physical leftmost root column as the reference and use only actual direct-root-array membership to delegate scalar candidates to the array Oracle; the combined false positives remain excluded by transaction membership, while the frozen single-root replicated-facility witness is retained.
+
+- 2026-09-10 10:14 Expanded Oracle regression is 62/63: the frozen medium case lost its intentional `xtal_1` first-column witness. Investigation shows `xtal_1` repeatedly feeds multi-input muxes but is the only zero-indegree root in those cohorts (the peers are PLL outputs), so it is not a direct-root array member and its replicated facilities still require scalar first-column checking. Refine ownership: specialized merge facilities are excluded from choosing the universal reference column, but only actual two-or-more-root mux-array members are excluded from scalar evaluation. This restores the independent frozen negative while preserving the combined bus-array precedence.
+
+- 2026-09-10 10:05 Structural repeated-merge classification now removes the invalid 020 counterfactual, but scalar 021 still proposes moving only the outer local input of pad01/pad10 into the bus column. The move is individually crossing-neutral because it lies just outside the bus service interval, yet it breaks the already-correct local two-source array; moving both local inputs would cross the bus. This proves a transaction-owner flaw: roots in one direct merge cohort must never be judged one-by-one by the first-column metric. The mux-array Oracle must own the complete cohort move (including an already-aligned later cohort), while scalar first-column skips those members.
+
+- 2026-09-10 09:55 Re-running direct-array closure after final root restoration correctly aligns the two local peers at x=123.93, but the Oracle still emits 020/021 by treating the bus-exclusive outer x=-62.88 as the universal first column and proposing copies of the shared bus facility at each pad. That counterfactual violates the simultaneously mandatory single-facility/single-trunk bus contract, so it is an Oracle composition defect. Derive repeated merge-service roots structurally (two or more direct multi-input targets of one kind); exclude those specialized facilities from the ordinary root-column reference and align only ordinary peers. Preserve raw stagger evidence for observability, but do not report an infeasible cross-contract improvement.
+
+- 2026-09-10 09:46 Visible-obstacle boundary search accepts the complete outer-bus transaction. On the 121-node combined case, `roots__common_from` remains one rendering anchor with one shared vertical trunk, its crossing incidents fall 6→0, whole-diagram crossings fall 7→1, overlaps stay 0, and bends stay 8. The remaining Oracle failure is FB-ROOT-020: the serialized safe-first pass runs after closing mux-array alignment and moves two local inputs back onto the public bus column. This is a closure-order defect—every invariant-changing pass must be followed by the affected invariant owner; add one final array transaction after serialized safe-first rather than weakening either metric.
+
+- 2026-09-10 09:34 First generic outer-bus transaction is correctly rejected rather than forced: all three layout phases report `bus-outer-edge-node`/`visible-edge-node`, and the combined SVG remains at 7 crossings. Root cause is that deriving the lane only from the left endpoint of a conflicting wire can still put the vertical backbone through the conflicting root glyph or its label (the local symbols occupy the same first column). Candidate generation must include visible obstacle boundaries across the complete service interval and search immediately outside them; the all-metric acceptance contract remains unchanged.
+
+- 2026-09-10 09:24 Atomic overlapping-bus demotion improves the 121-node combined reproduction from 29 to 7 proper crossings and 14 to 8 bends, but the full Oracle still rejects it. Six remaining public-root crossings are one retained `roots__common_from` trunk versus four local pad inputs at rows 06/09 (with two coincident crossings counted per edge pair), plus one unrelated ports crossing. This is a concrete red gate, not completion; next work must identify whether the trunk corridor itself is avoidably inside local-source traffic or a later closure pass reintroduces it, then remove all FB-ROOT-003/012/020/021 findings without sacrificing the bus.
+
+- 2026-09-10 09:15 Selecting one bus owner is insufficient when demoting another repeated root edge-by-edge: no first local move crosses the Pareto boundary even though converting the whole competing trunk wins. Treat each overlapping bus domain as one atomic transaction—retain the owner, convert every direct merge edge of all non-owners to target-axis same-name facilities in the first feasible column right of the owner lane, retire unused glyphs, and accept only complete all-metric improvement.
+
+- 2026-09-10 09:00 The bus-right change removes all public-vs-local crossings but exposes 36 crossings among three repeated candidate buses with interleaved target intervals. Generalize bus ownership: within one target kind/column and overlapping vertical service interval, retain exactly one trunk owner (prefer semantic `from`, then larger fanout and stable name); other roots use target-scoped facilities. Disjoint intervals or target columns form separate conflict components and keep independent buses.
+
+- 2026-09-10 08:48 Structural comparison separates repeated public buses from ordinary multi-output roots: `roots__common_*` repeatedly enter the same merge kind with a stable input role, while frozen `source_1/source_3` enter `mux4` and `mux2`. Subtracting all direct-array roots erased this distinction. Preserve roots with at least two direct merge targets of one target kind as dedicated buses; mixed-target roots remain eligible for target-scoped facilities. Use that information in the bus-right private-root escape.
+
+- 2026-09-10 08:35 Shared-bus regressions are closed, but the combined graph still has 29 crossings, 27 attributable to two public vertical trunks crossing first-column local-root horizontals. Direct-array root exclusion prevents the user's allowed crossing escape. For a merge cohort containing a dedicated bus root, freeze the bus and place only non-bus facilities in the first feasible root column strictly to the right of every bus lane (or the continuous boundary-derived position), accepting only a strict/non-worse complete artifact vector.
+
+- 2026-09-10 08:22 Full Oracle replay catches three shared-bus regressions: generalized merge handling clones `common_from`/`common_clock` per target, producing four facilities where one vertical trunk is required. This is an overlapping-feature priority defect. Compute dedicated shared-bus roots as shared-bus roots minus direct-array roots; freeze those facilities inside merge alignment while still allowing their private cohort peers to move. Bus identity outranks target-local straightness.
+
+- 2026-09-10 08:10 Per-facility first-column fallback closes frozen R4 with `detected_issues=[]`, zero crossing events, zero different-net overlaps and four residual bends outside the six direct mux inputs. Freeze the exact multi-output/two-merge/auxiliary-chain topology as a public-entry regression. Update the retained staggered-array assertion from two required source bends to zero because the new target-scoped facility is a strict improvement, not a regression.
+
+- 2026-09-10 08:00 Frozen R4 is down to zero crossings/overlaps and four bends, but FB-ROOT-021 proves one later `source_3` merge facility can independently return to column one without hard-metric regression. The production restore searches only one transitive all-root group; another member's collision masks the safe member. Retain the group transaction, then enumerate every physical facility as an independent fallback under the same all-metric gate.
+
+- 2026-09-10 07:48 Crossing attribution localizes 27/29 events to direct root inputs of twelve three-input merge nodes. The current full-array path is incorrectly gated by root kinds (`source`/`from` only), so mixed zero-indegree `gate`/`from`/`source` cohorts never receive target-scoped facilities or port-axis alignment. Make merge structure, not component kind, the applicability rule; clone a shared physical facility whenever either x or port-axis movement would disturb another consumer, and retain the identical whole-layout acceptance vector.
+
+- 2026-09-10 07:38 The retained combined graph still exposes dominated `weave__public_source` branches because direct-array edge protection was applied to every root kind. That conflates an ordinary source's target-scoped facilities with a `from` network's single-bus semantics. Limit this pre-split protection to `from` roots; source edges remain eligible for the full facility counterfactual and are subsequently normalized by the target-scoped mux-array pass.
+
+- 2026-09-10 07:28 Retained combined-case replay finds a prohibited metric exemption: legacy mux arrays bypass crossing and bend non-regression, so a closing alignment that adds four crossings is accepted. Remove both bypasses. Every placement feature must pass the identical whole-artifact crossing, bend, overlap, edge-node, direction and endpoint gates; alignment is never allowed to trade away an older metric.
+
+- 2026-09-10 07:18 The focused Oracle suite exposes four retained-case regressions. Earlier auxiliary facility splitting gives a logical root multiple physical glyphs, and `_refine_direct_root_fanin_arrays` then aborts the entire mux cohort under its obsolete one-facility assumption. Select the physical facility attached to each target edge instead; existing aliases must not disable merge alignment. Rerun all 62 Oracle cases before accepting the new counterfactual.
+
+- 2026-09-10 07:10 Target-scoped same-name facilities remove all three crossings and both root-facility issues in frozen R4; one mux-facing `source_0` facility legitimately remains later because restoring it to the cohort column recreates a crossing. The raw-column FB-ROOT-020 oracle therefore conflicts with the user's explicit exception. Replace raw inequality as the defect decision with a target-scoped alias/move counterfactual that proves a common column is feasible under the full crossing/overlap/bend vector; keep raw inequality as diagnostic evidence.
+
+- 2026-09-10 06:55 The interval search is complete but the frozen multi-output source remains red because the legacy mux-array transaction moves one physical facility and all of its branches together. A root feeding two muxes at different port axes cannot satisfy both with one glyph. Change the placement owner from whole logical root to `(logical root, merge target)` display facility: retain the consumer-local original and create a same-name mux-facing facility at the cohort column/port axis, while the full visible-overlap and route gates decide feasibility.
+
+- 2026-09-10 06:52 The serialized closure executes but the frozen R4 case remains red. The bounded search advances by a whole visible width, skipping narrow valid gaps (for example immediately left of a tall mux). Replace coarse sampling with deterministic visible-box forbidden-interval jumps: start target-adjacent, jump only to the nearest blocking boundary, and fail closed when no position remains to the right of the original facility.
+
+- 2026-09-10 06:40 Frozen R4 evidence exposes a pipeline-order defect rather than a candidate-search defect: the only same-name facility split runs before the closing direct-root/mux alignment, while that later alignment creates the auxiliary detours. Add a serialized-geometry facility closure immediately after the closing array pass; preserve direct mux-facing edges as protected pairs and allow only dominated auxiliary branches to split.
+
+- 2026-09-10 06:28 Function-scoped placement is fixed and compilation passes, but the exact target-adjacent replica candidate is rejected by visible label/node overlap even though the independent Oracle proves a shorter crossing-free facility. Generalize facility placement to scan bounded leftward slots by the complete visible source width plus routing clearance before full Pareto assessment.
+
+- 2026-09-10 06:18 Frozen CLI failed closed with `NameError: dedicated_bus_roots` because an under-contextual patch matched an earlier `structured_bus_roots` occurrence and placed the definitions in `_replicate_dispersed_roots` instead of `_split_dominated_root_facility_edges`. Move the block using the function signature plus indegree loop as context, then compile and rerun the exact witness.
+
+- 2026-09-10 06:13 Facility splitting now derives protected `(root, mux target)` pairs separately from dedicated shared-bus roots. Complete the edge-level guard so auxiliary consumers remain eligible without weakening the main mux-facing array.
+
+- 2026-09-10 06:10 Oracle now uses the same per-target membership. Frozen R4 confirms 020 is removed, but all-metric evaluation finds three dominated auxiliary branches (009/022): protecting a direct-mux cohort as an indivisible logical root prevents later same-name facilities from serving remote auxiliary consumers. Protect only the cohort's merge-facing edges; allow non-cohort outgoing edges to open a same-name facility when the full counterfactual strictly dominates.
+
+- 2026-09-10 06:01 Production cohort discovery/refinement no longer requires a root to have exactly one mux target; target-local membership is now independent of auxiliary outputs. Next synchronize the independent Oracle and rerun the frozen R4 witness.
+
+- 2026-09-10 05:58 Both revised 016/020 contracts now reproduce twice and the solve gate passes all 19 registered issues. Implement per-target direct-mux cohort membership: additional mux/output edges no longer disqualify a root; the joint transaction still reroutes every outgoing route and accepts only the complete quality vector.
+
+- 2026-09-10 05:42 The solve hook correctly rejected production edits after reopening 020: the 016 issue registry still named the retired worktree snapshot while its fresh receipt named immutable `c1a953f`, and the 020 requirement wording change invalidated its contract hash. Synchronize the registry, then replay both contracts before implementation.
+
+- 2026-09-10 05:35 Fresh recursive attack R4 seed 012 reproduced FB-ROOT-020 on a four-root main mux where source_1/source_3 also feed a side mux. Production and Oracle both excluded every root with more than one direct mux target from the cohort, directly contradicting the retained auxiliary-output requirement. Reopened 020 before touching production: cohort membership must be per merge target and the joint transaction must reroute every outgoing edge.
+
+- 2026-09-10 05:25 FB-ROOT-016 remained `not_reproduced` because its corpus entry pointed at a mutable worktree producer snapshot whose SVG already had one source-side vertical trunk. History identifies `1dc1f6e` as the shared-bus production fix and `c1a953f` as its exact parent. Replace the pseudo-baseline with that immutable pre-fix revision and archived execution; a baseline must preserve the defect, not merely preserve an old timestamp.
+
+- 2026-09-10 05:15 The 020 corpus deliberately includes roots with auxiliary consumers. A local facility-only move can therefore be blocked even though the production layout can jointly reorder the roots and their auxiliary branches. The oracle had incorrectly promoted this incomplete counterfactual into permission to delete the structural direct-mux alignment metric. Restore raw direct-mux column inconsistency as the hard 020 witness (unless explicitly column-constrained); keep feasible-move witnesses only as diagnostics.
+
+- 2026-09-10 05:08 Expanding the candidate columns alone still left 020 hidden. Artifact-level tracing found the counterfactual route builder moved each root endpoint but then inserted the old x-coordinate as a waypoint, manufacturing two bends on an otherwise same-y direct root→mux edge. Use a direct new-endpoint→target-endpoint segment for same-y edges, while retaining every full-graph acceptance check; this fixes the proof model rather than weakening the metric.
+
+- 2026-09-10 05:00 Joint replay of FB-ROOT-016/020 exposed a real oracle regression: the direct-mux baseline still has four physical source columns (401.93/201.39/72.78/337.05), but the feasibility oracle tests only the latest occupied column and suppresses the raw structural witness when that single candidate fails. This contradicts the retained requirement that a safe earlier/first column is admissible when crossings do not grow. Enumerate all occupied cohort columns under the same full-graph hard checks; target-issue detection must not be masked by an arbitrary one-candidate heuristic or by other simultaneously detected metrics.
+
+- 2026-09-10 04:45 Replayed FB-ROUTE-002 twice from its pinned pre-fix revision under the current independent semantics (`proper_crossing_events=105`, `bends=44` both runs), merged the receipt without dropping any issue, then regenerated the full fix group `20260909T162339Z-192e72f0`; all registered issues report `baseline_fails=true`, `current_passes=true`, and `failures=[]`.
+
+- 2026-09-10 04:30 Full pytest reaches 161 passes, then release integrity fails as designed: the fresh fix-evidence group is not Git-tracked and FB-ROUTE-002 reproduction semantics lineage predates the expanded current semantic checker. Replay 002 from its pinned pre-fix revision, reissue all fix receipts, then stage the exact receipt/evidence dependency closure; never disable the clean-checkout gate.
+
+- 2026-09-10 04:20 022/023 ledger states now bind the green fix group and the targeted lineage test passes. A separate environment failure showed Anaconda importing an unrelated installed regular package named `tools` instead of the project namespace; add project `tools/__init__.py` so quality scripts have an explicit package owner and full tests do not depend on prior import order or PYTHONPATH tricks.
+
+- 2026-09-10 04:12 Fresh fix group `20260909T160651Z-e78b36ce` marks 022/023 `baseline_fails=true` and `current_passes=true`. The remaining full-test failure is ledger state still `fix_in_progress` with no `fix_verification`; advance only these two issues from the generated receipts, then rerun from zero.
+
+- 2026-09-10 03:46 Pinned pre-fix replay merged successfully: FB-ROOT-022 and FB-ROUTE-023 each reproduced twice and aggregate `missing_issues=[]`. Full pytest now advances to 150 passes; its next failure is intentionally stale fix-receipt lineage after the final routing change. Reissue the complete fix group from current source before continuing.
+
+- 2026-09-10 03:35 Subset corpus rerun correctly failed: both new cases were marked `python_role=worktree`, so the runner archived the already-fixed producer and observed zero red issues, overwriting aggregate counts with 0. A reproduction baseline must remain replayable after the fix; switch 022/023 to their pinned pre-fix Git revision using the legacy/archive role, rerun only those issues with the current independent Oracle, and merge only if both attempts reproduce.
+
+- 2026-09-10 03:22 Corpus manifest already declares 022/023, but its executable `cases` list still omits both formal baselines; therefore the regenerated aggregate cannot observe them. Add the exact distant-root and premature-entry baseline inputs as normal many-to-many cases, plus their factors, then regenerate instead of editing the receipt by hand.
+
+- 2026-09-10 03:18 Alias-aware outer-detour detection now passes; full-suite restart reached 142 passed before the next hard failure. The corpus product manifest omitted new issue IDs 022/023 even though evidence mappings exist, so the many-to-many completeness gate correctly rejected them as unknown. Add both issue IDs and their facility-split/boundary-corridor factors; do not weaken the checker.
+
+- 2026-09-10 03:10 Full pytest first fail was a quality-oracle alias ownership gap, not a layout regression: the outer-detour checker exempted any logical fanout with one vertical stub, even when its branches originate from separate physical facilities. The test now locates aliases by canonical logical name; the independent inspector must exempt only a true single physical anchor/shared trunk and must still catch a detour on an alias-owned branch.
+
+- 2026-09-10 03:00 Restarted adversarial campaign `20260909T151927Z-2aade687` is 7/7 clean; fresh fix verification `20260909T152028Z-d67224db` has `failures=[]`. Full pytest first exposed an environment collision: Anaconda resolves an unrelated installed regular package named `tools` over this repository's namespace directory; a controlled bootstrap binds the repository tools path. The first real test failure then showed a legacy assertion matching physical vertex `.name == src`, which is invalid once a logical root legitimately gains a same-name display alias; update it to the stable `logical_name or name` identity without weakening geometry assertions.
+
+- 2026-09-10 02:38 Post-relocation boundary reroute closes the frozen R3 rename witness; the complete independent Oracle suite is 62/62 green. Restart the seven-round adversarial campaign from R1; prior clean rounds remain invalid.
+
+- 2026-09-10 02:30 Added the fixed-point round counter scaffold. The next change completes the same transaction with a post-relocation boundary reroute; the scaffold alone is not counted as a fix.
+
+- 2026-09-10 02:26 在 boundary/tree 后补 relocation 后，R3 的根跨线与列滞后 witness 全部消失，但独立 Oracle 新捕获 `FB-ROUTE-023`：公共根仍在内部行间转移，边界走廊反事实可减少 crossing event。说明 relocation 与 boundary routing 相互影响，单次固定顺序不能闭合；改为有界固定点（relocate→boundary→tree，最多 3 轮），最终仍由独立全指标门禁判定。
+
+- 2026-09-10 02:18 Stage counters localize the escape: the earlier relocation runs before boundary/tree routing, while the final relocation sees zero escape candidates because it also runs before those passes. Add one final relocation transaction after boundary-tree closure, then apply the safe-first-column transaction.
+
+- 2026-09-10 02:12 越障列优先且取消额外间距后，冻结 R3 仍命中同两条 witness，说明前述 y 间距推断不足。下一步给生产报告增加 escape candidate/selected/accepted 可观测计数，确定失败位于相交识别、可行域、位置选择还是全图验收阶段。
+
+- 2026-09-10 02:04 越障列接入后 R3 证据仍命中，不能计为修复。候选虽已生成，但 `profile.grid` 额外间距改变设施 y；独立候选证明原 y 在可见框不重叠时可保持直线并减少 crossing。越障候选改为只要求零额外间距，真实 node/label/edge 碰撞仍由全量硬门拒绝。
+
+- 2026-09-10 02:00 relocation 内部已加入基于终态完整折线、不同源网 proper crossing 和可见设施尺寸推导 escape column 的结构算法；下一步把该候选同时纳入可移动预检与实际候选选择，并保持全图质量向量验收。
+
+- 2026-09-10 01:52 递归攻击 run `20260909T144404Z-c5fd4652` 在 R3 全图改名重现 `FB-ROOT-003`，连续轮次按合同清零。独立终态证据为 node_027/node_034 各一条直入 PAD 的根边与公共纵干线相交；把单设施移到最后一条被跨纵线右侧可令 crossing 1→0、bend 0→0 且缩短 80.78/145.56px。根因不是命名特判，而是 relocation 只评估“最右可行列”，该位置若因标签/节点碰撞被拒绝就不回退到较早且已越过交叉干线的 Pareto 候选。改为补入由实际相交纵段推导的 escape column，并优先评估最小越障位置。
+
+- 2026-09-10 01:38 同构多输入正例与异构负例均通过；正式全问题双跑修复签收 `20260909T144016Z-572b3263` 完成，`failures=[]`。开始从 R1 执行规定的递归对抗轮次，若任一轮重现则清零重启。
+
+- 2026-09-10 01:31 helper 负例与质量合同 26/26 全绿；测试名称已从 from-semantic 改为 structural，避免名称暗示错误适用域。继续补独立结构正例后进入正式 fix verifier。
+
+- 2026-09-10 01:26 旧异构单消费者 helper 期望已改为负例；继续补充同构重复多输入汇合器正例，防止收窄适用域时把真正公共总线能力一并删除。
+
+- 2026-09-10 01:22 收窄事务域后 combined 精确门与完整独立 Oracle 62/62 全绿。质量系统 25/26，唯一失败是旧 helper 单测仍把“一个 from 分别直连单个 mux 与 clock”定义为共享总线；该期望与远距异构消费者拆分合同冲突，更新为负例，并补同类多输入汇合器正例。
+
+- 2026-09-10 01:15 物理设施粒度改造后仍为 61/62；运行报告只有 6 个尝试且 0 个接受。进一步取证发现 direct_by_target 把 PAD 等任意共享目标做传递并集，weave 全图被错误合成一个巨型事务。下一步只保留满足 direct-mux 数组合同的 cohort，其余设施独立评估。
+
+- 2026-09-10 01:08 末端重复首列事务后仍为 61/62，21 个 witness 完全不变。取证确认它们集中于 weave 语料的多物理别名；生产按 logical root 一次搬动全部别名，而独立 Oracle 按单个物理设施证明可安全回位，事务粒度不一致使安全候选被联合移动的劣化否决。修复方向是 direct-fanin cohort 仍整体搬动，其余每个物理设施独立事务。
+
+- 2026-09-10 01:02 Oracle 聚焦回归 61/62；022、023 与总线适用域均已通过，唯一剩余为 combined 终态 21 个可安全回首列 witness。根因是首列恢复发生在 boundary corridor 与最终 fanout tree 之前，后两者改变线路后制造了新的安全回位机会；下一步在最终序列化几何上复用同一全指标支配事务闭合。
+
+- 2026-09-10 00:56 生产与独立 Oracle 的同构保护均已收紧为至少两个 multi-input 同 kind 目标；开始回归。
+
+- 2026-09-10 00:53 Oracle facility-split 同构计数已独立收紧到 multi-input 目标；还需同步 shared-bus。
+
+- 2026-09-10 00:50 生产同构谓词已收紧到至少两个多输入目标；两个单输入 gate 的远距 root 不再误保护。待 Oracle 同步后运行。
+
+- 2026-09-10 00:45 聚焦 7/10；同 kind 规则过宽，收紧为至少两个多输入目标。
+
+- 2026-09-10 00:40 shared-bus 独立 Oracle 已同步适用域并开始回归。
+
+- 2026-09-10 00:37 Oracle facility-split 已保护 PAD 与同构重复目标；shared-bus 还需同步同构目标适用域后再运行。
+
+- 2026-09-10 00:34 Oracle facility-split 已把 PAD bus 与同构重复目标 bus 合成 protected roots；还需让 shared-bus 指标采用相同适用域，当前不运行。
+
+- 2026-09-10 00:31 已清理 Oracle 无效中间文本，并按 route 累积 root/port 的目标种类与计数。
+
+- 2026-09-10 00:28 Oracle 同构保护补丁回读发现夹入无效 `if please` 文本；该中间态未运行。已记录后先删除无效行，再继续补齐 target kind/count。
+
+- 2026-09-10 00:25 81/88 后回读确认同构目标谓词已存在，真正多余的是“所有 fanout from”无条件保护；已删除该规则。24 远距 from 与 023 根可重新参与几何支配，公共 from→同构 mux 阵列仍由同构谓词保护。
+
+- 2026-09-10 00:20 四类 bus 结构谓词已完整写入，开始语法、Oracle/质量合同与双图复验。
+
+- 2026-09-09 23:56 Oracle 函数前导已恢复：独立从终态 route + config 计算同 root/port 的 PAD 目标集合，两个以上定义为 pad bus root；facility-split 反事实跳过这些根。尚需修改调用签名与 shared-bus fallback 后才可运行。
+
+- 2026-09-09 23:53 Oracle 作用域补丁首次写入被回读发现中途截断为 `if please`，并破坏了 source-box 字典头；该中间态没有运行，必须先记录再修复。下一步用小块补丁恢复完整函数前导，再做语法检查。
 - scene: 用户反馈自然复现与防假完成门禁
+
+- 2026-09-10 00:17 target-kind 集合已在零入度根循环中填充；下一步一次加入同构阵列与 from 语义根两个 result 规则，再运行。
+
+- 2026-09-10 00:15 helper 已增加按 root/port 汇总直连 target kind 的独立集合；尚未填充和消费，当前不运行。
+
+- 2026-09-10 00:13 四谓词并集第一步已加入 direct-root-fanin mux 队列，outdegree 计数已准备；其余谓词尚未写入，当前不运行。
+
+- 2026-09-10 00:10 Oracle 语法恢复后子集 81/88，7 个失败揭示生产 bus 分类仍少三类：任意 fanout `from` 的语义共享网、同构重复目标阵列、以及多个根直达同一 mux 的设施队列；PAD 角色是第四类。最终集合将取四个结构谓词并集，异构 mux2/mux3 的 gate/source weave 根不在集合，可按几何收益拆分。Oracle 保持独立实现同一适用域概念。
+
+- 2026-09-10 00:01 shared-bus fallback 已收窄为直连 PAD 角色；不再用“同 kind 重复 mux”推定总线。至此 009 facility-split 与 016 shared-bus 对 PAD/mux 的适用域互斥；下一步语法、现有 Oracle 单测、combined/PAD 双图复验，再补反作弊单测固定该边界。
+
+- 2026-09-09 23:58 analyze 调用点已传入 config，与 Oracle 新签名一致；尚未同步 shared-bus fallback，继续不运行。
+
+- 2026-09-09 23:50 PAD-role 版本联合聚焦 9/9；combined 只余 016/021 宽泛提示、PAD 只余 009/022 宽泛提示，正式目标 issue 各自已闭合。冲突根因是 Oracle 009 的反事实仍把 PAD 公共收集总线视为可拆设施，和 016 的单总线合同争夺同一结构。下一步在独立 Oracle 定义互斥适用域：至少两个 pad 目标的根由 bus 指标所有，facility-split 指标跳过；direct bus fallback 也只认 PAD 收集角色，不把 mux 重汇合误认总线。
+
+- 2026-09-09 23:45 直接共享总线 cohort 已改为同 root/port 至少两个 `pad*` 目标；这使用器件库的正式 kind 角色，不依赖实例名。mux2/mux3 reconvergent 网退出该保护，公共 root→独立 gate→merge 阵列仍由纯拓扑规则覆盖。待联合复验。
+
+- 2026-09-09 23:42 三输入 cohort 联合聚焦 9/9，但 combined 与 PAD 均再命中 009。直接打印 helper 集合和入度发现 weave 也包含多个 mux3（入度 3），所以多输入数仍不是结构角色。正确区分是器件角色：PAD 收集阵列的公共根保持总线；mux2/mux3 是重汇合路由节点，异构深度网络允许几何支配时拆同名设施。既有 root→独立 gate→merge 规则阵列仍由通用拓扑规则保护。
+
+- 2026-09-09 23:36 helper 替换完成：规则一对一公共/私人阵列沿用既有拓扑识别；直接收集阵列仅在同 root/port 至少连接两个 indegree>=3 目标时保护单总线。两输入异构 reconvergent 网不再被误锁。待语法和联合门验证。
+
+- 2026-09-09 23:34 helper 旧循环开始逐行清理：已删除 target_kind 绑定，当前不运行。由于实时门按每次源码写入阻断，后续先合并剩余替换为一次完整小补丁。
+
+- 2026-09-09 23:32 已移除旧 root-target-signature 集合，helper 尚未完成，继续保持不运行。下一步用单个补丁替换循环与 result 逻辑为三输入收集 cohort，然后立即语法检查。
+
+- 2026-09-09 23:30 小步替换继续：已移除旧 repeated-target 结构签名字典，尚未完成 helper，当前不运行。实时门要求每个中间源码变化先记录，后续每步同样回读，避免大补丁误命中。
+
+- 2026-09-09 23:28 开始把直连 bus cohort 从过严的全签名一致改为至少两个三输入收集目标；已先移除仅为旧签名服务的 outgoing 表。其余旧签名代码尚在，当前中间态不运行；下一步以小步补丁整体替换并回读。
+
+- 2026-09-09 23:25 第二次全账本 `20260909T125847Z-9b602b7c` 中 009 已绿，但 016/021 被拒绝。精确图显示 `public_from` 被拆成 5 个设施，仍仅一条纵通道；PAD case 的根直达两类层级，但其中至少两个目标是 indegree=3 的多输入收集器，而 weave 的直连 mux 均为 indegree=2。下一步把直接共享总线 cohort 定义为“至少两个三输入及以上收集器”，并保留既有一对一公共/私人规则阵列识别；不再把整个 root 的所有目标强制同签名。
+
+- 2026-09-09 23:15 结构签名版本联合聚焦 9/9；combined current 图的 `root_facility_split_witnesses` 从 12 为 0，`FB-ROUTE-009` 不再检测到。该 combined 图仍会报告 016/021，但正式 case 合同只把它分配给 009，016/021 各有独立精确用例且本轮聚焦通过；下一步重新签发全账本，验证所有 issue 的各自合同。
+
+- 2026-09-09 23:09 shared-bus helper 已整体回读重写，顺带删除此前补丁留下的重复集合声明/重复 add。直连目标结构签名现为 `(kind, indegree, outdegree, sorted downstream kinds)`；只有同 root/port 的所有候选目标签名唯一才保护单总线。待重新跑 combined 009 和五项联合门。
+
+- 2026-09-09 23:05 联合聚焦仍为 9/9，但 combined 正式 case 的 009 仍命中 12 个 facility-split witness。拓扑回读发现 `weave__merge_*` 与 `weave__select_*` 名称虽代表不同阶段，器件 kind 都是 `mux2`，因此只按 kind 仍把异构层级误归同队列。下一步改用成熟分层布局常用的结构等价类：kind + 入/出度 + 下游 kind multiset；只有根的全部直连多输入目标结构签名一致才锁成一根共享总线。
+
+- 2026-09-09 23:00 回读首次结构作用域补丁发现引用了尚未声明的 `root_target_kinds`，该中间态没有运行、不能计为修复；已在 helper 所有者内加入按 `(root, source_port)` 汇总全部直连多输入目标 kind 的集合。下一步先做语法与 009/016/021/022/023 联合复验，防止用测试之外的 NameError 漏过。
+
+- 2026-09-09 22:58 直连共享总线结构判定已从“任一 target kind 重复”收紧为“同 root/source-port 的全部多输入直连目标同 kind，且至少两个目标”。规则 gate→merge 阵列与同类 PAD 阵列仍受单总线保护；同时直达 merge/select 的异构 weave 根恢复按全图收益拆分同名设施的资格。待同时复验 009、016、021、022、023。
+
+- 2026-09-09 22:55 内侧边界 lane 的聚焦门 9/9 通过，但正式全账本批次 `20260909T124201Z-48aa78c0` 被旧 `FB-ROUTE-009` 拒绝，不能签收。收据反查显示 `weave__public_gate/from/source` 同时直达 `merge` 与 `select` 两类目标；当前 shared-bus helper 只要任一种目标 kind 重复两次就把整个异构扇出误判为规则阵列，阻止几何收益显著的同名设施拆分。修复方向：直连共享总线保护要求该根的全部直连多输入目标属于同一结构 kind；规则 gate→merge 阵列仍由独立拓扑规则保护。
+
+- 2026-09-09 22:45 边界路由候选已加入 top/bottom 包络相邻内侧 lane，再保留原有从首个外侧 lane 向外的 grid 枚举。接受条件未改：节点/边节点/终态异网重叠/端点/方向/折点均不得变差，交叉点与事件字典序必须严格下降。待用同一自然红夹具和 25 指标对抗门验证。
+
+- 2026-09-09 22:43 生成当前 023 诊断 SVG/JSON 后提取到剩余 edge 0012、0112；生产选择报告为 7 次边界移动、删除 112 个交叉，剩余候选主要被交叉或异网重叠拒绝。坐标审计定位候选空间缺口：另一网络占用首个外侧 y=32 lane 后，现实现只继续向外搜索，两个 stem 必须穿过 y=32；节点包络与该 lane 之间仍有满足 18px 节点净空的 y=42 通道却从未生成。下一步增加包络相邻内侧边界 lane，并继续由全图硬门选择。
+
+- 2026-09-09 22:38 空闲 grid-lane 枚举后的精确聚焦门为 8/9：016、021、022 与全 25 指标对抗保持通过，023 从 3 个 witness 降为 2 个但仍失败，不能签收。被拦截的只读 Oracle 命令还暴露实时 worklog 门工作正常；下一步先提取剩余两条边的终态坐标、交叉对象和每个候选拒绝原因，再修候选生成/成本，不降低异网重叠或交叉指标。
+
+- 2026-09-09 22:33 基础边界 lane 加入后 023 仍余 3 个 witness。对 root2/edge12 的同一候选做生产内部反事实：交叉 1434→1432、折点不变，但 y=top_lane 与既有异网边界横段产生 1 段正长度重叠，生产硬门正确拒绝；独立 Oracle 在带跨线桥的最终 SVG 上没有识别这段候选重叠，暴露候选 lane 离散度不足而非应放宽重叠门。下一步按 grid 从边界向外枚举首个空闲平行 lane，由全图重叠/交叉门选择；不接受不同网重合。
+
+- 2026-09-09 22:28 结构化总线作用域修正后聚焦 10/11；016、021、022 通过，023 还有三个边界支配 witness。生产已接受六条边界改道，但固定每根偏移 lane 让剩余根绕得更外并穿过更多 stem。下一步把基础边界 lane 也加入全局候选，由完整重叠和交叉门选择，不固定强制偏移。
+
+- 2026-09-09 22:23 结构化总线 helper 已改为纯拓扑：规则一对一阵列，或同 source-port 直连至少两个同 kind 的多输入目标；replicate 与逐边 split 已消费该集合。源码回读发现通用上下文补丁把集合定义误插进 direct-array 函数，而 local-row 函数引用它却未定义；尚未运行，不能计修复。下一补丁移除误插并在 local owner 内精确声明，然后先跑 016/021/022/023 聚焦门。
+
+- 2026-09-09 22:18 正式 current fix 双跑组 20260909T120959Z-3cc516af 失败，不能签收：022/023 通过，但旧 FB-ROOT-016 与 FB-ROOT-021 复发。最终 SVG 显示 public_from 被拆为 5 个设施且安全首列反事实命中。根因是逐边设施 owner 未消费结构化阵列总线集合，旧 shared helper 又把所有 from fanout 过宽混为一类。下一步将其改为规则一对一阵列或同 source-port 至少两个同 kind 多输入直接目标的拓扑集合，并让所有设施创建阶段统一跳过；任意远距非阵列 022 仍走成本支配。
+
+- 2026-09-09 22:13 覆盖账本相邻测试名已精确恢复，JSON parser、layout feature coverage 3/3 与项目 clock-layout-algorithms Skill validator 全部 PASS。新特性、三项边界/故障场景和两条高风险交互现已闭合；进入当前公开入口的正式 fix receipt 双跑。
+
+- 2026-09-09 22:10 首次恢复测试名时又把相邻 `source_tree_contract` 误写成 `source_source_tree_contract`；仍只影响覆盖账本且尚未通过 validator。下一补丁仅替换这一精确字符串，然后执行 validator，避免再做宽上下文替换。
+
+- 2026-09-09 22:08 新增五个 success/fault/boundary 场景后 JSON 解析成功，但覆盖 validator 2/3：替换末项时把既有测试名 `claim_escapes` 误写成 `claimd-escapes`，机器门准确拒绝。该错误只在覆盖账本字符串，未改测试或生产；立即恢复真实 pytest node 后重跑，不能把其余两项通过计整体完成。
+
+- 2026-09-09 22:04 覆盖账本新增 source-facility-boundary 与 contract-release-lineage 高风险交互，分别绑定设施别名/同网树/路由支配/边界主干，以及 retention/coverage/release；场景角色仍待加入，当前不计闭合。
+
+- 2026-09-09 22:01 特性覆盖账本新增 boundary-backbone-routing 与 quality-contract-retention，并声明所需角色；interaction/scenario 尚未补齐，所以当前账本预期未闭合，不能计通过。
+
+- 2026-09-09 21:58 项目质量门新增三类不可混淆 owner：mux-facing cohort、结构化重复汇合总线、任意远距设施反事实，并把内部过早切入与外边界 backbone 定为全图反事实；另记录 canonical retention 及五类 mutant。下一步将这些合同映射进特性覆盖账本并验证 success/fault/boundary 角色。
+
+- 2026-09-09 21:55 项目 `clock-layout-algorithms` 根 Skill 已把不可变需求—指标 baseline 与全图/发布统一 checker 加入算法链入口；下一步补充项目质量门的设施作用域、外边界 backbone 和 retention mutant 细则。
+
+- 2026-09-09 21:52 全图与 release retention 集成 mutant 及 SVG 注册表聚焦 26/26 PASS。用户根新增“需求与质量指标不可丢失合同”和可复用 validator，`agent-project-goals` 加入稳定 ID/追加式目标/冲突上报，`clock-tree-layout` 修正无条件首列为硬质量优先的条件化首列，并扩充远距别名、mux-facing cohort 与外边界 backbone 美学规则；四个相关 Skill 均在显式 UTF-8 模式通过 quick_validate。首次未设置 UTF-8 的 validator 受 Windows GBK 默认解码阻断，未产生错误结论，设 `PYTHONUTF8=1` 后同一检查全绿。
+
+- 2026-09-09 21:47 retention validator 已嵌入两个不可旁路入口：`check_all_svg_quality.py` 在枚举任何图前验证需求—指标合同，release gate 将 retention 错误并入统一错误集。由此单测选择、公开图批处理和发布三层不再各自维护可漂移的指标集合；下一步增加集成 mutant，证明两个入口在合同失败时都非零退出。
+
+- 2026-09-09 21:44 删除过宽私有代理断言后，保留的正式 exact-set/full-execution 断言覆盖同一批图；retention、SVG 全指标系统、022/023、设施拆分与压力回归聚焦 28/28 PASS。下一步将 retention validator 直接嵌入全图 QA 与 release gate，使任何旧要求/指标删除、改义、适用性收窄或未报告冲突都无法靠只运行某个测试集合绕过。
+
+- 2026-09-09 21:40 修正 VisualBox 边界差值并接入逐边设施闭包后，三个个 adversarial seed 的正式 25 项注册指标均全绿，022/023 与两项设施回归保持绿；seed 3 的错列也因 mux-facing 设施与辅助副本正确解耦而关闭。聚焦 7/9，剩余两个失败来自测试内未注册的硬编码代理：它要求“所有 fanout from 都恰有一条纵线”，与现行注册合同“结构化重复汇合保留单总线、任意远距消费者允许同名设施副本”冲突。该代理不是旧需求本身，而是过宽实现；将按正式 applicability 收窄，并新增反作弊保证以后测试私有指标不能越过注册表。
+
+- 2026-09-09 21:38 已新增逐边设施反事实闭包主体：只考察仍与同设施共享的根支路，在目标前生成同逻辑名副本，完整比较节点/边/可见几何/方向/异网重叠/交叉/折点及“线墨水+设施周长”，每次只接纳全图最优候选并重新枚举。静态编译通过；函数尚未接入流水线，且回读发现 `VisualBox` 只有边界字段、没有 width/height 属性，下一补丁先改为边界差值并接入，未经运行不得计修复。
+
+- 2026-09-09 21:34 将共享总线 Oracle 收窄到“至少两个同类多输入目标”的结构化汇合子集，并允许第二阶段继续细分已有设施后，聚焦 6/9：三个对抗种子的 shared-root-bus 假阳性已全部消失，022/023 精确修复仍绿；剩余均为真实 `root_facility_split_dominance`，seed 3 另有 `root_facility_column_lag`。逐 witness 显示剩余候选主要是横向远距但纵向同带，因此仅按 Y 间隙成组的 partitioner 永远不会提出它们。下一步增加与独立 Oracle 同构的逐边设施反事实闭包，再让直入 mux 的物理设施作为 cohort 对齐，而不移动同名源的其它副本。
+
+- 2026-09-09 21:30 retention validator 正常路径及其删除/改义/重复/基线篡改 mutants 已能收集执行；联合质量测试 21/24 通过，三个既有 from→mux 对抗种子真实暴露 `root_facility_split_dominance`、`shared_root_single_bus`、`root_facility_column_lag` 回归。终态证据表明根既有 merge-facing 分支又有远距辅助分支时，“整根只能一设施”与“远距分支应局部别名”被错误当成互斥：质检按根总设施计数而非按 merge-facing 子网计数，同时产品的整阵列事务在已有别名时跳过对齐。当前明确不降低指标；先把 bus 所有权收窄到重复 merge-facing 分支、保留辅助别名，再让对齐事务只移动 mux-facing 设施。
+
+- 2026-09-09 21:27 mutant 文件已完整恢复，validator 正常路径 PASS 25/25；但 pytest 收集从环境中先解析到另一个已安装包 `tools`，导致新测试导入错误。该错误未执行任何 mutant，不能计通过；测试改用项目既有模式把仓库 `tools/` 绝对插入 `sys.path` 后再重跑。
+
+- 2026-09-09 21:24 新增独立 retention validator 后，当前 25 要求/25 指标 exact-set 与 canonical 基线哈希均 PASS；但同一补丁尾部的 mutant 测试文件被工具输入污染为不完整 Python，尚未执行且不得计覆盖。接下来先以小补丁完整替换该测试文件，再验证四类删除/改义/重复/基线篡改均红。
+
+- 2026-09-09 21:20 需求—指标基线现可解析，25/25 的 `(metric_id,witness,applicability)` 与当前 registry 顺序及 exact-set 完全相等；每项另有稳定 requirement ID，canonical SHA-256 为 `2a3d6b2696f48e5aef29396dc9812d186b63032b70421b97b53cb34679a62274`。下一步 validator 将把该哈希编入独立脚本，并对删除、改名、适用性收窄、witness 换绑、重复 ID、未映射新增和无用户证据冲突记录逐项失败。
+
+- 2026-09-09 21:17 基线草稿第一次修正补入后六项时仍留下两处被污染字段（`has_ro`、损坏的 requirement 行）且名称未完全按当前 registry 抄录；JSON parser 明确失败，因此没有进入门禁。下一步仅对可见尾段做小范围替换，以当前 `quality-metrics.json` 的 25 项 exact-set 为唯一输入，解析成功前不继续编写 validator。
+
+- 2026-09-09 21:15 修复聚焦门 8/8 PASS。开始建立 append-only 需求—指标基线时，首次大段文件补丁被工具输入污染，生成的草稿只含 19/25 项且两行 JSON 损坏；该文件尚未进入任何校验或发布，不计门通过。现先记录事故，再按当前唯一质量注册表逐项恢复 25 项精确定义，并以解析、exact-set 与不可变基线哈希共同校准。
+
+- 2026-09-09 21:12 聚焦 7/8；唯一失败是质量报告的 `rendering_replicas` 语义为“新增副本数”3，而测试误写为“总设施数”4。布局实际 4 个设施与产品统计 replicas=3 一致，现按字段合同修正；一次格式损坏的补丁在 Hook 解析目标阶段被 fail-closed 拒绝，无文件影响。
+
+- 2026-09-09 21:10 旧回归断言曾被后续“全根首列/公共 from 单设施”政策反向改为必须零副本，这是旧要求消失的可执行证据。恢复为：四个远距带产生 4 个显示设施，单根两带产生 2 个设施，任意零入度 gate 同样按几何复制；当前 CLI 测试改为要求 022/023 witness 缺席，冻结自然红灯由正式 reproduction receipt 独立保存，避免当前测试继续期待 bug。
+
+- 2026-09-09 21:07 每根固定外侧 backbone 后，023 当前公开输出为 1302 crossing、0 异网重叠、244 折，独立 023 witness=0；022 当前为 2 个同名设施、0 crossing/overlap、22 折，独立 022 witness=0。但旧 `shared_root_bus_fragmentation` 又把任意双目标 from 误报 016。该 fallback 现只拥有至少两个直接多输入目标的重复汇聚数组；任意两带 fanout 交给几何设施分分区/合并双向支配指标，避免“公共总线唯一”再次覆盖“远距可复制”。
+
+- 2026-09-09 21:03 多 lane 搜索把 crossing 降至 1284、witness 降至 1，但同一根的不同支路会贪心占用不同外侧 lane，既浪费通道又挤占其它根的槽位。改为按稳定根顺序为每个逻辑 source-port 分配一条 top 和一条 bottom backbone；同根支线天然复用同一主干，不同根物理分隔，匹配成熟 bus routing 的 backbone-first 模型。
+
+- 2026-09-09 21:00 首次多 lane 补丁因匹配到更早的通用 `for index, logical` 片段，误把 lane 枚举插进 `_refine_joint_coordinates`，公开 CLI 立即以 `NameError: indegree` 失败；旧 SVG 被后续 Oracle 读取但不计新验证。已删除错误插入并在边界 owner 的 `base_visible` 邻域精确落位；该事故证明宽泛补丁上下文会使新指标覆盖无关 owner，纳入后续变更归属 mutant。
+
+- 2026-09-09 20:56 改用异网终态重叠门后仍有 4 个 witness，说明并非同网误计：多个不同根若都占用同一最外 lane，会形成新的异网共线，生产门正确拒绝，而逐边 Oracle 的局部交互未暴露整批 lane 竞争。边界 owner 现为每个方向枚举按可见净空分隔的多条外侧通道，候选数量由实际多扇出根数决定；仍以全图异网重叠为零退化门，不能通过关闭指标放行。
+
+- 2026-09-09 20:52 首轮 023 修复将 1546 次 crossing 降到 1343，但仍有 4 个可支配入口。选择报告显示 3 次接受、其余主要被 `ambiguous_overlaps` 阻断；该指标把同一逻辑根在外侧 lane 上形成共享 backbone 的重合也当成错误，和用户要求“一根主干、多支线”冲突。终态接受门改用已有 raw edge/net owner + 四位序列化精度的异网重叠计数；同网共线由后续树规范化合并为合法共享主干。
+
+- 2026-09-09 20:48 边界 backbone owner 已接入真实序列化前的最后路由闭包；其后再次执行同网 fanout 树规范化，并以四位可见精度异网重叠不得增加作为接受门，避免用减少交叉换取 split-rejoin 或不同网络共线。下一步用 136 节点原始红图复验 023 直接 witness 必须消失。
+
+- 2026-09-09 20:46 022 当前公开输出已从 1 个设施变为 2 个同名设施，29 显示节点、22 折、9016.4649px，独立 022 Oracle 转绿。023 仍命中，因此新增通用边界走廊 owner：对任意零入度多消费者根的至少四折支路，同时枚举完整组件包络上/下外侧 backbone；固定真实端口和两端既有竖向通道，只接受节点/可见框/端点/方向/异网重叠/折点全不退化且交叉点—事件词典序严格下降的候选。每次全局选最优并重建候选，严格下降保证有限终止。
+
+- 2026-09-09 20:42 首轮产品输出仍与基线哈希完全相同；定位到更上层的 `ROOTS_USE_FIRST_RANK=True` 全局开关使两个设施分区 owner 对所有根无条件早退，前一步撤销类型排除仍无法执行。该开关违背用户已澄清的条件合同（只有不增加交叉/碰撞等时才优先首列），现删除绝对开关；首列偏好仍由终态 `_restore_safe_roots_to_first_column` 的全图不退化事务单独负责。
+
+- 2026-09-09 20:39 首个产品修复撤销设施分区、局部行拆分和设施走廊三个 owner 对公共 from、规则数组、直入 mux 阵列的绝对排除；所有零入度多消费者根都由同一真实设施周长 + 全图碰撞/重叠/交叉/折点/线长支配门裁决。同步修正 022 单测断言被误放进 023 clean-control 的测试归属缺陷；两项状态进入 fix_in_progress。
+
+- 2026-09-09 20:36 最终复现批次 `20260909T104911Z-e5b47fa2` 对 022/023 各经公共 CLI 双跑，`missing_issues=[]`；022 哈希稳定 FB132936…C854F，023 稳定 0754A646…93271，语义前提与直接症状均为真。solve precondition 现对 19 项账本 PASS，生产 owner 正式解冻；此前 20:33 半绿批次不作为完成证据。
+
+- 2026-09-09 20:34 022 语义合同已去除独立报告中不存在的冗余 target 约束，仍严格要求输入中 `shared_source` 为真实零入度 `from`、至少双扇出，且最终 SVG 出现该根的设施分区支配 witness；这保留了问题身份而不依赖 Oracle 未承诺的字段。
+
+- 2026-09-09 20:33 首次正式 022/023 runner 到达两项公共入口并各双跑；023 收据直接 reproduced，022 的 Oracle issue 已真实命中但语义 wrapper 返回 false，原因是合同要求 `target=fanout_hub`，而设施分区 witness 以 `edge_id` 表示被拆分边、没有重复输出 target 字段。该轮 `missing_issues=[FB-ROOT-022]`，不计完整成功；修正合同为根身份 + 直接 witness 后必须从头双跑。
+
+- 2026-09-09 20:31 正式语义层新增两种通用直接判据：远距根设施分区支配 witness、公共根过早内部干线入口 witness；evidence corpus 增加冻结当前 worktree 的两项公共 CLI 正例，每项双跑并绑定真实零入度 `from`、指定根身份和直接终态 witness。紧凑/线性 clean control 继续由独立单测承担，不再错误声明为“必须复现症状”的正向 variant。
+
+- 2026-09-09 20:29 首次生产补丁被强制 precondition 拒绝，原因不是复现缺失，而是新 022/023 账本仍缺正式 receipt 路径、022 producer/oracle 输入不一致，且三个中间尝试错误使用 `reproduction_in_progress` 作为 attempt result。现已统一为真实 `reproduction_blocked`、修正输入血缘并声明正向语义 variant；一次工具脚本误调用不存在的 `pencils()` 在执行前失败，无文件影响。接下来先通过正式 many-to-many runner 签发双跑收据，门未绿前继续禁止修改 `src/**`。
+
+- 2026-09-09 20:25 `FB-ROUTE-023` 精确自然红灯成立：小于 512 节点的 136 节点复杂组合中，真实 `from` 根的行间提前入口被整体底部边界候选严格支配；双跑 SHA-256 均为 `0754A64690E632C2564E60C651FC6B4B7978BFA0B00AFADF9763D041D1493271`。最强同一路线交叉事件 51→22、可见点 25→6，折点 4→4、重叠 0→0；另有 54→33、23→16 同根 witness，第 24 号 clean control 不命中。一次末尾 pytest 节点名误拼导致“no tests ran”，不影响双跑与 Oracle；测试引用已改为静态精确 from 夹具，待重新执行。022/023 均已 reproduced，生产 owner 现可进入修复阶段。
+
+- 2026-09-09 20:23 有界组合搜索完成：在 06 号 18 个 kind×声明顺序组合中找到 `source/from + reversed` 的精确 from 红灯，但仅减少 1 次交叉；进一步在 13 号 8 个“单 from 根×正常/反序声明”复杂组合中全部搜索，找到多个真实 from 大幅红灯。选定 root-0 正序最小语义变体：同一 `from` 根的内部四折分支分别可由 51→22、54→33、36→16 次交叉，首项可见交叉点 25→6，折点不增加。正式 023 输入改为该低于 512 节点的复杂拓扑，避免以弱近似样例替代用户所述“大量交叉”。
+
+- 2026-09-09 20:20 第二次角色变体 01966415…91B1 双跑稳定，但 `from` 图形高度改变整体排布后，直接 witness 又转移到仍为 source 的 `aux_source→mux_d001`；因此依然不能签为精确 public-from 红灯。复现夹具现将两个高复用零入度根都设为 `from`，避免通过名称追逐 witness；后续只按拓扑 fanout、真实 kind 与终态路线签收。
+
+- 2026-09-09 20:18 首个精确 `public_from` 变体把第 06 号的错误根换成了另一逻辑根，终态虽然 89DDF2AA…E04B 双跑稳定且 023 命中，但实际边界 witness 属于未改名的 `xtal_0→mux_d002`，不能冒充 public from。夹具已改为保持同一拓扑角色：原 `xtal_0` 改为 `public_from_primary/from`、另一根改为 `aux_source/source`；等待重新自然双跑。一次只读分析 here-doc 误调用 `analyze` 缺少 svg 参数而退出 1，随后两次工具 JavaScript 构造也在命令启动前语法失败；均没有生成或修改产品产物，不计复现轮次。
+
+- 2026-09-09 20:17 023 初次公开双跑候选 4/4 聚焦校准通过：第 06 号中 `xtal_1→mux_d001` 当前四折路线从行间进入后再下降，底部包络走廊反事实将异网交叉事件 6 降到 4、折点保持 4、重叠保持 0；两次原始 SVG 哈希同为 `2D7FEC6A...B6313F`。为严格覆盖用户所述公共 `from` 而非近似 source，新增同拓扑、只把该逻辑根改为 `public_from/from` 的正式复现输入；必须重新双跑并由同一 Oracle 命中后才推进 reproduced。
+
+- 2026-09-09 20:15 新增生产独立 `premature_interior_trunk_entry_witnesses`：只对零入度复用根的至少四折路线枚举整图组件包络上/下边界走廊，保持既有源侧/目标侧通道和端口不变；仅当节点净空成立、异网重叠与折点不增加、可见交叉点/事件严格减少时判错。第 06 号现有公开输入作为自然候选，第 24 号作为无内部入口的负校准；该指标加入统一全图注册表，因此不是测试用例自行挑选。
+
+- 2026-09-09 20:12 `FB-ROOT-022` 自然红灯成立：原始双跑均命中 `shared_source→fanout_hub`，单边由 731.4245px/2 折可降至 15.75px/0 折，完整根网显示成本 1189.4245 降至 795.32，交叉/重叠保持 0；01-linear 单路负例不命中。系统 Python 3.13 没有 pytest，首次 `py -3 -m pytest` 退出 1；只读发现现成 Anaconda pytest 后同两项聚焦测试 2/2 通过。另一次工具 JavaScript 参数误写为 `30000ls` 在命令启动前语法失败，不计产品运行。022 已推进 reproduced；023 仍在复现，故 `src/**` 继续冻结。
+
+- 2026-09-09 20:10 修正独立远距设施 Oracle：删除“单边至少四折”和“根不在第一列才允许拆分”的历史错误前提，改为比较同一逻辑根全部路线的正交线段并集、真实可视设施周长、全图交叉/重叠/碰撞与折点；共享主干仍被其它边使用的部分不会虚假计入拆分收益。新增第 24 号公开终态正校准与线性单路负校准，并为 022 增加独立 issue 映射。两次误用目标校验器参数（不存在的 `--project-root`、把旧目标乱码标题送入新校验器）均是命令接口错误，不计产品测试；新目标已用正确单文件参数验证通过。
+
+- 2026-09-09 20:08 已用 Windows `py -3` 成功到达公开 CLI，对既有 `24-single-source-rendering-alias.json` 连续生成两次未修改 SVG；两次 SHA-256 均为 `FB132936EFC82E322396562DEBA6C9259B58A461F2E9CD7DF74B6F58AC4C854F`。终态为 28 个逻辑/物理节点、28 边、0 交叉、0 重叠、24 折点；`shared_source` 仅 1 个设施，其直接根网约 963.5145px/2 折，远端扇出网络约 7079.1849px/22 折。现有 `root_facility_split_witnesses` 返回空，说明它只检查单条至少四折边，漏掉“单根两条直接边 + 远端辅助扇出消费带”的完整设施分区；本轮只签收为稳定自然产物与 Oracle escape，尚不把 022 提升为 reproduced，也不解冻 `src/**`。
+- 2026-09-09 20:08 本轮联网核验得到可直接落地的成熟模型：yFiles BusRouter 把同一 bus ID 的边压成无环正交树，先选长 backbone、再接短 bus connections，并按整体收益丢弃低收益 backbone；ELK 以 edge sections 与 junction points 表示共享分叉，且其分层流水线明确把 crossing minimization、node placement、edge routing 分阶段；NIST 资料强调 requirements traceability、冲突需求计数和终身维护回归用例。Find Skills 对正交图路由只返回泛化程度不足的候选，未安装第三方 skill，继续把成熟做法沉淀到现有布局/质量元 Skill。
+
+- 2026-09-09 20:06 第二次入口尝试以 `Resolve-Path .venv\\Scripts\\python.exe` 退出 1，证实仓库当前没有该虚拟环境；仍未到达产品入口，不计自然复现。连续两次解释器发现错误升级为活跃执行反例，后续先用 `Get-Command python`/项目导航只读发现，再将“解释器存在且可执行”作为复现 runner 的前置门。
+
+- 2026-09-09 20:04 选定公开第 24 号“single-source-rendering-alias”作为 `FB-ROOT-022` 第一轮自然输入；首次命令把 `.venv\\Scripts\\python.exe` 存入变量后由 PowerShell 误按模块解析，退出 1，产品入口未到达，因此分类为 operational error，不计自然复现或 clean。下一次改用 `Resolve-Path` 得到绝对可执行文件路径。
+
+- 2026-09-09 20:02 新目标文件补齐结构校验所需的成功证据：仅证明问题 ID、冻结提交与 `src/**` 未改，不提升为产品成功。该笔账本更新已同步 INDEX。
+
+- 2026-09-09 20:00 用户重新打开两项布局反馈：远距分离消费者未按完整几何收益拆分同名根设施，以及公共根主干在中部过早进入行间后向下贯穿造成大量交叉。已登记 `FB-ROOT-022`、`FB-ROUTE-023`，冻结发布提交 `33cceec`；同时确认旧要求分散、用户根规则冲突和历史指标集合无单调性校验，当前阶段仅允许复现/Oracle/账本修改。
 
 - 2026-09-09 19:55 修复提交 `4b53e4c` 已推送；GitHub Release run `34322535594` 全绿。Ubuntu 16.04 冻结构建、解压后 dependency-free 完整示例（含自然/强制第一列反事实）、离线源码部署、GNOME librsvg、发布以及下载已发布归档后的再次 smoke 均成功。滚动 tag `v1.0.0^{}` 指向 `4b53e4c`，归档 `drawclock-1.0.0-linux.tar.gz` 为 17,189,432 bytes，SHA-256 `49c24d52de8befe2a56f87dfe0705732a31f25026ad9a0de7242a9ff894b1388`。本专题完成。
 

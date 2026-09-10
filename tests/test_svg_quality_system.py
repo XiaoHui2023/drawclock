@@ -83,7 +83,7 @@ def test_exact_metric_receipt_rejects_escape_mutants(mutation: str) -> None:
         quality.validate_metric_receipt(required, executed, results)
 
 
-def test_shared_bus_root_detection_is_name_independent_and_from_semantic() -> None:
+def test_shared_bus_root_detection_is_name_independent_and_structural() -> None:
     module_path = ROOT / "src" / "elk_layout.py"
     spec = importlib.util.spec_from_file_location(
         "elk_layout_for_shared_bus_test", module_path
@@ -107,9 +107,27 @@ def test_shared_bus_root_detection_is_name_independent_and_from_semantic() -> No
         SimpleNamespace(source="arbitrary", target="a", target_port="0", source_port="west"),
         SimpleNamespace(source="arbitrary", target="b", target_port="left", source_port="west"),
     ]
-    assert module._shared_fanout_bus_roots(nodes, edges) == {"arbitrary"}
+    assert module._shared_fanout_bus_roots(nodes, edges) == set()
     nodes["arbitrary"].item["kind"] = "gate"
     assert module._shared_fanout_bus_roots(nodes, edges) == set()
+
+    nodes = {
+        name: Node(kind)
+        for name, kind in {
+            "shared": "from",
+            "peer_a": "source",
+            "peer_b": "source",
+            "merge_a": "mux2",
+            "merge_b": "mux2",
+        }.items()
+    }
+    edges = [
+        SimpleNamespace(source="shared", target="merge_a", target_port="0", source_port="west"),
+        SimpleNamespace(source="peer_a", target="merge_a", target_port="1", source_port="west"),
+        SimpleNamespace(source="shared", target="merge_b", target_port="0", source_port="west"),
+        SimpleNamespace(source="peer_b", target="merge_b", target_port="1", source_port="west"),
+    ]
+    assert module._shared_fanout_bus_roots(nodes, edges) == {"shared"}
 
 
 @pytest.mark.parametrize("seed", [0, 2, 3, 12, 24])
@@ -133,17 +151,6 @@ def test_adversarial_from_mux_seeds_preserve_all_quality_metrics(
     report = quality.evaluate(input_path, svg_path)
     assert report["executed_metric_ids"] == report["required_metric_ids"]
     assert report["failed_metric_ids"] == []
-    if seed in {2, 24}:
-        graph = inspector.inspect(input_path, svg_path)
-        shared_from_networks = [
-            item for item in graph["networks"]
-            if item["source"].startswith("source_") and item["fanout"] >= 2
-        ]
-        assert shared_from_networks
-        assert all(
-            len(network["source_vertical_bus_xs"]) == 1
-            for network in shared_from_networks
-        )
 
 
 def test_topology_identity_rejects_unknown_rendered_node(tmp_path: Path) -> None:

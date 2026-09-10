@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "corpus_id": "merged:merged:merged:merged:merged:merged:merged:merged:merged:20260907T014732Z-ff0a4ce1+20260907T085940Z-f059a5ec+20260908T030927Z-8159ddf2+20260908T031721Z-6bc9d000+20260908T073913Z-51fb01e3+20260908T103521Z-73e55677+20260908T103837Z-5adce6c1+20260908T104123Z-ecee64b0+20260908T110042Z-f2b3e73f+20260908T113039Z-2d1afbd6",
+  "corpus_id": "merged:merged:merged:merged:merged:merged:merged:merged:merged:merged:merged:merged:merged:merged:merged:merged:20260907T014732Z-ff0a4ce1+20260907T085940Z-f059a5ec+20260908T030927Z-8159ddf2+20260908T031721Z-6bc9d000+20260908T073913Z-51fb01e3+20260908T103521Z-73e55677+20260908T103837Z-5adce6c1+20260908T104123Z-ecee64b0+20260908T110042Z-f2b3e73f+20260908T113039Z-2d1afbd6+20260909T155754Z-2b5e015e+20260909T160052Z-8f1ea98c+20260909T162325Z-a7161efb+20260909T162952Z-08484bc0+20260909T163651Z-da62029c+20260909T164337Z-bc91b84b+20260909T165510Z-17bd851b",
   "coverage_model": "many_to_many",
   "cases": [
     {
@@ -430,126 +430,6 @@
       }
     },
     {
-      "case_id": "public-from-split-rejoin-baseline",
-      "attempt": 1,
-      "detected_issues": [
-        "FB-ROOT-001",
-        "FB-ROUTE-002",
-        "FB-ROOT-003",
-        "FB-ROOT-004",
-        "FB-ROUTE-009",
-        "FB-ROOT-010"
-      ],
-      "totals": {
-        "logical_nodes": 43,
-        "rendered_nodes": 43,
-        "logical_edges": 48,
-        "rendered_edges": 48,
-        "proper_crossing_events": 107,
-        "distinct_crossing_points": 48,
-        "different_net_overlaps": 0,
-        "bends": 44,
-        "manhattan_length_px": 13288.2144
-      }
-    },
-    {
-      "case_id": "public-from-split-rejoin-baseline",
-      "attempt": 2,
-      "detected_issues": [
-        "FB-ROOT-001",
-        "FB-ROUTE-002",
-        "FB-ROOT-003",
-        "FB-ROOT-004",
-        "FB-ROUTE-009",
-        "FB-ROOT-010"
-      ],
-      "totals": {
-        "logical_nodes": 43,
-        "rendered_nodes": 43,
-        "logical_edges": 48,
-        "rendered_edges": 48,
-        "proper_crossing_events": 107,
-        "distinct_crossing_points": 48,
-        "different_net_overlaps": 0,
-        "bends": 44,
-        "manhattan_length_px": 13288.2144
-      }
-    },
-    {
-      "case_id": "direct-source-mux-column-baseline",
-      "attempt": 1,
-      "detected_issues": [
-        "FB-ROOT-020"
-      ],
-      "totals": {
-        "logical_nodes": 15,
-        "rendered_nodes": 17,
-        "logical_edges": 14,
-        "rendered_edges": 14,
-        "proper_crossing_events": 0,
-        "distinct_crossing_points": 0,
-        "different_net_overlaps": 0,
-        "bends": 2,
-        "manhattan_length_px": 2207.5241
-      }
-    },
-    {
-      "case_id": "direct-source-mux-column-baseline",
-      "attempt": 2,
-      "detected_issues": [
-        "FB-ROOT-020"
-      ],
-      "totals": {
-        "logical_nodes": 15,
-        "rendered_nodes": 17,
-        "logical_edges": 14,
-        "rendered_edges": 14,
-        "proper_crossing_events": 0,
-        "distinct_crossing_points": 0,
-        "different_net_overlaps": 0,
-        "bends": 2,
-        "manhattan_length_px": 2207.5241
-      }
-    },
-    {
-      "case_id": "direct-from-mux-column-baseline",
-      "attempt": 1,
-      "detected_issues": [
-        "FB-ROOT-016",
-        "FB-ROOT-020"
-      ],
-      "totals": {
-        "logical_nodes": 15,
-        "rendered_nodes": 17,
-        "logical_edges": 14,
-        "rendered_edges": 14,
-        "proper_crossing_events": 0,
-        "distinct_crossing_points": 0,
-        "different_net_overlaps": 0,
-        "bends": 2,
-        "manhattan_length_px": 2028.1544
-      }
-    },
-    {
-      "case_id": "direct-from-mux-column-baseline",
-      "attempt": 2,
-      "detected_issues": [
-        "FB-ROOT-016",
-        "FB-ROOT-020"
-      ],
-      "totals": {
-        "logical_nodes": 15,
-        "rendered_nodes": 17,
-        "logical_edges": 14,
-        "rendered_edges": 14,
-        "proper_crossing_events": 0,
-        "distinct_crossing_points": 0,
-        "different_net_overlaps": 0,
-        "bends": 2,
-        "manhattan_length_px": 2028.1544
-      }
-    },
-    {
       "case_id": "arbitrary-direct-root-pad-column-baseline",
       "attempt": 1,
       "detected_issues": [
@@ -583,6 +463,246 @@
         "different_net_overlaps": 0,
         "bends": 14,
         "manhattan_length_px": 8367.9526
+      }
+    },
+    {
+      "case_id": "distant-root-two-bands-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROUTE-009",
+        "FB-ROOT-022"
+      ],
+      "totals": {
+        "logical_nodes": 28,
+        "rendered_nodes": 28,
+        "logical_edges": 28,
+        "rendered_edges": 28,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 24,
+        "manhattan_length_px": 9651.4594
+      }
+    },
+    {
+      "case_id": "distant-root-two-bands-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROUTE-009",
+        "FB-ROOT-022"
+      ],
+      "totals": {
+        "logical_nodes": 28,
+        "rendered_nodes": 28,
+        "logical_edges": 28,
+        "rendered_edges": 28,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 24,
+        "manhattan_length_px": 9651.4594
+      }
+    },
+    {
+      "case_id": "premature-interior-trunk-entry-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROUTE-023"
+      ],
+      "totals": {
+        "logical_nodes": 136,
+        "rendered_nodes": 136,
+        "logical_edges": 196,
+        "rendered_edges": 196,
+        "proper_crossing_events": 1546,
+        "distinct_crossing_points": 492,
+        "different_net_overlaps": 0,
+        "bends": 252,
+        "manhattan_length_px": 232838.325
+      }
+    },
+    {
+      "case_id": "premature-interior-trunk-entry-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROUTE-023"
+      ],
+      "totals": {
+        "logical_nodes": 136,
+        "rendered_nodes": 136,
+        "logical_edges": 196,
+        "rendered_edges": 196,
+        "proper_crossing_events": 1546,
+        "distinct_crossing_points": 492,
+        "different_net_overlaps": 0,
+        "bends": 252,
+        "manhattan_length_px": 232838.325
+      }
+    },
+    {
+      "case_id": "public-from-split-rejoin-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-001",
+        "FB-ROUTE-002",
+        "FB-ROOT-003",
+        "FB-ROOT-004",
+        "FB-ROOT-010"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 43,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 105,
+        "distinct_crossing_points": 46,
+        "different_net_overlaps": 0,
+        "bends": 44,
+        "manhattan_length_px": 13288.2144
+      }
+    },
+    {
+      "case_id": "public-from-split-rejoin-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-001",
+        "FB-ROUTE-002",
+        "FB-ROOT-003",
+        "FB-ROOT-004",
+        "FB-ROOT-010"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 43,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 105,
+        "distinct_crossing_points": 46,
+        "different_net_overlaps": 0,
+        "bends": 44,
+        "manhattan_length_px": 13288.2144
+      }
+    },
+    {
+      "case_id": "public-from-dispersed-bus-current-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROOT-016",
+        "FB-ROOT-021"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 56,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 0,
+        "manhattan_length_px": 4972.08
+      }
+    },
+    {
+      "case_id": "public-from-dispersed-bus-current-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROOT-016",
+        "FB-ROOT-021"
+      ],
+      "totals": {
+        "logical_nodes": 43,
+        "rendered_nodes": 56,
+        "logical_edges": 48,
+        "rendered_edges": 48,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 0,
+        "manhattan_length_px": 4972.08
+      }
+    },
+    {
+      "case_id": "direct-source-mux-column-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROUTE-009",
+        "FB-ROOT-020",
+        "FB-ROOT-021",
+        "FB-ROOT-022"
+      ],
+      "totals": {
+        "logical_nodes": 15,
+        "rendered_nodes": 17,
+        "logical_edges": 14,
+        "rendered_edges": 14,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 2,
+        "manhattan_length_px": 2207.5241
+      }
+    },
+    {
+      "case_id": "direct-source-mux-column-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROUTE-009",
+        "FB-ROOT-020",
+        "FB-ROOT-021",
+        "FB-ROOT-022"
+      ],
+      "totals": {
+        "logical_nodes": 15,
+        "rendered_nodes": 17,
+        "logical_edges": 14,
+        "rendered_edges": 14,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 2,
+        "manhattan_length_px": 2207.5241
+      }
+    },
+    {
+      "case_id": "direct-from-mux-column-baseline",
+      "attempt": 1,
+      "detected_issues": [
+        "FB-ROUTE-009",
+        "FB-ROOT-020",
+        "FB-ROOT-021",
+        "FB-ROOT-022"
+      ],
+      "totals": {
+        "logical_nodes": 15,
+        "rendered_nodes": 17,
+        "logical_edges": 14,
+        "rendered_edges": 14,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 2,
+        "manhattan_length_px": 2028.1544
+      }
+    },
+    {
+      "case_id": "direct-from-mux-column-baseline",
+      "attempt": 2,
+      "detected_issues": [
+        "FB-ROUTE-009",
+        "FB-ROOT-020",
+        "FB-ROOT-021",
+        "FB-ROOT-022"
+      ],
+      "totals": {
+        "logical_nodes": 15,
+        "rendered_nodes": 17,
+        "logical_edges": 14,
+        "rendered_edges": 14,
+        "proper_crossing_events": 0,
+        "distinct_crossing_points": 0,
+        "different_net_overlaps": 0,
+        "bends": 2,
+        "manhattan_length_px": 2028.1544
       }
     }
   ],
@@ -601,9 +721,11 @@
     "FB-ROOT-015": 2,
     "FB-ROOT-016": 4,
     "FB-ROOT-020": 4,
-    "FB-ROOT-021": 2,
+    "FB-ROOT-021": 8,
+    "FB-ROOT-022": 6,
     "FB-ROUTE-002": 4,
-    "FB-ROUTE-009": 6
+    "FB-ROUTE-009": 10,
+    "FB-ROUTE-023": 2
   },
   "missing_issues": []
 }

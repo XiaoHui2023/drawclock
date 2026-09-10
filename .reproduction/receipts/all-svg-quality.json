@@ -38,7 +38,8 @@
     "root_facility_column_lag",
     "downstream_corridor_tail_bend",
     "adjacent_root_height_bend",
-    "mergeable_root_facility"
+    "mergeable_root_facility",
+    "premature_interior_trunk_entry"
   ],
   "metric_execution_failures": [],
   "batch_failures": [],
@@ -76,7 +77,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -102,7 +104,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -245,6 +248,12 @@
         },
         {
           "metric_id": "mergeable_root_facility",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
@@ -285,7 +294,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -311,7 +321,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -457,6 +468,12 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -494,7 +511,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -520,7 +538,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -666,6 +685,12 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -703,7 +728,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -729,7 +755,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -875,6 +902,12 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -912,7 +945,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -938,7 +972,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -1084,6 +1119,12 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1091,9 +1132,9 @@
     {
       "input": "06-simple-16-clocks.json",
       "producer_exit": 0,
-      "sha256": "8233d6f1dea8da550ac2f42ca812b486483dfa757ee0a5ea992f4c0c2c38786a",
-      "crossings": 27,
-      "bends": 68,
+      "sha256": "b8bfaf91e73026919c5ea707a18c6680a141ec1e8c1bfaed49d9f19cb7be8bcf",
+      "crossings": 25,
+      "bends": 64,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -1121,7 +1162,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1147,7 +1189,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -1293,6 +1336,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=2",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=2",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1300,9 +1349,9 @@
     {
       "input": "07-medium-64-clocks.json",
       "producer_exit": 0,
-      "sha256": "faec2f624027cf301a72e79a6629a7466fd466a6cf28067081b60da19988a760",
-      "crossings": 291,
-      "bends": 230,
+      "sha256": "96c8156d99ec0e21299c7f1336b4650f49d422a928a24aa8c887b02b02b1b26f",
+      "crossings": 169,
+      "bends": 216,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -1330,7 +1379,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1356,7 +1406,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -1499,6 +1550,12 @@
         },
         {
           "metric_id": "mergeable_root_facility",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=2",
+          "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
           "status": "pass",
           "applicability_proof": "root_fanouts=2",
           "witnesses": []
@@ -1509,9 +1566,9 @@
     {
       "input": "12-dual-from-reuse.json",
       "producer_exit": 0,
-      "sha256": "2f85be0c6ac95a655ca345c4eacbe84ecbffd68d098014398befa7d046fba63b",
-      "crossings": 192,
-      "bends": 60,
+      "sha256": "3af4c04a13a6be602ab4d84eb5d7edd51c09a8cba730fd358b3458e4847c5021",
+      "crossings": 0,
+      "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -1539,7 +1596,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1565,7 +1623,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -1711,6 +1770,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=2",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=2",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1718,8 +1783,8 @@
     {
       "input": "13-label-clearance-weave.json",
       "producer_exit": 0,
-      "sha256": "f07be7a0823db13dc6a37821119621eaf4af74b2f483631849d4aaaa51363998",
-      "crossings": 1563,
+      "sha256": "5bb6eaa3ddcd4c90f617ac6c6b6a47a2a8ecdb4e9722624407822f6d7d01dd58",
+      "crossings": 1428,
       "bends": 252,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
@@ -1748,7 +1813,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1774,7 +1840,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -1920,6 +1987,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=4",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=4",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1927,9 +2000,9 @@
     {
       "input": "16-multi-from-clusters.json",
       "producer_exit": 0,
-      "sha256": "d7ad5a06aa170f6fccd67c89239b8e58314cd59637a54c57e18de4f8e8cd292b",
-      "crossings": 276,
-      "bends": 88,
+      "sha256": "0abdaebd5e6fffc1ab9c079c3eb153ef102009b8db23778d63514222cde9872b",
+      "crossings": 0,
+      "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -1957,7 +2030,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1983,7 +2057,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -2129,6 +2204,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=4",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=4",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2166,7 +2247,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2192,7 +2274,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -2338,6 +2421,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=1",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2345,9 +2434,9 @@
     {
       "input": "18-asymmetric-merge-columns.json",
       "producer_exit": 0,
-      "sha256": "28dc71156fa609a679cb179e377efa1514e63206ee1d5890f843b92b902d3f82",
-      "crossings": 48,
-      "bends": 28,
+      "sha256": "9e6e0974bd60d9e4522034e36beb7dbaef29033de7fa81081ba25b70706ea634",
+      "crossings": 0,
+      "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -2375,7 +2464,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2401,7 +2491,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -2547,6 +2638,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=2",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=2",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2554,9 +2651,9 @@
     {
       "input": "19-dispersed-root-fanout.json",
       "producer_exit": 0,
-      "sha256": "faeb605633a5911550fcf5c4786b701a718d70e253edca0d1255356168acf13b",
-      "crossings": 908,
-      "bends": 128,
+      "sha256": "3bb1efc9ecce15c8469214948bc7e5bc510f51bf8dd11457fcc5df3df8600043",
+      "crossings": 710,
+      "bends": 122,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -2584,7 +2681,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2610,7 +2708,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -2756,6 +2855,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=8",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=8",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2793,7 +2898,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2819,7 +2925,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -2965,6 +3072,12 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2972,9 +3085,9 @@
     {
       "input": "21-layout-column-preference.json",
       "producer_exit": 0,
-      "sha256": "7cb7a213c6c950590710116aac282083cbdbc9b63b5e56f71c987e330a74acaa",
-      "crossings": 2,
-      "bends": 6,
+      "sha256": "001e23c2fa8111f36bd33654d7efd88d1e449fe38b53650a02ede7e7fd469b2c",
+      "crossings": 0,
+      "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -3002,7 +3115,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3028,7 +3142,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -3174,6 +3289,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=1",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3211,7 +3332,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3237,7 +3359,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -3383,6 +3506,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=1",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3420,7 +3549,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3446,7 +3576,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -3592,6 +3723,12 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3599,9 +3736,9 @@
     {
       "input": "24-single-source-rendering-alias.json",
       "producer_exit": 0,
-      "sha256": "fb132936efc82e322396562deba6c9259b58a461f2e9cd7df74b6f58ac4c854f",
+      "sha256": "c759018b9ee69280a4dedc06201cf914a1237b0a04a88a3148dc7b561f7fc0de",
       "crossings": 0,
-      "bends": 24,
+      "bends": 22,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -3629,7 +3766,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3655,7 +3793,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -3801,6 +3940,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=1",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3838,7 +3983,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3864,7 +4010,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -4010,6 +4157,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=3",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=3",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4017,9 +4170,9 @@
     {
       "input": "26-feedback-reproduction-combined.json",
       "producer_exit": 0,
-      "sha256": "fbe22dd537ddedfc15e9bba82f721bd9e2229ba6596e4b25121ded239a43b63a",
-      "crossings": 78,
-      "bends": 66,
+      "sha256": "470205442c1196e413899aa32e3fecb4aad9d82ae820b232e920262a64731be1",
+      "crossings": 1,
+      "bends": 16,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -4047,7 +4200,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4073,7 +4227,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -4219,6 +4374,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=6",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=6",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4256,7 +4417,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4282,7 +4444,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -4425,6 +4588,12 @@
         },
         {
           "metric_id": "mergeable_root_facility",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
@@ -4465,7 +4634,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4491,7 +4661,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -4637,6 +4808,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=1",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4674,7 +4851,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4700,7 +4878,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -4846,6 +5025,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=1",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4853,9 +5038,9 @@
     {
       "input": "30-staggered-four-source-mux.json",
       "producer_exit": 0,
-      "sha256": "fe2f098a93131c8ebe9782815fd49c4a607491ab2e9351999f05816863202e8c",
-      "crossings": 2,
-      "bends": 6,
+      "sha256": "47c9ddb2251e429a4e5bf59fe73cf6ecf0a86d069d32b39ffd9a4bcdc0f46b6b",
+      "crossings": 0,
+      "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -4883,7 +5068,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4909,7 +5095,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -5055,6 +5242,12 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=3",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "pass",
+          "applicability_proof": "root_fanouts=3",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -5094,7 +5287,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -5120,7 +5314,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -5293,6 +5488,12 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -5337,7 +5538,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -5363,7 +5565,8 @@
         "root_facility_column_lag",
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
-        "mergeable_root_facility"
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry"
       ],
       "metric_results": [
         {
@@ -5547,6 +5750,12 @@
         },
         {
           "metric_id": "mergeable_root_facility",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []

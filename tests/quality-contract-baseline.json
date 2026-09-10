@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "policy": "Append-only protected requirements and metric definitions. Any removal, rename, narrowing, or semantic change requires an explicit user-visible conflict record and baseline review.",
+  "contracts": [
+    {"requirement_id": "QA-TOPOLOGY-001", "metric_id": "topology_identity", "witness": null, "applicability": "always"},
+    {"requirement_id": "QA-ROUTE-001", "metric_id": "orthogonal_segments", "witness": null, "applicability": "has_edges"},
+    {"requirement_id": "QA-ROUTE-002", "metric_id": "crossing_treatment", "witness": null, "applicability": "has_edges"},
+    {"requirement_id": "QA-ROUTE-003", "metric_id": "different_net_overlap", "witness": "overlaps", "applicability": "has_edges"},
+    {"requirement_id": "QA-BUS-001", "metric_id": "split_rejoin", "witness": "split_rejoin_roots", "applicability": "has_root_fanout"},
+    {"requirement_id": "QA-BEND-001", "metric_id": "avoidable_bends", "witness": "avoidable_bend_edges", "applicability": "has_edges"},
+    {"requirement_id": "QA-PORT-001", "metric_id": "port_order", "witness": "port_order_inversions", "applicability": "has_merge"},
+    {"requirement_id": "QA-ROOT-001", "metric_id": "root_fanout_axis_dominance", "witness": "root_fanout_axis_dominance_witnesses", "applicability": "has_root_fanout"},
+    {"requirement_id": "QA-ROOT-002", "metric_id": "direct_root_mux_column", "witness": "direct_root_fanin_column_witnesses", "applicability": "has_direct_root_mux_array"},
+    {"requirement_id": "QA-ROOT-003", "metric_id": "feasible_direct_root_fanin_column", "witness": "feasible_direct_root_fanin_column_witnesses", "applicability": "has_direct_root_fanin"},
+    {"requirement_id": "QA-ROOT-004", "metric_id": "root_first_column", "witness": "root_first_column_witnesses", "applicability": "has_roots"},
+    {"requirement_id": "QA-BUS-002", "metric_id": "regular_array_single_facility", "witness": "regular_fanout_array_replication_witnesses", "applicability": "has_root_fanout"},
+    {"requirement_id": "QA-BUS-003", "metric_id": "shared_root_single_bus", "witness": "shared_root_bus_fragmentation_witnesses", "applicability": "has_root_fanout"},
+    {"requirement_id": "QA-TEXT-001", "metric_id": "annotation_geometry", "witness": "annotation_quality", "applicability": "has_annotations"},
+    {"requirement_id": "QA-ROOT-005", "metric_id": "mixed_root_quality", "witness": "mixed_root_quality_failures", "applicability": "has_roots"},
+    {"requirement_id": "QA-ROOT-006", "metric_id": "public_root_crossing", "witness": "public_root_crossings", "applicability": "has_roots"},
+    {"requirement_id": "QA-ROOT-007", "metric_id": "root_relocation_dominance", "witness": "root_relocation_witnesses", "applicability": "has_roots"},
+    {"requirement_id": "QA-FACILITY-001", "metric_id": "root_facility_split_dominance", "witness": "root_facility_split_witnesses", "applicability": "has_root_fanout"},
+    {"requirement_id": "QA-FACILITY-002", "metric_id": "physical_anchor_relocation", "witness": "physical_anchor_relocation_witnesses", "applicability": "has_roots"},
+    {"requirement_id": "QA-FACILITY-003", "metric_id": "vertical_root_facility_bend", "witness": "vertical_root_facility_bend_witnesses", "applicability": "has_roots"},
+    {"requirement_id": "QA-FACILITY-004", "metric_id": "root_facility_column_lag", "witness": "root_facility_column_lag_witnesses", "applicability": "has_roots"},
+    {"requirement_id": "QA-CORRIDOR-002", "metric_id": "downstream_corridor_tail_bend", "witness": "downstream_corridor_tail_bend_witnesses", "applicability": "has_edges"},
+    {"requirement_id": "QA-ROOT-008", "metric_id": "adjacent_root_height_bend", "witness": "adjacent_root_height_bend_witnesses", "applicability": "has_roots"},
+    {"requirement_id": "QA-FACILITY-005", "metric_id": "mergeable_root_facility", "witness": "mergeable_root_facility_witnesses", "applicability": "has_root_fanout"},
+    {"requirement_id": "QA-CORRIDOR-001", "metric_id": "premature_interior_trunk_entry", "witness": "premature_interior_trunk_entry_witnesses", "applicability": "has_root_fanout"}
+  ],
+  "approved_conflicts": []
+}

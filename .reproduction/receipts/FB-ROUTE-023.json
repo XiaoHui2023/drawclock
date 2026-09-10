@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "issue_id": "FB-ROUTE-023",
+  "result": "reproduced",
+  "evidence_class": "user_reproduction",
+  "origin": "natural_user_workflow",
+  "fault_injection": false,
+  "output_mutated": false,
+  "production_code_changed": false,
+  "coverage_model": "many_to_many",
+  "corpus_id": "20260909T160052Z-8f1ea98c",
+  "required_reproduction_variants": [
+    "premature-interior-trunk-entry"
+  ],
+  "semantics_sha256": "9110e75d06071f93bc9837b695a63d9cbefb5e336210a8fca32b8a146b37bb0e",
+  "issue_contract_sha256": "2037eb88b1e4c31c2f33f46fb1d8e1416b5db6180d99ea4d80313b9a45e35a42",
+  "attempts": [
+    {
+      "run_id": "20260909T160052Z-8f1ea98c:premature-interior-trunk-entry-baseline:1",
+      "corpus_id": "20260909T160052Z-8f1ea98c",
+      "case_id": "premature-interior-trunk-entry-baseline",
+      "observed_issue_ids": [
+        "FB-ROUTE-023"
+      ],
+      "public_entrypoint": "public_cli",
+      "entrypoint_reached": true,
+      "producer_exit_code": 0,
+      "oracle_exit_code": 0,
+      "baseline_revision": "33cceec83733ea45403611c823c4b3ffc730292f",
+      "artifact_before_oracle_sha256": "0754a64690e632c2564e60c651fc6b4b7978bfa0b00afadf9763d041d1493271",
+      "artifact_after_oracle_sha256": "0754a64690e632c2564e60c651fc6b4b7978bfa0b00afadf9763d041d1493271",
+      "producer_tree_before_sha256": "b548abb3f45c7b7203c320d47127f942579612701ac830b9263d593a5bd6d72c",
+      "producer_tree_after_sha256": "b548abb3f45c7b7203c320d47127f942579612701ac830b9263d593a5bd6d72c",
+      "command_sha256": "04733514159db1b6dfec26463bd864293ecd23ce00c6f6c4edfcb4f9238aaad9",
+      "input_sha256": "6fc1ef017159fc12f236b1484b81071695b2f2cb2c5d4ea29bb0370dea2dfcd6",
+      "runner_sha256": "f3c96076e712af01962bd4cd100c04a55a4344ff4011b93d2315340a8867c1f2",
+      "oracle_sha256": "167f49ef31e6a8b2c6c1ba871e7b0509eeecef0e888083ad9197a58f20c645fe",
+      "started_at": "2026-09-09T16:01:56.469607+00:00",
+      "ended_at": "2026-09-09T16:02:02.820676+00:00",
+      "semantic_contract_sha256": "f9ef7b266f5f44ccda687822723abb7196fa7b36ac8a532c463af639f52f7aec",
+      "semantic_variant_id": "premature-interior-trunk-entry",
+      "semantic_preconditions_met": true,
+      "semantic_symptom_observed": true,
+      "semantic_errors": [],
+      "evidence_files": {
+        ".reproduction/evidence/20260909T160052Z-8f1ea98c/premature-interior-trunk-entry-baseline/attempt-1/output.svg": "0754a64690e632c2564e60c651fc6b4b7978bfa0b00afadf9763d041d1493271",
+        ".reproduction/evidence/20260909T160052Z-8f1ea98c/premature-interior-trunk-entry-baseline/attempt-1/producer.log": "ab27dbd198a9ad80f9a22cba5cdbf14678ad4d21bcb4886b6465fd6997195289",
+        ".reproduction/evidence/20260909T160052Z-8f1ea98c/premature-interior-trunk-entry-baseline/attempt-1/report.json": "6f658467daaa90c95ea294d4d84ca847d89a73b2925be72373317c39f6b3cdd3",
+        ".reproduction/evidence/20260909T160052Z-8f1ea98c/premature-interior-trunk-entry-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260909T160052Z-8f1ea98c/premature-interior-trunk-entry-baseline/attempt-1/FB-ROUTE-023.log": "6f658467daaa90c95ea294d4d84ca847d89a73b2925be72373317c39f6b3cdd3"
+      }
+    },
+    {
+      "run_id": "20260909T160052Z-8f1ea98c:premature-interior-trunk-entry-baseline:2",
+      "corpus_id": "20260909T160052Z-8f1ea98c",
+      "case_id": "premature-interior-trunk-entry-baseline",
+      "observed_issue_ids": [
+        "FB-ROUTE-023"
+      ],
+      "public_entrypoint": "public_cli",
+      "entrypoint_reached": true,
+      "producer_exit_code": 0,
+      "oracle_exit_code": 0,
+      "baseline_revision": "33cceec83733ea45403611c823c4b3ffc730292f",
+      "artifact_before_oracle_sha256": "0754a64690e632c2564e60c651fc6b4b7978bfa0b00afadf9763d041d1493271",
+      "artifact_after_oracle_sha256": "0754a64690e632c2564e60c651fc6b4b7978bfa0b00afadf9763d041d1493271",
+      "producer_tree_before_sha256": "b548abb3f45c7b7203c320d47127f942579612701ac830b9263d593a5bd6d72c",
+      "producer_tree_after_sha256": "b548abb3f45c7b7203c320d47127f942579612701ac830b9263d593a5bd6d72c",
+      "command_sha256": "281c801dc1737b4246e94b967d603b2f0b16f729dc8a4623b196414d8ca776cb",
+      "input_sha256": "6fc1ef017159fc12f236b1484b81071695b2f2cb2c5d4ea29bb0370dea2dfcd6",
+      "runner_sha256": "f3c96076e712af01962bd4cd100c04a55a4344ff4011b93d2315340a8867c1f2",
+      "oracle_sha256": "167f49ef31e6a8b2c6c1ba871e7b0509eeecef0e888083ad9197a58f20c645fe",
+      "started_at": "2026-09-09T16:02:02.836599+00:00",
+      "ended_at": "2026-09-09T16:02:09.495648+00:00",
+      "semantic_contract_sha256": "f9ef7b266f5f44ccda687822723abb7196fa7b36ac8a532c463af639f52f7aec",
+      "semantic_variant_id": "premature-interior-trunk-entry",
+      "semantic_preconditions_met": true,
+      "semantic_symptom_observed": true,
+      "semantic_errors": [],
+      "evidence_files": {
+        ".reproduction/evidence/20260909T160052Z-8f1ea98c/premature-interior-trunk-entry-baseline/attempt-2/output.svg": "0754a64690e632c2564e60c651fc6b4b7978bfa0b00afadf9763d041d1493271",
+        ".reproduction/evidence/20260909T160052Z-8f1ea98c/premature-interior-trunk-entry-baseline/attempt-2/producer.log": "12b1b043016ca8f1aaa90a79f8e1b3e2e8e423dbdf569f159694867933aae3d0",
+        ".reproduction/evidence/20260909T160052Z-8f1ea98c/premature-interior-trunk-entry-baseline/attempt-2/report.json": "6f658467daaa90c95ea294d4d84ca847d89a73b2925be72373317c39f6b3cdd3",
+        ".reproduction/evidence/20260909T160052Z-8f1ea98c/premature-interior-trunk-entry-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/evidence/20260909T160052Z-8f1ea98c/premature-interior-trunk-entry-baseline/attempt-2/FB-ROUTE-023.log": "6f658467daaa90c95ea294d4d84ca847d89a73b2925be72373317c39f6b3cdd3"
+      }
+    }
+  ]
+}

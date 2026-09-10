@@ -13,7 +13,7 @@ description: 修改、评审或扩展 drawclock 自动布局算法时使用，�
 2. 按[行序与坐标](references/ordering-and-placement.md)减少交叉、对齐相似支路并分配可见矩形。
 3. 按[正交路由与总线](references/orthogonal-routing.md)从精确端口寻路、合并同源干线并简化折点。
 4. 按[规模化与确定性](references/scalability.md)限制候选、分解接多路下游的结构并保持输出稳定。
-5. 使用[质量目标与门禁](references/quality-gates.md)选择候选和阻止回归。
+5. 使用[质量目标与门禁](references/quality-gates.md)选择候选和阻止回归。需求与指标采用不可变 baseline：后续特性只能增加合同或提交带用户证据的冲突记录，不能删除、改名、换 witness 或收窄旧指标；全图与发布入口都运行 `tools/check_quality_contract_retention.py`。
    通用零入度源显示副本专项的边界、指标、反例和回退点见[源副本能力合同](references/source-replication-capability.json)。
    自由源列、逐元素统计和特性覆盖专项见[自由源与覆盖能力合同](references/free-source-coverage-capability.json)。
    当前可执行的特性、风险交互、场景、Oracle 与故障注入映射见[布局特性覆盖账本](references/layout-feature-coverage.json)。

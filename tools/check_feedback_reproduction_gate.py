@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
+import check_quality_contract_retention as quality_contract
+
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / ".cursor/skills/project-goals/issues/user-feedback-natural-reproduction.json"
@@ -442,7 +444,10 @@ def _release_gate() -> int:
     if not isinstance(issues, list) or not issues:
         print("feedback release gate: issue list is missing or empty", file=sys.stderr)
         return 2
-    errors: list[str] = []
+    errors: list[str] = [
+        f"quality-contract: {error}"
+        for error in quality_contract.validate()
+    ]
     tracked_paths = _git_tracked_paths(errors)
     _validate_recursive_attack_receipt(errors)
     for issue in issues:

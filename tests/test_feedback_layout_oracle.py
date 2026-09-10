@@ -671,11 +671,71 @@ def test_staggered_four_source_mux_aligns_direct_source_array(
     direct = [edge for edge in report["edges"] if edge["target"] == "mux"]
     assert len(direct) == 4
     assert len({edge["points"][0][0] for edge in direct}) == 1
-    assert report["networks"]["source_2:right"]["bends_total"] == 2
+    assert report["networks"]["source_2:right"]["bends_total"] == 0
     assert report["witnesses"]["root_fanout_axis_dominance_witnesses"] == []
     assert report["witnesses"]["direct_root_fanin_column_witnesses"] == []
     assert "FB-BEND-017" not in report["detected_issues"]
     assert "FB-ROOT-020" not in report["detected_issues"]
+
+
+def test_multi_output_roots_use_target_scoped_mux_facilities(
+    tmp_path: Path,
+) -> None:
+    config = {
+        "source_0": {"kind": "source"},
+        "source_1": {"kind": "source"},
+        "source_2": {"kind": "source"},
+        "source_3": {"kind": "source"},
+        "aux_0_0": {"kind": "gate", "source": "source_0"},
+        "aux_0_1": {"kind": "div", "source": "aux_0_0"},
+        "aux_clock_0": {"kind": "clock", "source": "aux_0_1"},
+        "aux_1_0": {"kind": "div", "source": "source_1"},
+        "aux_1_1": {"kind": "cell", "source": "aux_1_0"},
+        "aux_clock_1": {"kind": "clock", "source": "aux_1_1"},
+        "aux_2_0": {"kind": "cell", "source": "source_2"},
+        "aux_2_1": {"kind": "gate", "source": "aux_2_0"},
+        "aux_clock_2": {"kind": "clock", "source": "aux_2_1"},
+        "aux_3_0": {"kind": "gate", "source": "source_3"},
+        "aux_3_1": {"kind": "div", "source": "aux_3_0"},
+        "aux_clock_3": {"kind": "clock", "source": "aux_3_1"},
+        "main_mux": {
+            "kind": "mux4",
+            "source": {
+                "0": "source_0",
+                "1": "source_2",
+                "2": "source_1",
+                "3": "source_3",
+            },
+        },
+        "main_clock": {"kind": "clock", "source": "main_mux"},
+        "side_mux": {
+            "kind": "mux2",
+            "source": {"0": "source_1", "1": "source_3"},
+        },
+        "side_clock": {"kind": "clock", "source": "side_mux"},
+    }
+    input_path = tmp_path / "multi-output-direct-mux-array.json"
+    output = tmp_path / "multi-output-direct-mux-array.svg"
+    input_path.write_text(json.dumps(config), encoding="utf-8")
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    direct = [
+        edge for edge in report["edges"]
+        if edge["target"] in {"main_mux", "side_mux"}
+    ]
+    assert len(direct) == 6
+    assert all(edge["bends"] == 0 for edge in direct)
+    assert report["totals"]["proper_crossing_events"] == 0
+    assert report["totals"]["different_net_overlaps"] == 0
+    assert report["witnesses"]["raw_direct_root_fanin_column_witnesses"] == []
+    assert report["witnesses"]["direct_root_fanin_column_witnesses"] == []
+    assert report["witnesses"]["root_first_column_witnesses"] == []
+    assert report["detected_issues"] == []
 
 
 def test_staggered_four_source_mux_accepts_clean_different_columns(
@@ -872,6 +932,55 @@ def test_single_route_root_without_crossed_trunk_is_clean_counterexample(
     assert report["witnesses"]["physical_anchor_relocation_witnesses"] == []
     assert "FB-ROUTE-009" not in report["detected_issues"]
     assert "FB-ROOT-010" not in report["detected_issues"]
+
+
+def test_current_cli_closes_distant_root_consumer_without_local_alias(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example/auto-layout/24-single-source-rendering-alias.json"
+    output = tmp_path / "distant-root.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["roots"]["shared_source"]["rendered_copies"] > 1
+    assert report["witnesses"]["root_facility_split_witnesses"] == []
+    assert "FB-ROOT-022" not in report["detected_issues"]
+
+
+def test_current_cli_closes_premature_interior_trunk_entry(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "tests/reproduction-corpus/premature-interior-trunk-entry.json"
+    output = tmp_path / "premature-entry.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
+    assert "FB-ROUTE-023" not in report["detected_issues"]
+
+
+def test_premature_interior_trunk_entry_keeps_clean_control(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example/auto-layout/24-single-source-rendering-alias.json"
+    output = tmp_path / "clean-control.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
+    assert "FB-ROUTE-023" not in report["detected_issues"]
 
 
 def test_oracle_rejects_frozen_mixed_root_failure() -> None:

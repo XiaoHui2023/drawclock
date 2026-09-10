@@ -1,0 +1,8289 @@
+{
+  "schema_version": 1,
+  "input": "pad-r08-s02.json",
+  "svg": "output.svg",
+  "totals": {
+    "logical_nodes": 43,
+    "rendered_nodes": 43,
+    "logical_edges": 48,
+    "rendered_edges": 48,
+    "proper_crossing_events": 105,
+    "distinct_crossing_points": 46,
+    "different_net_overlaps": 0,
+    "bends": 44,
+    "manhattan_length_px": 13288.2144
+  },
+  "roots": {
+    "public_from": {
+      "kind": "from",
+      "outdegree": 5,
+      "rendered_copies": 1
+    },
+    "public_gate": {
+      "kind": "gate",
+      "outdegree": 6,
+      "rendered_copies": 1
+    },
+    "public_source": {
+      "kind": "source",
+      "outdegree": 5,
+      "rendered_copies": 1
+    },
+    "sparse_00": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_01": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_02": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_03": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_04": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_05": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_06": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_07": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_08": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_09": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_10": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_11": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_12": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_13": {
+      "kind": "source",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_14": {
+      "kind": "from",
+      "outdegree": 1,
+      "rendered_copies": 1
+    },
+    "sparse_15": {
+      "kind": "gate",
+      "outdegree": 1,
+      "rendered_copies": 1
+    }
+  },
+  "nodes": {
+    "clock_00": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_01": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_02": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_03": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_04": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_05": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_06": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "clock_07": {
+      "kind": "clock",
+      "incoming_edges": 1,
+      "outgoing_edges": 0,
+      "direct_downstream_nodes": 0,
+      "source_port_nets": 0,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": true,
+      "manhattan_length_px": 0,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_00": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_01": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_02": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_03": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_04": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_05": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_06": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "mux_after_07": {
+      "kind": "mux2",
+      "incoming_edges": 2,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 83.2,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_00": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 104.38,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2
+    },
+    "pad_01": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 104.38,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1
+    },
+    "pad_02": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 104.38,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_03": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 104.38,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "pad_04": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 104.38,
+      "bends_total": 0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2
+    },
+    "pad_05": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 104.38,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1
+    },
+    "pad_06": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 104.38,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1
+    },
+    "pad_07": {
+      "kind": "pad3",
+      "incoming_edges": 3,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": false,
+      "is_terminal": false,
+      "manhattan_length_px": 104.38,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "public_from": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 5,
+      "direct_downstream_nodes": 5,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 2748.1426,
+      "bends_total": 14,
+      "crossing_points": 17,
+      "crossing_pair_incidents": 41,
+      "crossed_edge_count": 15
+    },
+    "public_gate": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 6,
+      "direct_downstream_nodes": 6,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 4422.988,
+      "bends_total": 16,
+      "crossing_points": 23,
+      "crossing_pair_incidents": 60,
+      "crossed_edge_count": 24
+    },
+    "public_source": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 5,
+      "direct_downstream_nodes": 5,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 2989.8038,
+      "bends_total": 14,
+      "crossing_points": 19,
+      "crossing_pair_incidents": 53,
+      "crossed_edge_count": 21
+    },
+    "sparse_00": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1
+    },
+    "sparse_01": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 105.79,
+      "bends_total": 0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 3,
+      "crossed_edge_count": 3
+    },
+    "sparse_02": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1
+    },
+    "sparse_03": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6
+    },
+    "sparse_04": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 105.79,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2
+    },
+    "sparse_05": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1
+    },
+    "sparse_06": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6
+    },
+    "sparse_07": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 105.79,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1
+    },
+    "sparse_08": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 5,
+      "crossed_edge_count": 5
+    },
+    "sparse_09": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2
+    },
+    "sparse_10": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 105.79,
+      "bends_total": 0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 3,
+      "crossed_edge_count": 3
+    },
+    "sparse_11": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2
+    },
+    "sparse_12": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6
+    },
+    "sparse_13": {
+      "kind": "source",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 105.79,
+      "bends_total": 0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6
+    },
+    "sparse_14": {
+      "kind": "from",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0
+    },
+    "sparse_15": {
+      "kind": "gate",
+      "incoming_edges": 0,
+      "outgoing_edges": 1,
+      "direct_downstream_nodes": 1,
+      "source_port_nets": 1,
+      "rendering_anchors": 1,
+      "is_root": true,
+      "is_terminal": false,
+      "manhattan_length_px": 99.79,
+      "bends_total": 0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 4,
+      "crossed_edge_count": 4
+    }
+  },
+  "networks": {
+    "mux_after_00:right": {
+      "source": "mux_after_00",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_01:right": {
+      "source": "mux_after_01",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_02:right": {
+      "source": "mux_after_02",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_03:right": {
+      "source": "mux_after_03",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_04:right": {
+      "source": "mux_after_04",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_05:right": {
+      "source": "mux_after_05",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_06:right": {
+      "source": "mux_after_06",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "mux_after_07:right": {
+      "source": "mux_after_07",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_00:right": {
+      "source": "pad_00",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_01:right": {
+      "source": "pad_01",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_02:right": {
+      "source": "pad_02",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_03:right": {
+      "source": "pad_03",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_04:right": {
+      "source": "pad_04",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_05:right": {
+      "source": "pad_05",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_06:right": {
+      "source": "pad_06",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "pad_07:right": {
+      "source": "pad_07",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "public_from:right": {
+      "source": "public_from",
+      "source_port": "right",
+      "edges": 5,
+      "rendering_anchors": 1,
+      "branch_count": 4,
+      "crossing_points": 17,
+      "crossing_pair_incidents": 41,
+      "crossed_edge_count": 15,
+      "manhattan_length_px": 2748.1426,
+      "horizontal_length_px": 884.09,
+      "vertical_length_px": 1864.0526,
+      "bends_total": 14,
+      "bends_max_per_edge": 4,
+      "split_rejoin": true
+    },
+    "public_gate:right": {
+      "source": "public_gate",
+      "source_port": "right",
+      "edges": 6,
+      "rendering_anchors": 1,
+      "branch_count": 5,
+      "crossing_points": 23,
+      "crossing_pair_incidents": 60,
+      "crossed_edge_count": 24,
+      "manhattan_length_px": 4422.988,
+      "horizontal_length_px": 983.88,
+      "vertical_length_px": 3439.108,
+      "bends_total": 16,
+      "bends_max_per_edge": 4,
+      "split_rejoin": false
+    },
+    "public_source:right": {
+      "source": "public_source",
+      "source_port": "right",
+      "edges": 5,
+      "rendering_anchors": 1,
+      "branch_count": 4,
+      "crossing_points": 19,
+      "crossing_pair_incidents": 53,
+      "crossed_edge_count": 21,
+      "manhattan_length_px": 2989.8038,
+      "horizontal_length_px": 785.71,
+      "vertical_length_px": 2204.0938,
+      "bends_total": 14,
+      "bends_max_per_edge": 4,
+      "split_rejoin": false
+    },
+    "sparse_00:right": {
+      "source": "sparse_00",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_01:right": {
+      "source": "sparse_01",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 3,
+      "crossed_edge_count": 3,
+      "manhattan_length_px": 105.79,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_02:right": {
+      "source": "sparse_02",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_03:right": {
+      "source": "sparse_03",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_04:right": {
+      "source": "sparse_04",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "manhattan_length_px": 105.79,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_05:right": {
+      "source": "sparse_05",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_06:right": {
+      "source": "sparse_06",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_07:right": {
+      "source": "sparse_07",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "manhattan_length_px": 105.79,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_08:right": {
+      "source": "sparse_08",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 5,
+      "crossed_edge_count": 5,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_09:right": {
+      "source": "sparse_09",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_10:right": {
+      "source": "sparse_10",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 3,
+      "crossed_edge_count": 3,
+      "manhattan_length_px": 105.79,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_11:right": {
+      "source": "sparse_11",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_12:right": {
+      "source": "sparse_12",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_13:right": {
+      "source": "sparse_13",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6,
+      "manhattan_length_px": 105.79,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_14:right": {
+      "source": "sparse_14",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    },
+    "sparse_15:right": {
+      "source": "sparse_15",
+      "source_port": "right",
+      "edges": 1,
+      "rendering_anchors": 1,
+      "branch_count": 0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 4,
+      "crossed_edge_count": 4,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "bends_total": 0,
+      "bends_max_per_edge": 0,
+      "split_rejoin": false
+    }
+  },
+  "edges": [
+    {
+      "edge_id": "svg-edge-0000",
+      "source": "public_source",
+      "target": "pad_01",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          123.83,
+          901.0147
+        ],
+        [
+          177.66,
+          901.0147
+        ],
+        [
+          177.66,
+          322.9917
+        ],
+        [
+          229.62,
+          322.9917
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 683.813,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 578.023,
+      "max_vertical_segment_px": 578.023,
+      "crossing_points": 7,
+      "crossing_pair_incidents": 12,
+      "crossed_edge_count": 12,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0001",
+      "source": "pad_02",
+      "target": "mux_after_02",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          253.62,
+          845.0147
+        ],
+        [
+          358.0,
+          845.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0002",
+      "source": "public_source",
+      "target": "mux_after_02",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          123.83,
+          901.0147
+        ],
+        [
+          177.66,
+          901.0147
+        ],
+        [
+          177.66,
+          958.0216
+        ],
+        [
+          305.58,
+          958.0216
+        ],
+        [
+          305.58,
+          901.0147
+        ],
+        [
+          358.0,
+          901.0147
+        ]
+      ],
+      "segments": 5,
+      "bends": 4,
+      "manhattan_length_px": 348.1838,
+      "horizontal_length_px": 234.17,
+      "vertical_length_px": 114.0138,
+      "max_vertical_segment_px": 57.0069,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 5,
+      "crossed_edge_count": 5,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0003",
+      "source": "mux_after_07",
+      "target": "clock_07",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          382.0,
+          173.9931
+        ],
+        [
+          465.2,
+          173.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0004",
+      "source": "pad_04",
+      "target": "mux_after_04",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          253.62,
+          1311.0255
+        ],
+        [
+          358.0,
+          1311.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0005",
+      "source": "public_gate",
+      "target": "mux_after_04",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          612.0039
+        ],
+        [
+          187.66,
+          612.0039
+        ],
+        [
+          187.66,
+          974.0324
+        ],
+        [
+          285.58,
+          974.0324
+        ],
+        [
+          285.58,
+          1367.0255
+        ],
+        [
+          358.0,
+          1367.0255
+        ]
+      ],
+      "segments": 5,
+      "bends": 4,
+      "manhattan_length_px": 983.1916,
+      "horizontal_length_px": 228.17,
+      "vertical_length_px": 755.0216,
+      "max_vertical_segment_px": 392.9931,
+      "crossing_points": 11,
+      "crossing_pair_incidents": 13,
+      "crossed_edge_count": 12,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0006",
+      "source": "pad_07",
+      "target": "mux_after_07",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          253.62,
+          145.9931
+        ],
+        [
+          358.0,
+          145.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0007",
+      "source": "public_gate",
+      "target": "mux_after_07",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          612.0039
+        ],
+        [
+          187.66,
+          612.0039
+        ],
+        [
+          187.66,
+          492.0
+        ],
+        [
+          285.58,
+          492.0
+        ],
+        [
+          285.58,
+          201.9931
+        ],
+        [
+          358.0,
+          201.9931
+        ]
+      ],
+      "segments": 5,
+      "bends": 4,
+      "manhattan_length_px": 638.1808,
+      "horizontal_length_px": 228.17,
+      "vertical_length_px": 410.0108,
+      "max_vertical_segment_px": 290.0069,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 4,
+      "crossed_edge_count": 4,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0008",
+      "source": "mux_after_01",
+      "target": "clock_01",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          382.0,
+          406.9931
+        ],
+        [
+          465.2,
+          406.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0009",
+      "source": "public_source",
+      "target": "pad_04",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          123.83,
+          901.0147
+        ],
+        [
+          177.66,
+          901.0147
+        ],
+        [
+          177.66,
+          1255.0241
+        ],
+        [
+          229.62,
+          1255.0241
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 459.7994,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 354.0094,
+      "max_vertical_segment_px": 354.0094,
+      "crossing_points": 5,
+      "crossing_pair_incidents": 10,
+      "crossed_edge_count": 9,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0010",
+      "source": "sparse_10",
+      "target": "pad_04",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          123.83,
+          1311.0255
+        ],
+        [
+          229.62,
+          1311.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 105.79,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 3,
+      "crossed_edge_count": 3,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0011",
+      "source": "sparse_04",
+      "target": "pad_01",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          123.83,
+          378.9931
+        ],
+        [
+          229.62,
+          378.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 105.79,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0012",
+      "source": "sparse_01",
+      "target": "pad_04",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          123.83,
+          1367.0269
+        ],
+        [
+          229.62,
+          1367.0269
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 105.79,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 3,
+      "crossed_edge_count": 3,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0013",
+      "source": "mux_after_05",
+      "target": "clock_05",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          382.0,
+          1106.0255
+        ],
+        [
+          465.2,
+          1106.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0014",
+      "source": "mux_after_00",
+      "target": "clock_00",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          382.0,
+          1572.0363
+        ],
+        [
+          465.2,
+          1572.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0015",
+      "source": "pad_05",
+      "target": "mux_after_05",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          253.62,
+          1078.0255
+        ],
+        [
+          358.0,
+          1078.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0016",
+      "source": "public_source",
+      "target": "mux_after_05",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          123.83,
+          901.0147
+        ],
+        [
+          177.66,
+          901.0147
+        ],
+        [
+          177.66,
+          1191.0324
+        ],
+        [
+          305.58,
+          1191.0324
+        ],
+        [
+          305.58,
+          1134.0255
+        ],
+        [
+          358.0,
+          1134.0255
+        ]
+      ],
+      "segments": 5,
+      "bends": 4,
+      "manhattan_length_px": 581.1946,
+      "horizontal_length_px": 234.17,
+      "vertical_length_px": 347.0246,
+      "max_vertical_segment_px": 290.0177,
+      "crossing_points": 6,
+      "crossing_pair_incidents": 12,
+      "crossed_edge_count": 10,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0017",
+      "source": "mux_after_02",
+      "target": "clock_02",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          382.0,
+          873.0147
+        ],
+        [
+          465.2,
+          873.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0018",
+      "source": "mux_after_06",
+      "target": "clock_06",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          382.0,
+          1805.0363
+        ],
+        [
+          465.2,
+          1805.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0019",
+      "source": "mux_after_03",
+      "target": "clock_03",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          382.0,
+          640.0039
+        ],
+        [
+          465.2,
+          640.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0020",
+      "source": "pad_01",
+      "target": "mux_after_01",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          253.62,
+          378.9931
+        ],
+        [
+          358.0,
+          378.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0021",
+      "source": "public_gate",
+      "target": "mux_after_01",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          612.0039
+        ],
+        [
+          187.66,
+          612.0039
+        ],
+        [
+          187.66,
+          492.0
+        ],
+        [
+          285.58,
+          492.0
+        ],
+        [
+          285.58,
+          434.9931
+        ],
+        [
+          358.0,
+          434.9931
+        ]
+      ],
+      "segments": 5,
+      "bends": 4,
+      "manhattan_length_px": 405.1808,
+      "horizontal_length_px": 228.17,
+      "vertical_length_px": 177.0108,
+      "max_vertical_segment_px": 120.0039,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 3,
+      "crossed_edge_count": 3,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0022",
+      "source": "sparse_11",
+      "target": "pad_01",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          129.83,
+          434.9945
+        ],
+        [
+          229.62,
+          434.9945
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0023",
+      "source": "mux_after_04",
+      "target": "clock_04",
+      "source_port": "right",
+      "target_port": "left",
+      "points": [
+        [
+          382.0,
+          1339.0255
+        ],
+        [
+          465.2,
+          1339.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 83.2,
+      "horizontal_length_px": 83.2,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0024",
+      "source": "sparse_05",
+      "target": "pad_06",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          129.83,
+          1721.0349
+        ],
+        [
+          229.62,
+          1721.0349
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0025",
+      "source": "public_gate",
+      "target": "pad_06",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          612.0039
+        ],
+        [
+          187.66,
+          612.0039
+        ],
+        [
+          187.66,
+          1777.0363
+        ],
+        [
+          229.62,
+          1777.0363
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 1264.8224,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 1165.0324,
+      "max_vertical_segment_px": 1165.0324,
+      "crossing_points": 15,
+      "crossing_pair_incidents": 20,
+      "crossed_edge_count": 20,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0026",
+      "source": "sparse_14",
+      "target": "pad_06",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          129.83,
+          1833.0377
+        ],
+        [
+          229.62,
+          1833.0377
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0027",
+      "source": "pad_06",
+      "target": "mux_after_06",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          253.62,
+          1777.0363
+        ],
+        [
+          358.0,
+          1777.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0028",
+      "source": "public_from",
+      "target": "mux_after_06",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          1134.0269
+        ],
+        [
+          197.66,
+          1134.0269
+        ],
+        [
+          197.66,
+          1440.0432
+        ],
+        [
+          295.58,
+          1440.0432
+        ],
+        [
+          295.58,
+          1833.0363
+        ],
+        [
+          358.0,
+          1833.0363
+        ]
+      ],
+      "segments": 5,
+      "bends": 4,
+      "manhattan_length_px": 927.1794,
+      "horizontal_length_px": 228.17,
+      "vertical_length_px": 699.0094,
+      "max_vertical_segment_px": 392.9931,
+      "crossing_points": 8,
+      "crossing_pair_incidents": 10,
+      "crossed_edge_count": 8,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0029",
+      "source": "sparse_06",
+      "target": "pad_02",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          129.83,
+          789.0133
+        ],
+        [
+          229.62,
+          789.0133
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0030",
+      "source": "sparse_13",
+      "target": "pad_02",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          123.83,
+          845.0147
+        ],
+        [
+          229.62,
+          845.0147
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 105.79,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0031",
+      "source": "public_from",
+      "target": "pad_02",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          129.83,
+          1134.0269
+        ],
+        [
+          197.66,
+          1134.0269
+        ],
+        [
+          197.66,
+          901.0161
+        ],
+        [
+          229.62,
+          901.0161
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 332.8008,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 233.0108,
+      "max_vertical_segment_px": 233.0108,
+      "crossing_points": 6,
+      "crossing_pair_incidents": 8,
+      "crossed_edge_count": 8,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0032",
+      "source": "sparse_12",
+      "target": "pad_05",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          129.83,
+          1022.0241
+        ],
+        [
+          229.62,
+          1022.0241
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0033",
+      "source": "sparse_15",
+      "target": "pad_03",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          129.83,
+          556.0025
+        ],
+        [
+          229.62,
+          556.0025
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 4,
+      "crossed_edge_count": 4,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0034",
+      "source": "sparse_03",
+      "target": "pad_05",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          1078.0255
+        ],
+        [
+          229.62,
+          1078.0255
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 3,
+      "crossing_pair_incidents": 6,
+      "crossed_edge_count": 6,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0035",
+      "source": "public_from",
+      "target": "pad_05",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          129.83,
+          1134.0269
+        ],
+        [
+          229.62,
+          1134.0269
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 4,
+      "crossed_edge_count": 4,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0036",
+      "source": "sparse_09",
+      "target": "pad_00",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          129.83,
+          1488.0349
+        ],
+        [
+          229.62,
+          1488.0349
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0037",
+      "source": "public_gate",
+      "target": "pad_00",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          612.0039
+        ],
+        [
+          187.66,
+          612.0039
+        ],
+        [
+          187.66,
+          1544.0363
+        ],
+        [
+          229.62,
+          1544.0363
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 1031.8224,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 932.0324,
+      "max_vertical_segment_px": 932.0324,
+      "crossing_points": 13,
+      "crossing_pair_incidents": 18,
+      "crossed_edge_count": 18,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0038",
+      "source": "sparse_02",
+      "target": "pad_00",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          129.83,
+          1600.0377
+        ],
+        [
+          229.62,
+          1600.0377
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0039",
+      "source": "pad_00",
+      "target": "mux_after_00",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          253.62,
+          1544.0363
+        ],
+        [
+          358.0,
+          1544.0363
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0040",
+      "source": "public_from",
+      "target": "mux_after_00",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          1134.0269
+        ],
+        [
+          197.66,
+          1134.0269
+        ],
+        [
+          197.66,
+          1207.0324
+        ],
+        [
+          295.58,
+          1207.0324
+        ],
+        [
+          295.58,
+          1600.0363
+        ],
+        [
+          358.0,
+          1600.0363
+        ]
+      ],
+      "segments": 5,
+      "bends": 4,
+      "manhattan_length_px": 694.1794,
+      "horizontal_length_px": 228.17,
+      "vertical_length_px": 466.0094,
+      "max_vertical_segment_px": 393.0039,
+      "crossing_points": 7,
+      "crossing_pair_incidents": 9,
+      "crossed_edge_count": 7,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0041",
+      "source": "pad_03",
+      "target": "mux_after_03",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          253.62,
+          612.0039
+        ],
+        [
+          358.0,
+          612.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 104.38,
+      "horizontal_length_px": 104.38,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 0,
+      "crossing_pair_incidents": 0,
+      "crossed_edge_count": 0,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0042",
+      "source": "public_from",
+      "target": "mux_after_03",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          1134.0269
+        ],
+        [
+          197.66,
+          1134.0269
+        ],
+        [
+          197.66,
+          725.0108
+        ],
+        [
+          295.58,
+          725.0108
+        ],
+        [
+          295.58,
+          668.0039
+        ],
+        [
+          358.0,
+          668.0039
+        ]
+      ],
+      "segments": 5,
+      "bends": 4,
+      "manhattan_length_px": 694.193,
+      "horizontal_length_px": 228.17,
+      "vertical_length_px": 466.023,
+      "max_vertical_segment_px": 409.0161,
+      "crossing_points": 8,
+      "crossing_pair_incidents": 10,
+      "crossed_edge_count": 10,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0043",
+      "source": "public_gate",
+      "target": "pad_03",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          612.0039
+        ],
+        [
+          229.62,
+          612.0039
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 2,
+      "crossed_edge_count": 2,
+      "source_port_fanout": 6,
+      "branch_siblings": 5
+    },
+    {
+      "edge_id": "svg-edge-0044",
+      "source": "sparse_08",
+      "target": "pad_03",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          129.83,
+          668.0053
+        ],
+        [
+          229.62,
+          668.0053
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 2,
+      "crossing_pair_incidents": 5,
+      "crossed_edge_count": 5,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0045",
+      "source": "public_source",
+      "target": "pad_07",
+      "source_port": "right",
+      "target_port": "0",
+      "points": [
+        [
+          123.83,
+          901.0147
+        ],
+        [
+          177.66,
+          901.0147
+        ],
+        [
+          177.66,
+          89.9917
+        ],
+        [
+          229.62,
+          89.9917
+        ]
+      ],
+      "segments": 3,
+      "bends": 2,
+      "manhattan_length_px": 916.813,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 811.023,
+      "max_vertical_segment_px": 811.023,
+      "crossing_points": 9,
+      "crossing_pair_incidents": 14,
+      "crossed_edge_count": 14,
+      "source_port_fanout": 5,
+      "branch_siblings": 4
+    },
+    {
+      "edge_id": "svg-edge-0046",
+      "source": "sparse_00",
+      "target": "pad_07",
+      "source_port": "right",
+      "target_port": "1",
+      "points": [
+        [
+          129.83,
+          145.9931
+        ],
+        [
+          229.62,
+          145.9931
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 99.79,
+      "horizontal_length_px": 99.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    },
+    {
+      "edge_id": "svg-edge-0047",
+      "source": "sparse_07",
+      "target": "pad_07",
+      "source_port": "right",
+      "target_port": "2",
+      "points": [
+        [
+          123.83,
+          201.9945
+        ],
+        [
+          229.62,
+          201.9945
+        ]
+      ],
+      "segments": 1,
+      "bends": 0,
+      "manhattan_length_px": 105.79,
+      "horizontal_length_px": 105.79,
+      "vertical_length_px": 0,
+      "max_vertical_segment_px": 0.0,
+      "crossing_points": 1,
+      "crossing_pair_incidents": 1,
+      "crossed_edge_count": 1,
+      "source_port_fanout": 1,
+      "branch_siblings": 0
+    }
+  ],
+  "crossings": [
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0005"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0007"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        378.9931
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0011"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0021"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        434.9945
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0022"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0025"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        789.0133
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0029"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        845.0147
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0030"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        556.0025
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0033"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0043"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        668.0053
+      ],
+      "edges": [
+        "svg-edge-0000",
+        "svg-edge-0044"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        958.0216
+      ],
+      "edges": [
+        "svg-edge-0002",
+        "svg-edge-0005"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        958.0216
+      ],
+      "edges": [
+        "svg-edge-0002",
+        "svg-edge-0025"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        958.0216
+      ],
+      "edges": [
+        "svg-edge-0002",
+        "svg-edge-0031"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        958.0216
+      ],
+      "edges": [
+        "svg-edge-0002",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        958.0216
+      ],
+      "edges": [
+        "svg-edge-0002",
+        "svg-edge-0042"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        285.58,
+        1311.0255
+      ],
+      "edges": [
+        "svg-edge-0004",
+        "svg-edge-0005"
+      ],
+      "segments": [
+        0,
+        3
+      ]
+    },
+    {
+      "point": [
+        295.58,
+        1311.0255
+      ],
+      "edges": [
+        "svg-edge-0004",
+        "svg-edge-0040"
+      ],
+      "segments": [
+        0,
+        3
+      ]
+    },
+    {
+      "point": [
+        285.58,
+        1078.0255
+      ],
+      "edges": [
+        "svg-edge-0005",
+        "svg-edge-0015"
+      ],
+      "segments": [
+        3,
+        0
+      ]
+    },
+    {
+      "point": [
+        285.58,
+        1191.0324
+      ],
+      "edges": [
+        "svg-edge-0005",
+        "svg-edge-0016"
+      ],
+      "segments": [
+        3,
+        2
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        789.0133
+      ],
+      "edges": [
+        "svg-edge-0005",
+        "svg-edge-0029"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        845.0147
+      ],
+      "edges": [
+        "svg-edge-0005",
+        "svg-edge-0030"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        974.0324
+      ],
+      "edges": [
+        "svg-edge-0005",
+        "svg-edge-0031"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        285.58,
+        1207.0324
+      ],
+      "edges": [
+        "svg-edge-0005",
+        "svg-edge-0040"
+      ],
+      "segments": [
+        3,
+        2
+      ]
+    },
+    {
+      "point": [
+        295.58,
+        1367.0255
+      ],
+      "edges": [
+        "svg-edge-0005",
+        "svg-edge-0040"
+      ],
+      "segments": [
+        4,
+        3
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        974.0324
+      ],
+      "edges": [
+        "svg-edge-0005",
+        "svg-edge-0042"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        668.0053
+      ],
+      "edges": [
+        "svg-edge-0005",
+        "svg-edge-0044"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0005",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        285.58,
+        378.9931
+      ],
+      "edges": [
+        "svg-edge-0007",
+        "svg-edge-0020"
+      ],
+      "segments": [
+        3,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        556.0025
+      ],
+      "edges": [
+        "svg-edge-0007",
+        "svg-edge-0033"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0007",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1255.0241
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0025"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0028"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        1255.0241
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0028"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0031"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1022.0241
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0032"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1078.0255
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0034"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0035"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1255.0241
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0040"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0009",
+        "svg-edge-0042"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1311.0255
+      ],
+      "edges": [
+        "svg-edge-0010",
+        "svg-edge-0025"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        1311.0255
+      ],
+      "edges": [
+        "svg-edge-0010",
+        "svg-edge-0028"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1311.0255
+      ],
+      "edges": [
+        "svg-edge-0010",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        378.9931
+      ],
+      "edges": [
+        "svg-edge-0011",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1367.0269
+      ],
+      "edges": [
+        "svg-edge-0012",
+        "svg-edge-0025"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        1367.0269
+      ],
+      "edges": [
+        "svg-edge-0012",
+        "svg-edge-0028"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1367.0269
+      ],
+      "edges": [
+        "svg-edge-0012",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1191.0324
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0025"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0028"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        1191.0324
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0028"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0031"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1022.0241
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0032"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1078.0255
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0034"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0035"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1191.0324
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0040"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        1191.0324
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0040"
+      ],
+      "segments": [
+        2,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0016",
+        "svg-edge-0042"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        556.0025
+      ],
+      "edges": [
+        "svg-edge-0021",
+        "svg-edge-0033"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0021",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        434.9945
+      ],
+      "edges": [
+        "svg-edge-0022",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1721.0349
+      ],
+      "edges": [
+        "svg-edge-0024",
+        "svg-edge-0025"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0028"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        789.0133
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0029"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        845.0147
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0030"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0031"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1022.0241
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0032"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1078.0255
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0034"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0035"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1488.0349
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0036"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1600.0377
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0038"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0040"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0042"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        668.0053
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0044"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0025",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        295.58,
+        1777.0363
+      ],
+      "edges": [
+        "svg-edge-0027",
+        "svg-edge-0028"
+      ],
+      "segments": [
+        0,
+        3
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0028",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        295.58,
+        1544.0363
+      ],
+      "edges": [
+        "svg-edge-0028",
+        "svg-edge-0039"
+      ],
+      "segments": [
+        3,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        789.0133
+      ],
+      "edges": [
+        "svg-edge-0029",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        789.0133
+      ],
+      "edges": [
+        "svg-edge-0029",
+        "svg-edge-0042"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        789.0133
+      ],
+      "edges": [
+        "svg-edge-0029",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        845.0147
+      ],
+      "edges": [
+        "svg-edge-0030",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        845.0147
+      ],
+      "edges": [
+        "svg-edge-0030",
+        "svg-edge-0042"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        845.0147
+      ],
+      "edges": [
+        "svg-edge-0030",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        1022.0241
+      ],
+      "edges": [
+        "svg-edge-0031",
+        "svg-edge-0032"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        1078.0255
+      ],
+      "edges": [
+        "svg-edge-0031",
+        "svg-edge-0034"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0031",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1022.0241
+      ],
+      "edges": [
+        "svg-edge-0032",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        1022.0241
+      ],
+      "edges": [
+        "svg-edge-0032",
+        "svg-edge-0042"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        556.0025
+      ],
+      "edges": [
+        "svg-edge-0033",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1078.0255
+      ],
+      "edges": [
+        "svg-edge-0034",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        197.66,
+        1078.0255
+      ],
+      "edges": [
+        "svg-edge-0034",
+        "svg-edge-0042"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0035",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1488.0349
+      ],
+      "edges": [
+        "svg-edge-0036",
+        "svg-edge-0037"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0037",
+        "svg-edge-0040"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        1134.0269
+      ],
+      "edges": [
+        "svg-edge-0037",
+        "svg-edge-0042"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        187.66,
+        668.0053
+      ],
+      "edges": [
+        "svg-edge-0037",
+        "svg-edge-0044"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0037",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        295.58,
+        1544.0363
+      ],
+      "edges": [
+        "svg-edge-0039",
+        "svg-edge-0040"
+      ],
+      "segments": [
+        0,
+        3
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        612.0039
+      ],
+      "edges": [
+        "svg-edge-0043",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        668.0053
+      ],
+      "edges": [
+        "svg-edge-0044",
+        "svg-edge-0045"
+      ],
+      "segments": [
+        0,
+        1
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        145.9931
+      ],
+      "edges": [
+        "svg-edge-0045",
+        "svg-edge-0046"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    },
+    {
+      "point": [
+        177.66,
+        201.9945
+      ],
+      "edges": [
+        "svg-edge-0045",
+        "svg-edge-0047"
+      ],
+      "segments": [
+        1,
+        0
+      ]
+    }
+  ],
+  "overlaps": [],
+  "annotation_quality": {
+    "expected": 0,
+    "rendered": 0,
+    "missing": [],
+    "unexpected": [],
+    "duplicates": [],
+    "text_mismatches": [],
+    "line_mismatches": [],
+    "profile_counts": {},
+    "profiles_present": [],
+    "annotation_overlaps": [],
+    "node_overlaps": [],
+    "edge_intersections": [],
+    "outside_viewport": [],
+    "owner_distances_px": {},
+    "too_far": [],
+    "decorative_elements": 0,
+    "failure_count": 0
+  },
+  "witnesses": {
+    "mixed_root_kinds": [
+      "from",
+      "gate",
+      "source"
+    ],
+    "mixed_root_quality_failures": [
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_06",
+        "edges": [
+          "svg-edge-0005",
+          "svg-edge-0029"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_13",
+        "edges": [
+          "svg-edge-0005",
+          "svg-edge-0030"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_08",
+        "edges": [
+          "svg-edge-0005",
+          "svg-edge-0044"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_15",
+        "edges": [
+          "svg-edge-0007",
+          "svg-edge-0033"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_10",
+        "edges": [
+          "svg-edge-0010",
+          "svg-edge-0025"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_10",
+        "edges": [
+          "svg-edge-0010",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_01",
+        "edges": [
+          "svg-edge-0012",
+          "svg-edge-0025"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_01",
+        "edges": [
+          "svg-edge-0012",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_15",
+        "edges": [
+          "svg-edge-0021",
+          "svg-edge-0033"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_05",
+        "edges": [
+          "svg-edge-0024",
+          "svg-edge-0025"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_06",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0029"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_13",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0030"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_12",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0032"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_03",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0034"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_09",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0036"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_02",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0038"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_08",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0044"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_06",
+        "edges": [
+          "svg-edge-0029",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_13",
+        "edges": [
+          "svg-edge-0030",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_12",
+        "edges": [
+          "svg-edge-0032",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_03",
+        "edges": [
+          "svg-edge-0034",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_09",
+        "edges": [
+          "svg-edge-0036",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_08",
+        "edges": [
+          "svg-edge-0037",
+          "svg-edge-0044"
+        ]
+      }
+    ],
+    "split_rejoin_roots": [
+      "public_from:right"
+    ],
+    "public_root_crossings": [
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_06",
+        "edges": [
+          "svg-edge-0005",
+          "svg-edge-0029"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_13",
+        "edges": [
+          "svg-edge-0005",
+          "svg-edge-0030"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_08",
+        "edges": [
+          "svg-edge-0005",
+          "svg-edge-0044"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_15",
+        "edges": [
+          "svg-edge-0007",
+          "svg-edge-0033"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_10",
+        "edges": [
+          "svg-edge-0010",
+          "svg-edge-0025"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_10",
+        "edges": [
+          "svg-edge-0010",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_01",
+        "edges": [
+          "svg-edge-0012",
+          "svg-edge-0025"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_01",
+        "edges": [
+          "svg-edge-0012",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_15",
+        "edges": [
+          "svg-edge-0021",
+          "svg-edge-0033"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_05",
+        "edges": [
+          "svg-edge-0024",
+          "svg-edge-0025"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_06",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0029"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_13",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0030"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_12",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0032"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_03",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0034"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_09",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0036"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_02",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0038"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_08",
+        "edges": [
+          "svg-edge-0025",
+          "svg-edge-0044"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_06",
+        "edges": [
+          "svg-edge-0029",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_13",
+        "edges": [
+          "svg-edge-0030",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_12",
+        "edges": [
+          "svg-edge-0032",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_03",
+        "edges": [
+          "svg-edge-0034",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_09",
+        "edges": [
+          "svg-edge-0036",
+          "svg-edge-0037"
+        ]
+      },
+      {
+        "public_root": "public_gate",
+        "other_root": "sparse_08",
+        "edges": [
+          "svg-edge-0037",
+          "svg-edge-0044"
+        ]
+      },
+      {
+        "public_root": "public_from",
+        "other_root": "sparse_10",
+        "edges": [
+          "svg-edge-0010",
+          "svg-edge-0028"
+        ]
+      },
+      {
+        "public_root": "public_from",
+        "other_root": "sparse_01",
+        "edges": [
+          "svg-edge-0012",
+          "svg-edge-0028"
+        ]
+      },
+      {
+        "public_root": "public_from",
+        "other_root": "sparse_06",
+        "edges": [
+          "svg-edge-0029",
+          "svg-edge-0042"
+        ]
+      },
+      {
+        "public_root": "public_from",
+        "other_root": "sparse_13",
+        "edges": [
+          "svg-edge-0030",
+          "svg-edge-0042"
+        ]
+      },
+      {
+        "public_root": "public_from",
+        "other_root": "sparse_12",
+        "edges": [
+          "svg-edge-0031",
+          "svg-edge-0032"
+        ]
+      },
+      {
+        "public_root": "public_from",
+        "other_root": "sparse_03",
+        "edges": [
+          "svg-edge-0031",
+          "svg-edge-0034"
+        ]
+      },
+      {
+        "public_root": "public_from",
+        "other_root": "sparse_12",
+        "edges": [
+          "svg-edge-0032",
+          "svg-edge-0042"
+        ]
+      },
+      {
+        "public_root": "public_from",
+        "other_root": "sparse_03",
+        "edges": [
+          "svg-edge-0034",
+          "svg-edge-0042"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_04",
+        "edges": [
+          "svg-edge-0000",
+          "svg-edge-0011"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_11",
+        "edges": [
+          "svg-edge-0000",
+          "svg-edge-0022"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_06",
+        "edges": [
+          "svg-edge-0000",
+          "svg-edge-0029"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_13",
+        "edges": [
+          "svg-edge-0000",
+          "svg-edge-0030"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_15",
+        "edges": [
+          "svg-edge-0000",
+          "svg-edge-0033"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_08",
+        "edges": [
+          "svg-edge-0000",
+          "svg-edge-0044"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_12",
+        "edges": [
+          "svg-edge-0009",
+          "svg-edge-0032"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_03",
+        "edges": [
+          "svg-edge-0009",
+          "svg-edge-0034"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_04",
+        "edges": [
+          "svg-edge-0011",
+          "svg-edge-0045"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_12",
+        "edges": [
+          "svg-edge-0016",
+          "svg-edge-0032"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_03",
+        "edges": [
+          "svg-edge-0016",
+          "svg-edge-0034"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_11",
+        "edges": [
+          "svg-edge-0022",
+          "svg-edge-0045"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_06",
+        "edges": [
+          "svg-edge-0029",
+          "svg-edge-0045"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_13",
+        "edges": [
+          "svg-edge-0030",
+          "svg-edge-0045"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_15",
+        "edges": [
+          "svg-edge-0033",
+          "svg-edge-0045"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_08",
+        "edges": [
+          "svg-edge-0044",
+          "svg-edge-0045"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_00",
+        "edges": [
+          "svg-edge-0045",
+          "svg-edge-0046"
+        ]
+      },
+      {
+        "public_root": "public_source",
+        "other_root": "sparse_07",
+        "edges": [
+          "svg-edge-0045",
+          "svg-edge-0047"
+        ]
+      }
+    ],
+    "low_use_left_crossing_roots": [],
+    "root_relocation_witnesses": [
+      {
+        "root": "sparse_00",
+        "edge_id": "svg-edge-0046",
+        "from_x": 89.83,
+        "to_x": 165.62,
+        "crossings_before": 1,
+        "crossings_after": 0,
+        "length_before": 99.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_01",
+        "edge_id": "svg-edge-0012",
+        "from_x": 89.83,
+        "to_x": 171.62,
+        "crossings_before": 3,
+        "crossings_after": 0,
+        "length_before": 105.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_02",
+        "edge_id": "svg-edge-0038",
+        "from_x": 89.83,
+        "to_x": 165.62,
+        "crossings_before": 1,
+        "crossings_after": 0,
+        "length_before": 99.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_03",
+        "edge_id": "svg-edge-0034",
+        "from_x": 89.83,
+        "to_x": 165.62,
+        "crossings_before": 6,
+        "crossings_after": 0,
+        "length_before": 99.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_04",
+        "edge_id": "svg-edge-0011",
+        "from_x": 89.83,
+        "to_x": 171.62,
+        "crossings_before": 2,
+        "crossings_after": 0,
+        "length_before": 105.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_05",
+        "edge_id": "svg-edge-0024",
+        "from_x": 89.83,
+        "to_x": 165.62,
+        "crossings_before": 1,
+        "crossings_after": 0,
+        "length_before": 99.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_06",
+        "edge_id": "svg-edge-0029",
+        "from_x": 89.83,
+        "to_x": 165.62,
+        "crossings_before": 6,
+        "crossings_after": 0,
+        "length_before": 99.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_07",
+        "edge_id": "svg-edge-0047",
+        "from_x": 89.83,
+        "to_x": 171.62,
+        "crossings_before": 1,
+        "crossings_after": 0,
+        "length_before": 105.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_08",
+        "edge_id": "svg-edge-0044",
+        "from_x": 89.83,
+        "to_x": 165.62,
+        "crossings_before": 5,
+        "crossings_after": 0,
+        "length_before": 99.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_09",
+        "edge_id": "svg-edge-0036",
+        "from_x": 89.83,
+        "to_x": 165.62,
+        "crossings_before": 2,
+        "crossings_after": 0,
+        "length_before": 99.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_10",
+        "edge_id": "svg-edge-0010",
+        "from_x": 89.83,
+        "to_x": 171.62,
+        "crossings_before": 3,
+        "crossings_after": 0,
+        "length_before": 105.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_11",
+        "edge_id": "svg-edge-0022",
+        "from_x": 89.83,
+        "to_x": 165.62,
+        "crossings_before": 2,
+        "crossings_after": 0,
+        "length_before": 99.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_12",
+        "edge_id": "svg-edge-0032",
+        "from_x": 89.83,
+        "to_x": 165.62,
+        "crossings_before": 6,
+        "crossings_after": 0,
+        "length_before": 99.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_13",
+        "edge_id": "svg-edge-0030",
+        "from_x": 89.83,
+        "to_x": 171.62,
+        "crossings_before": 6,
+        "crossings_after": 0,
+        "length_before": 105.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_15",
+        "edge_id": "svg-edge-0033",
+        "from_x": 89.83,
+        "to_x": 165.62,
+        "crossings_before": 4,
+        "crossings_after": 0,
+        "length_before": 99.79,
+        "length_after": 24.0
+      }
+    ],
+    "avoidable_bend_edges": [],
+    "port_order_inversions": [],
+    "root_facility_split_witnesses": [],
+    "premature_interior_trunk_entry_witnesses": [],
+    "physical_anchor_relocation_witnesses": [
+      {
+        "root": "sparse_10",
+        "edge_id": "svg-edge-0010",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 207.66,
+        "suffix_shift_px": 36.04,
+        "crossed_trunk_x": [
+          187.66,
+          197.66
+        ],
+        "crossing_points_before": 2,
+        "crossing_points_after": 0,
+        "crossing_events_before": 3,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 105.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_04",
+        "edge_id": "svg-edge-0011",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 187.66,
+        "suffix_shift_px": 16.04,
+        "crossed_trunk_x": [
+          177.66
+        ],
+        "crossing_points_before": 1,
+        "crossing_points_after": 0,
+        "crossing_events_before": 2,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 105.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_01",
+        "edge_id": "svg-edge-0012",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 207.66,
+        "suffix_shift_px": 36.04,
+        "crossed_trunk_x": [
+          187.66,
+          197.66
+        ],
+        "crossing_points_before": 2,
+        "crossing_points_after": 0,
+        "crossing_events_before": 3,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 105.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_11",
+        "edge_id": "svg-edge-0022",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 182.41,
+        "suffix_shift_px": 5.54,
+        "crossed_trunk_x": [
+          177.66
+        ],
+        "crossing_points_before": 1,
+        "crossing_points_after": 0,
+        "crossing_events_before": 2,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 99.79,
+        "length_after": 12.75
+      },
+      {
+        "root": "sparse_05",
+        "edge_id": "svg-edge-0024",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 192.41,
+        "suffix_shift_px": 15.54,
+        "crossed_trunk_x": [
+          187.66
+        ],
+        "crossing_points_before": 1,
+        "crossing_points_after": 0,
+        "crossing_events_before": 1,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 99.79,
+        "length_after": 12.75
+      },
+      {
+        "root": "sparse_06",
+        "edge_id": "svg-edge-0029",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 207.66,
+        "suffix_shift_px": 36.04,
+        "crossed_trunk_x": [
+          177.66,
+          187.66,
+          197.66
+        ],
+        "crossing_points_before": 3,
+        "crossing_points_after": 0,
+        "crossing_events_before": 6,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 99.79,
+        "length_after": 18.0
+      },
+      {
+        "root": "sparse_13",
+        "edge_id": "svg-edge-0030",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 207.66,
+        "suffix_shift_px": 36.04,
+        "crossed_trunk_x": [
+          177.66,
+          187.66,
+          197.66
+        ],
+        "crossing_points_before": 3,
+        "crossing_points_after": 0,
+        "crossing_events_before": 6,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 105.79,
+        "length_after": 24.0
+      },
+      {
+        "root": "sparse_12",
+        "edge_id": "svg-edge-0032",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 207.66,
+        "suffix_shift_px": 36.04,
+        "crossed_trunk_x": [
+          177.66,
+          187.66,
+          197.66
+        ],
+        "crossing_points_before": 3,
+        "crossing_points_after": 0,
+        "crossing_events_before": 6,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 99.79,
+        "length_after": 18.0
+      },
+      {
+        "root": "sparse_15",
+        "edge_id": "svg-edge-0033",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 197.66,
+        "suffix_shift_px": 26.04,
+        "crossed_trunk_x": [
+          177.66,
+          187.66
+        ],
+        "crossing_points_before": 2,
+        "crossing_points_after": 0,
+        "crossing_events_before": 4,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 99.79,
+        "length_after": 18.0
+      },
+      {
+        "root": "sparse_03",
+        "edge_id": "svg-edge-0034",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 207.66,
+        "suffix_shift_px": 36.04,
+        "crossed_trunk_x": [
+          177.66,
+          187.66,
+          197.66
+        ],
+        "crossing_points_before": 3,
+        "crossing_points_after": 0,
+        "crossing_events_before": 6,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 99.79,
+        "length_after": 18.0
+      },
+      {
+        "root": "sparse_09",
+        "edge_id": "svg-edge-0036",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 197.66,
+        "suffix_shift_px": 26.04,
+        "crossed_trunk_x": [
+          187.66
+        ],
+        "crossing_points_before": 1,
+        "crossing_points_after": 0,
+        "crossing_events_before": 2,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 99.79,
+        "length_after": 18.0
+      },
+      {
+        "root": "sparse_02",
+        "edge_id": "svg-edge-0038",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 192.41,
+        "suffix_shift_px": 15.54,
+        "crossed_trunk_x": [
+          187.66
+        ],
+        "crossing_points_before": 1,
+        "crossing_points_after": 0,
+        "crossing_events_before": 1,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 99.79,
+        "length_after": 12.75
+      },
+      {
+        "root": "sparse_08",
+        "edge_id": "svg-edge-0044",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 192.41,
+        "suffix_shift_px": 15.54,
+        "crossed_trunk_x": [
+          177.66,
+          187.66
+        ],
+        "crossing_points_before": 2,
+        "crossing_points_after": 0,
+        "crossing_events_before": 5,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 99.79,
+        "length_after": 12.75
+      },
+      {
+        "root": "sparse_00",
+        "edge_id": "svg-edge-0046",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 187.66,
+        "suffix_shift_px": 16.04,
+        "crossed_trunk_x": [
+          177.66
+        ],
+        "crossing_points_before": 1,
+        "crossing_points_after": 0,
+        "crossing_events_before": 1,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 99.79,
+        "length_after": 18.0
+      },
+      {
+        "root": "sparse_07",
+        "edge_id": "svg-edge-0047",
+        "physical_anchor_edges": 1,
+        "from_x": 89.83,
+        "to_x": 187.66,
+        "suffix_shift_px": 16.04,
+        "crossed_trunk_x": [
+          177.66
+        ],
+        "crossing_points_before": 1,
+        "crossing_points_after": 0,
+        "crossing_events_before": 1,
+        "crossing_events_after": 0,
+        "bends_before": 0,
+        "bends_after": 0,
+        "length_before": 105.79,
+        "length_after": 24.0
+      }
+    ],
+    "vertical_root_facility_bend_witnesses": [],
+    "root_facility_column_lag_witnesses": [],
+    "crossing_free_intervals": {
+      "svg-edge-0000": [
+        {
+          "kind": "prefix",
+          "start": [
+            123.83,
+            901.0147
+          ],
+          "end": [
+            177.66,
+            845.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 109.83,
+          "length_px": 109.83,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            845.0147
+          ],
+          "end": [
+            177.66,
+            789.0133
+          ],
+          "path_start_px": 109.83,
+          "path_end_px": 165.8314,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            789.0133
+          ],
+          "end": [
+            177.66,
+            668.0053
+          ],
+          "path_start_px": 165.8314,
+          "path_end_px": 286.8394,
+          "length_px": 121.008,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            668.0053
+          ],
+          "end": [
+            177.66,
+            612.0039
+          ],
+          "path_start_px": 286.8394,
+          "path_end_px": 342.8408,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            612.0039
+          ],
+          "end": [
+            177.66,
+            556.0025
+          ],
+          "path_start_px": 342.8408,
+          "path_end_px": 398.8422,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            556.0025
+          ],
+          "end": [
+            177.66,
+            434.9945
+          ],
+          "path_start_px": 398.8422,
+          "path_end_px": 519.8502,
+          "length_px": 121.008,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            434.9945
+          ],
+          "end": [
+            177.66,
+            378.9931
+          ],
+          "path_start_px": 519.8502,
+          "path_end_px": 575.8516,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            177.66,
+            378.9931
+          ],
+          "end": [
+            229.62,
+            322.9917
+          ],
+          "path_start_px": 575.8516,
+          "path_end_px": 683.813,
+          "length_px": 107.9614,
+          "internal_bends": 1
+        }
+      ],
+      "svg-edge-0001": [
+        {
+          "kind": "whole",
+          "start": [
+            253.62,
+            845.0147
+          ],
+          "end": [
+            358.0,
+            845.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 104.38,
+          "length_px": 104.38,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0002": [
+        {
+          "kind": "prefix",
+          "start": [
+            123.83,
+            901.0147
+          ],
+          "end": [
+            187.66,
+            958.0216
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 120.8369,
+          "length_px": 120.8369,
+          "internal_bends": 2
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            958.0216
+          ],
+          "end": [
+            197.66,
+            958.0216
+          ],
+          "path_start_px": 120.8369,
+          "path_end_px": 130.8369,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            197.66,
+            958.0216
+          ],
+          "end": [
+            358.0,
+            901.0147
+          ],
+          "path_start_px": 130.8369,
+          "path_end_px": 348.1838,
+          "length_px": 217.3469,
+          "internal_bends": 2
+        }
+      ],
+      "svg-edge-0003": [
+        {
+          "kind": "whole",
+          "start": [
+            382.0,
+            173.9931
+          ],
+          "end": [
+            465.2,
+            173.9931
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0004": [
+        {
+          "kind": "prefix",
+          "start": [
+            253.62,
+            1311.0255
+          ],
+          "end": [
+            285.58,
+            1311.0255
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 31.96,
+          "length_px": 31.96,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            285.58,
+            1311.0255
+          ],
+          "end": [
+            295.58,
+            1311.0255
+          ],
+          "path_start_px": 31.96,
+          "path_end_px": 41.96,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            295.58,
+            1311.0255
+          ],
+          "end": [
+            358.0,
+            1311.0255
+          ],
+          "path_start_px": 41.96,
+          "path_end_px": 104.38,
+          "length_px": 62.42,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0005": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            612.0039
+          ],
+          "end": [
+            177.66,
+            612.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            612.0039
+          ],
+          "end": [
+            187.66,
+            668.0053
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 113.8314,
+          "length_px": 66.0014,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            668.0053
+          ],
+          "end": [
+            187.66,
+            789.0133
+          ],
+          "path_start_px": 113.8314,
+          "path_end_px": 234.8394,
+          "length_px": 121.008,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            789.0133
+          ],
+          "end": [
+            187.66,
+            845.0147
+          ],
+          "path_start_px": 234.8394,
+          "path_end_px": 290.8408,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            845.0147
+          ],
+          "end": [
+            187.66,
+            958.0216
+          ],
+          "path_start_px": 290.8408,
+          "path_end_px": 403.8477,
+          "length_px": 113.0069,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            958.0216
+          ],
+          "end": [
+            197.66,
+            974.0324
+          ],
+          "path_start_px": 403.8477,
+          "path_end_px": 429.8585,
+          "length_px": 26.0108,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            974.0324
+          ],
+          "end": [
+            285.58,
+            1078.0255
+          ],
+          "path_start_px": 429.8585,
+          "path_end_px": 621.7716,
+          "length_px": 191.9131,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            285.58,
+            1078.0255
+          ],
+          "end": [
+            285.58,
+            1191.0324
+          ],
+          "path_start_px": 621.7716,
+          "path_end_px": 734.7785,
+          "length_px": 113.0069,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            285.58,
+            1191.0324
+          ],
+          "end": [
+            285.58,
+            1207.0324
+          ],
+          "path_start_px": 734.7785,
+          "path_end_px": 750.7785,
+          "length_px": 16.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            285.58,
+            1207.0324
+          ],
+          "end": [
+            285.58,
+            1311.0255
+          ],
+          "path_start_px": 750.7785,
+          "path_end_px": 854.7716,
+          "length_px": 103.9931,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            285.58,
+            1311.0255
+          ],
+          "end": [
+            295.58,
+            1367.0255
+          ],
+          "path_start_px": 854.7716,
+          "path_end_px": 920.7716,
+          "length_px": 66.0,
+          "internal_bends": 1
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            295.58,
+            1367.0255
+          ],
+          "end": [
+            358.0,
+            1367.0255
+          ],
+          "path_start_px": 920.7716,
+          "path_end_px": 983.1916,
+          "length_px": 62.42,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0006": [
+        {
+          "kind": "whole",
+          "start": [
+            253.62,
+            145.9931
+          ],
+          "end": [
+            358.0,
+            145.9931
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 104.38,
+          "length_px": 104.38,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0007": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            612.0039
+          ],
+          "end": [
+            177.66,
+            612.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            612.0039
+          ],
+          "end": [
+            187.66,
+            556.0025
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 113.8314,
+          "length_px": 66.0014,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            556.0025
+          ],
+          "end": [
+            285.58,
+            378.9931
+          ],
+          "path_start_px": 113.8314,
+          "path_end_px": 388.7608,
+          "length_px": 274.9294,
+          "internal_bends": 2
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            285.58,
+            378.9931
+          ],
+          "end": [
+            358.0,
+            201.9931
+          ],
+          "path_start_px": 388.7608,
+          "path_end_px": 638.1808,
+          "length_px": 249.42,
+          "internal_bends": 1
+        }
+      ],
+      "svg-edge-0008": [
+        {
+          "kind": "whole",
+          "start": [
+            382.0,
+            406.9931
+          ],
+          "end": [
+            465.2,
+            406.9931
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0009": [
+        {
+          "kind": "prefix",
+          "start": [
+            123.83,
+            901.0147
+          ],
+          "end": [
+            177.66,
+            1022.0241
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 174.8394,
+          "length_px": 174.8394,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1022.0241
+          ],
+          "end": [
+            177.66,
+            1078.0255
+          ],
+          "path_start_px": 174.8394,
+          "path_end_px": 230.8408,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1078.0255
+          ],
+          "end": [
+            177.66,
+            1134.0269
+          ],
+          "path_start_px": 230.8408,
+          "path_end_px": 286.8422,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1134.0269
+          ],
+          "end": [
+            187.66,
+            1255.0241
+          ],
+          "path_start_px": 286.8422,
+          "path_end_px": 417.8394,
+          "length_px": 130.9972,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1255.0241
+          ],
+          "end": [
+            197.66,
+            1255.0241
+          ],
+          "path_start_px": 417.8394,
+          "path_end_px": 427.8394,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            197.66,
+            1255.0241
+          ],
+          "end": [
+            229.62,
+            1255.0241
+          ],
+          "path_start_px": 427.8394,
+          "path_end_px": 459.7994,
+          "length_px": 31.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0010": [
+        {
+          "kind": "prefix",
+          "start": [
+            123.83,
+            1311.0255
+          ],
+          "end": [
+            187.66,
+            1311.0255
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 63.83,
+          "length_px": 63.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1311.0255
+          ],
+          "end": [
+            197.66,
+            1311.0255
+          ],
+          "path_start_px": 63.83,
+          "path_end_px": 73.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            197.66,
+            1311.0255
+          ],
+          "end": [
+            229.62,
+            1311.0255
+          ],
+          "path_start_px": 73.83,
+          "path_end_px": 105.79,
+          "length_px": 31.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0011": [
+        {
+          "kind": "prefix",
+          "start": [
+            123.83,
+            378.9931
+          ],
+          "end": [
+            177.66,
+            378.9931
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 53.83,
+          "length_px": 53.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            177.66,
+            378.9931
+          ],
+          "end": [
+            229.62,
+            378.9931
+          ],
+          "path_start_px": 53.83,
+          "path_end_px": 105.79,
+          "length_px": 51.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0012": [
+        {
+          "kind": "prefix",
+          "start": [
+            123.83,
+            1367.0269
+          ],
+          "end": [
+            187.66,
+            1367.0269
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 63.83,
+          "length_px": 63.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1367.0269
+          ],
+          "end": [
+            197.66,
+            1367.0269
+          ],
+          "path_start_px": 63.83,
+          "path_end_px": 73.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            197.66,
+            1367.0269
+          ],
+          "end": [
+            229.62,
+            1367.0269
+          ],
+          "path_start_px": 73.83,
+          "path_end_px": 105.79,
+          "length_px": 31.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0013": [
+        {
+          "kind": "whole",
+          "start": [
+            382.0,
+            1106.0255
+          ],
+          "end": [
+            465.2,
+            1106.0255
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0014": [
+        {
+          "kind": "whole",
+          "start": [
+            382.0,
+            1572.0363
+          ],
+          "end": [
+            465.2,
+            1572.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0015": [
+        {
+          "kind": "prefix",
+          "start": [
+            253.62,
+            1078.0255
+          ],
+          "end": [
+            285.58,
+            1078.0255
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 31.96,
+          "length_px": 31.96,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            285.58,
+            1078.0255
+          ],
+          "end": [
+            358.0,
+            1078.0255
+          ],
+          "path_start_px": 31.96,
+          "path_end_px": 104.38,
+          "length_px": 72.42,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0016": [
+        {
+          "kind": "prefix",
+          "start": [
+            123.83,
+            901.0147
+          ],
+          "end": [
+            177.66,
+            1022.0241
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 174.8394,
+          "length_px": 174.8394,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1022.0241
+          ],
+          "end": [
+            177.66,
+            1078.0255
+          ],
+          "path_start_px": 174.8394,
+          "path_end_px": 230.8408,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1078.0255
+          ],
+          "end": [
+            177.66,
+            1134.0269
+          ],
+          "path_start_px": 230.8408,
+          "path_end_px": 286.8422,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1134.0269
+          ],
+          "end": [
+            187.66,
+            1191.0324
+          ],
+          "path_start_px": 286.8422,
+          "path_end_px": 353.8477,
+          "length_px": 67.0055,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1191.0324
+          ],
+          "end": [
+            197.66,
+            1191.0324
+          ],
+          "path_start_px": 353.8477,
+          "path_end_px": 363.8477,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            1191.0324
+          ],
+          "end": [
+            285.58,
+            1191.0324
+          ],
+          "path_start_px": 363.8477,
+          "path_end_px": 451.7677,
+          "length_px": 87.92,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            285.58,
+            1191.0324
+          ],
+          "end": [
+            358.0,
+            1134.0255
+          ],
+          "path_start_px": 451.7677,
+          "path_end_px": 581.1946,
+          "length_px": 129.4269,
+          "internal_bends": 2
+        }
+      ],
+      "svg-edge-0017": [
+        {
+          "kind": "whole",
+          "start": [
+            382.0,
+            873.0147
+          ],
+          "end": [
+            465.2,
+            873.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0018": [
+        {
+          "kind": "whole",
+          "start": [
+            382.0,
+            1805.0363
+          ],
+          "end": [
+            465.2,
+            1805.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0019": [
+        {
+          "kind": "whole",
+          "start": [
+            382.0,
+            640.0039
+          ],
+          "end": [
+            465.2,
+            640.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0020": [
+        {
+          "kind": "prefix",
+          "start": [
+            253.62,
+            378.9931
+          ],
+          "end": [
+            285.58,
+            378.9931
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 31.96,
+          "length_px": 31.96,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            285.58,
+            378.9931
+          ],
+          "end": [
+            358.0,
+            378.9931
+          ],
+          "path_start_px": 31.96,
+          "path_end_px": 104.38,
+          "length_px": 72.42,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0021": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            612.0039
+          ],
+          "end": [
+            177.66,
+            612.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            612.0039
+          ],
+          "end": [
+            187.66,
+            556.0025
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 113.8314,
+          "length_px": 66.0014,
+          "internal_bends": 1
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            187.66,
+            556.0025
+          ],
+          "end": [
+            358.0,
+            434.9931
+          ],
+          "path_start_px": 113.8314,
+          "path_end_px": 405.1808,
+          "length_px": 291.3494,
+          "internal_bends": 3
+        }
+      ],
+      "svg-edge-0022": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            434.9945
+          ],
+          "end": [
+            177.66,
+            434.9945
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            177.66,
+            434.9945
+          ],
+          "end": [
+            229.62,
+            434.9945
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 99.79,
+          "length_px": 51.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0023": [
+        {
+          "kind": "whole",
+          "start": [
+            382.0,
+            1339.0255
+          ],
+          "end": [
+            465.2,
+            1339.0255
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 83.2,
+          "length_px": 83.2,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0024": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            1721.0349
+          ],
+          "end": [
+            187.66,
+            1721.0349
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 57.83,
+          "length_px": 57.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            187.66,
+            1721.0349
+          ],
+          "end": [
+            229.62,
+            1721.0349
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 99.79,
+          "length_px": 41.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0025": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            612.0039
+          ],
+          "end": [
+            177.66,
+            612.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            612.0039
+          ],
+          "end": [
+            187.66,
+            668.0053
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 113.8314,
+          "length_px": 66.0014,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            668.0053
+          ],
+          "end": [
+            187.66,
+            789.0133
+          ],
+          "path_start_px": 113.8314,
+          "path_end_px": 234.8394,
+          "length_px": 121.008,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            789.0133
+          ],
+          "end": [
+            187.66,
+            845.0147
+          ],
+          "path_start_px": 234.8394,
+          "path_end_px": 290.8408,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            845.0147
+          ],
+          "end": [
+            187.66,
+            958.0216
+          ],
+          "path_start_px": 290.8408,
+          "path_end_px": 403.8477,
+          "length_px": 113.0069,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            958.0216
+          ],
+          "end": [
+            187.66,
+            1022.0241
+          ],
+          "path_start_px": 403.8477,
+          "path_end_px": 467.8502,
+          "length_px": 64.0025,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1022.0241
+          ],
+          "end": [
+            187.66,
+            1078.0255
+          ],
+          "path_start_px": 467.8502,
+          "path_end_px": 523.8516,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1078.0255
+          ],
+          "end": [
+            187.66,
+            1134.0269
+          ],
+          "path_start_px": 523.8516,
+          "path_end_px": 579.853,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1134.0269
+          ],
+          "end": [
+            187.66,
+            1191.0324
+          ],
+          "path_start_px": 579.853,
+          "path_end_px": 636.8585,
+          "length_px": 57.0055,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1191.0324
+          ],
+          "end": [
+            187.66,
+            1255.0241
+          ],
+          "path_start_px": 636.8585,
+          "path_end_px": 700.8502,
+          "length_px": 63.9917,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1255.0241
+          ],
+          "end": [
+            187.66,
+            1311.0255
+          ],
+          "path_start_px": 700.8502,
+          "path_end_px": 756.8516,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1311.0255
+          ],
+          "end": [
+            187.66,
+            1367.0269
+          ],
+          "path_start_px": 756.8516,
+          "path_end_px": 812.853,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1367.0269
+          ],
+          "end": [
+            187.66,
+            1488.0349
+          ],
+          "path_start_px": 812.853,
+          "path_end_px": 933.861,
+          "length_px": 121.008,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1488.0349
+          ],
+          "end": [
+            187.66,
+            1600.0377
+          ],
+          "path_start_px": 933.861,
+          "path_end_px": 1045.8638,
+          "length_px": 112.0028,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1600.0377
+          ],
+          "end": [
+            187.66,
+            1721.0349
+          ],
+          "path_start_px": 1045.8638,
+          "path_end_px": 1166.861,
+          "length_px": 120.9972,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            187.66,
+            1721.0349
+          ],
+          "end": [
+            229.62,
+            1777.0363
+          ],
+          "path_start_px": 1166.861,
+          "path_end_px": 1264.8224,
+          "length_px": 97.9614,
+          "internal_bends": 1
+        }
+      ],
+      "svg-edge-0026": [
+        {
+          "kind": "whole",
+          "start": [
+            129.83,
+            1833.0377
+          ],
+          "end": [
+            229.62,
+            1833.0377
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 99.79,
+          "length_px": 99.79,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0027": [
+        {
+          "kind": "prefix",
+          "start": [
+            253.62,
+            1777.0363
+          ],
+          "end": [
+            295.58,
+            1777.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 41.96,
+          "length_px": 41.96,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            295.58,
+            1777.0363
+          ],
+          "end": [
+            358.0,
+            1777.0363
+          ],
+          "path_start_px": 41.96,
+          "path_end_px": 104.38,
+          "length_px": 62.42,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0028": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            1134.0269
+          ],
+          "end": [
+            177.66,
+            1134.0269
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1134.0269
+          ],
+          "end": [
+            187.66,
+            1134.0269
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 57.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1134.0269
+          ],
+          "end": [
+            197.66,
+            1191.0324
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 124.8355,
+          "length_px": 67.0055,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            1191.0324
+          ],
+          "end": [
+            197.66,
+            1255.0241
+          ],
+          "path_start_px": 124.8355,
+          "path_end_px": 188.8272,
+          "length_px": 63.9917,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            1255.0241
+          ],
+          "end": [
+            197.66,
+            1311.0255
+          ],
+          "path_start_px": 188.8272,
+          "path_end_px": 244.8286,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            1311.0255
+          ],
+          "end": [
+            197.66,
+            1367.0269
+          ],
+          "path_start_px": 244.8286,
+          "path_end_px": 300.83,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            1367.0269
+          ],
+          "end": [
+            295.58,
+            1544.0363
+          ],
+          "path_start_px": 300.83,
+          "path_end_px": 575.7594,
+          "length_px": 274.9294,
+          "internal_bends": 2
+        },
+        {
+          "kind": "interior",
+          "start": [
+            295.58,
+            1544.0363
+          ],
+          "end": [
+            295.58,
+            1777.0363
+          ],
+          "path_start_px": 575.7594,
+          "path_end_px": 808.7594,
+          "length_px": 233.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            295.58,
+            1777.0363
+          ],
+          "end": [
+            358.0,
+            1833.0363
+          ],
+          "path_start_px": 808.7594,
+          "path_end_px": 927.1794,
+          "length_px": 118.42,
+          "internal_bends": 1
+        }
+      ],
+      "svg-edge-0029": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            789.0133
+          ],
+          "end": [
+            177.66,
+            789.0133
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            789.0133
+          ],
+          "end": [
+            187.66,
+            789.0133
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 57.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            789.0133
+          ],
+          "end": [
+            197.66,
+            789.0133
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 67.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            197.66,
+            789.0133
+          ],
+          "end": [
+            229.62,
+            789.0133
+          ],
+          "path_start_px": 67.83,
+          "path_end_px": 99.79,
+          "length_px": 31.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0030": [
+        {
+          "kind": "prefix",
+          "start": [
+            123.83,
+            845.0147
+          ],
+          "end": [
+            177.66,
+            845.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 53.83,
+          "length_px": 53.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            845.0147
+          ],
+          "end": [
+            187.66,
+            845.0147
+          ],
+          "path_start_px": 53.83,
+          "path_end_px": 63.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            845.0147
+          ],
+          "end": [
+            197.66,
+            845.0147
+          ],
+          "path_start_px": 63.83,
+          "path_end_px": 73.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            197.66,
+            845.0147
+          ],
+          "end": [
+            229.62,
+            845.0147
+          ],
+          "path_start_px": 73.83,
+          "path_end_px": 105.79,
+          "length_px": 31.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0031": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            1134.0269
+          ],
+          "end": [
+            177.66,
+            1134.0269
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1134.0269
+          ],
+          "end": [
+            187.66,
+            1134.0269
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 57.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1134.0269
+          ],
+          "end": [
+            197.66,
+            1078.0255
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 123.8314,
+          "length_px": 66.0014,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            1078.0255
+          ],
+          "end": [
+            197.66,
+            1022.0241
+          ],
+          "path_start_px": 123.8314,
+          "path_end_px": 179.8328,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            1022.0241
+          ],
+          "end": [
+            197.66,
+            974.0324
+          ],
+          "path_start_px": 179.8328,
+          "path_end_px": 227.8245,
+          "length_px": 47.9917,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            974.0324
+          ],
+          "end": [
+            197.66,
+            958.0216
+          ],
+          "path_start_px": 227.8245,
+          "path_end_px": 243.8353,
+          "length_px": 16.0108,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            197.66,
+            958.0216
+          ],
+          "end": [
+            229.62,
+            901.0161
+          ],
+          "path_start_px": 243.8353,
+          "path_end_px": 332.8008,
+          "length_px": 88.9655,
+          "internal_bends": 1
+        }
+      ],
+      "svg-edge-0032": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            1022.0241
+          ],
+          "end": [
+            177.66,
+            1022.0241
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1022.0241
+          ],
+          "end": [
+            187.66,
+            1022.0241
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 57.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1022.0241
+          ],
+          "end": [
+            197.66,
+            1022.0241
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 67.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            197.66,
+            1022.0241
+          ],
+          "end": [
+            229.62,
+            1022.0241
+          ],
+          "path_start_px": 67.83,
+          "path_end_px": 99.79,
+          "length_px": 31.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0033": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            556.0025
+          ],
+          "end": [
+            177.66,
+            556.0025
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            556.0025
+          ],
+          "end": [
+            187.66,
+            556.0025
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 57.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            187.66,
+            556.0025
+          ],
+          "end": [
+            229.62,
+            556.0025
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 99.79,
+          "length_px": 41.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0034": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            1078.0255
+          ],
+          "end": [
+            177.66,
+            1078.0255
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1078.0255
+          ],
+          "end": [
+            187.66,
+            1078.0255
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 57.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1078.0255
+          ],
+          "end": [
+            197.66,
+            1078.0255
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 67.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            197.66,
+            1078.0255
+          ],
+          "end": [
+            229.62,
+            1078.0255
+          ],
+          "path_start_px": 67.83,
+          "path_end_px": 99.79,
+          "length_px": 31.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0035": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            1134.0269
+          ],
+          "end": [
+            177.66,
+            1134.0269
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1134.0269
+          ],
+          "end": [
+            187.66,
+            1134.0269
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 57.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            187.66,
+            1134.0269
+          ],
+          "end": [
+            229.62,
+            1134.0269
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 99.79,
+          "length_px": 41.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0036": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            1488.0349
+          ],
+          "end": [
+            187.66,
+            1488.0349
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 57.83,
+          "length_px": 57.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            187.66,
+            1488.0349
+          ],
+          "end": [
+            229.62,
+            1488.0349
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 99.79,
+          "length_px": 41.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0037": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            612.0039
+          ],
+          "end": [
+            177.66,
+            612.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            612.0039
+          ],
+          "end": [
+            187.66,
+            668.0053
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 113.8314,
+          "length_px": 66.0014,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            668.0053
+          ],
+          "end": [
+            187.66,
+            789.0133
+          ],
+          "path_start_px": 113.8314,
+          "path_end_px": 234.8394,
+          "length_px": 121.008,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            789.0133
+          ],
+          "end": [
+            187.66,
+            845.0147
+          ],
+          "path_start_px": 234.8394,
+          "path_end_px": 290.8408,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            845.0147
+          ],
+          "end": [
+            187.66,
+            958.0216
+          ],
+          "path_start_px": 290.8408,
+          "path_end_px": 403.8477,
+          "length_px": 113.0069,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            958.0216
+          ],
+          "end": [
+            187.66,
+            1022.0241
+          ],
+          "path_start_px": 403.8477,
+          "path_end_px": 467.8502,
+          "length_px": 64.0025,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1022.0241
+          ],
+          "end": [
+            187.66,
+            1078.0255
+          ],
+          "path_start_px": 467.8502,
+          "path_end_px": 523.8516,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1078.0255
+          ],
+          "end": [
+            187.66,
+            1134.0269
+          ],
+          "path_start_px": 523.8516,
+          "path_end_px": 579.853,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1134.0269
+          ],
+          "end": [
+            187.66,
+            1191.0324
+          ],
+          "path_start_px": 579.853,
+          "path_end_px": 636.8585,
+          "length_px": 57.0055,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1191.0324
+          ],
+          "end": [
+            187.66,
+            1255.0241
+          ],
+          "path_start_px": 636.8585,
+          "path_end_px": 700.8502,
+          "length_px": 63.9917,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1255.0241
+          ],
+          "end": [
+            187.66,
+            1311.0255
+          ],
+          "path_start_px": 700.8502,
+          "path_end_px": 756.8516,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1311.0255
+          ],
+          "end": [
+            187.66,
+            1367.0269
+          ],
+          "path_start_px": 756.8516,
+          "path_end_px": 812.853,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1367.0269
+          ],
+          "end": [
+            187.66,
+            1488.0349
+          ],
+          "path_start_px": 812.853,
+          "path_end_px": 933.861,
+          "length_px": 121.008,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            187.66,
+            1488.0349
+          ],
+          "end": [
+            229.62,
+            1544.0363
+          ],
+          "path_start_px": 933.861,
+          "path_end_px": 1031.8224,
+          "length_px": 97.9614,
+          "internal_bends": 1
+        }
+      ],
+      "svg-edge-0038": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            1600.0377
+          ],
+          "end": [
+            187.66,
+            1600.0377
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 57.83,
+          "length_px": 57.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            187.66,
+            1600.0377
+          ],
+          "end": [
+            229.62,
+            1600.0377
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 99.79,
+          "length_px": 41.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0039": [
+        {
+          "kind": "prefix",
+          "start": [
+            253.62,
+            1544.0363
+          ],
+          "end": [
+            295.58,
+            1544.0363
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 41.96,
+          "length_px": 41.96,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            295.58,
+            1544.0363
+          ],
+          "end": [
+            358.0,
+            1544.0363
+          ],
+          "path_start_px": 41.96,
+          "path_end_px": 104.38,
+          "length_px": 62.42,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0040": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            1134.0269
+          ],
+          "end": [
+            177.66,
+            1134.0269
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1134.0269
+          ],
+          "end": [
+            187.66,
+            1134.0269
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 57.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1134.0269
+          ],
+          "end": [
+            197.66,
+            1191.0324
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 124.8355,
+          "length_px": 67.0055,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            1191.0324
+          ],
+          "end": [
+            285.58,
+            1207.0324
+          ],
+          "path_start_px": 124.8355,
+          "path_end_px": 228.7555,
+          "length_px": 103.92,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            285.58,
+            1207.0324
+          ],
+          "end": [
+            295.58,
+            1311.0255
+          ],
+          "path_start_px": 228.7555,
+          "path_end_px": 342.7486,
+          "length_px": 113.9931,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            295.58,
+            1311.0255
+          ],
+          "end": [
+            295.58,
+            1367.0255
+          ],
+          "path_start_px": 342.7486,
+          "path_end_px": 398.7486,
+          "length_px": 56.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            295.58,
+            1367.0255
+          ],
+          "end": [
+            295.58,
+            1544.0363
+          ],
+          "path_start_px": 398.7486,
+          "path_end_px": 575.7594,
+          "length_px": 177.0108,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            295.58,
+            1544.0363
+          ],
+          "end": [
+            358.0,
+            1600.0363
+          ],
+          "path_start_px": 575.7594,
+          "path_end_px": 694.1794,
+          "length_px": 118.42,
+          "internal_bends": 1
+        }
+      ],
+      "svg-edge-0041": [
+        {
+          "kind": "whole",
+          "start": [
+            253.62,
+            612.0039
+          ],
+          "end": [
+            358.0,
+            612.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 104.38,
+          "length_px": 104.38,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0042": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            1134.0269
+          ],
+          "end": [
+            177.66,
+            1134.0269
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            1134.0269
+          ],
+          "end": [
+            187.66,
+            1134.0269
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 57.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            187.66,
+            1134.0269
+          ],
+          "end": [
+            197.66,
+            1078.0255
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 123.8314,
+          "length_px": 66.0014,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            1078.0255
+          ],
+          "end": [
+            197.66,
+            1022.0241
+          ],
+          "path_start_px": 123.8314,
+          "path_end_px": 179.8328,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            1022.0241
+          ],
+          "end": [
+            197.66,
+            974.0324
+          ],
+          "path_start_px": 179.8328,
+          "path_end_px": 227.8245,
+          "length_px": 47.9917,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            974.0324
+          ],
+          "end": [
+            197.66,
+            958.0216
+          ],
+          "path_start_px": 227.8245,
+          "path_end_px": 243.8353,
+          "length_px": 16.0108,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            958.0216
+          ],
+          "end": [
+            197.66,
+            845.0147
+          ],
+          "path_start_px": 243.8353,
+          "path_end_px": 356.8422,
+          "length_px": 113.0069,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            197.66,
+            845.0147
+          ],
+          "end": [
+            197.66,
+            789.0133
+          ],
+          "path_start_px": 356.8422,
+          "path_end_px": 412.8436,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            197.66,
+            789.0133
+          ],
+          "end": [
+            358.0,
+            668.0039
+          ],
+          "path_start_px": 412.8436,
+          "path_end_px": 694.193,
+          "length_px": 281.3494,
+          "internal_bends": 3
+        }
+      ],
+      "svg-edge-0043": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            612.0039
+          ],
+          "end": [
+            177.66,
+            612.0039
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            177.66,
+            612.0039
+          ],
+          "end": [
+            229.62,
+            612.0039
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 99.79,
+          "length_px": 51.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0044": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            668.0053
+          ],
+          "end": [
+            177.66,
+            668.0053
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            668.0053
+          ],
+          "end": [
+            187.66,
+            668.0053
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 57.83,
+          "length_px": 10.0,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            187.66,
+            668.0053
+          ],
+          "end": [
+            229.62,
+            668.0053
+          ],
+          "path_start_px": 57.83,
+          "path_end_px": 99.79,
+          "length_px": 41.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0045": [
+        {
+          "kind": "prefix",
+          "start": [
+            123.83,
+            901.0147
+          ],
+          "end": [
+            177.66,
+            845.0147
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 109.83,
+          "length_px": 109.83,
+          "internal_bends": 1
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            845.0147
+          ],
+          "end": [
+            177.66,
+            789.0133
+          ],
+          "path_start_px": 109.83,
+          "path_end_px": 165.8314,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            789.0133
+          ],
+          "end": [
+            177.66,
+            668.0053
+          ],
+          "path_start_px": 165.8314,
+          "path_end_px": 286.8394,
+          "length_px": 121.008,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            668.0053
+          ],
+          "end": [
+            177.66,
+            612.0039
+          ],
+          "path_start_px": 286.8394,
+          "path_end_px": 342.8408,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            612.0039
+          ],
+          "end": [
+            177.66,
+            556.0025
+          ],
+          "path_start_px": 342.8408,
+          "path_end_px": 398.8422,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            556.0025
+          ],
+          "end": [
+            177.66,
+            434.9945
+          ],
+          "path_start_px": 398.8422,
+          "path_end_px": 519.8502,
+          "length_px": 121.008,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            434.9945
+          ],
+          "end": [
+            177.66,
+            378.9931
+          ],
+          "path_start_px": 519.8502,
+          "path_end_px": 575.8516,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            378.9931
+          ],
+          "end": [
+            177.66,
+            201.9945
+          ],
+          "path_start_px": 575.8516,
+          "path_end_px": 752.8502,
+          "length_px": 176.9986,
+          "internal_bends": 0
+        },
+        {
+          "kind": "interior",
+          "start": [
+            177.66,
+            201.9945
+          ],
+          "end": [
+            177.66,
+            145.9931
+          ],
+          "path_start_px": 752.8502,
+          "path_end_px": 808.8516,
+          "length_px": 56.0014,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            177.66,
+            145.9931
+          ],
+          "end": [
+            229.62,
+            89.9917
+          ],
+          "path_start_px": 808.8516,
+          "path_end_px": 916.813,
+          "length_px": 107.9614,
+          "internal_bends": 1
+        }
+      ],
+      "svg-edge-0046": [
+        {
+          "kind": "prefix",
+          "start": [
+            129.83,
+            145.9931
+          ],
+          "end": [
+            177.66,
+            145.9931
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 47.83,
+          "length_px": 47.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            177.66,
+            145.9931
+          ],
+          "end": [
+            229.62,
+            145.9931
+          ],
+          "path_start_px": 47.83,
+          "path_end_px": 99.79,
+          "length_px": 51.96,
+          "internal_bends": 0
+        }
+      ],
+      "svg-edge-0047": [
+        {
+          "kind": "prefix",
+          "start": [
+            123.83,
+            201.9945
+          ],
+          "end": [
+            177.66,
+            201.9945
+          ],
+          "path_start_px": 0.0,
+          "path_end_px": 53.83,
+          "length_px": 53.83,
+          "internal_bends": 0
+        },
+        {
+          "kind": "suffix",
+          "start": [
+            177.66,
+            201.9945
+          ],
+          "end": [
+            229.62,
+            201.9945
+          ],
+          "path_start_px": 53.83,
+          "path_end_px": 105.79,
+          "length_px": 51.96,
+          "internal_bends": 0
+        }
+      ]
+    },
+    "downstream_corridor_tail_bend_witnesses": [],
+    "adjacent_root_height_bend_witnesses": [],
+    "mergeable_root_facility_witnesses": [],
+    "regular_fanout_array_replication_witnesses": [],
+    "shared_root_bus_fragmentation_witnesses": [],
+    "root_fanout_axis_dominance_witnesses": [],
+    "direct_root_fanin_column_witnesses": [],
+    "raw_direct_root_fanin_column_witnesses": [],
+    "feasible_direct_root_fanin_column_witnesses": [],
+    "root_first_column_witnesses": []
+  },
+  "detected_issues": [
+    "FB-ROOT-001",
+    "FB-ROUTE-002",
+    "FB-ROOT-003",
+    "FB-ROOT-004",
+    "FB-ROOT-010"
+  ]
+}

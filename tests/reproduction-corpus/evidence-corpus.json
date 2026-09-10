@@ -108,8 +108,8 @@
     },
     {
       "id": "public-from-dispersed-bus-current-baseline",
-      "baseline_revision": "worktree-producer-snapshot-20260908T122300+0800",
-      "python_role": "worktree",
+      "baseline_revision": "c1a953fd67dbbf75eb69b85a7541d3bb2bbed8d5",
+      "python_role": "current",
       "cli_mode": "direct",
       "input": "tests/reproduction-corpus/pad-r08-s02.json",
       "library": "drawio-lib",
@@ -196,6 +196,48 @@
       "input": "tests/reproduction-corpus/pad-r08-s02.json",
       "library": "drawio-lib",
       "issues": ["FB-ROOT-021"]
+    },
+    {
+      "id": "distant-root-two-bands-baseline",
+      "baseline_revision": "33cceec83733ea45403611c823c4b3ffc730292f",
+      "python_role": "legacy",
+      "cli_mode": "direct",
+      "input": "example/auto-layout/24-single-source-rendering-alias.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROOT-022"],
+      "semantic_contracts": {
+        "FB-ROOT-022": {
+          "variant_id": "distant-root-two-bands",
+          "nodes": [
+            {"name": "shared_source", "kind": "from", "root": true, "min_outdegree": 2}
+          ],
+          "symptom": {
+            "type": "root_facility_split_dominance",
+            "root": "shared_source"
+          }
+        }
+      }
+    },
+    {
+      "id": "premature-interior-trunk-entry-baseline",
+      "baseline_revision": "33cceec83733ea45403611c823c4b3ffc730292f",
+      "python_role": "legacy",
+      "cli_mode": "direct",
+      "input": "tests/reproduction-corpus/premature-interior-trunk-entry.json",
+      "library": "drawio-lib",
+      "issues": ["FB-ROUTE-023"],
+      "semantic_contracts": {
+        "FB-ROUTE-023": {
+          "variant_id": "premature-interior-trunk-entry",
+          "nodes": [
+            {"name": "reference_clock_source_with_long_instance_name_0", "kind": "from", "root": true, "min_outdegree": 2}
+          ],
+          "symptom": {
+            "type": "premature_interior_trunk_entry",
+            "root": "reference_clock_source_with_long_instance_name_0"
+          }
+        }
+      }
     }
   ],
   "current_fix_cases": [

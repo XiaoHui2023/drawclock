@@ -76,6 +76,7 @@ example/auto-layout/*.svg
 
 # CI / 本地 scratch 日志
 _ci_job.log
+.tmp-*
 
 # 本地试画图（非示例）
 test.drawio.svg

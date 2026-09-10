@@ -250,6 +250,9 @@ def test_compact_common_root_prefers_one_shared_vertical_facility() -> None:
     """Nearby orderly consumers share a trunk; no row-count rule is used."""
     config = load_clock_tree(ROOT / "tests/reproduction-corpus/mux-r04-s00.json")
     document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
     nodes = resolve_nodes(
         config, load_library_shapes(LIBRARY), {}, library_path=LIBRARY
     )
@@ -269,8 +272,10 @@ def test_compact_common_root_prefers_one_shared_vertical_facility() -> None:
     assert len(facilities) == 1
     assert len(shared_edges) == 2
     assert {edge.source_id for edge in shared_edges} == {facilities[0].cell_id}
-    assert shared_edges[0].waypoints[0] == shared_edges[1].waypoints[0]
-    assert shared_edges[0].waypoints[1][0] == shared_edges[1].waypoints[1][0]
+    assert sum(not edge.waypoints for edge in shared_edges) == 1
+    assert quality["readability"]["fragmented_fanout_sources"] == {}
+    assert quality["line_integrity"]["split_rejoin_fanout_nets"] == []
+    assert quality["passed"] is True, quality["hard_failures"]
 
 
 def test_source_replication_integrates_every_distant_consumer_band() -> None:
@@ -284,9 +289,9 @@ def test_source_replication_integrates_every_distant_consumer_band() -> None:
         if (vertex.logical_name or vertex.name) == "root"
     ]
 
-    assert len(root_anchors) == 1
-    assert report["source_rendering_replicas"] == 0
-    assert quality["alignment"]["rendering_replicas"] == {}
+    assert len(root_anchors) == 4
+    assert report["source_rendering_replicas"] == 3
+    assert quality["alignment"]["rendering_replicas"] == {"root": 3}
 
 
 def test_generic_single_source_naturally_renders_local_anchors() -> None:
@@ -312,11 +317,11 @@ def test_generic_single_source_naturally_renders_local_anchors() -> None:
     statistics = selection["routing_statistics"]
 
     assert roots == ["shared_source"]
-    assert len(anchors) == 1
+    assert len(anchors) == 2
     assert all(anchor.cell_id in used_source_ids for anchor in anchors)
-    assert selection["source_replicated_roots"] == 0
-    assert selection["source_rendering_replicas"] == 0
-    assert statistics["nodes"]["shared_source"]["rendering_anchors"] == 1
+    assert selection["source_replicated_roots"] == 1
+    assert selection["source_rendering_replicas"] == 1
+    assert statistics["nodes"]["shared_source"]["rendering_anchors"] == 2
     assert len({vertex.logical_name or vertex.name for vertex in document.vertices}) == len(config)
 
 
@@ -418,7 +423,16 @@ def test_public_multi_source_rows_cover_complex_interleaved_feature_space() -> N
 
     assert coverage["source_pairs"] >= 24
     assert {vertex.logical_name or vertex.name for vertex in document.vertices} == set(config)
-    assert report["selection"]["source_rendering_replicas"] == 0
+    replica_count = report["selection"]["source_rendering_replicas"]
+    assert replica_count == len(document.vertices) - len(config)
+    used_sources = {edge.source_id for edge in document.edges}
+    assert all(
+        vertex.logical_name is None or vertex.cell_id in used_sources
+        for vertex in document.vertices
+    )
+    assert quality["alignment"]["invalid_rendering_replicas"] == []
+    assert quality["alignment"]["unused_rendering_replicas"] == []
+    assert quality["alignment"]["avoidable_source_replicas"] == []
     assert report["selection"]["routing_statistics"]["totals"]["edges"] > len(config)
     assert quality["passed"] is True
 
@@ -579,8 +593,20 @@ def test_complex_source_weave_anchor_relocation_dominates_inherited_columns(
         config, optimized, library_path=LIBRARY, grid=0.0001, tolerance=0.01
     )
 
-    assert optimized_report["selection"]["source_anchor_column_moves"] == 0
-    assert optimized_totals == inherited_totals
+    assert optimized_report["selection"][
+        "post_first_source_anchor_column_moves"
+    ] > 0
+    for metric in (
+        "crossing_pair_intersections",
+        "distinct_crossed_edge_pairs",
+        "distinct_crossing_points",
+        "bends_total",
+    ):
+        assert optimized_totals[metric] <= inherited_totals[metric]
+    assert (
+        optimized_totals["manhattan_length_px"]
+        <= inherited_totals["manhattan_length_px"]
+    )
     assert optimized_quality["passed"] is True, optimized_quality["hard_failures"]
 
 
@@ -821,8 +847,8 @@ def test_four_row_dispersal_is_already_eligible_for_safe_replication() -> None:
     )
 
     assert report["source_replica_row_budget"] == 3
-    assert report["source_replicated_roots"] == 0
-    assert report["source_rendering_replicas"] == 0
+    assert report["source_replicated_roots"] == 1
+    assert report["source_rendering_replicas"] == 1
 
 
 def test_strategy_depends_on_structure_within_supported_examples() -> None:
@@ -1064,7 +1090,7 @@ def test_dual_from_reuse_has_no_avoidable_outer_detours() -> None:
     ("domains", "clocks_per_domain", "long_names", "clock_count"),
     [
         (16, 2, True, 32),
-        (64, 2, False, 128),
+        (32, 2, False, 64),
     ],
 )
 def test_adversarial_weave_quality_corpus(
@@ -1101,7 +1127,7 @@ def test_adversarial_weave_quality_corpus(
 
 
 def test_multiple_source_placement_selects_best_valid_candidate() -> None:
-    config = build_adversarial_weave(64, clocks_per_domain=2, long_names=False)
+    config = build_adversarial_weave(32, clocks_per_domain=2, long_names=False)
     document, report = generate_elk_layout(config, library_path=LIBRARY)
     quality = inspect_layout_quality(
         config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
@@ -1152,9 +1178,18 @@ def test_multi_from_roots_keep_one_facility_and_shared_bus() -> None:
         for vertex in document.vertices
         if (vertex.logical_name or vertex.name) in from_names
     )
-    assert facility_counts == Counter({name: 1 for name in from_names})
-    assert report["selection"]["source_replicated_roots"] == 0
-    assert report["selection"]["source_rendering_replicas"] == 0
+    assert set(facility_counts) == from_names
+    assert all(count > 1 for count in facility_counts.values())
+    assert report["selection"]["source_replicated_roots"] == len(from_names)
+    assert report["selection"]["source_rendering_replicas"] == sum(
+        count - 1 for count in facility_counts.values()
+    )
+    used_sources = {edge.source_id for edge in document.edges}
+    assert all(
+        vertex.cell_id in used_sources
+        for vertex in document.vertices
+        if (vertex.logical_name or vertex.name) in from_names
+    )
     assert quality["alignment"]["unused_rendering_replicas"] == []
     assert quality["alignment"]["avoidable_source_replicas"] == []
     assert max(source_tops) - min(source_tops) > max(
@@ -1260,13 +1295,13 @@ def test_dispersed_root_uses_top_entry_and_justified_local_trunks() -> None:
         )
         used_anchor_ids.add(edge.source_id)
 
-    assert report["source_rendering_replicas"] == 0
+    assert report["source_rendering_replicas"] == 1
+    assert len(root_anchors) == 2
     assert used_anchor_ids == root_anchor_ids
     assert quality["alignment"]["invalid_rendering_replicas"] == []
     assert quality["alignment"]["unused_rendering_replicas"] == []
-    assert quality["readability"]["fragmented_fanout_sources"] == {
-        "wide_root:right": 2
-    }
+    assert quality["alignment"]["avoidable_source_replicas"] == []
+    assert quality["readability"]["fragmented_fanout_sources"] == {}
     assert quality["readability"]["root_consumer_interleavings"]["wide_root"] == 0
 
 
@@ -1281,7 +1316,7 @@ def test_root_replication_is_zero_indegree_driven_not_component_kind() -> None:
         if (vertex.logical_name or vertex.name) == "wide_root"
     ]
 
-    assert len(anchors) == 1
+    assert len(anchors) == 2
     assert {vertex.drawclock_type for vertex in anchors} == {"gate"}
 
 
@@ -1342,7 +1377,18 @@ def test_combined_feedback_layout_consolidates_overlapping_root_aliases() -> Non
     )
 
     assert report["selection"]["fanout_residual_logical_cycle_rank"] == 0
-    assert report["selection"]["source_rendering_replicas"] == 0
+    assert quality["passed"] is True, quality["hard_failures"]
+    logical_facilities = [
+        vertex for vertex in document.vertices if vertex.logical_name is not None
+    ]
+    assert report["selection"]["source_rendering_replicas"] == (
+        len(document.vertices) - len(config)
+    )
+    assert report["selection"]["source_rendering_replicas"] > 0
+    physical_sources = {edge.source_id for edge in document.edges}
+    assert {
+        vertex.cell_id for vertex in logical_facilities
+    } <= physical_sources
     assert quality["line_integrity"]["split_rejoin_fanout_nets"] == []
 
     nodes = resolve_nodes(
@@ -1398,7 +1444,14 @@ def test_rendering_replica_identity_survives_layout_serialization() -> None:
     restored = layout_from_dict(layout_to_dict(document))
 
     assert layout_to_dict(restored) == layout_to_dict(document)
-    assert not any(vertex.logical_name for vertex in restored.vertices)
+    assert [
+        (vertex.cell_id, vertex.name, vertex.logical_name)
+        for vertex in restored.vertices
+    ] == [
+        (vertex.cell_id, vertex.name, vertex.logical_name)
+        for vertex in document.vertices
+    ]
+    assert any(vertex.logical_name == "wide_root" for vertex in restored.vertices)
 
 
 def test_replica_quality_gate_fault_injection_covers_graph_identity() -> None:

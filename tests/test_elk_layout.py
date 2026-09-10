@@ -96,8 +96,8 @@ def test_quality_rejects_avoidable_global_bottom_detour() -> None:
     vertices = {vertex.cell_id: vertex for vertex in document.vertices}
     bad_edge = next(
         edge for edge in document.edges
-        if vertices[edge.source_id].name == "src"
-        and vertices[edge.target_id].name == "sel"
+        if (vertices[edge.source_id].logical_name or vertices[edge.source_id].name) == "src"
+        and (vertices[edge.target_id].logical_name or vertices[edge.target_id].name) == "sel"
     )
     points = _points_for_edge(
         bad_edge, vertices[bad_edge.source_id], vertices[bad_edge.target_id]

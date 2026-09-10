@@ -122,6 +122,24 @@ def observe(
             ):
                 observed = True
                 break
+    elif symptom_type == "root_facility_split_dominance":
+        observed = any(
+            witness.get("root") == symptom.get("root")
+            and (
+                symptom.get("target") is None
+                or witness.get("target") == symptom.get("target")
+            )
+            for witness in report.get("witnesses", {}).get(
+                "root_facility_split_witnesses", []
+            )
+        )
+    elif symptom_type == "premature_interior_trunk_entry":
+        observed = any(
+            witness.get("root") == symptom.get("root")
+            for witness in report.get("witnesses", {}).get(
+                "premature_interior_trunk_entry_witnesses", []
+            )
+        )
     else:
         errors.append(f"unknown symptom contract type: {symptom_type!r}")
     return {

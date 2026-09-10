@@ -2,9 +2,9 @@
 
 ## 状态
 
-- status: done
+- status: active
 - owner: agent
-- updated: 2026-09-07
+- updated: 2026-09-09
 
 ## 期望结果
 
@@ -14,6 +14,9 @@
 - commit、push、release 与完成声明消费当前 issue 集合和制品身份；不能复用旧 PASS。
 
 ## 当前证据
+
+- failure: 2026-09-09 用户再次报告两个历史设计意图未稳定生效：远距分离消费者未按完整几何收益拆分同名零入度源设施；公共根总线可沿整体边界进入最下方却在中部过早进入行间再向下贯穿，制造大量交叉。新增 `FB-ROOT-022` 与 `FB-ROUTE-023`，冻结发布提交 `33cceec83733ea45403611c823c4b3ffc730292f`，在自然红灯前保持 `src/**` 冻结。
+- failure: 本次同时判定为 `memory_escape + routing_escape + coverage_escape + oracle_escape`：旧要求分散在目标清单、能力合同和领域资料中，用户根资料还存在互相冲突的首列规则；现有 exact-set 只保证“已注册指标都执行”，没有保证“历史必选指标不能无说明消失”。
 
 - failure: 2026-09-07 用户在已发布版本上再次观察到 `FB-ROOT-016` 的公共 from 分散/无纵向总线与 `FB-BEND-017` 的错列 source 多余拐点；旧完成声明与旧交付凭证立即失效，两项状态退回 `reported`。旧精确样例曾真实双跑复现，但未覆盖递归复杂组合攻击轮次，因此属于 `coverage_escape + oracle_escape + claim_escape`。
 - failure: 新一轮必须先在当前 `93568f94d37bf62b642b5cb7c499dd1fbca27113` 的公开 CLI 上自然复现并展示失败图；在此之前 `src/**` 冻结。修复后需要连续 5 个不同策略轮次均未复现，任一轮命中则清零、重新分析并从第 1 轮开始。

@@ -42,6 +42,8 @@ ISSUES = (
     "FB-BEND-017",
     "FB-ROOT-020",
     "FB-ROOT-021",
+    "FB-ROOT-022",
+    "FB-ROUTE-023",
 )
 
 
@@ -1391,6 +1393,34 @@ def _shared_root_bus_fragmentation_witnesses(
     for (root, port), net_routes in sorted(grouped.items()):
         if len(net_routes) < 2:
             continue
+        # This fallback metric owns direct repeated fan-in arrays. Arbitrary
+        # two-band fanout belongs to facility-partition dominance and may
+        # legitimately use multiple same-name rendering facilities.
+        merge_routes = [
+            route for route in net_routes
+            if isinstance(config.get(route.target, {}).get("source"), dict)
+            and len(config[route.target]["source"]) >= 2
+        ]
+        merge_kinds = {
+            str(config.get(route.target, {}).get("kind", ""))
+            for route in merge_routes
+        }
+        pad_routes = [
+            route for route in net_routes
+            if str(config.get(route.target, {}).get("kind", "")).startswith("pad")
+        ]
+        bus_routes = (
+            merge_routes
+            if len(merge_routes) >= 2 and len(merge_kinds) == 1
+            else pad_routes
+        )
+        if len(bus_routes) < 2:
+            continue
+        # Scope the physical-bus contract to the repeated merge-facing
+        # branches.  Same-name aliases that serve unrelated distant auxiliary
+        # consumers are a different facility and are intentionally governed
+        # by root-facility split/merge dominance instead.
+        net_routes = bus_routes
         starts = sorted({
             (round(route.points[0][0], 4), round(route.points[0][1], 4))
             for route in net_routes
@@ -1682,6 +1712,51 @@ def _root_fanout_axis_dominance_witnesses(
     return witnesses
 
 
+def _repeated_merge_service_roots(
+    config: dict[str, Any], roots: set[str], routes: list[Route]
+) -> set[str]:
+    """Return roots whose repeated merge fanout owns a routing facility.
+
+    These roots participate in a bus-domain transaction: one may retain the
+    shared trunk while its competitors use target-scoped same-name anchors.
+    Their outer/target-local columns are not ordinary root columns and cannot
+    be used as the global first-column reference without violating the bus
+    contract that another quality metric enforces.
+    """
+    incoming = Counter(route.target for route in routes)
+    targets_by_root: dict[str, set[str]] = defaultdict(set)
+    kinds_by_root: dict[str, set[str]] = defaultdict(set)
+    for route in routes:
+        if route.source not in roots or incoming[route.target] < 2:
+            continue
+        targets_by_root[route.source].add(route.target)
+        kinds_by_root[route.source].add(
+            str(config.get(route.target, {}).get("kind", ""))
+        )
+    return {
+        root for root, targets in targets_by_root.items()
+        if len(targets) >= 2 and len(kinds_by_root[root]) == 1
+    }
+
+
+def _direct_merge_array_roots(
+    config: dict[str, Any], roots: set[str], routes: list[Route]
+) -> set[str]:
+    """Return every root governed by a complete direct-mux array move."""
+    incoming: dict[str, set[str]] = defaultdict(set)
+    for route in routes:
+        if (
+            route.source in roots
+            and str(config.get(route.target, {}).get("kind", "")).startswith("mux")
+        ):
+            incoming[route.target].add(route.source)
+    return {
+        source
+        for sources in incoming.values() if len(sources) >= 2
+        for source in sources
+    }
+
+
 def _direct_root_fanin_column_witnesses(
     config: dict[str, Any], roots: set[str], routes: list[Route], boxes: list[Box]
 ) -> list[dict[str, Any]]:
@@ -1696,20 +1771,14 @@ def _direct_root_fanin_column_witnesses(
     for box in boxes:
         boxes_by_node[box.node].append(box)
     incoming_routes: dict[str, list[Route]] = defaultdict(list)
-    direct_mux_targets: dict[str, set[str]] = defaultdict(set)
     for route in routes:
         if route.source in roots:
             incoming_routes[route.target].append(route)
-            if str(config.get(route.target, {}).get("kind", "")).startswith("mux"):
-                direct_mux_targets[route.source].add(route.target)
     witnesses: list[dict[str, Any]] = []
     for target, incoming in sorted(incoming_routes.items()):
         if not str(config.get(target, {}).get("kind", "")).startswith("mux"):
             continue
-        sources = sorted({
-            route.source for route in incoming
-            if len(direct_mux_targets[route.source]) == 1
-        })
+        sources = sorted({route.source for route in incoming})
         if len(sources) < 2:
             continue
         if any("layout_column" in config.get(source, {}) for source in sources):
@@ -1727,6 +1796,173 @@ def _direct_root_fanin_column_witnesses(
                 "sources": sources,
                 "source_columns": columns,
                 "distinct_columns": distinct_columns,
+            })
+    return witnesses
+
+
+def _safe_first_column_mux_facility_witnesses(
+    config: dict[str, Any], roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Prove that staggered merge-facing facilities can safely use column one.
+
+    The transaction is target-scoped rather than logical-root-scoped.  When a
+    physical root also owns another consumer, the counterfactual keeps it and
+    opens a same-name facility for this mux edge.  A one-edge facility moves as
+    a whole.  Only the leftmost occupied root column is tested: a later column
+    is an allowed exception precisely when restoring column one would add a
+    crossing, overlap, bend, or visible collision.
+    """
+    boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+    for box in boxes:
+        boxes_by_node[box.node].append(box)
+    incoming: dict[str, list[Route]] = defaultdict(list)
+    for route in routes:
+        if route.source in roots:
+            incoming[route.target].append(route)
+    crossings_before, overlaps_before = route_crossings(routes)
+    bends_before = sum(max(0, len(route.points) - 2) for route in routes)
+    merge_service_roots = _repeated_merge_service_roots(config, roots, routes)
+
+    def material_overlap(left_box: Box, right_box: Box) -> bool:
+        left = left_box.visual_bounds
+        right = right_box.visual_bounds
+        return (
+            min(left[2], right[2]) - max(left[0], right[0]) > 8.0
+            and min(left[3], right[3]) - max(left[1], right[1]) > 8.0
+        )
+
+    overlap_pairs_before = {
+        (index, other_index)
+        for index, left in enumerate(boxes)
+        for other_index, right in enumerate(boxes[index + 1:], index + 1)
+        if material_overlap(left, right)
+    }
+    witnesses: list[dict[str, Any]] = []
+    for target, target_routes in sorted(incoming.items()):
+        if not str(config.get(target, {}).get("kind", "")).startswith("mux"):
+            continue
+        all_sources = {route.source for route in target_routes}
+        if len(all_sources) < 2:
+            continue
+        sources = sorted({
+            route.source for route in target_routes
+            if route.source not in merge_service_roots
+        })
+        if not sources:
+            continue
+        if any("layout_column" in config.get(source, {}) for source in sources):
+            continue
+        direct_by_source = {
+            source: next(route for route in target_routes if route.source == source)
+            for source in sources
+        }
+        facilities = {
+            source: _endpoint_box(route.points[0], boxes_by_node[source])
+            for source, route in direct_by_source.items()
+        }
+        if any(box is None for box in facilities.values()):
+            continue
+        facilities = {source: box for source, box in facilities.items() if box is not None}
+        columns = {source: round(box.x, 4) for source, box in facilities.items()}
+        common_x = min(
+            box.x for box in boxes
+            if box.node in roots and box.node not in merge_service_roots
+        )
+        if all(abs(box.x - common_x) <= EPS for box in facilities.values()):
+            continue
+        candidate_boxes = list(boxes)
+        candidate_routes = [
+            Route(
+                route.index, list(route.points), route.source, route.target,
+                route.target_port, route.source_port,
+            )
+            for route in routes
+        ]
+        route_by_index = {route.index: route for route in candidate_routes}
+        valid = True
+        for source in sources:
+            route = direct_by_source[source]
+            facility = facilities[source]
+            output_dx = route.points[0][0] - facility.x
+            output_dy = route.points[0][1] - facility.y
+            target_end = route.points[-1]
+            candidate_y = target_end[1] - output_dy
+            delta_x = common_x - facility.x
+            delta_y = candidate_y - facility.y
+            left, top, right, bottom = facility.visual_bounds
+            moved = Box(
+                facility.node,
+                common_x,
+                candidate_y,
+                facility.w,
+                facility.h,
+                left + delta_x,
+                top + delta_y,
+                right - left,
+                bottom - top,
+            )
+            owned = [
+                item for item in routes
+                if item.source == source
+                and _endpoint_box(item.points[0], boxes_by_node[source]) == facility
+            ]
+            if len(owned) <= 1:
+                facility_index = next(
+                    index for index, box in enumerate(candidate_boxes)
+                    if box is facility
+                )
+                candidate_boxes[facility_index] = moved
+            else:
+                candidate_boxes.append(moved)
+            new_start = (common_x + output_dx, target_end[1])
+            route_by_index[route.index].points = simplify([new_start, target_end])
+            if abs(new_start[1] - target_end[1]) > EPS:
+                valid = False
+                break
+        if not valid:
+            continue
+        overlap_pairs_after = {
+            (index, other_index)
+            for index, left in enumerate(candidate_boxes)
+            for other_index, right in enumerate(
+                candidate_boxes[index + 1:], index + 1
+            )
+            if material_overlap(left, right)
+        }
+        if not overlap_pairs_after.issubset(overlap_pairs_before):
+            continue
+        candidate_boxes_by_node: dict[str, list[Box]] = defaultdict(list)
+        for box in candidate_boxes:
+            candidate_boxes_by_node[box.node].append(box)
+        if any(
+            _visual_rect_interior_hit(a, b, box)
+            for route in candidate_routes
+            for a, b in segments(route)
+            for box in candidate_boxes
+            if box.node not in {route.source, route.target}
+        ):
+            continue
+        candidate_crossings, candidate_overlaps = route_crossings(candidate_routes)
+        candidate_bends = sum(
+            max(0, len(route.points) - 2) for route in candidate_routes
+        )
+        if (
+            len(candidate_crossings) <= len(crossings_before)
+            and len(candidate_overlaps) <= len(overlaps_before)
+            and candidate_bends <= bends_before
+        ):
+            witnesses.append({
+                "target": target,
+                "sources": sources,
+                "source_columns": columns,
+                "candidate_column": round(common_x, 4),
+                "crossing_events_before": len(crossings_before),
+                "crossing_events_after": len(candidate_crossings),
+                "overlaps_before": len(overlaps_before),
+                "overlaps_after": len(candidate_overlaps),
+                "bends_before": bends_before,
+                "bends_after": candidate_bends,
+                "transaction": "target-scoped-same-name-facilities",
             })
     return witnesses
 
@@ -1804,11 +2040,17 @@ def _feasible_direct_root_fanin_column_witnesses(
                 and _endpoint_box(route.points[0], boxes_by_node[source]) == facility
             ]
 
-        # Alignment may move earlier facilities to the latest occupied root
-        # layer, but it must not pull an already-later facility backwards.
-        # That violates the independent ALAP/root-layer hard gate even when
-        # crossings and bends happen to stay unchanged.
-        candidate_columns = [max(box.x for box in facilities.values())]
+        # Every already occupied cohort column is a legitimate alignment
+        # candidate.  Restricting the proof to the latest column can hide a
+        # safe first/earlier-column solution (and therefore erase an older
+        # quality requirement) merely because the one ALAP candidate is
+        # blocked.  Each candidate below still has to pass the complete
+        # serialized-artifact collision, clearance, crossing, overlap and
+        # bend transaction, so this broadens search rather than weakening the
+        # oracle.
+        candidate_columns = sorted(
+            {box.x for box in facilities.values()}, reverse=True
+        )
         for common_x in candidate_columns:
             moved_by_source: dict[str, Box] = {}
             for source, box in facilities.items():
@@ -1876,11 +2118,15 @@ def _feasible_direct_root_fanin_column_witnesses(
                         *route.points[first_vertical + 2:],
                     ])
                 else:
-                    points = simplify([
-                        moved_start,
-                        (old_start[0], moved_start[1]),
-                        *route.points[1:],
-                    ])
+                    target_end = route.points[-1]
+                    if abs(moved_start[1] - target_end[1]) <= EPS:
+                        points = simplify([moved_start, target_end])
+                    else:
+                        points = simplify([
+                            moved_start,
+                            (old_start[0], moved_start[1]),
+                            *route.points[1:],
+                        ])
                 candidate_routes.append(Route(
                     route.index, points, route.source, route.target,
                     route.target_port, route.source_port,
@@ -1962,10 +2208,85 @@ def _root_first_column_witnesses(
     """Report later roots only when extending them to the first column is safe."""
     if not boxes:
         return []
-    first_x = min(box.x for box in boxes)
+    direct_array_roots = _direct_merge_array_roots(config, roots, routes)
+    root_boxes = [box for box in boxes if box.node in roots]
+    if not root_boxes:
+        return []
+    first_x = min(box.x for box in root_boxes)
+    raw_centers = sorted({round(box.y + box.h / 2.0, 6) for box in boxes})
+    median_height = median([box.h for box in boxes] or [1.0])
+    row_bands: list[list[float]] = []
+    for axis in raw_centers:
+        if not row_bands or axis - row_bands[-1][0] >= median_height:
+            row_bands.append([axis])
+        else:
+            row_bands[-1].append(axis)
+    row_centers = [median(band) for band in row_bands]
+    row_deltas = [
+        right - left
+        for left, right in zip(row_centers, row_centers[1:])
+        if right - left > EPS
+    ]
+    geometry_pitch = max(1.0, median_height * 2.0)
+    row_pitch = (
+        max(median_height, min(median(row_deltas), geometry_pitch))
+        if row_deltas else geometry_pitch
+    )
+    facility_cost = row_pitch * 3.0
+
+    def avoidable_pairs(
+        root: str,
+        renderings: list[Box],
+        candidate_routes: list[Route],
+    ) -> frozenset[tuple[int, int]]:
+        assigned: dict[int, list[float]] = defaultdict(list)
+        for route in candidate_routes:
+            if route.source != root:
+                continue
+            matches = [
+                index for index, box in enumerate(renderings)
+                if box.contains(route.points[0])
+            ]
+            if len(matches) != 1:
+                continue
+            index = matches[0]
+            source_offset = route.points[0][1] - renderings[index].y
+            assigned[index].append(route.points[-1][1] - source_offset)
+        groups = [
+            (index, renderings[index].x, sorted(values))
+            for index, values in assigned.items() if values
+        ]
+        groups.sort(key=lambda item: median(item[2]))
+
+        def l1_cost(values: list[float]) -> float:
+            pivot = median(values)
+            return sum(abs(value - pivot) for value in values)
+
+        actual_cost = (
+            sum(l1_cost(values) for _, _, values in groups)
+            + facility_cost * len(groups)
+        )
+        result = set()
+        for left, right in zip(groups, groups[1:]):
+            if abs(left[1] - right[1]) > EPS:
+                continue
+            merged_cost = (
+                actual_cost
+                - l1_cost(left[2])
+                - l1_cost(right[2])
+                - facility_cost
+                + l1_cost(left[2] + right[2])
+            )
+            if merged_cost <= actual_cost + EPS:
+                result.add(tuple(sorted((left[0], right[0]))))
+        return frozenset(result)
+
     witnesses = []
     for root in sorted(roots):
-        if "layout_column" in config.get(root, {}):
+        if (
+            root in direct_array_roots
+            or "layout_column" in config.get(root, {})
+        ):
             continue
         renderings = [box for box in boxes if box.node == root]
         for rendering in renderings:
@@ -2032,6 +2353,13 @@ def _root_first_column_witnesses(
                 or len(after_overlaps) > len(before_overlaps)
                 or after_bends > before_bends
             ):
+                continue
+            candidate_renderings = [
+                moved if box is rendering else box for box in renderings
+            ]
+            if not avoidable_pairs(
+                root, candidate_renderings, candidate_routes
+            ).issubset(avoidable_pairs(root, renderings, routes)):
                 continue
             witnesses.append({
                 "root": root,
@@ -2243,10 +2571,108 @@ def _route_length(route: Route) -> float:
     )
 
 
+def _regular_intermediate_bus_roots(
+    config: dict[str, Any], roots: set[str], routes: list[Route]
+) -> set[str]:
+    """Identify repeated root→branch→merge arrays as one bus contract.
+
+    This independently mirrors the topology, not the production helper: at
+    least two one-input/one-output branch nodes must feed distinct merges, and
+    each merge must have a route-local competitor descending from a different
+    one-consumer root.  Such a common root must remain one traceable facility
+    even when row-local copies would reduce raw wire ink.
+    """
+    del config
+    incoming: dict[str, list[Route]] = defaultdict(list)
+    outgoing: dict[str, list[Route]] = defaultdict(list)
+    for route in routes:
+        incoming[route.target].append(route)
+        outgoing[route.source].append(route)
+
+    def upstream_roots(name: str) -> set[str]:
+        result: set[str] = set()
+        pending = [name]
+        visited: set[str] = set()
+        while pending:
+            current = pending.pop()
+            if current in visited:
+                continue
+            visited.add(current)
+            if not incoming[current]:
+                result.add(current)
+            else:
+                pending.extend(edge.source for edge in incoming[current])
+        return result
+
+    result: set[str] = set()
+    for root in roots:
+        if len(outgoing[root]) < 2:
+            continue
+        merges: list[str] = []
+        for root_edge in outgoing[root]:
+            child = root_edge.target
+            if len(incoming[child]) != 1 or len(outgoing[child]) != 1:
+                continue
+            merge = outgoing[child][0].target
+            if len(incoming[merge]) < 2:
+                continue
+            competing_sources = [
+                edge.source for edge in incoming[merge]
+                if edge.source != child
+            ]
+            if not any(
+                len(outgoing[private_root]) == 1
+                for source in competing_sources
+                for private_root in upstream_roots(source)
+                if private_root != root
+            ):
+                continue
+            merges.append(merge)
+        if len(merges) >= 2 and len(set(merges)) == len(merges):
+            result.add(root)
+    return result
+
+
 def _root_facility_split_witnesses(
-    roots: set[str], routes: list[Route], boxes: list[Box]
+    config: dict[str, Any], roots: set[str], routes: list[Route], boxes: list[Box]
 ) -> list[dict[str, Any]]:
-    """Prove that one incident route deserves its own root display facility."""
+    """Prove that one consumer band deserves its own root display facility.
+
+    The comparison uses the union of every route owned by the logical root, so
+    removing a leaf from an existing shared backbone only receives credit for
+    ink that actually disappears.  This is deliberately a facility-partition
+    counterfactual, not a bend-count heuristic for one edge.
+    """
+    pad_targets: dict[tuple[str, str], set[str]] = defaultdict(set)
+    target_kinds: dict[tuple[str, str], set[str]] = defaultdict(set)
+    target_counts: Counter[tuple[str, str]] = Counter()
+    for route in routes:
+        target_kind = str(config.get(route.target, {}).get("kind", ""))
+        key = (route.source, route.source_port)
+        target_source = config.get(route.target, {}).get("source")
+        if isinstance(target_source, dict) and len(target_source) >= 2:
+            target_kinds[key].add(target_kind)
+            target_counts[key] += 1
+        if target_kind.startswith("pad"):
+            pad_targets[key].add(route.target)
+    pad_bus_roots = {
+        root for (root, _port), targets in pad_targets.items()
+        if len(targets) >= 2
+    }
+    homogeneous_bus_roots = {
+        root for (root, port), kinds in target_kinds.items()
+        if target_counts[(root, port)] >= 2 and len(kinds) == 1
+    }
+    explicit_column_roots = {
+        root for root in roots
+        if "layout_column" in config.get(root, {})
+    }
+    protected_bus_roots = (
+        pad_bus_roots
+        | homogeneous_bus_roots
+        | _regular_intermediate_bus_roots(config, roots, routes)
+        | explicit_column_roots
+    )
     source_box_by_route = {
         route.index: _endpoint_box_index(route.points[0], route.source, boxes)
         for route in routes
@@ -2257,7 +2683,7 @@ def _root_facility_split_witnesses(
             routes_by_anchor[source_box_by_route[route.index]].append(route)
     witnesses: list[dict[str, Any]] = []
     for route in routes:
-        if route.source not in roots or len(route.points) - 2 < 4:
+        if route.source not in roots or route.source in protected_bus_roots:
             continue
         source_index = source_box_by_route[route.index]
         if len(routes_by_anchor[source_index]) <= 1:
@@ -2271,16 +2697,30 @@ def _root_facility_split_witnesses(
             1.0,
             min(source_box.w, source_box.h, target_box.w, target_box.h) / 4.0,
         )
+        visible_x = (
+            target_box.x - clearance - source_box.w
+            + float(source_box.visible_x) - source_box.x
+            if source_box.visible_x is not None else None
+        )
+        visible_y = (
+            route.points[-1][1] - output_y
+            + float(source_box.visible_y) - source_box.y
+            if source_box.visible_y is not None else None
+        )
         candidate_box = Box(
             source_box.node,
             target_box.x - clearance - source_box.w,
             route.points[-1][1] - output_y,
             source_box.w,
             source_box.h,
+            visible_x,
+            visible_y,
+            source_box.visible_w,
+            source_box.visible_h,
         )
         if candidate_box.x <= source_box.x + EPS:
             continue
-        if any(_box_overlap(candidate_box, box) for box in boxes):
+        if any(_visual_boxes_overlap(candidate_box, box) for box in boxes):
             continue
         candidate = _copy_route(
             route,
@@ -2290,11 +2730,25 @@ def _root_facility_split_witnesses(
             ],
         )
         candidate_boxes = [*boxes, candidate_box]
-        if _route_hits_unrelated_box(
-            candidate, candidate_boxes, len(candidate_boxes) - 1, target_index
+        if any(
+            _visual_rect_interior_hit(a, b, box)
+            for segment_index, (a, b) in enumerate(segments(candidate))
+            for box_index, box in enumerate(candidate_boxes)
+            if not (
+                box_index == len(candidate_boxes) - 1 and segment_index == 0
+            )
+            and not (
+                box_index == target_index
+                and segment_index == len(candidate.points) - 2
+            )
         ):
             continue
-        if _box_is_crossed_by_routes(candidate_box, routes, route.index):
+        if any(
+            _visual_rect_interior_hit(a, b, candidate_box)
+            for other in routes
+            if other.index != route.index
+            for a, b in segments(other)
+        ):
             continue
         before = _route_interactions(route, routes)
         after = _route_interactions(candidate, routes)
@@ -2302,11 +2756,42 @@ def _root_facility_split_witnesses(
         after_bends = len(candidate.points) - 2
         before_length = _route_length(route)
         after_length = _route_length(candidate)
-        if (
+        root_routes = [item for item in routes if item.source == route.source]
+        candidate_root_routes = [
+            candidate if item.index == route.index else item
+            for item in root_routes
+        ]
+        facility_cost = sum(
+            2.0 * ((right - left) + (bottom - top))
+            for left, top, right, bottom in (
+                box.visual_bounds for box in boxes if box.node == route.source
+            )
+        )
+        new_left, new_top, new_right, new_bottom = candidate_box.visual_bounds
+        candidate_facility_cost = facility_cost + 2.0 * (
+            (new_right - new_left) + (new_bottom - new_top)
+        )
+        display_cost_before = _orthogonal_union_length(root_routes) + facility_cost
+        display_cost_after = (
+            _orthogonal_union_length(candidate_root_routes)
+            + candidate_facility_cost
+        )
+        hard_geometry_nonworse = (
             after[0] <= before[0]
             and after[1] <= before[1]
             and after[2] <= before[2]
-            and after_bends < before_bends
+            and after_bends <= before_bends
+        )
+        strictly_better = (
+            after[1] < before[1]
+            or (
+                after[1] == before[1]
+                and display_cost_after < display_cost_before - EPS
+            )
+        )
+        if (
+            hard_geometry_nonworse
+            and strictly_better
             and after_length < before_length - EPS
         ):
             witnesses.append({
@@ -2321,10 +2806,103 @@ def _root_facility_split_witnesses(
                 "bends_after": after_bends,
                 "length_before": round(before_length, 4),
                 "length_after": round(after_length, 4),
+                "root_ink_before": round(_orthogonal_union_length(root_routes), 4),
+                "root_ink_after": round(
+                    _orthogonal_union_length(candidate_root_routes), 4
+                ),
+                "display_cost_before": round(display_cost_before, 4),
+                "display_cost_after": round(display_cost_after, 4),
                 "candidate_anchor": [
                     round(candidate_box.x, 4), round(candidate_box.y, 4)
                 ],
             })
+    return witnesses
+
+
+def _premature_interior_trunk_entry_witnesses(
+    roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Find a root branch whose interior descent loses to an outer corridor.
+
+    The candidate keeps the route's source-side and target-side vertical
+    channels, but moves their horizontal connection outside the complete
+    component envelope.  This models a bus staying on its outer backbone until
+    the last consumer band instead of entering a row gap and descending through
+    unrelated routes.
+    """
+    if not boxes:
+        return []
+    top_lane = min(box.visual_bounds[1] for box in boxes) - 24.0
+    bottom_lane = max(box.visual_bounds[3] for box in boxes) + 24.0
+    route_count_by_root = Counter(
+        route.source for route in routes if route.source in roots
+    )
+    witnesses: list[dict[str, Any]] = []
+    for route in routes:
+        if route.source not in roots or route_count_by_root[route.source] < 2:
+            continue
+        verticals = [
+            (start, end)
+            for start, end in segments(route)
+            if abs(start[0] - end[0]) <= EPS
+        ]
+        if len(route.points) < 6 or len(verticals) < 2:
+            continue
+        source_channel_x = verticals[0][0][0]
+        target_channel_x = verticals[-1][0][0]
+        if abs(source_channel_x - target_channel_x) <= EPS:
+            continue
+        source_index = _endpoint_box_index(route.points[0], route.source, boxes)
+        target_index = _endpoint_box_index(route.points[-1], route.target, boxes)
+        before = _route_interactions(route, routes)
+        before_bends = len(route.points) - 2
+        for side, lane_y in (("top", top_lane), ("bottom", bottom_lane)):
+            candidate = _copy_route(
+                route,
+                [
+                    route.points[0],
+                    (source_channel_x, route.points[0][1]),
+                    (source_channel_x, lane_y),
+                    (target_channel_x, lane_y),
+                    (target_channel_x, route.points[-1][1]),
+                    route.points[-1],
+                ],
+            )
+            if _route_hits_unrelated_box(
+                candidate, boxes, source_index, target_index
+            ):
+                continue
+            after = _route_interactions(candidate, routes)
+            after_bends = len(candidate.points) - 2
+            if not (
+                after[0] <= before[0]
+                and after[1] <= before[1]
+                and after[2] <= before[2]
+                and after_bends <= before_bends
+                and (after[0] < before[0] or after[1] < before[1])
+            ):
+                continue
+            witnesses.append({
+                "root": route.source,
+                "edge_id": route.edge_id,
+                "target": route.target,
+                "boundary_side": side,
+                "source_channel_x": round(source_channel_x, 4),
+                "target_channel_x": round(target_channel_x, 4),
+                "boundary_y": round(lane_y, 4),
+                "crossing_points_before": before[0],
+                "crossing_points_after": after[0],
+                "crossing_events_before": before[1],
+                "crossing_events_after": after[1],
+                "overlaps_before": before[2],
+                "overlaps_after": after[2],
+                "bends_before": before_bends,
+                "bends_after": after_bends,
+                "length_before": round(_route_length(route), 4),
+                "length_after": round(_route_length(candidate), 4),
+                "candidate_points": [list(point) for point in candidate.points],
+            })
+            break
     return witnesses
 
 
@@ -2632,16 +3210,13 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     protected_direct_mux_roots: set[str] = set()
     protected_direct_mux_pairs: set[frozenset[str]] = set()
     direct_mux_incoming: dict[str, set[str]] = defaultdict(set)
-    direct_mux_targets: dict[str, set[str]] = defaultdict(set)
     for route in routes:
         if route.source in roots and str(config.get(route.target, {}).get("kind", "")).startswith("mux"):
             direct_mux_incoming[route.target].add(route.source)
-            direct_mux_targets[route.source].add(route.target)
     for cohort in direct_mux_incoming.values():
         cohort_members = {
             root for root in cohort
             if str(config.get(root, {}).get("kind", "")) in {"source", "from"}
-            and len(direct_mux_targets[root]) == 1
         }
         if len(cohort_members) < 3:
             continue
@@ -2758,13 +3333,23 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         if root_kinds.get(witness["public_root"]) not in {"source", "from"}
     ]
     root_facility_split_witnesses = _root_facility_split_witnesses(
-        roots, routes, boxes
+        config, roots, routes, boxes
     )
+    # A direct mux cohort is one placement transaction.  A scalar facility
+    # split that merely shortens a straight wire would contradict the
+    # first-column preference and the cohort-wide column oracle.  Keep the
+    # counterfactual only when it removes an actual crossing, which is the
+    # user-defined reason a root facility may leave the first column.
     root_facility_split_witnesses = [
-        witness for witness in root_facility_split_witnesses
-        if min(box.x for box in boxes_by_node[witness["root"]])
-        > physical_first_x + 1.0
+        witness
+        for witness in root_facility_split_witnesses
+        if witness["root"] not in protected_direct_mux_roots
+        or witness["crossing_events_after"]
+        < witness["crossing_events_before"]
     ]
+    premature_interior_trunk_entry_witnesses = (
+        _premature_interior_trunk_entry_witnesses(roots, routes, boxes)
+    )
     physical_anchor_relocation_witnesses = (
         _physical_anchor_relocation_witnesses(roots, routes, boxes)
     )
@@ -2821,22 +3406,16 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     feasible_direct_root_fanin_column_witnesses = (
         _feasible_direct_root_fanin_column_witnesses(config, roots, routes, boxes)
     )
-    feasible_direct_targets = {
-        witness["target"]
-        for witness in feasible_direct_root_fanin_column_witnesses
-    }
-    direct_root_fanin_column_witnesses = [
-        witness for witness in raw_direct_root_fanin_column_witnesses
-        if witness["target"] in feasible_direct_targets
-    ]
+    # Column inequality is diagnostic only.  The defect requires a complete
+    # target-scoped same-name-facility counterfactual proving that column one
+    # is safe.  This preserves the alignment requirement without rejecting a
+    # later facility whose only alternative would recreate a crossing.
+    direct_root_fanin_column_witnesses = (
+        _safe_first_column_mux_facility_witnesses(config, roots, routes, boxes)
+    )
     root_first_column_witnesses = _root_first_column_witnesses(
         config, roots, boxes, routes
     )
-    if not root_first_column_witnesses:
-        # Splitting an already first-ranked root into later facilities is not
-        # an admissible remedy. Historical displaced layouts keep the legacy
-        # witness because their root-first violation remains directly visible.
-        root_facility_split_witnesses = []
     detected = {
         # Mixed kinds are only a precondition.  A defect is present only when
         # an ordinary zero-indegree component also exhibits the measured root
@@ -2871,6 +3450,8 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             feasible_direct_root_fanin_column_witnesses
             or root_first_column_witnesses
         ),
+        "FB-ROOT-022": bool(root_facility_split_witnesses),
+        "FB-ROUTE-023": bool(premature_interior_trunk_entry_witnesses),
     }
     route_row_by_id = {row["edge_id"]: row for row in route_rows}
     node_statistics = {}
@@ -2961,6 +3542,9 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
             "avoidable_bend_edges": avoidable,
             "port_order_inversions": port_inversions,
             "root_facility_split_witnesses": root_facility_split_witnesses,
+            "premature_interior_trunk_entry_witnesses": (
+                premature_interior_trunk_entry_witnesses
+            ),
             "physical_anchor_relocation_witnesses": (
                 physical_anchor_relocation_witnesses
             ),

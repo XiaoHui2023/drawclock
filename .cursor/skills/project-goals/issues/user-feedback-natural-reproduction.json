@@ -1,386 +1,2285 @@
 {
-  "schema_version": 1,
-  "issues": [
-    {
-      "id": "FB-ROOT-001",
-      "summary": "混合 source、from 和其它零入度器件的图根通用性",
-      "expected": "所有入度为零且有输出的器件按拓扑统一处理，不读取器件 kind 特判",
-      "actual": "混合图根场景中普通 gate 图根的公共分发线与低复用图根路线发生可归因交叉",
-      "status": "closed",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "6c9f9f42d9e0912309197d47b4b4c245db25ff75",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/pad-r08-s00.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/pad-r08-s00.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-001", "--input", "{project}/tests/reproduction-corpus/pad-r08-s00.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "有效混合图根经公开 CLI 产生普通零入度器件可归因的根布局质量失败",
-      "reproduction_does_not_prove": "其它五条几何问题或根因",
-      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:38:00+08:00", "hypothesis": "现有混合根 torture example 会经公开 CLI 暴露按 kind 特判的根布局。", "method": "审计 example 25、旧测试名称及现存证据路径，检查是否有冻结基线原始 SVG 与只读直接 Oracle 收据。", "result": "reproduction_blocked", "observed": "样例包含 source/from，但没有两次独立公开 CLI 红灯收据，也没有证明任意零入度器件均触发同一缺陷。", "analysis": "覆盖 source/from 不等价于覆盖拓扑定义的所有图根；现有资料只能形成待测假设。", "why_not_reproduced": "缺少冻结基线的两次自然运行与直接判定类别特判的只读 Oracle 证据。", "evidence": "example/auto-layout/25-mixed-root-port-order-torture.json; tests; .reproduction/receipts/FB-ROOT-001.json missing", "next_condition": "补充非 source/from 的零入度器件并让公开 CLI 在冻结基线上连续两次触发直接 Oracle 红灯。"},{"attempted_at":"2026-09-03T15:41:10+08:00","hypothesis":"一个多对多自然样例可同时证明混合图根与其它根布局症状。","method":"冻结当前 revision，对 example 25 通过公开 CLI 连续运行两次；独立 Oracle 直接读取 JSON 与 SVG，只检查三种零入度器件进入统计集合。","result":"not_reproduced","observed":"两次均识别 from、gate、source 三类零入度根和完整节点边绑定，但没有检查普通 gate 根是否实际产生用户所述交叉。","analysis":"该判据把混合器件种类这一触发前提误作缺陷结果，属于 Oracle 假通过，不能授权修复。","why_not_reproduced":"缺少可归因到非 source/from 普通图根的最终几何异常。","evidence":"已撤销的旧收据与 example/auto-layout/25-mixed-root-port-order-torture.json","next_condition":"使用同时含三类根且普通 gate 公共根自然发生低复用根交叉的冻结 PAD 产物，并增加同前提无症状的干净反例。"},{"attempted_at":"2026-09-03T17:19:46+08:00","hypothesis":"冻结 PAD 的普通 gate 公共根会与低复用图根发生可逐边归因的交叉，而干净混合根图不会命中。","method":"在 6c9f9f4 冻结源码上经公开 CLI 双跑 pad-r08-s00；Oracle 要求三类根前提和普通 gate 公共根的实际交叉同时成立，并以干净混合根图做负校准。","result":"reproduced","observed":"两次均为 43 节点、48 边、87 次交叉事件；普通 public_gate 根的失败 witness 直接命中，干净混合根图不命中。","analysis":"修正后的证据同时证明触发结构、用户可观察症状、器件种类通用性与判据非恒真。","why_not_reproduced":"","evidence":".reproduction/receipts/FB-ROOT-001.json; tests/test_feedback_layout_oracle.py","next_condition":"修复仅使用入度、出度、祖先、汇聚与显式列约束，并在同一当前输入证明 witness 消失。"}],
-      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-001.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-001.json"}
-    },
-    {
-      "id": "FB-ROUTE-002",
-      "summary": "同一图根的两条路线先分开、再合并、再分开",
-      "expected": "同一逻辑根端口的公共前段一次合并后不发生无拓扑依据的重新汇合",
-      "actual": "用户观察到重复分合造成多余走线和交叉；旧测试只人工改写航点",
-      "status": "fixed_verified",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "6c9f9f42d9e0912309197d47b4b4c245db25ff75",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/pad-r08-s02.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/pad-r08-s02.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROUTE-002", "--input", "{project}/tests/reproduction-corpus/pad-r08-s02.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py", "tools/reproduction_semantics.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "required_reproduction_variants": ["public-from-split-rejoin"],
-      "reproduction_proves": "公开 CLI 自然生成同根 split-rejoin 几何",
-      "reproduction_does_not_prove": "人工航点变异只证明 Oracle，不能满足本条",
-      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:39:00+08:00", "hypothesis": "example 19 的正常公开 CLI 输出自然包含同根先分、再合、再分。", "method": "核查旧 split-rejoin 测试与样例入口，区分正常生成输出和测试内人工航点改写。", "result": "not_reproduced", "observed": "旧测试先生成正常图再人工重写航点，随后 Oracle 能报错；正常产物本身没有合格红灯收据。", "analysis": "该测试只验证检测器能看见注入后的坏图，不能证明用户工作流会产生坏图。", "why_not_reproduced": "唯一红灯依赖输出变异，违反禁止人工注入故障和禁止改写产物的要求。", "evidence": "tests split-rejoin mutation test; example/auto-layout/19-dispersed-root-fanout.json; receipt missing", "next_condition": "重新设计自然输入，使未修改生产代码与未修改 SVG 的公开 CLI 输出直接出现 split-rejoin，并独立复跑两次。"},{"attempted_at":"2026-09-03T15:41:10+08:00","hypothesis":"三输入 pad 的跨行交错与公共根复用会让同一根网络自然形成分裂—重合—再分裂。","method":"冻结 6c9f9f4 revision，对 pad-r08-s00 正常 JSON 连续运行公开 CLI 两次；Oracle 对同根线段并集构图并寻找环。","result":"reproduced","observed":"两次均在 public_gate 网络发现 split-rejoin 环；43 节点、48 边全部绑定，未改写 SVG。","analysis":"症状由公共根跨行复用、固定多输入端口和交错纵序共同形成；几何判定依赖同网段拓扑，而非像素相似。","why_not_reproduced":"","evidence":".reproduction/receipts/FB-ROUTE-002.json","next_condition":"修复阶段应约束同根公共干线为树并保留端口绑定。"}],
-      "strict_reproduction": {"verified_at": "2026-09-08T11:13:00+08:00", "variant": "public-from-split-rejoin", "case": "public-from-split-rejoin-baseline", "observed_witness": "public_from:right", "corpus_id": "20260908T030927Z-8159ddf2", "analysis": "旧 s00 仅命中 public_gate；s02 通过 kind、零入度、扇出和指定 root/port witness 的数据驱动合同，证明公共 from 自身自然失败。"},
-      "reproduction_receipt": ".reproduction/receipts/FB-ROUTE-002.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROUTE-002.json"}
-    },
-    {
-      "id": "FB-ROOT-003",
-      "summary": "公共根位于下方并穿过单连接 pad 输入根",
-      "expected": "低复用图根靠近唯一消费者，公共根与固定目标端口纵序共同排列",
-      "actual": "公共根从下方长距离穿过其它根并与 pad 输入交叉",
-      "status": "closed",
-      "owner_paths": ["src/**"], "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"], "baseline_revision": "29252208654de2a2157004a4883c4c852a0c3191",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/25-mixed-root-port-order-torture.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-003", "--input", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "根纵序相对目标端口反转并产生可避免交叉", "reproduction_does_not_prove": "所有根布局最优",
-      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:40:00+08:00", "hypothesis": "example 25 会自然生成公共根从下方向上穿过单连接 pad 输入根的交叉。", "method": "审计该样例的输入拓扑、目标端口与旧质量结果，搜索直接归因到根纵序反转的原始 SVG 收据。", "result": "reproduction_blocked", "observed": "样例意图覆盖该结构，但没有冻结旧实现输出、两次直接 Oracle 红灯或反事实重排证据。", "analysis": "测试意图和复杂结构存在不能代替实际生成几何的可重复失败。", "why_not_reproduced": "缺少可验证的自然失败产物和逐交叉归因，无法排除交叉来自另一条边。", "evidence": "example/auto-layout/25-mixed-root-port-order-torture.json; receipt missing", "next_condition": "冻结基线运行公开 CLI，两次记录同一根纵序反转和交叉边对，并用只读 Oracle 验证。"},{"attempted_at":"2026-09-03T15:41:10+08:00","hypothesis":"公共根的纵向干线会与同批消费者附近的低复用根横线产生可归因交叉。","method":"冻结当前 revision，对 example 25 连续运行两次，并以线段内部交点而非端点接触统计根网络对。","result":"reproduced","observed":"两次均得到 4 个交叉事件、2 个交叉坐标；common_source 分别与 local_a_03、local_b_03 的两条边交叉。","analysis":"交叉由公共纵干线与低复用根过早放置后的横向接入共同触发，可逐边对归因。","why_not_reproduced":"","evidence":".reproduction/receipts/FB-ROOT-003.json","next_condition":"修复阶段以根位置和支路顺序的全局交叉代价共同优化。"}],
-      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-003.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-003.json"},
-      "reopened_feedback": {"reported_at": "2026-09-07T17:24:00+08:00", "status": "oracle_escape", "summary": "用户展示 30 号当前图仍有可消除交叉；旧专用 Oracle 返回 symptom not observed，而通用统计直接报告 4 个交叉事件、3 个交叉坐标。", "evidence": "work/rejection-baseline/attempt-1/output.svg; work/rejection-baseline/attempt-1/quality.json; SHA256 28B3E60492321366A1FED79A5E91BD81C30C3A7A1A8FDD6187C3000295C20F94", "next_condition": "先扩展独立整图坐标—路由反事实并证明该产物被拒绝，再修改布局 owner。"}
-    },
-    {
-      "id": "FB-ROOT-004",
-      "summary": "大量单连接 from 固定第一列并与公共根交叉",
-      "expected": "无显式列约束的低复用图根可进入消费者前的任意可行中间列",
-      "actual": "单连接根留在首列，延长线路并与公共根分发路线交叉",
-      "status": "closed",
-      "owner_paths": ["src/**"], "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"], "baseline_revision": "29252208654de2a2157004a4883c4c852a0c3191",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/25-mixed-root-port-order-torture.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-004", "--input", "{project}/example/auto-layout/25-mixed-root-port-order-torture.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "低复用根的首列位置被完整重排反事实支配", "reproduction_does_not_prove": "根复制或端口纵序问题",
-      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:41:00+08:00", "hypothesis": "example 23 可证明单连接 from 固定首列并与公共根到 mux 的路线交叉。", "method": "将样例拓扑与用户明确描述的公共源、多低复用源和 mux 中间列场景逐项对照。", "result": "not_reproduced", "observed": "用户已明确指出 example 23 覆盖不够详细且不是目标场景；现有结果没有合格反事实支配证据。", "analysis": "两个不同源或简单中间列示例不能代表公共根与多个低复用根竞争 mux 输入的交叉。", "why_not_reproduced": "输入结构缺少用户要求的复杂交叉组合，且没有自然红灯收据。", "evidence": "example/auto-layout/23-middle-column-low-use-sources.json; user rejection; receipt missing", "next_condition": "构造公共根连接多 mux、多个单连接异类图根连接同批 mux 的复杂公开输入，并证明中间列反事实严格减少交叉和长度。"},{"attempted_at":"2026-09-03T15:41:10+08:00","hypothesis":"单用根若固定在早期列，其移动到消费者前的可行列会同时降低交叉与长度。","method":"冻结当前 revision，对 example 25 双运行；Oracle 平移完整根外框并重建直连候选，仅在无节点重叠、无障碍穿越、无重叠增加且交叉和长度均严格下降时签名。","result":"reproduced","observed":"local_a_03 与 local_b_03 均从 2 次交叉降到 0，长度分别从 103.66/109.66px 降到 24px。","analysis":"可行中间位置由实际目标端口和源输出偏移计算；这证明当前位置被严格支配，不依赖器件名称或固定列号。","why_not_reproduced":"","evidence":".reproduction/receipts/FB-ROOT-004.json","next_condition":"修复阶段将连续可行列与全局交叉/长度代价纳入通用根放置。"}],
-      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-004.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-004.json"}
-    },
-    {
-      "id": "FB-BEND-005",
-      "summary": "相邻列节点本可直连却出现折点",
-      "expected": "无障碍且端口同轴的局部边为零折点直线",
-      "actual": "本可直连的边出现无交叉收益的额外折点",
-      "status": "closed",
-      "owner_paths": ["src/**"], "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"], "baseline_revision": "6c9f9f42d9e0912309197d47b4b4c245db25ff75",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/pad-r08-s00.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/pad-r08-s00.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-005", "--input", "{project}/tests/reproduction-corpus/pad-r08-s00.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 SVG 中存在被无障碍直线严格支配的边", "reproduction_does_not_prove": "全图面积或全部路线最优",
-      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:42:00+08:00", "hypothesis": "example 20 的相邻列同轴边会自然出现无收益折点。", "method": "审计样例、旧 gate_a_tap/sel 路径反馈与现有折点统计，检查是否保存了冻结基线的直接 dominance 证据。", "result": "reproduction_blocked", "observed": "存在用户截图式观察与针对性样例，但没有可核验的旧原始 SVG、障碍净空计算和两次独立红灯收据。", "analysis": "看到折点不等于证明它无必要；必须证明直线候选不碰节点、标签、端口或其它硬约束且质量向量严格更优。", "why_not_reproduced": "缺少冻结基线产物及只读直线可行性/支配 Oracle 收据。", "evidence": "example/auto-layout/20-asymmetric-merge-route-bulge.json; receipt missing", "next_condition": "用正常 CLI 生成两次相同折点，Oracle 同时证明直线路径可行且不降低更高优先级指标。"},{"attempted_at":"2026-09-03T15:41:10+08:00","hypothesis":"交错多输入布局会生成可由更少折点 H-V-H 路线严格支配的异常凸线。","method":"冻结 6c9f9f4 revision，对 pad-r08-s00 双运行；Oracle 规范化航点，并逐候选重算障碍、交叉、重叠、长度与折点。","result":"reproduced","observed":"两次均识别 svg-edge-0009、0023、0032 三条可避免折线；候选折点更少且高优先级指标不变差。","analysis":"异常折点是多输入交错、跨层排序与公共根路线耦合的结果；判定采用质量向量支配，不以画布面积交换美观。","why_not_reproduced":"","evidence":".reproduction/receipts/FB-BEND-005.json","next_condition":"修复阶段使用正交路径正规化与局部严格支配替换，并对全语料回归。"}],
-      "reproduction_receipt": ".reproduction/receipts/FB-BEND-005.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-BEND-005.json"}
-    },
-    {
-      "id": "FB-PORT-006",
-      "summary": "两个单连接图根相对 pad 端口次序反转",
-      "expected": "自由根纵序与固定目标端口纵序一致",
-      "actual": "连接端口 1 的根在端口 2 根下方，两个输入交叉",
-      "status": "closed",
-      "owner_paths": ["src/**"], "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"], "baseline_revision": "06c4c6c89f326b9cdc3a73ff2b229078789de544",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "draw", "-i", "{project}/example/auto-layout/20-asymmetric-merge-route-bulge.json", "-l", "{snapshot}/drawio-lib/drawclock.xml", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/20-asymmetric-merge-route-bulge.json", "drawio-lib/drawclock.xml"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-PORT-006", "--input", "{project}/example/auto-layout/20-asymmetric-merge-route-bulge.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "根纵序反转直接造成固定 pad 输入交叉", "reproduction_does_not_prove": "公共根位置或 split-rejoin",
-      "reproduction_attempts": [{"attempted_at": "2026-09-03T13:43:00+08:00", "hypothesis": "example 25 的两个单连接根会以目标 pad 端口相反的纵序自然生成交叉。", "method": "核查样例端口绑定、旧测试结果与收据目录，寻找两个独立公开 CLI 输出中的同一端口次序反转。", "result": "reproduction_blocked", "observed": "样例包含端口顺序压力结构，但没有逐端口坐标和交叉边对的自然复现收据。", "analysis": "仅有连接正确性不能证明根的纵序与端口纵序反转，也不能证明交叉可由交换根顺序消除。", "why_not_reproduced": "缺少两次原始 SVG 的端口坐标、根坐标与交叉归因证据。", "evidence": "example/auto-layout/25-mixed-root-port-order-torture.json; receipt missing", "next_condition": "公开 CLI 独立运行两次，并由只读 Oracle 验证根顺序反转、指定边对交叉及交换顺序的严格改善。"},{"attempted_at":"2026-09-03T15:41:10+08:00","hypothesis":"非对称双支路在修复前版本会让独占根祖先纵序与固定 mux 输入端口纵序反转。","method":"冻结 06c4c6c revision，在隔离历史依赖环境中对 example 20 通过公开 draw 子命令双运行；Oracle 沿 DAG 回溯唯一根祖先并检查目标端口坐标和内部交叉。","result":"reproduced","observed":"两次均发现 from_a/from_b 到 sel 的独占支路纵序反转；gate_a→sel.0 与 div_b→sel.1 发生 1 个内部交叉。","analysis":"简单断开双输入组没有复现；必须由不同链深和目标固定端口共同约束，说明该问题是排序耦合而不是命名特例。","why_not_reproduced":"","evidence":".reproduction/receipts/FB-PORT-006.json","next_condition":"修复阶段对独占输入支路进行端口感知排序，同时回归共享根和跨行结构。"}],
-      "reproduction_receipt": ".reproduction/receipts/FB-PORT-006.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-PORT-006.json"}
-    },
-    {
-      "id": "FB-ROUTE-009",
-      "summary": "零入度公共根到局部消费者出现可避免的四拐点大绕行",
-      "expected": "允许按拓扑与几何增设显示锚点或重排锚点，使每条根支路在不增加碰撞、异网重叠和交叉时采用更少拐点、更短路线",
-      "actual": "final-combined.svg 中 weave__public_gate 到 weave__select_04 的路线含 4 个拐点、934.1805px 和 1 次交叉；同类公共根支路先反向离开目标行再折返",
-      "status": "closed",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "22228714675a60c169745f71f73e926857610db1",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "arc"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/26-feedback-reproduction-combined.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROUTE-009", "--input", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 自然生成的最终 SVG 中，某个零入度逻辑根的现有显示锚点与路线集合被增加或重新分配显示锚点的完整几何反事实严格支配",
-      "reproduction_does_not_prove": "固定节点坐标下存在无障碍两拐点路线，或任意增加根副本都更优",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-03T20:43:37+08:00", "hypothesis": "现有逐边少拐点 Oracle 能直接识别 final-combined.svg 的公共根大绕行。", "method": "从最终 SVG 独立绑定逻辑边，枚举固定节点坐标下的直线或两拐点 H-V-H 候选并重算器件穿越、异网重叠、交叉和长度。", "result": "not_reproduced", "observed": "weave__public_gate→weave__select_04 实测 4 拐点、934.1805px、1 次交叉，但所有固定锚点两拐点候选均穿过器件，旧 avoidable_bend_edges 为空。", "analysis": "症状真实存在，但旧 Oracle 的反事实空间只改线不改零入度根显示设施，测错了优化自由度；不能以该 Oracle 签发复现。", "why_not_reproduced": "缺少对零入度根显示锚点拆分、重分配和重定位的独立联合反事实。", "evidence": "example/out/final-combined.svg; example/out/final-combined-quality.json; diagnostic import attempts (first two failed before successful direct geometry query)", "next_condition": "先扩展独立 Oracle，使其能证明新增/重分配显示锚点后高优先级几何不退化且拐点、交叉或长度严格改善，再对冻结 revision 公开 CLI 双跑。"},
-        {"attempted_at": "2026-09-03T20:58:24+08:00", "hypothesis": "把零入度根显示设施作为可复制资源后，冻结基线的公共根支路会被无碰撞反事实严格支配。", "method": "冻结 revision 2222871，经公开 CLI 对组合输入自然双跑；独立 SVG Oracle 绑定物理锚点与边，在目标前增设同身份显示设施，逐项重算器件穿越、异网重叠、交叉、折点和长度。", "result": "reproduced", "observed": "两次输出哈希一致，均命中 FB-ROUTE-009；weave__public_gate→weave__select_04 可由 4 拐点、934.1805px、1 次交叉变为 0 拐点、18px、0 交叉，且无器件碰撞或异网重叠退化。", "analysis": "根因属于显示设施分配和局部路由的联合优化缺口，不是固定端点路由器单独可解的问题。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROUTE-009.json", "next_condition": "owner 门解锁后，以通用零入度拓扑和完整几何支配关系修复，并用当前公开入口双跑转绿。"}
-      ],
-      "reproduction_receipt": ".reproduction/receipts/FB-ROUTE-009.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROUTE-009.json"}
-    },
-    {
-      "id": "FB-ROOT-010",
-      "summary": "已复制的零入度根锚点仍停在干线左侧并以短横线跨越多条纵线",
-      "expected": "每个物理根锚点按自身所服务边集进入消费者前的最右连续可行位置；若越过纵干线可减少交叉且不增加更高优先级缺陷，则必须采用该位置",
-      "actual": "final-medium.svg 中 xtal_1 的多个单边显示锚点位于 x=160.47，至 mux_d005/006/007/013/014/015 的直线横跨 x=221.02、231.02、241.02 的 PLL 纵干线，单边产生 2 至 8 个交叉伙伴",
-      "status": "closed",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "22228714675a60c169745f71f73e926857610db1",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/07-medium-64-clocks.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "arc"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/07-medium-64-clocks.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-010", "--input", "{project}/example/auto-layout/07-medium-64-clocks.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 自然生成的根显示锚点存在连续最右可行位置，完整移动该锚点并重接所属边可严格减少异网交叉与长度",
-      "reproduction_does_not_prove": "所有逻辑高扇出根都应整体右移，或器件名称 xtal 具有特殊语义",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-03T20:43:37+08:00", "hypothesis": "已有 FB-ROOT-004 根搬移 Oracle 会识别已复制 xtal_1 锚点的可避免交叉。", "method": "独立解析 final-medium.svg 的所有 xtal_1 显示锚点、逐边交叉伙伴和目标端口，检查 root_relocation_witnesses。", "result": "not_reproduced", "observed": "xtal_1 有 8 个显示锚点；多条实际单边锚点路线各跨 2 至 8 条纵干线，但 root_relocation_witnesses 为空。", "analysis": "旧 Oracle 要求逻辑根总出度等于 1 且只有一个渲染框，因而把物理锚点出度为 1、逻辑根总出度为 10 的合法复制场景全部跳过。", "why_not_reproduced": "判定粒度停留在逻辑节点，没有对每个物理锚点及其边归属执行连续位置反事实。", "evidence": "example/out/final-medium.svg; example/out/final-medium-quality.json", "next_condition": "扩展独立 Oracle 按物理锚点绑定边集，并校准同样多副本但已位于纵干线右侧的干净反例，再对冻结 revision 公开 CLI 双跑。"},
-        {"attempted_at": "2026-09-03T20:58:24+08:00", "hypothesis": "按物理显示锚点而非逻辑根总出度判断后，冻结基线中单边锚点可越过所跨纵干线并严格改善。", "method": "冻结 revision 2222871，经公开 CLI 对 medium-64 输入自然双跑；独立 SVG Oracle 识别每个单边物理锚点，向右越过实际交叉干线，必要时整体扩开消费者后缀，再重算所有路线。", "result": "reproduced", "observed": "两次输出哈希一致，均为 226 次交叉事件、52 个交叉点、220 折点、54162.1224px 并命中 FB-ROOT-010；多个 xtal_1 物理副本的反事实同时减少该边交叉和长度。", "analysis": "根因是以逻辑节点总出度限制物理锚点迁移，且坐标阶段没有为高优先级交叉改善提供后缀扩列自由度。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-010.json", "next_condition": "owner 门解锁后，以物理锚点服务边集和几何支配关系修复，不按 xtal/source 名称特判。"}
-      ],
-      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-010.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-010.json"}
-    },
-    {
-      "id": "FB-BEND-011",
-      "summary": "无异网交叉的根支路仍存在可避免折点",
-      "expected": "每条路线若存在保持精确端口、避开器件与文字、不增加异网重叠或交叉且严格减少折点的可行路线，则采用该支配路线；不能把原始折点数本身当作失败",
-      "actual": "用户指出包含 weave__public_from 与 weave__merge7 的最终 SVG 中该连接出现奇怪折点，现有质量结果未阻断",
-      "status": "closed",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "deaefc9c2205fbfaf63e70121cb7c378f39bfcef",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "arc"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/26-feedback-reproduction-combined.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-011", "--input", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 原始 SVG 中的路线存在被完整几何反事实严格支配的无交叉折点",
-      "reproduction_does_not_prove": "任意无交叉折线都不合理；端口纵差、障碍物或共享干线所需折点仍可成立",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-04T00:30:00+08:00", "hypothesis": "用户指定路线存在于 final-medium.svg。", "method": "逐字搜索 final-medium.svg 与同目录 final-combined.svg 的节点身份，并检查 SVG 旁的输入来源元数据。", "result": "reproduction_blocked", "observed": "final-medium.svg 不含 weave__public_from 或 weave__merge7；weave__public_from 存在于 final-combined.svg，旁路质量 JSON 将该文件绑定到 26-feedback-reproduction-combined.json。", "analysis": "用户给出的文件名与实际节点所在产物不同，必须改用含该边且输入血缘可验证的 final-combined.svg 继续，不得把错误文件绑定为复现证据。", "why_not_reproduced": "尚未由独立 Oracle 完整绑定 weave__public_from→weave__merge7 的端口、航点与反事实路线。", "evidence": "example/out/final-medium.svg; example/out/final-combined.svg; example/out/final-combined.quality.json", "next_condition": "扩展独立 Oracle 后，以当前冻结 revision 经公开 CLI 双跑，证明该路线由更少折点且不增加高优先级缺陷的路线严格支配。"},
-        {"attempted_at": "2026-09-04T01:23:00+08:00", "hypothesis": "新增多对多 case 可为 011/012 签发冻结自然复现收据。", "method": "完整运行 60-case 结构门及冻结公开 CLI 语料。", "result": "reproduction_blocked", "observed": "全部入口运行后，runner 在签发新问题收据时抛出 KeyError: reproduction_receipt。", "analysis": "问题账本缺少收据输出路径，运行结果不能形成可消费证据；半成品不可升级状态。", "why_not_reproduced": "签名阶段失败，未生成绑定问题合同的正式收据。", "evidence": "runner stderr KeyError: reproduction_receipt", "next_condition": "补齐两项收据路径并从头完整重跑。"},
-        {"attempted_at": "2026-09-04T01:28:00+08:00", "hypothesis": "冻结 deaefc9c 的组合输入会稳定产生无交叉但被纵向同轴反事实支配的根设施折线。", "method": "从公开 CLI 完整生成两次原始 SVG；独立 Oracle 读取最终端点、物理设施和保守文字框，未改写产物。", "result": "reproduced", "observed": "两次 SVG 哈希一致；weave__public_from→weave__merge_07 均为 2→0 折点、549.4573→500.46px，交叉与异网重叠保持 0；另有 public_source→merge_03 同类见证。", "analysis": "固定端点换线无法消除 H-V-H；缺失自由度是单边根显示设施的纵坐标与路线联合选择。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-011.json", "next_condition": "以通用物理设施坐标候选修复，并在当前源码双跑中让该直接见证消失。"}
-      ],
-      "reproduction_receipt": ".reproduction/receipts/FB-BEND-011.json",
-      "fix_verification": {
-        "baseline_fails": true,
-        "current_passes": true,
-        "receipt": ".reproduction/fix-receipts/FB-BEND-011.json"
-      }
-    },
-    {
-      "id": "FB-ROOT-012",
-      "summary": "无交叉收益时自由零入度根仍不必要停在首列或分散列",
-      "expected": "无显式列约束的零入度设施在不增加交叉、碰撞、异网重叠和可避免折点时优先形成稳定整齐的局部列；只有严格改善更高优先级几何时才偏离",
-      "actual": "用户观察到多个 source 仍位于第一列且未见减少交叉的必要性，整体排列不够整齐",
-      "status": "closed",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "deaefc9c2205fbfaf63e70121cb7c378f39bfcef",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "arc"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/26-feedback-reproduction-combined.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-012", "--input", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 原始 SVG 中存在自由零入度设施，其偏离局部规范列没有带来高优先级几何收益并被整列候选严格支配",
-      "reproduction_does_not_prove": "所有图根都必须固定首列，或具有显式 layout_column、远距消费域、交叉收益的根也应强制同列",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-04T01:23:00+08:00", "hypothesis": "新增多对多 case 可为 011/012 签发冻结自然复现收据。", "method": "完整运行 60-case 结构门及冻结公开 CLI 语料。", "result": "reproduction_blocked", "observed": "全部入口运行后，runner 在签发新问题收据时抛出 KeyError: reproduction_receipt。", "analysis": "问题账本缺少收据输出路径，运行结果不能形成可消费证据；半成品不可升级状态。", "why_not_reproduced": "签名阶段失败，未生成绑定问题合同的正式收据。", "evidence": "runner stderr KeyError: reproduction_receipt", "next_condition": "补齐两项收据路径并从头完整重跑。"},
-        {"attempted_at": "2026-09-04T01:28:00+08:00", "hypothesis": "冻结组合图的首列/早列单边根设施可进入另一根已使用的视觉列，并在不增加交叉时同时变直和缩短。", "method": "公开 CLI 双跑；独立 Oracle 只枚举最终 SVG 已使用的根输出列，按可视宽度聚类列并移动完整设施与端口。", "result": "reproduced", "observed": "两次 SVG 哈希一致；weave__public_from→weave__merge_07 的输出 x 可由 163.93 到 565.09，2→0 折点、549.4573→99.3px，交叉和异网重叠均保持 0；共 4 条跨视觉列见证。", "analysis": "当前设施迁移只在交叉收益或向右列搜索链被触发时工作，未把已使用根列的整齐性与零交叉支配纳入完整候选。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-012.json", "next_condition": "以拓扑根、物理服务边和既有视觉列为通用输入修复；显式列约束与真正交叉收益反例保持不变。"}
-      ],
-      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-012.json",
-      "fix_verification": {
-        "baseline_fails": true,
-        "current_passes": true,
-        "receipt": ".reproduction/fix-receipts/FB-ROOT-012.json"
-      }
-    },
-    {
-      "id": "FB-BEND-013",
-      "summary": "边在最后一次交叉之后的无交叉尾段仍存在可避免折点",
-      "expected": "把路线按交叉、分叉、合流和端口邻域分为局部区段；任一区段若存在保持端口、网络连续性和既有交叉语义且不增加碰撞、异网重叠或交叉的更少折点候选，则原路线必须被拒绝",
-      "actual": "ports__div_b 到 ports__sel 输入 1 的路线在较早横段发生一次交叉；最后交叉点之后已无交叉，却仍以水平、竖直、水平两次转向进入端口，旧的整边无交叉筛选因此漏检",
-      "status": "closed",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "5fe9a44b9e54121b372176dbcca631e2538b02c5",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "arc"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/26-feedback-reproduction-combined.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-013", "--input", "{project}/example/auto-layout/26-feedback-reproduction-combined.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 自然生成的最终 SVG 中，交叉分割后的局部无交叉区段存在被完整几何反事实严格支配的多余转向",
-      "reproduction_does_not_prove": "所有含交叉路线或所有端口前折线都不合理；障碍、固定端口纵差、共享网络分叉及保持交叉顺序所需的转向仍可成立",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-04T09:49:00+08:00", "hypothesis": "现有整边级无交叉折点 Oracle 会识别 ports__sel 输入路线的局部尾段冗余。", "method": "从当前公开入口 SVG 的独立统计中读取两条 ports__sel 入边的规范化航点、逐段交叉位置、折点和端口坐标。", "result": "not_reproduced", "observed": "ports__div_b→ports__sel 输入 1 为 3 段、2 折点、1 个交叉；唯一交叉位于第一横段，交叉后的路线仍有 2 个折点。ports__gate_a→输入 0 为 3 段、2 折点、整边 0 交叉。", "analysis": "旧 BEND-011 只筛选整条边交叉数为零且只覆盖可移动根设施；当前边是中间器件入 mux 的普通边，整边有一次交叉，因此交叉后的无交叉尾段从候选空间和指标中同时消失，属于 oracle_escape、coverage_escape 与 ownership_escape。", "why_not_reproduced": "现有 Oracle 没有沿折线参数顺序定位最后交叉，也没有为交叉分割后的首段、中段、尾段建立保持前缀/后缀语义的局部反事实。", "evidence": "example/out/final-combined.svg; example/out/final-combined.latest-oracle.json", "next_condition": "先扩展独立 Oracle 的局部区段表示和正反校准，再从冻结 5fe9a44 公开 CLI 双跑签发自然红灯；在此之前产品 owner 保持冻结。"},
-        {"attempted_at": "2026-09-04T09:56:00+08:00", "hypothesis": "共同移动 ports__sel 及其下游闭包 20px 会在保持原交叉对的同时把两条入边尾段变直。", "method": "新增独立下游闭包刚体平移反事实，先运行 27 项正反校准，再直接检查当前公开 SVG。", "result": "not_reproduced", "observed": "27 项 Oracle 测试在 7.565 秒内通过，但真实产物检查 0.412 秒返回 symptom not observed。", "analysis": "反事实把候选全图要求为绝对零视觉框重叠和零 edge-box 命中；原图中与移动无关的既有对象也导致候选被拒绝，比较量纲错误。", "why_not_reproduced": "应比较具体错误对象集合不得新增，而不是要求候选总错误数为零。", "evidence": "pytest tests/test_feedback_layout_oracle.py; direct FB-BEND-013 oracle exit 1", "next_condition": "改为 node-pair 与 edge-node-pair 身份集合差分，正反校准后重新检查真实产物。"},
-        {"attempted_at": "2026-09-04T10:00:00+08:00", "hypothesis": "新增证据 case 后正式 runner 可直接签发冻结双跑收据。", "method": "先运行 60-case 多对多结构门，再运行完整冻结公开入口 runner。", "result": "reproduction_blocked", "observed": "结构门 0.276 秒通过；runner 11.162 秒后因既有 06c legacy case 缺少 --legacy-python 返回 2。", "analysis": "FB-BEND-013 case 尚未获得完整批次签名；环境参数缺失不能算未观察到，也不能复用半批证据。", "why_not_reproduced": "完整语料包含旧 draw 子命令 case，必须显式提供项目已有隔离 Python 解释器。", "evidence": "run_feedback_reproduction_corpus.py exit 2: legacy corpus case requires --legacy-python", "next_condition": "使用项目既有 .venv/Scripts/python.exe 从头重跑整个批次，不下载依赖。"},
-        {"attempted_at": "2026-09-04T10:03:00+08:00", "hypothesis": "冻结 5fe9a44 的公开 CLI 会确定性产生交叉后尾段可由视觉行闭包变直的症状。", "method": "显式使用既有隔离 legacy Python，从头运行全部七个正式 case；目标 case 由冻结源码公开 CLI 两次生成，Oracle 前后验证原始 SVG 哈希。", "result": "reproduced", "observed": "批次 20260904T020233Z-622f7479 耗时 51.908 秒；FB-BEND-013 两次均直接命中，输出哈希一致为 428063c1...8aa，missing_issues=[]。", "analysis": "症状稳定属于交叉分割后的局部区段及目标视觉行坐标 owner；器件名、固定坐标和手工产物均不是触发条件。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-013.json", "next_condition": "solve 门通过后，以通用视觉行闭包候选接入生产坐标阶段，并用当前公开入口双跑转绿。"}
-      ],
-      "reproduction_receipt": ".reproduction/receipts/FB-BEND-013.json",
-      "fix_verification": {
-        "baseline_fails": true,
-        "current_passes": true,
-        "receipt": ".reproduction/fix-receipts/FB-BEND-013.json"
-      }
-    },
-    {
-      "id": "FB-BEND-014",
-      "summary": "相邻高器件连接右侧多输入器件时，下方根路线出现疑似可避免折点",
-      "expected": "布局必须从当前器件库的实际可视图形、标签、端口和净空计算障碍；当下方零入度器件到目标端口的直线路线不与相邻器件或文字相交且不增加其它高优先级缺陷时，路线应为零折点；只有真实碰撞使直线不可行时才允许绕行",
-      "actual": "用户观察到两个圆形波浪 source 同列且相邻行连接右侧 pad 时，下方 source 出现折点，而较矮的 from 在等价结构中不会；怀疑器件高度、可视包围盒或行间净空计算过度保守",
-      "status": "closed",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "41a5e5963088f81aba62a66d46464234d504d473",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/adjacent-tall-roots-pad.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/adjacent-tall-roots-pad.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-014", "--input", "{project}/tests/reproduction-corpus/adjacent-tall-roots-pad.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 原始 SVG 中，下方较高零入度器件的路线在实际可视净空允许直连时仍保留被严格支配的折点",
-      "reproduction_does_not_prove": "所有较高器件的折线都错误；真实图形、标签、端口引线或相邻行碰撞所需的绕行仍合理，也不能在复现前断言根因一定是高度计算",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-04T11:20:00+08:00", "hypothesis": "两个同列相邻 source 与两个同列相邻 from 分别连接右侧 pad3 时，高 source 的下方路线会自然出现折点。", "method": "通过当前冻结 revision 的公开 CLI 对同一严格 JSON 连续生成两次 SVG；独立 Oracle 绑定 10 个逻辑/渲染节点和 8 条边，比较 source/from 入边的折点与交叉。", "result": "not_reproduced", "observed": "两次 SVG 哈希均为 ACB89AC7...F74751；全部 8 条边均为直线，全图 0 折点、0 交叉，source 与 from 两组均未出现症状。", "analysis": "器件高度本身不足以触发问题。当前 source 单元 55px，在该 pad3 端口间距下两枚 source 可分别与端口同轴且不重叠。需要交叉变化端口占用、相邻行约束、其它支路和根纵序。", "why_not_reproduced": "有效输入包含用户描述的基本结构，但布局自然选择了无碰撞同轴位置，没有产生下方折线。", "evidence": ".reproduction/scratch/fb-014-015-current/adjacent-tall-roots-pad-1.svg; adjacent-report.json", "next_condition": "以相同 source/from 高度对照，系统搜索 pad 端口组合、插入顺序、邻近支路和多行交错；Oracle 仍要求最终直线反事实无真实可视碰撞。"},
-        {"attempted_at": "2026-09-04T11:48:00+08:00", "hypothesis": "保持公开 pad-r08-s02 拓扑与端口次序，仅把同尺寸的公共根器件换成真实 source，可自然保留由最终行轴造成的无谓折点。", "method": "冻结 revision 41a5e596 的公开 CLI 连续生成两次；独立 Oracle 使用 SVG 中真实可视包围盒、标签、端口和全图异网交叉，整体平移完整物理根设施到目标端口轴作反事实。", "result": "reproduced", "observed": "正式批次 20260904T033247Z-b99d523b 双运行哈希均为 9303E6A4...F776949；svg-edge-0043 从 2 折点、391.1808 长度可降为 0 折点、214.17 长度，交叉与异网重叠均保持 0。source 与同列相邻 source 的真实可视高度均为 62.77，平移前净间隙仍为 49.2314。", "analysis": "高度数据已被 Oracle 正确纳入，问题不是 source 高度漏算；缺口是布局阶段没有枚举并接受完整物理根设施到端口视觉行的合法坐标候选。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-014.json", "next_condition": "solve 门通过后，以通用物理设施坐标候选修复并用当前公开入口双跑转绿。"}
-      ],
-      "reproduction_receipt": ".reproduction/receipts/FB-BEND-014.json",
-      "fix_verification": {
-        "baseline_fails": true,
-        "current_passes": true,
-        "receipt": ".reproduction/fix-receipts/FB-BEND-014.json"
-      }
-    },
-    {
-      "id": "FB-ROOT-015",
-      "summary": "紧凑且工整的公共零入度时钟消费带被过度拆成多个同名显示节点",
-      "expected": "同一零入度逻辑器件的多个下游若形成相邻或近邻且排列工整的消费带，应优先由一个显示设施和一条共享纵向主干贯穿分发；只有拆分能严格改善更高优先级的碰撞、异网重叠、交叉或显著远距走线时才允许多个同名显示节点",
-      "actual": "用户观察到一个公共 from 与多个私人 from 分别两两接入多个 mux、每个 mux 直接输出一路 clock 的复用数组中，公共 from 被分散显示而没有用一条纵向总线分发。此前第 27 号样例使用公共 source、mux3 和 cell 中间级，输入器件类型与输出链均不符合这次明确描述，因此旧绿图不能作为该严格场景的覆盖证据",
-      "status": "closed",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "41a5e5963088f81aba62a66d46464234d504d473",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/mux-r04-s00.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/mux-r04-s00.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-015", "--input", "{project}/tests/reproduction-corpus/mux-r04-s00.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 原始 SVG 把一个几何紧凑、可由单一共享纵干线无退化服务的逻辑根拆成多个物理设施，且合并反事实严格改善显示设施数、主干连续性或总折点",
-      "reproduction_does_not_prove": "所有四至五行跨度都必须合并；行数不是固定阈值，真实器件尺寸、净空、交叉、消费簇间隙与路径长度可能证明拆分合理",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-04T11:20:00+08:00", "hypothesis": "一个公共 source 连接首尾 mux，中间穿插四条独立工整支路时，会自然形成约四至五行间隔并被拆成多个显示设施。", "method": "通过当前冻结 revision 的公开 CLI 连续生成两次 SVG；独立 Oracle 统计公共逻辑根的渲染副本和最终行序。", "result": "not_reproduced", "observed": "两次 SVG 哈希均为 57361C6C...FC43；shared_root 只有 1 个显示设施。层内排序把 mux_00 与 mux_05 排成相邻两行，其余四条支路位于其后。", "analysis": "输入对象顺序不能强制最终视觉行；公共祖先相似性会主动聚拢共同消费者。这是同触发语义下的干净反例，不是过度拆分红灯。", "why_not_reproduced": "最终消费端不再相隔四至五个视觉行，拆分前提没有成立。", "evidence": ".reproduction/scratch/fb-014-015-current/compact-root-fanout-band-1.svg; compact-report.json", "next_condition": "使用固定多输入端口、交错祖先签名或既有公开 alias 样例形成自然分隔，再由独立设施合并反事实直接判断是否过度拆分。"},
-        {"attempted_at": "2026-09-04T11:50:00+08:00", "hypothesis": "既有四行 mux 搜索用例的共享 source 消费者被自然分隔时，固定行距分区会把本可共享纵干线的根过度复制。", "method": "冻结 revision 41a5e596 的公开 CLI 对 mux-r04-s00 连续生成两次；独立 Oracle 枚举单设施共享纵干线，以同网线段并集长度加实际可视设施周长比较显示成本，并要求交叉、异网重叠和障碍不退化。", "result": "reproduced", "observed": "正式批次 20260904T033247Z-b99d523b 双运行哈希均为 A2EBA9FF...30E287；shared_wave 被渲染为 2 个设施。合并为 1 个设施后交叉仍为 0、异网重叠仍为 0，综合显示成本从 991.86 降至 811.9233。", "analysis": "当前拆分准则把逐边曼哈顿长度与固定行距成本相加，未对共享同网主干去重，也未使用器件真实可视复制成本，因此会系统性高估合并方案。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-015.json", "next_condition": "solve 门通过后，以通用共享网络几何成本修复并用当前公开入口双跑转绿。"},
-        {"attempted_at": "2026-09-04T16:30:00+08:00", "hypothesis": "六组 common root 与独立 private from 交替接入 pad3，且每个 pad 继续 cell→clock 时，旧版可能把公共根拆成多个设施。", "method": "新增只含公开 schema 的 27-interleaved-common-root-pads.json；从冻结 41a5e596 的 git archive 和当前 src 各通过公开 CLI 独立生成两次 SVG，独立 Oracle 绑定全部节点、边、源端口网络并枚举所有公共边的纵段 x 通道。", "result": "not_reproduced", "observed": "冻结版和当前版四张 SVG 的 SHA-256 均为 BC450307E00868C0435B7E067997CE1125A1659E0785D12299C5451A18AB2693；两版均只有 1 个 common_clock 设施、6 条公共边、唯一首纵向通道 x=170.84、0 交叉、0 异网重叠且无 split-rejoin。", "analysis": "该运行结果本身有效，但用户随后澄清汇聚器件必须是 mux3；pad3 不是目标语义，因此本尝试只能保留为历史旁证，不能覆盖澄清后的要求。", "why_not_reproduced": "测试夹具选择了 pad3，而目标是三输入 mux；没有到达澄清后的器件语义。", "evidence": "example/auto-layout/27-interleaved-common-root-pads.json; tests/test_feedback_layout_oracle.py::test_interleaved_common_root_uses_one_visible_vertical_trunk", "next_condition": "保持相同交替与下游链结构，将汇聚器件改为供应库中的精确 title mux3，并从冻结版与当前版公开 CLI 重新双跑、复算设施数和共享纵向通道。"},
-        {"attempted_at": "2026-09-04T17:05:00+08:00", "hypothesis": "此前 pad3 场景可代表用户所指的三输入 mux 场景。", "method": "回读用户澄清、器件目录、库合约和第 27 号 JSON；核对 drawio-lib 与 scripts/drawio_lib 的 Git 工作区及暂存区差异。", "result": "reproduction_blocked", "observed": "第 27 号 JSON 的六个汇聚器件均为 pad3；器件库目录没有任何工作区或暂存区改动，HEAD 中 drawio-lib 仍有 50 个文件。", "analysis": "布局结果不能弥补输入语义错误。问题是复现夹具/覆盖合同选错具体器件，不是器件库被修改，也不能据 pad3 的绿图推断 mux3。", "why_not_reproduced": "尚未通过公开 CLI 运行 mux3 版本的合法输入。", "evidence": "git status/diff -- drawio-lib scripts/drawio_lib; skills/component-library-design/references/component-catalog.md; example/auto-layout/27-interleaved-common-root-pads.json", "next_condition": "先构造 mux3 正常输入并验证端口子集合法，再执行冻结版与当前版各两次自然运行。"},
-        {"attempted_at": "2026-09-04T17:20:00+08:00", "hypothesis": "六组 common root 与独立 private from 分别接入稀疏 mux3 的输入 0/1、输入 2 空置且各自继续 cell→clock 时，冻结版可能过度拆分公共根。", "method": "由冻结 41a5e596 的 git archive 与当前工作树分别使用公开 CLI 独立运行两次；独立 Oracle 绑定最终 SVG 的全部逻辑边和精确端口，枚举公共网络的物理设施、rendering anchor、非零纵段通道、split-rejoin、交叉与异网重叠，并比较 Oracle 前后 SVG SHA-256。", "result": "not_reproduced", "observed": "冻结版与当前版四次 SVG 的 SHA-256 均为 304C076F84D214614F9AF86D333D17BBB325663676ACCC3187B84EDFD10DE601；每次均为 1 个 common_clock 设施、1 个 rendering anchor、6 条公共边精确连接 mux3 输入 0、6 条私有边精确连接输入 1、唯一非零纵向通道 x=170.84、0 交叉、0 异网重叠且无 split-rejoin，Oracle 前后字节不变。", "analysis": "该输入只能证明公共 source、稀疏 mux3 与 cell 中间级的场景；用户随后明确要求公共节点本身为 from，mux 直接输出 clock，因此这次成功边界不能覆盖新描述。", "why_not_reproduced": "输入器件类型和 mux 输出链与用户最终描述不同，未到达严格场景。", "evidence": "example/auto-layout/27-interleaved-common-root-mux3.json; tests/test_feedback_layout_oracle.py::test_interleaved_common_root_mux3_uses_one_visible_vertical_trunk; work/drawclock-mux3-2d7e6c357a2044f4bc68dcca88c5a73d", "next_condition": "使用一个公共 from、每行一个私人 from、二者接入 mux2 的输入 0/1，并让 mux2 直接连接 clock；从冻结版与当前版公开 CLI 双跑后复算公共 from 的设施数和纵向主干。"},
-        {"attempted_at": "2026-09-05T00:00:00+08:00", "hypothesis": "先前公共 source→mux3→cell→clock 的成功样例可覆盖公共 from 与私人 from→mux2→clock 的复用数组。", "method": "逐字段比较用户最终描述、第 27 号公开 JSON 和对应测试断言；检查供应器件库是否同时提供 from、mux2 与 clock。", "result": "reproduction_blocked", "observed": "第 27 号 JSON 的公共节点 kind 为 source，汇聚器件为 mux3，并在 mux 与 clock 之间插入 cell；现有测试明确断言这些旧结构。器件库存在 from.xml、mux2.xml 和 clock.xml，可构造严格正常输入。", "analysis": "旧测试测量的几何判据有效，但对照输入的语义不完整，属于 coverage_escape 和 claim_escape；必须撤销旧完成声明并从严格输入重新取得证据。", "why_not_reproduced": "严格场景的正常 JSON 尚未生成，公开 CLI 尚未到达该输入。", "evidence": "example/auto-layout/27-interleaved-common-root-mux3.json; tests/test_feedback_layout_oracle.py::test_interleaved_common_root_mux3_uses_one_visible_vertical_trunk; drawio-lib/drawclock/from.xml; drawio-lib/drawclock/mux2.xml; drawio-lib/drawclock/clock.xml", "next_condition": "新增严格输入 28-common-private-from-mux-clock-array.json，并对冻结版与当前版各独立运行两次。"},
-        {"attempted_at": "2026-09-05T00:05:00+08:00", "hypothesis": "公共 from 与六个私人 from 分别接入六个 mux2、mux2 直接输出 clock 时，冻结版或当前版会把公共 from 分散成多个显示设施。", "method": "新增只含公开 schema 的第 28 号输入；冻结 41a5e596 与当前工作树分别通过公开 CLI 独立运行两次，独立 Oracle 绑定全部节点、端口和边，并复算公共网络的显示设施、纵向通道、交叉、异网重叠与 split-rejoin。", "result": "not_reproduced", "observed": "冻结版和当前版四次 SVG 的 SHA-256 均为 C7E59F79C4A18667AF2AF2627E2F79DDCDC0255A47C2AB2937B528958B5517C8；每次均为 1 个 common_from 显示设施、1 个 rendering anchor、6 条公共边到 mux2 输入 0、6 条私人边到输入 1、6 条 mux2 直达 clock 的输出边、唯一纵向通道 x=164.02、0 交叉、0 异网重叠且无 split-rejoin。", "analysis": "严格场景已经真实重建并满足用户期望，因此它是成功边界而不是冻结旧版红灯。此前错误是用不同器件类型和输出链的绿图扩大了覆盖声明；正式 ROOT-015 缺陷仍由 mux-r04-s00 的冻结自然红灯证明。", "why_not_reproduced": "冻结版对严格 from→mux2→clock 数组已经使用单显示设施和单纵向总线，没有出现用户所述分散症状。", "evidence": "example/auto-layout/28-common-private-from-mux-clock-array.json; work/fb-root-015-strict-current-20260905; work/fb-root-015-strict-baseline-runs-20260905; tests/test_feedback_layout_oracle.py::test_common_private_from_mux_clock_array_uses_one_vertical_bus", "next_condition": "保留严格成功边界并刷新正式 ROOT-015 红灯/绿灯收据；完整回归和发行包必须包含第 28 号输入。"}
-      ],
-      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-015.json",
-      "fix_verification": {
-        "baseline_fails": true,
-        "current_passes": true,
-        "receipt": ".reproduction/fix-receipts/FB-ROOT-015.json",
-        "release_verification": {
-          "commit": "6e054f3627149ea87d1d7075f7a78f76fd2df4d7",
-          "run_id": 33973881006,
-          "tag": "v1.0.0",
-          "asset_sha256": "C53BDDB2E1BF58B4B5313DFC831ABEB4E19165DFF4694E7C947C8FD536EE746D"
+    "schema_version": 1,
+    "issues": [
+        {
+            "id": "FB-ROOT-001",
+            "summary": "混合 source、from 和其它零入度器件的图根通用性",
+            "expected": "所有入度为零且有输出的器件按拓扑统一处理，不读取器件 kind 特判",
+            "actual": "混合图根场景中普通 gate 图根的公共分发线与低复用图根路线发生可归因交叉",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "6c9f9f42d9e0912309197d47b4b4c245db25ff75",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/tests/reproduction-corpus/pad-r08-s00.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "tests/reproduction-corpus/pad-r08-s00.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROOT-001",
+                    "--input",
+                    "{project}/tests/reproduction-corpus/pad-r08-s00.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "有效混合图根经公开 CLI 产生普通零入度器件可归因的根布局质量失败",
+            "reproduction_does_not_prove": "其它五条几何问题或根因",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-03T13:38:00+08:00",
+                    "hypothesis": "现有混合根 torture example 会经公开 CLI 暴露按 kind 特判的根布局。",
+                    "method": "审计 example 25、旧测试名称及现存证据路径，检查是否有冻结基线原始 SVG 与只读直接 Oracle 收据。",
+                    "result": "reproduction_blocked",
+                    "observed": "样例包含 source/from，但没有两次独立公开 CLI 红灯收据，也没有证明任意零入度器件均触发同一缺陷。",
+                    "analysis": "覆盖 source/from 不等价于覆盖拓扑定义的所有图根；现有资料只能形成待测假设。",
+                    "why_not_reproduced": "缺少冻结基线的两次自然运行与直接判定类别特判的只读 Oracle 证据。",
+                    "evidence": "example/auto-layout/25-mixed-root-port-order-torture.json; tests; .reproduction/receipts/FB-ROOT-001.json missing",
+                    "next_condition": "补充非 source/from 的零入度器件并让公开 CLI 在冻结基线上连续两次触发直接 Oracle 红灯。"
+                },
+                {
+                    "attempted_at": "2026-09-03T15:41:10+08:00",
+                    "hypothesis": "一个多对多自然样例可同时证明混合图根与其它根布局症状。",
+                    "method": "冻结当前 revision，对 example 25 通过公开 CLI 连续运行两次；独立 Oracle 直接读取 JSON 与 SVG，只检查三种零入度器件进入统计集合。",
+                    "result": "not_reproduced",
+                    "observed": "两次均识别 from、gate、source 三类零入度根和完整节点边绑定，但没有检查普通 gate 根是否实际产生用户所述交叉。",
+                    "analysis": "该判据把混合器件种类这一触发前提误作缺陷结果，属于 Oracle 假通过，不能授权修复。",
+                    "why_not_reproduced": "缺少可归因到非 source/from 普通图根的最终几何异常。",
+                    "evidence": "已撤销的旧收据与 example/auto-layout/25-mixed-root-port-order-torture.json",
+                    "next_condition": "使用同时含三类根且普通 gate 公共根自然发生低复用根交叉的冻结 PAD 产物，并增加同前提无症状的干净反例。"
+                },
+                {
+                    "attempted_at": "2026-09-03T17:19:46+08:00",
+                    "hypothesis": "冻结 PAD 的普通 gate 公共根会与低复用图根发生可逐边归因的交叉，而干净混合根图不会命中。",
+                    "method": "在 6c9f9f4 冻结源码上经公开 CLI 双跑 pad-r08-s00；Oracle 要求三类根前提和普通 gate 公共根的实际交叉同时成立，并以干净混合根图做负校准。",
+                    "result": "reproduced",
+                    "observed": "两次均为 43 节点、48 边、87 次交叉事件；普通 public_gate 根的失败 witness 直接命中，干净混合根图不命中。",
+                    "analysis": "修正后的证据同时证明触发结构、用户可观察症状、器件种类通用性与判据非恒真。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROOT-001.json; tests/test_feedback_layout_oracle.py",
+                    "next_condition": "修复仅使用入度、出度、祖先、汇聚与显式列约束，并在同一当前输入证明 witness 消失。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-ROOT-001.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROOT-001.json"
+            }
+        },
+        {
+            "id": "FB-ROUTE-002",
+            "summary": "同一图根的两条路线先分开、再合并、再分开",
+            "expected": "同一逻辑根端口的公共前段一次合并后不发生无拓扑依据的重新汇合",
+            "actual": "用户观察到重复分合造成多余走线和交叉；旧测试只人工改写航点",
+            "status": "fixed_verified",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "6c9f9f42d9e0912309197d47b4b4c245db25ff75",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/tests/reproduction-corpus/pad-r08-s02.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "tests/reproduction-corpus/pad-r08-s02.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROUTE-002",
+                    "--input",
+                    "{project}/tests/reproduction-corpus/pad-r08-s02.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py",
+                    "tools/reproduction_semantics.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "required_reproduction_variants": [
+                "public-from-split-rejoin"
+            ],
+            "reproduction_proves": "公开 CLI 自然生成同根 split-rejoin 几何",
+            "reproduction_does_not_prove": "人工航点变异只证明 Oracle，不能满足本条",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-03T13:39:00+08:00",
+                    "hypothesis": "example 19 的正常公开 CLI 输出自然包含同根先分、再合、再分。",
+                    "method": "核查旧 split-rejoin 测试与样例入口，区分正常生成输出和测试内人工航点改写。",
+                    "result": "not_reproduced",
+                    "observed": "旧测试先生成正常图再人工重写航点，随后 Oracle 能报错；正常产物本身没有合格红灯收据。",
+                    "analysis": "该测试只验证检测器能看见注入后的坏图，不能证明用户工作流会产生坏图。",
+                    "why_not_reproduced": "唯一红灯依赖输出变异，违反禁止人工注入故障和禁止改写产物的要求。",
+                    "evidence": "tests split-rejoin mutation test; example/auto-layout/19-dispersed-root-fanout.json; receipt missing",
+                    "next_condition": "重新设计自然输入，使未修改生产代码与未修改 SVG 的公开 CLI 输出直接出现 split-rejoin，并独立复跑两次。"
+                },
+                {
+                    "attempted_at": "2026-09-03T15:41:10+08:00",
+                    "hypothesis": "三输入 pad 的跨行交错与公共根复用会让同一根网络自然形成分裂—重合—再分裂。",
+                    "method": "冻结 6c9f9f4 revision，对 pad-r08-s00 正常 JSON 连续运行公开 CLI 两次；Oracle 对同根线段并集构图并寻找环。",
+                    "result": "reproduced",
+                    "observed": "两次均在 public_gate 网络发现 split-rejoin 环；43 节点、48 边全部绑定，未改写 SVG。",
+                    "analysis": "症状由公共根跨行复用、固定多输入端口和交错纵序共同形成；几何判定依赖同网段拓扑，而非像素相似。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROUTE-002.json",
+                    "next_condition": "修复阶段应约束同根公共干线为树并保留端口绑定。"
+                }
+            ],
+            "strict_reproduction": {
+                "verified_at": "2026-09-08T11:13:00+08:00",
+                "variant": "public-from-split-rejoin",
+                "case": "public-from-split-rejoin-baseline",
+                "observed_witness": "public_from:right",
+                "corpus_id": "20260908T030927Z-8159ddf2",
+                "analysis": "旧 s00 仅命中 public_gate；s02 通过 kind、零入度、扇出和指定 root/port witness 的数据驱动合同，证明公共 from 自身自然失败。"
+            },
+            "reproduction_receipt": ".reproduction/receipts/FB-ROUTE-002.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROUTE-002.json"
+            }
+        },
+        {
+            "id": "FB-ROOT-003",
+            "summary": "公共根位于下方并穿过单连接 pad 输入根",
+            "expected": "低复用图根靠近唯一消费者，公共根与固定目标端口纵序共同排列",
+            "actual": "公共根从下方长距离穿过其它根并与 pad 输入交叉",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "29252208654de2a2157004a4883c4c852a0c3191",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/example/auto-layout/25-mixed-root-port-order-torture.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/25-mixed-root-port-order-torture.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROOT-003",
+                    "--input",
+                    "{project}/example/auto-layout/25-mixed-root-port-order-torture.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "根纵序相对目标端口反转并产生可避免交叉",
+            "reproduction_does_not_prove": "所有根布局最优",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-03T13:40:00+08:00",
+                    "hypothesis": "example 25 会自然生成公共根从下方向上穿过单连接 pad 输入根的交叉。",
+                    "method": "审计该样例的输入拓扑、目标端口与旧质量结果，搜索直接归因到根纵序反转的原始 SVG 收据。",
+                    "result": "reproduction_blocked",
+                    "observed": "样例意图覆盖该结构，但没有冻结旧实现输出、两次直接 Oracle 红灯或反事实重排证据。",
+                    "analysis": "测试意图和复杂结构存在不能代替实际生成几何的可重复失败。",
+                    "why_not_reproduced": "缺少可验证的自然失败产物和逐交叉归因，无法排除交叉来自另一条边。",
+                    "evidence": "example/auto-layout/25-mixed-root-port-order-torture.json; receipt missing",
+                    "next_condition": "冻结基线运行公开 CLI，两次记录同一根纵序反转和交叉边对，并用只读 Oracle 验证。"
+                },
+                {
+                    "attempted_at": "2026-09-03T15:41:10+08:00",
+                    "hypothesis": "公共根的纵向干线会与同批消费者附近的低复用根横线产生可归因交叉。",
+                    "method": "冻结当前 revision，对 example 25 连续运行两次，并以线段内部交点而非端点接触统计根网络对。",
+                    "result": "reproduced",
+                    "observed": "两次均得到 4 个交叉事件、2 个交叉坐标；common_source 分别与 local_a_03、local_b_03 的两条边交叉。",
+                    "analysis": "交叉由公共纵干线与低复用根过早放置后的横向接入共同触发，可逐边对归因。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROOT-003.json",
+                    "next_condition": "修复阶段以根位置和支路顺序的全局交叉代价共同优化。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-ROOT-003.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROOT-003.json"
+            },
+            "reopened_feedback": {
+                "reported_at": "2026-09-07T17:24:00+08:00",
+                "status": "oracle_escape",
+                "summary": "用户展示 30 号当前图仍有可消除交叉；旧专用 Oracle 返回 symptom not observed，而通用统计直接报告 4 个交叉事件、3 个交叉坐标。",
+                "evidence": "work/rejection-baseline/attempt-1/output.svg; work/rejection-baseline/attempt-1/quality.json; SHA256 28B3E60492321366A1FED79A5E91BD81C30C3A7A1A8FDD6187C3000295C20F94",
+                "next_condition": "先扩展独立整图坐标—路由反事实并证明该产物被拒绝，再修改布局 owner。"
+            }
+        },
+        {
+            "id": "FB-ROOT-004",
+            "summary": "大量单连接 from 固定第一列并与公共根交叉",
+            "expected": "无显式列约束的低复用图根可进入消费者前的任意可行中间列",
+            "actual": "单连接根留在首列，延长线路并与公共根分发路线交叉",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "29252208654de2a2157004a4883c4c852a0c3191",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/example/auto-layout/25-mixed-root-port-order-torture.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/25-mixed-root-port-order-torture.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROOT-004",
+                    "--input",
+                    "{project}/example/auto-layout/25-mixed-root-port-order-torture.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "低复用根的首列位置被完整重排反事实支配",
+            "reproduction_does_not_prove": "根复制或端口纵序问题",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-03T13:41:00+08:00",
+                    "hypothesis": "example 23 可证明单连接 from 固定首列并与公共根到 mux 的路线交叉。",
+                    "method": "将样例拓扑与用户明确描述的公共源、多低复用源和 mux 中间列场景逐项对照。",
+                    "result": "not_reproduced",
+                    "observed": "用户已明确指出 example 23 覆盖不够详细且不是目标场景；现有结果没有合格反事实支配证据。",
+                    "analysis": "两个不同源或简单中间列示例不能代表公共根与多个低复用根竞争 mux 输入的交叉。",
+                    "why_not_reproduced": "输入结构缺少用户要求的复杂交叉组合，且没有自然红灯收据。",
+                    "evidence": "example/auto-layout/23-middle-column-low-use-sources.json; user rejection; receipt missing",
+                    "next_condition": "构造公共根连接多 mux、多个单连接异类图根连接同批 mux 的复杂公开输入，并证明中间列反事实严格减少交叉和长度。"
+                },
+                {
+                    "attempted_at": "2026-09-03T15:41:10+08:00",
+                    "hypothesis": "单用根若固定在早期列，其移动到消费者前的可行列会同时降低交叉与长度。",
+                    "method": "冻结当前 revision，对 example 25 双运行；Oracle 平移完整根外框并重建直连候选，仅在无节点重叠、无障碍穿越、无重叠增加且交叉和长度均严格下降时签名。",
+                    "result": "reproduced",
+                    "observed": "local_a_03 与 local_b_03 均从 2 次交叉降到 0，长度分别从 103.66/109.66px 降到 24px。",
+                    "analysis": "可行中间位置由实际目标端口和源输出偏移计算；这证明当前位置被严格支配，不依赖器件名称或固定列号。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROOT-004.json",
+                    "next_condition": "修复阶段将连续可行列与全局交叉/长度代价纳入通用根放置。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-ROOT-004.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROOT-004.json"
+            }
+        },
+        {
+            "id": "FB-BEND-005",
+            "summary": "相邻列节点本可直连却出现折点",
+            "expected": "无障碍且端口同轴的局部边为零折点直线",
+            "actual": "本可直连的边出现无交叉收益的额外折点",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "6c9f9f42d9e0912309197d47b4b4c245db25ff75",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/tests/reproduction-corpus/pad-r08-s00.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "tests/reproduction-corpus/pad-r08-s00.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-BEND-005",
+                    "--input",
+                    "{project}/tests/reproduction-corpus/pad-r08-s00.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 SVG 中存在被无障碍直线严格支配的边",
+            "reproduction_does_not_prove": "全图面积或全部路线最优",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-03T13:42:00+08:00",
+                    "hypothesis": "example 20 的相邻列同轴边会自然出现无收益折点。",
+                    "method": "审计样例、旧 gate_a_tap/sel 路径反馈与现有折点统计，检查是否保存了冻结基线的直接 dominance 证据。",
+                    "result": "reproduction_blocked",
+                    "observed": "存在用户截图式观察与针对性样例，但没有可核验的旧原始 SVG、障碍净空计算和两次独立红灯收据。",
+                    "analysis": "看到折点不等于证明它无必要；必须证明直线候选不碰节点、标签、端口或其它硬约束且质量向量严格更优。",
+                    "why_not_reproduced": "缺少冻结基线产物及只读直线可行性/支配 Oracle 收据。",
+                    "evidence": "example/auto-layout/20-asymmetric-merge-route-bulge.json; receipt missing",
+                    "next_condition": "用正常 CLI 生成两次相同折点，Oracle 同时证明直线路径可行且不降低更高优先级指标。"
+                },
+                {
+                    "attempted_at": "2026-09-03T15:41:10+08:00",
+                    "hypothesis": "交错多输入布局会生成可由更少折点 H-V-H 路线严格支配的异常凸线。",
+                    "method": "冻结 6c9f9f4 revision，对 pad-r08-s00 双运行；Oracle 规范化航点，并逐候选重算障碍、交叉、重叠、长度与折点。",
+                    "result": "reproduced",
+                    "observed": "两次均识别 svg-edge-0009、0023、0032 三条可避免折线；候选折点更少且高优先级指标不变差。",
+                    "analysis": "异常折点是多输入交错、跨层排序与公共根路线耦合的结果；判定采用质量向量支配，不以画布面积交换美观。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-BEND-005.json",
+                    "next_condition": "修复阶段使用正交路径正规化与局部严格支配替换，并对全语料回归。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-BEND-005.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-BEND-005.json"
+            }
+        },
+        {
+            "id": "FB-PORT-006",
+            "summary": "两个单连接图根相对 pad 端口次序反转",
+            "expected": "自由根纵序与固定目标端口纵序一致",
+            "actual": "连接端口 1 的根在端口 2 根下方，两个输入交叉",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "06c4c6c89f326b9cdc3a73ff2b229078789de544",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "draw",
+                    "-i",
+                    "{project}/example/auto-layout/20-asymmetric-merge-route-bulge.json",
+                    "-l",
+                    "{snapshot}/drawio-lib/drawclock.xml",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/20-asymmetric-merge-route-bulge.json",
+                    "drawio-lib/drawclock.xml"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-PORT-006",
+                    "--input",
+                    "{project}/example/auto-layout/20-asymmetric-merge-route-bulge.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "根纵序反转直接造成固定 pad 输入交叉",
+            "reproduction_does_not_prove": "公共根位置或 split-rejoin",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-03T13:43:00+08:00",
+                    "hypothesis": "example 25 的两个单连接根会以目标 pad 端口相反的纵序自然生成交叉。",
+                    "method": "核查样例端口绑定、旧测试结果与收据目录，寻找两个独立公开 CLI 输出中的同一端口次序反转。",
+                    "result": "reproduction_blocked",
+                    "observed": "样例包含端口顺序压力结构，但没有逐端口坐标和交叉边对的自然复现收据。",
+                    "analysis": "仅有连接正确性不能证明根的纵序与端口纵序反转，也不能证明交叉可由交换根顺序消除。",
+                    "why_not_reproduced": "缺少两次原始 SVG 的端口坐标、根坐标与交叉归因证据。",
+                    "evidence": "example/auto-layout/25-mixed-root-port-order-torture.json; receipt missing",
+                    "next_condition": "公开 CLI 独立运行两次，并由只读 Oracle 验证根顺序反转、指定边对交叉及交换顺序的严格改善。"
+                },
+                {
+                    "attempted_at": "2026-09-03T15:41:10+08:00",
+                    "hypothesis": "非对称双支路在修复前版本会让独占根祖先纵序与固定 mux 输入端口纵序反转。",
+                    "method": "冻结 06c4c6c revision，在隔离历史依赖环境中对 example 20 通过公开 draw 子命令双运行；Oracle 沿 DAG 回溯唯一根祖先并检查目标端口坐标和内部交叉。",
+                    "result": "reproduced",
+                    "observed": "两次均发现 from_a/from_b 到 sel 的独占支路纵序反转；gate_a→sel.0 与 div_b→sel.1 发生 1 个内部交叉。",
+                    "analysis": "简单断开双输入组没有复现；必须由不同链深和目标固定端口共同约束，说明该问题是排序耦合而不是命名特例。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-PORT-006.json",
+                    "next_condition": "修复阶段对独占输入支路进行端口感知排序，同时回归共享根和跨行结构。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-PORT-006.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-PORT-006.json"
+            }
+        },
+        {
+            "id": "FB-ROUTE-009",
+            "summary": "零入度公共根到局部消费者出现可避免的四拐点大绕行",
+            "expected": "允许按拓扑与几何增设显示锚点或重排锚点，使每条根支路在不增加碰撞、异网重叠和交叉时采用更少拐点、更短路线",
+            "actual": "final-combined.svg 中 weave__public_gate 到 weave__select_04 的路线含 4 个拐点、934.1805px 和 1 次交叉；同类公共根支路先反向离开目标行再折返",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "22228714675a60c169745f71f73e926857610db1",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/example/auto-layout/26-feedback-reproduction-combined.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "arc"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/26-feedback-reproduction-combined.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROUTE-009",
+                    "--input",
+                    "{project}/example/auto-layout/26-feedback-reproduction-combined.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 CLI 自然生成的最终 SVG 中，某个零入度逻辑根的现有显示锚点与路线集合被增加或重新分配显示锚点的完整几何反事实严格支配",
+            "reproduction_does_not_prove": "固定节点坐标下存在无障碍两拐点路线，或任意增加根副本都更优",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-03T20:43:37+08:00",
+                    "hypothesis": "现有逐边少拐点 Oracle 能直接识别 final-combined.svg 的公共根大绕行。",
+                    "method": "从最终 SVG 独立绑定逻辑边，枚举固定节点坐标下的直线或两拐点 H-V-H 候选并重算器件穿越、异网重叠、交叉和长度。",
+                    "result": "not_reproduced",
+                    "observed": "weave__public_gate→weave__select_04 实测 4 拐点、934.1805px、1 次交叉，但所有固定锚点两拐点候选均穿过器件，旧 avoidable_bend_edges 为空。",
+                    "analysis": "症状真实存在，但旧 Oracle 的反事实空间只改线不改零入度根显示设施，测错了优化自由度；不能以该 Oracle 签发复现。",
+                    "why_not_reproduced": "缺少对零入度根显示锚点拆分、重分配和重定位的独立联合反事实。",
+                    "evidence": "example/out/final-combined.svg; example/out/final-combined-quality.json; diagnostic import attempts (first two failed before successful direct geometry query)",
+                    "next_condition": "先扩展独立 Oracle，使其能证明新增/重分配显示锚点后高优先级几何不退化且拐点、交叉或长度严格改善，再对冻结 revision 公开 CLI 双跑。"
+                },
+                {
+                    "attempted_at": "2026-09-03T20:58:24+08:00",
+                    "hypothesis": "把零入度根显示设施作为可复制资源后，冻结基线的公共根支路会被无碰撞反事实严格支配。",
+                    "method": "冻结 revision 2222871，经公开 CLI 对组合输入自然双跑；独立 SVG Oracle 绑定物理锚点与边，在目标前增设同身份显示设施，逐项重算器件穿越、异网重叠、交叉、折点和长度。",
+                    "result": "reproduced",
+                    "observed": "两次输出哈希一致，均命中 FB-ROUTE-009；weave__public_gate→weave__select_04 可由 4 拐点、934.1805px、1 次交叉变为 0 拐点、18px、0 交叉，且无器件碰撞或异网重叠退化。",
+                    "analysis": "根因属于显示设施分配和局部路由的联合优化缺口，不是固定端点路由器单独可解的问题。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROUTE-009.json",
+                    "next_condition": "owner 门解锁后，以通用零入度拓扑和完整几何支配关系修复，并用当前公开入口双跑转绿。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-ROUTE-009.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROUTE-009.json"
+            }
+        },
+        {
+            "id": "FB-ROOT-010",
+            "summary": "已复制的零入度根锚点仍停在干线左侧并以短横线跨越多条纵线",
+            "expected": "每个物理根锚点按自身所服务边集进入消费者前的最右连续可行位置；若越过纵干线可减少交叉且不增加更高优先级缺陷，则必须采用该位置",
+            "actual": "final-medium.svg 中 xtal_1 的多个单边显示锚点位于 x=160.47，至 mux_d005/006/007/013/014/015 的直线横跨 x=221.02、231.02、241.02 的 PLL 纵干线，单边产生 2 至 8 个交叉伙伴",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "22228714675a60c169745f71f73e926857610db1",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/example/auto-layout/07-medium-64-clocks.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "arc"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/07-medium-64-clocks.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROOT-010",
+                    "--input",
+                    "{project}/example/auto-layout/07-medium-64-clocks.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 CLI 自然生成的根显示锚点存在连续最右可行位置，完整移动该锚点并重接所属边可严格减少异网交叉与长度",
+            "reproduction_does_not_prove": "所有逻辑高扇出根都应整体右移，或器件名称 xtal 具有特殊语义",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-03T20:43:37+08:00",
+                    "hypothesis": "已有 FB-ROOT-004 根搬移 Oracle 会识别已复制 xtal_1 锚点的可避免交叉。",
+                    "method": "独立解析 final-medium.svg 的所有 xtal_1 显示锚点、逐边交叉伙伴和目标端口，检查 root_relocation_witnesses。",
+                    "result": "not_reproduced",
+                    "observed": "xtal_1 有 8 个显示锚点；多条实际单边锚点路线各跨 2 至 8 条纵干线，但 root_relocation_witnesses 为空。",
+                    "analysis": "旧 Oracle 要求逻辑根总出度等于 1 且只有一个渲染框，因而把物理锚点出度为 1、逻辑根总出度为 10 的合法复制场景全部跳过。",
+                    "why_not_reproduced": "判定粒度停留在逻辑节点，没有对每个物理锚点及其边归属执行连续位置反事实。",
+                    "evidence": "example/out/final-medium.svg; example/out/final-medium-quality.json",
+                    "next_condition": "扩展独立 Oracle 按物理锚点绑定边集，并校准同样多副本但已位于纵干线右侧的干净反例，再对冻结 revision 公开 CLI 双跑。"
+                },
+                {
+                    "attempted_at": "2026-09-03T20:58:24+08:00",
+                    "hypothesis": "按物理显示锚点而非逻辑根总出度判断后，冻结基线中单边锚点可越过所跨纵干线并严格改善。",
+                    "method": "冻结 revision 2222871，经公开 CLI 对 medium-64 输入自然双跑；独立 SVG Oracle 识别每个单边物理锚点，向右越过实际交叉干线，必要时整体扩开消费者后缀，再重算所有路线。",
+                    "result": "reproduced",
+                    "observed": "两次输出哈希一致，均为 226 次交叉事件、52 个交叉点、220 折点、54162.1224px 并命中 FB-ROOT-010；多个 xtal_1 物理副本的反事实同时减少该边交叉和长度。",
+                    "analysis": "根因是以逻辑节点总出度限制物理锚点迁移，且坐标阶段没有为高优先级交叉改善提供后缀扩列自由度。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROOT-010.json",
+                    "next_condition": "owner 门解锁后，以物理锚点服务边集和几何支配关系修复，不按 xtal/source 名称特判。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-ROOT-010.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROOT-010.json"
+            }
+        },
+        {
+            "id": "FB-BEND-011",
+            "summary": "无异网交叉的根支路仍存在可避免折点",
+            "expected": "每条路线若存在保持精确端口、避开器件与文字、不增加异网重叠或交叉且严格减少折点的可行路线，则采用该支配路线；不能把原始折点数本身当作失败",
+            "actual": "用户指出包含 weave__public_from 与 weave__merge7 的最终 SVG 中该连接出现奇怪折点，现有质量结果未阻断",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "deaefc9c2205fbfaf63e70121cb7c378f39bfcef",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/example/auto-layout/26-feedback-reproduction-combined.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "arc"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/26-feedback-reproduction-combined.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-BEND-011",
+                    "--input",
+                    "{project}/example/auto-layout/26-feedback-reproduction-combined.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 CLI 原始 SVG 中的路线存在被完整几何反事实严格支配的无交叉折点",
+            "reproduction_does_not_prove": "任意无交叉折线都不合理；端口纵差、障碍物或共享干线所需折点仍可成立",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-04T00:30:00+08:00",
+                    "hypothesis": "用户指定路线存在于 final-medium.svg。",
+                    "method": "逐字搜索 final-medium.svg 与同目录 final-combined.svg 的节点身份，并检查 SVG 旁的输入来源元数据。",
+                    "result": "reproduction_blocked",
+                    "observed": "final-medium.svg 不含 weave__public_from 或 weave__merge7；weave__public_from 存在于 final-combined.svg，旁路质量 JSON 将该文件绑定到 26-feedback-reproduction-combined.json。",
+                    "analysis": "用户给出的文件名与实际节点所在产物不同，必须改用含该边且输入血缘可验证的 final-combined.svg 继续，不得把错误文件绑定为复现证据。",
+                    "why_not_reproduced": "尚未由独立 Oracle 完整绑定 weave__public_from→weave__merge7 的端口、航点与反事实路线。",
+                    "evidence": "example/out/final-medium.svg; example/out/final-combined.svg; example/out/final-combined.quality.json",
+                    "next_condition": "扩展独立 Oracle 后，以当前冻结 revision 经公开 CLI 双跑，证明该路线由更少折点且不增加高优先级缺陷的路线严格支配。"
+                },
+                {
+                    "attempted_at": "2026-09-04T01:23:00+08:00",
+                    "hypothesis": "新增多对多 case 可为 011/012 签发冻结自然复现收据。",
+                    "method": "完整运行 60-case 结构门及冻结公开 CLI 语料。",
+                    "result": "reproduction_blocked",
+                    "observed": "全部入口运行后，runner 在签发新问题收据时抛出 KeyError: reproduction_receipt。",
+                    "analysis": "问题账本缺少收据输出路径，运行结果不能形成可消费证据；半成品不可升级状态。",
+                    "why_not_reproduced": "签名阶段失败，未生成绑定问题合同的正式收据。",
+                    "evidence": "runner stderr KeyError: reproduction_receipt",
+                    "next_condition": "补齐两项收据路径并从头完整重跑。"
+                },
+                {
+                    "attempted_at": "2026-09-04T01:28:00+08:00",
+                    "hypothesis": "冻结 deaefc9c 的组合输入会稳定产生无交叉但被纵向同轴反事实支配的根设施折线。",
+                    "method": "从公开 CLI 完整生成两次原始 SVG；独立 Oracle 读取最终端点、物理设施和保守文字框，未改写产物。",
+                    "result": "reproduced",
+                    "observed": "两次 SVG 哈希一致；weave__public_from→weave__merge_07 均为 2→0 折点、549.4573→500.46px，交叉与异网重叠保持 0；另有 public_source→merge_03 同类见证。",
+                    "analysis": "固定端点换线无法消除 H-V-H；缺失自由度是单边根显示设施的纵坐标与路线联合选择。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-BEND-011.json",
+                    "next_condition": "以通用物理设施坐标候选修复，并在当前源码双跑中让该直接见证消失。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-BEND-011.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-BEND-011.json"
+            }
+        },
+        {
+            "id": "FB-ROOT-012",
+            "summary": "无交叉收益时自由零入度根仍不必要停在首列或分散列",
+            "expected": "无显式列约束的零入度设施在不增加交叉、碰撞、异网重叠和可避免折点时优先形成稳定整齐的局部列；只有严格改善更高优先级几何时才偏离",
+            "actual": "用户观察到多个 source 仍位于第一列且未见减少交叉的必要性，整体排列不够整齐",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "deaefc9c2205fbfaf63e70121cb7c378f39bfcef",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/example/auto-layout/26-feedback-reproduction-combined.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "arc"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/26-feedback-reproduction-combined.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROOT-012",
+                    "--input",
+                    "{project}/example/auto-layout/26-feedback-reproduction-combined.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 CLI 原始 SVG 中存在自由零入度设施，其偏离局部规范列没有带来高优先级几何收益并被整列候选严格支配",
+            "reproduction_does_not_prove": "所有图根都必须固定首列，或具有显式 layout_column、远距消费域、交叉收益的根也应强制同列",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-04T01:23:00+08:00",
+                    "hypothesis": "新增多对多 case 可为 011/012 签发冻结自然复现收据。",
+                    "method": "完整运行 60-case 结构门及冻结公开 CLI 语料。",
+                    "result": "reproduction_blocked",
+                    "observed": "全部入口运行后，runner 在签发新问题收据时抛出 KeyError: reproduction_receipt。",
+                    "analysis": "问题账本缺少收据输出路径，运行结果不能形成可消费证据；半成品不可升级状态。",
+                    "why_not_reproduced": "签名阶段失败，未生成绑定问题合同的正式收据。",
+                    "evidence": "runner stderr KeyError: reproduction_receipt",
+                    "next_condition": "补齐两项收据路径并从头完整重跑。"
+                },
+                {
+                    "attempted_at": "2026-09-04T01:28:00+08:00",
+                    "hypothesis": "冻结组合图的首列/早列单边根设施可进入另一根已使用的视觉列，并在不增加交叉时同时变直和缩短。",
+                    "method": "公开 CLI 双跑；独立 Oracle 只枚举最终 SVG 已使用的根输出列，按可视宽度聚类列并移动完整设施与端口。",
+                    "result": "reproduced",
+                    "observed": "两次 SVG 哈希一致；weave__public_from→weave__merge_07 的输出 x 可由 163.93 到 565.09，2→0 折点、549.4573→99.3px，交叉和异网重叠均保持 0；共 4 条跨视觉列见证。",
+                    "analysis": "当前设施迁移只在交叉收益或向右列搜索链被触发时工作，未把已使用根列的整齐性与零交叉支配纳入完整候选。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROOT-012.json",
+                    "next_condition": "以拓扑根、物理服务边和既有视觉列为通用输入修复；显式列约束与真正交叉收益反例保持不变。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-ROOT-012.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROOT-012.json"
+            }
+        },
+        {
+            "id": "FB-BEND-013",
+            "summary": "边在最后一次交叉之后的无交叉尾段仍存在可避免折点",
+            "expected": "把路线按交叉、分叉、合流和端口邻域分为局部区段；任一区段若存在保持端口、网络连续性和既有交叉语义且不增加碰撞、异网重叠或交叉的更少折点候选，则原路线必须被拒绝",
+            "actual": "ports__div_b 到 ports__sel 输入 1 的路线在较早横段发生一次交叉；最后交叉点之后已无交叉，却仍以水平、竖直、水平两次转向进入端口，旧的整边无交叉筛选因此漏检",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "5fe9a44b9e54121b372176dbcca631e2538b02c5",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/example/auto-layout/26-feedback-reproduction-combined.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "arc"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/26-feedback-reproduction-combined.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-BEND-013",
+                    "--input",
+                    "{project}/example/auto-layout/26-feedback-reproduction-combined.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 CLI 自然生成的最终 SVG 中，交叉分割后的局部无交叉区段存在被完整几何反事实严格支配的多余转向",
+            "reproduction_does_not_prove": "所有含交叉路线或所有端口前折线都不合理；障碍、固定端口纵差、共享网络分叉及保持交叉顺序所需的转向仍可成立",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-04T09:49:00+08:00",
+                    "hypothesis": "现有整边级无交叉折点 Oracle 会识别 ports__sel 输入路线的局部尾段冗余。",
+                    "method": "从当前公开入口 SVG 的独立统计中读取两条 ports__sel 入边的规范化航点、逐段交叉位置、折点和端口坐标。",
+                    "result": "not_reproduced",
+                    "observed": "ports__div_b→ports__sel 输入 1 为 3 段、2 折点、1 个交叉；唯一交叉位于第一横段，交叉后的路线仍有 2 个折点。ports__gate_a→输入 0 为 3 段、2 折点、整边 0 交叉。",
+                    "analysis": "旧 BEND-011 只筛选整条边交叉数为零且只覆盖可移动根设施；当前边是中间器件入 mux 的普通边，整边有一次交叉，因此交叉后的无交叉尾段从候选空间和指标中同时消失，属于 oracle_escape、coverage_escape 与 ownership_escape。",
+                    "why_not_reproduced": "现有 Oracle 没有沿折线参数顺序定位最后交叉，也没有为交叉分割后的首段、中段、尾段建立保持前缀/后缀语义的局部反事实。",
+                    "evidence": "example/out/final-combined.svg; example/out/final-combined.latest-oracle.json",
+                    "next_condition": "先扩展独立 Oracle 的局部区段表示和正反校准，再从冻结 5fe9a44 公开 CLI 双跑签发自然红灯；在此之前产品 owner 保持冻结。"
+                },
+                {
+                    "attempted_at": "2026-09-04T09:56:00+08:00",
+                    "hypothesis": "共同移动 ports__sel 及其下游闭包 20px 会在保持原交叉对的同时把两条入边尾段变直。",
+                    "method": "新增独立下游闭包刚体平移反事实，先运行 27 项正反校准，再直接检查当前公开 SVG。",
+                    "result": "not_reproduced",
+                    "observed": "27 项 Oracle 测试在 7.565 秒内通过，但真实产物检查 0.412 秒返回 symptom not observed。",
+                    "analysis": "反事实把候选全图要求为绝对零视觉框重叠和零 edge-box 命中；原图中与移动无关的既有对象也导致候选被拒绝，比较量纲错误。",
+                    "why_not_reproduced": "应比较具体错误对象集合不得新增，而不是要求候选总错误数为零。",
+                    "evidence": "pytest tests/test_feedback_layout_oracle.py; direct FB-BEND-013 oracle exit 1",
+                    "next_condition": "改为 node-pair 与 edge-node-pair 身份集合差分，正反校准后重新检查真实产物。"
+                },
+                {
+                    "attempted_at": "2026-09-04T10:00:00+08:00",
+                    "hypothesis": "新增证据 case 后正式 runner 可直接签发冻结双跑收据。",
+                    "method": "先运行 60-case 多对多结构门，再运行完整冻结公开入口 runner。",
+                    "result": "reproduction_blocked",
+                    "observed": "结构门 0.276 秒通过；runner 11.162 秒后因既有 06c legacy case 缺少 --legacy-python 返回 2。",
+                    "analysis": "FB-BEND-013 case 尚未获得完整批次签名；环境参数缺失不能算未观察到，也不能复用半批证据。",
+                    "why_not_reproduced": "完整语料包含旧 draw 子命令 case，必须显式提供项目已有隔离 Python 解释器。",
+                    "evidence": "run_feedback_reproduction_corpus.py exit 2: legacy corpus case requires --legacy-python",
+                    "next_condition": "使用项目既有 .venv/Scripts/python.exe 从头重跑整个批次，不下载依赖。"
+                },
+                {
+                    "attempted_at": "2026-09-04T10:03:00+08:00",
+                    "hypothesis": "冻结 5fe9a44 的公开 CLI 会确定性产生交叉后尾段可由视觉行闭包变直的症状。",
+                    "method": "显式使用既有隔离 legacy Python，从头运行全部七个正式 case；目标 case 由冻结源码公开 CLI 两次生成，Oracle 前后验证原始 SVG 哈希。",
+                    "result": "reproduced",
+                    "observed": "批次 20260904T020233Z-622f7479 耗时 51.908 秒；FB-BEND-013 两次均直接命中，输出哈希一致为 428063c1...8aa，missing_issues=[]。",
+                    "analysis": "症状稳定属于交叉分割后的局部区段及目标视觉行坐标 owner；器件名、固定坐标和手工产物均不是触发条件。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-BEND-013.json",
+                    "next_condition": "solve 门通过后，以通用视觉行闭包候选接入生产坐标阶段，并用当前公开入口双跑转绿。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-BEND-013.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-BEND-013.json"
+            }
+        },
+        {
+            "id": "FB-BEND-014",
+            "summary": "相邻高器件连接右侧多输入器件时，下方根路线出现疑似可避免折点",
+            "expected": "布局必须从当前器件库的实际可视图形、标签、端口和净空计算障碍；当下方零入度器件到目标端口的直线路线不与相邻器件或文字相交且不增加其它高优先级缺陷时，路线应为零折点；只有真实碰撞使直线不可行时才允许绕行",
+            "actual": "用户观察到两个圆形波浪 source 同列且相邻行连接右侧 pad 时，下方 source 出现折点，而较矮的 from 在等价结构中不会；怀疑器件高度、可视包围盒或行间净空计算过度保守",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "41a5e5963088f81aba62a66d46464234d504d473",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/tests/reproduction-corpus/adjacent-tall-roots-pad.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "tests/reproduction-corpus/adjacent-tall-roots-pad.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-BEND-014",
+                    "--input",
+                    "{project}/tests/reproduction-corpus/adjacent-tall-roots-pad.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 CLI 原始 SVG 中，下方较高零入度器件的路线在实际可视净空允许直连时仍保留被严格支配的折点",
+            "reproduction_does_not_prove": "所有较高器件的折线都错误；真实图形、标签、端口引线或相邻行碰撞所需的绕行仍合理，也不能在复现前断言根因一定是高度计算",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-04T11:20:00+08:00",
+                    "hypothesis": "两个同列相邻 source 与两个同列相邻 from 分别连接右侧 pad3 时，高 source 的下方路线会自然出现折点。",
+                    "method": "通过当前冻结 revision 的公开 CLI 对同一严格 JSON 连续生成两次 SVG；独立 Oracle 绑定 10 个逻辑/渲染节点和 8 条边，比较 source/from 入边的折点与交叉。",
+                    "result": "not_reproduced",
+                    "observed": "两次 SVG 哈希均为 ACB89AC7...F74751；全部 8 条边均为直线，全图 0 折点、0 交叉，source 与 from 两组均未出现症状。",
+                    "analysis": "器件高度本身不足以触发问题。当前 source 单元 55px，在该 pad3 端口间距下两枚 source 可分别与端口同轴且不重叠。需要交叉变化端口占用、相邻行约束、其它支路和根纵序。",
+                    "why_not_reproduced": "有效输入包含用户描述的基本结构，但布局自然选择了无碰撞同轴位置，没有产生下方折线。",
+                    "evidence": ".reproduction/scratch/fb-014-015-current/adjacent-tall-roots-pad-1.svg; adjacent-report.json",
+                    "next_condition": "以相同 source/from 高度对照，系统搜索 pad 端口组合、插入顺序、邻近支路和多行交错；Oracle 仍要求最终直线反事实无真实可视碰撞。"
+                },
+                {
+                    "attempted_at": "2026-09-04T11:48:00+08:00",
+                    "hypothesis": "保持公开 pad-r08-s02 拓扑与端口次序，仅把同尺寸的公共根器件换成真实 source，可自然保留由最终行轴造成的无谓折点。",
+                    "method": "冻结 revision 41a5e596 的公开 CLI 连续生成两次；独立 Oracle 使用 SVG 中真实可视包围盒、标签、端口和全图异网交叉，整体平移完整物理根设施到目标端口轴作反事实。",
+                    "result": "reproduced",
+                    "observed": "正式批次 20260904T033247Z-b99d523b 双运行哈希均为 9303E6A4...F776949；svg-edge-0043 从 2 折点、391.1808 长度可降为 0 折点、214.17 长度，交叉与异网重叠均保持 0。source 与同列相邻 source 的真实可视高度均为 62.77，平移前净间隙仍为 49.2314。",
+                    "analysis": "高度数据已被 Oracle 正确纳入，问题不是 source 高度漏算；缺口是布局阶段没有枚举并接受完整物理根设施到端口视觉行的合法坐标候选。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-BEND-014.json",
+                    "next_condition": "solve 门通过后，以通用物理设施坐标候选修复并用当前公开入口双跑转绿。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-BEND-014.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-BEND-014.json"
+            }
+        },
+        {
+            "id": "FB-ROOT-015",
+            "summary": "紧凑且工整的公共零入度时钟消费带被过度拆成多个同名显示节点",
+            "expected": "同一零入度逻辑器件的多个下游若形成相邻或近邻且排列工整的消费带，应优先由一个显示设施和一条共享纵向主干贯穿分发；只有拆分能严格改善更高优先级的碰撞、异网重叠、交叉或显著远距走线时才允许多个同名显示节点",
+            "actual": "用户观察到一个公共 from 与多个私人 from 分别两两接入多个 mux、每个 mux 直接输出一路 clock 的复用数组中，公共 from 被分散显示而没有用一条纵向总线分发。此前第 27 号样例使用公共 source、mux3 和 cell 中间级，输入器件类型与输出链均不符合这次明确描述，因此旧绿图不能作为该严格场景的覆盖证据",
+            "status": "closed",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "41a5e5963088f81aba62a66d46464234d504d473",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/tests/reproduction-corpus/mux-r04-s00.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "tests/reproduction-corpus/mux-r04-s00.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROOT-015",
+                    "--input",
+                    "{project}/tests/reproduction-corpus/mux-r04-s00.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 CLI 原始 SVG 把一个几何紧凑、可由单一共享纵干线无退化服务的逻辑根拆成多个物理设施，且合并反事实严格改善显示设施数、主干连续性或总折点",
+            "reproduction_does_not_prove": "所有四至五行跨度都必须合并；行数不是固定阈值，真实器件尺寸、净空、交叉、消费簇间隙与路径长度可能证明拆分合理",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-04T11:20:00+08:00",
+                    "hypothesis": "一个公共 source 连接首尾 mux，中间穿插四条独立工整支路时，会自然形成约四至五行间隔并被拆成多个显示设施。",
+                    "method": "通过当前冻结 revision 的公开 CLI 连续生成两次 SVG；独立 Oracle 统计公共逻辑根的渲染副本和最终行序。",
+                    "result": "not_reproduced",
+                    "observed": "两次 SVG 哈希均为 57361C6C...FC43；shared_root 只有 1 个显示设施。层内排序把 mux_00 与 mux_05 排成相邻两行，其余四条支路位于其后。",
+                    "analysis": "输入对象顺序不能强制最终视觉行；公共祖先相似性会主动聚拢共同消费者。这是同触发语义下的干净反例，不是过度拆分红灯。",
+                    "why_not_reproduced": "最终消费端不再相隔四至五个视觉行，拆分前提没有成立。",
+                    "evidence": ".reproduction/scratch/fb-014-015-current/compact-root-fanout-band-1.svg; compact-report.json",
+                    "next_condition": "使用固定多输入端口、交错祖先签名或既有公开 alias 样例形成自然分隔，再由独立设施合并反事实直接判断是否过度拆分。"
+                },
+                {
+                    "attempted_at": "2026-09-04T11:50:00+08:00",
+                    "hypothesis": "既有四行 mux 搜索用例的共享 source 消费者被自然分隔时，固定行距分区会把本可共享纵干线的根过度复制。",
+                    "method": "冻结 revision 41a5e596 的公开 CLI 对 mux-r04-s00 连续生成两次；独立 Oracle 枚举单设施共享纵干线，以同网线段并集长度加实际可视设施周长比较显示成本，并要求交叉、异网重叠和障碍不退化。",
+                    "result": "reproduced",
+                    "observed": "正式批次 20260904T033247Z-b99d523b 双运行哈希均为 A2EBA9FF...30E287；shared_wave 被渲染为 2 个设施。合并为 1 个设施后交叉仍为 0、异网重叠仍为 0，综合显示成本从 991.86 降至 811.9233。",
+                    "analysis": "当前拆分准则把逐边曼哈顿长度与固定行距成本相加，未对共享同网主干去重，也未使用器件真实可视复制成本，因此会系统性高估合并方案。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROOT-015.json",
+                    "next_condition": "solve 门通过后，以通用共享网络几何成本修复并用当前公开入口双跑转绿。"
+                },
+                {
+                    "attempted_at": "2026-09-04T16:30:00+08:00",
+                    "hypothesis": "六组 common root 与独立 private from 交替接入 pad3，且每个 pad 继续 cell→clock 时，旧版可能把公共根拆成多个设施。",
+                    "method": "新增只含公开 schema 的 27-interleaved-common-root-pads.json；从冻结 41a5e596 的 git archive 和当前 src 各通过公开 CLI 独立生成两次 SVG，独立 Oracle 绑定全部节点、边、源端口网络并枚举所有公共边的纵段 x 通道。",
+                    "result": "not_reproduced",
+                    "observed": "冻结版和当前版四张 SVG 的 SHA-256 均为 BC450307E00868C0435B7E067997CE1125A1659E0785D12299C5451A18AB2693；两版均只有 1 个 common_clock 设施、6 条公共边、唯一首纵向通道 x=170.84、0 交叉、0 异网重叠且无 split-rejoin。",
+                    "analysis": "该运行结果本身有效，但用户随后澄清汇聚器件必须是 mux3；pad3 不是目标语义，因此本尝试只能保留为历史旁证，不能覆盖澄清后的要求。",
+                    "why_not_reproduced": "测试夹具选择了 pad3，而目标是三输入 mux；没有到达澄清后的器件语义。",
+                    "evidence": "example/auto-layout/27-interleaved-common-root-pads.json; tests/test_feedback_layout_oracle.py::test_interleaved_common_root_uses_one_visible_vertical_trunk",
+                    "next_condition": "保持相同交替与下游链结构，将汇聚器件改为供应库中的精确 title mux3，并从冻结版与当前版公开 CLI 重新双跑、复算设施数和共享纵向通道。"
+                },
+                {
+                    "attempted_at": "2026-09-04T17:05:00+08:00",
+                    "hypothesis": "此前 pad3 场景可代表用户所指的三输入 mux 场景。",
+                    "method": "回读用户澄清、器件目录、库合约和第 27 号 JSON；核对 drawio-lib 与 scripts/drawio_lib 的 Git 工作区及暂存区差异。",
+                    "result": "reproduction_blocked",
+                    "observed": "第 27 号 JSON 的六个汇聚器件均为 pad3；器件库目录没有任何工作区或暂存区改动，HEAD 中 drawio-lib 仍有 50 个文件。",
+                    "analysis": "布局结果不能弥补输入语义错误。问题是复现夹具/覆盖合同选错具体器件，不是器件库被修改，也不能据 pad3 的绿图推断 mux3。",
+                    "why_not_reproduced": "尚未通过公开 CLI 运行 mux3 版本的合法输入。",
+                    "evidence": "git status/diff -- drawio-lib scripts/drawio_lib; skills/component-library-design/references/component-catalog.md; example/auto-layout/27-interleaved-common-root-pads.json",
+                    "next_condition": "先构造 mux3 正常输入并验证端口子集合法，再执行冻结版与当前版各两次自然运行。"
+                },
+                {
+                    "attempted_at": "2026-09-04T17:20:00+08:00",
+                    "hypothesis": "六组 common root 与独立 private from 分别接入稀疏 mux3 的输入 0/1、输入 2 空置且各自继续 cell→clock 时，冻结版可能过度拆分公共根。",
+                    "method": "由冻结 41a5e596 的 git archive 与当前工作树分别使用公开 CLI 独立运行两次；独立 Oracle 绑定最终 SVG 的全部逻辑边和精确端口，枚举公共网络的物理设施、rendering anchor、非零纵段通道、split-rejoin、交叉与异网重叠，并比较 Oracle 前后 SVG SHA-256。",
+                    "result": "not_reproduced",
+                    "observed": "冻结版与当前版四次 SVG 的 SHA-256 均为 304C076F84D214614F9AF86D333D17BBB325663676ACCC3187B84EDFD10DE601；每次均为 1 个 common_clock 设施、1 个 rendering anchor、6 条公共边精确连接 mux3 输入 0、6 条私有边精确连接输入 1、唯一非零纵向通道 x=170.84、0 交叉、0 异网重叠且无 split-rejoin，Oracle 前后字节不变。",
+                    "analysis": "该输入只能证明公共 source、稀疏 mux3 与 cell 中间级的场景；用户随后明确要求公共节点本身为 from，mux 直接输出 clock，因此这次成功边界不能覆盖新描述。",
+                    "why_not_reproduced": "输入器件类型和 mux 输出链与用户最终描述不同，未到达严格场景。",
+                    "evidence": "example/auto-layout/27-interleaved-common-root-mux3.json; tests/test_feedback_layout_oracle.py::test_interleaved_common_root_mux3_uses_one_visible_vertical_trunk; work/drawclock-mux3-2d7e6c357a2044f4bc68dcca88c5a73d",
+                    "next_condition": "使用一个公共 from、每行一个私人 from、二者接入 mux2 的输入 0/1，并让 mux2 直接连接 clock；从冻结版与当前版公开 CLI 双跑后复算公共 from 的设施数和纵向主干。"
+                },
+                {
+                    "attempted_at": "2026-09-05T00:00:00+08:00",
+                    "hypothesis": "先前公共 source→mux3→cell→clock 的成功样例可覆盖公共 from 与私人 from→mux2→clock 的复用数组。",
+                    "method": "逐字段比较用户最终描述、第 27 号公开 JSON 和对应测试断言；检查供应器件库是否同时提供 from、mux2 与 clock。",
+                    "result": "reproduction_blocked",
+                    "observed": "第 27 号 JSON 的公共节点 kind 为 source，汇聚器件为 mux3，并在 mux 与 clock 之间插入 cell；现有测试明确断言这些旧结构。器件库存在 from.xml、mux2.xml 和 clock.xml，可构造严格正常输入。",
+                    "analysis": "旧测试测量的几何判据有效，但对照输入的语义不完整，属于 coverage_escape 和 claim_escape；必须撤销旧完成声明并从严格输入重新取得证据。",
+                    "why_not_reproduced": "严格场景的正常 JSON 尚未生成，公开 CLI 尚未到达该输入。",
+                    "evidence": "example/auto-layout/27-interleaved-common-root-mux3.json; tests/test_feedback_layout_oracle.py::test_interleaved_common_root_mux3_uses_one_visible_vertical_trunk; drawio-lib/drawclock/from.xml; drawio-lib/drawclock/mux2.xml; drawio-lib/drawclock/clock.xml",
+                    "next_condition": "新增严格输入 28-common-private-from-mux-clock-array.json，并对冻结版与当前版各独立运行两次。"
+                },
+                {
+                    "attempted_at": "2026-09-05T00:05:00+08:00",
+                    "hypothesis": "公共 from 与六个私人 from 分别接入六个 mux2、mux2 直接输出 clock 时，冻结版或当前版会把公共 from 分散成多个显示设施。",
+                    "method": "新增只含公开 schema 的第 28 号输入；冻结 41a5e596 与当前工作树分别通过公开 CLI 独立运行两次，独立 Oracle 绑定全部节点、端口和边，并复算公共网络的显示设施、纵向通道、交叉、异网重叠与 split-rejoin。",
+                    "result": "not_reproduced",
+                    "observed": "冻结版和当前版四次 SVG 的 SHA-256 均为 C7E59F79C4A18667AF2AF2627E2F79DDCDC0255A47C2AB2937B528958B5517C8；每次均为 1 个 common_from 显示设施、1 个 rendering anchor、6 条公共边到 mux2 输入 0、6 条私人边到输入 1、6 条 mux2 直达 clock 的输出边、唯一纵向通道 x=164.02、0 交叉、0 异网重叠且无 split-rejoin。",
+                    "analysis": "严格场景已经真实重建并满足用户期望，因此它是成功边界而不是冻结旧版红灯。此前错误是用不同器件类型和输出链的绿图扩大了覆盖声明；正式 ROOT-015 缺陷仍由 mux-r04-s00 的冻结自然红灯证明。",
+                    "why_not_reproduced": "冻结版对严格 from→mux2→clock 数组已经使用单显示设施和单纵向总线，没有出现用户所述分散症状。",
+                    "evidence": "example/auto-layout/28-common-private-from-mux-clock-array.json; work/fb-root-015-strict-current-20260905; work/fb-root-015-strict-baseline-runs-20260905; tests/test_feedback_layout_oracle.py::test_common_private_from_mux_clock_array_uses_one_vertical_bus",
+                    "next_condition": "保留严格成功边界并刷新正式 ROOT-015 红灯/绿灯收据；完整回归和发行包必须包含第 28 号输入。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-ROOT-015.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROOT-015.json",
+                "release_verification": {
+                    "commit": "6e054f3627149ea87d1d7075f7a78f76fd2df4d7",
+                    "run_id": 33973881006,
+                    "tag": "v1.0.0",
+                    "asset_sha256": "C53BDDB2E1BF58B4B5313DFC831ABEB4E19165DFF4694E7C947C8FD536EE746D"
+                }
+            }
+        },
+        {
+            "id": "FB-ROOT-016",
+            "summary": "唯一公共 from 经每路独立 gate 进入 mux、与更深私人链汇聚时公共分发线碎裂或失去总线形态",
+            "expected": "唯一公共 from 分别连接每一路独立 gate_i，再由 gate_i 进入对应 mux_i；每个私人 from_i 经各自 private_gate_i 和 div_i 后进入同一 mux_i。公共 from 的同一输出端口必须形成可追踪的共享纵向分发主干；两侧链深和可行列不同不得成为公共线路碎裂、复制或外绕的理由",
+            "actual": "用户指出精确结构是每一路公共 from→gate_i→mux_i，gate_i 与 mux_i 一样按路独立，只有公共 from 唯一；私人路径为 from_i→gate_i→div_i→mux_i。旧的同深 from→mux2→clock 和单个公共 gate 扇出输入都未覆盖该组合",
+            "status": "fixed_verified",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "c1a953fd67dbbf75eb69b85a7541d3bb2bbed8d5",
+            "required_reproduction_variants": [
+                "public-from-single-vertical-bus"
+            ],
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/tests/reproduction-corpus/pad-r08-s02.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "tests/reproduction-corpus/pad-r08-s02.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROOT-016",
+                    "--input",
+                    "{project}/tests/reproduction-corpus/pad-r08-s02.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py",
+                    "tools/reproduction_semantics.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 CLI 原始 SVG 在精确异深度拓扑中把唯一公共 from 输出网络拆成多个设施或多条纵向主干，或产生被单一共享主干严格支配的外绕",
+            "reproduction_does_not_prove": "所有不同深度路径必须让根节点同列，也不证明远距消费簇不得按完整质量向量拆分",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-07T09:31:00+08:00",
+                    "hypothesis": "一个公共 from 经单个公共 gate 后扇出到多个 mux 可代表用户所述异深度数组。",
+                    "method": "以公开 schema 建立单个 common_gate 扇出输入，通过当前和冻结 41a5e596 的公开 CLI 生成 SVG 并读取独立几何统计。",
+                    "result": "reproduction_blocked",
+                    "observed": "输入只有一个公共 gate；用户随后明确每一路都应有独立 gate_i，只有公共 from 唯一。",
+                    "analysis": "虽然该输入产生公共 gate 网络交叉，但控制语义不匹配，不能作为本问题证据。",
+                    "why_not_reproduced": "公共侧 gate 的实例数量错误，没有到达精确拓扑。",
+                    "evidence": "work/fb-016-017-current-baseline/depth.svg",
+                    "next_condition": "改为唯一 common_from 分别连接 common_gate_00..05，再让每个 gate_i 进入对应 mux_i。"
+                },
+                {
+                    "attempted_at": "2026-09-07T09:38:00+08:00",
+                    "hypothesis": "唯一公共 from→逐路 gate_i→mux_i 与私人 from_i→gate_i→div_i→mux_i 的异深度数组会使设施成本策略把公共根复制到每行。",
+                    "method": "精确输入经当前公开 CLI 与冻结 41a5e596 公开 CLI 各独立运行两次；通用只读统计完整绑定 37 个节点和 36 条边，读取公共根副本与路由锚点。",
+                    "result": "reproduction_blocked",
+                    "observed": "当前与冻结四次结果确定一致，SVG SHA-256 均为 4B364ACD...B7B3B4；common_from 有 6 个渲染副本和 6 个锚点，6 条公共边均为独立直线，纵向总线不存在，0 交叉、0 异网重叠。",
+                    "analysis": "精确症状已自然出现；仍需新增直接判定结构规则与单总线反例的独立 Oracle，正式双跑收据签发前不升级为 reproduced。",
+                    "why_not_reproduced": "当时尚无经正反校准的结构 Oracle 和绑定发布提交的正式双跑收据，原始统计不能单独升级问题状态。",
+                    "evidence": "tests/reproduction-corpus/asymmetric-depth-common-private-mux.json; work/fb-016-017-current-baseline/depth-exact-1.svg; work/fb-016-017-baseline-41a5e596/depth-exact-1.svg",
+                    "next_condition": "建立规则数组 fanout cohort Oracle，证明六副本被拒绝、单设施纵干线被接受，再由冻结 d686d74 正式双跑签名。"
+                },
+                {
+                    "attempted_at": "2026-09-07T09:58:00+08:00",
+                    "hypothesis": "结构 Oracle 正反校准后，发布提交 d686d74 的公开 CLI 双跑可正式证明公共根规则数组碎片化。",
+                    "method": "运行完整 many-to-many 冻结语料；目标输入由发布提交公开入口独立生成两次，独立 Oracle 按拓扑同构、分支深度与物理设施直接判定。",
+                    "result": "reproduced",
+                    "observed": "批次 20260907T014732Z-ff0a4ce1 中两次均检出 FB-ROOT-016；每次 37 个逻辑节点、42 个显示节点、36 条边、0 交叉、0 异网重叠、0 折点，missing_issues=[]。",
+                    "analysis": "算法把逐边短直线与根设施复制成本作局部权衡，却未识别规则数组中公共网络的共享总线语义；因此以六个副本换取零折点，视觉结构反而退化。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROOT-016.json",
+                    "next_condition": "solve 门通过后，以结构 cohort 和共享线段成本约束根设施分区，同时保留远距非规则消费域可拆分。"
+                },
+                {
+                    "attempted_at": "2026-09-07T12:21:30+08:00",
+                    "hypothesis": "两路边界及含不同私人深度、不同 mux 后级和额外公共消费者的复杂数组会穿透旧规则识别并再次拆散公共 from。",
+                    "method": "冻结 93568f94，使用公开 CLI 对复合合法输入独立运行两次；修正后的独立 Oracle 从合格分支子集判定物理设施数。",
+                    "result": "reproduced",
+                    "observed": "批次 20260907T042130Z-b81cdab9 两次均为 33 个逻辑节点、37 个显示节点、32 条边；唯一 shared 根形成 5 个显示设施，FB-ROOT-016 两次直接命中，SVG 哈希稳定为 040c749b...ae3b9。",
+                    "analysis": "旧生产识别器把最小三路、所有子女同 kind、merge 同 kind、下游签名相同和无额外消费者误作必要条件；任一条件变化都使后置设施 owner 重新复制公共根。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROOT-016.json; .reproduction/receipts/recurrent-corpus.json",
+                    "next_condition": "solve 门通过后把共享数组语义改为合格分支子集，并让所有设施 owner 消费同一判定。"
+                },
+                {
+                    "attempted_at": "2026-09-08T13:00:53+08:00",
+                    "hypothesis": "当前发布状态仍把 pad-r08-s02 中唯一 public_from 分散为多个行局部设施，旧 split-rejoin 指标因此显著漏报。",
+                    "method": "在生产源码冻结状态下归档 worktree 生产者，公开 CLI 独立生成两次；独立结构 Oracle 与语义合同直接核验同一输出端口的设施数、起点数、目标轴和共享纵向通道数。",
+                    "result": "reproduced",
+                    "observed": "批次 20260908T050053Z-ce58b64c 两次均满足语义前置条件并直接观察症状，SVG 哈希稳定为 e7d618f9...c7368c1df；public_from:right 扇出 5，物理设施 5、起点 5、目标轴 5、共享纵向通道 0，期望分别为 1、1、5、1。",
+                    "analysis": "旧门只证明没有分叉后重汇，完全没有检查共享网络的物理设施唯一性与分发干线唯一性；布局的行局部副本优化因此以零折点作为伪优目标，破坏了公共网络语义。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROOT-016.json; .reproduction/receipts/current-public-from-bus-corpus.json",
+                    "next_condition": "生产修复必须在任意节点名称、kind 和具体用例之外统一保护同一根端口的共享扇出设施，并由全指标终态质量系统复验所有图。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-ROOT-016.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROOT-016.json",
+                "verification_group": "20260908T084339Z-241f6340",
+                "verified_at": "2026-09-08T16:43:39+08:00",
+                "evidence": "最终源码公共 CLI 双跑哈希稳定为 a64136f6...f72427；public_from:right 为 1 个物理设施、1 个物理起点、5 个目标轴和 1 个源侧共享纵向总线；独立症状 Oracle 两次均为 absent。"
+            },
+            "reopened_feedback": {
+                "reported_at": "2026-09-08T12:20:00+08:00",
+                "status": "reproduced",
+                "summary": "用户指出当前修复图仍把 public_from 分散为多个物理设施和独立横线，没有合成一个纵向总线。",
+                "classification": [
+                    "oracle_escape",
+                    "metric_execution_escape",
+                    "claim_escape"
+                ],
+                "evidence": ".reproduction/receipts/FB-ROOT-016.json; public_from:right=5 设施/5 起点/0 纵干线，正式双跑哈希稳定",
+                "next_condition": "先建立独立全图信息提取器与全指标注册表，再修复布局 owner；所有测试图必须执行同一完整指标集合。"
+            }
+        },
+        {
+            "id": "FB-BEND-017",
+            "summary": "多个 source 直接进入同一 mux 时最终图保留被更少折点或更少交叉方案支配的路线",
+            "expected": "多个 source 均直接连接同一多输入 mux 时，分层、坐标和通道阶段必须联合选择；任何保持端口、碰撞和异网重叠不退化，且使折点或交叉严格下降的最终图候选都必须支配当前结果",
+            "actual": "四个 source 已被强制同列，但当前 30 号图仍有 8 个折点、4 个交叉事件；完整数组端口轴反事实可降为 6 折/2 交叉，visibility-channel 反事实还能在不改变折点和长度时消除 source_0/source_1 的矩形互穿",
+            "status": "fixed_verified",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "worktree-producer-snapshot-20260907T172400+0800",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/example/auto-layout/30-staggered-four-source-mux.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/30-staggered-four-source-mux.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-BEND-017",
+                    "--input",
+                    "{project}/example/auto-layout/30-staggered-four-source-mux.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 CLI 原始 SVG 存在由最终可见通道或完整数组坐标反事实严格支配的额外折点或交叉",
+            "reproduction_does_not_prove": "所有错列 source 都应强制同列；真实器件、标签、端口或其它扇出造成的必要绕障仍可保留",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-07T09:31:00+08:00",
+                    "hypothesis": "四个带不同 layout_column 的 source 直接进入 mux4 会自然产生额外折点。",
+                    "method": "公开 CLI 生成三列 source→mux4 最小图，独立统计逐边航点。",
+                    "result": "not_reproduced",
+                    "observed": "四条 source→mux 入边均为 0 折点、0 交叉、0 异网重叠。",
+                    "analysis": "错列本身不是充分条件；固定端口轴与不同 x 列完全兼容直线连接。",
+                    "why_not_reproduced": "每个 source 都能在自身列与对应 mux 端口同轴。",
+                    "evidence": "work/fb-016-017-current-baseline/sources.svg",
+                    "next_condition": "保持四条 source→mux 直接边，使用不同合法辅助链深自然约束 source 的列与纵向设施位置。"
+                },
+                {
+                    "attempted_at": "2026-09-07T09:34:00+08:00",
+                    "hypothesis": "四个 source 同时直入 mux4、并由不同深度辅助下游链自然形成不同可行列时，中间化 source 纵坐标会让两条扇出边都折弯。",
+                    "method": "当前与冻结 41a5e596 公开 CLI 各双跑；独立统计绑定全部 15 个逻辑节点、14 条边和 source→mux 精确端口。",
+                    "result": "reproduction_blocked",
+                    "observed": "四次 SVG 均确定一致为 3C95AC79...A0EEC2；source_0/source_1/source_2/source_3 位于不同自然列，source_2→mux 输入 2 为 2 折点、0 交叉，其另一条出边也为 2 折点，source_2 网络合计 4 折点。",
+                    "analysis": "把单个 source_2 设施移动到任一消费者端口轴可让一条边直连、另一条保持两折点，总折点 4→2且纵向跨度不变；现有 Oracle 只处理单出边根，尚不能签发直接 witness。",
+                    "why_not_reproduced": "当时 Oracle 只评估单出边根，不能证明移动设施后其它出边及全图质量不退化，也没有发布提交的正式双跑收据。",
+                    "evidence": "tests/reproduction-corpus/staggered-four-source-mux.json; work/fb-016-017-current-baseline/sources-natural.svg; work/fb-016-017-baseline-41a5e596/staggered-four-source-mux-1.svg",
+                    "next_condition": "新增单设施多目标根的坐标—路由联合支配 Oracle，使用显式错列零折点图作干净反例，再由冻结 d686d74 正式双跑签名。"
+                },
+                {
+                    "attempted_at": "2026-09-07T09:58:00+08:00",
+                    "hypothesis": "联合移动完整根设施并重路由其全部出边，可以在不牺牲长度与硬几何质量时直接证明中间轴坐标被消费端口轴严格支配。",
+                    "method": "运行完整冻结语料；发布提交 d686d74 对自然错列输入公开双跑，独立 Oracle 枚举消费者端口轴并检查节点、线路障碍、交叉、异网重叠、长度和总折点。",
+                    "result": "reproduced",
+                    "observed": "批次 20260907T014732Z-ff0a4ce1 两次均检出 FB-BEND-017；每次 15 个逻辑节点、17 个显示节点、14 条边、0 交叉、0 异网重叠、4 折点，missing_issues=[]。",
+                    "analysis": "根纵坐标使用偶数目标的中间值，落在两个消费者轴之间；L1 长度虽最优但没有把候选坐标限制到端口轴，也没有以同长度下折点更少作次级目标。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-BEND-017.json",
+                    "next_condition": "solve 门通过后，为多目标根枚举真实消费者轴并按硬门、交叉/重叠、折点、共享长度的词典序统一验收。"
+                },
+                {
+                    "attempted_at": "2026-09-07T12:21:30+08:00",
+                    "hypothesis": "显式错列与四条不同深度辅助链交互时，旧根联合坐标优化因列提示排除而再次留下可支配折点。",
+                    "method": "确定性复杂组合搜索在 seed 1 命中后冻结输入，并在 93568f94 的公开 CLI 上独立双跑；Oracle 联合平移完整根设施并重算全部出边。",
+                    "result": "reproduced",
+                    "observed": "批次 20260907T042130Z-b81cdab9 两次均为 27 节点、26 边、16 总折点；三条直入 main_mux 的边合计 8 折，source_0/source_2 各存在 4→2 且长度、交叉、重叠不退化的反事实，SVG 哈希稳定为 4e6fa23f...27f87。",
+                    "analysis": "layout_column 只约束 x 列，却被生产 owner 同时用于排除 y 轴联合优化；提示维度与优化维度错误耦合，导致显式错列场景逃逸。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-BEND-017.json; .reproduction/receipts/recurrent-corpus.json",
+                    "next_condition": "solve 门通过后保留 x 列约束，但允许完整根设施在 y 方向参与消费者轴反事实。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-BEND-017.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-BEND-017.json",
+                "release_verification": {
+                    "commit": "b648705dcb489a9b5667fd782752627b7a05b4c5",
+                    "run_id": 34085120202,
+                    "tag": "v1.0.0",
+                    "asset_sha256": "1876E4D9077C9F400FFB255041E7D14CF7ADF0BC6172AE2BC495602D753B2A97"
+                }
+            },
+            "reopened_feedback": {
+                "reported_at": "2026-09-07T17:24:00+08:00",
+                "status": "fixed_verified",
+                "summary": "用户展示 30 号当前图仍有多余折返和交叉；修正后的独立 Oracle 在 worktree producer 冻结快照公开双跑中稳定命中，当前修复以同一 Oracle 双跑清零。",
+                "evidence": ".reproduction/receipts/FB-BEND-017.json; .reproduction/fix-receipts/FB-BEND-017.json; verification group 20260907T110614Z-86f32691; baseline SHA256 28B3E60492321366A1FED79A5E91BD81C30C3A7A1A8FDD6187C3000295C20F94; current SHA256 faa91f92a3aa327fca431eba6377ad3f883b551867dcbb7100829709c98fabfe",
+                "next_condition": "发布门持续要求回执绑定当前源码、器件库、runner、Oracle，并先通过全公开图片新鲜生成门。"
+            }
+        },
+        {
+            "id": "FB-ROOT-020",
+            "summary": "多个直入同一 mux 的 source/from 因辅助消费者深度不同而错列",
+            "expected": "至少三个未显式定列的 source/from 若直接进入同一 mux，则其 mux-facing 物理设施必须同列；辅助消费者可以有不同深度或另一个 mux 目标，cohort 按当前汇合目标建立并联合重排全部出边",
+            "actual": "四个 source 都直接进入同一 mux4，但多输出 source 被排除出 cohort，辅助链与 side mux 深度使最终设施再次错列",
+            "status": "fixed_verified",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "b648705dcb489a9b5667fd782752627b7a05b4c5",
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/example/auto-layout/30-staggered-four-source-mux.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/30-staggered-four-source-mux.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROOT-020",
+                    "--input",
+                    "{project}/example/auto-layout/30-staggered-four-source-mux.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py",
+                    "tools/reproduction_semantics.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "required_reproduction_variants": [
+                "direct-source-mux-column",
+                "direct-from-mux-column"
+            ],
+            "reproduction_proves": "冻结公开 CLI 的原始 SVG 中至少三路 source/from 直入同一 mux，且各路实际端点所属物理设施分处不同 x 列",
+            "reproduction_does_not_prove": "显式 layout_column 必须被覆盖；它证明的是无显式覆盖时 cohort 不能因任一成员还有其他输出而被拆散",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-07T16:30:00+08:00",
+                    "hypothesis": "四个 source 直入同一 mux 且具有不同深度辅助消费者时，设施复制和 ALAP 会让 mux-facing source 错列。",
+                    "method": "当前公开 CLI 生成未改写 SVG；独立 Oracle 从最终边端点反查物理框 x 列并连续运行两次。",
+                    "result": "reproduced",
+                    "observed": "两次均命中；source_0..3 的物理列为 401.93、201.39、72.78、337.05，报告哈希一致。",
+                    "analysis": "低使用根 promotion、ALAP 和后置设施 owner 分别拥有同一 x 坐标，辅助链深度因此覆盖了直入 mux 数组的视觉列不变量。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/FB-ROOT-020.json",
+                    "next_condition": "分层阶段建立 direct source/from fan-in cohort，并由独立发行门覆盖声明顺序、端口排列和辅助深度。"
+                },
+                {
+                    "attempted_at": "2026-09-10T05:35:00+08:00",
+                    "hypothesis": "主 mux 的部分 source 同时直连 side mux 时，按每个根的 mux 目标数过滤会把多输出成员排除，导致主 cohort 再次错列。",
+                    "method": "7 轮递归攻击的 R4 covering-array 对节点顺序、辅助链 kind/深度和双 mux 输出做组合；公开 CLI 生成原始 SVG，独立 Oracle 对全部指标验收。",
+                    "result": "reproduced",
+                    "observed": "run 20260909T164821Z-c8b47f8d 的 mux-source-seed-012 命中 FB-ROOT-020；main_mux 的 source_0/source_2 物理列为 199.77/72.78，source_1/source_3 因还连接 side_mux 被旧 cohort 过滤。",
+                    "analysis": "旧需求被写成‘唯一 mux 目标’，把用户明确提出的‘一个源两路输出’误当例外；生产与 Oracle 共享了同一错误过滤条件。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/recursive-attack.json",
+                    "next_condition": "按汇合目标建立完整 cohort，联合移动设施并重路由每个成员的全部出边；随后重启 7 轮攻击。"
+                }
+            ],
+            "strict_reproduction": {
+                "verified_at": "2026-09-08T11:13:00+08:00",
+                "variants": [
+                    "direct-source-mux-column",
+                    "direct-from-mux-column"
+                ],
+                "cases": [
+                    "direct-source-mux-column-baseline",
+                    "direct-from-mux-column-baseline"
+                ],
+                "corpus_id": "20260908T030927Z-8159ddf2",
+                "analysis": "全 source 与全 from 各自经公开 CLI 双跑；合同要求四根 exact-set 直接进入同一 mux4，且终态物理设施至少分处两列。"
+            },
+            "reproduction_receipt": ".reproduction/receipts/FB-ROOT-020.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROOT-020.json",
+                "verification_group": "20260909T195856Z-63b42e09",
+                "evidence": "Pinned source/from baselines reproduce staggered direct mux facilities twice; the final public CLI closes both variants plus the multi-output/two-mux R4 topology, and the independent full-metric Oracle reports no issue on both current attempts."
+            }
+        },
+        {
+            "id": "FB-ROOT-021",
+            "summary": "任意零入度根直入同一汇聚节点时存在无硬质量退化的共同列却仍错列",
+            "expected": "不论节点 kind 或名称，两个及以上零入度根设施若直接进入同一多输入目标，且完整设施集合联合移动到某一共同 x 列不会新增交叉、跨线、节点碰撞、异网重叠或折点，则最终设施必须同列；若不存在安全共同列，保持错列是合法边界",
+            "actual": "公开 pad-r08-s02 图中多个 pad 的直接根包含 source、from、gate 等类型，设施在 x 方向参差不齐；旧指标仅检查至少三个 source/from 唯一直入 mux，因此全图质量系统对 pad 和任意根 kind 统一返回绿灯",
+            "status": "fixed_verified",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "tests/reproduction-corpus/pad-r08-s02.json",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "f950283222f2917896f610ee05c974487debf1d7",
+            "required_reproduction_variants": [],
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/tests/reproduction-corpus/pad-r08-s02.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "tests/reproduction-corpus/pad-r08-s02.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROOT-021",
+                    "--input",
+                    "{project}/tests/reproduction-corpus/pad-r08-s02.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py",
+                    "tools/svg_graph_inspector.py",
+                    "tools/svg_quality_system.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "公开 CLI 原始终态 SVG 中存在结构定义的直接零入度根汇聚 cohort；独立 Oracle 找到一个共同列联合反事实，并证明交叉、跨线、节点碰撞、异网重叠和折点均不增加，但当前设施仍分列",
+            "reproduction_does_not_prove": "所有零入度根必须无条件放在最左列，也不覆盖会新增交叉、跨线、碰撞、重叠或折点的不可行对齐",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-08T18:48:00+08:00",
+                    "hypothesis": "pad 前任意 kind 的直接零入度根会因辅助消费域和设施 owner 分散到不同列，即使共同列联合反事实不增加交叉、跨线、重叠或折点。",
+                    "method": "冻结 f950283 产品源码，使用公开 CLI 对 pad-r08-s02 独立生成两次未修改 SVG；独立终态 Oracle 从逻辑零入度、真实端点设施和完整设施出边联合反事实判定。",
+                    "result": "reproduced",
+                    "observed": "两次 SVG SHA-256 均为 82B69212FDC1B5D307F74BB7225FFC7D55826D343775EA83CDDD1107ACAA70EE；endpoint-aware 联合反事实最终只确认 pad_03/07 为真 witness，候选保持 3 crossings/0 overlaps/14 bends。pad_02/05 的共享 public_from 若同步移动设施与首纵干线会新增交叉，因此是合法边界而非缺陷。",
+                    "analysis": "旧规则把 source/from、mux、至少三路和唯一 mux 目标误作同列特性的必要条件；pad 与 gate 根从适用性阶段即被排除。布局上多个后置设施 owner 又可独立覆盖根 x，导致同层约束没有形成结构等价类。Oracle 最初只平移设施、不移动共享首纵干线且漏查端点净空，曾将 pad_02/05 误报为安全；现已把物理设施、全部关联路线、端点净空和全图交叉/重叠/折点纳入同一事务。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/scratch/fb-root-021-natural/run-1.svg; run-2.svg; report-1.json; report-2.json",
+                    "next_condition": "将任意直接根 fan-in cohort 归入同一结构 placement owner，枚举现有列并投影到完整端点净空可行区间，只接受全图交叉、异网重叠、节点碰撞、端点净空和折点均不退化的联合事务。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/FB-ROOT-021.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROOT-021.json",
+                "verification_group": "20260908T113113Z-1ad9c2f8",
+                "evidence": "当前公开 CLI 双跑中独立 021 Oracle 均以 exit=1 证明症状缺席；最终图保持 3 个异网真交叉、0 异网重叠、14 折点，pad_03/07 的无代价直接根已同列，pad_02/05 因共享设施对齐会新增交叉而作为合法边界保留；混合根 torture 另证明同列事务不再让根回退到更早层。",
+                "release_verification": {
+                    "commit": "5b460a295d80b60bb02fd9c6964438c0a4901ed3",
+                    "run_id": 34222137595,
+                    "tag": "v1.0.0",
+                    "asset_sha256": "CDB8EBA6570F9374DBCE5BBEAB2082B903B5662C04E7AB65C78F909373B7DE9D"
+                }
+            }
+        },
+        {
+            "id": "FB-ROOT-022",
+            "summary": "远距分离消费带仍由单个源显示设施和长主干服务",
+            "expected": "任意零入度逻辑根的消费者形成远距分离消费带时，若多个同名显示设施在保持拓扑、端口、碰撞、重叠、交叉和折点不退化后严格降低交叉或扣除设施成本后的共享线段并集，则必须采用几何最优连续分区；逻辑根保持唯一",
+            "actual": "用户报告一个源头连接两个相距很远的下级时仍走很远并造成大量交叉，没有按既有要求拆成两个同名显示设施",
+            "status": "fixed_verified",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "33cceec83733ea45403611c823c4b3ffc730292f",
+            "required_reproduction_variants": [
+                "distant-root-two-bands"
+            ],
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/example/auto-layout/24-single-source-rendering-alias.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "example/auto-layout/24-single-source-rendering-alias.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROOT-022",
+                    "--input",
+                    "{project}/example/auto-layout/24-single-source-rendering-alias.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py",
+                    "tools/svg_graph_inspector.py",
+                    "tools/svg_quality_system.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "冻结公开 CLI 原始 SVG 的单设施方案被几何设施分区反事实严格支配，且直接量化长主干与交叉收益",
+            "reproduction_does_not_prove": "紧凑连续消费带应复制，或中间/末端节点可复制",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-09T14:40:00+08:00",
+                    "hypothesis": "既有源副本能力只在专项夹具断言，没有进入全图指标注册表或后置 owner 重新合并设施。",
+                    "method": "审计项目目标、源副本能力合同、全图指标与用户反馈账本；冻结当前发布提交，尚未修改生产 owner。",
+                    "result": "reproduction_blocked",
+                    "observed": "旧要求存在于能力合同，但当前 issue exact-set 和逐制品指标中没有独立的远距设施支配项。",
+                    "analysis": "需求持久化与执行注册表分离，导致能力文档存在但全图质量门无法保证其持续生效。",
+                    "why_not_reproduced": "尚未通过公开 CLI 双跑取得最终 SVG witness。",
+                    "evidence": "skills/clock-layout-algorithms/references/source-replication-capability.json; skills/clock-layout-algorithms/references/quality-gates.md",
+                    "next_condition": "构造两远距消费带与带辅助扇出变体，双跑并由独立最终几何设施反事实直接判定。"
+                },
+                {
+                    "attempted_at": "2026-09-09T20:08:00+08:00",
+                    "hypothesis": "既有公开 alias 示例能稳定产生一个设施服务分离消费带的终态，但现有几何 Oracle 可能只看单条高折边而漏报完整分区收益。",
+                    "method": "在冻结 33cceec 当前公开入口上用 `py -3 src` 连续两次生成第 24 号未修改 SVG，随后由独立全图统计器读取 JSON+SVG。",
+                    "result": "reproduction_blocked",
+                    "observed": "两次 SVG 哈希同为 FB132936EFC82E322396562DEBA6C9259B58A461F2E9CD7DF74B6F58AC4C854F；shared_source 仅一个物理设施，根直接网 963.5145px/2 折，但 root_facility_split_witnesses 为空。",
+                    "analysis": "现有判据要求被拆的单条 route 至少四个内部折点，无法评价同一根的完整消费者分区、设施成本与辅助扇出消费带，因此先暴露的是 Oracle escape。",
+                    "why_not_reproduced": "尚未由校准后的独立设施分区反事实直接证明当前单设施方案被严格支配。",
+                    "evidence": ".reproduction/scratch/fb-root-022/run-1.svg; .reproduction/scratch/fb-root-022/run-2.svg",
+                    "next_condition": "先扩展生产独立 Oracle，使其枚举连续消费者分区与同名设施候选，并用正例、紧凑反例和 mutant 校准；同一原始 SVG 双跑命中后才提升为 reproduced。"
+                },
+                {
+                    "attempted_at": "2026-09-09T20:12:00+08:00",
+                    "hypothesis": "按完整根网正交线段并集扣除仍被其它分支使用的共享主干，并计入新增真实设施周长后，远端消费带的本地同名设施仍严格占优。",
+                    "method": "修正生产独立 Oracle 后重新只读检查 20:08 的两份原始公开 SVG；另以 01-linear 作为单路负校准。",
+                    "result": "reproduced",
+                    "observed": "两次均命中 shared_source→fanout_hub：731.4245px/2折变为15.75px/0折，根网显示成本1189.4245降至795.32，交叉/重叠均保持0；线性单路不命中。",
+                    "analysis": "回归来自后来的无条件单设施/首列规则覆盖旧的几何分区能力；旧 Oracle 的四折阈值和首列过滤共同造成 oracle_escape。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/scratch/fb-root-022/run-1.svg; .reproduction/scratch/fb-root-022/run-2.svg; tests/test_feedback_layout_oracle.py::test_oracle_rejects_distant_root_consumer_without_local_alias",
+                    "next_condition": "修复生产设施分区 owner，并保持紧凑共享数组、单路源和显式定列边界不退化。"
+                }
+            ],
+            "strict_reproduction": {
+                "verified_at": "2026-09-09T20:12:00+08:00",
+                "variants": [
+                    "distant-root-two-bands"
+                ],
+                "case": "24-single-source-rendering-alias",
+                "baseline_sha256": "FB132936EFC82E322396562DEBA6C9259B58A461F2E9CD7DF74B6F58AC4C854F",
+                "runs": 2,
+                "witness": "shared_source→fanout_hub full-root-union facility partition"
+            },
+            "reproduction_receipt": ".reproduction/receipts/FB-ROOT-022.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROOT-022.json",
+                "verification_group": "20260909T160651Z-e78b36ce",
+                "evidence": "Pinned pre-fix public CLI reproduces the dominated single facility twice; the current public CLI produces a local same-name facility and the independent issue Oracle rejects both current attempts."
+            }
+        },
+        {
+            "id": "FB-ROUTE-023",
+            "summary": "公共根总线在中部过早进入行间并向下贯穿造成大量交叉",
+            "expected": "跨越多行的同源公共主干应比较整体边界走廊与内部入口候选；若沿外侧到目标消费带再分支能保持硬门并严格减少异网交叉或折点，则中部提前进入行间的路线必须被拒绝",
+            "actual": "用户观察到公共 from 本可先沿总线到最下面并绕整体连接，却在中部突然分叉进入两行之间，再向下走线，造成大量交叉和跨线",
+            "status": "fixed_verified",
+            "owner_paths": [
+                "src/**"
+            ],
+            "reproduction_paths": [
+                "example/**",
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**"
+            ],
+            "baseline_revision": "33cceec83733ea45403611c823c4b3ffc730292f",
+            "required_reproduction_variants": [
+                "premature-interior-trunk-entry"
+            ],
+            "entrypoint": {
+                "kind": "public_cli",
+                "command": [
+                    "{python}",
+                    "{snapshot}/src",
+                    "-i",
+                    "{project}/tests/reproduction-corpus/premature-interior-trunk-entry.json",
+                    "-l",
+                    "{snapshot}/drawio-lib",
+                    "-o",
+                    "{trial}/output.svg",
+                    "--crossing-style",
+                    "none"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    "{trial}/output.svg"
+                ],
+                "input_paths": [
+                    "tests/reproduction-corpus/premature-interior-trunk-entry.json",
+                    "drawio-lib/**"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    "{python}",
+                    "{project}/tools/feedback_layout_reproduction_oracle.py",
+                    "--issue",
+                    "FB-ROUTE-023",
+                    "--input",
+                    "{project}/tests/reproduction-corpus/premature-interior-trunk-entry.json",
+                    "--svg",
+                    "{trial}/output.svg"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/feedback_layout_reproduction_oracle.py",
+                    "tools/svg_graph_inspector.py",
+                    "tools/svg_quality_system.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "冻结公开 CLI 的公共根物理主干存在被边界走廊反事实严格支配的过早内部入口，并直接量化减少的交叉/折点",
+            "reproduction_does_not_prove": "所有公共根必须无条件走画布最外边界，或允许用更长边界路线交换更高优先级质量退化",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-09T14:40:00+08:00",
+                    "hypothesis": "路由器只优化单边或局部源侧干线，没有把完整公共网络的入口位置作为一个事务比较。",
+                    "method": "审计总线路由合同、现有 split-rejoin/outer-detour 指标和项目目标；冻结当前发布提交，尚未修改生产 owner。",
+                    "result": "reproduction_blocked",
+                    "observed": "现有指标可检测环、外绕和局部多余折点，但没有独立的完整网络边界入口支配指标。",
+                    "analysis": "指标语义缺口允许一条拓扑合法但跨线显著更多的内部主干通过。",
+                    "why_not_reproduced": "尚未通过公开 CLI 双跑取得最终 SVG witness。",
+                    "evidence": "skills/clock-layout-algorithms/references/orthogonal-routing.md; skills/clock-layout-algorithms/references/quality-gates.md",
+                    "next_condition": "构造多行公共根、行间异网和底部消费者组合，枚举边界走廊并双跑直接判定。"
+                },
+                {
+                    "attempted_at": "2026-09-09T20:18:00+08:00",
+                    "hypothesis": "直接把小型 source 红图中的某一根替换成 from 可保持同一失败。",
+                    "method": "先后替换两种根角色并各自公开双跑，严格核对最终 witness 的逻辑根 kind。",
+                    "result": "not_reproduced",
+                    "observed": "两轮输出分别稳定为 89DDF2AA…E04B 与 01966415…91B1，但 from 图形高度改变了排布，witness 都转移到仍为 source 的另一根；双 from 又完全不命中。",
+                    "analysis": "器件形态会改变分层坐标与路线，不能把 source 近似案例冒充 public from；复现输入必须同时绑定真实 kind 和最终 witness owner。",
+                    "why_not_reproduced": "直接失败 witness 不属于 from 根。",
+                    "evidence": ".reproduction/scratch/fb-route-023-public-from; .reproduction/scratch/fb-route-023-public-from-primary; .reproduction/scratch/fb-route-023-both-from",
+                    "next_condition": "扩大到小于 512 节点的复杂组合搜索，并保持最终 witness 根为真实 from。"
+                },
+                {
+                    "attempted_at": "2026-09-09T20:25:00+08:00",
+                    "hypothesis": "复杂多行、多级汇聚组合会使真实 from 的支路过早进入内部，而全图边界走廊显著降低交叉。",
+                    "method": "在 136 节点复杂 weave 上枚举根 kind 与声明顺序，选取真实 from 自然命中的变体；冻结公开 CLI 对静态 JSON 双跑，独立 Oracle 只读验证。",
+                    "result": "reproduced",
+                    "observed": "两次 SVG SHA-256 均为 0754A64690E632C2564E60C651FC6B4B7978BFA0B00AFADF9763D041D1493271；from 根的最强 witness 为 select...014，交叉事件51→22、可见交叉点25→6，折点4→4、重叠0→0。另有同一 from 的54→33和23→16 witness；第24号保持 clean control。",
+                    "analysis": "路由候选只在内部行间选择跨层通道，没有把同一根的外侧 backbone 与末端消费带接入作为完整候选；局部长度更短却牺牲了更高优先级交叉质量。",
+                    "why_not_reproduced": "",
+                    "evidence": "tests/reproduction-corpus/premature-interior-trunk-entry.json; .reproduction/scratch/fb-route-023-natural/run-1.svg; run-2.svg; tests/test_feedback_layout_oracle.py::test_oracle_rejects_premature_interior_trunk_entry",
+                    "next_condition": "将边界 backbone 候选纳入生产全图路由优化，并保持端口、碰撞、重叠、折点与紧凑 clean control。"
+                }
+            ],
+            "strict_reproduction": {
+                "verified_at": "2026-09-09T20:25:00+08:00",
+                "variants": [
+                    "premature-interior-trunk-entry"
+                ],
+                "case": "premature-interior-trunk-entry",
+                "baseline_sha256": "0754A64690E632C2564E60C651FC6B4B7978BFA0B00AFADF9763D041D1493271",
+                "runs": 2,
+                "witness": "from root interior descent 51→22 crossing events; 25→6 visible points; bends and overlaps nonworse"
+            },
+            "reproduction_receipt": ".reproduction/receipts/FB-ROUTE-023.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/fix-receipts/FB-ROUTE-023.json",
+                "verification_group": "20260909T160651Z-e78b36ce",
+                "evidence": "Pinned pre-fix public CLI reproduces the premature interior trunk twice; the current public CLI uses a non-dominated boundary corridor and the independent issue Oracle rejects both current attempts."
+            }
         }
-      }
-    },
-    {
-      "id": "FB-ROOT-016",
-      "summary": "唯一公共 from 经每路独立 gate 进入 mux、与更深私人链汇聚时公共分发线碎裂或失去总线形态",
-      "expected": "唯一公共 from 分别连接每一路独立 gate_i，再由 gate_i 进入对应 mux_i；每个私人 from_i 经各自 private_gate_i 和 div_i 后进入同一 mux_i。公共 from 的同一输出端口必须形成可追踪的共享纵向分发主干；两侧链深和可行列不同不得成为公共线路碎裂、复制或外绕的理由",
-      "actual": "用户指出精确结构是每一路公共 from→gate_i→mux_i，gate_i 与 mux_i 一样按路独立，只有公共 from 唯一；私人路径为 from_i→gate_i→div_i→mux_i。旧的同深 from→mux2→clock 和单个公共 gate 扇出输入都未覆盖该组合",
-      "status": "fixed_verified",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "worktree-producer-snapshot-20260908T122300+0800",
-      "required_reproduction_variants": ["public-from-single-vertical-bus"],
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/pad-r08-s02.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/pad-r08-s02.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-016", "--input", "{project}/tests/reproduction-corpus/pad-r08-s02.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py", "tools/reproduction_semantics.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 原始 SVG 在精确异深度拓扑中把唯一公共 from 输出网络拆成多个设施或多条纵向主干，或产生被单一共享主干严格支配的外绕",
-      "reproduction_does_not_prove": "所有不同深度路径必须让根节点同列，也不证明远距消费簇不得按完整质量向量拆分",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-07T09:31:00+08:00", "hypothesis": "一个公共 from 经单个公共 gate 后扇出到多个 mux 可代表用户所述异深度数组。", "method": "以公开 schema 建立单个 common_gate 扇出输入，通过当前和冻结 41a5e596 的公开 CLI 生成 SVG 并读取独立几何统计。", "result": "reproduction_blocked", "observed": "输入只有一个公共 gate；用户随后明确每一路都应有独立 gate_i，只有公共 from 唯一。", "analysis": "虽然该输入产生公共 gate 网络交叉，但控制语义不匹配，不能作为本问题证据。", "why_not_reproduced": "公共侧 gate 的实例数量错误，没有到达精确拓扑。", "evidence": "work/fb-016-017-current-baseline/depth.svg", "next_condition": "改为唯一 common_from 分别连接 common_gate_00..05，再让每个 gate_i 进入对应 mux_i。"},
-        {"attempted_at": "2026-09-07T09:38:00+08:00", "hypothesis": "唯一公共 from→逐路 gate_i→mux_i 与私人 from_i→gate_i→div_i→mux_i 的异深度数组会使设施成本策略把公共根复制到每行。", "method": "精确输入经当前公开 CLI 与冻结 41a5e596 公开 CLI 各独立运行两次；通用只读统计完整绑定 37 个节点和 36 条边，读取公共根副本与路由锚点。", "result": "reproduction_blocked", "observed": "当前与冻结四次结果确定一致，SVG SHA-256 均为 4B364ACD...B7B3B4；common_from 有 6 个渲染副本和 6 个锚点，6 条公共边均为独立直线，纵向总线不存在，0 交叉、0 异网重叠。", "analysis": "精确症状已自然出现；仍需新增直接判定结构规则与单总线反例的独立 Oracle，正式双跑收据签发前不升级为 reproduced。", "why_not_reproduced": "当时尚无经正反校准的结构 Oracle 和绑定发布提交的正式双跑收据，原始统计不能单独升级问题状态。", "evidence": "tests/reproduction-corpus/asymmetric-depth-common-private-mux.json; work/fb-016-017-current-baseline/depth-exact-1.svg; work/fb-016-017-baseline-41a5e596/depth-exact-1.svg", "next_condition": "建立规则数组 fanout cohort Oracle，证明六副本被拒绝、单设施纵干线被接受，再由冻结 d686d74 正式双跑签名。"},
-        {"attempted_at": "2026-09-07T09:58:00+08:00", "hypothesis": "结构 Oracle 正反校准后，发布提交 d686d74 的公开 CLI 双跑可正式证明公共根规则数组碎片化。", "method": "运行完整 many-to-many 冻结语料；目标输入由发布提交公开入口独立生成两次，独立 Oracle 按拓扑同构、分支深度与物理设施直接判定。", "result": "reproduced", "observed": "批次 20260907T014732Z-ff0a4ce1 中两次均检出 FB-ROOT-016；每次 37 个逻辑节点、42 个显示节点、36 条边、0 交叉、0 异网重叠、0 折点，missing_issues=[]。", "analysis": "算法把逐边短直线与根设施复制成本作局部权衡，却未识别规则数组中公共网络的共享总线语义；因此以六个副本换取零折点，视觉结构反而退化。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-016.json", "next_condition": "solve 门通过后，以结构 cohort 和共享线段成本约束根设施分区，同时保留远距非规则消费域可拆分。"},
-        {"attempted_at": "2026-09-07T12:21:30+08:00", "hypothesis": "两路边界及含不同私人深度、不同 mux 后级和额外公共消费者的复杂数组会穿透旧规则识别并再次拆散公共 from。", "method": "冻结 93568f94，使用公开 CLI 对复合合法输入独立运行两次；修正后的独立 Oracle 从合格分支子集判定物理设施数。", "result": "reproduced", "observed": "批次 20260907T042130Z-b81cdab9 两次均为 33 个逻辑节点、37 个显示节点、32 条边；唯一 shared 根形成 5 个显示设施，FB-ROOT-016 两次直接命中，SVG 哈希稳定为 040c749b...ae3b9。", "analysis": "旧生产识别器把最小三路、所有子女同 kind、merge 同 kind、下游签名相同和无额外消费者误作必要条件；任一条件变化都使后置设施 owner 重新复制公共根。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-016.json; .reproduction/receipts/recurrent-corpus.json", "next_condition": "solve 门通过后把共享数组语义改为合格分支子集，并让所有设施 owner 消费同一判定。"},
-        {"attempted_at": "2026-09-08T13:00:53+08:00", "hypothesis": "当前发布状态仍把 pad-r08-s02 中唯一 public_from 分散为多个行局部设施，旧 split-rejoin 指标因此显著漏报。", "method": "在生产源码冻结状态下归档 worktree 生产者，公开 CLI 独立生成两次；独立结构 Oracle 与语义合同直接核验同一输出端口的设施数、起点数、目标轴和共享纵向通道数。", "result": "reproduced", "observed": "批次 20260908T050053Z-ce58b64c 两次均满足语义前置条件并直接观察症状，SVG 哈希稳定为 e7d618f9...c7368c1df；public_from:right 扇出 5，物理设施 5、起点 5、目标轴 5、共享纵向通道 0，期望分别为 1、1、5、1。", "analysis": "旧门只证明没有分叉后重汇，完全没有检查共享网络的物理设施唯一性与分发干线唯一性；布局的行局部副本优化因此以零折点作为伪优目标，破坏了公共网络语义。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-016.json; .reproduction/receipts/current-public-from-bus-corpus.json", "next_condition": "生产修复必须在任意节点名称、kind 和具体用例之外统一保护同一根端口的共享扇出设施，并由全指标终态质量系统复验所有图。"}
-      ],
-      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-016.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-016.json", "verification_group": "20260908T084339Z-241f6340", "verified_at": "2026-09-08T16:43:39+08:00", "evidence": "最终源码公共 CLI 双跑哈希稳定为 a64136f6...f72427；public_from:right 为 1 个物理设施、1 个物理起点、5 个目标轴和 1 个源侧共享纵向总线；独立症状 Oracle 两次均为 absent。"},
-      "reopened_feedback": {"reported_at": "2026-09-08T12:20:00+08:00", "status": "reproduced", "summary": "用户指出当前修复图仍把 public_from 分散为多个物理设施和独立横线，没有合成一个纵向总线。", "classification": ["oracle_escape", "metric_execution_escape", "claim_escape"], "evidence": ".reproduction/receipts/FB-ROOT-016.json; public_from:right=5 设施/5 起点/0 纵干线，正式双跑哈希稳定", "next_condition": "先建立独立全图信息提取器与全指标注册表，再修复布局 owner；所有测试图必须执行同一完整指标集合。"}
-    },
-    {
-      "id": "FB-BEND-017",
-      "summary": "多个 source 直接进入同一 mux 时最终图保留被更少折点或更少交叉方案支配的路线",
-      "expected": "多个 source 均直接连接同一多输入 mux 时，分层、坐标和通道阶段必须联合选择；任何保持端口、碰撞和异网重叠不退化，且使折点或交叉严格下降的最终图候选都必须支配当前结果",
-      "actual": "四个 source 已被强制同列，但当前 30 号图仍有 8 个折点、4 个交叉事件；完整数组端口轴反事实可降为 6 折/2 交叉，visibility-channel 反事实还能在不改变折点和长度时消除 source_0/source_1 的矩形互穿",
-      "status": "fixed_verified",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "worktree-producer-snapshot-20260907T172400+0800",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/30-staggered-four-source-mux.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/30-staggered-four-source-mux.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-BEND-017", "--input", "{project}/example/auto-layout/30-staggered-four-source-mux.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 原始 SVG 存在由最终可见通道或完整数组坐标反事实严格支配的额外折点或交叉",
-      "reproduction_does_not_prove": "所有错列 source 都应强制同列；真实器件、标签、端口或其它扇出造成的必要绕障仍可保留",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-07T09:31:00+08:00", "hypothesis": "四个带不同 layout_column 的 source 直接进入 mux4 会自然产生额外折点。", "method": "公开 CLI 生成三列 source→mux4 最小图，独立统计逐边航点。", "result": "not_reproduced", "observed": "四条 source→mux 入边均为 0 折点、0 交叉、0 异网重叠。", "analysis": "错列本身不是充分条件；固定端口轴与不同 x 列完全兼容直线连接。", "why_not_reproduced": "每个 source 都能在自身列与对应 mux 端口同轴。", "evidence": "work/fb-016-017-current-baseline/sources.svg", "next_condition": "保持四条 source→mux 直接边，使用不同合法辅助链深自然约束 source 的列与纵向设施位置。"},
-        {"attempted_at": "2026-09-07T09:34:00+08:00", "hypothesis": "四个 source 同时直入 mux4、并由不同深度辅助下游链自然形成不同可行列时，中间化 source 纵坐标会让两条扇出边都折弯。", "method": "当前与冻结 41a5e596 公开 CLI 各双跑；独立统计绑定全部 15 个逻辑节点、14 条边和 source→mux 精确端口。", "result": "reproduction_blocked", "observed": "四次 SVG 均确定一致为 3C95AC79...A0EEC2；source_0/source_1/source_2/source_3 位于不同自然列，source_2→mux 输入 2 为 2 折点、0 交叉，其另一条出边也为 2 折点，source_2 网络合计 4 折点。", "analysis": "把单个 source_2 设施移动到任一消费者端口轴可让一条边直连、另一条保持两折点，总折点 4→2且纵向跨度不变；现有 Oracle 只处理单出边根，尚不能签发直接 witness。", "why_not_reproduced": "当时 Oracle 只评估单出边根，不能证明移动设施后其它出边及全图质量不退化，也没有发布提交的正式双跑收据。", "evidence": "tests/reproduction-corpus/staggered-four-source-mux.json; work/fb-016-017-current-baseline/sources-natural.svg; work/fb-016-017-baseline-41a5e596/staggered-four-source-mux-1.svg", "next_condition": "新增单设施多目标根的坐标—路由联合支配 Oracle，使用显式错列零折点图作干净反例，再由冻结 d686d74 正式双跑签名。"},
-        {"attempted_at": "2026-09-07T09:58:00+08:00", "hypothesis": "联合移动完整根设施并重路由其全部出边，可以在不牺牲长度与硬几何质量时直接证明中间轴坐标被消费端口轴严格支配。", "method": "运行完整冻结语料；发布提交 d686d74 对自然错列输入公开双跑，独立 Oracle 枚举消费者端口轴并检查节点、线路障碍、交叉、异网重叠、长度和总折点。", "result": "reproduced", "observed": "批次 20260907T014732Z-ff0a4ce1 两次均检出 FB-BEND-017；每次 15 个逻辑节点、17 个显示节点、14 条边、0 交叉、0 异网重叠、4 折点，missing_issues=[]。", "analysis": "根纵坐标使用偶数目标的中间值，落在两个消费者轴之间；L1 长度虽最优但没有把候选坐标限制到端口轴，也没有以同长度下折点更少作次级目标。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-017.json", "next_condition": "solve 门通过后，为多目标根枚举真实消费者轴并按硬门、交叉/重叠、折点、共享长度的词典序统一验收。"},
-        {"attempted_at": "2026-09-07T12:21:30+08:00", "hypothesis": "显式错列与四条不同深度辅助链交互时，旧根联合坐标优化因列提示排除而再次留下可支配折点。", "method": "确定性复杂组合搜索在 seed 1 命中后冻结输入，并在 93568f94 的公开 CLI 上独立双跑；Oracle 联合平移完整根设施并重算全部出边。", "result": "reproduced", "observed": "批次 20260907T042130Z-b81cdab9 两次均为 27 节点、26 边、16 总折点；三条直入 main_mux 的边合计 8 折，source_0/source_2 各存在 4→2 且长度、交叉、重叠不退化的反事实，SVG 哈希稳定为 4e6fa23f...27f87。", "analysis": "layout_column 只约束 x 列，却被生产 owner 同时用于排除 y 轴联合优化；提示维度与优化维度错误耦合，导致显式错列场景逃逸。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-BEND-017.json; .reproduction/receipts/recurrent-corpus.json", "next_condition": "solve 门通过后保留 x 列约束，但允许完整根设施在 y 方向参与消费者轴反事实。"}
-      ],
-      "reproduction_receipt": ".reproduction/receipts/FB-BEND-017.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-BEND-017.json", "release_verification": {"commit": "b648705dcb489a9b5667fd782752627b7a05b4c5", "run_id": 34085120202, "tag": "v1.0.0", "asset_sha256": "1876E4D9077C9F400FFB255041E7D14CF7ADF0BC6172AE2BC495602D753B2A97"}},
-      "reopened_feedback": {"reported_at": "2026-09-07T17:24:00+08:00", "status": "fixed_verified", "summary": "用户展示 30 号当前图仍有多余折返和交叉；修正后的独立 Oracle 在 worktree producer 冻结快照公开双跑中稳定命中，当前修复以同一 Oracle 双跑清零。", "evidence": ".reproduction/receipts/FB-BEND-017.json; .reproduction/fix-receipts/FB-BEND-017.json; verification group 20260907T110614Z-86f32691; baseline SHA256 28B3E60492321366A1FED79A5E91BD81C30C3A7A1A8FDD6187C3000295C20F94; current SHA256 faa91f92a3aa327fca431eba6377ad3f883b551867dcbb7100829709c98fabfe", "next_condition": "发布门持续要求回执绑定当前源码、器件库、runner、Oracle，并先通过全公开图片新鲜生成门。"}
-    },
-    {
-      "id": "FB-ROOT-020",
-      "summary": "多个直入同一 mux 的 source/from 因辅助消费者深度不同而错列",
-      "expected": "至少三个未显式定列的 source/from 若唯一的直接 mux 目标相同，则其 mux-facing 物理设施必须同列；非 mux 辅助消费者可以有不同深度，服务多个 mux 的公共总线不属于该数组",
-      "actual": "四个 source 都直接进入同一 mux4，但辅助链深度不同使最终设施分处四列，形成参差阵列",
-      "status": "fixed_verified",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["example/**", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "b648705dcb489a9b5667fd782752627b7a05b4c5",
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/example/auto-layout/30-staggered-four-source-mux.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["example/auto-layout/30-staggered-four-source-mux.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-020", "--input", "{project}/example/auto-layout/30-staggered-four-source-mux.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py", "tools/reproduction_semantics.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "required_reproduction_variants": ["direct-source-mux-column", "direct-from-mux-column"],
-      "reproduction_proves": "冻结公开 CLI 的原始 SVG 中至少三路 source/from 直入同一 mux，且各路实际端点所属物理设施分处不同 x 列",
-      "reproduction_does_not_prove": "显式 layout_column 必须被覆盖，或服务多个 mux 的公共总线必须与每个局部数组同列",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-07T16:30:00+08:00", "hypothesis": "四个 source 直入同一 mux 且具有不同深度辅助消费者时，设施复制和 ALAP 会让 mux-facing source 错列。", "method": "当前公开 CLI 生成未改写 SVG；独立 Oracle 从最终边端点反查物理框 x 列并连续运行两次。", "result": "reproduced", "observed": "两次均命中；source_0..3 的物理列为 401.93、201.39、72.78、337.05，报告哈希一致。", "analysis": "低使用根 promotion、ALAP 和后置设施 owner 分别拥有同一 x 坐标，辅助链深度因此覆盖了直入 mux 数组的视觉列不变量。", "why_not_reproduced": "", "evidence": ".reproduction/receipts/FB-ROOT-020.json", "next_condition": "分层阶段建立 direct source/from fan-in cohort，并由独立发行门覆盖声明顺序、端口排列和辅助深度。"}
-      ],
-      "strict_reproduction": {"verified_at": "2026-09-08T11:13:00+08:00", "variants": ["direct-source-mux-column", "direct-from-mux-column"], "cases": ["direct-source-mux-column-baseline", "direct-from-mux-column-baseline"], "corpus_id": "20260908T030927Z-8159ddf2", "analysis": "全 source 与全 from 各自经公开 CLI 双跑；合同要求四根 exact-set 直接进入同一 mux4，且终态物理设施至少分处两列。"},
-      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-020.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-020.json"}
-    },
-    {
-      "id": "FB-ROOT-021",
-      "summary": "任意零入度根直入同一汇聚节点时存在无硬质量退化的共同列却仍错列",
-      "expected": "不论节点 kind 或名称，两个及以上零入度根设施若直接进入同一多输入目标，且完整设施集合联合移动到某一共同 x 列不会新增交叉、跨线、节点碰撞、异网重叠或折点，则最终设施必须同列；若不存在安全共同列，保持错列是合法边界",
-      "actual": "公开 pad-r08-s02 图中多个 pad 的直接根包含 source、from、gate 等类型，设施在 x 方向参差不齐；旧指标仅检查至少三个 source/from 唯一直入 mux，因此全图质量系统对 pad 和任意根 kind 统一返回绿灯",
-      "status": "fixed_verified",
-      "owner_paths": ["src/**"],
-      "reproduction_paths": ["tests/reproduction-corpus/pad-r08-s02.json", "tests/**", "tools/**", ".cursor/**", ".reproduction/**"],
-      "baseline_revision": "f950283222f2917896f610ee05c974487debf1d7",
-      "required_reproduction_variants": [],
-      "entrypoint": {"kind": "public_cli", "command": ["{python}", "{snapshot}/src", "-i", "{project}/tests/reproduction-corpus/pad-r08-s02.json", "-l", "{snapshot}/drawio-lib", "-o", "{trial}/output.svg", "--crossing-style", "none"], "working_directory": ".", "artifacts": ["{trial}/output.svg"], "input_paths": ["tests/reproduction-corpus/pad-r08-s02.json", "drawio-lib/**"], "deterministic": true},
-      "oracle": {"command": ["{python}", "{project}/tools/feedback_layout_reproduction_oracle.py", "--issue", "FB-ROOT-021", "--input", "{project}/tests/reproduction-corpus/pad-r08-s02.json", "--svg", "{trial}/output.svg"], "working_directory": ".", "files": ["tools/feedback_layout_reproduction_oracle.py", "tools/svg_graph_inspector.py", "tools/svg_quality_system.py"], "read_only": true, "reported_symptom_direct": true},
-      "reproduction_policy": {"fault_injection": false, "output_mutation": false, "production_code_change": false},
-      "reproduction_proves": "公开 CLI 原始终态 SVG 中存在结构定义的直接零入度根汇聚 cohort；独立 Oracle 找到一个共同列联合反事实，并证明交叉、跨线、节点碰撞、异网重叠和折点均不增加，但当前设施仍分列",
-      "reproduction_does_not_prove": "所有零入度根必须无条件放在最左列，也不覆盖会新增交叉、跨线、碰撞、重叠或折点的不可行对齐",
-      "reproduction_attempts": [
-        {"attempted_at": "2026-09-08T18:48:00+08:00", "hypothesis": "pad 前任意 kind 的直接零入度根会因辅助消费域和设施 owner 分散到不同列，即使共同列联合反事实不增加交叉、跨线、重叠或折点。", "method": "冻结 f950283 产品源码，使用公开 CLI 对 pad-r08-s02 独立生成两次未修改 SVG；独立终态 Oracle 从逻辑零入度、真实端点设施和完整设施出边联合反事实判定。", "result": "reproduced", "observed": "两次 SVG SHA-256 均为 82B69212FDC1B5D307F74BB7225FFC7D55826D343775EA83CDDD1107ACAA70EE；endpoint-aware 联合反事实最终只确认 pad_03/07 为真 witness，候选保持 3 crossings/0 overlaps/14 bends。pad_02/05 的共享 public_from 若同步移动设施与首纵干线会新增交叉，因此是合法边界而非缺陷。", "analysis": "旧规则把 source/from、mux、至少三路和唯一 mux 目标误作同列特性的必要条件；pad 与 gate 根从适用性阶段即被排除。布局上多个后置设施 owner 又可独立覆盖根 x，导致同层约束没有形成结构等价类。Oracle 最初只平移设施、不移动共享首纵干线且漏查端点净空，曾将 pad_02/05 误报为安全；现已把物理设施、全部关联路线、端点净空和全图交叉/重叠/折点纳入同一事务。", "why_not_reproduced": "", "evidence": ".reproduction/scratch/fb-root-021-natural/run-1.svg; run-2.svg; report-1.json; report-2.json", "next_condition": "将任意直接根 fan-in cohort 归入同一结构 placement owner，枚举现有列并投影到完整端点净空可行区间，只接受全图交叉、异网重叠、节点碰撞、端点净空和折点均不退化的联合事务。"}
-      ],
-      "reproduction_receipt": ".reproduction/receipts/FB-ROOT-021.json",
-      "fix_verification": {"baseline_fails": true, "current_passes": true, "receipt": ".reproduction/fix-receipts/FB-ROOT-021.json", "verification_group": "20260908T113113Z-1ad9c2f8", "evidence": "当前公开 CLI 双跑中独立 021 Oracle 均以 exit=1 证明症状缺席；最终图保持 3 个异网真交叉、0 异网重叠、14 折点，pad_03/07 的无代价直接根已同列，pad_02/05 因共享设施对齐会新增交叉而作为合法边界保留；混合根 torture 另证明同列事务不再让根回退到更早层。", "release_verification": {"commit": "5b460a295d80b60bb02fd9c6964438c0a4901ed3", "run_id": 34222137595, "tag": "v1.0.0", "asset_sha256": "CDB8EBA6570F9374DBCE5BBEAB2082B903B5662C04E7AB65C78F909373B7DE9D"}}
-    }
-  ],
-  "process_incidents": [
-    {"id": "META-QUALITY-011", "status": "closed", "release_blocking": true, "summary": "最终可见异网交叉缺少跨线桥但统一全图门假绿", "classification": ["oracle_escape", "serialization_precision_escape", "claim_escape"], "evidence": "09e5d27 公开 CLI 的 asymmetric-depth-common-private-mux 终态 SVG：private_from_00 水平边在 x=191.3 穿越公共主干但无 arc；原始 y 浮点尾差在四位序列化后消失", "analysis": "生产在序列化前用浮点精确相等识别正交段，独立 23 指标注册表又只统计交叉而不检查零桥、双桥、孤立桥和 junction 冒充桥。现将交叉分类坐标先量化到最终 SVG 四位精度，并新增独立 crossing_treatment 指标，对每张最终 arc SVG 强制每个异网正交交叉恰好一个桥，同时拒绝零桥、双桥、孤立桥和 junction 冒充桥。", "fix_verification": {"baseline_natural_reproduction": "09e5d27 asymmetric-depth public CLI two deterministic runs both reported missing_bridge at x=191.3", "final_coordinate_precision_digits": 4, "crossing_treatment_mutants_rejected": ["missing_bridge", "multiple_bridges", "orphan_bridge", "different_net_junction"], "all_public_images_passed": 26, "metric_registry_count": 24, "metric_executions": 624, "recursive_attack_run": "20260909T062544Z-99d5a3f0", "consecutive_clean_rounds": 7}},
-    {"id": "META-POLICY-012", "status": "closed", "release_blocking": true, "summary": "无条件把所有无约束源头固定第一列会制造可避免交叉", "classification": ["requirement_model_error", "oracle_escape", "quality_priority_error"], "evidence": "23-middle-column-low-use-sources 当前 09e5d27：7 个可见交叉、14 折、13512.896 px；策略引入前 a739054：0 交叉、14 折、8675.596 px", "analysis": "第一列现为硬几何质量相同时的次级美观偏好。布局按完整逻辑根设施及其全部出边执行联合事务：后移必须严格改善交叉/折点硬向量，终态又尝试安全回第一列；回列只要增加交叉、跨线、异网重叠、节点/标签碰撞或折点即拒绝，若仅使直线变长则接受。直接汇入同一多输入目标的根作为原子 cohort 处理。", "fix_verification": {"natural_fixture": "example/auto-layout/23-middle-column-low-use-sources.json", "natural_distinct_crossings": 0, "forced_first_column_distinct_crossings": 7, "natural_bends": 14, "forced_first_column_bends": 14, "natural_manhattan_length_px": 9301.976, "forced_first_column_manhattan_length_px": 13512.896, "safe_first_column_roots": ["common_source", "local_source_07"], "quality_required_later_roots": ["local_source_00", "local_source_01", "local_source_02", "local_source_03", "local_source_04", "local_source_05", "local_source_06"], "all_public_images_passed": 26, "recursive_attack_run": "20260909T062544Z-99d5a3f0", "consecutive_clean_rounds": 7}},
-    {"id": "META-CLAIM-007", "status": "closed", "release_blocking": true, "summary": "未完整自然复现却声称全部完成并提交发布", "classification": ["reproduction_escape", "claim_escape", "oracle_escape"], "evidence": "corrected FB-ROOT-001 precondition/outcome Oracle; frozen corpus 20260903T095028Z-9c31e607; current verification 20260903T100531Z-98de36d8; 432 passed", "analysis": "旧的器件种类前提假通过已撤销并永久记录；owner 写入、release、complete 分阶段消费自然红灯和当前双跑哈希收据，开放流程事故也会阻断 release。", "fix_verification": {"oracle_positive_negative_calibration": true, "stale_receipt_rejected": true, "release_incident_gate_tested": true}},
-    {"id": "META-RELEASE-008", "status": "closed", "release_blocking": true, "summary": "发布工作流未执行反馈复现门且 always 条件允许发布链继续", "evidence": "escape: run 33720713223 published 0a2f48b; verification: run 33724488973 failed feedback gate and skipped build/publish for 291274e", "analysis": "交付门曾依据 src 变化选择 structure 阶段，远端 build 没有 feedback gate 且 publish 使用 always。现在本地 pack 和受保护 release 命令强制 release 阶段，CI build/publish 显式依赖反馈门。", "fix_verification": {"current_run": 33724488973, "feedback_gate": "failure", "build": "skipped", "publish": "skipped", "tag_target_unchanged": "0a2f48b295133aa97aed05baa6cf75209f1c4378"}},
-    {"id": "META-CLAIM-009", "status": "closed", "release_blocking": true, "summary": "公共 from 复用数组被近似样例替代并误报为已精确复现", "classification": ["coverage_escape", "claim_escape", "control_semantics_error"], "evidence": "example/auto-layout/28-common-private-from-mux-clock-array.json；tests/test_feedback_layout_oracle.py::test_common_private_from_mux_clock_array_uses_one_vertical_bus；冻结与当前四次 SVG 哈希 C7E59F79...B5517C8；专项 4 passed", "analysis": "几何 Oracle 原来检查了一个显示设施和一条纵向主干，但夹具把公共 from 换成 source，并增加 mux3 空端口和 cell 中间级。现由严格公开输入、逐字段结构断言和最终 SVG 直接判据共同限制声明范围；第 27 号保留为不同边界，第 28 号才证明公共/私人 from→mux2→clock 数组。", "fix_verification": {"exact_input_semantics": true, "exact_edge_binding": true, "single_common_facility": true, "single_vertical_bus": true, "frozen_and_current_public_cli_runs": 4}},
-    {"id": "META-QUALITY-010", "status": "closed", "release_blocking": true, "summary": "逐问题 Oracle 与同列门放过了最终图中的多余交叉和折返，且所有发行图片未走统一几何质量门", "classification": ["oracle_escape", "coverage_escape", "claim_escape"], "evidence": "用户截图与冻结公共 from 坏图 SHA256 e7d618...；最终 021 修复验证组 20260908T113113Z-1ad9c2f8；全公开图片 26/26，每图统一执行同一 22 项 exact-set，共 572 次指标执行、失败 0", "analysis": "根因是设计制作与质量签收耦合、测试用例可隐式选择指标，并且旧共享根判据只排除 split-rejoin、没有强制单设施与单源侧纵向总线；旧同列指标又把 source/from、mux 和至少三路误作必要条件。现由独立终态 SVG 事实提取器保存逐节点、逐边、逐段、方向、折点、交叉伙伴、异网重叠、设施和总线事实，再由独立指标注册表对 artifact×metric 笛卡尔积逐项执行并签收；任意根→任意汇聚的同列指标使用完整设施/路线联合反事实和最新可行根层边界。缺项、多项、重复、乱序、缺回执或无适用性证明均 fail-closed。", "fix_verification": {"all_public_images_passed": 26, "metric_registry_count": 22, "metric_executions": 572, "fix_verification_group": "20260908T113113Z-1ad9c2f8", "annotation_mutants_rejected": true, "metric_set_mutants_rejected": true, "topology_and_orthogonal_mutants_rejected": true, "direct_root_fanin_kind_and_target_independent": true, "latest_root_layer_mutant_rejected": true, "single_public_from_facility": true, "single_source_side_vertical_bus": true, "release_workflow_gate": "tools/check_all_svg_quality.py", "final_artifact_precision_digits": 4}}
-  ]
+    ],
+    "process_incidents": [
+        {
+            "id": "META-QUALITY-011",
+            "status": "closed",
+            "release_blocking": true,
+            "summary": "最终可见异网交叉缺少跨线桥但统一全图门假绿",
+            "classification": [
+                "oracle_escape",
+                "serialization_precision_escape",
+                "claim_escape"
+            ],
+            "evidence": "09e5d27 公开 CLI 的 asymmetric-depth-common-private-mux 终态 SVG：private_from_00 水平边在 x=191.3 穿越公共主干但无 arc；原始 y 浮点尾差在四位序列化后消失",
+            "analysis": "生产在序列化前用浮点精确相等识别正交段，独立 23 指标注册表又只统计交叉而不检查零桥、双桥、孤立桥和 junction 冒充桥。现将交叉分类坐标先量化到最终 SVG 四位精度，并新增独立 crossing_treatment 指标，对每张最终 arc SVG 强制每个异网正交交叉恰好一个桥，同时拒绝零桥、双桥、孤立桥和 junction 冒充桥。",
+            "fix_verification": {
+                "baseline_natural_reproduction": "09e5d27 asymmetric-depth public CLI two deterministic runs both reported missing_bridge at x=191.3",
+                "final_coordinate_precision_digits": 4,
+                "crossing_treatment_mutants_rejected": [
+                    "missing_bridge",
+                    "multiple_bridges",
+                    "orphan_bridge",
+                    "different_net_junction"
+                ],
+                "all_public_images_passed": 26,
+                "metric_registry_count": 24,
+                "metric_executions": 624,
+                "recursive_attack_run": "20260909T062544Z-99d5a3f0",
+                "consecutive_clean_rounds": 7
+            }
+        },
+        {
+            "id": "META-POLICY-012",
+            "status": "closed",
+            "release_blocking": true,
+            "summary": "无条件把所有无约束源头固定第一列会制造可避免交叉",
+            "classification": [
+                "requirement_model_error",
+                "oracle_escape",
+                "quality_priority_error"
+            ],
+            "evidence": "23-middle-column-low-use-sources 当前 09e5d27：7 个可见交叉、14 折、13512.896 px；策略引入前 a739054：0 交叉、14 折、8675.596 px",
+            "analysis": "第一列现为硬几何质量相同时的次级美观偏好。布局按完整逻辑根设施及其全部出边执行联合事务：后移必须严格改善交叉/折点硬向量，终态又尝试安全回第一列；回列只要增加交叉、跨线、异网重叠、节点/标签碰撞或折点即拒绝，若仅使直线变长则接受。直接汇入同一多输入目标的根作为原子 cohort 处理。",
+            "fix_verification": {
+                "natural_fixture": "example/auto-layout/23-middle-column-low-use-sources.json",
+                "natural_distinct_crossings": 0,
+                "forced_first_column_distinct_crossings": 7,
+                "natural_bends": 14,
+                "forced_first_column_bends": 14,
+                "natural_manhattan_length_px": 9301.976,
+                "forced_first_column_manhattan_length_px": 13512.896,
+                "safe_first_column_roots": [
+                    "common_source",
+                    "local_source_07"
+                ],
+                "quality_required_later_roots": [
+                    "local_source_00",
+                    "local_source_01",
+                    "local_source_02",
+                    "local_source_03",
+                    "local_source_04",
+                    "local_source_05",
+                    "local_source_06"
+                ],
+                "all_public_images_passed": 26,
+                "recursive_attack_run": "20260909T062544Z-99d5a3f0",
+                "consecutive_clean_rounds": 7
+            }
+        },
+        {
+            "id": "META-CLAIM-007",
+            "status": "closed",
+            "release_blocking": true,
+            "summary": "未完整自然复现却声称全部完成并提交发布",
+            "classification": [
+                "reproduction_escape",
+                "claim_escape",
+                "oracle_escape"
+            ],
+            "evidence": "corrected FB-ROOT-001 precondition/outcome Oracle; frozen corpus 20260903T095028Z-9c31e607; current verification 20260903T100531Z-98de36d8; 432 passed",
+            "analysis": "旧的器件种类前提假通过已撤销并永久记录；owner 写入、release、complete 分阶段消费自然红灯和当前双跑哈希收据，开放流程事故也会阻断 release。",
+            "fix_verification": {
+                "oracle_positive_negative_calibration": true,
+                "stale_receipt_rejected": true,
+                "release_incident_gate_tested": true
+            }
+        },
+        {
+            "id": "META-RELEASE-008",
+            "status": "closed",
+            "release_blocking": true,
+            "summary": "发布工作流未执行反馈复现门且 always 条件允许发布链继续",
+            "evidence": "escape: run 33720713223 published 0a2f48b; verification: run 33724488973 failed feedback gate and skipped build/publish for 291274e",
+            "analysis": "交付门曾依据 src 变化选择 structure 阶段，远端 build 没有 feedback gate 且 publish 使用 always。现在本地 pack 和受保护 release 命令强制 release 阶段，CI build/publish 显式依赖反馈门。",
+            "fix_verification": {
+                "current_run": 33724488973,
+                "feedback_gate": "failure",
+                "build": "skipped",
+                "publish": "skipped",
+                "tag_target_unchanged": "0a2f48b295133aa97aed05baa6cf75209f1c4378"
+            }
+        },
+        {
+            "id": "META-CLAIM-009",
+            "status": "closed",
+            "release_blocking": true,
+            "summary": "公共 from 复用数组被近似样例替代并误报为已精确复现",
+            "classification": [
+                "coverage_escape",
+                "claim_escape",
+                "control_semantics_error"
+            ],
+            "evidence": "example/auto-layout/28-common-private-from-mux-clock-array.json；tests/test_feedback_layout_oracle.py::test_common_private_from_mux_clock_array_uses_one_vertical_bus；冻结与当前四次 SVG 哈希 C7E59F79...B5517C8；专项 4 passed",
+            "analysis": "几何 Oracle 原来检查了一个显示设施和一条纵向主干，但夹具把公共 from 换成 source，并增加 mux3 空端口和 cell 中间级。现由严格公开输入、逐字段结构断言和最终 SVG 直接判据共同限制声明范围；第 27 号保留为不同边界，第 28 号才证明公共/私人 from→mux2→clock 数组。",
+            "fix_verification": {
+                "exact_input_semantics": true,
+                "exact_edge_binding": true,
+                "single_common_facility": true,
+                "single_vertical_bus": true,
+                "frozen_and_current_public_cli_runs": 4
+            }
+        },
+        {
+            "id": "META-QUALITY-010",
+            "status": "closed",
+            "release_blocking": true,
+            "summary": "逐问题 Oracle 与同列门放过了最终图中的多余交叉和折返，且所有发行图片未走统一几何质量门",
+            "classification": [
+                "oracle_escape",
+                "coverage_escape",
+                "claim_escape"
+            ],
+            "evidence": "用户截图与冻结公共 from 坏图 SHA256 e7d618...；最终 021 修复验证组 20260908T113113Z-1ad9c2f8；全公开图片 26/26，每图统一执行同一 22 项 exact-set，共 572 次指标执行、失败 0",
+            "analysis": "根因是设计制作与质量签收耦合、测试用例可隐式选择指标，并且旧共享根判据只排除 split-rejoin、没有强制单设施与单源侧纵向总线；旧同列指标又把 source/from、mux 和至少三路误作必要条件。现由独立终态 SVG 事实提取器保存逐节点、逐边、逐段、方向、折点、交叉伙伴、异网重叠、设施和总线事实，再由独立指标注册表对 artifact×metric 笛卡尔积逐项执行并签收；任意根→任意汇聚的同列指标使用完整设施/路线联合反事实和最新可行根层边界。缺项、多项、重复、乱序、缺回执或无适用性证明均 fail-closed。",
+            "fix_verification": {
+                "all_public_images_passed": 26,
+                "metric_registry_count": 22,
+                "metric_executions": 572,
+                "fix_verification_group": "20260908T113113Z-1ad9c2f8",
+                "annotation_mutants_rejected": true,
+                "metric_set_mutants_rejected": true,
+                "topology_and_orthogonal_mutants_rejected": true,
+                "direct_root_fanin_kind_and_target_independent": true,
+                "latest_root_layer_mutant_rejected": true,
+                "single_public_from_facility": true,
+                "single_source_side_vertical_bus": true,
+                "release_workflow_gate": "tools/check_all_svg_quality.py",
+                "final_artifact_precision_digits": 4
+            }
+        }
+    ]
 }

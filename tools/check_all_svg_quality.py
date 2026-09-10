@@ -13,6 +13,7 @@ from pathlib import Path
 
 import feedback_layout_reproduction_oracle as geometry
 import svg_quality_system as quality_system
+import check_quality_contract_retention as quality_contract
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +35,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--report", type=Path)
     args = parser.parse_args(argv)
+    contract_errors = quality_contract.validate()
+    if contract_errors:
+        print("all SVG quality gate: quality contract retention failed", file=sys.stderr)
+        for error in contract_errors:
+            print(f"- {error}", file=sys.stderr)
+        return 2
     inputs = sorted(args.input_dir.glob("*.json"))
     if not inputs:
         print("all SVG quality gate: no input JSON files", file=sys.stderr)

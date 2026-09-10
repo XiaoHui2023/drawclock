@@ -300,6 +300,7 @@ def inspect_layout_quality(
     source_lead_clearance_short: list[str] = []
     target_lead_clearance_short: list[str] = []
     first_stub_x_by_net: dict[tuple[str, str], set[float]] = defaultdict(set)
+    physical_anchor_ids_by_net: dict[tuple[str, str], set[str]] = defaultdict(set)
     edge_bends_by_key: dict[str, int] = {}
     observed_edge_ports: dict[str, tuple[str, str, str, str]] = {}
     observed_edge_vertices: dict[str, tuple[Any, Any]] = {}
@@ -332,6 +333,7 @@ def inspect_layout_quality(
         )
         source_name = source.logical_name or source.name
         target_name = target.logical_name or target.name
+        physical_anchor_ids_by_net[(source_name, source_port)].add(source.cell_id)
         key = _edge_key(source_name, source_port, target_name, target_port)
         observed_counter[key] += 1
         observed_edge_ports[edge.cell_id] = (source_name, source_port, target_name, target_port)
@@ -647,6 +649,7 @@ def inspect_layout_quality(
         # is enforced below by the trunk-fragmentation and cluster gates.
         if (
             logical_fanout[source_net] > 1
+            and len(physical_anchor_ids_by_net[source_net]) == 1
             and len(first_stub_x_by_net[source_net]) <= 1
         ):
             continue
@@ -2258,7 +2261,11 @@ def inspect_layout_quality(
     vertical_gaps: list[float] = []
     for rank in sorted(set(ranks.values())):
         items = sorted(
-            (visual_boxes[name] for name in ranks if ranks[name] == rank and name in vertices_by_name),
+            (
+                vertex_visual_box(vertices_by_name[name])
+                for name in ranks
+                if ranks[name] == rank and name in vertices_by_name
+            ),
             key=lambda item: item.top,
         )
         vertical_gaps.extend(b.top - a.bottom for a, b in zip(items, items[1:]))
@@ -2327,12 +2334,12 @@ def inspect_layout_quality(
     inter_rank_gaps: list[dict[str, float | int]] = []
     for left_rank, right_rank in zip(rank_levels, rank_levels[1:]):
         left_edge = max(
-            visual_boxes[name].right
+            vertex_visual_box(vertices_by_name[name]).right
             for name in ranks
             if ranks[name] == left_rank and name in vertices_by_name
         )
         right_edge = min(
-            visual_boxes[name].left
+            vertex_visual_box(vertices_by_name[name]).left
             for name in ranks
             if ranks[name] == right_rank and name in vertices_by_name
         )
