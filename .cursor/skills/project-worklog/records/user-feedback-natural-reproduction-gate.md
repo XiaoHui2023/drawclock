@@ -2,7 +2,13 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-11 02:18 +08:00
+- updated: 2026-09-11 02:45 +08:00
+
+- 2026-09-11 02:45 产品/质量提交 `857a3d081a02a961f3161b11a05faf4386b087cd` 已推送 `main`。第一次 push 在 TLS handshake 前失败；第二次上传后收到 HTTP 408，`ls-remote` 证明远端仍是旧提交；第三次保持同一提交并切到 HTTP/1.1 后明确成功。Release run `34503391056` 的反馈门、Ubuntu 16.04 PyInstaller/staticx 与 Publish 三个 job 全部 success，`v1.0.0^{}` 精确指向该提交；workflow 在构建包与公开 Release 回下载后均执行 frozen/source smoke。
+
+- 2026-09-11 02:45 本机独立公开下载起初极慢，未并行重启；轮询同一 curl 到 17,222,362-byte 完整资产，公开响应 `Content-Length` 一致，本地 SHA-256 `9fbbb7050c7122947c0036e99d16386044ed6217869bf68e9391b48d2ca8c434`，tar 全量完整性与 151 文件解包结构通过，包内离线源码消费退出码 0。下载后匿名 GitHub API 达到 rate limit，无法再次读取 digest 字段，因此没有声称 API digest 比对；替代证据为公开长度、归档完整性、本地 source smoke，以及 workflow 的公开资产 frozen/source 双 smoke。Windows 本地发行候选的 frozen/source 消费已在 01:58 独立通过。
+
+- 2026-09-11 02:45 期间 `run_source_release.py --help` 和 `run_frozen_example.py --help` 被脚本按位置参数当作路径而失败、首次 `tar -tzf | Select-Object -First` 因提前闭管未完成全量校验；均未计绿灯，随后按真实位置参数与不截断 tar 流重跑通过。最终账本补丁首次因引用了错误的 02:18 上下文而整体拒绝、未改文件；现按回读后的精确顶部元数据插入。
 
 - 2026-09-11 02:18 三张最终代表 SVG（29 公共 from 非对称层级、30 多源直连 mux 含条件式同名设施、32 注释压力）均由同一质量系统逐张执行 25/25 指标并 `passed=true`、`failed=[]`；转为稳定路径 PNG 后，媒体完整性、哈希一致性与人工终态复核通过。29 为单一公共设施、单条纵向主干和圆点分叉；30 的 mux 直连 cohort 同列，额外远端消费者只保留必要的近端同名设施；32 覆盖短/长/多行/空行尾换行/中英混排且文字不与节点、线路或其它注释重叠。Edge headless 仅报告账户头像获取失败，不参与本地 file SVG 渲染，三个 PNG 均非零且由独立媒体脚本解析成功。会话交付别名已按内容哈希建立并原生预览；最终仍只能声明文件已验证、显示尝试已完成，是否在用户端可见需用户确认。
 
