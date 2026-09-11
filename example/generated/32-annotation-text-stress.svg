@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-77.01 -64.0016 986.02 390.0025" width="986.02" height="390.0025">
+<style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}.node-annotation text{font-family:Arial,Noto Sans CJK SC,sans-serif;font-size:11px}</style>
+<rect x="-77.01" y="-64.0016" width="986.02" height="390.0025" fill="#ffffff"/>
+<polyline class="edge" points="123.83,94.0009 243.31,94.0009"/>
+<polyline class="edge" points="129.83,150.0009 241.918,150.0009"/>
+<polyline class="edge" points="272.31,94.0009 379.38,94.0009"/>
+<polyline class="edge" points="262.702,150.0009 379.38,150.0009"/>
+<polyline class="edge" points="403.38,122.0009 511.63,122.0009"/>
+<polyline class="edge" points="533.63,122.0009 591.46,122.0009 591.46,96.0009 639.29,96.0009"/>
+<polyline class="edge" points="533.63,122.0009 591.46,122.0009 591.46,148.0009 639.29,148.0009"/>
+<circle cx="591.46" cy="122.0009" r="3" fill="#000000"/>
+<g class="component" data-node-id="cell_trailing"><svg class="component-graphic" x="503.63" y="91.9984" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><polygon points="8,15 30,30 8,45" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" /></svg><text x="525.63" y="152.0184" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">cell_trailing</text></g>
+<g class="component" data-node-id="clock_dense_a"><svg class="component-graphic" x="639.29" y="60" width="40" height="36" viewBox="0 0 40 36" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 36 L 7 36 M 43 36 L 43 24 L 39 24 L 39 36 L 34 36 L 34 24 L 30 24 L 30 36 L 25 36 L 25 24 L 21 24 L 21 36 L 16 36 L 16 24 L 12 24 L 12 36 L 7 36" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" /></svg><text x="666.29" y="116.02" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">clock_dense_a</text></g>
+<g class="component" data-node-id="clock_dense_b"><svg class="component-graphic" x="639.29" y="112" width="40" height="36" viewBox="0 0 40 36" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 36 L 7 36 M 43 36 L 43 24 L 39 24 L 39 36 L 34 36 L 34 24 L 30 24 L 30 36 L 25 36 L 25 24 L 21 24 L 21 36 L 16 36 L 16 24 L 12 24 L 12 36 L 7 36" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" /></svg><text x="666.29" y="168.02" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">clock_dense_b</text></g>
+<g class="component" data-node-id="div_long_cjk"><svg class="component-graphic" x="232.31" y="119.9984" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><polygon points="30.4,36.0 20.0,42.0 9.6,36.0 9.6,24.0 20.0,18.0 30.4,24.0" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="round" /><path d="M 14.5 30.0 L 25.5 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" /><circle cx="20.0" cy="25.5" r="1.4" fill="#000000" /><circle cx="20.0" cy="34.5" r="1.4" fill="#000000" /></svg><text x="254.31" y="180.0184" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">div_long_cjk</text></g>
+<g class="component" data-node-id="gate_long_ascii"><svg class="component-graphic" x="232.31" y="63.9984" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 11 18 L 19 18 A 12 12 0 1 1 19 42 L 11 42 Z" fill="none" stroke="#000000" stroke-width="2" stroke-linejoin="miter" /><path d="M 31 30 L 34 30" fill="none" stroke="#000000" stroke-width="2" /><circle cx="37" cy="30" r="3" fill="#ffffff" stroke="#000000" stroke-width="2" /></svg><text x="254.31" y="124.0184" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">gate_long_ascii</text></g>
+<g class="component" data-node-id="ref_multiline"><svg class="component-graphic" x="89.83" y="135.9997" width="40" height="19" viewBox="0 0 40 19" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><path d="M 0 14 Q 5 9 10 14 T 20 14 T 30 14 T 40 14" fill="none" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="111.83" y="170.0197" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">ref_multiline</text></g>
+<g class="component" data-node-id="ref_short"><svg class="component-graphic" x="89.83" y="63.9984" width="40" height="54" viewBox="0 0 40 54" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><circle cx="20.0" cy="30" r="14" fill="none" stroke="#000000" stroke-width="2" /><path d="M 12.0 30.0 L 13.3 33.5 L 14.7 35.0 L 16.0 33.5 L 17.3 30.0 L 18.7 26.5 L 20.0 25.0 L 21.3 26.5 L 22.7 30.0 L 24.0 33.5 L 25.3 35.0 L 26.7 33.5 L 28.0 30.0" fill="none" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg><text x="111.83" y="124.0184" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">ref_short</text></g>
+<g class="component" data-node-id="select_mixed"><svg class="component-graphic" x="371.38" y="64.0009" width="40" height="110" viewBox="0 0 40 110" preserveAspectRatio="none" style="display:block;overflow:visible;" overflow="visible"><polygon points="8,6 8,110 32,100 32,16" fill="none" stroke="#000000" stroke-width="2" /></svg><text x="385.38" y="97.5209" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">0</text><text x="385.38" y="153.5209" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">1</text><text x="393.38" y="194.0209" font-size="11" font-family="Helvetica,Arial,sans-serif" fill="#000000" text-anchor="middle">select_mixed</text></g>
+<g class="frequency-table">
+<g class="frequency-heading" data-frequency-field="func_freq" data-heading-render="outline" aria-label="工作频率" transform="translate(723.47 68.0009) scale(0.012 -0.012)" fill="#20252b">
+<title>工作频率</title>
+<path transform="translate(0 0)" d="M52 72V-3H951V72H539V650H900V727H104V650H456V72Z"/>
+<path transform="translate(1000 0)" d="M526 828C476 681 395 536 305 442C322 430 351 404 363 391C414 447 463 520 506 601H575V-79H651V164H952V235H651V387H939V456H651V601H962V673H542C563 717 582 763 598 809ZM285 836C229 684 135 534 36 437C50 420 72 379 80 362C114 397 147 437 179 481V-78H254V599C293 667 329 741 357 814Z"/>
+<path transform="translate(2000 0)" d="M701 501C699 151 688 35 446-30C459-43 477-67 483-83C743-9 762 129 764 501ZM728 84C795 34 881-38 923-82L968-34C925 9 837 78 770 126ZM428 386C376 178 261 42 49-25C64-40 81-65 88-83C315-3 438 144 493 371ZM133 397C113 323 80 248 37 197C54 189 81 172 93 162C135 217 174 301 196 383ZM544 609V137H608V550H854V139H922V609H742L782 714H950V781H518V714H709C699 680 686 640 672 609ZM114 753V529H39V461H248V158H316V461H502V529H334V652H479V716H334V841H266V529H176V753Z"/>
+<path transform="translate(3000 0)" d="M829 643C794 603 732 548 687 515L742 478C788 510 846 558 892 605ZM56 337 94 277C160 309 242 353 319 394L304 451C213 407 118 363 56 337ZM85 599C139 565 205 515 236 481L290 527C256 561 190 609 136 640ZM677 408C746 366 832 306 874 266L930 311C886 351 797 410 730 448ZM51 202V132H460V-80H540V132H950V202H540V284H460V202ZM435 828C450 805 468 776 481 750H71V681H438C408 633 374 592 361 579C346 561 331 550 317 547C324 530 334 498 338 483C353 489 375 494 490 503C442 454 399 415 379 399C345 371 319 352 297 349C305 330 315 297 318 284C339 293 374 298 636 324C648 304 658 286 664 270L724 297C703 343 652 415 607 466L551 443C568 424 585 401 600 379L423 364C511 434 599 522 679 615L618 650C597 622 573 594 550 567L421 560C454 595 487 637 516 681H941V750H569C555 779 531 818 508 847Z"/>
+</g>
+<text class="frequency-heading" data-frequency-field="scan_freq" x="831.83" y="68.0009" text-anchor="middle" font-family="Noto Sans CJK SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif" font-size="12" fill="#20252b">SCAN</text>
+<text class="frequency-value" data-node-id="clock_dense_a" data-frequency-field="func_freq" x="747.47" y="100.2009" text-anchor="middle" font-family="Arial,Noto Sans CJK SC,sans-serif" font-size="12" fill="#d02020">800 MHz</text>
+<text class="frequency-value" data-node-id="clock_dense_b" data-frequency-field="scan_freq" x="831.83" y="152.2009" text-anchor="middle" font-family="Arial,Noto Sans CJK SC,sans-serif" font-size="12" fill="#d02020">200 MHz</text>
+</g>
+<g class="node-annotations">
+<g class="node-annotation" data-node-id="clock_dense_a" data-description-color="#4b5563"><title>相邻终端 A 的说明文本较长，用于制造标签、线路与频率表共同竞争空间的情况。</title>
+<text x="545.22" y="33" fill="#4b5563">相邻终端 A 的说明文本较长，用于制造标</text>
+<text x="545.22" y="48" fill="#4b5563">签、线路与频率表共同竞争空间的情况。</text>
+</g>
+<g class="node-annotation" data-node-id="gate_long_ascii" data-description-color="#4b5563"><title>A_very_long_unbroken_ASCII_annotation_used_to_verify_deterministic_wrapping_without_relying_on_browser_automatic_line_breaking_or_installed_fonts</title>
+<text x="140.11" y="-8.0016" fill="#4b5563">A_very_long_unbroken_ASCII_ann</text>
+<text x="140.11" y="6.9984" fill="#4b5563">otation_used_to_verify_determi</text>
+<text x="140.11" y="21.9984" fill="#4b5563">nistic_wrapping_without_relyin</text>
+<text x="140.11" y="36.9984" fill="#4b5563">g_on_browser_automatic_line_br</text>
+<text x="140.11" y="51.9984" fill="#4b5563">eaking_or_installed_fonts</text>
+</g>
+<g class="node-annotation" data-node-id="ref_short" data-description-color="#4b5563"><title>短</title>
+<text x="103.78" y="51.9984" fill="#4b5563">短</text>
+</g>
+<g class="node-annotation" data-node-id="select_mixed" data-description-color="#4b5563"><title>Mixed 中文 + ASCII 12345；第一段。
+
+第三段在显式空行之后，并继续增长以覆盖多段文本。</title>
+<text x="276.43" y="217.0009" fill="#4b5563">Mixed 中文 + ASCII 12345；第一段</text>
+<text x="276.43" y="232.0009" fill="#4b5563">。</text>
+<text x="276.43" y="247.0009" fill="#4b5563"></text>
+<text x="276.43" y="262.0009" fill="#4b5563">第三段在显式空行之后，并继续增长以覆盖</text>
+<text x="276.43" y="277.0009" fill="#4b5563">多段文本。</text>
+</g>
+<g class="node-annotation" data-node-id="cell_trailing" data-description-color="#4b5563"><title>保留显式换行
+并检查尾随换行
+</title>
+<text x="596.46" y="189.9984" fill="#4b5563">保留显式换行</text>
+<text x="596.46" y="204.9984" fill="#4b5563">并检查尾随换行</text>
+<text x="596.46" y="219.9984" fill="#4b5563"></text>
+</g>
+<g class="node-annotation" data-node-id="clock_dense_b" data-description-color="#4b5563"><title>相邻终端 B
+多行说明
+靠近视口右侧
+必须完整显示且不能重叠</title>
+<text x="717.12" y="191" fill="#4b5563">相邻终端 B</text>
+<text x="717.12" y="206" fill="#4b5563">多行说明</text>
+<text x="717.12" y="221" fill="#4b5563">靠近视口右侧</text>
+<text x="717.12" y="236" fill="#4b5563">必须完整显示且不能重叠</text>
+</g>
+<g class="node-annotation" data-node-id="div_long_cjk" data-description-color="#4b5563"><title>这是一段用于验证中文长文本自动换行以及注释边界计算是否一致的说明文字同时还要避开节点线路频率表和其他注释</title>
+<text x="-32.01" y="202.9984" fill="#4b5563">这是一段用于验证中文长文本自动换行以及</text>
+<text x="-32.01" y="217.9984" fill="#4b5563">注释边界计算是否一致的说明文字同时还要</text>
+<text x="-32.01" y="232.9984" fill="#4b5563">避开节点线路频率表和其他注释</text>
+</g>
+<g class="node-annotation" data-node-id="ref_multiline" data-description-color="#4b5563"><title>第一行
+第二行
+第三行
+第四行
+第五行
+第六行</title>
+<text x="15.7" y="48.9997" fill="#4b5563">第一行</text>
+<text x="15.7" y="63.9997" fill="#4b5563">第二行</text>
+<text x="15.7" y="78.9997" fill="#4b5563">第三行</text>
+<text x="15.7" y="93.9997" fill="#4b5563">第四行</text>
+<text x="15.7" y="108.9997" fill="#4b5563">第五行</text>
+<text x="15.7" y="123.9997" fill="#4b5563">第六行</text>
+</g>
+</g>
+</svg>

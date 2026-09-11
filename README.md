@@ -8,7 +8,7 @@
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 ```
 
-末端 clock 可选填写 `func_freq`、`scan_freq`、`bist_freq`。输出会将末端逐行对齐，并在右侧按 `工作频率 / SCAN / BIST` 三列显示红色数值；未填项留空。示例为 `example/auto-layout/22-terminal-frequency-table.json`。
+末端 clock 可选填写 `func_freq`、`scan_freq`、`bist_freq`。输出会将末端逐行对齐，并在右侧按 `工作频率 / SCAN / BIST` 的固定顺序显示红色数值；只有至少一个末端填写了对应值时才显示该列，三类值全空时不显示频率表。示例为 `example/auto-layout/22-terminal-frequency-table.json`。
 
 任意节点可填写字符串 `description`。`description_color` 设置该段注释的颜色；省略时使用 `#4b5563`。支持 CSS 命名色、3/4/6/8 位十六进制、`rgb()`、`rgba()`、`hsl()`、`hsla()` 和 `hwb()`。示例为 `example/auto-layout/33-description-colors.json`。
 

@@ -41,6 +41,7 @@ FREQUENCY_CJK_GLYPHS = (
 @dataclass(frozen=True)
 class FrequencyTable:
     terminals: tuple[tuple[VertexLayout, float], ...]
+    columns: tuple[tuple[str, str], ...]
     column_centers: tuple[float, ...]
     header_y: float
     min_x: float
@@ -280,12 +281,20 @@ def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
         rows.append((vertex, row_axis))
     rows.sort(key=lambda row: (row[1], row[0].name))
 
+    columns = tuple(
+        (field, heading)
+        for field, heading in FREQUENCY_COLUMNS
+        if any(vertex.object_attrs.get(field, "") for vertex, _ in rows)
+    )
+    if not columns:
+        return None
+
     table_left = max(
         vertex.x + vertex.width + HTML_LABEL_CONTENT_OFFSET_X
         for vertex, _ in rows
     ) + FREQUENCY_TABLE_GAP
     column_widths: list[float] = []
-    for field, heading in FREQUENCY_COLUMNS:
+    for field, heading in columns:
         widest = max(
             [_estimated_text_width(heading)]
             + [
@@ -304,6 +313,7 @@ def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
     header_y = first_axis - 28.0
     return FrequencyTable(
         terminals=tuple(rows),
+        columns=columns,
         column_centers=tuple(centers),
         header_y=header_y,
         min_x=table_left,
@@ -316,7 +326,7 @@ def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
 def _render_frequency_table(table: FrequencyTable) -> list[str]:
     lines = ['<g class="frequency-table">']
     for (field, heading), center_x in zip(
-        FREQUENCY_COLUMNS, table.column_centers
+        table.columns, table.column_centers
     ):
         if heading == "工作频率":
             start_x = center_x - 2 * FREQUENCY_FONT_SIZE
@@ -344,7 +354,7 @@ def _render_frequency_table(table: FrequencyTable) -> list[str]:
     for vertex, row_axis in table.terminals:
         logical_name = vertex.logical_name or vertex.name
         for (field, _), center_x in zip(
-            FREQUENCY_COLUMNS, table.column_centers
+            table.columns, table.column_centers
         ):
             value = vertex.object_attrs.get(field, "")
             if not value:

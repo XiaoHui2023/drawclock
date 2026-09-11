@@ -59,7 +59,7 @@ def test_quality_cli_rejects_known_bad_artifact(tmp_path: Path) -> None:
     assert completed.returncode == 1
     report = json.loads(receipt.read_text(encoding="utf-8"))
     assert report["executed_metric_ids"] == report["required_metric_ids"]
-    assert len(report["executed_metric_ids"]) == 27
+    assert len(report["executed_metric_ids"]) == 28
     assert report["failed_metric_ids"]
 
 
@@ -105,6 +105,51 @@ def test_diagram_title_metric_rejects_root_level_filename_caption(
     assert metric["witnesses"] == [{
         "text": "01-linear", "x": "0", "y": "12", "matches_input_stem": True,
     }]
+
+
+@pytest.mark.parametrize(
+    "input_name,unexpected_field",
+    [
+        ("01-linear.json", "scan_freq"),
+        ("31-node-descriptions.json", "bist_freq"),
+    ],
+)
+def test_frequency_column_metric_rejects_inactive_column_mutant(
+    input_name: str, unexpected_field: str, tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example" / "auto-layout" / input_name
+    svg_path = tmp_path / input_name.replace(".json", ".svg")
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(svg_path)],
+        cwd=ROOT, check=True,
+    )
+    clean = quality.evaluate(input_path, svg_path)
+    clean_metric = next(
+        item for item in clean["metric_results"]
+        if item["metric_id"] == "frequency_column_visibility"
+    )
+    assert clean_metric["status"] == "pass"
+
+    text = svg_path.read_text(encoding="utf-8")
+    heading = (
+        f'<text class="frequency-heading" data-frequency-field="{unexpected_field}" '
+        'x="0" y="0">unexpected</text>'
+    )
+    if '<g class="frequency-table">' in text:
+        text = text.replace('<g class="frequency-table">',
+                            '<g class="frequency-table">' + heading, 1)
+    else:
+        text = text.replace('</svg>',
+                            '<g class="frequency-table">' + heading + '</g></svg>')
+    svg_path.write_text(text, encoding="utf-8")
+    mutant = quality.evaluate(input_path, svg_path)
+    metric = next(
+        item for item in mutant["metric_results"]
+        if item["metric_id"] == "frequency_column_visibility"
+    )
+    assert metric["status"] == "fail"
+    assert any(item["kind"] == "heading_fields" for item in metric["witnesses"])
 
 
 @pytest.mark.parametrize(

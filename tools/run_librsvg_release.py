@@ -19,7 +19,7 @@ def _render_and_verify(
         [
             *command,
             "-i", str(example),
-            "-l", str(root / "drawio-lib/drawclock"),
+            "-l", str(root / "libraries"),
             "-o", str(source),
         ],
         check=True,

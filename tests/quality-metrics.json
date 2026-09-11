@@ -29,5 +29,6 @@
     ,{"id": "premature_interior_trunk_entry", "witness": "premature_interior_trunk_entry_witnesses", "applicability": "has_root_fanout"}
     ,{"id": "annotation_color", "witness": "annotation_color_quality", "applicability": "has_annotations"}
     ,{"id": "diagram_title_absence", "witness": null, "applicability": "always"}
+    ,{"id": "frequency_column_visibility", "witness": null, "applicability": "always"}
   ]
 }

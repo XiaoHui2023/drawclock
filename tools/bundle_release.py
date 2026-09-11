@@ -12,15 +12,20 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 BINARY_NAMES = ("drawclock",)
 
-# 默认附件只保留最终用户运行所需文件。
-RELEASE_PATHS = (
-    "README.md",
-    "draw.md",
-    "licenses/NotoSansCJK-OFL-1.1.txt",
-    "drawio-lib/drawclock",
-    "example/draw.json",
-    "example/auto-layout/33-description-colors.json",
+# 默认附件只保留最终用户运行所需文件。源路径与发布路径显式分离，
+# 让仓库内部结构不泄漏为用户接口。
+RELEASE_FILES = (
+    ("README.md", "doc/README.md"),
+    ("draw.md", "doc/draw.md"),
+    ("licenses/NotoSansCJK-OFL-1.1.txt", "doc/licenses/NotoSansCJK-OFL-1.1.txt"),
+    ("example/draw.json", "example/draw.json"),
+    (
+        "example/auto-layout/33-description-colors.json",
+        "example/auto-layout/33-description-colors.json",
+    ),
 )
+LIBRARY_SOURCE = "drawio-lib/drawclock"
+LIBRARY_DESTINATION = "libraries"
 
 
 def _project_version(root: pathlib.Path) -> str:
@@ -61,17 +66,32 @@ def main() -> int:
         print("错误: dist 中未找到可执行文件。", file=sys.stderr)
         return 1
 
-    for rel in RELEASE_PATHS:
-        src = ROOT / rel
+    for source_rel, destination_rel in RELEASE_FILES:
+        src = ROOT / source_rel
         if not src.exists():
             print(f"错误: 未找到 {src}", file=sys.stderr)
             return 1
-        dest = bundle_dir / rel
-        if src.is_dir():
-            shutil.copytree(src, dest)
-        else:
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dest)
+        dest = bundle_dir / destination_rel
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src, dest)
+        if dest.suffix.lower() == ".md":
+            text = dest.read_text(encoding="utf-8")
+            text = text.replace("drawio-lib/drawclock", "libraries")
+            text = text.replace("drawio-lib\\drawclock", "libraries")
+            dest.write_text(text, encoding="utf-8")
+
+    library_source = ROOT / LIBRARY_SOURCE
+    if not library_source.is_dir():
+        print(f"错误: 未找到 {library_source}", file=sys.stderr)
+        return 1
+    library_destination = bundle_dir / LIBRARY_DESTINATION
+    library_destination.mkdir(parents=True)
+    library_files = sorted(library_source.glob("*.xml"))
+    if not library_files:
+        print(f"错误: {library_source} 中没有 XML 器件库", file=sys.stderr)
+        return 1
+    for src in library_files:
+        shutil.copy2(src, library_destination / src.name)
 
     archive_base = dist / tag
     fmt = "zip" if platform.system() == "Windows" else "gztar"

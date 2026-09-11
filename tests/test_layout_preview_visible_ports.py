@@ -458,6 +458,76 @@ def test_frequency_text_is_xml_escaped_and_long_value_expands_canvas() -> None:
     assert float(root.attrib["width"]) > 700
 
 
+@pytest.mark.parametrize(
+    "attrs,expected_fields,expected_labels",
+    [
+        ({"func_freq": "100 MHz"}, ["func_freq"], ["工作频率"]),
+        ({"scan_freq": "20 MHz"}, ["scan_freq"], ["SCAN"]),
+        ({"bist_freq": "10 MHz"}, ["bist_freq"], ["BIST"]),
+        (
+            {"scan_freq": "20 MHz", "bist_freq": "10 MHz"},
+            ["scan_freq", "bist_freq"],
+            ["SCAN", "BIST"],
+        ),
+        (
+            {"func_freq": "100 MHz", "bist_freq": "10 MHz"},
+            ["func_freq", "bist_freq"],
+            ["工作频率", "BIST"],
+        ),
+    ],
+)
+def test_frequency_table_only_renders_nonempty_columns(
+    attrs: dict[str, str],
+    expected_fields: list[str],
+    expected_labels: list[str],
+) -> None:
+    vertex = VertexLayout(
+        "clk", "v1", "generic", 10, 20, 40, 40,
+        "points=[[0,0.5,0,0,0]];", object_attrs=attrs,
+    )
+    root = ET.fromstring(build_preview_svg(
+        LayoutDocument(version=1, vertices=[vertex], edges=[])
+    ))
+    headings = [
+        element for element in root.iter()
+        if element.attrib.get("class") == "frequency-heading"
+    ]
+    assert [element.attrib["data-frequency-field"] for element in headings] == expected_fields
+    assert [element.attrib.get("aria-label", element.text) for element in headings] == expected_labels
+    values = [
+        element for element in root.iter()
+        if element.attrib.get("class") == "frequency-value"
+    ]
+    assert [element.attrib["data-frequency-field"] for element in values] == expected_fields
+
+
+def test_frequency_table_disappears_when_all_terminal_values_are_empty() -> None:
+    style = "points=[[0,0.5,0,0,0]];"
+    empty = VertexLayout(
+        "clk", "v1", "generic", 10, 20, 40, 40, style,
+        object_attrs={"func_freq": "", "scan_freq": "", "bist_freq": ""},
+    )
+    populated = VertexLayout(
+        "clk", "v1", "generic", 10, 20, 40, 40, style,
+        object_attrs={"bist_freq": "10 MHz"},
+    )
+    empty_root = ET.fromstring(build_preview_svg(
+        LayoutDocument(version=1, vertices=[empty], edges=[])
+    ))
+    populated_root = ET.fromstring(build_preview_svg(
+        LayoutDocument(version=1, vertices=[populated], edges=[])
+    ))
+    assert not any(
+        element.attrib.get("class") == "frequency-table"
+        for element in empty_root.iter()
+    )
+    assert not any(
+        element.attrib.get("class") in {"frequency-heading", "frequency-value"}
+        for element in empty_root.iter()
+    )
+    assert float(empty_root.attrib["width"]) < float(populated_root.attrib["width"])
+
+
 def test_preview_default_draws_real_arc_bridge_at_crossing() -> None:
     style = "points=[[0,0.5,0,0,0],[1,0.5,0,0,0]];"
     vertices = [

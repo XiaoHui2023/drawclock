@@ -2,6 +2,7 @@
 
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
+| `records/frequency-columns-and-release-layout.md` | record | active | 2026-09-11 20:15 +08:00 | 2026-09-11 22:19 +08:00 | 频率列裁剪、发布目录与错列 mux 主干 | 完整测试 618/618；上传审查与发布门通过，待远端 Release。 |
 | `analysis/annotation-color-python-release-surface.md` | analysis | done | 2026-09-11 16:17 +08:00 | 2026-09-11 19:43 +08:00 | description_color、最低 Python 与精简归档 | CSS 颜色、Python 3.9 下界、精简归档及全制品质量合同已落地并公开验证。 |
 | `records/annotation-color-python-release-surface.md` | record | done | 2026-09-11 16:17 +08:00 | 2026-09-11 19:43 +08:00 | description_color、最低 Python、精简归档与文档门禁 | 607 项测试、七轮攻击、公开回下载与 Ubuntu 16.04 冻结消费均已通过。 |
 | `drafts/case-generalization-fanout-simulation.md` | draft | done | 2026-09-07 10:24 +08:00 | 2026-09-07 16:28 +08:00 | 举一反三扇出数组模拟 | 五轮递归 epoch 实际捕获复发后重启通过，复杂组合、结构边界与远端发行均已闭合。 |

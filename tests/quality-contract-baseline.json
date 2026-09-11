@@ -28,7 +28,8 @@
     {"requirement_id": "QA-FACILITY-005", "metric_id": "mergeable_root_facility", "witness": "mergeable_root_facility_witnesses", "applicability": "has_root_fanout"},
     {"requirement_id": "QA-CORRIDOR-001", "metric_id": "premature_interior_trunk_entry", "witness": "premature_interior_trunk_entry_witnesses", "applicability": "has_root_fanout"},
     {"requirement_id": "QA-TEXT-002", "metric_id": "annotation_color", "witness": "annotation_color_quality", "applicability": "has_annotations"},
-    {"requirement_id": "QA-TEXT-003", "metric_id": "diagram_title_absence", "witness": null, "applicability": "always"}
+    {"requirement_id": "QA-TEXT-003", "metric_id": "diagram_title_absence", "witness": null, "applicability": "always"},
+    {"requirement_id": "QA-FREQUENCY-001", "metric_id": "frequency_column_visibility", "witness": null, "applicability": "always"}
   ],
   "approved_conflicts": []
 }

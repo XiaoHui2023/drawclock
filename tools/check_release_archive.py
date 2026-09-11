@@ -10,11 +10,11 @@ from pathlib import Path
 
 
 REQUIRED = {
-    "README.md",
-    "draw.md",
+    "doc/README.md",
+    "doc/draw.md",
+    "doc/licenses/NotoSansCJK-OFL-1.1.txt",
     "example/draw.json",
     "example/auto-layout/33-description-colors.json",
-    "licenses/NotoSansCJK-OFL-1.1.txt",
 }
 
 
@@ -46,9 +46,16 @@ def validate(path: Path) -> list[str]:
     binaries = [name for name in names if name in {"drawclock", "drawclock.exe"}]
     if len(binaries) != 1:
         errors.append("archive must contain exactly one drawclock executable")
-    libraries = [name for name in names if name.startswith("drawio-lib/drawclock/")]
-    if not libraries or any(not name.endswith(".xml") for name in libraries):
-        errors.append("component library must contain only XML files")
+    libraries = [name for name in names if name.startswith("libraries/")]
+    if (
+        not libraries
+        or any(not name.endswith(".xml") or name.count("/") != 1 for name in libraries)
+    ):
+        errors.append("libraries must be flat and contain only XML files")
+    if any(name in {"README.md", "draw.md"} for name in names):
+        errors.append("documentation must be contained in doc/")
+    if any(name.startswith("drawio-lib/") for name in names):
+        errors.append("legacy drawio-lib directory is forbidden")
     allowed = REQUIRED | set(binaries) | set(libraries)
     unexpected = sorted(set(names) - allowed)
     if unexpected:

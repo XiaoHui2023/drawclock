@@ -18,6 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REGISTRY = ROOT / "tests" / "quality-metrics.json"
 SERIALIZED_AXIS_TOLERANCE = 0.001
 NS = "{http://www.w3.org/2000/svg}"
+FREQUENCY_COLUMNS = ("func_freq", "scan_freq", "bist_freq")
 
 
 def _svg_edge_bridge_centers(root: ET.Element) -> list[list[tuple[float, float]]]:
@@ -193,11 +194,62 @@ def _artifact_metric_witnesses(
         for element in root
         if element.tag == f"{NS}text"
     ]
+    referenced = {edge.source for edge in logical}
+    terminals = sorted(set(config) - referenced)
+    expected_fields = [
+        field for field in FREQUENCY_COLUMNS
+        if any(str(config[name].get(field, "")) for name in terminals)
+    ]
+    expected_values = sorted(
+        (name, field, str(config[name].get(field, "")))
+        for name in terminals
+        for field in expected_fields
+        if str(config[name].get(field, ""))
+    )
+    frequency_groups = [
+        element for element in root.iter()
+        if element.get("class") == "frequency-table"
+    ]
+    headings = [
+        element.get("data-frequency-field")
+        for element in root.iter()
+        if element.get("class") == "frequency-heading"
+    ]
+    values = sorted(
+        (
+            element.get("data-node-id"),
+            element.get("data-frequency-field"),
+            "".join(element.itertext()),
+        )
+        for element in root.iter()
+        if element.get("class") == "frequency-value"
+    )
+    frequency_failures = []
+    expected_group_count = 1 if expected_fields else 0
+    if len(frequency_groups) != expected_group_count:
+        frequency_failures.append({
+            "kind": "table_count",
+            "expected": expected_group_count,
+            "actual": len(frequency_groups),
+        })
+    if headings != expected_fields:
+        frequency_failures.append({
+            "kind": "heading_fields",
+            "expected": expected_fields,
+            "actual": headings,
+        })
+    if values != expected_values:
+        frequency_failures.append({
+            "kind": "values",
+            "expected": [list(item) for item in expected_values],
+            "actual": [list(item) for item in values],
+        })
     return {
         "topology_identity": topology_failures,
         "orthogonal_segments": non_orthogonal,
         "crossing_treatment": _crossing_treatment_witnesses(root, routes),
         "diagram_title_absence": diagram_titles,
+        "frequency_column_visibility": frequency_failures,
     }
 
 

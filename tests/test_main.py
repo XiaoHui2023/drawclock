@@ -234,7 +234,10 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     (project / "example").mkdir()
     (project / "example" / "auto-layout").mkdir()
     (project / "dist" / "drawclock.exe").write_text("", encoding="utf-8")
-    (project / "README.md").write_text("", encoding="utf-8")
+    (project / "README.md").write_text(
+        "drawclock -i example/draw.json -l drawio-lib/drawclock -o out.svg\n",
+        encoding="utf-8",
+    )
     (project / "draw.md").write_text("", encoding="utf-8")
     (project / "source-deploy.md").write_text("", encoding="utf-8")
     (project / "licenses").mkdir()
@@ -269,14 +272,19 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     prefix = "drawclock-1.2.3-windows/"
     expected = {
         prefix + "drawclock.exe",
-        prefix + "README.md",
-        prefix + "draw.md",
+        prefix + "doc/README.md",
+        prefix + "doc/draw.md",
+        prefix + "doc/licenses/NotoSansCJK-OFL-1.1.txt",
         prefix + "example/draw.json",
         prefix + "example/auto-layout/33-description-colors.json",
-        prefix + "licenses/NotoSansCJK-OFL-1.1.txt",
-        prefix + "drawio-lib/drawclock/source.xml",
+        prefix + "libraries/source.xml",
     }
     assert names == expected
+
+    with zipfile.ZipFile(archive) as zf:
+        packaged_readme = zf.read(prefix + "doc/README.md").decode("utf-8")
+    assert "-l libraries" in packaged_readme
+    assert "drawio-lib" not in packaged_readme
 
     checker_spec = importlib.util.spec_from_file_location(
         "check_release_archive", ROOT / "tools" / "check_release_archive.py"

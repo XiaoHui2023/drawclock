@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-57.73 -8 740.76 270.0025" width="740.76" height="270.0025">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-57.73 -8 584.76 270.0025" width="584.76" height="270.0025">
 <style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}.node-annotation text{font-family:Arial,Noto Sans CJK SC,sans-serif;font-size:11px}</style>
-<rect x="-57.73" y="-8" width="740.76" height="270.0025" fill="#ffffff"/>
+<rect x="-57.73" y="-8" width="584.76" height="270.0025" fill="#ffffff"/>
 <polyline class="edge" points="94,90.0025 159.78,90.0025"/>
 <polyline class="edge" points="188.78,90.0025 254.93,90.0025"/>
 <polyline class="edge" points="278.93,118.0025 341.67,118.0025"/>
@@ -17,8 +17,6 @@
 <path transform="translate(2000 0)" d="M701 501C699 151 688 35 446-30C459-43 477-67 483-83C743-9 762 129 764 501ZM728 84C795 34 881-38 923-82L968-34C925 9 837 78 770 126ZM428 386C376 178 261 42 49-25C64-40 81-65 88-83C315-3 438 144 493 371ZM133 397C113 323 80 248 37 197C54 189 81 172 93 162C135 217 174 301 196 383ZM544 609V137H608V550H854V139H922V609H742L782 714H950V781H518V714H709C699 680 686 640 672 609ZM114 753V529H39V461H248V158H316V461H502V529H334V652H479V716H334V841H266V529H176V753Z"/>
 <path transform="translate(3000 0)" d="M829 643C794 603 732 548 687 515L742 478C788 510 846 558 892 605ZM56 337 94 277C160 309 242 353 319 394L304 451C213 407 118 363 56 337ZM85 599C139 565 205 515 236 481L290 527C256 561 190 609 136 640ZM677 408C746 366 832 306 874 266L930 311C886 351 797 410 730 448ZM51 202V132H460V-80H540V132H950V202H540V284H460V202ZM435 828C450 805 468 776 481 750H71V681H438C408 633 374 592 361 579C346 561 331 550 317 547C324 530 334 498 338 483C353 489 375 494 490 503C442 454 399 415 379 399C345 371 319 352 297 349C305 330 315 297 318 284C339 293 374 298 636 324C648 304 658 286 664 270L724 297C703 343 652 415 607 466L551 443C568 424 585 401 600 379L423 364C511 434 599 522 679 615L618 650C597 622 573 594 550 567L421 560C454 595 487 637 516 681H941V750H569C555 779 531 818 508 847Z"/>
 </g>
-<text class="frequency-heading" data-frequency-field="scan_freq" x="531.03" y="90.0025" text-anchor="middle" font-family="Noto Sans CJK SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif" font-size="12" fill="#20252b">SCAN</text>
-<text class="frequency-heading" data-frequency-field="bist_freq" x="609.03" y="90.0025" text-anchor="middle" font-family="Noto Sans CJK SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif" font-size="12" fill="#20252b">BIST</text>
 <text class="frequency-value" data-node-id="clk_cpu" data-frequency-field="func_freq" x="449.85" y="122.2025" text-anchor="middle" font-family="Arial,Noto Sans CJK SC,sans-serif" font-size="12" fill="#d02020">800 MHz</text>
 </g>
 <g class="node-annotations">

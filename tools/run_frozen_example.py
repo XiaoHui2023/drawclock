@@ -418,19 +418,29 @@ def _assert_frequency_table(path: Path, config_path: Path) -> None:
         element for element in root.iter()
         if element.get("class") == "frequency-heading"
     ]
+    columns = (
+        ("func_freq", "工作频率"),
+        ("scan_freq", "SCAN"),
+        ("bist_freq", "BIST"),
+    )
+    expected_columns = [
+        (field, label) for field, label in columns
+        if any(str(config[name].get(field, "")) for name in terminals)
+    ]
     labels = [element.get("aria-label", element.text or "") for element in headings]
     fields = [element.get("data-frequency-field") for element in headings]
-    if labels != ["工作频率", "SCAN", "BIST"] or fields != [
-        "func_freq", "scan_freq", "bist_freq",
+    if labels != [label for _, label in expected_columns] or fields != [
+        field for field, _ in expected_columns
     ]:
         raise SystemExit(f"frequency headings are invalid: {labels=} {fields=}")
     if any(element.get("fill") != "#20252b" for element in headings):
         raise SystemExit("frequency headings are not black")
-    outline = headings[0]
-    if outline.get("data-heading-render") != "outline" or sum(
-        child.tag.rsplit("}", 1)[-1] == "path" for child in outline
-    ) != 4:
-        raise SystemExit("Chinese frequency heading is not font-independent")
+    if expected_columns and expected_columns[0][0] == "func_freq":
+        outline = headings[0]
+        if outline.get("data-heading-render") != "outline" or sum(
+            child.tag.rsplit("}", 1)[-1] == "path" for child in outline
+        ) != 4:
+            raise SystemExit("Chinese frequency heading is not font-independent")
 
     values = [
         element for element in root.iter()

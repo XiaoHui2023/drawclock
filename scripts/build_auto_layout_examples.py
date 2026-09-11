@@ -14,26 +14,9 @@ from elk_layout import generate_elk_layout  # noqa: E402
 from layout_preview import write_preview_svg  # noqa: E402
 
 
-EXAMPLES = (
-    "01-linear",
-    "02-branch-tree",
-    "03-mux-dag",
-    "04-dual-pll",
-    "05-dense-cross-root",
-    "06-simple-16-clocks",
-    "07-medium-64-clocks",
-    "12-dual-from-reuse",
-    "13-label-clearance-weave",
-    "16-multi-from-clusters",
-    "17-terminal-fanout-order",
-    "18-asymmetric-merge-columns",
-    "19-dispersed-root-fanout",
-    "20-asymmetric-merge-route-bulge",
-    "21-layout-column-preference",
-    "22-terminal-frequency-table",
-    "23-middle-column-low-use-sources",
-    "24-single-source-rendering-alias",
-    "25-mixed-root-port-order-torture",
+EXAMPLES = tuple(
+    path.stem
+    for path in sorted((ROOT / "example" / "auto-layout").glob("*.json"))
 )
 
 

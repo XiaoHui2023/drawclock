@@ -5,6 +5,7 @@ description: drawclock 当前目标、验证证据与完成条件索引。
 
 # 项目目标
 
+- [频率列裁剪与发行目录收敛](goals/frequency-columns-and-release-layout.md)
 - [注释颜色与 Python 发行边界](goals/annotation-color-python-release-surface.md)
 
 - [ ] 每条用户反馈先经公开入口自然复现，再允许修改对应生产 owner。

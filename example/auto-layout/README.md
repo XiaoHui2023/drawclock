@@ -28,7 +28,7 @@ python src `
 | 复杂多源交错 | `19-dispersed-root-fanout.json` | 8 个独立 source、48 个 clock；覆盖非周期不定间隔直连、完整/稀疏 `pad3`、重叠根组合、PAD 扇出、PAD 与另一 source 经 mux 二次汇聚，以及不同链深和复用度 |
 | 汇聚折线 | `20-asymmetric-merge-route-bulge.json` | 长短分支进入 mux 时的可避免外凸折线 |
 | 列等级 | `21-layout-column-preference.json` | `10`、`20`、`30` 控制左右顺序，同等级器件共列 |
-| 频率列 | `22-terminal-frequency-table.json` | 一行一个末端 clock，并显示工作频率、SCAN、BIST 三列 |
+| 频率列 | `22-terminal-frequency-table.json` | 一行一个末端 clock；只显示至少有一个非空值的工作频率、SCAN、BIST 列 |
 | 多层自由源列 | `23-middle-column-low-use-sources.json` | 公共源经共享链留在最前；直接服务 mux 的低复用源进入第 4 层、位于 mux 左侧，避免首列长线、交叉与多余折点 |
 | 单源显示副本 | `24-single-source-rendering-alias.json` | 只有一个逻辑源；近端与远端消费带在质量向量更优时使用多个同名显示锚点 |
 | 端口顺序组合 | `25-mixed-root-port-order-torture.json` | 混合根类型、固定多输入端口、非对称链深和输入顺序交互 |
