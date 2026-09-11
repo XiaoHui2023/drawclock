@@ -1,10 +1,11 @@
 # 频率列裁剪与发布目录集中实施记录
 
-- status: active
+- status: blocked
 - created: 2026-09-11 20:15 +08:00
-- updated: 2026-09-11 23:25 +08:00
+- updated: 2026-09-11 23:34 +08:00
 - scene: 频率列裁剪、发布目录与错列 mux 主干
 
+- 2026-09-11 23:34 连续第三个目标回合复核同一 run：`status=queued`、`updated_at=2026-09-11T14:22:23Z`、Ubuntu job `103296869615` 的 `runner_name=null`，无项目命令执行或失败日志。已达到三轮阻塞审计阈值，目标转为 blocked；恢复条件为 GitHub 分配 runner 或 run 进入可诊断终态。
 - 2026-09-11 23:25 产品提交 `25196cf` 已推送，Release run `34609031939` 的反馈复现门 7m02s 成功；后续 Ubuntu 16.04 作业排队超过 60 分钟仍未获得 `runner_name`，没有执行项目命令或产生失败日志。GitHub Status 同期显示 Actions Operational；按有上限重试规则停止本轮密集轮询，目标保持 active，恢复条件为 GitHub 分配 `ubuntu-latest` runner，之后继续构建、发布与回下载验收。
 - 2026-09-11 22:19 精确暂存后的完整 pytest 618/618 通过，耗时 622.62 秒。上传审查确认本地与 origin/main 为 0/0、无跨仓库路径或密钥命中、五件套通过、反馈发布门 19/19 通过；待提交并值守远端 Release。
 

@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: blocked
 - owner: agent
 - updated: 2026-09-11
 
@@ -31,7 +31,7 @@
 
 ## 下一步
 
-- 产品提交 `25196cf` 已推送；继续值守远端 Release run `34609031939`。首道反馈复现门已通过，Ubuntu 16.04 作业自 2026-09-11 22:22 +08:00 起等待 GitHub 托管 runner；获得 runner 后核对 tag、资产清单和下载后冻结消费，再关闭目标。
+- 恢复条件：GitHub 为 Release run `34609031939` 的 Ubuntu 16.04 作业分配 `ubuntu-latest` runner，或该 run 进入可诊断终态。恢复后继续核对构建、publish、tag、资产清单和下载后冻结消费，再关闭目标。
 
 ## 收敛条件
 
