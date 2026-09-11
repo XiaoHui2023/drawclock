@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
 import pathlib
 import platform
 import re
@@ -14,30 +12,15 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 BINARY_NAMES = ("drawclock",)
 
-# 绘图专档、源码部署材料与分层质量样例。
+# 默认附件只保留最终用户运行所需文件。
 RELEASE_PATHS = (
     "README.md",
     "draw.md",
-    "pyproject.toml",
-    "source-deploy.md",
-    "licenses",
-    "drawio-lib",
-    "skills",
-    "example/README.md",
-    "example/auto-layout/README.md",
+    "licenses/NotoSansCJK-OFL-1.1.txt",
+    "drawio-lib/drawclock",
     "example/draw.json",
+    "example/auto-layout/33-description-colors.json",
 )
-
-SOURCE_PATHS = (
-    ("src", "src"),
-)
-
-def _sha256(path: pathlib.Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as stream:
-        for chunk in iter(lambda: stream.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def _project_version(root: pathlib.Path) -> str:
@@ -89,62 +72,6 @@ def main() -> int:
         else:
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(src, dest)
-
-    for rel, dest_rel in SOURCE_PATHS:
-        src = ROOT / rel
-        if not src.exists():
-            print(f"错误: 未找到 {src}", file=sys.stderr)
-            return 1
-        dest = bundle_dir / dest_rel
-        if src.is_dir():
-            shutil.copytree(
-                src,
-                dest,
-                ignore=shutil.ignore_patterns(
-                    "__pycache__", "*.pyc", "*.pyo", "*.egg-info"
-                ),
-            )
-        else:
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dest)
-
-    example_source = ROOT / "example" / "auto-layout"
-    example_target = bundle_dir / "example" / "auto-layout"
-    example_target.mkdir(parents=True, exist_ok=True)
-    example_paths = sorted(example_source.glob("*.json"))
-    if not example_paths:
-        print("错误: 未找到自动布局 JSON 示例。", file=sys.stderr)
-        return 1
-    for source in example_paths:
-        shutil.copy2(source, example_target / source.name)
-
-    manifest_paths = [
-        path
-        for base in (
-            bundle_dir / "src", bundle_dir / "skills", bundle_dir / "licenses",
-        )
-        for path in base.rglob("*")
-        if path.is_file()
-    ]
-    manifest_paths.extend(
-        path
-        for path in (bundle_dir / "drawio-lib" / "drawclock").rglob("*.xml")
-        if path.is_file()
-    )
-    manifest_paths.extend(
-        path for path in (bundle_dir / "example").rglob("*.json")
-        if path.is_file()
-    )
-    source_manifest = {
-        "schema": 1,
-        "files": {
-            path.relative_to(bundle_dir).as_posix(): _sha256(path)
-            for path in sorted(manifest_paths)
-        },
-    }
-    (bundle_dir / "source-manifest.json").write_text(
-        json.dumps(source_manifest, indent=2) + "\n", encoding="utf-8"
-    )
 
     archive_base = dist / tag
     fmt = "zip" if platform.system() == "Windows" else "gztar"

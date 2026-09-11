@@ -8,6 +8,7 @@ import re
 
 from drawio_layout import LayoutDocument, VertexLayout
 from drawio_ports import abs_port_xy, edge_attachment, port_anchors
+from css_color import DEFAULT_DESCRIPTION_COLOR, parse_css_color
 from svg_native import render_native_label, validate_static_svg
 from visual_geometry import vertex_visual_box
 
@@ -57,6 +58,7 @@ class NodeAnnotation:
     y: float
     width: float
     height: float
+    color: str
 
 
 ANNOTATION_FONT_SIZE = 11.0
@@ -211,6 +213,11 @@ def _node_annotations(
             y=y,
             width=width,
             height=height,
+            color=parse_css_color(
+                str(vertex.object_attrs.get(
+                    "description_color", DEFAULT_DESCRIPTION_COLOR
+                ))
+            ),
         ))
         occupied.append((
             x - ANNOTATION_CLEARANCE, y - ANNOTATION_CLEARANCE,
@@ -228,13 +235,15 @@ def _render_node_annotations(
         escaped_name = _escape(note.logical_name)
         x0, y0 = note.x, note.y
         lines.append(
-            f'<g class="node-annotation" data-node-id="{escaped_name}">'
+            f'<g class="node-annotation" data-node-id="{escaped_name}" '
+            f'data-description-color="{note.color}">'
             f'<title>{_escape(note.text)}</title>'
         )
         for index, text in enumerate(note.lines):
             lines.append(
                 f'<text x="{_svg_num(x0)}" '
-                f'y="{_svg_num(y0 + ANNOTATION_FONT_SIZE + index * ANNOTATION_LINE_HEIGHT)}">'
+                f'y="{_svg_num(y0 + ANNOTATION_FONT_SIZE + index * ANNOTATION_LINE_HEIGHT)}" '
+                f'fill="{note.color}">'
                 f'{_escape(text)}</text>'
             )
         lines.append('</g>')
@@ -682,7 +691,7 @@ def build_preview_svg(
             f'{_svg_num(width)} {_svg_num(height)}" '
             f'width="{_svg_num(width)}" height="{_svg_num(height)}">'
         ),
-        "<style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}.node-annotation text{font-family:Arial,Noto Sans CJK SC,sans-serif;font-size:11px;fill:#4b5563}</style>",
+        "<style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}.node-annotation text{font-family:Arial,Noto Sans CJK SC,sans-serif;font-size:11px}</style>",
         f'<rect x="{_svg_num(min_x)}" y="{_svg_num(min_y)}" '
         f'width="{_svg_num(width)}" height="{_svg_num(height)}" fill="#ffffff"/>',
     ]

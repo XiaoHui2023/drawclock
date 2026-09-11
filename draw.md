@@ -60,17 +60,22 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 
 所有节点都可选填写字符串字段 `description`。它是面向读图者的说明，不参与连接或布局语义；输出只使用简单文字，相同逻辑节点即使存在显示副本也只标一次。显式换行、空行和尾随换行会保留；长行会按保守字符宽度确定性换行。文字必须避开节点可见边界、线路、频率表和其他注释；限定距离内没有安全位置时生成直接失败，不输出带碰撞的图。
 
+`description_color` 只修饰该节点的 `description`。省略时为 `#4b5563`。输入支持 CSS 命名色、3/4/6/8 位十六进制、RGB(A)、HSL(A) 和 HWB；输出统一为小写 `#rrggbb` 或 `#rrggbbaa`。动态值 `var()`、`currentColor`、`url()` 与宽色域函数不进入 SVG，配置阶段直接报错。
+
 ```json
 {
   "pll_main": {
     "kind": "pll",
     "source": "xtal",
-    "description": "主 PLL；上电后由固件配置倍频参数"
+    "description": "主 PLL；上电后由固件配置倍频参数",
+    "description_color": "hsl(271 81% 56%)"
   }
 }
 ```
 
-完整效果见 `example/auto-layout/31-node-descriptions.json`。
+纯文字排布示例为 `example/auto-layout/31-node-descriptions.json`；颜色输入示例为 `example/auto-layout/33-description-colors.json`。
+
+输出画布不添加输入文件名或文件名前缀标题。
 
 器件库可定义任意类型。布局只依据连接关系、库内几何、标签和端口计算，不按固定器件名或实例名分支。
 

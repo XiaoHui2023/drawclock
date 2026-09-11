@@ -150,6 +150,57 @@ def test_description_is_available_on_every_node_kind() -> None:
     }
 
 
+@pytest.mark.parametrize("value", [None, True, 42, [], {}])
+def test_description_color_rejects_non_strings(value: object) -> None:
+    config = {
+        "osc": {
+            "kind": "source", "description": "reference",
+            "description_color": value,
+        }
+    }
+    with pytest.raises(ValueError, match="description_color 必须是字符串"):
+        generate_elk_layout(config, library_path=LIBRARY)
+
+
+def test_description_color_requires_nonempty_description() -> None:
+    config = {"osc": {"kind": "source", "description_color": "red"}}
+    with pytest.raises(ValueError, match="只有填写 description"):
+        generate_elk_layout(config, library_path=LIBRARY)
+
+
+@pytest.mark.parametrize("value", ["var(--brand)", "url(#paint)", "not-a-color"])
+def test_description_color_rejects_unsupported_values(value: str) -> None:
+    config = {
+        "osc": {
+            "kind": "source", "description": "reference",
+            "description_color": value,
+        }
+    }
+    with pytest.raises(ValueError, match="description_color 无效"):
+        generate_elk_layout(config, library_path=LIBRARY)
+
+
+def test_description_color_is_available_on_every_node_kind() -> None:
+    config = {
+        "source": {
+            "kind": "source", "description": "reference", "description_color": "navy",
+        },
+        "gate": {
+            "kind": "gate", "source": "source", "description": "gate",
+            "description_color": "rgb(20 40 60 / 80%)",
+        },
+        "clock": {
+            "kind": "clock", "source": "gate", "description": "clock",
+            "description_color": "hsl(120 100% 25%)",
+        },
+    }
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    attrs = {vertex.name: vertex.object_attrs for vertex in document.vertices}
+    assert {name: attrs[name]["description_color"] for name in config} == {
+        name: item["description_color"] for name, item in config.items()
+    }
+
+
 def test_unconstrained_source_array_direct_to_one_mux_shares_a_column() -> None:
     config = load_clock_tree(
         ROOT / "example/auto-layout/30-staggered-four-source-mux.json"

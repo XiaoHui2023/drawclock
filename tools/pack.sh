@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the dependency-free executable and source archive.
+# Build the dependency-free executable archive.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -114,5 +114,8 @@ fi
 
 echo "==> Assembling release archive"
 "${PYTHON_CMD[@]}" "$ROOT/tools/bundle_release.py"
+ARCHIVE="$(find "$ROOT/dist" -maxdepth 1 -type f -name 'drawclock-*-linux.tar.gz' -print -quit)"
+test -n "$ARCHIVE"
+"${PYTHON_CMD[@]}" "$ROOT/tools/check_release_archive.py" "$ARCHIVE"
 
 echo "PyInstaller output: $ROOT/dist"

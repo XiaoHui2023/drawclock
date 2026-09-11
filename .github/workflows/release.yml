@@ -47,13 +47,7 @@ jobs:
           test -n "$BINARY"
           python3 tools/run_frozen_example.py "$BINARY"
 
-      - name: Run extracted offline source deployment
-        run: |
-          PACKAGE_ROOT="$(find release-smoke -mindepth 1 -maxdepth 1 -type d -print -quit)"
-          test -n "$PACKAGE_ROOT"
-          python3 tools/run_source_release.py "$PACKAGE_ROOT"
-
-      - name: Verify frozen and source SVG with GNOME librsvg
+      - name: Verify frozen SVG with GNOME librsvg
         run: |
           sudo apt-get update
           sudo apt-get install -y librsvg2-bin
@@ -120,16 +114,14 @@ jobs:
           name: ${{ steps.version.outputs.tag }}
           body: |
             Rolling release: self-contained Ubuntu 16.04 PyInstaller bundle from the main commit.
-            The archive includes the complete standard-library-only Python source tree, component
-            libraries, examples, and progressively disclosed project maintenance skills. It does not
-            bundle Node.js, ELK, a browser, or third-party Python runtime dependencies.
+            The archive contains the executable, component library, concise usage files, one runnable
+            runnable examples, and the required embedded-font license. Complete source remains available from
+            this tag. It does not bundle Node.js, ELK, a browser, or Python runtime dependencies.
             Before publishing, CI extracts the archive and exercises the frozen executable with the
             host PATH isolated for direct SVG generation under arbitrary output suffixes,
             supplied and merged-library rendering, strict JSON input, and large-layout bounds checks.
-            CI also creates a clean virtual environment and generates SVG through the extracted
-            source tree with site-packages disabled. Both package gates validate the project skill
-            inventory, references, UTF-8 content, and private-path exclusions. GNOME librsvg also
-            renders both frozen and source outputs and verifies that every component remains painted.
+            The archive surface is checked against an allowlist. GNOME librsvg renders the frozen
+            output and verifies that every component remains painted.
           files: release-assets/**
           fail_on_unmatched_files: true
           generate_release_notes: false
@@ -151,4 +143,3 @@ jobs:
           test -n "$PACKAGE_ROOT"
           test -n "$BINARY"
           python3 tools/run_frozen_example.py "$BINARY"
-          python3 tools/run_source_release.py "$PACKAGE_ROOT"

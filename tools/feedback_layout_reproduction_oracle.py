@@ -8,6 +8,7 @@ SVG as the observed user artifact and the JSON as the logical topology.
 from __future__ import annotations
 
 import argparse
+import colorsys
 import json
 import math
 import re
@@ -24,6 +25,17 @@ NS = "{http://www.w3.org/2000/svg}"
 EPS = 1e-4
 ANNOTATION_FONT_SIZE = 11.0
 ANNOTATION_MAX_WIDTH = 230.0
+DEFAULT_DESCRIPTION_COLOR = "#4b5563"
+_CSS_NAMED_COLORS = json.loads(
+    (Path(__file__).resolve().parents[1] / "tests/css-named-colors.json").read_text(
+        encoding="utf-8"
+    )
+)
+_CSS_HEX_RE = re.compile(r"#[0-9a-f]+", re.IGNORECASE)
+_CSS_FUNCTION_RE = re.compile(r"([a-z]+)\((.*)\)", re.IGNORECASE)
+_CSS_NUMBER_RE = re.compile(
+    r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?", re.IGNORECASE
+)
 ROUTE_CLEARANCE = 18.0
 ISSUES = (
     "FB-ROOT-001",
@@ -293,10 +305,26 @@ def _annotation_quality(
         name: item["description"] for name, item in config.items()
         if isinstance(item.get("description"), str) and item["description"]
     }
+    expected_colors = {
+        name: _oracle_css_color(str(config[name].get(
+            "description_color", DEFAULT_DESCRIPTION_COLOR
+        )))
+        for name in expected
+    }
     annotations: list[tuple[str, tuple[float, float, float, float]]] = []
     observed_titles: list[tuple[str, str]] = []
     observed_lines: list[tuple[str, tuple[str, ...]]] = []
+    observed_colors: list[tuple[str, str, tuple[str, ...]]] = []
     decorative_elements = 0
+    style_color_overrides = [
+        "".join(style.itertext()).strip()
+        for style in root.iter(f"{NS}style")
+        if re.search(
+            r"\.node-annotation[^{}]*\{[^{}]*\bfill\s*:",
+            "".join(style.itertext()),
+            re.IGNORECASE,
+        )
+    ]
     for group in root.iter(f"{NS}g"):
         if "node-annotation" not in (group.get("class") or "").split():
             continue
@@ -305,6 +333,7 @@ def _annotation_quality(
         title = group.find(f"{NS}title")
         observed_titles.append((node, "" if title is None else "".join(title.itertext())))
         line_values = []
+        line_colors = []
         for element in group.iter():
             local = element.tag.rsplit("}", 1)[-1]
             if element is not group and local not in {"title", "text"}:
@@ -313,6 +342,7 @@ def _annotation_quality(
                 continue
             value = "".join(element.itertext())
             line_values.append(value)
+            line_colors.append(element.get("fill", ""))
             size = float(element.get("font-size", "11"))
             x = float(element.get("x", "0"))
             baseline = float(element.get("y", "0"))
@@ -320,6 +350,9 @@ def _annotation_quality(
             text_boxes.append((x, baseline - size, x + max(size * 0.5, width), baseline + size * 0.25))
         if text_boxes:
             observed_lines.append((node, tuple(line_values)))
+            observed_colors.append((
+                node, group.get("data-description-color", ""), tuple(line_colors)
+            ))
             annotations.append((node, (
                 min(box[0] for box in text_boxes),
                 min(box[1] for box in text_boxes),
@@ -381,6 +414,19 @@ def _annotation_quality(
         name for name, values in observed_lines
         if name in expected and values != _wrap_annotation_text(expected[name])
     )
+    color_mismatches = sorted(
+        name for name, declared, fills in observed_colors
+        if name in expected_colors and (
+            declared != expected_colors[name]
+            or not fills
+            or any(fill != expected_colors[name] for fill in fills)
+        )
+    )
+    noncanonical_colors = sorted(
+        name for name, declared, fills in observed_colors
+        if not re.fullmatch(r"#[0-9a-f]{6}(?:[0-9a-f]{2})?", declared)
+        or any(not re.fullmatch(r"#[0-9a-f]{6}(?:[0-9a-f]{2})?", fill) for fill in fills)
+    )
     profile_counts = Counter(
         profile for text in expected.values() for profile in _annotation_profiles(text)
     )
@@ -400,6 +446,18 @@ def _annotation_quality(
         "duplicates": duplicates,
         "text_mismatches": text_mismatches,
         "line_mismatches": line_mismatches,
+        "expected_colors": expected_colors,
+        "observed_colors": {
+            name: {"declared": declared, "fills": list(fills)}
+            for name, declared, fills in observed_colors
+        },
+        "color_mismatches": color_mismatches,
+        "noncanonical_colors": noncanonical_colors,
+        "style_color_overrides": style_color_overrides,
+        "color_failure_count": (
+            len(color_mismatches) + len(noncanonical_colors)
+            + len(style_color_overrides)
+        ),
         "profile_counts": dict(sorted(profile_counts.items())),
         "profiles_present": sorted(profile_counts),
         "annotation_overlaps": annotation_overlaps,
@@ -411,6 +469,117 @@ def _annotation_quality(
         "decorative_elements": decorative_elements,
         "failure_count": failures,
     }
+
+
+def _oracle_css_number(text: str) -> float:
+    token = text.strip()
+    if not _CSS_NUMBER_RE.fullmatch(token):
+        raise ValueError("invalid CSS number")
+    value = float(token)
+    if not math.isfinite(value):
+        raise ValueError("non-finite CSS number")
+    return value
+
+
+def _oracle_css_clamp(value: float) -> float:
+    return min(1.0, max(0.0, value))
+
+
+def _oracle_css_byte(value: float) -> int:
+    return int(math.floor(_oracle_css_clamp(value) * 255.0 + 0.5))
+
+
+def _oracle_css_alpha(text: str) -> float:
+    token = text.strip()
+    value = _oracle_css_number(token[:-1]) / 100.0 if token.endswith("%") else _oracle_css_number(token)
+    return _oracle_css_clamp(value)
+
+
+def _oracle_css_percentage(text: str) -> float:
+    token = text.strip()
+    if not token.endswith("%"):
+        raise ValueError("expected percentage")
+    return _oracle_css_clamp(_oracle_css_number(token[:-1]) / 100.0)
+
+
+def _oracle_css_hue(text: str) -> float:
+    token = text.strip().lower()
+    for suffix, factor in (("grad", .9), ("turn", 360.0), ("rad", 180.0 / math.pi), ("deg", 1.0)):
+        if token.endswith(suffix):
+            return (_oracle_css_number(token[:-len(suffix)]) * factor) % 360.0
+    return _oracle_css_number(token) % 360.0
+
+
+def _oracle_css_parts(body: str, name: str) -> tuple[list[str], str | None]:
+    if "," in body:
+        if name == "hwb":
+            raise ValueError("invalid hwb separator")
+        if "/" in body:
+            raise ValueError("mixed CSS separators")
+        values = [part.strip() for part in body.split(",")]
+        expected = 4 if name in {"rgba", "hsla"} else 3
+        if len(values) != expected or any(not part for part in values):
+            raise ValueError("invalid CSS arity")
+        return values[:3], values[3] if len(values) == 4 else None
+    if body.count("/") > 1:
+        raise ValueError("invalid CSS alpha separator")
+    main, separator, alpha = body.partition("/")
+    values = main.split()
+    if len(values) != 3 or (separator and not alpha.strip()):
+        raise ValueError("invalid CSS arity")
+    return values, alpha.strip() if separator else None
+
+
+def _oracle_css_format(red: float, green: float, blue: float, alpha: float) -> str:
+    result = "#" + "".join(f"{_oracle_css_byte(value):02x}" for value in (red, green, blue))
+    alpha_byte = _oracle_css_byte(alpha)
+    return result if alpha_byte == 255 else result + f"{alpha_byte:02x}"
+
+
+def _oracle_css_color(value: str) -> str:
+    normalized = value.strip().lower()
+    if normalized == "transparent":
+        return "#00000000"
+    if normalized in _CSS_NAMED_COLORS:
+        return _CSS_NAMED_COLORS[normalized]
+    if _CSS_HEX_RE.fullmatch(normalized):
+        digits = normalized[1:]
+        if len(digits) in {3, 4}:
+            digits = "".join(char * 2 for char in digits)
+        if len(digits) not in {6, 8}:
+            raise ValueError("invalid CSS hex length")
+        return "#" + digits
+    match = _CSS_FUNCTION_RE.fullmatch(normalized)
+    if not match:
+        raise ValueError("unsupported CSS color")
+    name, body = match.groups()
+    values, alpha_text = _oracle_css_parts(body, name)
+    alpha = 1.0 if alpha_text is None else _oracle_css_alpha(alpha_text)
+    if name in {"rgb", "rgba"}:
+        channels = [
+            _oracle_css_clamp(_oracle_css_number(item[:-1]) / 100.0)
+            if item.endswith("%") else _oracle_css_clamp(_oracle_css_number(item) / 255.0)
+            for item in values
+        ]
+        return _oracle_css_format(*channels, alpha)
+    if name in {"hsl", "hsla"}:
+        red, green, blue = colorsys.hls_to_rgb(
+            _oracle_css_hue(values[0]) / 360.0,
+            _oracle_css_percentage(values[2]),
+            _oracle_css_percentage(values[1]),
+        )
+        return _oracle_css_format(red, green, blue, alpha)
+    if name == "hwb":
+        whiteness = _oracle_css_percentage(values[1])
+        blackness = _oracle_css_percentage(values[2])
+        if whiteness + blackness >= 1.0:
+            red = green = blue = whiteness / (whiteness + blackness)
+        else:
+            red, green, blue = colorsys.hsv_to_rgb(_oracle_css_hue(values[0]) / 360.0, 1.0, 1.0)
+            scale = 1.0 - whiteness - blackness
+            red, green, blue = (red * scale + whiteness, green * scale + whiteness, blue * scale + whiteness)
+        return _oracle_css_format(red, green, blue, alpha)
+    raise ValueError("unsupported CSS color function")
 
 
 def _segment_rect_interior_hit(a, b, rect) -> bool:
@@ -441,6 +610,8 @@ def generic_quality_failures(report: dict[str, Any]) -> list[str]:
     )
     if report["annotation_quality"]["failure_count"]:
         failures.append("annotation-geometry")
+    if report["annotation_quality"]["color_failure_count"]:
+        failures.append("annotation-color")
     return failures
 
 

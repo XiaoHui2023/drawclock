@@ -984,7 +984,7 @@ def test_current_cli_closes_premature_interior_trunk_entry(
     assert completed.returncode == 0, completed.stdout + completed.stderr
     quality = json.loads(receipt.read_text(encoding="utf-8"))
     assert quality["required_metric_ids"] == quality["executed_metric_ids"]
-    assert len(quality["executed_metric_ids"]) == 25
+    assert len(quality["executed_metric_ids"]) == 27
     assert quality["failed_metric_ids"] == []
 
 
@@ -1260,6 +1260,32 @@ def test_annotation_text_stress_preserves_content_and_required_profiles(
     }
 
 
+def test_description_color_example_matches_independent_expected_values(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example/auto-layout/33-description-colors.json"
+    output = tmp_path / "description-colors.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    quality = oracle.analyze(input_path, output)["annotation_quality"]
+    assert quality["color_failure_count"] == 0
+    assert quality["expected_colors"] == {
+        "xtal": "#000080",
+        "gate_core": "#0e7490",
+        "div_core": "#b45309e6",
+        "mux_core": "#9234ea",
+        "clk_core": "#e60d55d9",
+    }
+    assert {
+        name: item["declared"]
+        for name, item in quality["observed_colors"].items()
+    } == quality["expected_colors"]
+
+
 def test_annotation_oracle_rejects_silently_dropped_wrapped_line(
     tmp_path: Path,
 ) -> None:
@@ -1287,6 +1313,38 @@ def test_annotation_oracle_rejects_silently_dropped_wrapped_line(
     assert report["annotation_quality"]["text_mismatches"] == ["ref_short"]
     assert report["annotation_quality"]["failure_count"] > 0
 
+
+def test_annotation_color_metric_rejects_fill_and_declaration_mutants(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example/auto-layout/31-node-descriptions.json"
+    output = tmp_path / "annotation-color-mutant.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    original = output.read_text(encoding="utf-8")
+    output.write_text(original.replace('fill="#4b5563"', 'fill="#ff0000"', 1), encoding="utf-8")
+    report = oracle.analyze(input_path, output)
+    assert report["annotation_quality"]["color_failure_count"] > 0
+    assert "annotation-color" in oracle.generic_quality_failures(report)
+
+    output.write_text(original.replace(
+        'data-description-color="#4b5563"', 'data-description-color="red"', 1
+    ), encoding="utf-8")
+    report = oracle.analyze(input_path, output)
+    assert report["annotation_quality"]["noncanonical_colors"]
+    assert report["annotation_quality"]["color_failure_count"] > 0
+
+    output.write_text(original.replace(
+        ".node-annotation text{", ".node-annotation text{fill:#ff0000;",
+        1,
+    ), encoding="utf-8")
+    report = oracle.analyze(input_path, output)
+    assert report["annotation_quality"]["style_color_overrides"]
+    assert report["annotation_quality"]["color_failure_count"] > 0
 
 def test_all_svg_gate_rejects_missing_annotation_profile_coverage(
     tmp_path: Path,

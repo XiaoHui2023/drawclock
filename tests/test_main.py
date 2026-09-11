@@ -265,44 +265,29 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
 
     archive = project / "dist" / "drawclock-1.2.3-windows.zip"
     with zipfile.ZipFile(archive) as zf:
-        names = set(zf.namelist())
+        names = {item.filename for item in zf.infolist() if not item.is_dir()}
     prefix = "drawclock-1.2.3-windows/"
-    assert prefix + "draw.md" in names
-    assert prefix + "example/README.md" in names
-    assert prefix + "example/auto-layout/README.md" in names
-    assert prefix + "example/draw.json" in names
-    for name in packaged_layout_examples:
-        assert prefix + "example/auto-layout/" + name in names
-    assert not any(name.startswith(prefix + "runtime/") for name in names)
-    assert not any(name.startswith(prefix + "node_modules/") for name in names)
-    assert prefix + "package.json" not in names
-    assert prefix + "package-lock.json" not in names
-    assert prefix + "src/__main__.py" in names
-    assert prefix + "source/__main__.py" not in names
-    assert prefix + "source-deploy.md" in names
-    assert prefix + "licenses/NotoSansCJK-OFL-1.1.txt" in names
-    assert prefix + "drawio-lib/drawclock/source.xml" in names
-    assert prefix + "drawio-lib/drawclock.xml" not in names
-    for skill in (
-        "clock-diagram-design",
-        "clock-json-schema",
-        "clock-layout-algorithms",
-        "component-library-design",
-        "drawclock-project-navigation",
-    ):
-        assert prefix + f"skills/{skill}/SKILL.md" in names
-    assert (
-        prefix
-        + "skills/drawclock-project-navigation/scripts/validate_skills.py"
-        in names
+    expected = {
+        prefix + "drawclock.exe",
+        prefix + "README.md",
+        prefix + "draw.md",
+        prefix + "example/draw.json",
+        prefix + "example/auto-layout/33-description-colors.json",
+        prefix + "licenses/NotoSansCJK-OFL-1.1.txt",
+        prefix + "drawio-lib/drawclock/source.xml",
+    }
+    assert names == expected
+
+    checker_spec = importlib.util.spec_from_file_location(
+        "check_release_archive", ROOT / "tools" / "check_release_archive.py"
     )
-    assert prefix + "requirements-offline.txt" not in names
-    assert not any("vendor/wheels/" in name for name in names)
-    assert prefix + "source-manifest.json" in names
-    assert not any(".egg-info/" in name for name in names)
-    assert prefix + "json.md" not in names
-    assert prefix + "rule.md" not in names
-    assert not any("reload" in name or "extract" in name for name in names)
+    assert checker_spec is not None and checker_spec.loader is not None
+    checker = importlib.util.module_from_spec(checker_spec)
+    checker_spec.loader.exec_module(checker)
+    assert checker.validate(archive) == []
+    with zipfile.ZipFile(archive, "a") as zf:
+        zf.writestr(prefix + "pyproject.toml", "[project]\n")
+    assert checker.validate(archive) == ["unexpected files: pyproject.toml"]
 
 
 def test_source_manifest_rejects_missing_or_modified_source(

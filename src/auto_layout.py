@@ -26,6 +26,11 @@ from library_ports import input_connection_keys, output_connection_keys, port_to
 from validate_config import validate_config
 
 
+def _bit_count(value: int) -> int:
+    """Count set bits on every supported Python 3 version."""
+    return bin(value).count("1")
+
+
 def _junction_count(document: LayoutDocument) -> int:
     from layout_preview import junction_points
 
@@ -1193,7 +1198,7 @@ def assess_layout(
                     incidents - grouped_owner_adjustments[(group_key, edge_id)]
                 )
     distinct_crossed_edge_pairs = sum(
-        owner_mask.bit_count() for owner_mask in edge_crossed_owner_masks
+        _bit_count(owner_mask) for owner_mask in edge_crossed_owner_masks
     ) // 2
 
     ambiguous = (
@@ -1307,9 +1312,9 @@ def assess_layout(
                 "target": logical.target,
                 "crossing_points": len(edge_crossing_points[edge_id]),
                 "crossing_pair_incidents": edge_crossing_pair_incidents[edge_id],
-                "crossed_edge_count": edge_crossed_owner_masks[
+                "crossed_edge_count": _bit_count(edge_crossed_owner_masks[
                     edge_index_by_id[edge_id]
-                ].bit_count(),
+                ]),
                 "source_port_fanout": net_fanout[
                     (logical.source, logical.source_port)
                 ],
@@ -1345,7 +1350,7 @@ def assess_layout(
                 "crossing_pair_incidents": sum(
                     edge_crossing_pair_incidents[edge_id] for edge_id in edge_ids
                 ),
-                "crossed_edge_count": source_crossed_mask.bit_count(),
+                "crossed_edge_count": _bit_count(source_crossed_mask),
                 "max_vertical_span_rows": max(
                     edge_statistics[edge_id]["vertical_span_rows"] for edge_id in edge_ids
                 ),
@@ -1405,7 +1410,7 @@ def assess_layout(
                     edge_crossing_pair_incidents[edge_id]
                     for edge_id in edge_ids
                 ),
-                "crossed_edge_count": crossed_mask.bit_count(),
+                "crossed_edge_count": _bit_count(crossed_mask),
                 "manhattan_length_px": round(sum(
                     edge_statistics[edge_id]["manhattan_length_px"]
                     for edge_id in edge_ids

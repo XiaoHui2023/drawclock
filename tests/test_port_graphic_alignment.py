@@ -92,8 +92,8 @@ def test_drawio_export_label_offset_is_stable() -> None:
         text,
     )
     pads = re.findall(r"padding-top: (\d+)px; margin-left: (\d+)px", text)
-    dys = {int(pt) - int(ry) for (rx, ry, rw, rh), (pt, ml) in zip(rects, pads, strict=False)}
-    dxs = {int(ml) - int(rx) for (rx, ry, rw, rh), (pt, ml) in zip(rects, pads, strict=False)}
+    dys = {int(pt) - int(ry) for (rx, ry, rw, rh), (pt, ml) in zip(rects, pads)}
+    dxs = {int(ml) - int(rx) for (rx, ry, rw, rh), (pt, ml) in zip(rects, pads)}
     assert DRAWIO_HTML_LABEL_OFFSET_Y in dys
     assert DRAWIO_HTML_LABEL_OFFSET_X in dxs
 

@@ -217,7 +217,7 @@ def _match_labeled_ports(
     candidates.sort(key=lambda item: item[1])
     return {
       port: text
-      for port, (_, _, text) in zip(ports_sorted, candidates, strict=True)
+      for port, (_, _, text) in zip(ports_sorted, candidates)
     }
 
   right_candidates = [
@@ -228,7 +228,7 @@ def _match_labeled_ports(
     right_candidates.sort(key=lambda item: item[1])
     return {
       port: text
-      for port, (_, _, text) in zip(ports_sorted, right_candidates, strict=True)
+      for port, (_, _, text) in zip(ports_sorted, right_candidates)
     }
 
   body_candidates = [
@@ -241,7 +241,7 @@ def _match_labeled_ports(
     body_candidates.sort(key=lambda item: item[1])
     return {
       port: text
-      for port, (_, _, text) in zip(ports_sorted, body_candidates, strict=True)
+      for port, (_, _, text) in zip(ports_sorted, body_candidates)
     }
 
   return {port: connection_dict_key(port) for port in ports}

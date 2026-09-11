@@ -13,7 +13,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BASELINE = ROOT / "tests/quality-contract-baseline.json"
 DEFAULT_REGISTRY = ROOT / "tests/quality-metrics.json"
-BASELINE_CANONICAL_SHA256 = "2a3d6b2696f48e5aef29396dc9812d186b63032b70421b97b53cb34679a62274"
+BASELINE_CANONICAL_SHA256 = "71f27c888b2f36859a7e7e048b5b4bc6b6225b53ef267002c62a8d197b983902"
 
 
 def canonical_hash(value: Any) -> str:
@@ -92,7 +92,11 @@ def main() -> int:
         for error in errors:
             print(f"- {error}")
         return 1
-    print("quality contract retention: PASS metrics=25 requirements=25")
+    print(
+        "quality contract retention: PASS "
+        f"metrics={len(json.loads(args.registry.read_text(encoding='utf-8-sig'))['metrics'])} "
+        f"requirements={len(json.loads(args.baseline.read_text(encoding='utf-8-sig'))['contracts'])}"
+    )
     return 0
 
 

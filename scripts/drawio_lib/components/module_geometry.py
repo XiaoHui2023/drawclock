@@ -128,7 +128,7 @@ def compute_module_geometry(output_labels: tuple[str, ...]) -> ModuleGeometry:
     label_x = box_right - MODULE_PORT_LABEL_PAD_X
     port_labels = tuple(
         (label_x, y, label, MODULE_PORT_LABEL_FONT_PX, "right")
-        for y, label in zip(output_ys, output_labels, strict=True)
+        for y, label in zip(output_ys, output_labels)
     )
 
     return ModuleGeometry(

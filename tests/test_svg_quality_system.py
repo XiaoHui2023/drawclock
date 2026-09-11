@@ -42,6 +42,8 @@ def test_every_artifact_executes_exact_complete_registry() -> None:
     by_id = {item["metric_id"]: item for item in report["metric_results"]}
     assert by_id["annotation_geometry"]["status"] == "not_applicable"
     assert by_id["annotation_geometry"]["applicability_proof"] == "annotations=0"
+    assert by_id["annotation_color"]["status"] == "not_applicable"
+    assert by_id["annotation_color"]["applicability_proof"] == "annotations=0"
     assert "feasible_direct_root_fanin_column" in report["executed_metric_ids"]
 
 
@@ -57,7 +59,7 @@ def test_quality_cli_rejects_known_bad_artifact(tmp_path: Path) -> None:
     assert completed.returncode == 1
     report = json.loads(receipt.read_text(encoding="utf-8"))
     assert report["executed_metric_ids"] == report["required_metric_ids"]
-    assert len(report["executed_metric_ids"]) == 25
+    assert len(report["executed_metric_ids"]) == 27
     assert report["failed_metric_ids"]
 
 
@@ -72,6 +74,37 @@ def test_registry_rejects_duplicate_or_missing_identity(tmp_path: Path) -> None:
         assert "unique" in str(exc)
     else:
         raise AssertionError("duplicate metric id escaped")
+
+
+def test_diagram_title_metric_rejects_root_level_filename_caption(
+    tmp_path: Path,
+) -> None:
+    input_path = ROOT / "example/auto-layout/01-linear.json"
+    svg_path = tmp_path / "01-linear.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(svg_path)],
+        cwd=ROOT, check=True,
+    )
+    clean = quality.evaluate(input_path, svg_path)
+    clean_metric = next(
+        item for item in clean["metric_results"]
+        if item["metric_id"] == "diagram_title_absence"
+    )
+    assert clean_metric["status"] == "pass"
+
+    original = svg_path.read_text(encoding="utf-8")
+    caption = '<text x="0" y="12">01-linear</text>'
+    svg_path.write_text(original.replace("</svg>", caption + "</svg>"), encoding="utf-8")
+    mutant = quality.evaluate(input_path, svg_path)
+    metric = next(
+        item for item in mutant["metric_results"]
+        if item["metric_id"] == "diagram_title_absence"
+    )
+    assert metric["status"] == "fail"
+    assert metric["witnesses"] == [{
+        "text": "01-linear", "x": "0", "y": "12", "matches_input_stem": True,
+    }]
 
 
 @pytest.mark.parametrize(

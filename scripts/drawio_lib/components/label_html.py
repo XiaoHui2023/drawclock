@@ -1,17 +1,17 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, Tuple, Union
 
 from drawio_lib.components.label_attrs import ATTR_NAME, LABEL_FONT_PX
 from drawio_lib.components.label_overflow import graphic_layer_pin_css
 
 OverlayAnchor = Literal["center", "left", "right"]
 
-LabelOverlay = (
-    tuple[float, float, str]
-    | tuple[float, float, str, int]
-    | tuple[float, float, str, int, OverlayAnchor]
-)
+LabelOverlay = Union[
+    Tuple[float, float, str],
+    Tuple[float, float, str, int],
+    Tuple[float, float, str, int, OverlayAnchor],
+]
 
 
 def shell_open(design_cell_w: int, design_cell_h: int) -> str:

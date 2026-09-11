@@ -92,6 +92,7 @@ def main(argv: list[str] | None = None) -> int:
                 "bends": report["totals"]["bends"],
                 "different_net_overlaps": report["totals"]["different_net_overlaps"],
                 "annotation_failures": report["annotation_quality"]["failure_count"],
+                "annotation_color_failures": report["annotation_quality"]["color_failure_count"],
                 "annotation_profiles": report["annotation_quality"]["profiles_present"],
                 "required_metric_ids": quality["required_metric_ids"],
                 "executed_metric_ids": quality["executed_metric_ids"],

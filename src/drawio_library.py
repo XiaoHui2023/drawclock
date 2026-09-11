@@ -9,7 +9,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
-from typing import TypeAlias
+from typing import Union
 
 LABEL_PLACEHOLDER_RE = re.compile(
     r"%(?:name|pll_kind|ratio|in\d+_label)%"
@@ -26,8 +26,8 @@ def package_root() -> Path:
 
 
 DEFAULT_LIBRARY_PATH = package_root() / "drawio-lib" / "drawclock"
-LibraryPath: TypeAlias = str | Path
-LibrarySource: TypeAlias = LibraryPath | Sequence[LibraryPath]
+LibraryPath = Union[str, Path]
+LibrarySource = Union[LibraryPath, Sequence[LibraryPath]]
 
 
 @dataclass(frozen=True)

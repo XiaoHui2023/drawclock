@@ -7,7 +7,7 @@ name = "drawclock"
 version = "1.0.0"
 description = "从时钟连接配置生成 SVG 时钟图"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.9"
 dependencies = []
 
 [project.optional-dependencies]
@@ -17,6 +17,7 @@ dev = ["pytest>=8.0"]
 package-dir = {"" = "src"}
 py-modules = [
     "config_input",
+    "css_color",
     "device_attrs_validate",
     "library_payload",
     "drawio_layout",

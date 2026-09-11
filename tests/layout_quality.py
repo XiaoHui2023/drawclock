@@ -34,6 +34,10 @@ from visual_geometry import vertex_visual_box
 QUALITY_SCHEMA_VERSION = 13  # Test-only Agent artifact inspection schema.
 
 
+def _bit_count(value: int) -> int:
+    return bin(value).count("1")
+
+
 def _independent_latest_forward_ranks(
     names: list[str], logical_edges: list[LogicalEdge]
 ) -> dict[str, int]:
@@ -960,7 +964,7 @@ def inspect_layout_quality(
                     )
                 active.append((hi, segment, owners))
     distinct_crossed_edge_pairs = sum(
-        owner_mask.bit_count() for owner_mask in edge_crossed_owner_masks
+        _bit_count(owner_mask) for owner_mask in edge_crossed_owner_masks
     ) // 2
     crossings = sorted(set(crossings))
     same_net_junctions = sorted(set(same_net_junctions))
@@ -1063,9 +1067,9 @@ def inspect_layout_quality(
             "target": target_name,
             "crossing_points": len(edge_crossing_points[edge_id]),
             "crossing_pair_incidents": edge_crossing_pair_incidents[edge_id],
-            "crossed_edge_count": edge_crossed_owner_masks[
+            "crossed_edge_count": _bit_count(edge_crossed_owner_masks[
                 edge_index_by_id[edge_id]
-            ].bit_count(),
+            ]),
             "source_port_fanout": logical_fanout[(source_name, source_port)],
             "branch_siblings": max(
                 0, logical_fanout[(source_name, source_port)] - 1
@@ -1104,7 +1108,7 @@ def inspect_layout_quality(
             "crossing_pair_incidents": sum(
                 edge_crossing_pair_incidents[edge_id] for edge_id in edge_ids
             ),
-            "crossed_edge_count": source_crossed_mask.bit_count(),
+            "crossed_edge_count": _bit_count(source_crossed_mask),
             "max_vertical_span_rows": max(
                 routing_edge_statistics[edge_id]["vertical_span_rows"] for edge_id in edge_ids
             ),
@@ -1172,7 +1176,7 @@ def inspect_layout_quality(
                 edge_crossing_pair_incidents[edge_id]
                 for edge_id in edge_ids
             ),
-            "crossed_edge_count": crossed_mask.bit_count(),
+            "crossed_edge_count": _bit_count(crossed_mask),
             "manhattan_length_px": round(sum(
                 routing_edge_statistics[edge_id]["manhattan_length_px"]
                 for edge_id in edge_ids

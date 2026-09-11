@@ -11,6 +11,10 @@ __pycache__/
 !.reproduction/receipts/
 .reproduction/receipts/*
 !.reproduction/receipts/*.json
+# 本地中间回执；发布只跟踪无后缀的规范回执。
+.reproduction/receipts/*-color*.json
+.reproduction/receipts/*-debug.json
+.reproduction/receipts/linux-seed*-quality.json
 !.reproduction/evidence/
 .reproduction/evidence/*
 !.reproduction/evidence/20260907T014732Z-ff0a4ce1/

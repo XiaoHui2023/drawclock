@@ -27,5 +27,7 @@
     ,{"id": "adjacent_root_height_bend", "witness": "adjacent_root_height_bend_witnesses", "applicability": "has_roots"}
     ,{"id": "mergeable_root_facility", "witness": "mergeable_root_facility_witnesses", "applicability": "has_root_fanout"}
     ,{"id": "premature_interior_trunk_entry", "witness": "premature_interior_trunk_entry_witnesses", "applicability": "has_root_fanout"}
+    ,{"id": "annotation_color", "witness": "annotation_color_quality", "applicability": "has_annotations"}
+    ,{"id": "diagram_title_absence", "witness": null, "applicability": "always"}
   ]
 }

@@ -5,6 +5,8 @@ description: drawclock 当前目标、验证证据与完成条件索引。
 
 # 项目目标
 
+- [注释颜色与 Python 发行边界](goals/annotation-color-python-release-surface.md)
+
 - [ ] 每条用户反馈先经公开入口自然复现，再允许修改对应生产 owner。
 - [ ] 每条非共享普通边都通过可行通道的最少拐点证明，避免两拐点路线逃逸。
 - [ ] `FB-BEND-014`：自然复现并判定相邻高根器件的折点是否由真实可视碰撞所需；若直连净空成立则消除多余折点。
@@ -19,7 +21,7 @@ description: drawclock 当前目标、验证证据与完成条件索引。
 - [ ] 跨大区域根从合适边界进入，同根消费域不夹杂可分离的无关域。
 - [ ] `FB-ROOT-022`：远距分离消费带在完整几何收益成立时拆分为多个同名源显示设施。
 - [ ] `FB-ROUTE-023`：公共根主干不得在中部过早进入行间并向下贯穿；边界绕行反事实支配时必须采用边界走廊。
-- [远距源显示设施与边界主干路由](goals/source-alias-and-boundary-trunk-routing.md)
+- [x] [远距源显示设施与边界主干路由](goals/source-alias-and-boundary-trunk-routing.md)
 - [x] Agent 质检记录末层交叉、根消费域夹杂、合理局部主干、微线段和可避免拐点。
 - [x] `gate_a_tap` 类长距末端使用结构性整组换行消除非必要拐点，面积不再优先于美观。
 - [x] v1.0.0 只保留直接绘图主功能，v0.0.0 可恢复。

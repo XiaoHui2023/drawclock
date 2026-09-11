@@ -1,0 +1,32 @@
+{
+  "xtal": {
+    "kind": "source",
+    "description": "命名色：系统参考时钟",
+    "description_color": "navy"
+  },
+  "gate_core": {
+    "kind": "gate",
+    "source": "xtal",
+    "description": "RGB：核心时钟门控",
+    "description_color": "rgb(14 116 144)"
+  },
+  "div_core": {
+    "kind": "div",
+    "source": "gate_core",
+    "description": "八位十六进制：二分频",
+    "description_color": "#b45309e6"
+  },
+  "mux_core": {
+    "kind": "mux2",
+    "source": {"0": "div_core"},
+    "description": "HSL：核心时钟选择",
+    "description_color": "hsl(271 81% 56%)"
+  },
+  "clk_core": {
+    "kind": "clock",
+    "source": "mux_core",
+    "func_freq": "400 MHz",
+    "description": "HWB：核心工作时钟",
+    "description_color": "hwb(340 5% 10% / 85%)"
+  }
+}

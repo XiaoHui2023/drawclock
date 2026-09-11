@@ -1,5 +1,5 @@
 @echo off
-rem Build the dependency-free executable and source archive.
+rem Build the dependency-free executable archive.
 cd /d "%~dp0\.."
 
 rem Fail before environment creation, downloads, builds, or dist mutation.
@@ -31,6 +31,10 @@ if errorlevel 1 exit /b 1
 
 echo ==^> Assembling release archive
 %PY% tools\bundle_release.py
+if errorlevel 1 exit /b 1
+for %%F in (dist\drawclock-*-windows.zip) do set ARCHIVE=%%F
+if not defined ARCHIVE exit /b 1
+%PY% tools\check_release_archive.py "%ARCHIVE%"
 if errorlevel 1 exit /b 1
 
 echo Done: dist\drawclock.exe and dist\drawclock-*-windows.zip

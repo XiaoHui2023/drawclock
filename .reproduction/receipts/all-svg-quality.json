@@ -2,13 +2,13 @@
   "schema_version": 1,
   "input_dir": "F:\\Project\\python\\drawclock\\example\\auto-layout",
   "library": "F:\\Project\\python\\drawclock\\drawio-lib\\drawclock",
-  "expected_count": 26,
-  "observed_count": 26,
+  "expected_count": 27,
+  "observed_count": 27,
   "failed_count": 0,
   "annotation_profile_case_counts": {
     "blank_line": 1,
     "long": 1,
-    "mixed_script": 2,
+    "mixed_script": 3,
     "multiline": 1,
     "short": 1,
     "trailing_line_break": 1
@@ -39,7 +39,9 @@
     "downstream_corridor_tail_bend",
     "adjacent_root_height_bend",
     "mergeable_root_facility",
-    "premature_interior_trunk_entry"
+    "premature_interior_trunk_entry",
+    "annotation_color",
+    "diagram_title_absence"
   ],
   "metric_execution_failures": [],
   "batch_failures": [],
@@ -47,11 +49,12 @@
     {
       "input": "01-linear.json",
       "producer_exit": 0,
-      "sha256": "70b896d94a67142f1bca63aa597e3cc19024bf6b3cdbbe1c4eda8ec339018c82",
+      "sha256": "ed2565b346549e45608fc24d574f7529b89abb79352b4089a46781afaa1ef2e9",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -78,7 +81,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -105,7 +110,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -256,6 +263,18 @@
           "metric_id": "premature_interior_trunk_entry",
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
           "witnesses": []
         }
       ],
@@ -264,11 +283,12 @@
     {
       "input": "02-branch-tree.json",
       "producer_exit": 0,
-      "sha256": "df4d080cce03079d31ee8009ab185cbfbfca6f660a91817ac8f8f05728cead63",
+      "sha256": "0df19270b5e60a27fed657ac4e026ec361bdcf65e67bc49c1943d8f103463b22",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -295,7 +315,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -322,7 +344,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -474,6 +498,18 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -481,11 +517,12 @@
     {
       "input": "03-mux-dag.json",
       "producer_exit": 0,
-      "sha256": "ad55cc98a21c9037b95c932f37ceaccd1265c3524b48a2004b844ddb8ee8f79c",
+      "sha256": "f7c9b7ca1346b1934319625811dfe7c1d04d489cc6453652c0e6272b58da3375",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -512,7 +549,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -539,7 +578,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -691,6 +732,18 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -698,11 +751,12 @@
     {
       "input": "04-dual-pll.json",
       "producer_exit": 0,
-      "sha256": "bf341960692d23518853c1b0a7f8c6292a488c0c0a65afcf25e6b39df13d2ad7",
+      "sha256": "3909446f64ea31bece78f78942a04c5f81f7271e51df7c972da55c3daa03c774",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -729,7 +783,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -756,7 +812,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -908,6 +966,18 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -915,11 +985,12 @@
     {
       "input": "05-dense-cross-root.json",
       "producer_exit": 0,
-      "sha256": "b3be6b2e3d5c3afc5724e6f5e0236b17ba8bbd0f09bdfec36a23483417be49ad",
+      "sha256": "47f0be39816574f28e0a760bb02a8f7e9c47afbc34a7cbb3a8ad6e1a17c0405e",
       "crossings": 6,
       "bends": 22,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -946,7 +1017,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -973,7 +1046,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -1125,6 +1200,18 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1132,11 +1219,12 @@
     {
       "input": "06-simple-16-clocks.json",
       "producer_exit": 0,
-      "sha256": "7b20fe908730c0d0eb042dfffceb5fa3e04b654696056cfce55e3a78ddda1bbd",
+      "sha256": "f9e1d0c5aaf615892f5d8f0969976ffc910bc8efc74111eb02d8be8faedfed05",
       "crossings": 22,
       "bends": 68,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -1163,7 +1251,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1190,7 +1280,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -1342,6 +1434,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=2",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1349,11 +1453,12 @@
     {
       "input": "07-medium-64-clocks.json",
       "producer_exit": 0,
-      "sha256": "33c3fa07a60c0494b343eaaa6b214a6ab23bb269632ad34c0433571414d03fcf",
+      "sha256": "a1b57582b48656df18fe333aa5048b1b3e1f97cab7cedb21263ab7cfbec3b69d",
       "crossings": 169,
       "bends": 216,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -1380,7 +1485,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1407,7 +1514,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -1558,6 +1667,18 @@
           "metric_id": "premature_interior_trunk_entry",
           "status": "pass",
           "applicability_proof": "root_fanouts=2",
+          "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
           "witnesses": []
         }
       ],
@@ -1566,11 +1687,12 @@
     {
       "input": "12-dual-from-reuse.json",
       "producer_exit": 0,
-      "sha256": "f6b7fec62fa2210362482d363d260546f446c4c1ad1b6b9716c68664e28d7925",
+      "sha256": "7dab84fa473d5b227938292993e94c638d275a44adf4f0a029832e278ec41981",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -1597,7 +1719,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1624,7 +1748,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -1776,6 +1902,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=2",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1783,11 +1921,12 @@
     {
       "input": "13-label-clearance-weave.json",
       "producer_exit": 0,
-      "sha256": "4494718c71c1b202e4dc40ae4dd218861528955e8bdc1a3c8294e95796a452dd",
+      "sha256": "975e94c22db12456ddd8a0f88d5d980499a5f8717b5cca06e96aa4b79566bb54",
       "crossings": 1432,
       "bends": 252,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -1814,7 +1953,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1841,7 +1982,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -1993,6 +2136,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=4",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2000,11 +2155,12 @@
     {
       "input": "16-multi-from-clusters.json",
       "producer_exit": 0,
-      "sha256": "e49386b111f09ced923ef3df7209cd87c9368a9507066d7c06001fe322261193",
+      "sha256": "40f79debedef53211dad83f9762f5973a47c368e40121bdbfd033f792fcc440c",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -2031,7 +2187,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2058,7 +2216,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -2210,6 +2370,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=4",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2217,11 +2389,12 @@
     {
       "input": "17-terminal-fanout-order.json",
       "producer_exit": 0,
-      "sha256": "2034076858a6bd35b82c7d7702e02004309ace797847bd9779e46497b40e9df0",
+      "sha256": "ff3540ff6c845cf38a98f0a3de98dc8ad6754e6f863e3b97ac5ac5ab5f076a3b",
       "crossings": 0,
       "bends": 8,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -2248,7 +2421,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2275,7 +2450,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -2427,6 +2604,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2434,11 +2623,12 @@
     {
       "input": "18-asymmetric-merge-columns.json",
       "producer_exit": 0,
-      "sha256": "3afce81f8a177b01b2b59ba6fb68dfadf57569fe3716837e1279ac388ff33059",
+      "sha256": "0906bb3cdfe3cdb01b5db0e393e09c28c53d0e271af08183247e05019a575091",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -2465,7 +2655,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2492,7 +2684,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -2644,6 +2838,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=2",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2651,11 +2857,12 @@
     {
       "input": "19-dispersed-root-fanout.json",
       "producer_exit": 0,
-      "sha256": "90058d9401f439c3a5f731b872a0142ef0d45672cbeed22e2b9ea9d1b1233120",
+      "sha256": "2aca95b8430129c9a3699441bd21700cbfd75d9e190f68c3d1ef02cc368c0dd1",
       "crossings": 710,
       "bends": 122,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -2682,7 +2889,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2709,7 +2918,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -2861,6 +3072,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=8",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2868,11 +3091,12 @@
     {
       "input": "20-asymmetric-merge-route-bulge.json",
       "producer_exit": 0,
-      "sha256": "ab175023df1f05c480ef9f78fa2a4a5a80914f20345a9c7bc79358dc1cc5d12a",
+      "sha256": "155ef879b0c68305eca618208cf1b13e7d04eaad64dabf55109a34976b0d0ad8",
       "crossings": 0,
       "bends": 2,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -2899,7 +3123,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2926,7 +3152,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -3078,6 +3306,18 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3085,11 +3325,12 @@
     {
       "input": "21-layout-column-preference.json",
       "producer_exit": 0,
-      "sha256": "0ddfef448c8dde7d47976ca3759215cfe9d9bf818b97873426173eae4616e313",
+      "sha256": "dcf5d12cfa70c482d79790ff658fd160a6cf8b000fca42bb61cdc6bd8f177da4",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -3116,7 +3357,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3143,7 +3386,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -3295,6 +3540,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3302,11 +3559,12 @@
     {
       "input": "22-terminal-frequency-table.json",
       "producer_exit": 0,
-      "sha256": "1ac792efcf292f1db7278fa9a91218a14d147f1ebe589c1bd0578792d47e48d1",
+      "sha256": "ff5fde495a70cb255a4d89c22c43a09c1cfc599c3de01dc51be49d45fc3601f2",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -3333,7 +3591,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3360,7 +3620,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -3512,6 +3774,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3519,11 +3793,12 @@
     {
       "input": "23-middle-column-low-use-sources.json",
       "producer_exit": 0,
-      "sha256": "8539c359b5f617bc2eb1ae230e7aef81d0341a38177da101a2439cbcaa8f866f",
+      "sha256": "153e034213b90d96c2a6bad9976329f5469b77fc420d1ceebb2a028b4e6ac1fd",
       "crossings": 0,
       "bends": 14,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -3550,7 +3825,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3577,7 +3854,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -3729,6 +4008,18 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3736,11 +4027,12 @@
     {
       "input": "24-single-source-rendering-alias.json",
       "producer_exit": 0,
-      "sha256": "54d7817dd7c2994f565d292e2663fde073cf7c78a5de21908c6f259920ce2159",
+      "sha256": "62fa0c1de69e8f1bbbd0e501adece642a3c4ba77021cfaf7b497c1be2be8c6b8",
       "crossings": 0,
       "bends": 22,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -3767,7 +4059,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3794,7 +4088,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -3946,6 +4242,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3953,11 +4261,12 @@
     {
       "input": "25-mixed-root-port-order-torture.json",
       "producer_exit": 0,
-      "sha256": "3c2d23d7b32f0b90a2cc8a89aebe5b9323f85fc4fa655648c35285cdef8d971b",
+      "sha256": "2a78d93fc7cdd5bc47263e90959f939f0540705078d5421c84f5e678504e1ee2",
       "crossings": 0,
       "bends": 18,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -3984,7 +4293,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4011,7 +4322,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -4163,6 +4476,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=3",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4170,11 +4495,12 @@
     {
       "input": "26-feedback-reproduction-combined.json",
       "producer_exit": 0,
-      "sha256": "d8d6ff64a30cdcd14caae9ef764afd9967159e4cdc81d5f895731a1690fdda20",
+      "sha256": "0ae5e502e9c588a830e5151cf76444b734ba49f36f544b8d1626f8791fcf1eaf",
       "crossings": 1,
       "bends": 16,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -4201,7 +4527,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4228,7 +4556,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -4380,6 +4710,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=6",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4387,11 +4729,12 @@
     {
       "input": "27-interleaved-common-root-mux3.json",
       "producer_exit": 0,
-      "sha256": "42708be727403f5ee7509dc294afe75314c91ceebba472792d722714d24ffe11",
+      "sha256": "92bc2aae068e643caf392dfe82e1a88bcc6f717b3c43f579e5d20402cef79e2d",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -4418,7 +4761,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4445,7 +4790,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -4596,6 +4943,18 @@
           "metric_id": "premature_interior_trunk_entry",
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
           "witnesses": []
         }
       ],
@@ -4604,11 +4963,12 @@
     {
       "input": "28-common-private-from-mux-clock-array.json",
       "producer_exit": 0,
-      "sha256": "ca6d7fc0daa474b8d0ec07193ac88049d2a03d4f24a05620884c142a292a549b",
+      "sha256": "0c8eec27394fab61d08d48112beb76d0d87c22e5f24b74d85ac52563b5675f45",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -4635,7 +4995,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4662,7 +5024,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -4814,6 +5178,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4821,11 +5197,12 @@
     {
       "input": "29-asymmetric-depth-common-private-mux-array.json",
       "producer_exit": 0,
-      "sha256": "16c9d63f55e0a7db5ad92f1ade0ab528af567f6544a787d939558847a3586b86",
+      "sha256": "a9365e3390ea066b18f2e1a743a5d1c7999b762f5f04d207949f72f08a5ae1c4",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -4852,7 +5229,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4879,7 +5258,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -5031,6 +5412,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=1",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -5038,11 +5431,12 @@
     {
       "input": "30-staggered-four-source-mux.json",
       "producer_exit": 0,
-      "sha256": "aa3735f0a5ad2d98b73938da3f3f3eb316c40eff0c8a676bc933e1668d5419f9",
+      "sha256": "1502d133bdf87b23ddde08a06519040f970923abe4f9c0bd845663800679977e",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [],
       "required_metric_ids": [
         "topology_identity",
@@ -5069,7 +5463,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -5096,7 +5492,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -5248,6 +5646,18 @@
           "status": "pass",
           "applicability_proof": "root_fanouts=3",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "not_applicable",
+          "applicability_proof": "annotations=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -5255,11 +5665,12 @@
     {
       "input": "31-node-descriptions.json",
       "producer_exit": 0,
-      "sha256": "2b0a342620f3379b25a644bbf691aa49f8befc1cba71ab9f6bf4cd5505060777",
+      "sha256": "e5c63f5e8e7ef1a390ba7416659ed3d67176fda54e68433c95b5f2b19437cc30",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [
         "mixed_script"
       ],
@@ -5288,7 +5699,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -5315,7 +5728,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -5408,6 +5823,42 @@
             "duplicates": [],
             "text_mismatches": [],
             "line_mismatches": [],
+            "expected_colors": {
+              "xtal": "#4b5563",
+              "gate_cpu": "#4b5563",
+              "mux_cpu": "#4b5563",
+              "clk_cpu": "#4b5563"
+            },
+            "observed_colors": {
+              "gate_cpu": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "xtal": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "mux_cpu": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "clk_cpu": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              }
+            },
+            "color_mismatches": [],
+            "noncanonical_colors": [],
+            "style_color_overrides": [],
+            "color_failure_count": 0,
             "profile_counts": {
               "mixed_script": 4
             },
@@ -5494,6 +5945,81 @@
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
           "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "pass",
+          "applicability_proof": "annotations=4",
+          "witnesses": {
+            "expected": 4,
+            "rendered": 4,
+            "missing": [],
+            "unexpected": [],
+            "duplicates": [],
+            "text_mismatches": [],
+            "line_mismatches": [],
+            "expected_colors": {
+              "xtal": "#4b5563",
+              "gate_cpu": "#4b5563",
+              "mux_cpu": "#4b5563",
+              "clk_cpu": "#4b5563"
+            },
+            "observed_colors": {
+              "gate_cpu": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "xtal": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "mux_cpu": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "clk_cpu": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              }
+            },
+            "color_mismatches": [],
+            "noncanonical_colors": [],
+            "style_color_overrides": [],
+            "color_failure_count": 0,
+            "profile_counts": {
+              "mixed_script": 4
+            },
+            "profiles_present": [
+              "mixed_script"
+            ],
+            "annotation_overlaps": [],
+            "node_overlaps": [],
+            "edge_intersections": [],
+            "outside_viewport": [],
+            "owner_distances_px": {
+              "gate_cpu": 9.25,
+              "xtal": 9.23,
+              "mux_cpu": 9.23,
+              "clk_cpu": 9.25
+            },
+            "too_far": [],
+            "decorative_elements": 0,
+            "failure_count": 0
+          }
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -5501,11 +6027,12 @@
     {
       "input": "32-annotation-text-stress.json",
       "producer_exit": 0,
-      "sha256": "c92b91ce28ebe7dee1b78ba76f437db86ed051c185a4819e54dbb7a3d11e8f13",
+      "sha256": "d2671254593a132637efa44282ee60139040fb6b615180bfdd630a96c17f086e",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
+      "annotation_color_failures": 0,
       "annotation_profiles": [
         "blank_line",
         "long",
@@ -5539,7 +6066,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -5566,7 +6095,9 @@
         "downstream_corridor_tail_bend",
         "adjacent_root_height_bend",
         "mergeable_root_facility",
-        "premature_interior_trunk_entry"
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
       ],
       "metric_results": [
         {
@@ -5659,6 +6190,91 @@
             "duplicates": [],
             "text_mismatches": [],
             "line_mismatches": [],
+            "expected_colors": {
+              "ref_short": "#4b5563",
+              "ref_multiline": "#4b5563",
+              "gate_long_ascii": "#4b5563",
+              "div_long_cjk": "#4b5563",
+              "select_mixed": "#4b5563",
+              "cell_trailing": "#4b5563",
+              "clock_dense_a": "#4b5563",
+              "clock_dense_b": "#4b5563"
+            },
+            "observed_colors": {
+              "clock_dense_a": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "gate_long_ascii": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "ref_short": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "select_mixed": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "cell_trailing": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "clock_dense_b": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "div_long_cjk": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "ref_multiline": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              }
+            },
+            "color_mismatches": [],
+            "noncanonical_colors": [],
+            "style_color_overrides": [],
+            "color_failure_count": 0,
             "profile_counts": {
               "blank_line": 1,
               "long": 4,
@@ -5758,6 +6374,522 @@
           "metric_id": "premature_interior_trunk_entry",
           "status": "not_applicable",
           "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "pass",
+          "applicability_proof": "annotations=8",
+          "witnesses": {
+            "expected": 8,
+            "rendered": 8,
+            "missing": [],
+            "unexpected": [],
+            "duplicates": [],
+            "text_mismatches": [],
+            "line_mismatches": [],
+            "expected_colors": {
+              "ref_short": "#4b5563",
+              "ref_multiline": "#4b5563",
+              "gate_long_ascii": "#4b5563",
+              "div_long_cjk": "#4b5563",
+              "select_mixed": "#4b5563",
+              "cell_trailing": "#4b5563",
+              "clock_dense_a": "#4b5563",
+              "clock_dense_b": "#4b5563"
+            },
+            "observed_colors": {
+              "clock_dense_a": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "gate_long_ascii": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "ref_short": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "select_mixed": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "cell_trailing": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "clock_dense_b": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "div_long_cjk": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "ref_multiline": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              }
+            },
+            "color_mismatches": [],
+            "noncanonical_colors": [],
+            "style_color_overrides": [],
+            "color_failure_count": 0,
+            "profile_counts": {
+              "blank_line": 1,
+              "long": 4,
+              "mixed_script": 3,
+              "multiline": 4,
+              "short": 1,
+              "trailing_line_break": 1
+            },
+            "profiles_present": [
+              "blank_line",
+              "long",
+              "mixed_script",
+              "multiline",
+              "short",
+              "trailing_line_break"
+            ],
+            "annotation_overlaps": [],
+            "node_overlaps": [],
+            "edge_intersections": [],
+            "outside_viewport": [],
+            "owner_distances_px": {
+              "clock_dense_a": 9.25,
+              "gate_long_ascii": 9.25,
+              "ref_short": 9.25,
+              "select_mixed": 9.23,
+              "cell_trailing": 45.01,
+              "clock_dense_b": 10.01,
+              "div_long_cjk": 19.45,
+              "ref_multiline": 19.03
+            },
+            "too_far": [],
+            "decorative_elements": 0,
+            "failure_count": 0
+          }
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        }
+      ],
+      "failures": []
+    },
+    {
+      "input": "33-description-colors.json",
+      "producer_exit": 0,
+      "sha256": "0673fe359fbed0d435b323aa0441a69efc6fc0167695463ff2b7ba529c7d2ccd",
+      "crossings": 0,
+      "bends": 0,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_color_failures": 0,
+      "annotation_profiles": [
+        "mixed_script"
+      ],
+      "required_metric_ids": [
+        "topology_identity",
+        "orthogonal_segments",
+        "crossing_treatment",
+        "different_net_overlap",
+        "split_rejoin",
+        "avoidable_bends",
+        "port_order",
+        "root_fanout_axis_dominance",
+        "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
+        "regular_array_single_facility",
+        "shared_root_single_bus",
+        "annotation_geometry",
+        "mixed_root_quality",
+        "public_root_crossing",
+        "root_relocation_dominance",
+        "root_facility_split_dominance",
+        "physical_anchor_relocation",
+        "vertical_root_facility_bend",
+        "root_facility_column_lag",
+        "downstream_corridor_tail_bend",
+        "adjacent_root_height_bend",
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
+      ],
+      "executed_metric_ids": [
+        "topology_identity",
+        "orthogonal_segments",
+        "crossing_treatment",
+        "different_net_overlap",
+        "split_rejoin",
+        "avoidable_bends",
+        "port_order",
+        "root_fanout_axis_dominance",
+        "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
+        "regular_array_single_facility",
+        "shared_root_single_bus",
+        "annotation_geometry",
+        "mixed_root_quality",
+        "public_root_crossing",
+        "root_relocation_dominance",
+        "root_facility_split_dominance",
+        "physical_anchor_relocation",
+        "vertical_root_facility_bend",
+        "root_facility_column_lag",
+        "downstream_corridor_tail_bend",
+        "adjacent_root_height_bend",
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence"
+      ],
+      "metric_results": [
+        {
+          "metric_id": "topology_identity",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": {}
+        },
+        {
+          "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "different_net_overlap",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "split_rejoin",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "avoidable_bends",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "port_order",
+          "status": "not_applicable",
+          "applicability_proof": "merges=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_fanout_axis_dominance",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "direct_root_mux_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "regular_array_single_facility",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "shared_root_single_bus",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "annotation_geometry",
+          "status": "pass",
+          "applicability_proof": "annotations=5",
+          "witnesses": {
+            "expected": 5,
+            "rendered": 5,
+            "missing": [],
+            "unexpected": [],
+            "duplicates": [],
+            "text_mismatches": [],
+            "line_mismatches": [],
+            "expected_colors": {
+              "xtal": "#000080",
+              "gate_core": "#0e7490",
+              "div_core": "#b45309e6",
+              "mux_core": "#9234ea",
+              "clk_core": "#e60d55d9"
+            },
+            "observed_colors": {
+              "div_core": {
+                "declared": "#b45309e6",
+                "fills": [
+                  "#b45309e6"
+                ]
+              },
+              "gate_core": {
+                "declared": "#0e7490",
+                "fills": [
+                  "#0e7490"
+                ]
+              },
+              "xtal": {
+                "declared": "#000080",
+                "fills": [
+                  "#000080"
+                ]
+              },
+              "mux_core": {
+                "declared": "#9234ea",
+                "fills": [
+                  "#9234ea"
+                ]
+              },
+              "clk_core": {
+                "declared": "#e60d55d9",
+                "fills": [
+                  "#e60d55d9"
+                ]
+              }
+            },
+            "color_mismatches": [],
+            "noncanonical_colors": [],
+            "style_color_overrides": [],
+            "color_failure_count": 0,
+            "profile_counts": {
+              "mixed_script": 3
+            },
+            "profiles_present": [
+              "mixed_script"
+            ],
+            "annotation_overlaps": [],
+            "node_overlaps": [],
+            "edge_intersections": [],
+            "outside_viewport": [],
+            "owner_distances_px": {
+              "div_core": 9.25,
+              "gate_core": 9.23,
+              "xtal": 9.25,
+              "mux_core": 9.23,
+              "clk_core": 9.25
+            },
+            "too_far": [],
+            "decorative_elements": 0,
+            "failure_count": 0
+          }
+        },
+        {
+          "metric_id": "mixed_root_quality",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "public_root_crossing",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_relocation_dominance",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_facility_split_dominance",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "physical_anchor_relocation",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "vertical_root_facility_bend",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_facility_column_lag",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "downstream_corridor_tail_bend",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "adjacent_root_height_bend",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "mergeable_root_facility",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "pass",
+          "applicability_proof": "annotations=5",
+          "witnesses": {
+            "expected": 5,
+            "rendered": 5,
+            "missing": [],
+            "unexpected": [],
+            "duplicates": [],
+            "text_mismatches": [],
+            "line_mismatches": [],
+            "expected_colors": {
+              "xtal": "#000080",
+              "gate_core": "#0e7490",
+              "div_core": "#b45309e6",
+              "mux_core": "#9234ea",
+              "clk_core": "#e60d55d9"
+            },
+            "observed_colors": {
+              "div_core": {
+                "declared": "#b45309e6",
+                "fills": [
+                  "#b45309e6"
+                ]
+              },
+              "gate_core": {
+                "declared": "#0e7490",
+                "fills": [
+                  "#0e7490"
+                ]
+              },
+              "xtal": {
+                "declared": "#000080",
+                "fills": [
+                  "#000080"
+                ]
+              },
+              "mux_core": {
+                "declared": "#9234ea",
+                "fills": [
+                  "#9234ea"
+                ]
+              },
+              "clk_core": {
+                "declared": "#e60d55d9",
+                "fills": [
+                  "#e60d55d9"
+                ]
+              }
+            },
+            "color_mismatches": [],
+            "noncanonical_colors": [],
+            "style_color_overrides": [],
+            "color_failure_count": 0,
+            "profile_counts": {
+              "mixed_script": 3
+            },
+            "profiles_present": [
+              "mixed_script"
+            ],
+            "annotation_overlaps": [],
+            "node_overlaps": [],
+            "edge_intersections": [],
+            "outside_viewport": [],
+            "owner_distances_px": {
+              "div_core": 9.25,
+              "gate_core": 9.23,
+              "xtal": 9.25,
+              "mux_core": 9.23,
+              "clk_core": 9.25
+            },
+            "too_far": [],
+            "decorative_elements": 0,
+            "failure_count": 0
+          }
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
           "witnesses": []
         }
       ],

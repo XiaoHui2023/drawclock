@@ -106,12 +106,18 @@ def test_description_renders_once_as_safe_plain_text_annotation() -> None:
     primary = VertexLayout(
         name="shared", cell_id="v1", drawclock_type="source",
         x=20, y=30, width=80, height=40, style="",
-        object_attrs={"description": "公共参考<&>\n仅用于测试"},
+        object_attrs={
+            "description": "公共参考<&>\n仅用于测试",
+            "description_color": "rgba(255, 0, 128, 50%)",
+        },
     )
     alias = VertexLayout(
         name="shared__alias", logical_name="shared", cell_id="v2",
         drawclock_type="source", x=20, y=100, width=80, height=40,
-        style="", object_attrs={"description": "公共参考<&>\n仅用于测试"},
+        style="", object_attrs={
+            "description": "公共参考<&>\n仅用于测试",
+            "description_color": "rgba(255, 0, 128, 50%)",
+        },
     )
 
     svg = build_preview_svg(
@@ -119,6 +125,8 @@ def test_description_renders_once_as_safe_plain_text_annotation() -> None:
     )
 
     assert svg.count('class="node-annotation" data-node-id="shared"') == 1
+    assert 'data-description-color="#ff008080"' in svg
+    assert svg.count('fill="#ff008080"') == 2
     assert 'node-annotation-link' not in svg
     annotation = svg.split('<g class="node-annotation"', 1)[1].split('</g>', 1)[0]
     assert '<path' not in annotation
@@ -127,6 +135,17 @@ def test_description_renders_once_as_safe_plain_text_annotation() -> None:
     assert "公共参考&lt;&amp;&gt;" in svg
     assert "<foreignObject" not in svg
     validate_static_svg(svg)
+
+
+def test_description_uses_the_stable_default_color() -> None:
+    vertex = VertexLayout(
+        name="source", cell_id="v1", drawclock_type="source",
+        x=20, y=30, width=80, height=40, style="",
+        object_attrs={"description": "default color"},
+    )
+    svg = build_preview_svg(LayoutDocument(version=1, vertices=[vertex], edges=[]))
+    assert 'data-description-color="#4b5563"' in svg
+    assert 'fill="#4b5563"' in svg
 
 
 def test_crossing_renderer_treats_physical_aliases_as_one_logical_net() -> None:

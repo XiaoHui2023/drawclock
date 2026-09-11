@@ -45,16 +45,9 @@ def main() -> int:
         raise FileNotFoundError(f"release binary is missing: {binary}")
     with tempfile.TemporaryDirectory(prefix="drawclock-rsvg-") as directory:
         work = Path(directory)
-        examples = (
-            ("draw", root / "example/draw.json"),
-            ("frequency", root / "example/auto-layout/22-terminal-frequency-table.json"),
-        )
+        examples = (("draw", root / "example/draw.json"),)
         for suffix, example in examples:
             _render_and_verify([str(binary)], root, work, f"frozen-{suffix}", example)
-            _render_and_verify(
-                [sys.executable, "-I", "-S", str(root / "src")],
-                root, work, f"source-{suffix}", example,
-            )
     return 0
 
 

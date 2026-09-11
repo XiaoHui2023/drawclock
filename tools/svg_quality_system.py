@@ -179,10 +179,25 @@ def _artifact_metric_witnesses(
                     "start": list(start),
                     "end": list(end),
                 })
+    # Diagram captions used to be emitted as a direct child of the SVG root
+    # and copied the input filename stem.  Component labels, annotation text,
+    # and the frequency table are all nested in groups, so root-level text is
+    # an independent, serialization-level witness for that unwanted caption.
+    diagram_titles = [
+        {
+            "text": "".join(element.itertext()),
+            "x": element.get("x"),
+            "y": element.get("y"),
+            "matches_input_stem": "".join(element.itertext()) == input_path.stem,
+        }
+        for element in root
+        if element.tag == f"{NS}text"
+    ]
     return {
         "topology_identity": topology_failures,
         "orthogonal_segments": non_orthogonal,
         "crossing_treatment": _crossing_treatment_witnesses(root, routes),
+        "diagram_title_absence": diagram_titles,
     }
 
 
@@ -248,6 +263,9 @@ def evaluate(input_path: Path, svg_path: Path, registry_path: Path = DEFAULT_REG
         elif witness_name == "annotation_quality":
             witnesses = report["annotation_quality"]
             status = "fail" if report["annotation_quality"]["failure_count"] else "pass"
+        elif witness_name == "annotation_color_quality":
+            witnesses = report["annotation_quality"]
+            status = "fail" if report["annotation_quality"]["color_failure_count"] else "pass"
         else:
             witnesses = report["witnesses"][witness_name]
             status = "fail" if witnesses else "pass"

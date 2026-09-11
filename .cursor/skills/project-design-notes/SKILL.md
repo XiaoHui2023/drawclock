@@ -78,15 +78,12 @@ description: >-
 ## 发布
 
 - PyInstaller 可执行文件内含本项目 Python 模块，不依赖宿主 Python、Node.js、ELK 或浏览器。
-- 发行包包含主程序、原始 `src/`、`drawio-lib/`、全部公开示例、源码部署说明和根目录 `skills/`；不含 Runtime、npm 清单、Python wheelhouse 或依赖清单。
-- `skills/` 包含器件库、布局算法、JSON 合约、时钟图设计、SVG 成品、SVG 兼容性和项目导航七个渐进披露 skill；只含项目知识，不含私人路径、身份或本机自动化信息，也不是绘图运行时依赖。
-- 源码部署只要求 CPython 3.10 或更高版本；以 `-I -S` 禁用用户目录和 site-packages 后仍可直接生成 SVG。
-- `source-manifest.json` 逐文件记录源码、项目 skill、器件库目录内各组件 XML 与示例的 SHA-256，缺失和篡改均阻断源码消费门。
-- 冻结包门和源码包门都执行包内 skill 校验器，检查固定目录集合、frontmatter、单层 references、链接完整性、UTF-8 和私人绝对路径。
-- 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、严格 JSON 拒绝规则、文件与目录混合器件库、默认圆弧、维护范围示例与复杂图，并确认不携带 512+ 高压力输入或 Runtime/npm 污染。
+- 默认发行包只含主程序、`README.md`、`draw.md`、`drawio-lib/drawclock/*.xml`、最小示例、颜色字段示例和嵌入 Noto 字形要求保留的 OFL 文本；完整源码由仓库与发布 tag 提供。
+- 源码运行只要求 CPython 3.9 或更高版本；以 `-I -S` 禁用用户目录和 site-packages 后仍可直接生成 SVG，Python 3.9、3.10 与当前版本对代表输入结果一致。
+- 发布包执行独立 allowlist 门，拒绝 `src/`、项目 Skills、`pyproject.toml`、source manifest、批量质量语料、Runtime、npm 清单、wheelhouse 和缓存进入默认附件。
+- 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、严格 JSON 拒绝规则、文件与目录混合器件库、默认圆弧和维护范围示例。
 - 本地 `pack.sh` / `pack.bat` 在创建环境、下载依赖或修改 `dist/` 之前执行自包含 release 门；任一反馈未自然复现、未修复验证或未关闭均非零退出。
 - GitHub Actions 的反馈门是 build 的必要前驱，publish 同时依赖反馈门与 build；发布 job 禁止用 `always()` 绕过失败传播。
-- 同一解压包还要创建空虚拟环境，通过 `python -I -S src` 生成可解析的 SVG，证明源码不借用第三方 Python 包。
 - 每次修改通过检查后读取用户根 `github-upload` 与 `github-release` 规则，提交、推送并发布当前 `pyproject.toml` 版本。
 
 ## 用户文档
@@ -97,4 +94,4 @@ description: >-
 | `draw.md` | 参数、通用配置规则和使用示范 |
 | `example/README.md` | `example/` 内配置与运行命令 |
 | `example/auto-layout/README.md` | 各布局与压力配置覆盖范围 |
-| `source-deploy.md` | 发行包断网源码部署命令与 Python 版本边界 |
+| `source-deploy.md` | 仓库源码运行命令与 Python 版本边界 |
