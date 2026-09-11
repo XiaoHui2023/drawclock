@@ -1,8 +1,8 @@
 # 注释颜色、Python 版本与发行表面分析
 
-- status: active
+- status: done
 - created: 2026-09-11 16:17 +08:00
-- updated: 2026-09-11 19:08 +08:00
+- updated: 2026-09-11 19:43 +08:00
 - scene: description_color、最低 Python 与精简归档
 
 ## 已确认事实

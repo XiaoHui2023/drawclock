@@ -2,8 +2,8 @@
 
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `analysis/annotation-color-python-release-surface.md` | analysis | active | 2026-09-11 16:17 +08:00 | 2026-09-11 19:08 +08:00 | description_color、最低 Python 与精简归档 | 已确定 CSS 规范化、Python 3.9 实证、两项代表示例 allowlist 和源码/tag 分工。 |
-| `records/annotation-color-python-release-surface.md` | record | active | 2026-09-11 16:17 +08:00 | 2026-09-11 18:31 +08:00 | description_color、最低 Python、精简归档与文档门禁 | 完整 pytest 607/607 通过；同步记录元数据后重跑五件套并准备提交。 |
+| `analysis/annotation-color-python-release-surface.md` | analysis | done | 2026-09-11 16:17 +08:00 | 2026-09-11 19:43 +08:00 | description_color、最低 Python 与精简归档 | CSS 颜色、Python 3.9 下界、精简归档及全制品质量合同已落地并公开验证。 |
+| `records/annotation-color-python-release-surface.md` | record | done | 2026-09-11 16:17 +08:00 | 2026-09-11 19:43 +08:00 | description_color、最低 Python、精简归档与文档门禁 | 607 项测试、七轮攻击、公开回下载与 Ubuntu 16.04 冻结消费均已通过。 |
 | `drafts/case-generalization-fanout-simulation.md` | draft | done | 2026-09-07 10:24 +08:00 | 2026-09-07 16:28 +08:00 | 举一反三扇出数组模拟 | 五轮递归 epoch 实际捕获复发后重启通过，复杂组合、结构边界与远端发行均已闭合。 |
 | `records/user-feedback-natural-reproduction-gate.md` | record | active | 2026-09-03 13:32 +08:00 | 2026-09-12 00:36 +08:00 | 用户反馈自然复现与防假完成门禁 | 无标题终图与新鲜 Windows 发布包均已完成独立质量、解码、哈希和全新解包消费；等待远端滚动发布。 |
 | `analysis/managed-delivery-gate-invocation.md` | analysis | done | 2026-09-04 18:30 +08:00 | 2026-09-04 18:40 +08:00 | 闭环提交后的新鲜回执与 push 误阻断诊断 | 已修复绝对可执行文件路径发现崩溃，记录 Code Mode 剩余上游覆盖边界。 |
