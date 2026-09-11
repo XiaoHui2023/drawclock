@@ -65,6 +65,7 @@ ANNOTATION_GAP = 8.0
 ANNOTATION_MAX_WIDTH = 230.0
 ANNOTATION_MAX_OWNER_DISTANCE = 90.0
 ANNOTATION_CLEARANCE = 2.0
+SERIALIZED_AXIS_SNAP = 0.01
 _OUTER_LABEL_HEIGHT_RE = re.compile(r"height:([0-9.]+)px")
 
 
@@ -613,10 +614,23 @@ def build_preview_svg(
         # boundary removes binary floating tails without changing visible
         # geometry, preventing a rendered horizontal segment from being
         # misclassified as diagonal before bridge insertion.
-        edge_points[edge.cell_id] = [
+        points = [
             (float(_svg_num(x)), float(_svg_num(y)))
             for x, y in (start, *edge.waypoints, end)
         ]
+        # Truncated relative port anchors can leave a nominally straight edge
+        # a few thousandths of a pixel off-axis after serialization.  That
+        # invisible diagonal can intersect the shared source trunk twice and
+        # become a real split/rejoin cycle to geometry consumers.  Preserve
+        # both exact port contacts and insert one orthogonal sub-pixel terminal
+        # segment; larger differences remain the router's responsibility.
+        if len(points) == 2:
+            first, second = points
+            if 0.0 < abs(first[1] - second[1]) <= SERIALIZED_AXIS_SNAP:
+                points.insert(1, (second[0], first[1]))
+            elif 0.0 < abs(first[0] - second[0]) <= SERIALIZED_AXIS_SNAP:
+                points.insert(1, (first[0], second[1]))
+        edge_points[edge.cell_id] = points
 
     # The scalable router may reserve channels outside the node rectangle.
     # The viewport therefore derives from the complete rendered geometry,

@@ -1132,9 +1132,9 @@
     {
       "input": "06-simple-16-clocks.json",
       "producer_exit": 0,
-      "sha256": "b8bfaf91e73026919c5ea707a18c6680a141ec1e8c1bfaed49d9f19cb7be8bcf",
-      "crossings": 25,
-      "bends": 64,
+      "sha256": "605c92d61fb00f50d000e9c5e5b713d0f84d73841ace4441cd1fbf3078ad94d4",
+      "crossings": 22,
+      "bends": 68,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_profiles": [],
@@ -1783,8 +1783,8 @@
     {
       "input": "13-label-clearance-weave.json",
       "producer_exit": 0,
-      "sha256": "5bb6eaa3ddcd4c90f617ac6c6b6a47a2a8ecdb4e9722624407822f6d7d01dd58",
-      "crossings": 1428,
+      "sha256": "5a32e7a9233ef3002bcd2e9a6125208d667122b91a05712c66199da68fd8448d",
+      "crossings": 1432,
       "bends": 252,
       "different_net_overlaps": 0,
       "annotation_failures": 0,

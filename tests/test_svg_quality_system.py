@@ -45,6 +45,22 @@ def test_every_artifact_executes_exact_complete_registry() -> None:
     assert "feasible_direct_root_fanin_column" in report["executed_metric_ids"]
 
 
+def test_quality_cli_rejects_known_bad_artifact(tmp_path: Path) -> None:
+    receipt = tmp_path / "quality.json"
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "tools/svg_quality_system.py"),
+         "--input", str(INPUT), "--svg", str(BAD_SVG),
+         "--registry", str(quality.DEFAULT_REGISTRY),
+         "--output", str(receipt)],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert completed.returncode == 1
+    report = json.loads(receipt.read_text(encoding="utf-8"))
+    assert report["executed_metric_ids"] == report["required_metric_ids"]
+    assert len(report["executed_metric_ids"]) == 25
+    assert report["failed_metric_ids"]
+
+
 def test_registry_rejects_duplicate_or_missing_identity(tmp_path: Path) -> None:
     source = json.loads(quality.DEFAULT_REGISTRY.read_text(encoding="utf-8"))
     source["metrics"].append(dict(source["metrics"][0]))

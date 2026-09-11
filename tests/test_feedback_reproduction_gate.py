@@ -75,6 +75,42 @@ class FeedbackReproductionGateTest(unittest.TestCase):
         finally:
             sys.path.remove(str(ROOT / "tools"))
 
+    def test_recursive_campaign_covers_boundary_offset_variant_every_round(self) -> None:
+        sys.path.insert(0, str(ROOT / "tools"))
+        try:
+            spec = importlib.util.spec_from_file_location(
+                "drawclock_recursive_boundary_contract", RECURSIVE_RUNNER
+            )
+            self.assertIsNotNone(spec.loader)
+            runner = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(runner)
+            manifest = json.loads(
+                (ROOT / "tests/reproduction-corpus/recursive-attack-rounds.json")
+                .read_text(encoding="utf-8")
+            )
+            self.assertIn("FB-ROUTE-023", manifest["issues"])
+            self.assertIn(
+                "outer-boundary-offset-fanout-clean",
+                manifest["required_semantic_variants"],
+            )
+            for round_spec in manifest["rounds"]:
+                boundary_cases = [
+                    config for case_id, config in runner.case_configs(round_spec)
+                    if case_id.startswith("boundary-offset-seed-")
+                ]
+                self.assertEqual(len(boundary_cases), 1)
+                self.assertIn(
+                    "outer-boundary-offset-fanout-clean",
+                    runner.semantic_variants(boundary_cases[0]),
+                )
+            renamed = runner.rename_config({
+                "root": {"kind": "source"},
+                "child": {"kind": "gate", "source": "root[right]"},
+            })
+            self.assertEqual(renamed["node_000"]["source"], "node_001[right]")
+        finally:
+            sys.path.remove(str(ROOT / "tools"))
+
     def test_tree_hash_uses_platform_neutral_posix_order(self) -> None:
         spec = importlib.util.spec_from_file_location("drawclock_feedback_checker", CHECKER)
         self.assertIsNotNone(spec)

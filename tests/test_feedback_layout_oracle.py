@@ -959,12 +959,25 @@ def test_current_cli_closes_premature_interior_trunk_entry(
     subprocess.run(
         [sys.executable, str(ROOT / "src"), "-i", str(input_path),
          "-l", str(ROOT / "drawio-lib"), "-o", str(output),
-         "--crossing-style", "none"],
+         "--crossing-style", "arc"],
         cwd=ROOT, check=True,
     )
     report = oracle.analyze(input_path, output)
     assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
     assert "FB-ROUTE-023" not in report["detected_issues"]
+    receipt = tmp_path / "boundary-trunk-seed-013-quality.json"
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "svg_quality_system.py"),
+         "--input", str(input_path), "--svg", str(output),
+         "--registry", str(ROOT / "tests" / "quality-metrics.json"),
+         "--output", str(receipt)],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    quality = json.loads(receipt.read_text(encoding="utf-8"))
+    assert quality["required_metric_ids"] == quality["executed_metric_ids"]
+    assert len(quality["executed_metric_ids"]) == 25
+    assert quality["failed_metric_ids"] == []
 
 
 def test_premature_interior_trunk_entry_keeps_clean_control(
@@ -1002,6 +1015,32 @@ def test_premature_corridor_rejects_local_gain_that_worsens_global_crossings(
     )
     report = oracle.analyze(reversed_input, output)
     assert report["totals"]["distinct_crossing_points"] == 16
+    assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
+    assert "FB-ROUTE-023" not in report["detected_issues"]
+
+
+def test_boundary_corridor_survives_late_local_outer_detour_owner(
+    tmp_path: Path,
+) -> None:
+    search_path = ROOT / "tools" / "search_boundary_trunk_recurrence.py"
+    search_spec = importlib.util.spec_from_file_location(
+        "boundary_trunk_seed_builder", search_path
+    )
+    assert search_spec is not None and search_spec.loader is not None
+    search = importlib.util.module_from_spec(search_spec)
+    search_spec.loader.exec_module(search)
+    input_path = tmp_path / "boundary-trunk-seed-013.json"
+    input_path.write_text(
+        json.dumps(search.build_case(13), indent=2) + "\n", encoding="utf-8"
+    )
+    output = tmp_path / "boundary-trunk-seed-013.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "none"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
     assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
     assert "FB-ROUTE-023" not in report["detected_issues"]
 

@@ -3,33 +3,36 @@
   "campaign_name": "defect-driven-adversarial-regression-loop",
   "risk_class": "high",
   "status": "clean",
-  "run_id": "20260910T152017Z-05b5ca2f",
+  "run_id": "20260911T055047Z-874669d0",
   "issues": [
     "FB-ROUTE-002",
     "FB-ROOT-003",
     "FB-ROOT-016",
     "FB-BEND-017",
-    "FB-ROOT-020"
+    "FB-ROOT-020",
+    "FB-ROUTE-023"
   ],
   "required_semantic_variants": [
     "direct-from-column-clean",
     "direct-source-column-clean",
-    "public-from-tree-clean"
+    "public-from-tree-clean",
+    "outer-boundary-offset-fanout-clean"
   ],
   "covered_semantic_variants": [
     "direct-from-column-clean",
     "direct-source-column-clean",
+    "outer-boundary-offset-fanout-clean",
     "public-from-tree-clean"
   ],
   "required_consecutive_clean_rounds": 7,
   "consecutive_clean_rounds": 7,
   "restart_semantics": "any reproduction resets to zero and requires a new run from R1",
-  "source_tree_sha256": "89bc74410fffaf93592f8bcb17fa277a38242b831c13f074a3a6e56f8b2984bb",
-  "manifest_sha256": "0de9ee9c8cc3126e661786f9b8ad2970f8743f6e65f35f40ecf1a69126360081",
-  "runner_sha256": "1c172df5f805df3ff44dd3754208a4ee31d7073689fb8d5f481850208d83e0a2",
-  "oracle_sha256": "d1ea06cb322dca8df00c6aee26a6b00bbfb583e26634805e7a5da0e938dc49a8",
+  "source_tree_sha256": "32a5306578acef432db0aff95ac829f951c1f53dc8db543a04f389cd9f3d8d46",
+  "manifest_sha256": "b7698a13158c5cd3cfe56542c353599ec128a226cbedbc6285c194d38685e2bf",
+  "runner_sha256": "f1e686a691e968bf8fe5f2f1c964f8a1576b9c8a1ed65a71e5fc82cdf63c0d2e",
+  "oracle_sha256": "42544aba8f9b19b2cdd08d7beac57b86ab6563c1c76348af9edfc2d8eaeb1558",
   "semantics_sha256": "9110e75d06071f93bc9837b695a63d9cbefb5e336210a8fca32b8a146b37bb0e",
-  "quality_system_sha256": "6351c2560d4a7d35d7dd4c10cb343b8d01d274a0c3cf37e9c1310453273de77d",
+  "quality_system_sha256": "9e2821e9be8b97dedb28b49fcf005aae22b65b476b1c861a4688add0b1227674",
   "quality_registry_sha256": "0785657da5a36d1b330b4ea53716fb79165474b1a1699da3ec118c3a11048b72",
   "rounds": [
     {
@@ -42,8 +45,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "2ac1478b80793aeab8b0d2c1fc97667e1b5f3a69e46e1919a6d4c4845108126d",
-          "artifact_before_oracle_sha256": "3cff8831e8512f17cccaeeaebcb8b7bb5b024612c2a4328a9c54add2ffa982e3",
-          "artifact_after_oracle_sha256": "3cff8831e8512f17cccaeeaebcb8b7bb5b024612c2a4328a9c54add2ffa982e3",
+          "artifact_before_oracle_sha256": "29b20dcba234a0adfccaf549cd6d2ece9102b24aa27bae88bc5f3753a968b5ed",
+          "artifact_after_oracle_sha256": "29b20dcba234a0adfccaf549cd6d2ece9102b24aa27bae88bc5f3753a968b5ed",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -2017,6 +2020,227 @@
           ],
           "failed_metric_ids": [],
           "quality_passed": true
+        },
+        {
+          "case_id": "boundary-offset-seed-013",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "70b2d832ca456ec2a9f1c7a7d8b9c2a205b214880eeedfd3ef33e9ab12b5c30b",
+          "artifact_before_oracle_sha256": "187e9c6cdd5e1b37049c975000c3eba808f84c03be5a6f24192e5f4a15ba174a",
+          "artifact_after_oracle_sha256": "187e9c6cdd5e1b37049c975000c3eba808f84c03be5a6f24192e5f4a15ba174a",
+          "observed_issue_ids": [],
+          "semantic_variants": [
+            "outer-boundary-offset-fanout-clean",
+            "public-from-tree-clean"
+          ],
+          "required_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "executed_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "metric_results": [
+            {
+              "metric_id": "topology_identity",
+              "status": "pass",
+              "applicability_proof": "artifact",
+              "witnesses": {}
+            },
+            {
+              "metric_id": "orthogonal_segments",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "crossing_treatment",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "different_net_overlap",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "split_rejoin",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "avoidable_bends",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "port_order",
+              "status": "pass",
+              "applicability_proof": "merges=32",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_fanout_axis_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "direct_root_mux_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_mux_arrays=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "feasible_direct_root_fanin_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_fanins=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_first_column",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "regular_array_single_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "shared_root_single_bus",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "annotation_geometry",
+              "status": "not_applicable",
+              "applicability_proof": "annotations=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mixed_root_quality",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "public_root_crossing",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_relocation_dominance",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_split_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "physical_anchor_relocation",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "vertical_root_facility_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_column_lag",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "downstream_corridor_tail_bend",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "adjacent_root_height_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mergeable_root_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "premature_interior_trunk_entry",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            }
+          ],
+          "failed_metric_ids": [],
+          "quality_passed": true
         }
       ]
     },
@@ -3124,6 +3348,227 @@
           ],
           "failed_metric_ids": [],
           "quality_passed": true
+        },
+        {
+          "case_id": "boundary-offset-seed-014",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "a717019dfacc18c92d234f0ab64262a36725390a1512f8728abe3bce20066935",
+          "artifact_before_oracle_sha256": "3a2e4c303d98f8f49d6435362e7c3383216d1960848fccd1a650cb6a621c6782",
+          "artifact_after_oracle_sha256": "3a2e4c303d98f8f49d6435362e7c3383216d1960848fccd1a650cb6a621c6782",
+          "observed_issue_ids": [],
+          "semantic_variants": [
+            "outer-boundary-offset-fanout-clean",
+            "public-from-tree-clean"
+          ],
+          "required_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "executed_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "metric_results": [
+            {
+              "metric_id": "topology_identity",
+              "status": "pass",
+              "applicability_proof": "artifact",
+              "witnesses": {}
+            },
+            {
+              "metric_id": "orthogonal_segments",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "crossing_treatment",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "different_net_overlap",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "split_rejoin",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "avoidable_bends",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "port_order",
+              "status": "pass",
+              "applicability_proof": "merges=32",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_fanout_axis_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "direct_root_mux_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_mux_arrays=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "feasible_direct_root_fanin_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_fanins=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_first_column",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "regular_array_single_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "shared_root_single_bus",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "annotation_geometry",
+              "status": "not_applicable",
+              "applicability_proof": "annotations=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mixed_root_quality",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "public_root_crossing",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_relocation_dominance",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_split_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "physical_anchor_relocation",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "vertical_root_facility_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_column_lag",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "downstream_corridor_tail_bend",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "adjacent_root_height_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mergeable_root_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "premature_interior_trunk_entry",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            }
+          ],
+          "failed_metric_ids": [],
+          "quality_passed": true
         }
       ]
     },
@@ -4011,6 +4456,227 @@
           ],
           "failed_metric_ids": [],
           "quality_passed": true
+        },
+        {
+          "case_id": "boundary-offset-seed-015",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "5b6f55929b2de2fc5aef96c9aaf5bf78911bf57948da7fd6f4c46bc1bf5cef4a",
+          "artifact_before_oracle_sha256": "ca1e85919d0807a98f812e814b3507dd8b80e02c932dc32c41dc7650e3dc3d45",
+          "artifact_after_oracle_sha256": "ca1e85919d0807a98f812e814b3507dd8b80e02c932dc32c41dc7650e3dc3d45",
+          "observed_issue_ids": [],
+          "semantic_variants": [
+            "outer-boundary-offset-fanout-clean",
+            "public-from-tree-clean"
+          ],
+          "required_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "executed_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "metric_results": [
+            {
+              "metric_id": "topology_identity",
+              "status": "pass",
+              "applicability_proof": "artifact",
+              "witnesses": {}
+            },
+            {
+              "metric_id": "orthogonal_segments",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "crossing_treatment",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "different_net_overlap",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "split_rejoin",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "avoidable_bends",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "port_order",
+              "status": "pass",
+              "applicability_proof": "merges=32",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_fanout_axis_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "direct_root_mux_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_mux_arrays=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "feasible_direct_root_fanin_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_fanins=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_first_column",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "regular_array_single_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "shared_root_single_bus",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "annotation_geometry",
+              "status": "not_applicable",
+              "applicability_proof": "annotations=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mixed_root_quality",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "public_root_crossing",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_relocation_dominance",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_split_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "physical_anchor_relocation",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "vertical_root_facility_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_column_lag",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "downstream_corridor_tail_bend",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "adjacent_root_height_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mergeable_root_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "premature_interior_trunk_entry",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            }
+          ],
+          "failed_metric_ids": [],
+          "quality_passed": true
         }
       ]
     },
@@ -4244,8 +4910,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f25869415da2414e764d2a27180e7dae4262dba34c6756f812c229f6faf52af9",
-          "artifact_before_oracle_sha256": "bcdfe7c355108e64f3653edc9227f02c747ca137c929d50576aa7932ba9c5167",
-          "artifact_after_oracle_sha256": "bcdfe7c355108e64f3653edc9227f02c747ca137c929d50576aa7932ba9c5167",
+          "artifact_before_oracle_sha256": "3d0a760f6af5391091459eda06896c3cb1f2fe8be6d8498be8fac16c91d02a89",
+          "artifact_after_oracle_sha256": "3d0a760f6af5391091459eda06896c3cb1f2fe8be6d8498be8fac16c91d02a89",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -9536,8 +10202,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "80f3ce94757e0da4380d0ac51fd44438c6762c3b6abf954dc71f02defb303a7c",
-          "artifact_before_oracle_sha256": "946a4ccf7ff71c5f8efdf695a803cbe6b07f0e6f26d9768bf0e786489ec3857b",
-          "artifact_after_oracle_sha256": "946a4ccf7ff71c5f8efdf695a803cbe6b07f0e6f26d9768bf0e786489ec3857b",
+          "artifact_before_oracle_sha256": "fb9c4cd8c1ed110be1652ff3b5c9d5705747d101a97869e0687aeef7a1865d90",
+          "artifact_after_oracle_sha256": "fb9c4cd8c1ed110be1652ff3b5c9d5705747d101a97869e0687aeef7a1865d90",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -10979,6 +11645,227 @@
               "metric_id": "feasible_direct_root_fanin_column",
               "status": "pass",
               "applicability_proof": "direct_root_fanins=2",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_first_column",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "regular_array_single_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "shared_root_single_bus",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "annotation_geometry",
+              "status": "not_applicable",
+              "applicability_proof": "annotations=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mixed_root_quality",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "public_root_crossing",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_relocation_dominance",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_split_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "physical_anchor_relocation",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "vertical_root_facility_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_column_lag",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "downstream_corridor_tail_bend",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "adjacent_root_height_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mergeable_root_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "premature_interior_trunk_entry",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            }
+          ],
+          "failed_metric_ids": [],
+          "quality_passed": true
+        },
+        {
+          "case_id": "boundary-offset-seed-016",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "2a770ccd8f76b2e3c3518eb88d3dc188a18a6268e424022d057e98a55ec3374a",
+          "artifact_before_oracle_sha256": "84e3b2e225afdf4faf692c35e6cd302ddf839408d1e051221e5eee73a454be44",
+          "artifact_after_oracle_sha256": "84e3b2e225afdf4faf692c35e6cd302ddf839408d1e051221e5eee73a454be44",
+          "observed_issue_ids": [],
+          "semantic_variants": [
+            "outer-boundary-offset-fanout-clean",
+            "public-from-tree-clean"
+          ],
+          "required_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "executed_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "metric_results": [
+            {
+              "metric_id": "topology_identity",
+              "status": "pass",
+              "applicability_proof": "artifact",
+              "witnesses": {}
+            },
+            {
+              "metric_id": "orthogonal_segments",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "crossing_treatment",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "different_net_overlap",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "split_rejoin",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "avoidable_bends",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "port_order",
+              "status": "pass",
+              "applicability_proof": "merges=32",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_fanout_axis_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "direct_root_mux_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_mux_arrays=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "feasible_direct_root_fanin_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_fanins=0",
               "witnesses": []
             },
             {
@@ -12630,8 +13517,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f6e3e0bc91124d8b8d6da1cbfd5f7037c6c50ad26d32f6b0f4bf9ee035548169",
-          "artifact_before_oracle_sha256": "f3a259609b55143916f07f28f0ae0940f2ba4bc2110ad7e27d65f6815a0cc37c",
-          "artifact_after_oracle_sha256": "f3a259609b55143916f07f28f0ae0940f2ba4bc2110ad7e27d65f6815a0cc37c",
+          "artifact_before_oracle_sha256": "4efd494227529eb9d87b7f4826b31677274edb5aacf30813fe25cbd9bbdb607a",
+          "artifact_after_oracle_sha256": "4efd494227529eb9d87b7f4826b31677274edb5aacf30813fe25cbd9bbdb607a",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -15489,6 +16376,227 @@
           ],
           "failed_metric_ids": [],
           "quality_passed": true
+        },
+        {
+          "case_id": "boundary-offset-seed-017",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "6314bfbc0dfbf9c85023c00c7933871274b3bb68d90dc29ff2a7b8d541995f4b",
+          "artifact_before_oracle_sha256": "74b2aba5480758b76635e410db5db4f72c43a30ada7d6a06c343d7bd61516eeb",
+          "artifact_after_oracle_sha256": "74b2aba5480758b76635e410db5db4f72c43a30ada7d6a06c343d7bd61516eeb",
+          "observed_issue_ids": [],
+          "semantic_variants": [
+            "outer-boundary-offset-fanout-clean",
+            "public-from-tree-clean"
+          ],
+          "required_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "executed_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "metric_results": [
+            {
+              "metric_id": "topology_identity",
+              "status": "pass",
+              "applicability_proof": "artifact",
+              "witnesses": {}
+            },
+            {
+              "metric_id": "orthogonal_segments",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "crossing_treatment",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "different_net_overlap",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "split_rejoin",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "avoidable_bends",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "port_order",
+              "status": "pass",
+              "applicability_proof": "merges=32",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_fanout_axis_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "direct_root_mux_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_mux_arrays=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "feasible_direct_root_fanin_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_fanins=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_first_column",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "regular_array_single_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "shared_root_single_bus",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "annotation_geometry",
+              "status": "not_applicable",
+              "applicability_proof": "annotations=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mixed_root_quality",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "public_root_crossing",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_relocation_dominance",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_split_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "physical_anchor_relocation",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "vertical_root_facility_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_column_lag",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "downstream_corridor_tail_bend",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "adjacent_root_height_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mergeable_root_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "premature_interior_trunk_entry",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            }
+          ],
+          "failed_metric_ids": [],
+          "quality_passed": true
         }
       ]
     },
@@ -18148,8 +19256,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "ed8a89c5c95b18d50b373f1c558522c54629e08e765c0db795edd3b2ad8c6aa5",
-          "artifact_before_oracle_sha256": "68bcecb4f68877fa49437fd70159c9ab9cdc498100208c04a299c8be765682c1",
-          "artifact_after_oracle_sha256": "68bcecb4f68877fa49437fd70159c9ab9cdc498100208c04a299c8be765682c1",
+          "artifact_before_oracle_sha256": "6d8de971d33d7d69e59d8e5cb8d0bb68ea15f534b47942def0fac393e590117a",
+          "artifact_after_oracle_sha256": "6d8de971d33d7d69e59d8e5cb8d0bb68ea15f534b47942def0fac393e590117a",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -18809,8 +19917,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "145b8caf4828e7bd30ef75dc74ad5a2dd595540e8ecea95e043be4e74094ccf2",
-          "artifact_before_oracle_sha256": "41ba28e9d50313eb7536b39b2c66006c6ffdc3067904f1a2707dfacf90583cf6",
-          "artifact_after_oracle_sha256": "41ba28e9d50313eb7536b39b2c66006c6ffdc3067904f1a2707dfacf90583cf6",
+          "artifact_before_oracle_sha256": "744030f18b86fb749ac796ea8efeefa8170b7d068b22ca9e27acefaf5a50d452",
+          "artifact_after_oracle_sha256": "744030f18b86fb749ac796ea8efeefa8170b7d068b22ca9e27acefaf5a50d452",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -19250,8 +20358,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "25998bc5442e482caef284060ebc925ef42794c2aca6743878bfba5f512f414e",
-          "artifact_before_oracle_sha256": "94f139f696d43e41fc0ebf8311d253f66f365edf466bddbc22ffd53d29a33125",
-          "artifact_after_oracle_sha256": "94f139f696d43e41fc0ebf8311d253f66f365edf466bddbc22ffd53d29a33125",
+          "artifact_before_oracle_sha256": "65c9f63b10fbd3d8112b237eff3d1cab2120f6b7bfa0072380c56a64967d66fe",
+          "artifact_after_oracle_sha256": "65c9f63b10fbd3d8112b237eff3d1cab2120f6b7bfa0072380c56a64967d66fe",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -19691,8 +20799,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "1c2becb5ec3a109e276a4b6921e31caa69a9d9f8fda2b32bef4d52aba4ba5d83",
-          "artifact_before_oracle_sha256": "7de755af2362a5e9ffa4462cd5aa85e6a0c2aacc574387dd62cdf612a92e21a1",
-          "artifact_after_oracle_sha256": "7de755af2362a5e9ffa4462cd5aa85e6a0c2aacc574387dd62cdf612a92e21a1",
+          "artifact_before_oracle_sha256": "e8d334e398bd7eaa21b5b8dee16eea7139549e8a8dd9c90a9c3c754f4e53cbe2",
+          "artifact_after_oracle_sha256": "e8d334e398bd7eaa21b5b8dee16eea7139549e8a8dd9c90a9c3c754f4e53cbe2",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -21896,8 +23004,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "56629ac0b55b82b317757c6fedec8caf8d26bcc3bd99fdebf743f89a87de1cd3",
-          "artifact_before_oracle_sha256": "47c736dc5e150a23008f4fa4ef7b270b032519e775464cbc2ebe05f42ec9e816",
-          "artifact_after_oracle_sha256": "47c736dc5e150a23008f4fa4ef7b270b032519e775464cbc2ebe05f42ec9e816",
+          "artifact_before_oracle_sha256": "a3bbd834b3ab782505352312f575df3c0dbdf16441894a65277a8ab626f170cd",
+          "artifact_after_oracle_sha256": "a3bbd834b3ab782505352312f575df3c0dbdf16441894a65277a8ab626f170cd",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -26080,6 +27188,227 @@
           ],
           "failed_metric_ids": [],
           "quality_passed": true
+        },
+        {
+          "case_id": "boundary-offset-seed-018",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "0744421f0cde36c044def562d75745ede05e2d80078b3ec9224a884d39e5a1b1",
+          "artifact_before_oracle_sha256": "18069887784a49311e5bc74ca37b9dae08f3174e96cef5f09e9743edd8b319bc",
+          "artifact_after_oracle_sha256": "18069887784a49311e5bc74ca37b9dae08f3174e96cef5f09e9743edd8b319bc",
+          "observed_issue_ids": [],
+          "semantic_variants": [
+            "outer-boundary-offset-fanout-clean",
+            "public-from-tree-clean"
+          ],
+          "required_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "executed_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "metric_results": [
+            {
+              "metric_id": "topology_identity",
+              "status": "pass",
+              "applicability_proof": "artifact",
+              "witnesses": {}
+            },
+            {
+              "metric_id": "orthogonal_segments",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "crossing_treatment",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "different_net_overlap",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "split_rejoin",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "avoidable_bends",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "port_order",
+              "status": "pass",
+              "applicability_proof": "merges=32",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_fanout_axis_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "direct_root_mux_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_mux_arrays=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "feasible_direct_root_fanin_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_fanins=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_first_column",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "regular_array_single_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "shared_root_single_bus",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "annotation_geometry",
+              "status": "not_applicable",
+              "applicability_proof": "annotations=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mixed_root_quality",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "public_root_crossing",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_relocation_dominance",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_split_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "physical_anchor_relocation",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "vertical_root_facility_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_column_lag",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "downstream_corridor_tail_bend",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "adjacent_root_height_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mergeable_root_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "premature_interior_trunk_entry",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            }
+          ],
+          "failed_metric_ids": [],
+          "quality_passed": true
         }
       ]
     },
@@ -28077,8 +29406,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "311a851b6c4500592b6809d52e4b463151e039dee26ab1c65eefe7e36b12bf83",
-          "artifact_before_oracle_sha256": "ddc600978533879d26678223f56c0282e1e384103ec5ace7785a5a4c5c24b86b",
-          "artifact_after_oracle_sha256": "ddc600978533879d26678223f56c0282e1e384103ec5ace7785a5a4c5c24b86b",
+          "artifact_before_oracle_sha256": "a1d02f2490a323e8a6facda391dd167f93103fd02cee7a5d638c8a703c64a0a1",
+          "artifact_after_oracle_sha256": "a1d02f2490a323e8a6facda391dd167f93103fd02cee7a5d638c8a703c64a0a1",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -30282,8 +31611,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "dd2d68967e6629731ff626a5f4f5bcdd09390f2388c9aed752a11bafdcb0b499",
-          "artifact_before_oracle_sha256": "e60ed269358d23671680400fca86e00bcc37df7e6a8a8582c7bf3b0f749e14a6",
-          "artifact_after_oracle_sha256": "e60ed269358d23671680400fca86e00bcc37df7e6a8a8582c7bf3b0f749e14a6",
+          "artifact_before_oracle_sha256": "71b063bc709440f740853fe5e1965f38c0bd3e3ea8fcfdc347170f384298eb40",
+          "artifact_after_oracle_sha256": "71b063bc709440f740853fe5e1965f38c0bd3e3ea8fcfdc347170f384298eb40",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -30723,8 +32052,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "30bfddbcc1eb9c740b796e8dbf6ee759de7ed5370840a5307d0e8c0b83f2e1bb",
-          "artifact_before_oracle_sha256": "a58c12be752e42a8b68d7449f1446d27687b4b5e7b98fb2ae22fc1065b3c7fe4",
-          "artifact_after_oracle_sha256": "a58c12be752e42a8b68d7449f1446d27687b4b5e7b98fb2ae22fc1065b3c7fe4",
+          "artifact_before_oracle_sha256": "af654fd86341e14a860bd431c6c6efd62a7558b5a8211e7f0c8d85da8b5e2761",
+          "artifact_after_oracle_sha256": "af654fd86341e14a860bd431c6c6efd62a7558b5a8211e7f0c8d85da8b5e2761",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -31164,8 +32493,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "42aea6761394069676803e961767a0adfab390c71c6302858e0e7004e0f825d7",
-          "artifact_before_oracle_sha256": "db1e055a48f6f14e29bec54f3f66f0d482005ee1d35953eaaa3bed4a27f06b8b",
-          "artifact_after_oracle_sha256": "db1e055a48f6f14e29bec54f3f66f0d482005ee1d35953eaaa3bed4a27f06b8b",
+          "artifact_before_oracle_sha256": "35f247adbdf7302e4916caa3a7cb2a272749bba2082d57de6912e43fd4c6c8d2",
+          "artifact_after_oracle_sha256": "35f247adbdf7302e4916caa3a7cb2a272749bba2082d57de6912e43fd4c6c8d2",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -31385,8 +32714,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "621f1cc03eb415b5d92e1ddd78080b0d606da615aa8170371ff76ee124e2f996",
-          "artifact_before_oracle_sha256": "dd49f194e1d45e227d597edc0c00d56058efe6b741b56eb2b21e49e637d3858f",
-          "artifact_after_oracle_sha256": "dd49f194e1d45e227d597edc0c00d56058efe6b741b56eb2b21e49e637d3858f",
+          "artifact_before_oracle_sha256": "74bb1ef3109758537f2bb8486056afa983f62521a2a60a1b46d5bdcba463796b",
+          "artifact_after_oracle_sha256": "74bb1ef3109758537f2bb8486056afa983f62521a2a60a1b46d5bdcba463796b",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -31605,8 +32934,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "36836441933cfb31de9e1341d63d43af7a2c02883b8f8638791f07941529eb63",
-          "artifact_before_oracle_sha256": "7ba34658895053164fe94cb779f548cf6cfc59d7f83ec27be6cf0a196f9b7b48",
-          "artifact_after_oracle_sha256": "7ba34658895053164fe94cb779f548cf6cfc59d7f83ec27be6cf0a196f9b7b48",
+          "artifact_before_oracle_sha256": "98adeda3928ec0cb913fbc0ebb6c49c61f2cfc146dee7374ea12c1e8ceb4a91b",
+          "artifact_after_oracle_sha256": "98adeda3928ec0cb913fbc0ebb6c49c61f2cfc146dee7374ea12c1e8ceb4a91b",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -34238,6 +35567,227 @@
               "metric_id": "premature_interior_trunk_entry",
               "status": "pass",
               "applicability_proof": "root_fanouts=1",
+              "witnesses": []
+            }
+          ],
+          "failed_metric_ids": [],
+          "quality_passed": true
+        },
+        {
+          "case_id": "boundary-offset-seed-019",
+          "public_entrypoint": "public_cli",
+          "producer_exit_code": 0,
+          "input_sha256": "196f5e4f5e9fb7b56ec189c8437d5a863b0a0208be9311284bd5a42b06baaa5f",
+          "artifact_before_oracle_sha256": "8bc4ca701276addd93d3dc0af816c59cb7c0667daf9d3a0d6db2599e8d34783c",
+          "artifact_after_oracle_sha256": "8bc4ca701276addd93d3dc0af816c59cb7c0667daf9d3a0d6db2599e8d34783c",
+          "observed_issue_ids": [],
+          "semantic_variants": [
+            "outer-boundary-offset-fanout-clean",
+            "public-from-tree-clean"
+          ],
+          "required_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "executed_metric_ids": [
+            "topology_identity",
+            "orthogonal_segments",
+            "crossing_treatment",
+            "different_net_overlap",
+            "split_rejoin",
+            "avoidable_bends",
+            "port_order",
+            "root_fanout_axis_dominance",
+            "direct_root_mux_column",
+            "feasible_direct_root_fanin_column",
+            "root_first_column",
+            "regular_array_single_facility",
+            "shared_root_single_bus",
+            "annotation_geometry",
+            "mixed_root_quality",
+            "public_root_crossing",
+            "root_relocation_dominance",
+            "root_facility_split_dominance",
+            "physical_anchor_relocation",
+            "vertical_root_facility_bend",
+            "root_facility_column_lag",
+            "downstream_corridor_tail_bend",
+            "adjacent_root_height_bend",
+            "mergeable_root_facility",
+            "premature_interior_trunk_entry"
+          ],
+          "metric_results": [
+            {
+              "metric_id": "topology_identity",
+              "status": "pass",
+              "applicability_proof": "artifact",
+              "witnesses": {}
+            },
+            {
+              "metric_id": "orthogonal_segments",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "crossing_treatment",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "different_net_overlap",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "split_rejoin",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "avoidable_bends",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "port_order",
+              "status": "pass",
+              "applicability_proof": "merges=32",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_fanout_axis_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "direct_root_mux_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_mux_arrays=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "feasible_direct_root_fanin_column",
+              "status": "not_applicable",
+              "applicability_proof": "direct_root_fanins=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_first_column",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "regular_array_single_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "shared_root_single_bus",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "annotation_geometry",
+              "status": "not_applicable",
+              "applicability_proof": "annotations=0",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mixed_root_quality",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "public_root_crossing",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_relocation_dominance",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_split_dominance",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "physical_anchor_relocation",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "vertical_root_facility_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "root_facility_column_lag",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "downstream_corridor_tail_bend",
+              "status": "pass",
+              "applicability_proof": "logical_edges",
+              "witnesses": []
+            },
+            {
+              "metric_id": "adjacent_root_height_bend",
+              "status": "pass",
+              "applicability_proof": "roots=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "mergeable_root_facility",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
+              "witnesses": []
+            },
+            {
+              "metric_id": "premature_interior_trunk_entry",
+              "status": "pass",
+              "applicability_proof": "root_fanouts=4",
               "witnesses": []
             }
           ],

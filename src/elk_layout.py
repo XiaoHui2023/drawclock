@@ -2008,6 +2008,9 @@ def _restore_root_outer_detours(
         indegree[logical.target] += 1
 
     accepted = _clone_layout_geometry(document)
+    accepted_fanout_cycles = _logical_fanout_cycle_count(
+        accepted, logical_edges
+    )
     attempts = 0
     moves = 0
     blockers: Counter[str] = Counter()
@@ -2101,6 +2104,9 @@ def _restore_root_outer_detours(
                     item.cell_id: item for item in candidate.edges
                 }[edge.cell_id]
                 candidate_edge.waypoints = tuple(candidate_points[1:-1])
+                candidate_fanout_cycles = _logical_fanout_cycle_count(
+                    candidate, logical_edges
+                )
                 candidate_report = assess_layout(
                     candidate, logical_edges, 0.0
                 )
@@ -2127,6 +2133,9 @@ def _restore_root_outer_detours(
                     "length": candidate_report["manhattan_length"] < accepted_report["manhattan_length"] - 1e-6,
                     "endpoint": after_endpoint.issubset(before_endpoint),
                     "outer": candidate_outer < actual_outer - 1e-6,
+                    "logical-fanout-cycle": (
+                        candidate_fanout_cycles <= accepted_fanout_cycles
+                    ),
                 }
                 if not all(checks.values()):
                     blockers.update(
@@ -2147,6 +2156,9 @@ def _restore_root_outer_detours(
         if best is None:
             break
         accepted = best[1]
+        accepted_fanout_cycles = _logical_fanout_cycle_count(
+            accepted, logical_edges
+        )
         moves += 1
 
     return accepted, {
@@ -4283,6 +4295,129 @@ def _clone_layout_geometry(document: LayoutDocument) -> LayoutDocument:
     )
 
 
+def _logical_fanout_cycle_count(
+    document: LayoutDocument,
+    logical_edges,
+) -> int:
+    """Return split/rejoin cycle count without running any repair transaction.
+
+    Physical source aliases still represent one logical source-port net, so
+    grouping by rendered ``source_id`` is insufficient.  This read-only
+    arrangement graph mirrors the serialized SVG Oracle: every intersection
+    and collinear endpoint cuts a segment, then union-find detects a cycle.
+    """
+    by_id = {vertex.cell_id: vertex for vertex in document.vertices}
+    edge_by_id = {edge.cell_id: edge for edge in document.edges}
+    groups: dict[tuple[str, str], list[list[tuple[float, float]]]] = defaultdict(list)
+    for index, logical in enumerate(logical_edges, 1):
+        edge = edge_by_id[f"e{index}"]
+        source = by_id[edge.source_id]
+        target = by_id[edge.target_id]
+        points = _simplify([
+            abs_port_xy(
+                source.x, source.y, source.width, source.height,
+                source.style, source.drawclock_type, logical.source_port,
+            ),
+            *edge.waypoints,
+            abs_port_xy(
+                target.x, target.y, target.width, target.height,
+                target.style, target.drawclock_type, logical.target_port,
+            ),
+        ])
+        serialized_points = [
+            (round(point[0], 4), round(point[1], 4)) for point in points
+        ]
+        # Match layout_preview's final near-axis canonicalization.  Without
+        # this, a 0.005 px port-ratio truncation looks like one baseline cycle
+        # here and can let a candidate replace it with a large visible cycle
+        # while keeping the scalar count unchanged.
+        if len(serialized_points) == 2:
+            first, second = serialized_points
+            if 0.0 < abs(first[1] - second[1]) <= 0.01:
+                serialized_points.insert(1, (second[0], first[1]))
+            elif 0.0 < abs(first[0] - second[0]) <= 0.01:
+                serialized_points.insert(1, (first[0], second[1]))
+        groups[(logical.source, logical.source_port)].append(serialized_points)
+
+    def point_on_segment(point, first, second) -> bool:
+        if abs(first[0] - second[0]) <= 1e-6:
+            return (
+                abs(point[0] - first[0]) <= 1e-6
+                and min(first[1], second[1]) - 1e-6
+                <= point[1]
+                <= max(first[1], second[1]) + 1e-6
+            )
+        return (
+            abs(point[1] - first[1]) <= 1e-6
+            and min(first[0], second[0]) - 1e-6
+            <= point[0]
+            <= max(first[0], second[0]) + 1e-6
+        )
+
+    cycle_count = 0
+    for paths in groups.values():
+        if len(paths) < 2:
+            continue
+        raw = [
+            (first, second)
+            for points in paths
+            for first, second in zip(points, points[1:])
+            if first != second
+        ]
+        cuts = [{first, second} for first, second in raw]
+        for left_index, (first, second) in enumerate(raw):
+            for right_index in range(left_index + 1, len(raw)):
+                other_first, other_second = raw[right_index]
+                left_segment = Segment("", ("", ""), first, second)
+                right_segment = Segment("", ("", ""), other_first, other_second)
+                if _proper_cross(left_segment, right_segment):
+                    if abs(first[0] - second[0]) <= 1e-6:
+                        crossing = (first[0], other_first[1])
+                    else:
+                        crossing = (other_first[0], first[1])
+                    cuts[left_index].add(crossing)
+                    cuts[right_index].add(crossing)
+                for point in (first, second):
+                    if point_on_segment(point, other_first, other_second):
+                        cuts[right_index].add(point)
+                for point in (other_first, other_second):
+                    if point_on_segment(point, first, second):
+                        cuts[left_index].add(point)
+        graph_edges = set()
+        for (first, second), points in zip(raw, cuts):
+            ordered = sorted(
+                points,
+                key=(
+                    (lambda point: (point[1], point[0]))
+                    if abs(first[0] - second[0]) <= 1e-6
+                    else (lambda point: (point[0], point[1]))
+                ),
+            )
+            graph_edges.update(
+                tuple(sorted((left, right)))
+                for left, right in zip(ordered, ordered[1:])
+                if left != right
+            )
+        parent: dict[tuple[float, float], tuple[float, float]] = {}
+
+        def find(point):
+            parent.setdefault(point, point)
+            while parent[point] != point:
+                parent[point] = parent[parent[point]]
+                point = parent[point]
+            return point
+
+        has_cycle = False
+        for left, right in sorted(graph_edges):
+            left_root, right_root = find(left), find(right)
+            if left_root == right_root:
+                has_cycle = True
+                break
+            parent[left_root] = right_root
+        cycle_count += int(has_cycle)
+    return cycle_count
+
+
 def _refine_direct_root_fanin_arrays(
     document: LayoutDocument,
     nodes,
@@ -5449,7 +5584,17 @@ def _normalize_fanout_routes_as_trees(
         edges = local_edge_by_id if local_edge_by_id is not None else edge_by_id
         edge = edges[f"e{index}"]
         start, end = route_endpoints(index, local_by_id, local_edge_by_id)
-        return [canonical(point) for point in _simplify([start, *edge.waypoints, end])]
+        points = [
+            canonical(point)
+            for point in _simplify([start, *edge.waypoints, end])
+        ]
+        if len(points) == 2:
+            first, second = points
+            if 0.0 < abs(first[1] - second[1]) <= 0.01:
+                points.insert(1, (second[0], first[1]))
+            elif 0.0 < abs(first[0] - second[0]) <= 0.01:
+                points.insert(1, (first[0], second[1]))
+        return points
 
     def union_graph(
         indices: list[int],
@@ -8366,6 +8511,9 @@ def _route_root_branches_through_boundary_corridors(
     """
     accepted = _clone_layout_geometry(document)
     accepted_report = assess_layout(accepted, logical_edges, 0.0)
+    accepted_fanout_cycles = _logical_fanout_cycle_count(
+        accepted, logical_edges
+    )
     indegree = Counter(edge.target for edge in logical_edges)
     fanout = Counter(edge.source for edge in logical_edges)
     attempts = 0
@@ -8420,6 +8568,14 @@ def _route_root_branches_through_boundary_corridors(
         # Enumerate every adjacent track cheaply, then send only the best
         # candidate on each side to the expensive whole-layout gate.
         lane_offsets = range(len(fanout_roots) + 2)
+        # A crossing-free visibility lane may lie strictly between the
+        # envelope-clearance line and the first outer grid line.  Enumerate a
+        # bounded scale-relative sweep in that one-grid strip; using only its
+        # endpoints creates a blind zone, while only the best candidate per
+        # side reaches the expensive whole-document transaction below.
+        subgrid_offsets = tuple(
+            profile.grid * step / 10.0 for step in range(1, 10)
+        )
         accepted_by_id = {
             vertex.cell_id: vertex for vertex in accepted.vertices
         }
@@ -8481,6 +8637,14 @@ def _route_root_branches_through_boundary_corridors(
                 ("bottom", bottom_inner_lane),
                 *(
                     candidate
+                    for offset in subgrid_offsets
+                    for candidate in (
+                        ("top", top_inner_lane - offset),
+                        ("bottom", bottom_inner_lane + offset),
+                    )
+                ),
+                *(
+                    candidate
                 for offset in lane_offsets
                 for candidate in (
                     ("top", top_lane - profile.grid * offset),
@@ -8506,7 +8670,25 @@ def _route_root_branches_through_boundary_corridors(
                 for segment in segments_by_index[index]
                 for other in other_segments
             )
+            def crossing_point(segment, other):
+                if not _proper_cross(segment, other):
+                    return None
+                if abs(segment.a[0] - segment.b[0]) <= 1e-6:
+                    return (segment.a[0], other.a[1])
+                return (other.a[0], segment.a[1])
+
+            before_crossing_points = {
+                point
+                for segment in segments_by_index[index]
+                for other in other_segments
+                if (point := crossing_point(segment, other)) is not None
+            }
             best_by_side: dict[str, tuple[tuple[Any, ...], float]] = {}
+            mandatory_lanes = {
+                "top": {top_inner_lane, top_lane},
+                "bottom": {bottom_inner_lane, bottom_lane},
+            }
+            admissible_mandatory: dict[str, set[float]] = defaultdict(set)
             for side, lane_y in lane_candidates:
                 local_points = _simplify([
                     points[0],
@@ -8531,8 +8713,15 @@ def _route_root_branches_through_boundary_corridors(
                     for segment in local_segments
                     for other in other_segments
                 )
+                local_crossing_points = {
+                    point
+                    for segment in local_segments
+                    for other in other_segments
+                    if (point := crossing_point(segment, other)) is not None
+                }
                 if (
                     local_overlaps > before_overlaps
+                    or len(local_crossing_points) > len(before_crossing_points)
                     or local_crossings > before_crossings
                 ):
                     continue
@@ -8541,6 +8730,7 @@ def _route_root_branches_through_boundary_corridors(
                 )
                 local_score = (
                     local_overlaps,
+                    len(local_crossing_points),
                     local_crossings,
                     len(local_points) - 2,
                     sum(
@@ -8555,8 +8745,24 @@ def _route_root_branches_through_boundary_corridors(
                     or local_score < best_by_side[side][0]
                 ):
                     best_by_side[side] = (local_score, lane_y)
+                if lane_y in mandatory_lanes[side]:
+                    admissible_mandatory[side].add(lane_y)
 
-            for side, (_local_score, lane_y) in sorted(best_by_side.items()):
+            selected_lanes = {
+                side: {
+                    *admissible_mandatory.get(side, set()),
+                    *(
+                        (best_by_side[side][1],)
+                        if side in best_by_side else ()
+                    ),
+                }
+                for side in ("top", "bottom")
+            }
+            for side, lane_y in (
+                (side, lane_y)
+                for side in ("top", "bottom")
+                for lane_y in sorted(selected_lanes[side])
+            ):
                 attempts += 1
                 candidate = _clone_layout_geometry(accepted)
                 candidate_edge = next(
@@ -8571,6 +8777,12 @@ def _route_root_branches_through_boundary_corridors(
                     points[-1],
                 ])
                 candidate_edge.waypoints = tuple(candidate_points[1:-1])
+                candidate_fanout_cycles = _logical_fanout_cycle_count(
+                    candidate, logical_edges
+                )
+                if candidate_fanout_cycles > accepted_fanout_cycles:
+                    blockers["logical-fanout-cycle"] += 1
+                    continue
                 report = assess_layout(candidate, logical_edges, 0.0)
                 visible = _visible_layout_signature(candidate, logical_edges)
                 accepted_final_overlap = _final_artifact_overlap_count(
@@ -8625,6 +8837,9 @@ def _route_root_branches_through_boundary_corridors(
         previous_crossings = accepted_report["crossings"]
         accepted = best[1]
         accepted_report = best[2]
+        accepted_fanout_cycles = _logical_fanout_cycle_count(
+            accepted, logical_edges
+        )
         moves += 1
         crossings_removed += previous_crossings - accepted_report["crossings"]
 
@@ -9144,15 +9359,6 @@ def generate_elk_layout(
         key.replace("source_anchor", "serialized_source_anchor"): value
         for key, value in serialized_anchor_report.items()
     })
-    document, serialized_corridor_report = (
-        _route_root_branches_through_boundary_corridors(
-            document, nodes, logical_edges, profile
-        )
-    )
-    report["selection"].update({
-        key.replace("boundary_corridor", "serialized_boundary_corridor"): value
-        for key, value in serialized_corridor_report.items()
-    })
     report["selection"]["root_closure_rounds"] = 1
     # Boundary routing and the final fanout-tree transaction are deliberately
     # allowed to change only routes.  Those changes can nevertheless remove
@@ -9214,6 +9420,20 @@ def generate_elk_layout(
     report["selection"].update({
         key.replace("source_anchor", "post_first_source_anchor"): value
         for key, value in local_after_first_report.items()
+    })
+    # This is the final multi-row fanout route owner.  Placement, facility
+    # splitting and obsolete-outer-detour cleanup have all completed, so an
+    # exterior corridor chosen here cannot be pulled back through a dense
+    # branch band by a later route optimizer.  The transaction itself is
+    # guarded by the logical-net cycle and complete geometry invariants above.
+    document, serialized_corridor_report = (
+        _route_root_branches_through_boundary_corridors(
+            document, nodes, logical_edges, profile
+        )
+    )
+    report["selection"].update({
+        key.replace("boundary_corridor", "serialized_boundary_corridor"): value
+        for key, value in serialized_corridor_report.items()
     })
     document, source_lead_report = _restore_root_source_lead_clearance(
         document,

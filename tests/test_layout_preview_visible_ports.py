@@ -150,6 +150,33 @@ def test_crossing_renderer_treats_physical_aliases_as_one_logical_net() -> None:
     assert crossings == {}
 
 
+def test_direct_near_axis_route_snaps_at_serialization_boundary() -> None:
+    source = VertexLayout(
+        name="root", cell_id="v1", drawclock_type="source",
+        x=0, y=0, width=10, height=10,
+        style="exitX=1;exitY=0.50025;", object_attrs={},
+    )
+    target = VertexLayout(
+        name="target", cell_id="v2", drawclock_type="gate",
+        x=50, y=0, width=10, height=10,
+        style="entryX=0;entryY=0.49975;", object_attrs={},
+    )
+    edge = EdgeLayout(
+        "e1", "v1", "v2",
+        "exitX=1;exitY=0.50025;entryX=0;entryY=0.49975;",
+    )
+    svg = build_preview_svg(
+        LayoutDocument(version=1, vertices=[source, target], edges=[edge])
+    )
+    match = re.search(r'<polyline class="edge" points="([^"]+)"', svg)
+    assert match is not None
+    points = [tuple(map(float, item.split(","))) for item in match.group(1).split()]
+    assert len(points) == 3
+    assert points[0][1] == points[1][1]
+    assert points[1][0] == points[2][0]
+    assert points[2] == pytest.approx((50.0, 4.9975))
+
+
 def test_annotation_wrap_preserves_empty_and_trailing_lines() -> None:
     assert _wrap_annotation("短") == ("短",)
     assert _wrap_annotation("一\r\n\r\n三\r") == ("一", "", "三", "")

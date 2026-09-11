@@ -11,6 +11,10 @@ import sys
 from pathlib import Path
 from typing import Any
 
+TOOLS = Path(__file__).resolve().parent
+if str(TOOLS) not in sys.path:
+    sys.path.insert(0, str(TOOLS))
+
 import check_quality_contract_retention as quality_contract
 
 
@@ -420,7 +424,8 @@ def _validate_recursive_attack_receipt(
         cases = actual.get("cases")
         expected_count = (len(expected.get("fixtures", []))
                           + 2 * len(expected.get("seeds", []))
-                          + len(expected.get("bus_rows", [])))
+                          + len(expected.get("bus_rows", []))
+                          + len(expected.get("boundary_seeds", [])))
         if actual.get("status") != "clean" or not isinstance(cases, list) or len(cases) != expected_count:
             errors.append(f"recursive attack round {expected.get('id')} is incomplete")
             continue

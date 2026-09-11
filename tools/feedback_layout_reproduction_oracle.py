@@ -2913,6 +2913,16 @@ def _premature_interior_trunk_entry_witnesses(
                 candidate if item.index == route.index else item
                 for item in routes
             ]
+            candidate_net_routes = [
+                item for item in candidate_routes
+                if (item.source, item.source_port)
+                == (route.source, route.source_port)
+            ]
+            if (
+                len(candidate_net_routes) > 1
+                and _same_net_cycle(candidate_net_routes)
+            ):
+                continue
             global_crossings_after, global_overlaps_after = route_crossings(
                 candidate_routes
             )

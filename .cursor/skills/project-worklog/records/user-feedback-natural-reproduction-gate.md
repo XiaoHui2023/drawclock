@@ -1,8 +1,46 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: done
+- status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-11 03:01 +08:00
+- updated: 2026-09-11 18:02 +08:00
+
+- 2026-09-11 18:02 用户复位 `FB-ROUTE-023`，要求覆盖“密集上方分支带 + 略偏右下消费者”而非只复用旧大图。第一版 19 节点公开 CLI 输入双跑哈希一致，但公共 `from` 被拆成 7 个显示设施，`FB-ROUTE-023` 未命中而完整 Oracle 命中 `FB-ROOT-015` 的 `mergeable_root_facility_witnesses`；该轮是相邻回退红灯，不计目标症状复现或 clean。下一轮用显式列约束隔离设施复制，继续寻找主干过早进入的自然红灯。
+
+- 2026-09-11 18:08 给公共根增加显式列约束后双跑仍产生 5 个设施，现有 023 逐边 Oracle 仍未命中，但完整 Oracle 继续以可合并设施拒绝。由此确认 `layout_column` 只约束层级而不约束显示设施数量，不能作为复现隔离手段。下一轮改用结构化公共/私人 mux 阵列保留单公共总线，并仅让末行公共 gate 错后一列，隔离“完整同源网络边界通道”变量。
+
+- 2026-09-11 18:15 单总线错列 gate 控制双跑稳定且全 Oracle 干净；终态图显示公共主干沿左侧连续下行、末行从分支带下方接入，没有复现，作为干净边界冻结。下一次单变量变化改为公共根直接连接深层末行 mux，使右下端点真实右移，同时由上方六路结构化阵列维持单公共设施。
+
+- 2026-09-11 18:21 深层右下 mux 变体双跑哈希一致、公共根单设施、完整 Oracle 干净；终态仍正确沿分支带下方接入，证明错列和异深度也不是充分条件。网络资料表明成熟路由器把共享边集合当 bus/backbone 整体路由，并以空间驱动搜索、交叉代价、标签障碍和可选单/多 backbone 约束共同决策；现新增有上限的发布基线变形搜索器，对旧 136 节点自然红图执行列偏移、端口逆序、声明乱序与组合变形，逐案走公开 CLI、独立 Oracle 与完整指标集。
+
+- 2026-09-11 18:35 组合搜索在 seed 13 自然复现并由公开 CLI 双跑确认，SVG SHA-256 均为 `4F74DA9B3445B9628C09F938FD6B5E63387CB965E0E26BB027FE59A95B9C3518`；外缘候选使局部交叉点 7→5、事件 9→7，全图交叉点 390→388、事件 1425→1423，重叠与折点不增。阶段统计显示边界 owner 已接受 5 次改善，但后置 `_restore_root_outer_detours` 又接受 2 次路线改写；代码缺少其注释所声明的“单物理设施多分支不得逐边修改”检查，确认这是前序修复被后置局部 owner 覆盖的根因。
+
+- 2026-09-11 18:42 首次聚焦回归为 2 PASS / 1 FAIL；失败发生在新增搜索工具被测试动态导入时，因本地 `tools` 目录不在 `sys.path` 而 `ModuleNotFoundError`，尚未执行 seed 13 产品断言，故不计绿灯。修复工具自身的稳定导入边界后原样重跑。
+
+- 2026-09-11 18:49 修正导入后聚焦仍为 2 PASS / 1 产品红灯，seed 13 的同一 witness 未消失，证明“阻止后置 outer-detour 单边改写”只是必要保护而非充分修复。根因扩展为：边界全局事务运行后仍有设施、坐标与单边通道 owner，最终序列缺少重新达到边界支配闭包的步骤。候选改为在全部最终路由 owner 后复用同一全图边界事务；完整 split/rejoin 与全指标门负责拒绝副作用。
+
+- 2026-09-11 18:57 最终边界闭包已执行但 seed 13 仍红，统计为 17 次候选全部被 crossing 条件拒绝。独立 Oracle 的支配 lane 位于可视边界净空线与第一条整网格外缘线之间；生产候选仅含两个端点和更外整格线，旧记录要求的 `[0..1]×grid` 子网格 visibility sweep 已在实现中退化为端点枚举。恢复按网格比例的有界十分位采样，每侧仍仅提交一个局部最优候选到全图评估。
+
+- 2026-09-11 19:06 子网格采样关闭 seed 13，却使旧冻结基线出现 edge 0062 的新 witness：外缘候选全图唯一交叉点 449→448、事件保持 1432、折点保持 4、重叠保持 0。生产预筛只按局部 crossing event 数和长度选每侧一个候选，因正确 lane 稍长而在正式全图唯一交叉点目标之前被丢弃。修复为在廉价正交段扫描中先计算 distinct crossing points，使预筛与正式词典序目标一致。
+
+- 2026-09-11 19:14 预筛目标修复后聚焦门 3/3 PASS：旧冻结 023、局部收益但全局 crossing 变差的干净反例、新 seed 13 复发均通过。尚未计完成；搜索器进一步改为任一完整质量指标失败立即非零退出并保存首个失败，再从 case 0 重跑有界 24 案。
+
+- 2026-09-11 19:17 全指标搜索 case 0 立即以 `crossing_treatment` 非零；原因是搜索器沿用精确几何复现的 `--crossing-style none`，而发行质量合同要求有交叉时使用 `arc` 桥接。该项分类为 operational_error，不计失败或 clean；攻击阶段改为 `arc` 后从 case 0 重启，精确双跑红灯证据仍保留 none 版。
+
+- 2026-09-11 19:22 `arc` 全指标攻击在 seed 6 捕获 `split_rejoin`，clean streak 清零。023 已关闭，但最终逐边边界闭包破坏同源树语法；终态改为边界路由与 fanout-tree 规范化的组合事务，并以终态不同网重叠门决定是否接受。
+
+- 2026-09-11 19:29 组合后规范化仍在 seed 6 残留 split-rejoin；候选必须在参与全图排序前先规范化且 residual cycle rank=0，不能先接受非法候选再事后修复。
+
+- 2026-09-11 19:36 候选级树准入后聚焦 3/3 PASS；攻击 seed 1 报 023，但其 Oracle 单边边界候选未检查同源 split-rejoin，生产规范化后无法保持该局部收益。这是 Oracle 假阳性：023 反事实必须同时满足共享网络无环，且原自然红灯/seed 13 仍须保持红灯校准。
+
+- 2026-09-11 19:48 Oracle 无环校准 4/4 PASS，但 7 案攻击在 seed 6 同时报 split-rejoin 与 023。阶段报告证明终态边界未接受候选，随后事后树规范化残留 cycle rank=4 却因只检查 overlap 被接受。删除重复终态 owner，保留原两阶段的升级候选空间、distinct-point 预筛、候选级无环准入及后置共享设施保护。
+
+- 2026-09-11 20:03 独立 `HEAD=86a4705` worktree 对同一 seed 6 运行公开 CLI 与完整 25 指标退出 0，证明 split-rejoin 是本轮回退。撤销过宽的“共享物理设施完全跳过 outer-detour”禁令；该 owner 可能承担上游环清理，正确约束应由候选级全网无环事务而非一刀切跳过实现。
+
+- 2026-09-11 20:18 哈希对照证明所谓 seed 6 单独绿灯与攻击红灯是同一输入/同一 SVG；`tools/svg_quality_system.py` 缺少 CLI main，直接执行实际空跑并返回 0。撤销该绿灯，新增正式 fail-closed CLI 与坏图非零子进程回归，防止质量函数可导入但命令入口静默绕过。
+
+- 2026-09-11 20:27 CLI 门回归 2/2 PASS，已知坏图非零且执行 25/25；同门确认 HEAD seed 6 为 PASS，当前为回退。候选内 fanout 规范化会连带改写整网且其内部 cycle 判定未与独立 SVG Oracle 同精度，撤销该副作用，恢复单候选单边变化并由终态全指标拒绝 split-rejoin。
+
+- 2026-09-11 20:36 撤销整网副作用后聚焦 4/4 PASS，seed 6 仅剩 split-rejoin。确认子网格单边候选本身可制造环；改为只读调用 fanout 分析器，任何候选出现 `fanout_cycle_candidates>0` 直接拒绝，不采用规范化产物。
 
 - 2026-09-11 03:01 关闭补丁虽然成功应用，但 INDEX 摘要尾部混入无意义字符串 `gbe?`，且第一版纠正说明本身出现重复字；回读后在任何校验、暂存或提交前一并修正，并同步本记录与 INDEX 更新时间。这些中间文本状态均不计为关闭通过。
 
@@ -1718,3 +1756,29 @@
 - 12:20 计划新增通用 SVG 全图检查脚本，输出节点方位/入出边、边的完整点段/方向/折点/交叉伙伴、网络分支/汇合/环/设施/共享纵干线；同时给每图回执写 `required_metric_ids == executed_metric_ids == receipted_metric_ids`。条件指标也必须执行并产生经证明的适用或不适用结果，语料层再强制每项指标至少有适用正例与 mutant，避免用 `not_applicable` 集体逃逸。
 - 12:22 首次状态补丁使用了过宽的 `"status": "closed"` 上下文，误把 `FB-ROOT-001` 重开而没有重开 016；JSON 自检立即发现。已按稳定 issue ID 上下文恢复 001=closed、设置 016=reproduction_in_progress，并把这类“补丁命中错误对象”继续保留为状态归属反作弊回归。
 - 12:31 当前 `c1a953f` 对 `pad-r08-s02.json` 经公开 CLI 独立双跑，两个原始 SVG SHA-256 均为 `e81cd21f6bf8db57683f60a48b98b57005159ad803e5229b349954158fc59ed1`；独立终态统计显示 `public_from:right` 扇出 5、渲染设施/起点 5、纵向通道 0，全部变成互不相连的行内横线。旧规则数组 witness 与 split-rejoin 都为空，因而错误放行。Oracle 现新增通用共享根总线判据，只按零入度、多目标、同输出端口、物理起点和终态纵段判断。
+
+## 2026-09-11：外缘通道复位复现续作
+
+- 20:40 最新聚焦用例 4/4 通过后，完整 25 指标门在相邻 seed-006 上仍报 `split_rejoin` 与 `premature_interior_trunk_entry`。报告显示边界通道本身 `moves=0`，但候选期调用树归一化会执行带设施合并的完整变换；即使丢弃其返回文档，也可能改写共享输入对象或缓存，造成只读探针并不只读。该候选探针已撤回，后续结构门必须使用独立纯函数终态图判定，禁止借用会执行优化事务的修复器作为 Oracle。
+- 20:48 撤回修复器探针后 seed-006 的 `FB-ROUTE-023` 消失，但 9 次亚网格通道移动仍新造 `split_rejoin`，证明回退来自逻辑同源跨物理别名的环，而原归一化器按 `source_id` 分组无法作为采用前门。新增纯 `_logical_fanout_cycle_count`：按逻辑 source-port 汇总所有设施的终态正交段，以 SVG 四位精度切分交点/共线端点并用 union-find 检环；边界事务只允许环数不增。
+- 20:54 seed-006 经公开 CLI 和独立质量 CLI 已恢复 25/25 PASS。正式 seed-013 回归不再只断言 023 缺席：改用 arc 终态产物，并通过外部质量 CLI 强制 `required == executed == 25` 且 `failed=[]`，防止一个目标指标变绿时旧指标静默回退。
+- 21:02 高风险递归攻击合同纳入 `FB-ROUTE-023` 与 `outer-boundary-offset-fanout-clean` 语义变体；R1–R7 每轮各含一个不同确定性 boundary seed，R2/R3 同时施加声明逆序/全图改名。新增合同测试强制该场景不能只在某一轮出现，且每个样例仍执行统一 25 项注册表。
+- 21:06 新合同测试自然抓到 R3 改名变形器把 `node[port]` 当完整节点名而 `KeyError`，此前复杂端口图会在攻击前中止。修正为只改 base node、原样保留端口后缀，并加入 `root[right]` 正向测试；该失败不计作攻击成功轮。
+- 21:18 有界攻击在第 19 个变异 seed-018 再次自然命中 002+023，streak 清零。阶段报告把回退归因到边界闭合后的 `_restore_root_outer_detours`：它执行 2 次逐边内缩，既未检查跨物理别名的逻辑网环，之后也没有最终外缘 owner。现为该事务加入逻辑环不增门，并把既有 serialized boundary pass 移到所有设施/锚点/outer-detour owner 之后，成为末端多行扇出路由 owner；后续 source-lead/single-edge pass 不拥有多分支网络。
+- 21:20 补丁回读发现宽上下文把 `accepted_fanout_cycles` 初始化插入了相邻 source-lead owner，而 outer-detour 使用处未初始化；尚未运行即被静态回读拦住。已按函数签名精确移动初始化，保留为“补丁落点必须回读”的过程证据。
+- 21:31 seed-018 与 seed-006 均经公开 CLI + 25 指标门 PASS，seed-013 正式测试 4/4 PASS；第二攻击 epoch 已从 R1 启动。用户根专题同步沉淀：逻辑网跨 alias 检环、连续/亚网格外缘通道搜索、末端 route owner、修复器不可充当只读 Oracle、CLI 空入口故障注入、端口限定引用的语义保持改名，以及复发后从 R1 重启。
+- 21:49 第二 epoch 在 seed-019 再次命中 002+023，并暴露 `orthogonal_segments`。HEAD 对同一输入也命中 orthogonal+split，根因是截断端口比例让一条无 waypoint 的“直线”终态相差 0.005px；它穿过共享干线形成微小三角环。SVG 终态层现只对不超过 0.01px 的两点近轴线保持源端并吸附目标坐标，较大偏差仍失败。023 则来自“每侧只送局部最优一条到整图门”丢掉 envelope 边界可行解；现每侧强制评估 inner/outer 两个边界锚点加局部最优，不做全量昂贵枚举。
+- 21:50 源码回读与 `py_compile` 通过；同时把新增双层候选循环缩进修正为项目统一四空格，避免仅语法可用但风格漂移。
+- 21:52 公开 CLI 随后正确报 `IndentationError`，揭示 21:50 的编译证据发生在格式补丁之前，属于陈旧证据，明确撤销。候选枚举改为单层 `(side, lane)` 生成器以消除大段嵌套缩进风险；必须重新编译和公开生成。
+- 22:01 seed-019 重验已消除 orthogonal 与 023，但仍有 root1 split-rejoin。路线审计显示终态吸附消除了原 0.005px 微环，然而采用前纯环门仍把未吸附基线计为 1，允许候选用一个大型可见环替换它而保持标量 1。纯环门现与 renderer 共用同一四位精度/0.01px 两点近轴语义，使基线为 0、任何新大型环都被拒绝；这是“同指标但 witness 身份替换”的标量逃逸修复。
+- 22:10 仅修候选环门后终态仍为 1；更早的 `_normalize_fanout_routes_as_trees` 仍以六位未吸附伪直线构造 union graph，报告 `disconnected-union` 并跳过真实大环。其 `route_points` 现同步两点近轴语义，使树提取器、候选门和最终 SVG 三个观察面一致，避免 precision split-brain。
+- 22:16 seed-019 已公开入口 25/25 PASS，第三攻击 epoch 从 R1 启动。用户根布局/质量专题补记统一精度合同、只吸附有界亚像素近轴线，以及“标量不增仍可能替换 witness 身份”的门禁风险。
+- 22:43 第三 epoch 曾完成 24/24 clean，但随后相关测试 177/180 揭示目标端口精确接触回退；另外两个失败是预期的新源码导致旧 fix/recursive 收据陈旧。将“移动目标端点到源 y”改为保留两端精确端口、在目标前插入 0.005px 正交末段，并同步树归一化/纯环门。第三 epoch 因之后发生源码变更作废，必须开启第四 epoch。
+- 23:14 第四 epoch 在最终不变源码上连续 24/24 clean；正式递归 run `20260911T053825Z-a3269815` R1–R7 全 clean，覆盖 10/6/5/33/21/49/38 个 case，每图完整 25 指标且 required/covered semantic exact-set 相等。全 issue 当前 fix 双跑批次 `20260911T054454Z-682e218b` failures=[]；023 账本追加 reset 三次红灯根因链和新验证组。
+- 23:18 账本补丁回读发现新增 reset attempt 因宽 `}` 上下文误挂到 FB-ROOT-001；JSON 虽合法但语义 owner 错误。已删除误挂块并用 023 最后一次旧 attempt 的唯一 next_condition 作为锚点重插，保留“合法 JSON 不等于记录归属正确”的反例。
+- 23:25 固定路径递归收据重新运行 `20260911T055047Z-874669d0`，R1–R7 clean。发布 checker 审计发现预期 case 数公式尚未计入每轮新增 `boundary_seeds`，会把真实额外覆盖误报为 incomplete；公式现加入该字段，收据仍绑定未变的 manifest/runner/Oracle/quality/source 哈希。
+- 23:28 隔离 gate 测试发现 checker 导入本地 `check_quality_contract_retention` 依赖先前测试污染的 `sys.path`；单独加载会 ModuleNotFoundError。checker 现按 `__file__` 显式加入自身 tools 目录，消除测试顺序/调用入口依赖。
+- 23:43 最终不变源码完成全量回归 `554 passed in 548.38s`；随后由公开制品 runner 新鲜生成全部 26 张 SVG，每张均执行同一注册表 exact-set，结果 `PASS 26/26 × 25/25`。最终 seed-019 交付 SVG 再由独立质量 CLI 单独复核为 25/25 PASS。
+- 23:46 第一次 Edge 截图只返回 `WSALookupServiceBegin 10108` 且没有 PNG，明确记为制品失败、未作可见性声明；改用隔离 `user-data-dir` 后生成 4060×4703、447364-byte PNG。媒体检查器解码通过，SHA-256=`4dc4ddc7569e72b756bcf3c95d9ea86fd23be8ea9a8674a006f76cdff9ce24cd`，稳定 ASCII 别名哈希一致；原生图像工具已读取确切别名。用户端是否显示仍须用户确认，Markdown/文件链接仅作为独立后备。
+- 23:55 当前暂存闭包 release gate 19/19 PASS；本地与 `origin/main` 为 0 ahead / 0 behind。最初误查根目录 `pack.bat` 以及把 `run_frozen_example.py --help` 当普通帮助入口均正确非零，未计作发布证据；改走真实 `tools/pack.bat` 后，Windows PyInstaller 6.22.2 构建及内置完整 frozen smoke 通过，归档 SHA-256=`25712860ea90371c431752a5410d25dfd7fba908ac3343fe826b736f2d8e65bc`。
+- 23:58 Windows zip 再解到新 GUID 临时目录，从解压包内 `drawclock.exe` 运行完整 frozen workflow，项目 skill 7/7 且功能 smoke PASS；该消费过程未引用 `dist` 可执行文件或源码入口。Linux Ubuntu 16.04 + staticx、归档消费、librsvg 与远程下载 smoke 由 push 后 Release workflow 承担，未用 Windows 本地结果冒充异平台证据。

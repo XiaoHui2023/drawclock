@@ -2,11 +2,12 @@
   "schema_version": 1,
   "campaign_name": "defect-driven-adversarial-regression-loop",
   "risk_class": "high",
-  "issues": ["FB-ROUTE-002", "FB-ROOT-003", "FB-ROOT-016", "FB-BEND-017", "FB-ROOT-020"],
+  "issues": ["FB-ROUTE-002", "FB-ROOT-003", "FB-ROOT-016", "FB-BEND-017", "FB-ROOT-020", "FB-ROUTE-023"],
   "required_semantic_variants": [
     "direct-from-column-clean",
     "direct-source-column-clean",
-    "public-from-tree-clean"
+    "public-from-tree-clean",
+    "outer-boundary-offset-fanout-clean"
   ],
   "required_consecutive_clean_rounds": 7,
   "rounds": [
@@ -23,7 +24,8 @@
         "tests/reproduction-corpus/recurrent-staggered-four-source-bend.json",
         "example/auto-layout/30-staggered-four-source-mux.json",
         "tests/reproduction-corpus/staggered-four-from-mux.json"
-      ]
+      ],
+      "boundary_seeds": [13]
     },
     {
       "id": "R2-declaration-order",
@@ -35,7 +37,8 @@
         "tests/reproduction-corpus/recurrent-mixed-depth-downstream-array.json",
         "tests/reproduction-corpus/recurrent-staggered-four-source-bend.json"
       ],
-      "transform": "reverse"
+      "transform": "reverse",
+      "boundary_seeds": [14]
     },
     {
       "id": "R3-structural-renaming",
@@ -46,33 +49,38 @@
         "tests/reproduction-corpus/recurrent-mixed-depth-downstream-array.json",
         "tests/reproduction-corpus/recurrent-staggered-four-source-bend.json"
       ],
-      "transform": "rename"
+      "transform": "rename",
+      "boundary_seeds": [15]
     },
     {
       "id": "R4-mux-covering-array-a",
       "strategy": "mux_depth_column_port_pairwise",
       "generator": "mux",
-      "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+      "seeds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      "boundary_seeds": [16]
     },
     {
       "id": "R5-cross-feature-recursion",
       "strategy": "mux_and_bus_three_way_boundaries",
       "generator": "mixed",
       "seeds": [16, 17, 18, 19, 20, 21, 22, 23],
-      "bus_rows": [2, 3, 4, 8]
+      "bus_rows": [2, 3, 4, 8],
+      "boundary_seeds": [17]
     },
     {
       "id": "R6-generated-high-interactions",
       "strategy": "deterministic_property_generation_and_shrinking_seeds",
       "generator": "mux",
-      "seeds": [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]
+      "seeds": [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47],
+      "boundary_seeds": [18]
     },
     {
       "id": "R7-cross-owner-end-to-end",
       "strategy": "root_cause_cross_owner_release_replay",
       "generator": "mixed",
       "seeds": [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63],
-      "bus_rows": [5, 6, 7, 12, 16]
+      "bus_rows": [5, 6, 7, 12, 16],
+      "boundary_seeds": [19]
     }
   ]
 }

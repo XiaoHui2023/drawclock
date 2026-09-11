@@ -2111,6 +2111,17 @@
                     "why_not_reproduced": "",
                     "evidence": "tests/reproduction-corpus/premature-interior-trunk-entry.json; .reproduction/scratch/fb-route-023-natural/run-1.svg; run-2.svg; tests/test_feedback_layout_oracle.py::test_oracle_rejects_premature_interior_trunk_entry",
                     "next_condition": "将边界 backbone 候选纳入生产全图路由优化，并保持端口、碰撞、重叠、折点与紧凑 clean control。"
+                },
+                {
+                    "attempted_at": "2026-09-11T20:05:00+08:00",
+                    "hypothesis": "旧修复会被后置局部 owner 覆盖；目标错列、端口逆序和声明洗牌可重新暴露公共根从密集分支带中部穿入的问题。",
+                    "method": "以 136 节点冻结母图做有界确定性变异，通过公开 CLI 逐案生成最终 SVG，并让独立 25 指标系统拒绝任一回退；不修改产物。",
+                    "result": "reproduced",
+                    "observed": "pre-fix seed-013 稳定命中 FB-ROUTE-023，可见交叉点 7→5、事件 9→7；修复候选后的第一/第二 epoch 又分别在 seed-018、seed-019 重现 002+023，seed-019 还暴露 0.005px 非正交端口线。",
+                    "analysis": "根因不是单一坐标：亚网格合法通道未枚举、局部预筛丢弃全局可行边界锚点、outer-detour 后置覆盖最终路由 owner、逻辑网环检查按物理 alias 分组，以及 normalizer/renderer 精度语义分裂共同造成复发。",
+                    "why_not_reproduced": "",
+                    "evidence": "tools/search_boundary_trunk_recurrence.py; tests/test_feedback_layout_oracle.py::test_boundary_corridor_survives_late_local_outer_detour_owner; .reproduction/scratch/fb-route-023-reset/post-fix-search/first-failure.json; .reproduction/scratch/fb-route-023-reset/post-fix-search-epoch-2/first-failure.json",
+                    "next_condition": "保持最终外缘 owner、跨 alias 纯环门和统一终态精度；每次修改后从 R1 重启有界攻击并执行全部 25 指标。"
                 }
             ],
             "strict_reproduction": {
@@ -2128,8 +2139,8 @@
                 "baseline_fails": true,
                 "current_passes": true,
                 "receipt": ".reproduction/fix-receipts/FB-ROUTE-023.json",
-                "verification_group": "20260909T160651Z-e78b36ce",
-                "evidence": "Pinned pre-fix public CLI reproduces the premature interior trunk twice; the current public CLI uses a non-dominated boundary corridor and the independent issue Oracle rejects both current attempts."
+                "verification_group": "20260911T054454Z-682e218b",
+                "evidence": "Pinned pre-fix public CLI reproduces the premature interior trunk twice; reset variants 013/018/019 drove successive red epochs; the final public CLI passes the independent issue Oracle, 25-metric artifact gate, 24 clean bounded mutations, and seven heterogeneous recursive rounds."
             }
         }
     ],

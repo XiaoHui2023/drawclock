@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import xml.etree.ElementTree as ET
@@ -267,3 +268,29 @@ def evaluate(input_path: Path, svg_path: Path, registry_path: Path = DEFAULT_REG
         "failed_metric_ids": [item["metric_id"] for item in results if item["status"] == "fail"],
         "passed": all(item["status"] != "fail" for item in results),
     }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input", type=Path, required=True)
+    parser.add_argument("--svg", type=Path, required=True)
+    parser.add_argument("--registry", type=Path, default=DEFAULT_REGISTRY)
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args()
+    report = evaluate(args.input, args.svg, args.registry)
+    if args.output:
+        args.output.write_text(
+            json.dumps(report, indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
+    print(
+        "svg-quality: "
+        + ("PASS" if report["passed"] else "FAIL")
+        + f" metrics={len(report['executed_metric_ids'])}"
+        + f" failed={','.join(report['failed_metric_ids']) or '-'}"
+    )
+    return 0 if report["passed"] else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

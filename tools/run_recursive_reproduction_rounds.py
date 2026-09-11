@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from feedback_layout_reproduction_oracle import analyze
+from search_boundary_trunk_recurrence import build_case as build_boundary_case
 from search_recurrent_mux_bends import build_case as build_mux_case
 from svg_quality_system import evaluate as evaluate_quality
 
@@ -50,14 +51,22 @@ def source_tree_hash() -> str:
 
 def rename_config(config: dict[str, Any]) -> dict[str, Any]:
     names = {name: f"node_{index:03d}" for index, name in enumerate(sorted(config))}
+
+    def rename_reference(value: str) -> str:
+        base, separator, suffix = value.partition("[")
+        renamed = names[base]
+        return renamed + (separator + suffix if separator else "")
+
     result: dict[str, Any] = {}
     for name in sorted(config, reverse=True):
         item = dict(config[name])
         source = item.get("source")
         if isinstance(source, str):
-            item["source"] = names[source]
+            item["source"] = rename_reference(source)
         elif isinstance(source, dict):
-            item["source"] = {key: names[value] for key, value in source.items()}
+            item["source"] = {
+                key: rename_reference(value) for key, value in source.items()
+            }
         result[names[name]] = item
     return result
 
@@ -101,6 +110,12 @@ def semantic_variants(config: dict[str, Any]) -> set[str]:
         for name, item in config.items()
         if item.get("kind") == "from" and len(children.get(name, [])) >= 2
     }
+    if any(
+        item.get("kind") == "from"
+        and len(children.get(name, [])) >= 8
+        for name, item in config.items()
+    ) and any("layout_column" in item for item in config.values()):
+        variants.add("outer-boundary-offset-fanout-clean")
     for item in config.values():
         source = item.get("source")
         if (not str(item.get("kind", "")).startswith("mux")
@@ -139,6 +154,13 @@ def case_configs(round_spec: dict[str, Any]) -> list[tuple[str, dict[str, Any]]]
             result.append((f"mux-from-seed-{seed:03d}", mux_case(seed, "from")))
     if generator == "mixed":
         result.extend((f"bus-rows-{rows:02d}", build_bus_case(rows)) for rows in round_spec["bus_rows"])
+    for seed in round_spec.get("boundary_seeds", []):
+        config = build_boundary_case(seed)
+        if round_spec.get("transform") == "reverse":
+            config = dict(reversed(config.items()))
+        elif round_spec.get("transform") == "rename":
+            config = rename_config(config)
+        result.append((f"boundary-offset-seed-{seed:03d}", config))
     return result
 
 
