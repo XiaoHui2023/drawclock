@@ -685,8 +685,6 @@ def build_preview_svg(
         "<style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}.node-annotation text{font-family:Arial,Noto Sans CJK SC,sans-serif;font-size:11px;fill:#4b5563}</style>",
         f'<rect x="{_svg_num(min_x)}" y="{_svg_num(min_y)}" '
         f'width="{_svg_num(width)}" height="{_svg_num(height)}" fill="#ffffff"/>',
-        f'<text x="{_svg_num(min_x + 8)}" y="{_svg_num(min_y + 18)}" '
-        f'font-family="Arial,sans-serif" font-size="12" fill="#68707a">{_escape(title)}</text>',
     ]
     arc_crossings = (
         _arc_crossings(document, edge_points) if crossing_style == "arc" else {}

@@ -21,6 +21,14 @@ sys.modules[SPEC.name] = oracle
 SPEC.loader.exec_module(oracle)
 
 
+def test_simplify_treats_four_decimal_axis_noise_as_visually_collinear() -> None:
+    assert oracle.simplify([
+        (112.78, 179.9922),
+        (202.34, 179.9922),
+        (202.34, 179.9921),
+    ]) == [(112.78, 179.9922), (202.34, 179.9921)]
+
+
 def test_oracle_source_has_no_production_import() -> None:
     for path in (ORACLE_PATH, QUALITY_ORACLE_PATH):
         tree = ast.parse(path.read_text(encoding="utf-8"))

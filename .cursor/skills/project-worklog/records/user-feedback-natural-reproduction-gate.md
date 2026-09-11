@@ -2,7 +2,7 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-11 18:02 +08:00
+- updated: 2026-09-12 00:36 +08:00
 
 - 2026-09-11 18:02 用户复位 `FB-ROUTE-023`，要求覆盖“密集上方分支带 + 略偏右下消费者”而非只复用旧大图。第一版 19 节点公开 CLI 输入双跑哈希一致，但公共 `from` 被拆成 7 个显示设施，`FB-ROUTE-023` 未命中而完整 Oracle 命中 `FB-ROOT-015` 的 `mergeable_root_facility_witnesses`；该轮是相邻回退红灯，不计目标症状复现或 clean。下一轮用显式列约束隔离设施复制，继续寻找主干过早进入的自然红灯。
 
@@ -1782,3 +1782,10 @@
 - 23:46 第一次 Edge 截图只返回 `WSALookupServiceBegin 10108` 且没有 PNG，明确记为制品失败、未作可见性声明；改用隔离 `user-data-dir` 后生成 4060×4703、447364-byte PNG。媒体检查器解码通过，SHA-256=`4dc4ddc7569e72b756bcf3c95d9ea86fd23be8ea9a8674a006f76cdff9ce24cd`，稳定 ASCII 别名哈希一致；原生图像工具已读取确切别名。用户端是否显示仍须用户确认，Markdown/文件链接仅作为独立后备。
 - 23:55 当前暂存闭包 release gate 19/19 PASS；本地与 `origin/main` 为 0 ahead / 0 behind。最初误查根目录 `pack.bat` 以及把 `run_frozen_example.py --help` 当普通帮助入口均正确非零，未计作发布证据；改走真实 `tools/pack.bat` 后，Windows PyInstaller 6.22.2 构建及内置完整 frozen smoke 通过，归档 SHA-256=`25712860ea90371c431752a5410d25dfd7fba908ac3343fe826b736f2d8e65bc`。
 - 23:58 Windows zip 再解到新 GUID 临时目录，从解压包内 `drawclock.exe` 运行完整 frozen workflow，项目 skill 7/7 且功能 smoke PASS；该消费过程未引用 `dist` 可执行文件或源码入口。Linux Ubuntu 16.04 + staticx、归档消费、librsvg 与远程下载 smoke 由 push 后 Release workflow 承担，未用 Windows 本地结果冒充异平台证据。
+- 00:01 远端 run `34570247889` 在递归攻击 step 退出 1，Linux 构建与 publish 正确跳过；公开日志下载因 GitHub 要求仓库管理员身份而 403，annotations 只含退出码。本地 `python:3.12-slim` 对同一提交从 R1 重跑后在 R7 `mux-from-seed-060` 复现：四位坐标相差 0.0001px，但二进制减法略大于 `EPS`，使视觉共线折点被 `vertical_root_facility_bend` 与 `adjacent_root_height_bend` 拒绝。Oracle 共线比较加入仅用于浮点表示误差的 `1e-9` 裕量；同一 Linux SVG 恢复 25/25，相关聚焦测试 2/2，随后用户新增去除左上默认文件标题要求，已中止尚未完成的递归 run，等待标题修复后从 R1 重启。
+- 00:03 SVG 预览器不再输出左上角默认 `title` 文本；保留 Python API 的命名参数只为调用兼容，任何输入文件前缀或显式 title 都不进入图面。新增直接断言防止文件名前缀回归，下一步先跑聚焦与全公开质量，再从 R1 重建递归/fix 收据。
+- 00:05 首次标题单测用纯文本冒充器件原生标签，被既有 native SVG 安全门正确拒绝；这是测试 fixture 错误，不是标题实现回退。全公开 SVG 仍新鲜 26/26×25/25 PASS。测试改用器件库的合法原生标签后重跑，失败运行不计通过。
+- 00:22 标题 fixture 修正后聚焦 4/4 PASS；Linux 正式递归 run `20260911T070227Z-0b5f37aa` 从 R1 重启并达到 R1-R7 连续 clean，随后全 issue 双跑验证组 `20260911T071618Z-164c2087` 为 `failures=[]`。全量 pytest 得到 555 个功能通过、1 个证据闭包拒绝：新验证组尚未加入 Git 索引，release gate 因 260 个证据文件未跟踪而 fail-closed；这不是功能绿灯，必须精确暂存该验证组并重跑 release gate 后才可提交。
+- 00:27 新验证组暂存后隔离 release 测试与 release gate 均通过。最终 SVG 已由同一 seed-019 输入重新生成并通过 25/25；文本扫描确认不含输入文件名前缀或旧默认标题样式，隔离 Edge 新鲜输出 `boundary-trunk-fixed-no-title.png`。首次媒体检查错误使用项目零依赖 venv，因缺少 Pillow 正确失败；随后尝试读取 Codex 工作区依赖路径又被管理员 PreToolUse hook 以“未知写能力未提供可解析本地目标”拒绝。两次均不计媒体绿灯，改为发现本机现有带 Pillow 的解释器后重跑，不向项目引入依赖。
+- 00:31 使用本机 Python 3.11 + Pillow 9.5 重新执行通用媒体检查与稳定别名交付，4060×4703 PNG 解码通过，447070 bytes，SHA-256=`d060c6855dc39c92889c931a1361e5a883f7a29f1eb02d5c0d5563ef2a359f7d`；原文件与稳定 ASCII 别名哈希一致，原生图像预览已读取确切别名，像素复核确认左上角不再显示文件名标题。用户端可见性仍由最终 Markdown 嵌入与用户确认闭合。
+- 00:36 重新执行 `tools/pack.bat` 成功。第一次新目录命令误用 `New-Item -LiteralPath`，虽然后续解包与 smoke 成功仍不采信该轮；改用受支持参数创建另一 GUID 目录后，包内 `drawclock.exe` 的完整 frozen workflow 退出 0。Windows zip 为 9,399,393 bytes，SHA-256=`08747e23c18c411cb079e321b56df7a7e142db623b20420eb27e1ed49b141257`。

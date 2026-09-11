@@ -88,6 +88,20 @@ def test_native_preview_visible_graphic_origin_equals_geometry_origin(spec) -> N
     validate_static_svg(svg)
 
 
+def test_preview_omits_the_input_filename_title() -> None:
+    mod = ALL[0].module
+    vertex = VertexLayout(
+        name=mod.TITLE, cell_id="v1", drawclock_type=mod.TITLE,
+        x=20, y=30, width=mod.W, height=mod.H, style=mod.cell_style(),
+        object_attrs={"label": mod.label_html()},
+    )
+    svg = build_preview_svg(
+        LayoutDocument(version=1, vertices=[vertex], edges=[]),
+        title="input-file-stem",
+    )
+    assert "input-file-stem" not in svg
+
+
 def test_description_renders_once_as_safe_plain_text_annotation() -> None:
     primary = VertexLayout(
         name="shared", cell_id="v1", drawclock_type="source",

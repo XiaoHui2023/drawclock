@@ -47,7 +47,7 @@
     {
       "input": "01-linear.json",
       "producer_exit": 0,
-      "sha256": "8a2dd5597529dc5af3eca7b526d580e96abcda14ccc53d2183930f5223b78919",
+      "sha256": "70b896d94a67142f1bca63aa597e3cc19024bf6b3cdbbe1c4eda8ec339018c82",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -264,7 +264,7 @@
     {
       "input": "02-branch-tree.json",
       "producer_exit": 0,
-      "sha256": "12ce36512c0d10f73dafab3113732464ac49f8aa60d1b6d4952664e779b04979",
+      "sha256": "df4d080cce03079d31ee8009ab185cbfbfca6f660a91817ac8f8f05728cead63",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -481,7 +481,7 @@
     {
       "input": "03-mux-dag.json",
       "producer_exit": 0,
-      "sha256": "60bc3f8ce68e00f901534a64abbcbd88380cec736574bb35b838024b14fe94d9",
+      "sha256": "ad55cc98a21c9037b95c932f37ceaccd1265c3524b48a2004b844ddb8ee8f79c",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -698,7 +698,7 @@
     {
       "input": "04-dual-pll.json",
       "producer_exit": 0,
-      "sha256": "4db40ba9349a700cf40a95e03cecdb722360832d9b3e340bc9713d8635a8ae69",
+      "sha256": "bf341960692d23518853c1b0a7f8c6292a488c0c0a65afcf25e6b39df13d2ad7",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -915,7 +915,7 @@
     {
       "input": "05-dense-cross-root.json",
       "producer_exit": 0,
-      "sha256": "99f7a402ae3bf8ef55d7b190952be075faa4db811cae31e80d882153d213ebf4",
+      "sha256": "b3be6b2e3d5c3afc5724e6f5e0236b17ba8bbd0f09bdfec36a23483417be49ad",
       "crossings": 6,
       "bends": 22,
       "different_net_overlaps": 0,
@@ -1132,7 +1132,7 @@
     {
       "input": "06-simple-16-clocks.json",
       "producer_exit": 0,
-      "sha256": "605c92d61fb00f50d000e9c5e5b713d0f84d73841ace4441cd1fbf3078ad94d4",
+      "sha256": "7b20fe908730c0d0eb042dfffceb5fa3e04b654696056cfce55e3a78ddda1bbd",
       "crossings": 22,
       "bends": 68,
       "different_net_overlaps": 0,
@@ -1349,7 +1349,7 @@
     {
       "input": "07-medium-64-clocks.json",
       "producer_exit": 0,
-      "sha256": "96c8156d99ec0e21299c7f1336b4650f49d422a928a24aa8c887b02b02b1b26f",
+      "sha256": "33c3fa07a60c0494b343eaaa6b214a6ab23bb269632ad34c0433571414d03fcf",
       "crossings": 169,
       "bends": 216,
       "different_net_overlaps": 0,
@@ -1566,7 +1566,7 @@
     {
       "input": "12-dual-from-reuse.json",
       "producer_exit": 0,
-      "sha256": "3af4c04a13a6be602ab4d84eb5d7edd51c09a8cba730fd358b3458e4847c5021",
+      "sha256": "f6b7fec62fa2210362482d363d260546f446c4c1ad1b6b9716c68664e28d7925",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -1783,7 +1783,7 @@
     {
       "input": "13-label-clearance-weave.json",
       "producer_exit": 0,
-      "sha256": "5a32e7a9233ef3002bcd2e9a6125208d667122b91a05712c66199da68fd8448d",
+      "sha256": "4494718c71c1b202e4dc40ae4dd218861528955e8bdc1a3c8294e95796a452dd",
       "crossings": 1432,
       "bends": 252,
       "different_net_overlaps": 0,
@@ -2000,7 +2000,7 @@
     {
       "input": "16-multi-from-clusters.json",
       "producer_exit": 0,
-      "sha256": "0abdaebd5e6fffc1ab9c079c3eb153ef102009b8db23778d63514222cde9872b",
+      "sha256": "e49386b111f09ced923ef3df7209cd87c9368a9507066d7c06001fe322261193",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -2217,7 +2217,7 @@
     {
       "input": "17-terminal-fanout-order.json",
       "producer_exit": 0,
-      "sha256": "2a7a345253bb2807e645be9a3b4a3780d920af71df099c64b590403a2886c356",
+      "sha256": "2034076858a6bd35b82c7d7702e02004309ace797847bd9779e46497b40e9df0",
       "crossings": 0,
       "bends": 8,
       "different_net_overlaps": 0,
@@ -2434,7 +2434,7 @@
     {
       "input": "18-asymmetric-merge-columns.json",
       "producer_exit": 0,
-      "sha256": "9e6e0974bd60d9e4522034e36beb7dbaef29033de7fa81081ba25b70706ea634",
+      "sha256": "3afce81f8a177b01b2b59ba6fb68dfadf57569fe3716837e1279ac388ff33059",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -2651,7 +2651,7 @@
     {
       "input": "19-dispersed-root-fanout.json",
       "producer_exit": 0,
-      "sha256": "3bb1efc9ecce15c8469214948bc7e5bc510f51bf8dd11457fcc5df3df8600043",
+      "sha256": "90058d9401f439c3a5f731b872a0142ef0d45672cbeed22e2b9ea9d1b1233120",
       "crossings": 710,
       "bends": 122,
       "different_net_overlaps": 0,
@@ -2868,7 +2868,7 @@
     {
       "input": "20-asymmetric-merge-route-bulge.json",
       "producer_exit": 0,
-      "sha256": "f49e8dd298b1a4f7b0e0e2902770a67ac9d3321ae1a7c929aadc6f485063c2c9",
+      "sha256": "ab175023df1f05c480ef9f78fa2a4a5a80914f20345a9c7bc79358dc1cc5d12a",
       "crossings": 0,
       "bends": 2,
       "different_net_overlaps": 0,
@@ -3085,7 +3085,7 @@
     {
       "input": "21-layout-column-preference.json",
       "producer_exit": 0,
-      "sha256": "001e23c2fa8111f36bd33654d7efd88d1e449fe38b53650a02ede7e7fd469b2c",
+      "sha256": "0ddfef448c8dde7d47976ca3759215cfe9d9bf818b97873426173eae4616e313",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -3302,7 +3302,7 @@
     {
       "input": "22-terminal-frequency-table.json",
       "producer_exit": 0,
-      "sha256": "d9ece18b060804400da0c2fafffccc9de15dc76b573608659e48c426cfd78755",
+      "sha256": "1ac792efcf292f1db7278fa9a91218a14d147f1ebe589c1bd0578792d47e48d1",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -3519,7 +3519,7 @@
     {
       "input": "23-middle-column-low-use-sources.json",
       "producer_exit": 0,
-      "sha256": "d50165c365109f13ca5e8f6e2b1ba4f1f665e75e699d94f88022a554ea548759",
+      "sha256": "8539c359b5f617bc2eb1ae230e7aef81d0341a38177da101a2439cbcaa8f866f",
       "crossings": 0,
       "bends": 14,
       "different_net_overlaps": 0,
@@ -3736,7 +3736,7 @@
     {
       "input": "24-single-source-rendering-alias.json",
       "producer_exit": 0,
-      "sha256": "c759018b9ee69280a4dedc06201cf914a1237b0a04a88a3148dc7b561f7fc0de",
+      "sha256": "54d7817dd7c2994f565d292e2663fde073cf7c78a5de21908c6f259920ce2159",
       "crossings": 0,
       "bends": 22,
       "different_net_overlaps": 0,
@@ -3953,7 +3953,7 @@
     {
       "input": "25-mixed-root-port-order-torture.json",
       "producer_exit": 0,
-      "sha256": "a4b1250d80c42a9d206a211dd5f9ec0d7c9d3992740a05588d559192f8c6be2f",
+      "sha256": "3c2d23d7b32f0b90a2cc8a89aebe5b9323f85fc4fa655648c35285cdef8d971b",
       "crossings": 0,
       "bends": 18,
       "different_net_overlaps": 0,
@@ -4170,7 +4170,7 @@
     {
       "input": "26-feedback-reproduction-combined.json",
       "producer_exit": 0,
-      "sha256": "470205442c1196e413899aa32e3fecb4aad9d82ae820b232e920262a64731be1",
+      "sha256": "d8d6ff64a30cdcd14caae9ef764afd9967159e4cdc81d5f895731a1690fdda20",
       "crossings": 1,
       "bends": 16,
       "different_net_overlaps": 0,
@@ -4387,7 +4387,7 @@
     {
       "input": "27-interleaved-common-root-mux3.json",
       "producer_exit": 0,
-      "sha256": "bd6f3fae07724ec9ed30a4a5c3fb1d6d0aee8bff2000e9f3a50ffa99446d2289",
+      "sha256": "42708be727403f5ee7509dc294afe75314c91ceebba472792d722714d24ffe11",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -4604,7 +4604,7 @@
     {
       "input": "28-common-private-from-mux-clock-array.json",
       "producer_exit": 0,
-      "sha256": "e591f9df69da6c82d7ccfd144df2b7aec56690b2c4e6d26d31add206b3979a0c",
+      "sha256": "ca6d7fc0daa474b8d0ec07193ac88049d2a03d4f24a05620884c142a292a549b",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -4821,7 +4821,7 @@
     {
       "input": "29-asymmetric-depth-common-private-mux-array.json",
       "producer_exit": 0,
-      "sha256": "cf3ee5bb2b1a612e452683bb919bb14e1d5818327375732eb0730bf761934b94",
+      "sha256": "16c9d63f55e0a7db5ad92f1ade0ab528af567f6544a787d939558847a3586b86",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -5038,7 +5038,7 @@
     {
       "input": "30-staggered-four-source-mux.json",
       "producer_exit": 0,
-      "sha256": "47c9ddb2251e429a4e5bf59fe73cf6ecf0a86d069d32b39ffd9a4bcdc0f46b6b",
+      "sha256": "aa3735f0a5ad2d98b73938da3f3f3eb316c40eff0c8a676bc933e1668d5419f9",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -5255,7 +5255,7 @@
     {
       "input": "31-node-descriptions.json",
       "producer_exit": 0,
-      "sha256": "b867f02675c28cf0e0c3e1f3853128ebacd534af131e2be13524330fec1727c4",
+      "sha256": "2b0a342620f3379b25a644bbf691aa49f8befc1cba71ab9f6bf4cd5505060777",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -5501,7 +5501,7 @@
     {
       "input": "32-annotation-text-stress.json",
       "producer_exit": 0,
-      "sha256": "db56ee456505f13b55752a338dfc898d2813c602ea4a40d7c71b430dc10e165c",
+      "sha256": "c92b91ce28ebe7dee1b78ba76f437db86ed051c185a4819e54dbb7a3d11e8f13",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,

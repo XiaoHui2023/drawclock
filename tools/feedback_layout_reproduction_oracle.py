@@ -117,8 +117,13 @@ def simplify(points: Iterable[tuple[float, float]]) -> list[tuple[float, float]]
         result.append(point)
         while len(result) >= 3:
             a, b, c = result[-3:]
-            if (abs(a[0] - b[0]) <= EPS and abs(b[0] - c[0]) <= EPS) or (
-                abs(a[1] - b[1]) <= EPS and abs(b[1] - c[1]) <= EPS
+            serialized_eps = EPS + 1e-9
+            if (
+                abs(a[0] - b[0]) <= serialized_eps
+                and abs(b[0] - c[0]) <= serialized_eps
+            ) or (
+                abs(a[1] - b[1]) <= serialized_eps
+                and abs(b[1] - c[1]) <= serialized_eps
             ):
                 result.pop(-2)
             else:
