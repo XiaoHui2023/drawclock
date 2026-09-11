@@ -2,9 +2,9 @@
 
 ## 状态
 
-- status: blocked
+- status: done
 - owner: agent
-- updated: 2026-09-11
+- updated: 2026-09-12
 
 ## 期望结果
 
@@ -24,14 +24,17 @@
 - success: 修复后 31 号仅输出 `func_freq`，01 号不生成频率表；27 张公开图和 27 张仓库 SVG 均逐图通过完整 28 项指标。
 - success: 错列 mux 定向搜索 24/24 未复现，四个固定回归 seed 无过早内部主干入口；七轮递归攻击连续全绿。
 - success: Windows 包使用平铺 `libraries/*.xml` 和集中 `doc/`；全新解压后冻结程序生成两张代表图并各自通过 28 项指标。
+- success: GitHub Release run `34609031939` attempt 2 三个 job 全部成功，publish 从公开 Release 回下载 Linux 资产并通过冻结消费；`v1.0.0` 解引用精确指向产品提交 `25196cf`。
+- success: 本机独立下载的 Linux 资产为 17,040,415 bytes，SHA-256 `e74e60fc80016c08f719e88028020a84070d25edeb055c3f4a956a714a7b4525`，与 GitHub API digest 一致；归档 exact-set 门通过，包含 24 个平铺 XML、集中 `doc/` 且无根级文档或 `drawio-lib/`。
 
 ## 已尝试
 
 - 2026-09-11: 用 Python 3.13 `-I -S src` 和公开示例形成修改前结构化 XML 红灯；定位布局 owner 为 `_frequency_table()` 固定三列分配，发布 owner 为 `bundle_release.py` 的原路径复制。
+- 2026-09-12: 排除仓库 Actions 权限、runner 标签和其它非终态 run 后，正常取消卡死的 run attempt 1，并按 GitHub 官方 REST API 对同一 run 执行 re-run；attempt 2 保持产品 SHA `25196cf`，数秒内获得 GitHub-hosted runner。
 
 ## 下一步
 
-- 恢复条件：GitHub 为 Release run `34609031939` 的 Ubuntu 16.04 作业分配 `ubuntu-latest` runner，或该 run 进入可诊断终态。恢复后继续核对构建、publish、tag、资产清单和下载后冻结消费，再关闭目标。
+- 无.
 
 ## 收敛条件
 

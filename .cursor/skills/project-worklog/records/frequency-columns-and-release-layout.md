@@ -1,10 +1,13 @@
 # 频率列裁剪与发布目录集中实施记录
 
-- status: blocked
+- status: done
 - created: 2026-09-11 20:15 +08:00
-- updated: 2026-09-11 23:34 +08:00
+- updated: 2026-09-12 00:12 +08:00
 - scene: 频率列裁剪、发布目录与错列 mux 主干
 
+- 2026-09-12 00:00 GitHub 自主恢复成功：认证 API 确认 Actions enabled/allowed_actions=all、唯一非终态 run 为 `34609031939`、标签为有效 `ubuntu-latest`。正常取消返回 202，同一 run re-run 返回 201；attempt 2 保持 source SHA `25196cf` 并在数秒内获得 runner `GitHub Actions 1000000717`。目标恢复 active，继续值守完整发布链。
+- 2026-09-12 00:08 用户根 `github-release` 新增 hosted-runner 停滞诊断/恢复专题与通用脚本：只对超过 60 分钟、当前 queued job 无 runner、权限和标签已排除的 run 允许恢复；执行普通 cancel 后重跑同一 run，并强制核对 attempt 增长与 SHA/ref 不变。首轮测试实际捕获参数名拼写和“前序 completed job 的 runner 掩盖下游排队”误判，修正后 6/6 单元测试、UTF-8 skill validator 和当前 run 只读诊断均通过；诊断认定 attempt 2 已分配 runner。
+- 2026-09-12 00:12 Release run `34609031939` attempt 2 的反馈门、Ubuntu 16.04 build 和 publish 三个 job 全部成功；publish 从公开 Release 回下载并运行最终 frozen asset。annotated tag `v1.0.0` 解引用为产品提交 `25196cfe58e3954258062df60f994aff59e2f833`。本机独立下载资产 17,040,415 bytes，SHA-256 `E74E60FC80016C08F719E88028020A84070D25EDEB055C3F4A956A714A7B4525` 与 API digest 一致；release archive surface PASS，包含 24 个平铺 `libraries/*.xml`、`doc/` 文档且无旧路径。目标完成。
 - 2026-09-11 23:34 连续第三个目标回合复核同一 run：`status=queued`、`updated_at=2026-09-11T14:22:23Z`、Ubuntu job `103296869615` 的 `runner_name=null`，无项目命令执行或失败日志。已达到三轮阻塞审计阈值，目标转为 blocked；恢复条件为 GitHub 分配 runner 或 run 进入可诊断终态。
 - 2026-09-11 23:25 产品提交 `25196cf` 已推送，Release run `34609031939` 的反馈复现门 7m02s 成功；后续 Ubuntu 16.04 作业排队超过 60 分钟仍未获得 `runner_name`，没有执行项目命令或产生失败日志。GitHub Status 同期显示 Actions Operational；按有上限重试规则停止本轮密集轮询，目标保持 active，恢复条件为 GitHub 分配 `ubuntu-latest` runner，之后继续构建、发布与回下载验收。
 - 2026-09-11 22:19 精确暂存后的完整 pytest 618/618 通过，耗时 622.62 秒。上传审查确认本地与 origin/main 为 0/0、无跨仓库路径或密钥命中、五件套通过、反馈发布门 19/19 通过；待提交并值守远端 Release。

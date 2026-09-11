@@ -78,7 +78,7 @@ description: >-
 ## 发布
 
 - PyInstaller 可执行文件内含本项目 Python 模块，不依赖宿主 Python、Node.js、ELK 或浏览器。
-- 默认发行包只含主程序、`README.md`、`draw.md`、`drawio-lib/drawclock/*.xml`、最小示例、颜色字段示例和嵌入 Noto 字形要求保留的 OFL 文本；完整源码由仓库与发布 tag 提供。
+- 默认发行包只含主程序、`doc/README.md`、`doc/draw.md`、`doc/licenses/`、平铺的 `libraries/*.xml`、最小示例和颜色字段示例；完整源码由仓库与发布 tag 提供。仓库内部开发路径不因发行映射而改名。
 - 源码运行只要求 CPython 3.9 或更高版本；以 `-I -S` 禁用用户目录和 site-packages 后仍可直接生成 SVG，Python 3.9、3.10 与当前版本对代表输入结果一致。
 - 发布包执行独立 allowlist 门，拒绝 `src/`、项目 Skills、`pyproject.toml`、source manifest、批量质量语料、Runtime、npm 清单、wheelhouse 和缓存进入默认附件。
 - 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、严格 JSON 拒绝规则、文件与目录混合器件库、默认圆弧和维护范围示例。
@@ -95,3 +95,5 @@ description: >-
 | `example/README.md` | `example/` 内配置与运行命令 |
 | `example/auto-layout/README.md` | 各布局与压力配置覆盖范围 |
 | `source-deploy.md` | 仓库源码运行命令与 Python 版本边界 |
+
+发行归档把前两份用户文档映射到 `doc/`，器件库映射到平铺 `libraries/`；归档根目录不得再出现 README、`draw.md` 或 `drawio-lib/`。
