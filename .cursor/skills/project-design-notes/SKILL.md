@@ -74,6 +74,8 @@ description: >-
 - `tools/feedback_layout_reproduction_oracle.py` 不导入生产模块，只读最终 SVG，先完整绑定节点/边/端口，再区分内部交叉、端点接触、共线重叠和同网分支。多余折点与根位置只以无碰撞、无高优先级退化的严格反事实支配判定。
 - 搜索语料先覆盖全部反馈，再比较失败样本与没有症状的样本，最后制作综合 example；综合 example 不替代不同历史 revision 的正式收据。
 - 用户问题修复后必须运行有界的七轮递归对抗：精确回归、声明顺序变形、实例重命名、mux 参数组合、跨特性复杂组合和高交互变体。任一目标问题再次出现时连续轮数清零并从第一轮重启；生成/入口/Oracle 运行错误不获得 clean。发行 CI 现场重跑，并校验轮次 exact-set、当前源码、runner、Oracle、语义合同及逐 case 回执哈希。
+- 错列 MUX 攻击的前置条件以最终 SVG 为准：目标 MUX 的真实横坐标必须严格大于同组普通 MUX，且公共根边必须直接绑定该目标。仅在输入写 `layout_column`、但最终所有 MUX 仍同列的样例不能计入错列覆盖或攻击 clean。
+- 同源正交网的树化 predecessor 必须以最终几何点为唯一键；若以 `(point, incoming_axis)` 保留多状态，各目标路径投影回 SVG 后仍可能重新闭环。树化按折点、长度、跳数确定性择一父节点，所有放置/设施/outer-detour owner 后再闭合一次，最终 boundary corridor 只允许保持 cycle rank 不增。
 
 ## 发布
 

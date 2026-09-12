@@ -2,7 +2,25 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-12 00:44 +08:00
+- updated: 2026-09-12 23:18 +08:00
+
+- 2026-09-12 21:16 首次逐 seed 语义门补丁在 `target_offset_px` 字段后混入无效文本，`py_compile` 以 `SyntaxError: ':' expected after dictionary key` 拒绝；该版本未运行、不能产生攻击证据。实时记录门随后阻止了未入账修补。现先记录该失败，再只删除无效文本并从语法、单 seed 正反前置条件开始复验。
+
+- 2026-09-12 21:15 第二次完整攻击运行到 2/24 时，最终 diff 审查发现终态错列和公共 `from` 直连只由四个 pytest seed 检查，24 轮 runner 的每个 seed 回执尚未包含这两个语义前置条件；其余 seed 可能在前置条件不成立时仍因 `quality_failed=[]` 被计 clean。该轮再次主动终止并清零。runner 必须逐 seed 从最终 SVG 复算目标/普通 MUX 横坐标差，核对目标 source 包含唯一公共 `from`，前置失败以独立非零退出结束并保存失败回执。
+
+- 2026-09-12 21:11 生成器现要求母图恰有一个无上游 `from`，只从 source 字典直接包含该公共根的 reconvergent mux 中选择右移目标；测试同时断言唯一公共根、直接拓扑绑定、输入相对列差和最终 SVG 横坐标差。seed 0/3/13/23 在收紧后 4/4 PASS，耗时 134.03 秒。下一轮完整攻击必须在这份未再变更的生成器上从 0 开始。
+
+- 2026-09-12 21:08 新版真实错列攻击运行到 12/24 时复核出第二个语义缺口：目标 MUX 虽真实右移，但目标轮换集合包含由普通 `source` 直接输入的 MUX，不保证每个 seed 都绑定唯一公共 `from`。该轮主动终止，`search-progress.json` 保持 `complete=false`，不得计 clean；生成器将只从直接接收公共 `from` 的 reconvergent mux 中选目标，测试同时断言拓扑绑定与终态错列，再从 seed 0 清零重启。前后可见图使用的目标 014 已直接接收公共 `from`，不受此缺口影响。
+
+- 2026-09-12 21:03 攻击 runner 新增逐 seed `result.json` 与累计 `search-progress.json`，中断时明确保留 `completed_attempts/requested_attempts/complete=false`，只有达到上限才生成最终汇总并置真，避免长轮次因会话中断丢证据或假完成。新的 24 轮真实错列攻击已启动并持续写入进度。目标错列探针的旧版和当前 SVG 已各自通过隔离 Edge 原样栅格化，得到 423,953-byte 与 402,462-byte PNG。首次命令在 Edge 异步退出后立即取文件得到不存在错误；等待 5 秒后两张文件均出现，该轮只以实际文件为准，不采信空退出码。
+
+- 2026-09-12 20:58 错列攻击生成器已改为给全部 reconvergent mux 明确共同列 5、每个 seed 选一个目标设为列 8/9，保证相对列约束而非孤立数值；端口逆序和声明乱序继续保留。测试同时解析最终 SVG，要求目标 MUX 的真实中心 x 严格大于全部同组普通 MUX，之后才允许检查 023。seed 0/3/13/23 四个参数组均通过，耗时 129.28 秒；这证明新门会观察终态错列，不再把输入字段当作像素事实。
+
+- 2026-09-12 20:55 已创建活动项目目标 `misaligned-mux-boundary-trunk-reverification` 并加入目标索引；目标把终态 MUX 横坐标差异、旧版自然红灯、当前完整 28 指标、错列攻击和用户可见前后图列为不可缩减的收敛条件。随后构造全体 reconvergent mux 为列 5、目标 014 为列 8 的单变量探针，最终 SVG 中旧版目标 x=2969.06、普通 mux x=2444.66，当前目标 x=3029.06、普通 mux x=2504.66，确认真实错列。冻结旧版目标边 `svg-edge-0148` 命中 023：局部交叉点 20→16、事件 45→24 的边界候选严格支配；当前同输入 witness=0 且统一 28 指标全通过。下一步将这一终态前置条件固化到攻击生成器和测试，不能只检查输入字段。
+
+- 2026-09-12 20:50 复核发现既有 `test_boundary_corridor_survives_misaligned_mux_column_attacks` 只断言输入中至少一个 mux 带 `layout_column`，没有断言最终 SVG 的 mux 横坐标确实错列。seed-013 虽给 `select_primary_*_014` 写入 `layout_column: 5`，冻结旧版与当前版的同组 primary mux 最终 x 均为 876.71、列索引均为 2；该 seed 的旧版确实命中 4 个 023 witness，但不能证明“目标 mux 实际更靠右”这一诱因。原错列覆盖声明撤销并分类为 `coverage_escape + claim_escape`；攻击生成器、测试和语义收据必须加入终态横坐标差异证明。
+
+- 2026-09-12 09:17 用户要求针对“目标 MUX 比同组普通 MUX 更靠右时，公共总线提前横穿、随后纵向贯穿分支区”重新建立目标并复验。该要求不是沿用旧完成口径：本轮把 MUX 横向错列列为显式语义前置条件，先复核冻结旧版自然红灯是否满足该条件，再用当前公开入口、统一 28 指标和定向错列 seed 攻击验证；最终必须交付同输入旧/新图，用户可见性未确认前不关闭目标。
 
 - 2026-09-12 00:44 已从同一正式输入的原始签收 SVG 生成前后全图和局部对照。局部红线仅按独立报告中的 `svg-edge-0088` 点序列叠加，用于标出同一条逻辑边，未改原始 SVG。旧版该边在行 10/11 之间横穿后向下，25 个交叉点、51 个交叉事件；当前版沿整体底部边界再回到目标，降为 8/24，`premature_interior_trunk_entry_witnesses` 从 8 项变为 0。三张 PNG 解码通过；对照图为 2328×1505、466,262 bytes、SHA-256 `60a18a54c56ba0b202012e60b23b4289588d27660ae99b8bdf4b6e428ff2117d`，稳定 ASCII 别名哈希一致并已通过原生图像预览读取。
 
@@ -1795,3 +1813,19 @@
 - 00:27 新验证组暂存后隔离 release 测试与 release gate 均通过。最终 SVG 已由同一 seed-019 输入重新生成并通过 25/25；文本扫描确认不含输入文件名前缀或旧默认标题样式，隔离 Edge 新鲜输出 `boundary-trunk-fixed-no-title.png`。首次媒体检查错误使用项目零依赖 venv，因缺少 Pillow 正确失败；随后尝试读取 Codex 工作区依赖路径又被管理员 PreToolUse hook 以“未知写能力未提供可解析本地目标”拒绝。两次均不计媒体绿灯，改为发现本机现有带 Pillow 的解释器后重跑，不向项目引入依赖。
 - 00:31 使用本机 Python 3.11 + Pillow 9.5 重新执行通用媒体检查与稳定别名交付，4060×4703 PNG 解码通过，447070 bytes，SHA-256=`d060c6855dc39c92889c931a1361e5a883f7a29f1eb02d5c0d5563ef2a359f7d`；原文件与稳定 ASCII 别名哈希一致，原生图像预览已读取确切别名，像素复核确认左上角不再显示文件名标题。用户端可见性仍由最终 Markdown 嵌入与用户确认闭合。
 - 00:36 重新执行 `tools/pack.bat` 成功。第一次新目录命令误用 `New-Item -LiteralPath`，虽然后续解包与 smoke 成功仍不采信该轮；改用受支持参数创建另一 GUID 目录后，包内 `drawclock.exe` 的完整 frozen workflow 退出 0。Windows zip 为 9,399,393 bytes，SHA-256=`08747e23c18c411cb079e321b56df7a7e142db623b20420eb27e1ed49b141257`。
+
+## 2026-09-12：目标 MUX 真实错列的边界总线复验
+
+- 21:19 逐 seed 语义前提 smoke 在生成 SVG 后以 `NameError: name 'config' is not defined` 非零退出。原因是攻击器把 `build_case(seed)` 的返回值直接序列化，新增终态 MUX 坐标门却引用了未保留的 `config`；没有写出 seed 回执和完成进度，本轮不计有效攻击。修复限定为先保存 `config = build_case(seed)` 再序列化，随后必须重新执行语法检查、单轮 smoke 和完整 24 轮。
+- 21:21 修复后语法检查与单 seed smoke 从头通过：进度回执为 `requested=completed=1`、`complete=true`；唯一公共 `from` 直接进入右移目标，最终目标相对普通 MUX 右移 524.4px，`semantic_preconditions_met=true`，统一质量失败与 023 witness 均为空。该轮只校准攻击器，不替代后续 24 轮。
+- 21:36 完整攻击在 seed-022（第 23/24 轮）重新命中 `FB-ROUTE-002/split_rejoin`：目标 MUX 真实右移 524.4px、公共 `from` 直连和 023 缺席均成立，但统一质量注册表仍判失败。前 22 轮全部作废、clean streak 清零，证明只看 023 会漏掉相邻总线环路。首次提取详情误用了 Oracle 不支持的 `--output` 参数，CLI 以 usage error 退出且未生成报告；改用其正式 `--report` 入口后再归因，错误命令不算证据。
+- 21:42 独立 SVG Oracle 将复发归因到 `reference_clock_source_with_long_instance_name_2:right`。最小环仅需两条边：edge-0120 从共享 x=436.36 在 y=2643.0126 横到 x=2202.46 后向下，edge-0191 从同一共享干线在 y=2932.014 横到 x=2212.46；后者横段穿过前者纵段，和左侧共享干线共同闭成矩形环。流水线在 outer-detour、safe-first 和 locality 移动之后没有再次树化，末端 boundary owner 只保证环数不增加，因而会保留已经存在的环。通用修复是在所有放置/外绕事务结束后、最终 boundary corridor 之前增加带全图 overlap 回滚的 fanout-tree closure；boundary 随后仍作为最终多行路由 owner，避免树化重新引入 023。
+- 21:50 新增末端树化 owner 后 seed-022 聚焦门仍失败，统一注册表报 `split_rejoin`；测试使用 `crossing-style=none` 还额外触发 `crossing_treatment`，后者是 fixture 参数错误，正式质量检查必须与攻击器一致使用 `arc`。直接读取布局选择报告确认真正阻塞为 `post_placement_fanout_tree_normalization_blockers={candidate-cycle:1}`、残余 cycle rank=2：树化器以 `(point,incoming_axis)` 为状态分别为各目标求最少折点路径，同一几何点可通过不同 axis 状态拥有不同 predecessor；投影回几何图后，多条“状态树路径”的并集仍可能成环。修复改为单一几何点的确定性最短路树，每个点只有一个 parent，路径并集由构造保证无环；距离优先还保证每个目标在原 union graph 内不增长，折点只作结果指标而非破坏结构正确性的主目标。
+- 21:51 单一几何点 predecessor 实现已落入树化器。补丁回读同时发现用于把新参数化用例切换到 `arc` 的宽上下文误改了较早的 mux3 测试，而目标 seed 测试仍为 `none`；尚未重跑，不能计绿。先实时入账，再按测试函数上下文恢复 mux3 原值并只修改错列 seed 用例。
+- 21:58 精确修正测试参数后，seed-022 单例完整 28 指标通过；布局报告显示残余逻辑环秩由 2 降至 0。随后 seed 0/3/13/22/23 五组正式回归全部通过（5 passed，222.71s），每组都核对唯一公共 `from` 直连、终态 MUX 实际错列、023 缺席并运行统一 28 指标。现在在此不变源码上从 seed 0 重启完整 24 轮；先前 22/24 不继承。
+- 22:12 修复后 epoch 在不变源码上从零完成 24/24：`requested=completed=24`、`complete=true`，覆盖 4 个不同公共目标，全部终态错列为 524.4px；语义前提失败、统一 28 指标失败、任何 feedback issue 和 023 witness 行均为 0。此前失败的 seed-022 在第 23 轮明确通过。一次汇总只读命令误写 `-joinjoinjoin` 被 PowerShell ParserError 拒绝，随后用正确 `-join` 重跑取得上述精确统计；错误命令不影响攻击产物，也不计门禁证据。
+- 22:31 全量回归得到 `616 passed, 3 failed`（949.72s）。其中两项是 `src` 哈希变化后 fix/recursive 收据陈旧，属于正确 fail-closed，须在最终源码固定后重建；唯一功能回退是 64-clock adversarial weave 的 `bends_max_per_edge=6` 超过合同 4。纯 Manhattan 最短树虽消除环，但会选择折点更多的等价短路。下一版仍保持“每个几何点唯一 parent”的无环构造，把点标签改为折点、长度、跳数、入轴的确定性字典序；入轴只参与该点最优标签，不再允许同一点多个 predecessor，兼顾正交可读性和树结构。源码再次变化后刚完成的 24/24 作废，聚焦及全量绿灯后必须从零重跑。
+- 22:38 唯一父节点的折点优先树落地后，原 split-rejoin seed-022 的 28 指标单例继续通过；原回退的 64-clock adversarial weave 也从头通过（1 passed，172.70s），恢复单边最大折点合同。现在以该源码启动第三个 24 轮 epoch，前两次 24 轮结果均不继承。
+- 22:50 最终候选源码的第三个 epoch 完成 24/24，`complete=true`，seed-022 及其余轮次均无语义、质量或 issue 失败。启动包装层把 `JSON.stringify` 误写为不存在的 `JSON.stringifyédé`，仅丢失会话句柄；通过进程 18044 和持久化进度监控确认底层唯一攻击进程持续运行并正常退出，没有重复启动，包装错误不计结果。随后误探测不存在的 `tools/run_feedback_reproduction.py` 得到文件不存在；正确脚本为 `run_feedback_fix_verification.py`。该脚本没有 help parser，传 `--help` 实际执行正式验证；因运行绑定最终候选源码而保留，最终验证组 `20260912T144635Z-d0e9352f` 返回 `failures=[]`，19 份 fix 收据已更新为当前 source tree 哈希。
+- 23:11 正式递归攻击收据已在最终候选源码上重建，R1–R7 连续 clean。随后最终全量回归为 `618 passed, 1 failed`（705.21s）；唯一失败是 release gate 明确列出新 fix 验证组的 260 个证据文件未被 Git 跟踪，所有功能、布局、Oracle、攻击和压力测试均通过。该红灯按证据闭包处理，不能改 checker 或跳过：只强制暂存 `.reproduction/fix-evidence/20260912T144635Z-d0e9352f/**`、19 份已更新 fix 收据和新的 recursive receipt，再重跑 release gate。状态审计末尾误读不存在的 `.reproduction/lk`，得到可验证 PathNotFound，仅为只读命令尾项，不影响此前 status/check-ignore 结果。
+- 23:18 新 fix evidence、19 份 fix 收据和 recursive receipt 已精确加入索引；release gate 19/19 PASS，隔离 gate 测试 24/24 PASS。全公开 SVG 由独立 runner 新鲜生成并达到 27/27，每图完整执行 28 指标、失败 0。最终候选重新生成错列样例并通过 28/28，SVG SHA-256 `32801bf5...ac4bc5` 与已交付 after SVG 完全一致；同输入冻结旧版为 `c22a264d...63f49`。2670×1273 前后对照稳定别名已再次由原生图像工具读取，用户端显示仍待本轮 Markdown 嵌入后的确认。

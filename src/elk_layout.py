@@ -6033,52 +6033,52 @@ def _normalize_fanout_routes_as_trees(
         cycles_before += 1
         routing_graph = target_leaf_graph(graph, indices)
         start = route_points(indices[0])[0]
-        start_state = (start, "")
-        # Orthogonal schematic readability is dominated by turns.  Choose a
-        # minimum-bend path inside the already fixed union graph, then break
-        # ties by length and segment count.  The whole-candidate acceptance
-        # gate below still requires aggregate Manhattan length not to grow.
-        distances = {start_state: (0, 0.0, 0)}
+        # Build one deterministic minimum-turn tree over geometric points.
+        # Axis-augmented states are unsuitable here: two states for the same
+        # point can have different predecessors, and their projected route
+        # union can recreate the very cycle this pass must remove.  A single
+        # parent per point makes every destination path a subtree by
+        # construction.  Turns dominate orthogonal schematic readability;
+        # length and hop count break ties, while the accepted-candidate gate
+        # below still rejects aggregate route-length growth.
+        distances = {start: (0, 0.0, 0, "")}
         previous: dict[
-            tuple[tuple[float, float], str],
-            tuple[tuple[float, float], str],
+            tuple[float, float], tuple[float, float]
         ] = {}
         queue = [(0, 0.0, 0, start, "")]
         while queue:
             bends, distance, hops, point, incoming_axis = heapq.heappop(queue)
-            state = (point, incoming_axis)
-            if (bends, distance, hops) != distances.get(state):
+            if (bends, distance, hops, incoming_axis) != distances.get(point):
                 continue
             for neighbour, length in sorted(routing_graph.get(point, {}).items()):
                 axis = "v" if abs(point[0] - neighbour[0]) <= 1e-6 else "h"
                 turn = int(bool(incoming_axis) and incoming_axis != axis)
-                candidate = (bends + turn, distance + length, hops + 1)
-                neighbour_state = (neighbour, axis)
+                candidate = (
+                    bends + turn, distance + length, hops + 1, axis
+                )
                 if candidate < distances.get(
-                    neighbour_state, (math.inf, sys.maxsize, sys.maxsize)
+                    neighbour,
+                    (sys.maxsize, math.inf, sys.maxsize, "~"),
                 ):
-                    distances[neighbour_state] = candidate
-                    previous[neighbour_state] = state
-                    heapq.heappush(queue, (*candidate, neighbour, axis))
+                    distances[neighbour] = candidate
+                    previous[neighbour] = point
+                    heapq.heappush(
+                        queue,
+                        (candidate[0], candidate[1], candidate[2], neighbour, axis),
+                    )
         candidate = _clone_layout_geometry(accepted)
         candidate_edges = {edge.cell_id: edge for edge in candidate.edges}
         chosen_paths: dict[int, list[tuple[float, float]]] = {}
         complete = True
         for index in indices:
             end = route_points(index)[-1]
-            end_states = [
-                state for state in ((end, "h"), (end, "v"), (end, ""))
-                if state in distances
-            ]
-            if not end_states:
+            if end not in distances:
                 complete = False
                 break
-            state = min(end_states, key=lambda item: (distances[item], item[1]))
-            states = [state]
-            while states[-1] != start_state:
-                states.append(previous[states[-1]])
-            states.reverse()
-            path = [item[0] for item in states]
+            path = [end]
+            while path[-1] != start:
+                path.append(previous[path[-1]])
+            path.reverse()
             chosen_paths[index] = path
             canonical_start, canonical_end = path[0], path[-1]
             actual_start, actual_end = route_endpoints(index)
@@ -9421,6 +9421,41 @@ def generate_elk_layout(
         key.replace("source_anchor", "post_first_source_anchor"): value
         for key, value in local_after_first_report.items()
     })
+    # Outer-detour cleanup and the final placement closures can make two
+    # branches of one logical source-port net cross and rejoin even when the
+    # earlier tree closure was clean.  Rebuild the tree after every placement
+    # owner has finished, then let the boundary pass choose the exterior lane.
+    # This order removes cycles without allowing tree normalization to be the
+    # final owner that pulls an offset-MUX branch back through the row band.
+    pre_serialized_tree = document
+    pre_serialized_overlap = _final_artifact_overlap_count(
+        document, logical_edges
+    )
+    serialized_tree_candidate, serialized_tree_report = (
+        _normalize_fanout_routes_as_trees(
+            document,
+            nodes,
+            logical_edges,
+            route_clearance=profile.route_clearance,
+        )
+    )
+    serialized_tree_overlap = _final_artifact_overlap_count(
+        serialized_tree_candidate, logical_edges
+    )
+    if serialized_tree_overlap <= pre_serialized_overlap:
+        document = serialized_tree_candidate
+        report["selection"].update({
+            key.replace("fanout_", "post_placement_fanout_"): value
+            for key, value in serialized_tree_report.items()
+            if key != "_accepted_assessment"
+        })
+        report["selection"]["post_placement_fanout_tree_rollback_overlap"] = 0
+    else:
+        document = pre_serialized_tree
+        report["selection"]["post_placement_fanout_tree_rollback_overlap"] = 1
+        report["selection"]["post_placement_fanout_tree_candidate_overlaps"] = (
+            serialized_tree_overlap
+        )
     # This is the final multi-row fanout route owner.  Placement, facility
     # splitting and obsolete-outer-detour cleanup have all completed, so an
     # exterior corridor chosen here cannot be pulled back through a dense

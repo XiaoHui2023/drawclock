@@ -5,6 +5,7 @@ description: drawclock 当前目标、验证证据与完成条件索引。
 
 # 项目目标
 
+- [错列 MUX 边界主干复验](goals/misaligned-mux-boundary-trunk-reverification.md)
 - [频率列裁剪与发行目录收敛](goals/frequency-columns-and-release-layout.md)
 - [注释颜色与 Python 发行边界](goals/annotation-color-python-release-surface.md)
 

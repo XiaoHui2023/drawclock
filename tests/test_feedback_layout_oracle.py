@@ -1027,7 +1027,7 @@ def test_premature_corridor_rejects_local_gain_that_worsens_global_crossings(
     assert "FB-ROUTE-023" not in report["detected_issues"]
 
 
-@pytest.mark.parametrize("seed", [0, 3, 13, 23])
+@pytest.mark.parametrize("seed", [0, 3, 13, 22, 23])
 def test_boundary_corridor_survives_misaligned_mux_column_attacks(
     seed: int, tmp_path: Path,
 ) -> None:
@@ -1039,12 +1039,24 @@ def test_boundary_corridor_survives_misaligned_mux_column_attacks(
     search = importlib.util.module_from_spec(search_spec)
     search_spec.loader.exec_module(search)
     config = search.build_case(seed)
-    shifted_muxes = [
-        item for item in config.values()
-        if str(item.get("kind", "")).startswith("mux")
-        and "layout_column" in item
+    reconvergent = {
+        name: item for name, item in config.items()
+        if name.startswith("select_reconvergent_")
+    }
+    target = max(
+        reconvergent,
+        key=lambda name: int(reconvergent[name]["layout_column"]),
+    )
+    public_roots = [
+        name for name, item in config.items()
+        if item.get("kind") == "from" and "source" not in item
     ]
-    assert shifted_muxes
+    assert len(public_roots) == 1
+    assert public_roots[0] in reconvergent[target]["source"].values()
+    assert int(reconvergent[target]["layout_column"]) > max(
+        int(item["layout_column"])
+        for name, item in reconvergent.items() if name != target
+    )
     input_path = tmp_path / f"boundary-trunk-seed-{seed:03d}.json"
     input_path.write_text(
         json.dumps(config, indent=2) + "\n", encoding="utf-8"
@@ -1053,12 +1065,33 @@ def test_boundary_corridor_survives_misaligned_mux_column_attacks(
     subprocess.run(
         [sys.executable, str(ROOT / "src"), "-i", str(input_path),
          "-l", str(ROOT / "drawio-lib"), "-o", str(output),
-         "--crossing-style", "none"],
+         "--crossing-style", "arc"],
         cwd=ROOT, check=True,
     )
     report = oracle.analyze(input_path, output)
+    boxes, _routes = oracle.parse_svg(output, set(config))
+    mux_x = {
+        box.node: box.x + box.w / 2.0
+        for box in boxes if box.node in reconvergent
+    }
+    assert mux_x[target] > max(
+        x for name, x in mux_x.items() if name != target
+    ) + oracle.EPS
     assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
     assert "FB-ROUTE-023" not in report["detected_issues"]
+    quality_receipt = tmp_path / f"boundary-trunk-seed-{seed:03d}-quality.json"
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "svg_quality_system.py"),
+         "--input", str(input_path), "--svg", str(output),
+         "--registry", str(ROOT / "tests" / "quality-metrics.json"),
+         "--output", str(quality_receipt)],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    quality = json.loads(quality_receipt.read_text(encoding="utf-8"))
+    assert quality["required_metric_ids"] == quality["executed_metric_ids"]
+    assert len(quality["executed_metric_ids"]) == 28
+    assert quality["failed_metric_ids"] == []
 
 
 def test_final_route_closure_removes_globally_dominated_local_channels(
