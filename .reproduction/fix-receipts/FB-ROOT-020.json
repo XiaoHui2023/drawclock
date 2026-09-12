@@ -3,7 +3,7 @@
   "hash_mode": "sha256-normalized-text-v1",
   "issue_id": "FB-ROOT-020",
   "result": "fixed_verified",
-  "verification_group": "20260912T144635Z-d0e9352f",
+  "verification_group": "20260912T185502Z-2436c1bb",
   "baseline_fails": true,
   "current_passes": true,
   "baseline_receipt": ".reproduction/receipts/FB-ROOT-020.json",
@@ -19,7 +19,7 @@
   "semantics_sha256": "9110e75d06071f93bc9837b695a63d9cbefb5e336210a8fca32b8a146b37bb0e",
   "attempts": [
     {
-      "run_id": "20260912T144635Z-d0e9352f:direct-source-mux-column-baseline:1",
+      "run_id": "20260912T185502Z-2436c1bb:direct-source-mux-column-baseline:1",
       "case_id": "direct-source-mux-column-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -32,23 +32,23 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:48:12.385561+00:00",
-      "ended_at": "2026-09-12T14:48:12.914614+00:00",
+      "started_at": "2026-09-12T18:56:34.052833+00:00",
+      "ended_at": "2026-09-12T18:56:34.594652+00:00",
       "semantic_contract_sha256": "b7efab82153adeff34295ecc5409c6bbfe28b0727887144196e421ec4cba0383",
       "semantic_variant_id": "direct-source-mux-column",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-baseline/attempt-1/output.svg": "20e08f4ef1ab275ea18c6b24046ea4ed7bee5b7cd94ef3e61eb8318f8c19a5ac",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-baseline/attempt-1/producer.log": "e22abb26b6cb4eb5cbc9b20a7231b731d6477d2a860bcbc18443b9524fc103fc",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-baseline/attempt-1/report.json": "58252033a619a654f13a861968531bad71a6bc19457a88f03d6f48137911a817",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-baseline/attempt-1/FB-ROOT-020.log": "06c333ba41bcb53786c4fb1a2677c0dab628edb39f1b3cabd53eb82cdbbad3db"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-baseline/attempt-1/output.svg": "20e08f4ef1ab275ea18c6b24046ea4ed7bee5b7cd94ef3e61eb8318f8c19a5ac",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-baseline/attempt-1/producer.log": "c8fae3de246cfb016006e9b03a8fca388f22ef56255b2ebff57b14865c2f8ca5",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-baseline/attempt-1/report.json": "58252033a619a654f13a861968531bad71a6bc19457a88f03d6f48137911a817",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-baseline/attempt-1/FB-ROOT-020.log": "06c333ba41bcb53786c4fb1a2677c0dab628edb39f1b3cabd53eb82cdbbad3db"
       }
     },
     {
-      "run_id": "20260912T144635Z-d0e9352f:direct-source-mux-column-baseline:2",
+      "run_id": "20260912T185502Z-2436c1bb:direct-source-mux-column-baseline:2",
       "case_id": "direct-source-mux-column-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -61,23 +61,23 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:48:12.926411+00:00",
-      "ended_at": "2026-09-12T14:48:13.461747+00:00",
+      "started_at": "2026-09-12T18:56:34.605630+00:00",
+      "ended_at": "2026-09-12T18:56:35.132734+00:00",
       "semantic_contract_sha256": "b7efab82153adeff34295ecc5409c6bbfe28b0727887144196e421ec4cba0383",
       "semantic_variant_id": "direct-source-mux-column",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-baseline/attempt-2/output.svg": "20e08f4ef1ab275ea18c6b24046ea4ed7bee5b7cd94ef3e61eb8318f8c19a5ac",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-baseline/attempt-2/producer.log": "838f51d6d754aa2fa7bbcfb247ee0a45fae67c3706809c9fa9b1998da62c22fd",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-baseline/attempt-2/report.json": "58252033a619a654f13a861968531bad71a6bc19457a88f03d6f48137911a817",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-baseline/attempt-2/FB-ROOT-020.log": "06c333ba41bcb53786c4fb1a2677c0dab628edb39f1b3cabd53eb82cdbbad3db"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-baseline/attempt-2/output.svg": "20e08f4ef1ab275ea18c6b24046ea4ed7bee5b7cd94ef3e61eb8318f8c19a5ac",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-baseline/attempt-2/producer.log": "7296a2a5bd6d106099da5e35fc1bc3258393b8b63034bb04522109c705bc9f96",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-baseline/attempt-2/report.json": "58252033a619a654f13a861968531bad71a6bc19457a88f03d6f48137911a817",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-baseline/attempt-2/FB-ROOT-020.log": "06c333ba41bcb53786c4fb1a2677c0dab628edb39f1b3cabd53eb82cdbbad3db"
       }
     },
     {
-      "run_id": "20260912T144635Z-d0e9352f:direct-from-mux-column-baseline:1",
+      "run_id": "20260912T185502Z-2436c1bb:direct-from-mux-column-baseline:1",
       "case_id": "direct-from-mux-column-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -90,23 +90,23 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:48:13.472774+00:00",
-      "ended_at": "2026-09-12T14:48:14.004160+00:00",
+      "started_at": "2026-09-12T18:56:35.144032+00:00",
+      "ended_at": "2026-09-12T18:56:35.652182+00:00",
       "semantic_contract_sha256": "dbc0054c41c3ad781ff3853d1e97d1643f10d4249a6376c7f8f627e8ba1d37a6",
       "semantic_variant_id": "direct-from-mux-column",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-baseline/attempt-1/output.svg": "692990b7b61271fabbf48e45f6902371c882ecbc09713358a84bf718835735ba",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-baseline/attempt-1/producer.log": "9048027327bcfb18609ff64feb5933e04f0f126be20e81aabc9d253768562423",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-baseline/attempt-1/report.json": "cf64ca8a0dd53768de7431e4ebca8500d41f928b944995ccf0a95ff56d908290",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-baseline/attempt-1/FB-ROOT-020.log": "d855746613a9824a4495fc6fe687e2a6bbf3ff195bf32daf2498fdd0c9653f2f"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-baseline/attempt-1/output.svg": "692990b7b61271fabbf48e45f6902371c882ecbc09713358a84bf718835735ba",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-baseline/attempt-1/producer.log": "962d8b4b3ba5721390677a981ef9feefbee992ff14fc01d04b980fbe4148f931",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-baseline/attempt-1/report.json": "cf64ca8a0dd53768de7431e4ebca8500d41f928b944995ccf0a95ff56d908290",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-baseline/attempt-1/FB-ROOT-020.log": "d855746613a9824a4495fc6fe687e2a6bbf3ff195bf32daf2498fdd0c9653f2f"
       }
     },
     {
-      "run_id": "20260912T144635Z-d0e9352f:direct-from-mux-column-baseline:2",
+      "run_id": "20260912T185502Z-2436c1bb:direct-from-mux-column-baseline:2",
       "case_id": "direct-from-mux-column-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -119,23 +119,23 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:48:14.014491+00:00",
-      "ended_at": "2026-09-12T14:48:14.539495+00:00",
+      "started_at": "2026-09-12T18:56:35.662691+00:00",
+      "ended_at": "2026-09-12T18:56:36.200444+00:00",
       "semantic_contract_sha256": "dbc0054c41c3ad781ff3853d1e97d1643f10d4249a6376c7f8f627e8ba1d37a6",
       "semantic_variant_id": "direct-from-mux-column",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-baseline/attempt-2/output.svg": "692990b7b61271fabbf48e45f6902371c882ecbc09713358a84bf718835735ba",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-baseline/attempt-2/producer.log": "8b75a886c327ace67982b883a3bcb71d211db018e631099ba23c10729bff2721",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-baseline/attempt-2/report.json": "cf64ca8a0dd53768de7431e4ebca8500d41f928b944995ccf0a95ff56d908290",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-baseline/attempt-2/FB-ROOT-020.log": "d855746613a9824a4495fc6fe687e2a6bbf3ff195bf32daf2498fdd0c9653f2f"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-baseline/attempt-2/output.svg": "692990b7b61271fabbf48e45f6902371c882ecbc09713358a84bf718835735ba",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-baseline/attempt-2/producer.log": "7025d77495fb048849df9c9427aeaa93fc942056c22bc49d1524afb64f3cf70f",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-baseline/attempt-2/report.json": "cf64ca8a0dd53768de7431e4ebca8500d41f928b944995ccf0a95ff56d908290",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-baseline/attempt-2/FB-ROOT-020.log": "d855746613a9824a4495fc6fe687e2a6bbf3ff195bf32daf2498fdd0c9653f2f"
       }
     },
     {
-      "run_id": "20260912T144635Z-d0e9352f:direct-source-mux-column-current:1",
+      "run_id": "20260912T185502Z-2436c1bb:direct-source-mux-column-current:1",
       "case_id": "direct-source-mux-column-current",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -148,23 +148,23 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:50:07.678977+00:00",
-      "ended_at": "2026-09-12T14:50:08.201602+00:00",
+      "started_at": "2026-09-12T18:58:25.211845+00:00",
+      "ended_at": "2026-09-12T18:58:25.721525+00:00",
       "semantic_contract_sha256": "b7efab82153adeff34295ecc5409c6bbfe28b0727887144196e421ec4cba0383",
       "semantic_variant_id": "direct-source-mux-column",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-current/attempt-1/output.svg": "20e08f4ef1ab275ea18c6b24046ea4ed7bee5b7cd94ef3e61eb8318f8c19a5ac",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-current/attempt-1/producer.log": "969970d9808bcc71a987d5451b223fdc4c86e6a48adbe19272d0ca9e98df42db",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-current/attempt-1/report.json": "58252033a619a654f13a861968531bad71a6bc19457a88f03d6f48137911a817",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-current/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-current/attempt-1/FB-ROOT-020.log": "06c333ba41bcb53786c4fb1a2677c0dab628edb39f1b3cabd53eb82cdbbad3db"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-current/attempt-1/output.svg": "20e08f4ef1ab275ea18c6b24046ea4ed7bee5b7cd94ef3e61eb8318f8c19a5ac",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-current/attempt-1/producer.log": "f8ff40b4a75aca87d03ca7f6c0150126642eb911cb99691d035d9631de31cbd1",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-current/attempt-1/report.json": "58252033a619a654f13a861968531bad71a6bc19457a88f03d6f48137911a817",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-current/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-current/attempt-1/FB-ROOT-020.log": "06c333ba41bcb53786c4fb1a2677c0dab628edb39f1b3cabd53eb82cdbbad3db"
       }
     },
     {
-      "run_id": "20260912T144635Z-d0e9352f:direct-source-mux-column-current:2",
+      "run_id": "20260912T185502Z-2436c1bb:direct-source-mux-column-current:2",
       "case_id": "direct-source-mux-column-current",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -177,23 +177,23 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:50:08.211233+00:00",
-      "ended_at": "2026-09-12T14:50:08.724075+00:00",
+      "started_at": "2026-09-12T18:58:25.731528+00:00",
+      "ended_at": "2026-09-12T18:58:26.244364+00:00",
       "semantic_contract_sha256": "b7efab82153adeff34295ecc5409c6bbfe28b0727887144196e421ec4cba0383",
       "semantic_variant_id": "direct-source-mux-column",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-current/attempt-2/output.svg": "20e08f4ef1ab275ea18c6b24046ea4ed7bee5b7cd94ef3e61eb8318f8c19a5ac",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-current/attempt-2/producer.log": "0e677e7c549e30b430b9254eeff54269a4c0de50bd123ea0ce4b5c777ac7c236",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-current/attempt-2/report.json": "58252033a619a654f13a861968531bad71a6bc19457a88f03d6f48137911a817",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-current/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-source-mux-column-current/attempt-2/FB-ROOT-020.log": "06c333ba41bcb53786c4fb1a2677c0dab628edb39f1b3cabd53eb82cdbbad3db"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-current/attempt-2/output.svg": "20e08f4ef1ab275ea18c6b24046ea4ed7bee5b7cd94ef3e61eb8318f8c19a5ac",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-current/attempt-2/producer.log": "fa09715de9c75fbaf4cdbeebd2e649fb79990243b9f8c17b70f991e099f68f6b",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-current/attempt-2/report.json": "58252033a619a654f13a861968531bad71a6bc19457a88f03d6f48137911a817",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-current/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-source-mux-column-current/attempt-2/FB-ROOT-020.log": "06c333ba41bcb53786c4fb1a2677c0dab628edb39f1b3cabd53eb82cdbbad3db"
       }
     },
     {
-      "run_id": "20260912T144635Z-d0e9352f:direct-from-mux-column-current:1",
+      "run_id": "20260912T185502Z-2436c1bb:direct-from-mux-column-current:1",
       "case_id": "direct-from-mux-column-current",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -206,23 +206,23 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:50:08.734590+00:00",
-      "ended_at": "2026-09-12T14:50:09.253934+00:00",
+      "started_at": "2026-09-12T18:58:26.254435+00:00",
+      "ended_at": "2026-09-12T18:58:26.761044+00:00",
       "semantic_contract_sha256": "dbc0054c41c3ad781ff3853d1e97d1643f10d4249a6376c7f8f627e8ba1d37a6",
       "semantic_variant_id": "direct-from-mux-column",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-current/attempt-1/output.svg": "692990b7b61271fabbf48e45f6902371c882ecbc09713358a84bf718835735ba",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-current/attempt-1/producer.log": "ec55947b29e1e8489b9b08b7c357d60416665acc60775ae835f9181128945478",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-current/attempt-1/report.json": "cf64ca8a0dd53768de7431e4ebca8500d41f928b944995ccf0a95ff56d908290",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-current/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-current/attempt-1/FB-ROOT-020.log": "d855746613a9824a4495fc6fe687e2a6bbf3ff195bf32daf2498fdd0c9653f2f"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-current/attempt-1/output.svg": "692990b7b61271fabbf48e45f6902371c882ecbc09713358a84bf718835735ba",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-current/attempt-1/producer.log": "48643f8398cc3eca5340b6bbf2741d5c08da1d6d7ce76c0ac494501f2b3acf65",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-current/attempt-1/report.json": "cf64ca8a0dd53768de7431e4ebca8500d41f928b944995ccf0a95ff56d908290",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-current/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-current/attempt-1/FB-ROOT-020.log": "d855746613a9824a4495fc6fe687e2a6bbf3ff195bf32daf2498fdd0c9653f2f"
       }
     },
     {
-      "run_id": "20260912T144635Z-d0e9352f:direct-from-mux-column-current:2",
+      "run_id": "20260912T185502Z-2436c1bb:direct-from-mux-column-current:2",
       "case_id": "direct-from-mux-column-current",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -235,19 +235,19 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:50:09.264654+00:00",
-      "ended_at": "2026-09-12T14:50:09.784942+00:00",
+      "started_at": "2026-09-12T18:58:26.770909+00:00",
+      "ended_at": "2026-09-12T18:58:27.279338+00:00",
       "semantic_contract_sha256": "dbc0054c41c3ad781ff3853d1e97d1643f10d4249a6376c7f8f627e8ba1d37a6",
       "semantic_variant_id": "direct-from-mux-column",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-current/attempt-2/output.svg": "692990b7b61271fabbf48e45f6902371c882ecbc09713358a84bf718835735ba",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-current/attempt-2/producer.log": "74cba294fa0ce96dba28efbc6fdf6daf7ab6dc6d55759e656ae3e15fef9ccdf8",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-current/attempt-2/report.json": "cf64ca8a0dd53768de7431e4ebca8500d41f928b944995ccf0a95ff56d908290",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-current/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/direct-from-mux-column-current/attempt-2/FB-ROOT-020.log": "d855746613a9824a4495fc6fe687e2a6bbf3ff195bf32daf2498fdd0c9653f2f"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-current/attempt-2/output.svg": "692990b7b61271fabbf48e45f6902371c882ecbc09713358a84bf718835735ba",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-current/attempt-2/producer.log": "b1ee2fa7b4efd6bb0f8f64cea49581b4bdb161ef978cffc7275b1b5d359c7bff",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-current/attempt-2/report.json": "cf64ca8a0dd53768de7431e4ebca8500d41f928b944995ccf0a95ff56d908290",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-current/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/direct-from-mux-column-current/attempt-2/FB-ROOT-020.log": "d855746613a9824a4495fc6fe687e2a6bbf3ff195bf32daf2498fdd0c9653f2f"
       }
     }
   ]

@@ -31,7 +31,19 @@ def test_inspector_reports_complete_public_from_geometry() -> None:
     assert network["fanout"] == 5
     assert network["physical_source_facilities"] == 5
     assert network["vertical_channel_xs"] == []
-    assert all("bend_points" in edge and "segments" in edge and "crossings" in edge for edge in report["edges"])
+    assert report["schema_version"] == 2
+    assert all(
+        edge["segment_count"] == len(edge["segments"])
+        and edge["bend_count"] == len(edge["bend_points"])
+        and edge["crossing_count"] == len(edge["crossings"])
+        and edge["direction_sequence"] == [
+            segment["direction"] for segment in edge["segments"]
+        ]
+        and all("bounds" in segment for segment in edge["segments"])
+        for edge in report["edges"]
+    )
+    assert "geometry_graph" in network
+    assert network["geometry_graph"]["cycle_rank"] >= 0
 
 
 def test_every_artifact_executes_exact_complete_registry() -> None:
@@ -59,7 +71,7 @@ def test_quality_cli_rejects_known_bad_artifact(tmp_path: Path) -> None:
     assert completed.returncode == 1
     report = json.loads(receipt.read_text(encoding="utf-8"))
     assert report["executed_metric_ids"] == report["required_metric_ids"]
-    assert len(report["executed_metric_ids"]) == 28
+    assert len(report["executed_metric_ids"]) == 29
     assert report["failed_metric_ids"]
 
 
@@ -74,6 +86,21 @@ def test_registry_rejects_duplicate_or_missing_identity(tmp_path: Path) -> None:
         assert "unique" in str(exc)
     else:
         raise AssertionError("duplicate metric id escaped")
+
+
+def test_geometry_inventory_metric_rejects_missing_line_fact() -> None:
+    inventory = inspector.inspect(INPUT, BAD_SVG)
+    config, logical = quality.geometry.parse_topology(INPUT)
+    boxes, routes = quality.geometry.parse_svg(BAD_SVG, set(config))
+    quality.geometry.bind_routes(routes, boxes, logical)
+    assert quality._geometry_inventory_failures(inventory, routes) == []
+
+    mutant = json.loads(json.dumps(inventory))
+    del mutant["edges"][0]["segments"][0]["direction"]
+    failures = quality._geometry_inventory_failures(mutant, routes)
+    assert any(
+        row["kind"] == "segment_fields" for row in failures
+    )
 
 
 def test_diagram_title_metric_rejects_root_level_filename_caption(

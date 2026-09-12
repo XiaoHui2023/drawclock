@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 import feedback_layout_reproduction_oracle as geometry
+import svg_graph_inspector as geometry_inventory
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -144,6 +145,150 @@ def validate_metric_receipt(
         )
 
 
+def _geometry_inventory_failures(
+    inventory: dict[str, Any], routes: list[geometry.Route]
+) -> list[dict[str, Any]]:
+    """Fail closed when the reusable per-line fact surface is incomplete."""
+    failures: list[dict[str, Any]] = []
+
+    def reject(kind: str, **details: Any) -> None:
+        failures.append({"kind": kind, **details})
+
+    if inventory.get("schema_version") != 2:
+        reject(
+            "schema_version", expected=2,
+            actual=inventory.get("schema_version"),
+        )
+    edge_rows = inventory.get("edges")
+    if not isinstance(edge_rows, list):
+        return [*failures, {"kind": "edges_not_array"}]
+    by_id = {
+        row.get("id"): row for row in edge_rows if isinstance(row, dict)
+    }
+    route_ids = [route.edge_id for route in routes]
+    if sorted(by_id) != sorted(route_ids):
+        reject(
+            "edge_exact_set", expected=sorted(route_ids), actual=sorted(by_id),
+        )
+    crossings, overlaps = geometry.route_crossings(routes)
+    crossing_by_edge: Counter[str] = Counter(
+        edge_id for event in crossings for edge_id in event["edges"]
+    )
+    crossing_points = {route.edge_id: set() for route in routes}
+    crossing_partners = {route.edge_id: set() for route in routes}
+    for event in crossings:
+        left, right = event["edges"]
+        point = tuple(event["point"])
+        crossing_points[left].add(point)
+        crossing_points[right].add(point)
+        crossing_partners[left].add(right)
+        crossing_partners[right].add(left)
+    overlap_by_edge: Counter[str] = Counter(
+        edge_id for event in overlaps for edge_id in event["edges"]
+    )
+    required_edge_fields = {
+        "id", "source", "source_port", "target", "target_port",
+        "points", "bounds", "segment_count", "bend_count", "bend_points",
+        "direction_sequence", "segments", "crossing_count",
+        "crossing_points", "crossed_edge_ids", "crossings",
+        "different_net_overlap_count", "different_net_overlap_length_px",
+        "different_net_overlaps",
+    }
+    for route in routes:
+        row = by_id.get(route.edge_id)
+        if not isinstance(row, dict):
+            continue
+        missing = sorted(required_edge_fields - set(row))
+        if missing:
+            reject("edge_fields", edge_id=route.edge_id, missing=missing)
+            continue
+        raw_segments = geometry.segments(route)
+        expected_directions = []
+        for start, end in raw_segments:
+            if abs(start[1] - end[1]) <= geometry.EPS:
+                expected_directions.append(
+                    "right" if end[0] > start[0] else "left"
+                )
+            elif abs(start[0] - end[0]) <= geometry.EPS:
+                expected_directions.append(
+                    "down" if end[1] > start[1] else "up"
+                )
+            else:
+                expected_directions.append("non_orthogonal")
+        expected = {
+            "segment_count": len(raw_segments),
+            "bend_count": max(0, len(route.points) - 2),
+            "direction_sequence": expected_directions,
+            "crossing_count": crossing_by_edge[route.edge_id],
+            "crossing_points": [
+                list(point) for point in sorted(crossing_points[route.edge_id])
+            ],
+            "crossed_edge_ids": sorted(crossing_partners[route.edge_id]),
+            "different_net_overlap_count": overlap_by_edge[route.edge_id],
+        }
+        for field, value in expected.items():
+            if row.get(field) != value:
+                reject(
+                    "edge_fact_mismatch", edge_id=route.edge_id,
+                    field=field, expected=value, actual=row.get(field),
+                )
+        segment_rows = row.get("segments")
+        if not isinstance(segment_rows, list) or len(segment_rows) != len(raw_segments):
+            reject("segment_rows", edge_id=route.edge_id)
+            continue
+        for index, (segment, pair) in enumerate(zip(segment_rows, raw_segments)):
+            required = {
+                "index", "start", "end", "orientation", "direction",
+                "length_px", "bounds",
+            }
+            if not isinstance(segment, dict) or required - set(segment):
+                reject(
+                    "segment_fields", edge_id=route.edge_id, index=index,
+                    missing=sorted(required - set(segment or {})),
+                )
+                continue
+            if (
+                segment["index"] != index
+                or segment["start"] != list(pair[0])
+                or segment["end"] != list(pair[1])
+                or segment["direction"] != expected_directions[index]
+            ):
+                reject(
+                    "segment_fact_mismatch", edge_id=route.edge_id, index=index,
+                )
+    network_rows = inventory.get("networks")
+    expected_networks = sorted({
+        f"{route.source}:{route.source_port}" for route in routes
+    })
+    if not isinstance(network_rows, list):
+        reject("networks_not_array")
+    else:
+        network_ids = sorted(
+            row.get("id") for row in network_rows if isinstance(row, dict)
+        )
+        if network_ids != expected_networks:
+            reject(
+                "network_exact_set", expected=expected_networks,
+                actual=network_ids,
+            )
+        graph_fields = {
+            "vertex_count", "segment_count", "connected_components",
+            "cycle_rank", "junction_points", "leaf_points",
+            "shared_segments", "shared_segment_length_px",
+        }
+        for row in network_rows:
+            if not isinstance(row, dict):
+                reject("network_row_not_object")
+                continue
+            graph = row.get("geometry_graph")
+            if not isinstance(graph, dict) or graph_fields - set(graph):
+                reject(
+                    "network_graph_fields", network_id=row.get("id"),
+                    missing=sorted(graph_fields - set(graph or {})),
+                )
+    return failures
+
+
 def _artifact_metric_witnesses(
     input_path: Path, svg_path: Path
 ) -> dict[str, Any]:
@@ -167,6 +312,38 @@ def _artifact_metric_witnesses(
             else value != topology["expected_edge_count"]
         )
     }
+    if topology_failures:
+        inventory_failures = [{
+            "kind": "topology_invalid",
+            "topology_failures": topology_failures,
+        }]
+        inventory_summary = {
+            "schema_version": None,
+            "nodes": len(boxes),
+            "edges": len(routes),
+            "segments": sum(len(geometry.segments(route)) for route in routes),
+            "networks": len({
+                (route.source, route.source_port) for route in routes
+            }),
+            "crossings": None,
+            "different_net_overlaps": None,
+        }
+    else:
+        inventory = geometry_inventory.inspect(input_path, svg_path)
+        inventory_failures = _geometry_inventory_failures(inventory, routes)
+        inventory_summary = {
+            "schema_version": inventory["schema_version"],
+            "nodes": len(inventory["nodes"]),
+            "edges": len(inventory["edges"]),
+            "segments": sum(
+                row["segment_count"] for row in inventory["edges"]
+            ),
+            "networks": len(inventory["networks"]),
+            "crossings": len(inventory["crossings"]),
+            "different_net_overlaps": len(
+                inventory["different_net_overlaps"]
+            ),
+        }
     non_orthogonal = []
     for route in routes:
         for index, (start, end) in enumerate(geometry.segments(route)):
@@ -250,6 +427,8 @@ def _artifact_metric_witnesses(
         "crossing_treatment": _crossing_treatment_witnesses(root, routes),
         "diagram_title_absence": diagram_titles,
         "frequency_column_visibility": frequency_failures,
+        "geometry_inventory_completeness": inventory_failures,
+        "_geometry_inventory_summary": inventory_summary,
     }
 
 
@@ -298,6 +477,7 @@ def evaluate(input_path: Path, svg_path: Path, registry_path: Path = DEFAULT_REG
     config = json.loads(input_path.read_text(encoding="utf-8-sig"))
     report = geometry.analyze(input_path, svg_path)
     artifact_witnesses = _artifact_metric_witnesses(input_path, svg_path)
+    inventory_summary = artifact_witnesses.pop("_geometry_inventory_summary")
     report["_input_path"] = str(input_path)
     results = []
     for metric in registry:
@@ -336,6 +516,7 @@ def evaluate(input_path: Path, svg_path: Path, registry_path: Path = DEFAULT_REG
         "executed_metric_ids": executed,
         "metric_results": results,
         "failed_metric_ids": [item["metric_id"] for item in results if item["status"] == "fail"],
+        "geometry_inventory_summary": inventory_summary,
         "passed": all(item["status"] != "fail" for item in results),
     }
 

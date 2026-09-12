@@ -3,7 +3,7 @@
   "hash_mode": "sha256-normalized-text-v1",
   "issue_id": "FB-ROUTE-023",
   "result": "fixed_verified",
-  "verification_group": "20260912T144635Z-d0e9352f",
+  "verification_group": "20260912T185502Z-2436c1bb",
   "baseline_fails": true,
   "current_passes": true,
   "baseline_receipt": ".reproduction/receipts/FB-ROUTE-023.json",
@@ -18,7 +18,7 @@
   "semantics_sha256": "9110e75d06071f93bc9837b695a63d9cbefb5e336210a8fca32b8a146b37bb0e",
   "attempts": [
     {
-      "run_id": "20260912T144635Z-d0e9352f:premature-interior-trunk-entry-baseline:1",
+      "run_id": "20260912T185502Z-2436c1bb:premature-interior-trunk-entry-baseline:1",
       "case_id": "premature-interior-trunk-entry-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -31,23 +31,23 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:48:19.326621+00:00",
-      "ended_at": "2026-09-12T14:49:01.589920+00:00",
+      "started_at": "2026-09-12T18:56:40.924241+00:00",
+      "ended_at": "2026-09-12T18:57:21.970342+00:00",
       "semantic_contract_sha256": "f9ef7b266f5f44ccda687822723abb7196fa7b36ac8a532c463af639f52f7aec",
       "semantic_variant_id": "premature-interior-trunk-entry",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/premature-interior-trunk-entry-baseline/attempt-1/output.svg": "64f34752a4511ef2ebcc096fb9c1053aeb0b8b99ef85a399aaa29059f7d29a2a",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/premature-interior-trunk-entry-baseline/attempt-1/producer.log": "e1f11ab8c04f4ba6246cdea5fae60aa8ac040ed398d9acf8b1897bcfaaa41a85",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/premature-interior-trunk-entry-baseline/attempt-1/report.json": "0b8bdf9336ee90dfa2879bfcb666d90c551f59260a7550cc0dec2555b2757160",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/premature-interior-trunk-entry-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/premature-interior-trunk-entry-baseline/attempt-1/FB-ROUTE-023.log": "cea9db2e031370771fa2d6b0f4a9aeb9c0a97f4e6f515114ed75b44e45e879d4"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/premature-interior-trunk-entry-baseline/attempt-1/output.svg": "64f34752a4511ef2ebcc096fb9c1053aeb0b8b99ef85a399aaa29059f7d29a2a",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/premature-interior-trunk-entry-baseline/attempt-1/producer.log": "93281938e3ab2f2c6ebe9abcc0811ba6c708770bb2d25e6f99e3e0579ab90f50",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/premature-interior-trunk-entry-baseline/attempt-1/report.json": "0b8bdf9336ee90dfa2879bfcb666d90c551f59260a7550cc0dec2555b2757160",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/premature-interior-trunk-entry-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/premature-interior-trunk-entry-baseline/attempt-1/FB-ROUTE-023.log": "cea9db2e031370771fa2d6b0f4a9aeb9c0a97f4e6f515114ed75b44e45e879d4"
       }
     },
     {
-      "run_id": "20260912T144635Z-d0e9352f:premature-interior-trunk-entry-baseline:2",
+      "run_id": "20260912T185502Z-2436c1bb:premature-interior-trunk-entry-baseline:2",
       "case_id": "premature-interior-trunk-entry-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -60,19 +60,19 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:49:01.606579+00:00",
-      "ended_at": "2026-09-12T14:49:45.470868+00:00",
+      "started_at": "2026-09-12T18:57:21.986833+00:00",
+      "ended_at": "2026-09-12T18:58:03.232111+00:00",
       "semantic_contract_sha256": "f9ef7b266f5f44ccda687822723abb7196fa7b36ac8a532c463af639f52f7aec",
       "semantic_variant_id": "premature-interior-trunk-entry",
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": false,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/premature-interior-trunk-entry-baseline/attempt-2/output.svg": "64f34752a4511ef2ebcc096fb9c1053aeb0b8b99ef85a399aaa29059f7d29a2a",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/premature-interior-trunk-entry-baseline/attempt-2/producer.log": "ffadc70a68b4923f69b508b87d053d65c3d633157ed3a4c97180962e34f5992e",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/premature-interior-trunk-entry-baseline/attempt-2/report.json": "0b8bdf9336ee90dfa2879bfcb666d90c551f59260a7550cc0dec2555b2757160",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/premature-interior-trunk-entry-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/premature-interior-trunk-entry-baseline/attempt-2/FB-ROUTE-023.log": "cea9db2e031370771fa2d6b0f4a9aeb9c0a97f4e6f515114ed75b44e45e879d4"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/premature-interior-trunk-entry-baseline/attempt-2/output.svg": "64f34752a4511ef2ebcc096fb9c1053aeb0b8b99ef85a399aaa29059f7d29a2a",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/premature-interior-trunk-entry-baseline/attempt-2/producer.log": "05ce361a64ddb6bc696d470f7f3d8d39aec1e6c46048a3072bd21e221f159d90",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/premature-interior-trunk-entry-baseline/attempt-2/report.json": "0b8bdf9336ee90dfa2879bfcb666d90c551f59260a7550cc0dec2555b2757160",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/premature-interior-trunk-entry-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/premature-interior-trunk-entry-baseline/attempt-2/FB-ROUTE-023.log": "cea9db2e031370771fa2d6b0f4a9aeb9c0a97f4e6f515114ed75b44e45e879d4"
       }
     }
   ]

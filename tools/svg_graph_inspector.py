@@ -20,6 +20,141 @@ def _axis_index(values: list[float], value: float) -> int:
     return sorted(set(round(item, 4) for item in values)).index(round(value, 4))
 
 
+def _segment_direction(
+    start: tuple[float, float], end: tuple[float, float],
+) -> str:
+    if abs(start[1] - end[1]) <= oracle.EPS:
+        return "right" if end[0] > start[0] else "left"
+    if abs(start[0] - end[0]) <= oracle.EPS:
+        return "down" if end[1] > start[1] else "up"
+    return "non_orthogonal"
+
+
+def _bounds(points: list[tuple[float, float]]) -> list[float]:
+    xs = [point[0] for point in points]
+    ys = [point[1] for point in points]
+    return [
+        round(min(xs), 4), round(min(ys), 4),
+        round(max(xs) - min(xs), 4), round(max(ys) - min(ys), 4),
+    ]
+
+
+def _point_on_segment(
+    point: tuple[float, float],
+    start: tuple[float, float],
+    end: tuple[float, float],
+) -> bool:
+    if abs(start[0] - end[0]) <= oracle.EPS:
+        return (
+            abs(point[0] - start[0]) <= oracle.EPS
+            and min(start[1], end[1]) - oracle.EPS <= point[1]
+            <= max(start[1], end[1]) + oracle.EPS
+        )
+    if abs(start[1] - end[1]) <= oracle.EPS:
+        return (
+            abs(point[1] - start[1]) <= oracle.EPS
+            and min(start[0], end[0]) - oracle.EPS <= point[0]
+            <= max(start[0], end[0]) + oracle.EPS
+        )
+    return False
+
+
+def _network_geometry(routes: list[oracle.Route]) -> dict[str, Any]:
+    """Build the visible source-port network graph from final SVG segments."""
+    raw = [
+        (route.edge_id, start, end)
+        for route in routes
+        for start, end in oracle.segments(route)
+    ]
+    cuts = [{start, end} for _edge_id, start, end in raw]
+    for left_index, (_left_id, start, end) in enumerate(raw):
+        for right_index in range(left_index + 1, len(raw)):
+            _right_id, other_start, other_end = raw[right_index]
+            crossing = oracle.proper_cross(
+                start, end, other_start, other_end
+            )
+            if crossing is not None:
+                cuts[left_index].add(crossing)
+                cuts[right_index].add(crossing)
+            for point in (start, end):
+                if _point_on_segment(point, other_start, other_end):
+                    cuts[right_index].add(point)
+            for point in (other_start, other_end):
+                if _point_on_segment(point, start, end):
+                    cuts[left_index].add(point)
+
+    graph_edges: set[
+        tuple[tuple[float, float], tuple[float, float]]
+    ] = set()
+    for (_edge_id, start, end), points in zip(raw, cuts):
+        if abs(start[0] - end[0]) <= oracle.EPS:
+            ordered = sorted(points, key=lambda point: (point[1], point[0]))
+        else:
+            ordered = sorted(points, key=lambda point: (point[0], point[1]))
+        for first, second in zip(ordered, ordered[1:]):
+            if first != second:
+                graph_edges.add(tuple(sorted((first, second))))
+
+    degrees: Counter[tuple[float, float]] = Counter()
+    parent: dict[tuple[float, float], tuple[float, float]] = {}
+
+    def find(point: tuple[float, float]) -> tuple[float, float]:
+        parent.setdefault(point, point)
+        while parent[point] != point:
+            parent[point] = parent[parent[point]]
+            point = parent[point]
+        return point
+
+    for start, end in graph_edges:
+        degrees[start] += 1
+        degrees[end] += 1
+        left_root = find(start)
+        right_root = find(end)
+        if left_root != right_root:
+            parent[left_root] = right_root
+    vertices = set(degrees)
+    components = len({find(point) for point in vertices}) if vertices else 0
+    cycle_rank = max(0, len(graph_edges) - len(vertices) + components)
+
+    shared_segments = []
+    for start, end in sorted(graph_edges):
+        midpoint = ((start[0] + end[0]) / 2, (start[1] + end[1]) / 2)
+        users = sorted({
+            edge_id for edge_id, raw_start, raw_end in raw
+            if _point_on_segment(midpoint, raw_start, raw_end)
+        })
+        if len(users) >= 2:
+            shared_segments.append({
+                "start": list(start),
+                "end": list(end),
+                "orientation": (
+                    "vertical" if abs(start[0] - end[0]) <= oracle.EPS
+                    else "horizontal"
+                ),
+                "length_px": round(
+                    abs(end[0] - start[0]) + abs(end[1] - start[1]), 4
+                ),
+                "edge_ids": users,
+            })
+    return {
+        "vertex_count": len(vertices),
+        "segment_count": len(graph_edges),
+        "connected_components": components,
+        "cycle_rank": cycle_rank,
+        "junction_points": [
+            {"point": list(point), "degree": degrees[point]}
+            for point in sorted(vertices) if degrees[point] >= 3
+        ],
+        "leaf_points": [
+            list(point) for point in sorted(vertices) if degrees[point] == 1
+        ],
+        "shared_segments": shared_segments,
+        "shared_segment_length_px": round(
+            sum(row["length_px"] for row in shared_segments), 4
+        ),
+    }
+
+
 def inspect(input_path: Path, svg_path: Path) -> dict[str, Any]:
     config, logical = oracle.parse_topology(input_path)
     boxes, routes = oracle.parse_svg(svg_path, set(config))
@@ -88,7 +223,25 @@ def inspect(input_path: Path, svg_path: Path) -> dict[str, Any]:
                 "start": list(start),
                 "end": list(end),
                 "orientation": orientation,
+                "direction": _segment_direction(start, end),
                 "length_px": round(abs(end[0] - start[0]) + abs(end[1] - start[1]), 4),
+                "bounds": _bounds([start, end]),
+            })
+        crossing_rows = sorted(
+            crossing_by_edge[route.edge_id],
+            key=lambda item: (item["partner"], item["point"]),
+        )
+        overlap_rows = sorted(
+            overlap_by_edge[route.edge_id], key=lambda item: item["partner"]
+        )
+        bend_rows = []
+        directions = [row["direction"] for row in segment_rows]
+        for index, point in enumerate(route.points[1:-1], start=1):
+            bend_rows.append({
+                "index": index,
+                "point": list(point),
+                "incoming_direction": directions[index - 1],
+                "outgoing_direction": directions[index],
             })
         edge_rows.append({
             "id": route.edge_id,
@@ -97,10 +250,27 @@ def inspect(input_path: Path, svg_path: Path) -> dict[str, Any]:
             "target": route.target,
             "target_port": route.target_port,
             "points": [list(point) for point in route.points],
-            "bend_points": [list(point) for point in route.points[1:-1]],
+            "bounds": _bounds(route.points),
+            "segment_count": len(segment_rows),
+            "bend_count": len(bend_rows),
+            "bend_points": bend_rows,
+            "direction_sequence": directions,
             "segments": segment_rows,
-            "crossings": sorted(crossing_by_edge[route.edge_id], key=lambda item: (item["partner"], item["point"])),
-            "different_net_overlaps": sorted(overlap_by_edge[route.edge_id], key=lambda item: item["partner"]),
+            "crossing_count": len(crossing_rows),
+            "crossing_points": [
+                list(point) for point in sorted({
+                    tuple(row["point"]) for row in crossing_rows
+                })
+            ],
+            "crossed_edge_ids": sorted({
+                row["partner"] for row in crossing_rows
+            }),
+            "crossings": crossing_rows,
+            "different_net_overlap_count": len(overlap_rows),
+            "different_net_overlap_length_px": round(sum(
+                float(row["length"]) for row in overlap_rows
+            ), 4),
+            "different_net_overlaps": overlap_rows,
         })
 
     route_by_id = {route.edge_id: route for route in routes}
@@ -122,6 +292,7 @@ def inspect(input_path: Path, svg_path: Path) -> dict[str, Any]:
                     source_bus_xs_set.add(round(start[0], 4))
                     break
         source_bus_xs = sorted(source_bus_xs_set)
+        graph = _network_geometry(members)
         networks.append({
             "id": f"{source}:{source_port}",
             "source": source,
@@ -134,10 +305,11 @@ def inspect(input_path: Path, svg_path: Path) -> dict[str, Any]:
             "source_vertical_bus_xs": source_bus_xs,
             "branch_count": max(0, len(edge_ids) - 1),
             "split_rejoin": f"{source}:{source_port}" in base["witnesses"]["split_rejoin_roots"],
+            "geometry_graph": graph,
         })
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "input": str(input_path),
         "svg": str(svg_path),
         "summary": base["totals"],

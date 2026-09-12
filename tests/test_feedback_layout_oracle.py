@@ -984,7 +984,7 @@ def test_current_cli_closes_premature_interior_trunk_entry(
     assert completed.returncode == 0, completed.stdout + completed.stderr
     quality = json.loads(receipt.read_text(encoding="utf-8"))
     assert quality["required_metric_ids"] == quality["executed_metric_ids"]
-    assert len(quality["executed_metric_ids"]) == 28
+    assert len(quality["executed_metric_ids"]) == 29
     assert quality["failed_metric_ids"] == []
 
 
@@ -1090,7 +1090,7 @@ def test_boundary_corridor_survives_misaligned_mux_column_attacks(
     assert completed.returncode == 0, completed.stdout + completed.stderr
     quality = json.loads(quality_receipt.read_text(encoding="utf-8"))
     assert quality["required_metric_ids"] == quality["executed_metric_ids"]
-    assert len(quality["executed_metric_ids"]) == 28
+    assert len(quality["executed_metric_ids"]) == 29
     assert quality["failed_metric_ids"] == []
 
 

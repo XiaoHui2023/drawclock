@@ -8,6 +8,10 @@ description: >-
 
 （规则见 `~/.cursor/skills/agent-project-changelog/SKILL.md`。）
 
+## 2026-09-13
+
+- **逐线可观测质量与 Agent-owned Oracle**：`svg_graph_inspector` 升级为 v2，逐边输出完整点列、逐段方向/长度/包围框、结构化拐点、交叉坐标/伙伴、重叠以及网络分叉、共享段和环秩；统一注册表新增 `geometry_inventory_completeness`，全部公开图由 28 项提升为 29 项。质量判断由 Agent 从最终制品独立完成，用户反馈可重开缺陷，但用户确认不再作为常规完成门。
+
 ## 2026-09-12
 
 - **频率列按值显示**：工作频率、SCAN、BIST 分别仅在至少一个末端值非空时出现；三列全空时不生成频率表或预留空白。该规则进入独立全图质量注册表，所有公开用例统一执行 28 项指标。

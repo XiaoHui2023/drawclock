@@ -30,5 +30,6 @@
     ,{"id": "annotation_color", "witness": "annotation_color_quality", "applicability": "has_annotations"}
     ,{"id": "diagram_title_absence", "witness": null, "applicability": "always"}
     ,{"id": "frequency_column_visibility", "witness": null, "applicability": "always"}
+    ,{"id": "geometry_inventory_completeness", "witness": null, "applicability": "always"}
   ]
 }

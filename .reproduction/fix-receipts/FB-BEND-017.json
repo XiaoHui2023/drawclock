@@ -3,7 +3,7 @@
   "hash_mode": "sha256-normalized-text-v1",
   "issue_id": "FB-BEND-017",
   "result": "fixed_verified",
-  "verification_group": "20260912T144635Z-d0e9352f",
+  "verification_group": "20260912T185502Z-2436c1bb",
   "baseline_fails": true,
   "current_passes": true,
   "baseline_receipt": ".reproduction/receipts/FB-BEND-017.json",
@@ -16,7 +16,7 @@
   "semantics_sha256": "9110e75d06071f93bc9837b695a63d9cbefb5e336210a8fca32b8a146b37bb0e",
   "attempts": [
     {
-      "run_id": "20260912T144635Z-d0e9352f:recurrent-staggered-four-source-bend-baseline:1",
+      "run_id": "20260912T185502Z-2436c1bb:recurrent-staggered-four-source-bend-baseline:1",
       "case_id": "recurrent-staggered-four-source-bend-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -29,23 +29,23 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:48:11.178115+00:00",
-      "ended_at": "2026-09-12T14:48:11.772431+00:00",
+      "started_at": "2026-09-12T18:56:32.865766+00:00",
+      "ended_at": "2026-09-12T18:56:33.431892+00:00",
       "semantic_contract_sha256": null,
       "semantic_variant_id": null,
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": null,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/recurrent-staggered-four-source-bend-baseline/attempt-1/output.svg": "7e0ed641b0f086e951767b836e4840ffbeef053b3e6faf300ecef2a870b562af",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/recurrent-staggered-four-source-bend-baseline/attempt-1/producer.log": "7b7c466d571a12344776da3adeba3fd44a484bf3a2e37222c570e857253edfce",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/recurrent-staggered-four-source-bend-baseline/attempt-1/report.json": "9e01c0111b74011f7efac3c017e0bc4b97e023100ac10d7c6b8211b3c49e0e39",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/recurrent-staggered-four-source-bend-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/recurrent-staggered-four-source-bend-baseline/attempt-1/FB-BEND-017.log": "dd2da7e9d4c26b111ab8ab6efa6d5538cc2c9a7836d3615efeb49df511ffde89"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/recurrent-staggered-four-source-bend-baseline/attempt-1/output.svg": "7e0ed641b0f086e951767b836e4840ffbeef053b3e6faf300ecef2a870b562af",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/recurrent-staggered-four-source-bend-baseline/attempt-1/producer.log": "00cdd10eb0b9ef511d567bc40718da22898bac3753fb2028087ee774ae37c273",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/recurrent-staggered-four-source-bend-baseline/attempt-1/report.json": "9e01c0111b74011f7efac3c017e0bc4b97e023100ac10d7c6b8211b3c49e0e39",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/recurrent-staggered-four-source-bend-baseline/attempt-1/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/recurrent-staggered-four-source-bend-baseline/attempt-1/FB-BEND-017.log": "dd2da7e9d4c26b111ab8ab6efa6d5538cc2c9a7836d3615efeb49df511ffde89"
       }
     },
     {
-      "run_id": "20260912T144635Z-d0e9352f:recurrent-staggered-four-source-bend-baseline:2",
+      "run_id": "20260912T185502Z-2436c1bb:recurrent-staggered-four-source-bend-baseline:2",
       "case_id": "recurrent-staggered-four-source-bend-baseline",
       "public_entrypoint": "public_cli",
       "producer_exit_code": 0,
@@ -58,19 +58,19 @@
       "library_tree_sha256": "363d0e899560d2ca78d6868efebeda5ebb6ec8b72674e282814f0ab235998e32",
       "runner_sha256": "e3221fc6a79cdeaaa807f1fea6a79676ac98c9b0296faf9b0411afe3eb88d94b",
       "oracle_sha256": "f1d01df0f4e437e3cac57acbd75a28149411e057214c56bd627d70b5266ad7e3",
-      "started_at": "2026-09-12T14:48:11.782987+00:00",
-      "ended_at": "2026-09-12T14:48:12.374289+00:00",
+      "started_at": "2026-09-12T18:56:33.443988+00:00",
+      "ended_at": "2026-09-12T18:56:34.041003+00:00",
       "semantic_contract_sha256": null,
       "semantic_variant_id": null,
       "semantic_preconditions_met": true,
       "semantic_symptom_observed": null,
       "semantic_errors": [],
       "evidence_files": {
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/recurrent-staggered-four-source-bend-baseline/attempt-2/output.svg": "7e0ed641b0f086e951767b836e4840ffbeef053b3e6faf300ecef2a870b562af",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/recurrent-staggered-four-source-bend-baseline/attempt-2/producer.log": "4a732812d3f4a96feb1beca47aa6054d02b2616833db0966bddd3af274ba3aec",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/recurrent-staggered-four-source-bend-baseline/attempt-2/report.json": "9e01c0111b74011f7efac3c017e0bc4b97e023100ac10d7c6b8211b3c49e0e39",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/recurrent-staggered-four-source-bend-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        ".reproduction/fix-evidence/20260912T144635Z-d0e9352f/recurrent-staggered-four-source-bend-baseline/attempt-2/FB-BEND-017.log": "dd2da7e9d4c26b111ab8ab6efa6d5538cc2c9a7836d3615efeb49df511ffde89"
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/recurrent-staggered-four-source-bend-baseline/attempt-2/output.svg": "7e0ed641b0f086e951767b836e4840ffbeef053b3e6faf300ecef2a870b562af",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/recurrent-staggered-four-source-bend-baseline/attempt-2/producer.log": "2f8e4df3db7fb625897d823c32acd4676a69399133b6f3a7356be29c17f74621",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/recurrent-staggered-four-source-bend-baseline/attempt-2/report.json": "9e01c0111b74011f7efac3c017e0bc4b97e023100ac10d7c6b8211b3c49e0e39",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/recurrent-staggered-four-source-bend-baseline/attempt-2/report.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        ".reproduction/fix-evidence/20260912T185502Z-2436c1bb/recurrent-staggered-four-source-bend-baseline/attempt-2/FB-BEND-017.log": "dd2da7e9d4c26b111ab8ab6efa6d5538cc2c9a7836d3615efeb49df511ffde89"
       }
     }
   ]

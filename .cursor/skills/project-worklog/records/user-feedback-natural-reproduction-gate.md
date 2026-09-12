@@ -2,7 +2,45 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-12 23:36 +08:00
+- updated: 2026-09-13 03:22 +08:00
+
+- 2026-09-13 03:22 完整 pytest 在最新源码、29 项注册表、已跟踪 fix evidence 与新递归收据上最终 `620 passed in 769.18s`。没有跳过或已知失败；下一步只做提交契约、staged diff、敏感/跨仓路径、同模式旧 28 口径和远端同步审查，再提交推送并值守滚动 Release。
+
+- 2026-09-13 03:08 发布门先按预期以 260 条未跟踪证据非零；精确暂存 group `20260912T185502Z-2436c1bb` 的 228 个文件及其收据后，同一 release gate 为 19/19 PASS，聚焦的 reproduction/retention/inventory 测试 55/55 PASS。没有修改 ignore 或放宽 checker。下一步运行完整 pytest；这一步通过前不提交。
+
+- 2026-09-13 03:04 19 个历史反馈问题已在当前源码与 29 项质量合同下完成同输入双跑验证，新 group `20260912T185502Z-2436c1bb` 返回 `failures=[]`。下一步审计变更与证据依赖闭包，精确暂存本轮新 evidence/receipts 后运行 release gate 和全量测试；未跟踪证据预期会被门禁拒绝，不能通过忽略来绕过。
+
+- 2026-09-13 03:00 新递归 campaign `20260912T184659Z-85de1601` 在当前质量系统上 R1–R7 连续 clean；七轮 ID exact-set 完整、非 clean 轮为 0，每个 case 的必选指标数均为 29，收据绑定当前 source tree、质量系统和注册表哈希。首次只读摘要沿用不存在的 `round_id/source_tree_hash/quality_registry_hash/failures` 字段而显示空值及伪 `failures=1`；原始收据回读确认实际字段为 `id/*_sha256` 且状态 clean，按 schema 重算后上述正式结果成立。错误摘要不计结果，后续读取先核对 schema。
+
+- 2026-09-13 02:47 在当前 inspector v2 与 29 项注册表上，真实错列 MUX 定向攻击从 seed 0 完成 24/24，`complete=true`、`first_failure=null`；覆盖 4 个不同公共目标，目标相对普通 MUX 均真实右移 524.4px，语义前提、全质量、全部反馈 issue 和过早内部入口失败均为 0。一次只读汇总误用了不存在的 `observed_issue_ids/target_node` 字段而得到错误统计 24/0；回读首条正式结果后按实际 `issues/shifted_target` 字段重算为 0 个 issue 失败、4 个目标。错误的只读统计不计门禁结果。
+
+- 2026-09-13 02:34 独立全图 runner 新鲜生成并检查全部公开 SVG，最终 `PASS 27/27`；每张图均执行同一 29 项注册表，包括逐线 inventory 完整性，不存在 case 自选指标。下一阶段在当前源码上从 seed 0 启动 24 轮真实错列 MUX 定向攻击；旧 28 项回执不冒充新门通过。
+
+- 2026-09-13 02:31 用户根自主学习、成熟项目失败恢复、质量系统、时钟树 SVG Oracle、目标管理和 Codex 制品交付专题已统一改为 Agent-owned 检验：逐对象事实由脚本提取、Agent 独立判断，只有显式人工签署目标才等待用户确认；五个相关 Skill 均通过 quick_validate。项目设计说明与变更记录同步登记 inspector v2、29 项完整指标和用户反馈可推翻但不授权的边界。
+
+- 2026-09-13 02:27 Agent 已对同一输入的冻结旧图与最终图完成逐线独立判定，不再依赖用户数线或确认。目标逻辑边按 source/target 绑定：旧图 5 段、4 拐点、方向 `right/down/right/down/right`、45 个交叉事件，先在分支区中部横穿再纵向贯穿；新图 5 段、4 拐点、方向 `right/down/right/up/right`、20 个交叉事件，先沿左侧公共主干到整体下边界再横向并回到目标。新图统一质量系统 29/29 PASS，新增逐线 inventory 完整性指标随所有既有指标共同执行。用户确认不再是产品质量或目标完成条件；后续由 Agent 继续完成全图、攻击、收据、全量与发布门。
+
+- 2026-09-13 02:24 修正后语法、retention 29/29 与质量专题 31/31 全部 PASS。新 mutant 已证明删除任一逐段 direction 会使 inventory completeness 红灯；下一步用通用 inspector 对同输入冻结旧图和最终图分别生成逐线报告，再由 Agent 从报告重算目标边质量，不要求用户判断。
+
+- 2026-09-13 02:23 inventory crossing 坐标已规范化为 JSON list；artifact witness 改为先保留 topology 身份诊断，拓扑无效时 inventory 明确失败为 `topology_invalid`，拓扑有效才调用完整 inspector。下一步重跑同一 31 项专题，旧失败不继承。
+
+- 2026-09-13 02:22 retention 29/29 PASS，但质量专题 27/31，四项失败均来自新 inventory 观察层而非产品：三个 adversarial seed 的 crossing_points 数值相同却因内存 tuple 与期望 list 类型不同被误判；unknown-node mutant 在 topology witness 返回前调用 inspector，而 inspector 的严格 analyze 提前抛错。修复应规范化 crossing_points 为 JSON list，并让 artifact witness 在 topology 已坏时记录 inventory 的 `topology_invalid` 而不抢占原 topology 诊断；不能放宽产品指标。
+
+- 2026-09-13 02:20 canonical hash 常量已按机器输出逐字符修正；尚待 retention 与全 quality tests 复验。
+
+- 2026-09-13 02:19 hash 回读门正确继续报 `protected quality baseline changed`：写入常量时把摘要中间误重复为 `...caa9d57e66...`，与实际 `...caa9b4c...` 不符。该轮明确为抄录失败，未计通过；下一步只按机器输出精确修正常量并重新计算/验证。
+
+- 2026-09-13 02:18 retention 门按预期拒绝变更前的受保护哈希并给出唯一错误；canonical baseline 新哈希为 `6fd84d32abe809932d2707df56e66fe15caa9b4c863503d3a7c7fbda172160fe`。逐线完整性正向与删除字段 mutant 2/2 PASS；现已把显式审核后的新哈希写入 checker，需立即重跑以防抄录错误。
+
+- 2026-09-13 02:17 质量合同追加 `QA-OBSERVABILITY-001 / geometry_inventory_completeness`，因此每张图从 28 项提升为 29 项且仍必须 exact-set 全执行。测试新增逐边方向/计数/包围框、网络图事实正向断言和删除 segment.direction 的失败 mutant；受保护 baseline 内容已显式追加，canonical hash 尚未刷新，当前 retention 门预期红灯。
+
+- 2026-09-13 02:16 inspector 与 quality system 语法检查通过，既有逐图 inspector/完整注册表聚焦测试 2/2 PASS；这只证明兼容旧合同，下一步新增第 29 项 inventory 完整性指标及删除字段 mutant，使旧格式无法假绿。
+
+- 2026-09-13 02:15 `svg_quality_system.py` 已把逐线 inventory 作为独立 artifact witness：逐边 exact-set、点列、逐段起止/方向/包围框、折点、交叉坐标/伙伴、异网重叠，以及逐 source-port 网络图的结点、共享段、连通分量和环秩均须完整且与终态 SVG 重算一致。质量回执新增 inventory 摘要；注册表和 mutant 测试尚未更新，当前不能计全图门通过。
+
+- 2026-09-13 02:14 质量系统已先接入独立 `svg_graph_inspector` 模块；尚未新增注册指标或运行绿灯，下一笔实现必须同时加入完整性校验和正反测试。
+
+- 2026-09-13 02:13 用户纠正“禁止让用户介入检验”。旧流程把会话可见性确认误升格为产品质量收敛条件，属于 quality-owner/claim drift；该条件撤销，语义质量由 Agent 使用终态几何事实和独立指标自行判定，交付显示只保留可恢复的通道状态。联网对标已阅读 W3C SVG 2 path、Graphviz JSON/xdot、ELK Layered、OGDF orthogonal/planarization 与正交绘图流水线论文；Find Skills 以 svg geometry、graph drawing quality、diagram layout testing、visual regression geometry 四组词检索，未发现比现有领域 Skill 更贴合的可直接采用项，因此不安装第三方 Skill。现有 `svg_graph_inspector.py` 已能输出完整点序列、折点、线段方向、交叉和重叠，本轮继续补充实际行进方向、包围框、逐边计数、网络结点/共享段/环秩，并把完整性作为全制品注册指标。首次继续修改质量系统被实时记录 Hook 正确阻止，因为 inspector 修改尚未记账；当前先闭合记录，再恢复实现。
 
 - 2026-09-12 23:36 最终对照 PNG 再经通用媒体检查器通过：2670×1273、403455 bytes、SHA-256 `e25b6f8726a0a302e9cbe6220c53eddff2a6b6cb2765faca4f8d01faedc36fd9`；复制到无空格、全 ASCII 稳定别名后哈希一致，原生图像预览成功。Codex 文件面板打开请求仅返回 `queued`，按交付 skill 不能据此声称用户已看到。相同可见性条件连续三轮只能等待用户确认，项目专项目标已准确转为 blocked；产品、机器质检、攻击和发行状态不回退。
 
