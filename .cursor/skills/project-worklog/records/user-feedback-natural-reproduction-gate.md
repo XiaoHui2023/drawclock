@@ -2,7 +2,9 @@
 
 - status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-12 23:33 +08:00
+- updated: 2026-09-12 23:36 +08:00
+
+- 2026-09-12 23:36 最终对照 PNG 再经通用媒体检查器通过：2670×1273、403455 bytes、SHA-256 `e25b6f8726a0a302e9cbe6220c53eddff2a6b6cb2765faca4f8d01faedc36fd9`；复制到无空格、全 ASCII 稳定别名后哈希一致，原生图像预览成功。Codex 文件面板打开请求仅返回 `queued`，按交付 skill 不能据此声称用户已看到。相同可见性条件连续三轮只能等待用户确认，项目专项目标已准确转为 blocked；产品、机器质检、攻击和发行状态不回退。
 
 - 2026-09-12 23:33 功能提交 `ae176f8650c8c551a795d9662cfb51d90c09d68c` 已推送 main。Release run `34701974542` 的反馈复现门、Ubuntu 16.04 PyInstaller 构建与冻结消费、librsvg 检查、发布及公开资产回下载 smoke 全部 success；`v1.0.0^{}` 精确指向该提交。再次从公开 Release 地址下载 17,041,726-byte 归档，SHA-256 `e44f0655401db801856f21aea413e07bad89b653a1566903310e46301f7668de` 与 GitHub digest 一致，清单 36 项。产品、质量和发布均已闭合；目标仍保持 active，唯一剩余条件是用户确认本轮 Markdown 对照图在会话中可见。
 
