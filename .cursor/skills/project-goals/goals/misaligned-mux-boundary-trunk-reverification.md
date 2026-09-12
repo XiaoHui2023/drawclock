@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-09-13
 
@@ -21,6 +21,8 @@
 - success: 全量运行的 618 个非闭包测试全部通过；唯一 Git 未跟踪证据红灯在精确暂存后由隔离 release 测试签绿。最终修复后 SVG 哈希与交付对照图绑定的当前 SVG 一致。
 - success: 对照 PNG 已重新通过媒体检查器验证为 2670×1273、403455 bytes、SHA-256 `e25b6f8726a0a302e9cbe6220c53eddff2a6b6cb2765faca4f8d01faedc36fd9`；无风险 ASCII 交付别名保持相同哈希，原生图像预览成功解码。
 - success: 通用 inspector v2 已对目标逻辑边按 source/target 绑定：旧图方向为 `right/down/right/down/right`、45 个交叉事件，新图为 `right/down/right/up/right`、20 个交叉事件；新图先走公共纵向主干至下边界再接入错列 MUX。新图统一质量注册表 29/29 PASS，删除任一逐段方向字段的 mutant 会使门禁失败。
+- success: 最终候选在 29 项合同下完成公开图 27/27、真实错列定向攻击 24/24、递归 R1–R7、19 问题双跑 group `20260912T185502Z-2436c1bb`、release gate 19/19 和完整 pytest 620/620。
+- success: 提交 `8c961a648106417f590506852b2b718113dccd47` 已推送；GitHub Release run `34713554102` 的反馈门、Ubuntu 16.04 PyInstaller/staticx、冻结示例、publish 及公开资产下载 smoke 全部 success。`v1.0.0^{}` 指向该提交；公开归档 17,041,410 bytes、36 项，SHA-256 `c826b70188c7789f3d3488bd315b0ec6de2da1ce2ca89f50ab14d0470f098992` 与 Release digest 一致。
 - failure: 用户指出既有说明没有把“目标 MUX 更靠右、不与普通 MUX 对齐”作为可见复现条件，也未接受此前交付图作为本轮闭环证据。
 - failure: seed-013 的输入虽含 `layout_column: 5`，冻结旧版和当前版的同组 MUX 最终仍全部位于 x=876.71；旧版命中 023 不能证明实际错列诱因。现有测试只检查配置字段，属于覆盖和声明逃逸。
 - historical_failure: 曾把会话图片是否由用户亲自确认可见误升格为产品质量收敛条件，造成 quality-owner drift。用户已明确要求全部检验由 Agent 完成；该条件已撤销，后续用户反馈仍可推翻并重开交付表面问题，但不是常规质量授权门。
@@ -34,7 +36,7 @@
 
 ## 下一步
 
-- 更新用户根自主学习、质量检测、时钟树布局、目标和制品交付 Skills，明确 Agent-owned oracle；随后在 29 项注册表下重跑全图、错列攻击、递归攻击、修复收据、全量测试与发布闭环。
+- 无。用户后续若提供新的反例，按新观察重新打开目标并扩大语料与 Oracle；不要求用户承担常规验收。
 
 ## 收敛条件
 

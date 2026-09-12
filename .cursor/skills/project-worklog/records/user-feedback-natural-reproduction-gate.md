@@ -1,8 +1,10 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-13 03:22 +08:00
+- updated: 2026-09-13 03:31 +08:00
+
+- 2026-09-13 03:31 交付闭环完成。提交 `8c961a648106417f590506852b2b718113dccd47` 推送后，Release run `34713554102` 的干净 checkout 反馈门、Ubuntu 16.04 PyInstaller/staticx、冻结程序完整 example、publish 和公开资产回下载 smoke 全部 success；annotated `v1.0.0^{}` 精确指向该提交。Agent 再从公开 URL 下载 17,041,410-byte 归档，SHA-256 `c826b70188c7789f3d3488bd315b0ec6de2da1ce2ca89f50ab14d0470f098992` 与 API digest 一致，清单 36 项、单一冻结二进制、24 个平铺 libraries XML 与 5 个 doc 项。两次只读轮询错误分别为 PowerShell 无效字符和发送前 JavaScript 语法错误，均未触达写接口、未改变远端 run，正式 API 重读后发布证据成立。目标由 Agent 独立闭合，不等待用户确认。
 
 - 2026-09-13 03:22 完整 pytest 在最新源码、29 项注册表、已跟踪 fix evidence 与新递归收据上最终 `620 passed in 769.18s`。没有跳过或已知失败；下一步只做提交契约、staged diff、敏感/跨仓路径、同模式旧 28 口径和远端同步审查，再提交推送并值守滚动 Release。
 
