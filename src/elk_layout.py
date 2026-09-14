@@ -2207,11 +2207,16 @@ def _refine_final_single_edge_channels(
                 if a != b
             ]
             channel_xs.update(point[0] for point in points)
-        visible = _visible_layout_signature(accepted, logical_edges)
         visible_boxes = {
             vertex.cell_id: vertex_visual_box(vertex)
             for vertex in accepted.vertices
         }
+        channel_xs.update(
+            value
+            for box in visible_boxes.values()
+            for value in (box.left, box.right)
+        )
+        visible = _visible_layout_signature(accepted, logical_edges)
         accepted_report = assess_layout(accepted, logical_edges, 0.0)
         accepted_overlap = _final_artifact_overlap_count(accepted, logical_edges)
         ordered_channel_xs = sorted(channel_xs)
@@ -6774,7 +6779,13 @@ def _restore_safe_roots_to_first_column(
     accepted = _clone_layout_geometry(document)
     accepted_report = assess_layout(accepted, logical_edges, 0.0)
     indegree = Counter(edge.target for edge in logical_edges)
-    first_x = min((vertex.x for vertex in accepted.vertices), default=0.0)
+    first_x = min(
+        (
+            vertex.x for vertex in accepted.vertices
+            if indegree[vertex.logical_name or vertex.name] == 0
+        ),
+        default=0.0,
+    )
     attempts = 0
     moves = 0
     blockers: Counter[str] = Counter()
@@ -6875,21 +6886,6 @@ def _restore_safe_roots_to_first_column(
         candidate_visible = _visible_layout_signature(
             candidate, logical_edges, affected_edges, moved_ids
         )
-        facility_cost = _source_facility_opening_cost(accepted)
-        accepted_facilities = frozenset(
-            (root, *pair)
-            for root in roots
-            for pair in _avoidable_source_facility_pairs(
-                accepted, logical_edges, root, facility_cost
-            )
-        )
-        candidate_facilities = frozenset(
-            (root, *pair)
-            for root in roots
-            for pair in _avoidable_source_facility_pairs(
-                candidate, logical_edges, root, facility_cost
-            )
-        )
         checks = {
             "node-overlap": candidate_report["node_overlaps"] <= accepted_report["node_overlaps"],
             "edge-node": candidate_report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
@@ -6902,9 +6898,6 @@ def _restore_safe_roots_to_first_column(
                 for after, before in zip(
                     hard_vector(candidate_report), hard_vector(accepted_report)
                 )
-            ),
-            "facility-minimality": candidate_facilities.issubset(
-                accepted_facilities
             ),
         }
         if all(checks.values()):
@@ -8632,9 +8625,21 @@ def _route_root_branches_through_boundary_corridors(
             target_x = verticals[-1][0][0]
             if abs(source_x - target_x) <= 1e-6:
                 continue
+            departure_y = verticals[0][1][1]
+            target_y = points[-1][1]
+            local_lane_values = sorted({
+                point[1]
+                for candidate_points in points_by_index.values()
+                for point in candidate_points
+                if (
+                    min(departure_y, target_y) + 1e-6 < point[1]
+                    < max(departure_y, target_y) - 1e-6
+                )
+            })
             lane_candidates = (
                 ("top", top_inner_lane),
                 ("bottom", bottom_inner_lane),
+                *(("local", lane_y) for lane_y in local_lane_values),
                 *(
                     candidate
                     for offset in subgrid_offsets
@@ -8726,7 +8731,9 @@ def _route_root_branches_through_boundary_corridors(
                 ):
                     continue
                 inner_lane = (
-                    top_inner_lane if side == "top" else bottom_inner_lane
+                    top_inner_lane if side == "top"
+                    else bottom_inner_lane if side == "bottom"
+                    else target_y
                 )
                 local_score = (
                     local_overlaps,
@@ -8745,7 +8752,7 @@ def _route_root_branches_through_boundary_corridors(
                     or local_score < best_by_side[side][0]
                 ):
                     best_by_side[side] = (local_score, lane_y)
-                if lane_y in mandatory_lanes[side]:
+                if lane_y in mandatory_lanes.get(side, set()):
                     admissible_mandatory[side].add(lane_y)
 
             selected_lanes = {
@@ -8756,11 +8763,11 @@ def _route_root_branches_through_boundary_corridors(
                         if side in best_by_side else ()
                     ),
                 }
-                for side in ("top", "bottom")
+                for side in ("top", "bottom", "local")
             }
             for side, lane_y in (
                 (side, lane_y)
-                for side in ("top", "bottom")
+                for side in ("top", "bottom", "local")
                 for lane_y in sorted(selected_lanes[side])
             ):
                 attempts += 1

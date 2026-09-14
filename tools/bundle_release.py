@@ -17,7 +17,6 @@ BINARY_NAMES = ("drawclock",)
 RELEASE_FILES = (
     ("README.md", "doc/README.md"),
     ("draw.md", "doc/draw.md"),
-    ("licenses/NotoSansCJK-OFL-1.1.txt", "doc/licenses/NotoSansCJK-OFL-1.1.txt"),
     ("example/draw.json", "example/draw.json"),
     (
         "example/auto-layout/33-description-colors.json",

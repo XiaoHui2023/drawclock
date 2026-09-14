@@ -973,6 +973,51 @@ def test_current_cli_closes_premature_interior_trunk_entry(
     report = oracle.analyze(input_path, output)
     assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
     assert "FB-ROUTE-023" not in report["detected_issues"]
+    receipt = tmp_path / "premature-entry-quality.json"
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "svg_quality_system.py"),
+         "--input", str(input_path), "--svg", str(output),
+         "--registry", str(ROOT / "tests" / "quality-metrics.json"),
+         "--output", str(receipt)],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    quality = json.loads(receipt.read_text(encoding="utf-8"))
+    assert quality["required_metric_ids"] == quality["executed_metric_ids"]
+    assert len(quality["executed_metric_ids"]) == 29
+    assert quality["failed_metric_ids"] == []
+
+
+def test_current_cli_keeps_lower_external_mux_branch_on_common_trunk(
+    tmp_path: Path,
+) -> None:
+    search_path = ROOT / "tools" / "search_boundary_trunk_coverage.py"
+    spec = importlib.util.spec_from_file_location(
+        "boundary_trunk_coverage_builder", search_path
+    )
+    assert spec is not None and spec.loader is not None
+    search = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(search)
+    factors = search.REQUIRED_SCENARIOS[
+        "lower-external-anchor-extra-fanout"
+    ]
+    input_path = tmp_path / "lower-external-mux.json"
+    input_path.write_text(
+        json.dumps(search.build_case(factors), indent=2) + "\n",
+        encoding="utf-8",
+    )
+    output = tmp_path / "lower-external-mux.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "arc"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
+    assert "FB-ROUTE-023" not in report["detected_issues"]
+    assert report["totals"]["logical_nodes"] == 154
+    assert report["totals"]["proper_crossing_events"] == 4
     receipt = tmp_path / "boundary-trunk-seed-013-quality.json"
     completed = subprocess.run(
         [sys.executable, str(ROOT / "tools" / "svg_quality_system.py"),
@@ -986,6 +1031,31 @@ def test_current_cli_closes_premature_interior_trunk_entry(
     assert quality["required_metric_ids"] == quality["executed_metric_ids"]
     assert len(quality["executed_metric_ids"]) == 29
     assert quality["failed_metric_ids"] == []
+
+
+def test_boundary_trunk_coverage_model_closes_exact_set() -> None:
+    search_path = ROOT / "tools" / "search_boundary_trunk_coverage.py"
+    spec = importlib.util.spec_from_file_location(
+        "boundary_trunk_coverage_contract", search_path
+    )
+    assert spec is not None and spec.loader is not None
+    search = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(search)
+    suite = search.covering_suite()
+    covered = set()
+    for factors in suite:
+        covered.update(search.coverage_units(factors))
+        covered.update(search.scenario_units(factors))
+    assert covered == search.required_units()
+    assert suite[:len(search.REQUIRED_SCENARIOS)] == list(
+        search.REQUIRED_SCENARIOS.values()
+    )
+    assert {
+        "array", "external"
+    } == {case["target_membership"] for case in suite}
+    assert {
+        "top", "middle", "bottom"
+    } == {case["target_band"] for case in suite}
 
 
 def test_premature_interior_trunk_entry_keeps_clean_control(

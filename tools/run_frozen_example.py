@@ -436,11 +436,8 @@ def _assert_frequency_table(path: Path, config_path: Path) -> None:
     if any(element.get("fill") != "#20252b" for element in headings):
         raise SystemExit("frequency headings are not black")
     if expected_columns and expected_columns[0][0] == "func_freq":
-        outline = headings[0]
-        if outline.get("data-heading-render") != "outline" or sum(
-            child.tag.rsplit("}", 1)[-1] == "path" for child in outline
-        ) != 4:
-            raise SystemExit("Chinese frequency heading is not font-independent")
+        if headings[0].text != "工作频率":
+            raise SystemExit("Chinese frequency heading text is missing")
 
     values = [
         element for element in root.iter()

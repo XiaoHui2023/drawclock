@@ -2121,7 +2121,18 @@
                     "analysis": "根因不是单一坐标：亚网格合法通道未枚举、局部预筛丢弃全局可行边界锚点、outer-detour 后置覆盖最终路由 owner、逻辑网环检查按物理 alias 分组，以及 normalizer/renderer 精度语义分裂共同造成复发。",
                     "why_not_reproduced": "",
                     "evidence": "tools/search_boundary_trunk_recurrence.py; tests/test_feedback_layout_oracle.py::test_boundary_corridor_survives_late_local_outer_detour_owner; .reproduction/scratch/fb-route-023-reset/post-fix-search/first-failure.json; .reproduction/scratch/fb-route-023-reset/post-fix-search-epoch-2/first-failure.json",
-                    "next_condition": "保持最终外缘 owner、跨 alias 纯环门和统一终态精度；每次修改后从 R1 重启有界攻击并执行全部 25 指标。"
+                    "next_condition": "保持最终外缘 owner、跨 alias 纯环门和统一终态精度；用覆盖方向、交互 exact-set 与全指标执行取代固定轮数。"
+                },
+                {
+                    "attempted_at": "2026-09-14T19:08:00+08:00",
+                    "hypothesis": "后排错列外部目标、跨行障碍织网、额外消费者和不同链深的高阶交互会暴露公共主干过早横穿；修复必须允许沿既有纵干延迟到目标邻域通道。",
+                    "method": "冻结 c21e734 公开 CLI 对 154 节点合法输入双跑，自终态 SVG 重建逐边方向/交叉并取得 lateral-departure witness；当前实现随后执行 14 轴值覆盖、全部适用 pairwise、指定高风险 triples、具名历史逃逸和六个最终几何方向的 coverage v3。",
+                    "result": "reproduced",
+                    "observed": "冻结图两次哈希均为 9f473d90…2158；公共边在 y=2318.3066 过早离开 x=232.22 主干，随后于 x=804.86 纵穿 2279.0236px 和 9 行，局部交叉 11→4、整图事件 66→59、4 折和总长不增。当前同输入 witness=0；coverage v3 为 32/32 case、843/843 units、6/6 必需最终几何方向、0 质量失败、0 复发。",
+                    "analysis": "旧门以 seed/轮数代理覆盖且 Oracle 只比较画布最外廊，遗漏了沿既有主干继续到目标邻域的通道。通用修复位于最终 root-corridor owner，以硬几何不退化和整图交叉严格下降选择 local/top/bottom 候选；没有器件名、固定坐标、行数或 MUX 特判。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/coverage-driven-boundary/anchor-lower-24; .reproduction/coverage-driven-boundary/current-clean-final-v3/coverage-receipt.json; .reproduction/fix-receipts/FB-ROUTE-023.json",
+                    "next_condition": "保留 coverage exact-set 与全 29 指标为每次发布前置；新增诱因只扩展 required 集，不以增加轮数替代。"
                 }
             ],
             "strict_reproduction": {
@@ -2139,8 +2150,8 @@
                 "baseline_fails": true,
                 "current_passes": true,
                 "receipt": ".reproduction/fix-receipts/FB-ROUTE-023.json",
-                "verification_group": "20260911T054454Z-682e218b",
-                "evidence": "Pinned pre-fix public CLI reproduces the premature interior trunk twice; reset variants 013/018/019 drove successive red epochs; the final public CLI passes the independent issue Oracle, 25-metric artifact gate, 24 clean bounded mutations, and seven heterogeneous recursive rounds."
+                "verification_group": "20260914T104230Z-c6a501e6",
+                "evidence": "Frozen public CLI reproduces the original and lower external misaligned-target forms; the current public CLI passes the independent issue Oracle twice, all 29 artifact metrics, the 843-unit coverage exact-set, and all six required final-geometry directions without recurrence."
             }
         }
     ],

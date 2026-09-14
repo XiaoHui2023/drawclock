@@ -472,7 +472,12 @@ def _applicable(kind: str, report: dict[str, Any], config: dict[str, Any]) -> tu
     raise ValueError(f"unknown applicability predicate: {kind}")
 
 
-def evaluate(input_path: Path, svg_path: Path, registry_path: Path = DEFAULT_REGISTRY) -> dict[str, Any]:
+def evaluate_with_geometry(
+    input_path: Path,
+    svg_path: Path,
+    registry_path: Path = DEFAULT_REGISTRY,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Run the complete gate once and return its independent geometry facts."""
     registry = load_registry(registry_path)
     config = json.loads(input_path.read_text(encoding="utf-8-sig"))
     report = geometry.analyze(input_path, svg_path)
@@ -510,7 +515,7 @@ def evaluate(input_path: Path, svg_path: Path, registry_path: Path = DEFAULT_REG
     required = [metric["id"] for metric in registry]
     executed = [result["metric_id"] for result in results]
     validate_metric_receipt(required, executed, results)
-    return {
+    quality = {
         "schema_version": 1,
         "required_metric_ids": required,
         "executed_metric_ids": executed,
@@ -519,6 +524,18 @@ def evaluate(input_path: Path, svg_path: Path, registry_path: Path = DEFAULT_REG
         "geometry_inventory_summary": inventory_summary,
         "passed": all(item["status"] != "fail" for item in results),
     }
+    return quality, report
+
+
+def evaluate(
+    input_path: Path,
+    svg_path: Path,
+    registry_path: Path = DEFAULT_REGISTRY,
+) -> dict[str, Any]:
+    quality, _report = evaluate_with_geometry(
+        input_path, svg_path, registry_path
+    )
+    return quality
 
 
 def main() -> int:

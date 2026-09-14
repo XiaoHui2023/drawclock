@@ -3150,6 +3150,202 @@ def _premature_interior_trunk_entry_witnesses(
     return witnesses
 
 
+def _premature_lateral_departure_witnesses(
+    roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Find a branch that leaves its source trunk before a long row descent.
+
+    The older boundary-only counterfactual can miss the common case where the
+    clean route is not outside the complete diagram: it simply stays on the
+    already-established source trunk until the target row, then exits once.
+    Diagnose that geometry from final SVG segments, independently of the
+    production router's phase names or stored scores.
+    """
+    grouped: dict[tuple[str, str], list[Route]] = defaultdict(list)
+    for route in routes:
+        if route.source in roots:
+            grouped[(route.source, route.source_port)].append(route)
+    global_crossings, global_overlaps = route_crossings(routes)
+    global_crossing_points = _distinct_crossing_count(global_crossings)
+    witnesses: list[dict[str, Any]] = []
+    for (root, source_port), members in sorted(grouped.items()):
+        if len(members) < 4:
+            continue
+        target_rows = sorted({round(route.points[-1][1], 4) for route in members})
+        for route in members:
+            route_segments = list(segments(route))
+            vertical_indices = [
+                index for index, (start, end) in enumerate(route_segments)
+                if abs(start[0] - end[0]) <= EPS
+                and abs(start[1] - end[1]) > EPS
+            ]
+            if len(vertical_indices) < 2:
+                continue
+            trunk_index = vertical_indices[0]
+            remote_index = next((
+                index for index in vertical_indices[1:]
+                if abs(route_segments[index][0][0]
+                       - route_segments[trunk_index][0][0]) > EPS
+            ), None)
+            if remote_index is None:
+                continue
+            trunk_x = route_segments[trunk_index][0][0]
+            remote_start, remote_end = route_segments[remote_index]
+            crossed_rows = [
+                row for row in target_rows
+                if min(remote_start[1], remote_end[1]) + EPS < row
+                < max(remote_start[1], remote_end[1]) - EPS
+            ]
+            if len(crossed_rows) < 2:
+                continue
+            source_index = _endpoint_box_index(
+                route.points[0], route.source, boxes
+            )
+            target_index = _endpoint_box_index(
+                route.points[-1], route.target, boxes
+            )
+            before_crossings = global_crossings
+            before_overlaps = global_overlaps
+            before_points = global_crossing_points
+            before_local = _route_interactions(route, routes)
+            before_length = _route_length(route)
+            departure_y = route_segments[trunk_index][1][1]
+            target_y = route.points[-1][1]
+            # A useful delayed departure must line up with either another
+            # branch row or the immediate target neighbourhood. Enumerating
+            # every bend in the complete drawing adds no semantic class and
+            # makes dense diagrams needlessly approach routes cubed.
+            local_lane_points = [
+                point
+                for item in routes
+                if (
+                    item.index == route.index
+                    or item.source == route.target
+                    or item.target == route.target
+                )
+                for point in item.points
+            ]
+            lane_candidates = {
+                *target_rows,
+                *(point[1] for point in local_lane_points),
+            }
+            lane_candidates = {
+                lane_y for lane_y in lane_candidates
+                if (
+                    min(departure_y, target_y) + EPS < lane_y
+                    < max(departure_y, target_y) - EPS
+                )
+            }
+            best = None
+            for lane_y in sorted(lane_candidates):
+                candidate = _copy_route(route, [
+                    route.points[0],
+                    (trunk_x, route.points[0][1]),
+                    (trunk_x, lane_y),
+                    (remote_start[0], lane_y),
+                    (remote_start[0], target_y),
+                    route.points[-1],
+                ])
+                if (
+                    len(candidate.points) > len(route.points)
+                    or _route_length(candidate) > before_length + EPS
+                    or _route_hits_unrelated_box(
+                        candidate, boxes, source_index, target_index
+                    )
+                ):
+                    continue
+                candidate_routes = [
+                    candidate if item.index == route.index else item
+                    for item in routes
+                ]
+                candidate_net = [
+                    item for item in candidate_routes
+                    if (item.source, item.source_port) == (root, source_port)
+                ]
+                if _same_net_cycle(candidate_net):
+                    continue
+                unaffected_crossings = [
+                    event for event in before_crossings
+                    if route.edge_id not in event["edges"]
+                ]
+                unaffected_overlaps = [
+                    event for event in before_overlaps
+                    if route.edge_id not in event["edges"]
+                ]
+                candidate_crossings = []
+                candidate_overlaps = []
+                for other in routes:
+                    if other.index == route.index or same_net(candidate, other):
+                        continue
+                    for left_index, (a, b) in enumerate(segments(candidate)):
+                        for right_index, (c, d) in enumerate(segments(other)):
+                            point = proper_cross(a, b, c, d)
+                            if point is not None:
+                                candidate_crossings.append({
+                                    "point": list(point),
+                                    "edges": [candidate.edge_id, other.edge_id],
+                                    "segments": [left_index, right_index],
+                                })
+                            overlap = collinear_overlap(a, b, c, d)
+                            if overlap > EPS:
+                                candidate_overlaps.append({
+                                    "length": round(overlap, 4),
+                                    "edges": [candidate.edge_id, other.edge_id],
+                                })
+                after_crossings = unaffected_crossings + candidate_crossings
+                after_overlaps = unaffected_overlaps + candidate_overlaps
+                after_points = _distinct_crossing_count(after_crossings)
+                after_local = _route_interactions(candidate, routes)
+                if not (
+                    after_points < before_points
+                    and len(after_crossings) < len(before_crossings)
+                    and len(after_overlaps) <= len(before_overlaps)
+                    and after_local[0] <= before_local[0]
+                    and after_local[1] < before_local[1]
+                    and after_local[2] <= before_local[2]
+                ):
+                    continue
+                key = (
+                    after_points, len(after_crossings), len(after_overlaps),
+                    after_local[0], after_local[1],
+                    len(candidate.points), _route_length(candidate), lane_y,
+                )
+                if best is None or key < best[0]:
+                    best = (
+                        key, candidate, after_points, after_crossings,
+                        after_local, lane_y,
+                    )
+            if best is None:
+                continue
+            _, candidate, after_points, after_crossings, after_local, lane_y = best
+            witnesses.append({
+                "root": root,
+                "source_port": source_port,
+                "edge_id": route.edge_id,
+                "target": route.target,
+                "trunk_x": round(trunk_x, 4),
+                "premature_departure_y": round(
+                    departure_y, 4
+                ),
+                "preferred_departure_y": round(lane_y, 4),
+                "remote_vertical_x": round(remote_start[0], 4),
+                "remote_vertical_span_px": round(
+                    abs(remote_end[1] - remote_start[1]), 4
+                ),
+                "crossed_target_rows": crossed_rows,
+                "global_crossing_points_before": before_points,
+                "global_crossing_points_after": after_points,
+                "global_crossing_events_before": len(before_crossings),
+                "global_crossing_events_after": len(after_crossings),
+                "local_crossing_events_before": before_local[1],
+                "local_crossing_events_after": after_local[1],
+                "bends_before": len(route.points) - 2,
+                "bends_after": len(candidate.points) - 2,
+                "candidate_points": [list(point) for point in candidate.points],
+            })
+    return witnesses
+
+
 def _physical_anchor_relocation_witnesses(
     roots: set[str], routes: list[Route], boxes: list[Box]
 ) -> list[dict[str, Any]]:
@@ -3592,9 +3788,10 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
         or witness["crossing_events_after"]
         < witness["crossing_events_before"]
     ]
-    premature_interior_trunk_entry_witnesses = (
-        _premature_interior_trunk_entry_witnesses(roots, routes, boxes)
-    )
+    premature_interior_trunk_entry_witnesses = [
+        *_premature_interior_trunk_entry_witnesses(roots, routes, boxes),
+        *_premature_lateral_departure_witnesses(roots, routes, boxes),
+    ]
     physical_anchor_relocation_witnesses = (
         _physical_anchor_relocation_witnesses(roots, routes, boxes)
     )

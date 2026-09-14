@@ -41,7 +41,9 @@
     "mergeable_root_facility",
     "premature_interior_trunk_entry",
     "annotation_color",
-    "diagram_title_absence"
+    "diagram_title_absence",
+    "frequency_column_visibility",
+    "geometry_inventory_completeness"
   ],
   "metric_execution_failures": [],
   "batch_failures": [],
@@ -49,7 +51,7 @@
     {
       "input": "01-linear.json",
       "producer_exit": 0,
-      "sha256": "ed2565b346549e45608fc24d574f7529b89abb79352b4089a46781afaa1ef2e9",
+      "sha256": "cba9264d0a64eb164d30030dbf8e80253bd6aba2d7c25f093ae06aedf265cc19",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -83,7 +85,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -112,7 +116,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -276,6 +282,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -283,7 +301,7 @@
     {
       "input": "02-branch-tree.json",
       "producer_exit": 0,
-      "sha256": "0df19270b5e60a27fed657ac4e026ec361bdcf65e67bc49c1943d8f103463b22",
+      "sha256": "c495d0ee0397a307cb12e1fac0ae593bf02056e71a8e6f513d72368466199d51",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -317,7 +335,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -346,7 +366,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -510,6 +532,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -517,7 +551,7 @@
     {
       "input": "03-mux-dag.json",
       "producer_exit": 0,
-      "sha256": "f7c9b7ca1346b1934319625811dfe7c1d04d489cc6453652c0e6272b58da3375",
+      "sha256": "9301713c2c0bbdfc3a799ee21bb798e0423bb518ddc70f64a9ffdc603b2efb76",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -551,7 +585,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -580,7 +616,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -744,6 +782,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -751,7 +801,7 @@
     {
       "input": "04-dual-pll.json",
       "producer_exit": 0,
-      "sha256": "3909446f64ea31bece78f78942a04c5f81f7271e51df7c972da55c3daa03c774",
+      "sha256": "f34edbe93cec22b1ddd8ea84f66c42f89be2a60646c5df5c62921bf84b0981e6",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -785,7 +835,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -814,7 +866,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -978,6 +1032,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -985,7 +1051,7 @@
     {
       "input": "05-dense-cross-root.json",
       "producer_exit": 0,
-      "sha256": "47f0be39816574f28e0a760bb02a8f7e9c47afbc34a7cbb3a8ad6e1a17c0405e",
+      "sha256": "3678972907ce3b1d15ee29df7b64667ed4be09cad0b48292f43aa8d40e79f1c4",
       "crossings": 6,
       "bends": 22,
       "different_net_overlaps": 0,
@@ -1019,7 +1085,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1048,7 +1116,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -1212,6 +1282,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1219,7 +1301,7 @@
     {
       "input": "06-simple-16-clocks.json",
       "producer_exit": 0,
-      "sha256": "f9e1d0c5aaf615892f5d8f0969976ffc910bc8efc74111eb02d8be8faedfed05",
+      "sha256": "7e30c174c0bf36d943f819a7fd4f3a6ebde75d966d7373ab9801277c88590ddb",
       "crossings": 22,
       "bends": 68,
       "different_net_overlaps": 0,
@@ -1253,7 +1335,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1282,7 +1366,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -1446,6 +1532,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1453,7 +1551,7 @@
     {
       "input": "07-medium-64-clocks.json",
       "producer_exit": 0,
-      "sha256": "a1b57582b48656df18fe333aa5048b1b3e1f97cab7cedb21263ab7cfbec3b69d",
+      "sha256": "bc1075c756757e350388ac002429fdb72e47c4a9c13dc137498dd8c0cf83261f",
       "crossings": 169,
       "bends": 216,
       "different_net_overlaps": 0,
@@ -1487,7 +1585,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1516,7 +1616,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -1680,6 +1782,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1687,7 +1801,7 @@
     {
       "input": "12-dual-from-reuse.json",
       "producer_exit": 0,
-      "sha256": "7dab84fa473d5b227938292993e94c638d275a44adf4f0a029832e278ec41981",
+      "sha256": "8ecf2a2c37d7f715633eb4b71c96c8a4cac9dc9e5c8f3d74f4c79ca9b4ae0771",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -1721,7 +1835,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1750,7 +1866,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -1914,6 +2032,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -1921,7 +2051,7 @@
     {
       "input": "13-label-clearance-weave.json",
       "producer_exit": 0,
-      "sha256": "975e94c22db12456ddd8a0f88d5d980499a5f8717b5cca06e96aa4b79566bb54",
+      "sha256": "7d6f817e3557399b4357dc6fa3f1d2f10e70e483918f14cbc250eaa2280ca104",
       "crossings": 1432,
       "bends": 252,
       "different_net_overlaps": 0,
@@ -1955,7 +2085,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -1984,7 +2116,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -2148,6 +2282,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2155,7 +2301,7 @@
     {
       "input": "16-multi-from-clusters.json",
       "producer_exit": 0,
-      "sha256": "40f79debedef53211dad83f9762f5973a47c368e40121bdbfd033f792fcc440c",
+      "sha256": "c9544354fe12ab1f8fbc41541f44217a02e45b5a106acf1d867373b2c4963e44",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -2189,7 +2335,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2218,7 +2366,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -2382,6 +2532,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2389,7 +2551,7 @@
     {
       "input": "17-terminal-fanout-order.json",
       "producer_exit": 0,
-      "sha256": "ff3540ff6c845cf38a98f0a3de98dc8ad6754e6f863e3b97ac5ac5ab5f076a3b",
+      "sha256": "f9f0c9f6e2bebcf37645126f176c3e5274bfd269d6db0f6087d53e029ec95306",
       "crossings": 0,
       "bends": 8,
       "different_net_overlaps": 0,
@@ -2423,7 +2585,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2452,7 +2616,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -2616,6 +2782,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2623,7 +2801,7 @@
     {
       "input": "18-asymmetric-merge-columns.json",
       "producer_exit": 0,
-      "sha256": "0906bb3cdfe3cdb01b5db0e393e09c28c53d0e271af08183247e05019a575091",
+      "sha256": "681c7a9649e4506419820781290121f9d5b51be06cd11672777824d17133b7f8",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -2657,7 +2835,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2686,7 +2866,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -2850,6 +3032,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -2857,7 +3051,7 @@
     {
       "input": "19-dispersed-root-fanout.json",
       "producer_exit": 0,
-      "sha256": "2aca95b8430129c9a3699441bd21700cbfd75d9e190f68c3d1ef02cc368c0dd1",
+      "sha256": "fffd2fd994b44abe7a5bef0a733836a6e6b4e4455e7a58b68be50042775cc4c0",
       "crossings": 710,
       "bends": 122,
       "different_net_overlaps": 0,
@@ -2891,7 +3085,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -2920,7 +3116,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -3084,6 +3282,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3091,7 +3301,7 @@
     {
       "input": "20-asymmetric-merge-route-bulge.json",
       "producer_exit": 0,
-      "sha256": "155ef879b0c68305eca618208cf1b13e7d04eaad64dabf55109a34976b0d0ad8",
+      "sha256": "0610e9c2cd22815b5c91aae56db650a39d2d638474a40d8687c28c5a45ce93ce",
       "crossings": 0,
       "bends": 2,
       "different_net_overlaps": 0,
@@ -3125,7 +3335,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3154,7 +3366,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -3318,6 +3532,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3325,7 +3551,7 @@
     {
       "input": "21-layout-column-preference.json",
       "producer_exit": 0,
-      "sha256": "dcf5d12cfa70c482d79790ff658fd160a6cf8b000fca42bb61cdc6bd8f177da4",
+      "sha256": "f6e09385ea9c3595fe5413683b24589860e64609949e8d34353e466100f1bb3f",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -3359,7 +3585,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3388,7 +3616,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -3552,6 +3782,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3559,7 +3801,7 @@
     {
       "input": "22-terminal-frequency-table.json",
       "producer_exit": 0,
-      "sha256": "ff5fde495a70cb255a4d89c22c43a09c1cfc599c3de01dc51be49d45fc3601f2",
+      "sha256": "7ad9a8280488a1ae930ae04caf544ad50ba42f36eacd7d07af0f58a51645c2c9",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -3593,7 +3835,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3622,7 +3866,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -3786,6 +4032,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -3793,7 +4051,7 @@
     {
       "input": "23-middle-column-low-use-sources.json",
       "producer_exit": 0,
-      "sha256": "153e034213b90d96c2a6bad9976329f5469b77fc420d1ceebb2a028b4e6ac1fd",
+      "sha256": "8b6f74d0f7bcbaaafca2e6324abab6c12ba37d3c9d4a3f052d50b7f78a9a7506",
       "crossings": 0,
       "bends": 14,
       "different_net_overlaps": 0,
@@ -3827,7 +4085,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -3856,7 +4116,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -4020,6 +4282,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4027,7 +4301,7 @@
     {
       "input": "24-single-source-rendering-alias.json",
       "producer_exit": 0,
-      "sha256": "62fa0c1de69e8f1bbbd0e501adece642a3c4ba77021cfaf7b497c1be2be8c6b8",
+      "sha256": "54639e7dbd78696ec29c7bd1e5e61b58175d1d84162f8da6a65120769c8f61a9",
       "crossings": 0,
       "bends": 22,
       "different_net_overlaps": 0,
@@ -4061,7 +4335,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4090,7 +4366,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -4254,6 +4532,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4261,7 +4551,7 @@
     {
       "input": "25-mixed-root-port-order-torture.json",
       "producer_exit": 0,
-      "sha256": "2a78d93fc7cdd5bc47263e90959f939f0540705078d5421c84f5e678504e1ee2",
+      "sha256": "e1e897c47ca7e89f7f11bae22ffdfb995062f0376741fbf562ab1e41bdfde38f",
       "crossings": 0,
       "bends": 18,
       "different_net_overlaps": 0,
@@ -4295,7 +4585,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4324,7 +4616,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -4488,6 +4782,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4495,7 +4801,7 @@
     {
       "input": "26-feedback-reproduction-combined.json",
       "producer_exit": 0,
-      "sha256": "0ae5e502e9c588a830e5151cf76444b734ba49f36f544b8d1626f8791fcf1eaf",
+      "sha256": "e697e892bc780bbb6b70425b2dab77acfd014d5537ce3c9d76afad8cebdb88a9",
       "crossings": 1,
       "bends": 16,
       "different_net_overlaps": 0,
@@ -4529,7 +4835,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4558,7 +4866,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -4722,6 +5032,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -4729,7 +5051,7 @@
     {
       "input": "27-interleaved-common-root-mux3.json",
       "producer_exit": 0,
-      "sha256": "92bc2aae068e643caf392dfe82e1a88bcc6f717b3c43f579e5d20402cef79e2d",
+      "sha256": "36612c53ca21750025cc495b180cc94181942150709b36d92b48f56bb8508df6",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -4763,7 +5085,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -4792,7 +5116,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -4953,6 +5279,18 @@
         },
         {
           "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
@@ -4963,7 +5301,7 @@
     {
       "input": "28-common-private-from-mux-clock-array.json",
       "producer_exit": 0,
-      "sha256": "0c8eec27394fab61d08d48112beb76d0d87c22e5f24b74d85ac52563b5675f45",
+      "sha256": "bbda1a4715d01a6fc9bdae6b5d2eb156cae7ac7f4c8c7b2052e39597a4adeb20",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -4997,7 +5335,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -5026,7 +5366,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -5190,6 +5532,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -5197,7 +5551,7 @@
     {
       "input": "29-asymmetric-depth-common-private-mux-array.json",
       "producer_exit": 0,
-      "sha256": "a9365e3390ea066b18f2e1a743a5d1c7999b762f5f04d207949f72f08a5ae1c4",
+      "sha256": "1a0245bfd6d9cc739dd057336a0ef3d41be3fc211655e3f64efe362c00a7470a",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -5231,7 +5585,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -5260,7 +5616,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -5424,6 +5782,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -5431,7 +5801,7 @@
     {
       "input": "30-staggered-four-source-mux.json",
       "producer_exit": 0,
-      "sha256": "1502d133bdf87b23ddde08a06519040f970923abe4f9c0bd845663800679977e",
+      "sha256": "1a2cb7b52830a4336a6a23594f5bdc282f5175ab5075d189f86a0ecc8fc50d48",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -5465,7 +5835,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -5494,7 +5866,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -5658,6 +6032,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -5665,7 +6051,7 @@
     {
       "input": "31-node-descriptions.json",
       "producer_exit": 0,
-      "sha256": "e5c63f5e8e7ef1a390ba7416659ed3d67176fda54e68433c95b5f2b19437cc30",
+      "sha256": "3df83f0d7f229caa49a1b8f4dc87d2caa0a31ad6bcf84e3b0707d4d1b5189dad",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -5701,7 +6087,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -5730,7 +6118,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -6020,6 +6410,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -6027,7 +6429,7 @@
     {
       "input": "32-annotation-text-stress.json",
       "producer_exit": 0,
-      "sha256": "d2671254593a132637efa44282ee60139040fb6b615180bfdd630a96c17f086e",
+      "sha256": "f977351b5d754caffadb985a7d80c3032c73e7fbe84592ad7b973231b78e22af",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -6068,7 +6470,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -6097,7 +6501,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -6513,6 +6919,18 @@
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
         }
       ],
       "failures": []
@@ -6520,7 +6938,7 @@
     {
       "input": "33-description-colors.json",
       "producer_exit": 0,
-      "sha256": "0673fe359fbed0d435b323aa0441a69efc6fc0167695463ff2b7ba529c7d2ccd",
+      "sha256": "d3a4c2d070f3e827ee951081c026039b1c96b5f478c523606c829000aa7a7bb6",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -6556,7 +6974,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "executed_metric_ids": [
         "topology_identity",
@@ -6585,7 +7005,9 @@
         "mergeable_root_facility",
         "premature_interior_trunk_entry",
         "annotation_color",
-        "diagram_title_absence"
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
       ],
       "metric_results": [
         {
@@ -6888,6 +7310,18 @@
         },
         {
           "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
           "status": "pass",
           "applicability_proof": "artifact",
           "witnesses": []

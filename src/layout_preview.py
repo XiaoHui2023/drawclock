@@ -27,17 +27,6 @@ FREQUENCY_COLUMNS = (
 FREQUENCY_FONT_SIZE = 12.0
 FREQUENCY_COLUMN_GAP = 20.0
 FREQUENCY_TABLE_GAP = 34.0
-# Four fixed heading glyph outlines from Noto Sans CJK SC Regular 2.004
-# (SIL OFL 1.1).  Keeping only outlines makes the final SVG independent of
-# viewer fonts while adding no runtime dependency.  See licenses/.
-FREQUENCY_CJK_GLYPHS = (
-    "M52 72V-3H951V72H539V650H900V727H104V650H456V72Z",
-    "M526 828C476 681 395 536 305 442C322 430 351 404 363 391C414 447 463 520 506 601H575V-79H651V164H952V235H651V387H939V456H651V601H962V673H542C563 717 582 763 598 809ZM285 836C229 684 135 534 36 437C50 420 72 379 80 362C114 397 147 437 179 481V-78H254V599C293 667 329 741 357 814Z",
-    "M701 501C699 151 688 35 446-30C459-43 477-67 483-83C743-9 762 129 764 501ZM728 84C795 34 881-38 923-82L968-34C925 9 837 78 770 126ZM428 386C376 178 261 42 49-25C64-40 81-65 88-83C315-3 438 144 493 371ZM133 397C113 323 80 248 37 197C54 189 81 172 93 162C135 217 174 301 196 383ZM544 609V137H608V550H854V139H922V609H742L782 714H950V781H518V714H709C699 680 686 640 672 609ZM114 753V529H39V461H248V158H316V461H502V529H334V652H479V716H334V841H266V529H176V753Z",
-    "M829 643C794 603 732 548 687 515L742 478C788 510 846 558 892 605ZM56 337 94 277C160 309 242 353 319 394L304 451C213 407 118 363 56 337ZM85 599C139 565 205 515 236 481L290 527C256 561 190 609 136 640ZM677 408C746 366 832 306 874 266L930 311C886 351 797 410 730 448ZM51 202V132H460V-80H540V132H950V202H540V284H460V202ZM435 828C450 805 468 776 481 750H71V681H438C408 633 374 592 361 579C346 561 331 550 317 547C324 530 334 498 338 483C353 489 375 494 490 503C442 454 399 415 379 399C345 371 319 352 297 349C305 330 315 297 318 284C339 293 374 298 636 324C648 304 658 286 664 270L724 297C703 343 652 415 607 466L551 443C568 424 585 401 600 379L423 364C511 434 599 522 679 615L618 650C597 622 573 594 550 567L421 560C454 595 487 637 516 681H941V750H569C555 779 531 818 508 847Z",
-)
-
-
 @dataclass(frozen=True)
 class FrequencyTable:
     terminals: tuple[tuple[VertexLayout, float], ...]
@@ -328,26 +317,10 @@ def _render_frequency_table(table: FrequencyTable) -> list[str]:
     for (field, heading), center_x in zip(
         table.columns, table.column_centers
     ):
-        if heading == "工作频率":
-            start_x = center_x - 2 * FREQUENCY_FONT_SIZE
-            lines.append(
-                f'<g class="frequency-heading" data-frequency-field="{field}" '
-                'data-heading-render="outline" aria-label="工作频率" '
-                f'transform="translate({_svg_num(start_x)} {_svg_num(table.header_y)}) '
-                f'scale({_svg_num(FREQUENCY_FONT_SIZE / 1000)} '
-                f'{_svg_num(-FREQUENCY_FONT_SIZE / 1000)})" fill="#20252b">'
-            )
-            lines.append('<title>工作频率</title>')
-            for index, path in enumerate(FREQUENCY_CJK_GLYPHS):
-                lines.append(
-                    f'<path transform="translate({index * 1000} 0)" d="{path}"/>'
-                )
-            lines.append("</g>")
-            continue
         lines.append(
             f'<text class="frequency-heading" data-frequency-field="{field}" '
             f'x="{_svg_num(center_x)}" y="{_svg_num(table.header_y)}" '
-            'text-anchor="middle" font-family="Noto Sans CJK SC,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif" '
+            'text-anchor="middle" font-family="Microsoft YaHei,WenQuanYi Micro Hei,Arial,sans-serif" '
             f'font-size="{_svg_num(FREQUENCY_FONT_SIZE)}" fill="#20252b">'
             f'{_escape(heading)}</text>'
         )
@@ -489,13 +462,19 @@ def _edge_arc_path(
         ordered = sorted(xs, reverse=direction < 0)
         last = start[0]
         for x in ordered:
-            before = x - direction * radius
-            after = x + direction * radius
-            if direction * (before - last) <= 0 or direction * (end[0] - after) <= 0:
+            arc_radius = min(
+                radius,
+                direction * (x - last),
+                direction * (end[0] - x),
+            )
+            if arc_radius <= 1e-6:
                 continue
-            commands.append(f"L {_svg_num(before)} {_svg_num(start[1])}")
+            before = x - direction * arc_radius
+            after = x + direction * arc_radius
+            if abs(before - last) > 1e-6:
+                commands.append(f"L {_svg_num(before)} {_svg_num(start[1])}")
             commands.append(
-                f"A {_svg_num(radius)} {_svg_num(radius)} 0 0 0 "
+                f"A {_svg_num(arc_radius)} {_svg_num(arc_radius)} 0 0 0 "
                 f"{_svg_num(after)} {_svg_num(start[1])}"
             )
             last = after

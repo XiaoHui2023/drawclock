@@ -17,6 +17,7 @@ from layout_preview import (
     HTML_LABEL_CONTENT_OFFSET_X,
     HTML_LABEL_CONTENT_OFFSET_Y,
     _estimated_text_width,
+    _edge_arc_path,
     _node_annotations,
     _arc_crossings,
     _wrap_annotation,
@@ -413,8 +414,8 @@ def test_terminal_frequency_table_has_one_aligned_row_per_sink() -> None:
         "func_freq", "scan_freq", "bist_freq",
     ]
     assert all(heading.attrib["fill"] == "#20252b" for heading in headings)
-    assert headings[0].attrib["data-heading-render"] == "outline"
-    assert len(headings[0].findall("svg:path", ns)) == 4
+    assert headings[0].text == "工作频率"
+    assert headings[0].tag.endswith("text")
     assert all(value.attrib["fill"] == "#d02020" for value in values)
     assert {(value.attrib["data-node-id"], value.text) for value in values} == {
         ("clk_a", "800 MHz"), ("clk_a", "50 MHz"),
@@ -552,6 +553,13 @@ def test_preview_default_draws_real_arc_bridge_at_crossing() -> None:
     assert re.search(r'<path class="edge" d="[^"]* A 4 4 ', arc_svg)
     assert 'class="edge-gap"' not in arc_svg
     assert 'class="edge-gap"' in gap_svg
+
+
+def test_arc_bridge_shrinks_at_near_bend_without_losing_crossing_center() -> None:
+    path = _edge_arc_path([(0.0, 10.0), (10.0, 10.0)], {0: [1.25]})
+
+    assert "A 1.25 1.25 0 0 0 2.5 10" in path
+    assert "A 4 4" not in path
 
 
 def test_arc_bridge_uses_final_visible_coordinate_precision() -> None:

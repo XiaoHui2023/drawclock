@@ -12,7 +12,6 @@ from pathlib import Path
 REQUIRED = {
     "doc/README.md",
     "doc/draw.md",
-    "doc/licenses/NotoSansCJK-OFL-1.1.txt",
     "example/draw.json",
     "example/auto-layout/33-description-colors.json",
 }
@@ -56,6 +55,12 @@ def validate(path: Path) -> list[str]:
         errors.append("documentation must be contained in doc/")
     if any(name.startswith("drawio-lib/") for name in names):
         errors.append("legacy drawio-lib directory is forbidden")
+    license_files = [
+        name for name in names
+        if Path(name).name.lower().startswith(("license", "licence", "copying", "notice"))
+    ]
+    if license_files:
+        errors.append("license files are forbidden: " + ", ".join(license_files))
     allowed = REQUIRED | set(binaries) | set(libraries)
     unexpected = sorted(set(names) - allowed)
     if unexpected:

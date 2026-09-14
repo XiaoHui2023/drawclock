@@ -274,7 +274,6 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         prefix + "drawclock.exe",
         prefix + "doc/README.md",
         prefix + "doc/draw.md",
-        prefix + "doc/licenses/NotoSansCJK-OFL-1.1.txt",
         prefix + "example/draw.json",
         prefix + "example/auto-layout/33-description-colors.json",
         prefix + "libraries/source.xml",

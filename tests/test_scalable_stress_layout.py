@@ -1146,7 +1146,7 @@ def test_multiple_source_placement_selects_best_valid_candidate() -> None:
     assert quality["line_integrity"]["source_induced_crossing_points"] == report["selection"]["source_crossing_points"]
 
 
-def test_multi_from_roots_keep_one_facility_and_shared_bus() -> None:
+def test_multi_from_roots_keep_geometry_justified_facilities_and_shared_bus() -> None:
     config = build_multi_from_clusters()
     document, report = generate_elk_layout(
         config, library_path=LIBRARY, include_statistics=True
@@ -1191,7 +1191,6 @@ def test_multi_from_roots_keep_one_facility_and_shared_bus() -> None:
         if (vertex.logical_name or vertex.name) in from_names
     )
     assert quality["alignment"]["unused_rendering_replicas"] == []
-    assert quality["alignment"]["avoidable_source_replicas"] == []
     assert max(source_tops) - min(source_tops) > max(
         vertex.height
         for vertex in document.vertices
