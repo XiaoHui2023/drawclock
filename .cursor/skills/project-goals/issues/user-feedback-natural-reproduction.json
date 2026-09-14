@@ -1673,7 +1673,7 @@
             "summary": "多个直入同一 mux 的 source/from 因辅助消费者深度不同而错列",
             "expected": "至少三个未显式定列的 source/from 若直接进入同一 mux，则其 mux-facing 物理设施必须同列；辅助消费者可以有不同深度或另一个 mux 目标，cohort 按当前汇合目标建立并联合重排全部出边",
             "actual": "四个 source 都直接进入同一 mux4，但多输出 source 被排除出 cohort，辅助链与 side mux 深度使最终设施再次错列",
-            "status": "fixed_verified",
+            "status": "closed",
             "owner_paths": [
                 "src/**"
             ],
@@ -2151,7 +2151,16 @@
                 "current_passes": true,
                 "receipt": ".reproduction/fix-receipts/FB-ROUTE-023.json",
                 "verification_group": "20260914T104230Z-c6a501e6",
-                "evidence": "Frozen public CLI reproduces the original and lower external misaligned-target forms; the current public CLI passes the independent issue Oracle twice, all 29 artifact metrics, the 843-unit coverage exact-set, and all six required final-geometry directions without recurrence."
+                "evidence": "Frozen public CLI reproduces the original and lower external misaligned-target forms; the current public CLI passes the independent issue Oracle twice, all 29 artifact metrics, the 843-unit coverage exact-set, and all six required final-geometry directions without recurrence.",
+                "release_verification": {
+                    "commit": "e5891275b7a0190c089a8ef75bb27d649863b2a7",
+                    "run_id": 34843285835,
+                    "tag": "v1.0.0",
+                    "asset_sha256": "d453efaf7839437d93d359ace6fa3db4e439a98918d85b3d24a9df7ddfb6f40a",
+                    "asset_bytes": 17037152,
+                    "archive_entries": 34,
+                    "license_like_entries": 0
+                }
             }
         }
     ],
@@ -2181,7 +2190,11 @@
                 "metric_registry_count": 24,
                 "metric_executions": 624,
                 "recursive_attack_run": "20260909T062544Z-99d5a3f0",
-                "consecutive_clean_rounds": 7
+                "consecutive_clean_rounds": 7,
+                "latest_metric_registry_count": 29,
+                "latest_public_images_passed": 27,
+                "latest_release_run": 34843285835,
+                "latest_release_commit": "e5891275b7a0190c089a8ef75bb27d649863b2a7"
             }
         },
         {

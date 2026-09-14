@@ -1,11 +1,14 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-14 20:10 +08:00
+- updated: 2026-09-14 21:12 +08:00
 
 ## 2026-09-14：错列外部目标导致公共主干提前横穿再次复发
 
+- 21:12 将项目目标切换 done 后，release gate 正确暴露发布阻断流程事故 `META-QUALITY-011` 仍停在 fixed_verified；它的关闭证据现已由 29 项注册表、27 张公开图、桥接 mutant、递归攻击以及 Release run `34843285835` 补齐。按稳定 incident ID 将其推进 closed，并记录最新指标数、图数、run 与 commit；这次阻断证明完成态会独立检查流程事故，而非只看产品 issue。
+- 21:08 收尾时一次只按 `"status": "fixed_verified"` 的宽上下文补丁误将 `FB-ROOT-021` 改为 closed，而目标 `FB-ROUTE-023` 保持原状态；JSON 语法与 release gate 都不会发现这种合法值的 owner 漂移。按 issue ID 审计立即识别并恢复 021，023 保留 `fixed_verified` 并绑定发布证据；再次验证所有非 closed 状态和 release gate。后续状态补丁继续强制使用稳定 issue ID 上下文，不能把“JSON 可解析”当作归属正确。
+- 21:05 commit `e5891275b7a0190c089a8ef75bb27d649863b2a7` 已推送。Release run `34843285835` 的覆盖穷尽、历史 R1–R7、27×29 全图门、Ubuntu 16.04 PyInstaller/staticx、解包后 frozen smoke、publish 与公开资产回下载全部 success；`v1.0.0^{}` 与该 commit 一致。独立再次下载 17,037,152-byte 资产，SHA-256 `d453efaf...6f40a` 与 GitHub digest 相同；项目检查器及用户根通用归档检查器均 PASS，34 项清单中 license-like 文件为 0。目标已满足覆盖方向而非次数、全指标、公开发布和 Agent 独立检验的全部收敛条件。
 - 20:10 全公开 SVG 新鲜生成门 `27/27` PASS，每图完整 29 指标；质量合同 retention 为 metrics=29/requirements=29，feedback release gate 19/19 PASS。上传审计的第一次 ahead/behind 命令在 PowerShell 中把未引用的 `@{u}` 误解析，Git 收到畸形参数 `dQA=` 并非零；随后用单引号保护 `HEAD...@{upstream}` 正确取得 `0/0`，远端无分叉。新 fix/recursive 证据此前虽已在索引中，但路径仍命中 `.reproduction/*` 忽略规则；现为两个规范证据批次增加精确白名单，禁止依赖 `git add -f` 的本机偶然状态。
 - 20:04 撤回实验 Oracle 后哈希精确恢复为 `fa85a891...09f3e`，既有 coverage/fix 收据血缘继续有效；错误 L1 硬断言已删除，聚焦测试通过。随后从零执行全量回归，最终 `623 passed in 913.06s`，没有以聚焦绿灯替代全量结论。
 - 19:47 全量回归唯一失败经公开 `16-multi-from-clusters.json` 双跑与正式 29 指标 Oracle 复核，确认是旧测试误把 `avoidable_source_replicas` 的 L1 廉价候选筛选当成硬质量结论；该字段所在实现已明确声明“candidate screen, not a proof”，且不参与 `quality.passed`。为排除正式 Oracle 漏报，曾临时加入相邻设施 pair 反事实，结果没有任何 pair 能在交叉、重叠、折点均不增且显示成本下降的条件下安全合并，公开 SVG 仍 29/29 PASS。结论改为：产品没有发生该回退，实验 Oracle 必须原样撤回以恢复已签收哈希，测试删除错误硬断言并继续消费正式全几何门；`FB-ROOT-015` 恢复 closed。此前覆盖、fix 与全图收据仅在 Oracle 哈希恢复后继续有效。

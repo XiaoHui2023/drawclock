@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-09-14
 
@@ -24,6 +24,8 @@
 - success: 通用 inspector v2 已对目标逻辑边按 source/target 绑定：旧图方向为 `right/down/right/down/right`、45 个交叉事件，新图为 `right/down/right/up/right`、20 个交叉事件；新图先走公共纵向主干至下边界再接入错列 MUX。新图统一质量注册表 29/29 PASS，删除任一逐段方向字段的 mutant 会使门禁失败。
 - success: 最终候选在 29 项合同下完成公开图 27/27、真实错列定向攻击 24/24、递归 R1–R7、19 问题双跑 group `20260912T185502Z-2436c1bb`、release gate 19/19 和完整 pytest 620/620。
 - success: 提交 `8c961a648106417f590506852b2b718113dccd47` 已推送；GitHub Release run `34713554102` 的反馈门、Ubuntu 16.04 PyInstaller/staticx、冻结示例、publish 及公开资产下载 smoke 全部 success。`v1.0.0^{}` 指向该提交；公开归档 17,041,410 bytes、36 项，SHA-256 `c826b70188c7789f3d3488bd315b0ec6de2da1ce2ca89f50ab14d0470f098992` 与 Release digest 一致。
+- success: 最终 coverage v3 在单一血缘下完成 32/32 case、843/843 覆盖单元、6/6 必需终态几何方向，缺口、质量失败与复发均为 0；19 项 fix 双跑、R1–R7、27 张公开图 × 29 指标、质量合同 29/29 和完整 pytest 623/623 全部通过。
+- success: 提交 `e5891275b7a0190c089a8ef75bb27d649863b2a7` 已推送；GitHub Release run `34843285835` 的覆盖穷尽、历史攻击、全图门、Ubuntu 16.04 构建、解包后 frozen smoke、publish 与公开资产回下载全部 success。`v1.0.0^{}` 指向该提交；公开归档 17,037,152 bytes、34 项，SHA-256 `d453efaf7839437d93d359ace6fa3db4e439a98918d85b3d24a9df7ddfb6f40a` 与 Release digest 一致，两套归档检查器确认 license-like 文件为 0。
 - failure: 用户指出既有说明没有把“目标 MUX 更靠右、不与普通 MUX 对齐”作为可见复现条件，也未接受此前交付图作为本轮闭环证据。
 - failure: seed-013 的输入虽含 `layout_column: 5`，冻结旧版和当前版的同组 MUX 最终仍全部位于 x=876.71；旧版命中 023 不能证明实际错列诱因。现有测试只检查配置字段，属于覆盖和声明逃逸。
 - historical_failure: 曾把会话图片是否由用户亲自确认可见误升格为产品质量收敛条件，造成 quality-owner drift。用户已明确要求全部检验由 Agent 完成；该条件已撤销，后续用户反馈仍可推翻并重开交付表面问题，但不是常规质量授权门。
@@ -40,8 +42,7 @@
 
 ## 下一步
 
-- 等待当前单一血缘 coverage v3 完整结束；只有 units、最终几何方向、质量失败三项缺口都为空，才更新问题状态。
-- 重跑全制品 × 全指标、问题/目标/提交门、完整 pytest 与发行包检查；提交推送后值守公开 Release 并下载最终资产复验。
+- 无
 
 ## 收敛条件
 
