@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-09-15
 
@@ -17,6 +17,7 @@
 
 ## 当前证据
 
+- success: 提交 `9ab3939a762f83295f7c449afea373203819c0be` 已推送；Release run `34945409769` 的旧覆盖、新结构矩阵、R1–R7、27 张全图、反馈门、Ubuntu 16.04 PyInstaller/staticx、解包 frozen/librsvg、发布与公开回下载 smoke 全部 success。`v1.0.0^{}` 与该提交一致；公开 Linux 资产 17,038,409 bytes、34 项，SHA-256 `9c99598fd3f424a4bd4367a83bcfa77cb298f93f5e2855bd796197affc5837a5` 与 API digest 一致，license-like=0。
 - success: 冻结 `9deb186` 的结构 case-001 公开 CLI 双跑哈希均为 `b2148bd6…2374`；同一逻辑边在 y=3152.5428 提前离开 x=416.36 主干，到 x=1101.86 后纵穿 8 个视觉行。当前版将出口延迟至 y=3368.5387，目标、端口与连接关系不变，023 witness 清零。
 - success: 当前结构矩阵 13/13，计划与实际成对覆盖均为 106/106；逐例 required/executed=29/29，复发、其它质量失败和证据矛盾均为 0。旧边界覆盖同步完成 32/32 case、843/843 单元。
 - success: 全部 19 个历史反馈当前源码双跑 group `20260915T065641Z-4f5cedfd` 无失败；高风险递归攻击 `20260915T070216Z-e2dbf9c2` 为 R1–R7、162 例、4/4 语义变体、逐例 29/29；全公开图 27/27 × 29 和完整 pytest 637/637 通过。
@@ -47,8 +48,7 @@
 
 ## 下一步
 
-- 提交并推送当前候选；等待干净 GitHub Actions 重新执行结构矩阵、旧覆盖、递归攻击、全公开图、Ubuntu 16.04 冻结构建、发布与公开资产回下载消费。
-- 远端 tag、Release 附件、公开回下载哈希和归档表面全部闭合后，才把本目标与 023 从 fixed_verified 推进 closed。
+- 已完成；后续新增布局要求只能扩展质量注册表和覆盖模型，不得删除本目标的结构因子、终态 witness 或发布前置门。
 
 ## 收敛条件
 

@@ -114,7 +114,7 @@
             "summary": "同一图根的两条路线先分开、再合并、再分开",
             "expected": "同一逻辑根端口的公共前段一次合并后不发生无拓扑依据的重新汇合",
             "actual": "用户观察到重复分合造成多余走线和交叉；旧测试只人工改写航点",
-            "status": "fixed_verified",
+            "status": "closed",
             "owner_paths": [
                 "src/**"
             ],
@@ -1392,7 +1392,7 @@
             "summary": "唯一公共 from 经每路独立 gate 进入 mux、与更深私人链汇聚时公共分发线碎裂或失去总线形态",
             "expected": "唯一公共 from 分别连接每一路独立 gate_i，再由 gate_i 进入对应 mux_i；每个私人 from_i 经各自 private_gate_i 和 div_i 后进入同一 mux_i。公共 from 的同一输出端口必须形成可追踪的共享纵向分发主干；两侧链深和可行列不同不得成为公共线路碎裂、复制或外绕的理由",
             "actual": "用户指出精确结构是每一路公共 from→gate_i→mux_i，gate_i 与 mux_i 一样按路独立，只有公共 from 唯一；私人路径为 from_i→gate_i→div_i→mux_i。旧的同深 from→mux2→clock 和单个公共 gate 扇出输入都未覆盖该组合",
-            "status": "fixed_verified",
+            "status": "closed",
             "owner_paths": [
                 "src/**"
             ],
@@ -1541,7 +1541,7 @@
             "summary": "多个 source 直接进入同一 mux 时最终图保留被更少折点或更少交叉方案支配的路线",
             "expected": "多个 source 均直接连接同一多输入 mux 时，分层、坐标和通道阶段必须联合选择；任何保持端口、碰撞和异网重叠不退化，且使折点或交叉严格下降的最终图候选都必须支配当前结果",
             "actual": "四个 source 已被强制同列，但当前 30 号图仍有 8 个折点、4 个交叉事件；完整数组端口轴反事实可降为 6 折/2 交叉，visibility-channel 反事实还能在不改变折点和长度时消除 source_0/source_1 的矩形互穿",
-            "status": "fixed_verified",
+            "status": "closed",
             "owner_paths": [
                 "src/**"
             ],
@@ -1790,7 +1790,7 @@
             "summary": "任意零入度根直入同一汇聚节点时存在无硬质量退化的共同列却仍错列",
             "expected": "不论节点 kind 或名称，两个及以上零入度根设施若直接进入同一多输入目标，且完整设施集合联合移动到某一共同 x 列不会新增交叉、跨线、节点碰撞、异网重叠或折点，则最终设施必须同列；若不存在安全共同列，保持错列是合法边界",
             "actual": "公开 pad-r08-s02 图中多个 pad 的直接根包含 source、from、gate 等类型，设施在 x 方向参差不齐；旧指标仅检查至少三个 source/from 唯一直入 mux，因此全图质量系统对 pad 和任意根 kind 统一返回绿灯",
-            "status": "fixed_verified",
+            "status": "closed",
             "owner_paths": [
                 "src/**"
             ],
@@ -1887,7 +1887,7 @@
             "summary": "远距分离消费带仍由单个源显示设施和长主干服务",
             "expected": "任意零入度逻辑根的消费者形成远距分离消费带时，若多个同名显示设施在保持拓扑、端口、碰撞、重叠、交叉和折点不退化后严格降低交叉或扣除设施成本后的共享线段并集，则必须采用几何最优连续分区；逻辑根保持唯一",
             "actual": "用户报告一个源头连接两个相距很远的下级时仍走很远并造成大量交叉，没有按既有要求拆成两个同名显示设施",
-            "status": "fixed_verified",
+            "status": "closed",
             "owner_paths": [
                 "src/**"
             ],
@@ -2012,7 +2012,7 @@
             "summary": "公共根总线在中部过早进入行间并向下贯穿造成大量交叉",
             "expected": "跨越多行的同源公共主干应比较整体边界走廊与内部入口候选；若沿外侧到目标消费带再分支能保持硬门并严格减少异网交叉或折点，则中部提前进入行间的路线必须被拒绝",
             "actual": "用户观察到公共 from 本可先沿总线到最下面并绕整体连接，却在中部突然分叉进入两行之间，再向下走线，造成大量交叉和跨线",
-      "status": "fixed_verified",
+            "status": "closed",
             "owner_paths": [
                 "src/**"
             ],
@@ -2175,11 +2175,11 @@
       "verification_group": "20260915T065641Z-4f5cedfd",
       "evidence": "Frozen public CLI reproduces the detached H-V-H public-root branch with a remote descent across eight visual rows. The current public CLI passes the independent issue Oracle twice, all 29 artifact metrics for every one of 13 structural cases, and the planned and executed 106/106 pairwise coverage without recurrence.",
                 "release_verification": {
-                    "commit": "e5891275b7a0190c089a8ef75bb27d649863b2a7",
-                    "run_id": 34843285835,
+                    "commit": "9ab3939a762f83295f7c449afea373203819c0be",
+                    "run_id": 34945409769,
                     "tag": "v1.0.0",
-                    "asset_sha256": "d453efaf7839437d93d359ace6fa3db4e439a98918d85b3d24a9df7ddfb6f40a",
-                    "asset_bytes": 17037152,
+                    "asset_sha256": "9c99598fd3f424a4bd4367a83bcfa77cb298f93f5e2855bd796197affc5837a5",
+                    "asset_bytes": 17038409,
                     "archive_entries": 34,
                     "license_like_entries": 0
                 }

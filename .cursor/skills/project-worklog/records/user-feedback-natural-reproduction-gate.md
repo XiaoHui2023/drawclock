@@ -1,11 +1,12 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-15 16:07 +08:00
+- updated: 2026-09-15 17:14 +08:00
 
 ## 2026-09-15：发布版同症状复发，固定轴覆盖再次逃逸
 
+- 17:14 产品提交 `9ab3939a762f83295f7c449afea373203819c0be` 已推送。Release run `34945409769` 的旧边界覆盖、13 组结构矩阵、R1–R7、27 张全图、反馈门、Ubuntu 16.04 PyInstaller/staticx、解包 frozen/librsvg、publish 和公开资产回下载 smoke 全部 success；所有步骤均为 completed/success，无跳过。`v1.0.0^{}` 与产品提交一致。Release API 资产为 17,038,409 bytes、digest `9c99598f…7a5`；本机从公开 URL 独立下载得到相同 SHA-256，34 项、license-like=0。023 与本轮等待发布复核的 002/016/017/021/022 一并关闭，目标完成。收尾状态提交仍需按常驻发布规则让 tag 对齐最终仓库提交。
 - 16:07 旧边界覆盖当前源码重跑通过：32/32 case、843/843 units，状态 clean。五件套 PASS；项目算法 Skill、随包 7 个项目 Skills、用户根 case-generalization/agent-quality-workflow/proactive-skill-learning/clock-tree-layout/codex-agent-hard-gates 均 valid；actionlint 1.7.12 与 `git diff --check` 通过。第一次 quick_validate 由 Windows 默认 GBK 读取 UTF‑8 文档而抛 `UnicodeDecodeError`，不计通过；显式 `PYTHONUTF8=1` 后同一验证器全绿。Windows 包构建前 release gate 19/19 PASS；ZIP 9,152,830 bytes、SHA-256 `FDC19F84…0AA1`、34 项、license-like=0，仅含 exe、doc、example、libraries。全新 GUID 目录解压后包内 exe 与 7 个项目 Skills 完成冻结消费。下一步提交前上传审计与远端发布，尚不关闭目标。
 - 15:48 聚焦结构/防作弊/workflow/真实 CLI 测试 15/15 通过（253.60 秒）；随后完整 pytest 637/637 通过（1394.70 秒），没有跳过或失败。79% 后的复杂候选搜索长时间无输出时做只读健康检查，`python3.11` CPU 时间在 2 秒内增加约 2 秒、内存稳定约 99 MB，确认持续计算而非死锁；最终自然完成。下一步运行旧边界覆盖、项目 Skills、工作流静态检查和真实发行包消费，完整 pytest 不能替代这些独立门。
 - 15:17 历史递归攻击批次 `20260915T070216Z-e2dbf9c2` 完成：high 风险 R1–R7 七种异构策略共 162 个公开 CLI 组合，4/4 语义变体、连续 7/7 clean；逐案 required/executed 均为 29/29，复发与其它失败均为 0。随后全公开图从输入重新生成，27/27 × 29 指标通过。新 fix/recursive 原始证据目前仍命中批次级 ignore；下一步只对白名单加入 `20260915T065641Z-4f5cedfd` 与 `20260915T070216Z-e2dbf9c2`，不放宽目录级规则，然后由发布门验证干净检出血缘。
