@@ -1,8 +1,34 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: done
+- status: active
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-14 21:12 +08:00
+- updated: 2026-09-15 16:07 +08:00
+
+## 2026-09-15：发布版同症状复发，固定轴覆盖再次逃逸
+
+- 16:07 旧边界覆盖当前源码重跑通过：32/32 case、843/843 units，状态 clean。五件套 PASS；项目算法 Skill、随包 7 个项目 Skills、用户根 case-generalization/agent-quality-workflow/proactive-skill-learning/clock-tree-layout/codex-agent-hard-gates 均 valid；actionlint 1.7.12 与 `git diff --check` 通过。第一次 quick_validate 由 Windows 默认 GBK 读取 UTF‑8 文档而抛 `UnicodeDecodeError`，不计通过；显式 `PYTHONUTF8=1` 后同一验证器全绿。Windows 包构建前 release gate 19/19 PASS；ZIP 9,152,830 bytes、SHA-256 `FDC19F84…0AA1`、34 项、license-like=0，仅含 exe、doc、example、libraries。全新 GUID 目录解压后包内 exe 与 7 个项目 Skills 完成冻结消费。下一步提交前上传审计与远端发布，尚不关闭目标。
+- 15:48 聚焦结构/防作弊/workflow/真实 CLI 测试 15/15 通过（253.60 秒）；随后完整 pytest 637/637 通过（1394.70 秒），没有跳过或失败。79% 后的复杂候选搜索长时间无输出时做只读健康检查，`python3.11` CPU 时间在 2 秒内增加约 2 秒、内存稳定约 99 MB，确认持续计算而非死锁；最终自然完成。下一步运行旧边界覆盖、项目 Skills、工作流静态检查和真实发行包消费，完整 pytest 不能替代这些独立门。
+- 15:17 历史递归攻击批次 `20260915T070216Z-e2dbf9c2` 完成：high 风险 R1–R7 七种异构策略共 162 个公开 CLI 组合，4/4 语义变体、连续 7/7 clean；逐案 required/executed 均为 29/29，复发与其它失败均为 0。随后全公开图从输入重新生成，27/27 × 29 指标通过。新 fix/recursive 原始证据目前仍命中批次级 ignore；下一步只对白名单加入 `20260915T065641Z-4f5cedfd` 与 `20260915T070216Z-e2dbf9c2`，不放宽目录级规则，然后由发布门验证干净检出血缘。
+- 15:03 正式当前版结构矩阵完成：13/13 个公开 CLI 用例、计划与实际成对覆盖均为 106/106；每例统一质量系统 required/executed 均为 29/29，目标 witness、其它质量失败和证据矛盾均为 0。总收据绑定 runner `1c513d1c…5bb`、源码树 `d7a37c5d…83a`、Oracle `1f605725…df8` 与质量注册表 `f9beadff…761`。随后刷新全部 19 个历史反馈的当前源码双跑，verification group `20260915T065641Z-4f5cedfd`、`failures=[]`；023 两次当前图哈希一致且独立 Oracle 未观察到症状。下一步把 023 精确推进到 fixed_verified、刷新递归攻击与发行证据，尚未授权关闭或发布。
+- 独立 Oracle 的路线碰撞已切换为 `_visual_rect_interior_hit`，把节点文字、名称和其他扩展可见边界纳入同一硬门。由于严格复现被撤销，先前两版 `src/elk_layout.py` 实验不再具备修改授权，必须精确回滚本轮源码差异、确认 `src/**` 恢复发布基线后，再以修正后的 Oracle 继续自然搜索。
+- 对 Oracle 候选注入最终 `LayoutDocument` 后发现独立判定器仍有完整性缺陷：候选 450→447/1453→1443 虽不穿器件图形盒，却新增 1 个文字可见盒碰撞；Oracle 的 `_route_hits_unrelated_box` 错用 graphic bbox 而非 `visual_bounds`。生产硬门拒绝该候选正确，前述 reproduced 结论撤销，023 退回 `reproduction_in_progress`；双跑 SVG 仅保留为疑似形态，不再授权生产修复。第一/二版源码实验也都未绿，后续先修独立 Oracle 可见盒语义并重新搜索合法反事实。
+- 第一版生产修复失败并保持红灯：当前 SVG 哈希仍与冻结失败版完全相同 `C20146A7…49EF`，023 witness 仍有 7 个。统计显示早期 boundary owner 尝试 249/移动 8 次并移除 106 个事件，但最终 serialized owner 23 次候选、0 次移动，阻断集中于 crossing/edge-node。代码审计确认局部阶段每个 side 只保留一个“最佳”lane；若该 lane 到完整终态才发现碰撞，其他局部次优但全局可行的可见通道已经被丢弃。下一版先用终态可见盒做廉价碰撞筛选，再把每侧前五个可行 lane 送入完整全图事务，避免单候选逃逸。
+- 问题账本已按稳定 ID 将 `FB-ROUTE-023` 从 `reproduction_in_progress` 推进为 `reproduced`，末次 attempt 同为 reproduced；五件套与 owner 状态回读通过。生产修复方案限定为：按物理 root facility 推断重复 backbone、支持自身只有一个远端竖段的 H-V-H 离群边，并从整图终态可见 y 轴选择延迟出口；不按器件名、固定行号或坐标特判。
+- 本轮严格自然复现成立：冻结发布提交 `9deb186` 的公开 CLI 对同一合法输入双跑，两个原始 SVG SHA-256 均为 `C20146A78FF1EF6F32BA1F470E7300E763C766572652287F31323949D67549EF`；两份独立 Oracle 均命中 `FB-ROUTE-023` 且公共 from witness 逐字段一致。坏边 `svg-edge-0162` 先沿 x=416.36 主干到 y=2630，随后横移至 x=1618.52 并纵穿 20 个整图视觉行；延迟至 y=3118.0085 可使全图交叉点 450→447、事件 1453→1443、局部事件 52→42，折点 4→4、异网重叠 0→0。生产 owner 现在才解冻。
+- 有效生成图中已找到 Oracle 漏检的直接几何：`svg-edge-0162` 从公共 root 的 x=416.36 主干在 y=2630 提前横移到 x=1618.52，再纵降 462.01px；原路线局部 16 个交叉点/52 个事件，后移至 y=3118.0085 的候选为 13/42，折点 4→4、异网重叠 0→0。旧 predicate 仍返回空，因为它只用同一 root 的目标端点定义“行”，这段虽穿过大量私人/中间视觉行，却恰好没有穿过两个同源目标行。修复 Oracle 为整图终态视觉行与可见通道后，才可把该自然图计作复现。
+- 远后排列轴已加入复现器；col=13 的首四个绑定完整组合仍 clean 后主动停止。进一步对照用户“沿整体外缘绕行”的语义与现有实现发现，生产门和旧 Oracle 都把“折点不得增加”置于交叉改进之前，且 detached 判定只枚举出发点与目标之间的行，完全排除了越过目标到整体 top/bottom 外缘再返回的合法候选。下一步按硬约束→交叉→折点/长度的词典序开放外缘候选；若多两个折点，则至少要求减少两个交叉点且三个交叉事件，避免轻微收益制造折线。
+- 绑定修复后从 case-000 重跑，“lower + 每路独立 gate”12 个组合才得到有效 clean；冻结旧失败图仍稳定被 023 拒绝，校准成立。运行在进入下一重复结构组前主动停止：旧模型的错列幅度只覆盖 2/4 列，本轮扩展为终态远后排 9/13/17 列，并继续记录消费端/owner 交互；这改变覆盖方向而非增加次数。
+- 结构复现器首轮运行到 case-035 后被主动中止；随后检查快速路径发现 `parse_svg()` 只提取几何，未调用 `bind_routes()` 绑定公开输入的逻辑边，导致所有 route source/target 为空，36 个所谓 clean 全部作废。这是复现 Oracle 自身的 binding escape，不是产品通过。修复必须先建立 logical edge、执行绑定，并硬断言每条路线的 source/target/edge_id 均非空；任何未绑定路线立即 operational failure，然后从 case-000 重跑。
+- 复现器已把 outlier gate 约束改为在节点条目构造时写入，消除未登记节点访问；下一步按最高风险组合优先排序，只改变探索顺序，不改变 required factor 全集或成功判据。
+- 新增结构复现器，冻结 producer 下正交枚举目标纵区、公共链形、错列约束 owner、离群 gate 额外消费者和声明顺序；每案从公开 CLI 原始 SVG 直接执行三类 023 判定，命中后同输入双跑并进入完整质量系统。脚本初审发现 gate 约束在节点写入 config 前赋值，须改为先构造 `gate_item` 再追加；修正和语法/运行验证完成前不计任何复现结果。
+- 局部筛选后二阶段已按候选重建完整 route set，避免使用上一候选的陈旧变量；语法通过。旧 coverage v3 的 32/32 个最终 SVG 在扩展 Oracle 下全部 clean，证明新谓词没有对旧语料产生即时误报，但也确认旧语料确实不包含本轮复发结构，不能据此恢复完成状态。
+- 新 Oracle 只读重放旧 32 图时，前 11 图无误报，但密集图因对每个候选重复计算整图交叉而过慢，已在有界等待后中止；不把中止计作 clean。候选生成现缩小到同一 source-net 的可见行，并先用局部交互筛选、最多把前五个候选送入整图门。该机械优化后仍需立即补齐二阶段候选路线重建并做语法/等价性测试，未验证前不计有效 Oracle。
+- 独立终态 Oracle 新增“脱离共享主干的远端纵降”判定：不再要求坏边自身同时含主干竖段和远端竖段，而是从同一 source-net 的兄弟路线推断重复 backbone x，再对 H-V-H 单竖段离群支路枚举后置可见行。候选只允许端点/碰撞/异网重叠/长度不退化，交叉点与事件均须严格下降；最多允许两个额外折点，避免旧硬筛先于更高优先级交叉目标误杀。生产布局器仍未修改。
+- 重开账本时首次宽匹配状态文本误触 `FB-ROUTE-002`；即时按稳定 ID 回读发现后，恢复 002 原状态并把 023 精确改为 `reproduction_in_progress`。JSON 解析、两个 owner ID、五件套和目标结构均已复核通过；这再次证明状态修改必须以稳定对象 ID 校验，不能以文件可解析代替归属正确。
+- 用户确认实际运行后仍出现公共主干提前横穿、再在后排目标前纵向贯穿多行的错误。`FB-ROUTE-023`、错列 MUX 复验目标及相关完成声明立即重开；当前发布提交只作为冻结失败候选，不再作为已闭合证据。
+- 复发分类升级为 `coverage_escape + oracle_escape + claim_escape + abstraction_escape`：上一轮 14 轴/843 单元仍以输入参数和值组合为主体，没有把“直接目标与结构消费端不一致”“同网共享树而非单边”“任意可见通道而非 local/top/bottom”“后置 owner 序列”作为一等覆盖对象。
+- 生产 `src/**` 继续冻结。新门要求先由公开 CLI 对原始合法输入双跑，独立从最终 SVG 提取逐线点列、方向、交叉、折点、共享段和 owner 归属，并取得两次一致的直接红灯；故障注入、手改 SVG、源码推断或旧收据均不能解锁修复。
+- 联网对标采用成熟的整网建模：多端网络按正交共享树/总线处理，节点障碍与端口进入可见图，硬约束优先于交叉、折点、共享长度等软成本；测试侧用 NIST t-way 覆盖叠加属性/蜕变关系，不能再用固定 case 数或人工列出的少量轴证明闭合。
 
 ## 2026-09-14：错列外部目标导致公共主干提前横穿再次复发
 
@@ -1932,3 +1958,42 @@
 - 22:50 最终候选源码的第三个 epoch 完成 24/24，`complete=true`，seed-022 及其余轮次均无语义、质量或 issue 失败。启动包装层把 `JSON.stringify` 误写为不存在的 `JSON.stringifyédé`，仅丢失会话句柄；通过进程 18044 和持久化进度监控确认底层唯一攻击进程持续运行并正常退出，没有重复启动，包装错误不计结果。随后误探测不存在的 `tools/run_feedback_reproduction.py` 得到文件不存在；正确脚本为 `run_feedback_fix_verification.py`。该脚本没有 help parser，传 `--help` 实际执行正式验证；因运行绑定最终候选源码而保留，最终验证组 `20260912T144635Z-d0e9352f` 返回 `failures=[]`，19 份 fix 收据已更新为当前 source tree 哈希。
 - 23:11 正式递归攻击收据已在最终候选源码上重建，R1–R7 连续 clean。随后最终全量回归为 `618 passed, 1 failed`（705.21s）；唯一失败是 release gate 明确列出新 fix 验证组的 260 个证据文件未被 Git 跟踪，所有功能、布局、Oracle、攻击和压力测试均通过。该红灯按证据闭包处理，不能改 checker 或跳过：只强制暂存 `.reproduction/fix-evidence/20260912T144635Z-d0e9352f/**`、19 份已更新 fix 收据和新的 recursive receipt，再重跑 release gate。状态审计末尾误读不存在的 `.reproduction/lk`，得到可验证 PathNotFound，仅为只读命令尾项，不影响此前 status/check-ignore 结果。
 - 23:18 新 fix evidence、19 份 fix 收据和 recursive receipt 已精确加入索引；release gate 19/19 PASS，隔离 gate 测试 24/24 PASS。全公开 SVG 由独立 runner 新鲜生成并达到 27/27，每图完整执行 28 指标、失败 0。最终候选重新生成错列样例并通过 28/28，SVG SHA-256 `32801bf5...ac4bc5` 与已交付 after SVG 完全一致；同输入冻结旧版为 `c22a264d...63f49`。2670×1273 前后对照稳定别名已再次由原生图像工具读取，用户端显示仍待本轮 Markdown 嵌入后的确认。
+
+## 2026-09-15：复发后的 Oracle 与回滚门禁修复
+
+- 04:03 复核所谓自然红灯时，把候选路线注入完整 `LayoutDocument` 后发现边-节点可见碰撞从 1 增至 2；旧 Oracle 只检查器件图形盒，遗漏文字可见盒，故此前 `FB-ROUTE-023` 红灯无效并已撤回为 `reproduction_in_progress`。结构搜索器还曾遗漏 `bind_routes`，导致 36 个假 clean；现已强制每条 route 绑定 source/target/edge_id，并把可见文字盒纳入路线可行性。
+- 04:16 “未复现禁止写生产路径”门禁错误阻止恢复 Git 基线。用户根硬门禁运行时按测试先行新增窄恢复通道：只有可无歧义预测、且所有命中受保护文件后像精确等于 Git HEAD 的纯 Update 补丁允许执行；部分回滚、增删移动、未跟踪文件、混合新改动仍拒绝。50 行为 + 34 模块 + 42 项目上下文 + 6 恢复测试、4/4 变异和 doctor 全通过后完成热安装。
+- 04:18 已用该通道把 `src/elk_layout.py` 两处未经有效复现证明的实验改动精确恢复到 HEAD；`git diff --exit-code -- src/elk_layout.py` 通过。下一步仅在修正后的独立可见几何 Oracle 下继续结构覆盖搜索，取得双跑稳定自然红灯前不再改生产布局。
+- 04:23 修正后 Oracle 重查旧 case-006 为 `symptom not observed`，正式否定旧红灯。随后启动结构搜索并在 4 个 clean 样例后审计到生成器会展开 486 个全笛卡尔组合；主动中止，不能以盲目次数代替覆盖方向。下一步按 NIST ACTS 思路生成确定性 pairwise covering array，并用机器断言每个值及任意两因素值对均被覆盖；命中后再做局部高阶扩展。
+- 04:27 新增 covering-array 合同测试，旧 `factor_cases()` 如预期红灯：实际全笛卡尔为 324/324，不满足“小于穷举规模”；确定性、单值覆盖和两两覆盖断言同时保留，防止仅减少 case 数却漏组合。
+- 04:31 确定性贪心 covering array 已落地并转绿：13 个样例覆盖 6 个结构轴全部取值及 106/106 个两两值对，远小于 324 个穷举组合；搜索器启动前和收据内都强制记录 `strength=2`、required/covered pair exact equality。高风险值只影响同分候选顺序，不删减覆盖义务。
+- 04:35 pairwise case-001 在冻结发布版自然命中并完成严格双跑：SVG 哈希均为 `b2148bd6…2374`，独立 Oracle 与统一质量注册表一致只失败 `premature_interior_trunk_entry`。公共 from 的 `svg-edge-0159` 在 y=3152.5428 提前离开 x=416.36 主干，到 x=1101.86 后纵穿 8 个视觉行；合法延迟候选使全局事件 1791→1787、点 404→403、局部事件 18→14、折点 4→4。023 已重新推进为 reproduced，但当前收据把计划 pairwise 覆盖误写成已执行覆盖；修复该证据语义并跑完 13 案前不声称覆盖闭合。
+- 04:39 五件套 checker PASS，023 账本已绑定新双跑 witness。新增负向合同：只执行前 2 个 case 时 `coverage_summary` 必须因 exact pairwise coverage 不完整抛错，禁止把计划矩阵提升为实际执行证据。
+- 04:43 搜索器不再首个红灯即退出：每个红灯仍双跑并执行统一质量注册表，但必须完成全部 13 个计划 case 后才生成总收据；收据分离 `planned_pairwise_coverage` 与由实际结果重算的 `executed_pairwise_coverage`，后者不完整直接异常。合同测试 2/2 与语法检查通过。
+- 05:05 冻结发行版全矩阵完成：planned=executed=13，全部因素取值与 106/106 两两值对实际覆盖；6 个红灯、7 个 clean。红灯覆盖上/中/下目标、gate/gate-cell/gate-div、9/13 列、两种约束 owner、额外近/远/单扇出和正逆声明。对 case-001 候选注入生产终态时首次误用 SVG 序号 `0159` 作为逻辑 `e159`，导致伪造 71 个可见碰撞；回读绑定确认真实逻辑边为 `e201`。随后又用四位 Oracle 坐标手工写入精确生产几何，6e-6 端点误差被严格轴判定视作斜线并假报碰撞；改为从终态端口读取未舍入 y 后，候选完整门为 cycle 0→0、交叉点 404→403、事件 1791→1787、折点 276→276、edge-node 0→0、可见新增碰撞 0、异网重叠 0。证明候选有效，也冻结“跨层 edge ID 不可按数字等同、反事实必须使用生产精度端点”两项 Oracle 指标。
+- 05:10 新增公开 CLI 集成失败基线，直接由 pairwise 生成器构造 case-001 并要求单一公共 root、023 空集和统一 29 指标全绿；当前如预期在 57.70s 后因 023 witness 非空失败。生产修复不得只使内部 report 变绿，必须让该公开入口测试和全矩阵共同转绿。
+- 05:16 首版通用整网修复使同一公开 CLI 集成测试转绿且语法通过，但耗时从失败基线 57.70s 增至 147.43s，暂不接受为完成。实现按逻辑 root-port 推断兄弟共享纵干、覆盖 H-V-H 单远端竖段、整图 lane、每侧 5 候选和完整事务门；性能回退来自每轮对全部可见 y 候选做节点可见盒扫描。下一步保留原区间 lanes，仅追加沿目标远离出发方向的有限最近可见 lanes；全图外缘仍由既有 top/bottom 候选覆盖。
+- 05:24 outward lane 收敛为距目标最近 12 条后，集成闭环 99.37s、单布局 58.39s，继续保持绿但仍高；选择报告显示 boundary attempts 从旧 324 增至 744（10 moves），瓶颈是每侧 5 个候选反复进入完整事务，而非 lane 初筛。下一步把每侧支配集收敛为 3 个，并用 6 红/7 clean 全矩阵验证是否仍覆盖；禁止退回单候选，因为旧逃逸正由单候选淘汰全局可行次优路线造成。
+- 05:30 每侧 3 候选后 case-001 公开 CLI + 独立 Oracle + 统一 29 指标继续通过，耗时 94.64s；性能较 5 候选小幅改善且仍保留次优通道。审计搜索器发现 clean case 只跑目标 Oracle、未跑完整质量注册表，违背“所有图执行所有指标”；下一步把统一质量评估提升到每个 case 的无条件步骤，目标 witness 直接从同一完整几何报告取得，避免重复解析和指标选择性执行。
+- 05:34 搜索器现对每个 case 无条件调用统一质量系统，并硬断言 `required_metric_ids == executed_metric_ids`；目标 023 witness 从这份完整几何报告读取，红灯才额外双跑，避免先单指标再全指标的重复解析。语法与 covering-array 合同 2/2 通过；开始在当前候选源码上执行 13 案全矩阵，任何 case 的任一旧指标失败都算失败。
+- 05:51 当前候选全矩阵实际执行 13/13×29 指标，12 clean、case-008 仍红，故不发布。case-008 为 H-V-H 直接 gate 分支；精确生产端点反事实确认目标候选 `e198` 全部门均可接受：cycle 0→0、点 421→417、事件 1817→1799、折点 288→290（满足 +2 折点需至少 -2 点/-3 事件）、edge-node/可见碰撞/异网重叠/端点新增均 0。未采用的原因不是硬门，而是候选生成先按距目标最近 12 条截断，合法的 y=2529.7517 较远而被删。下一步改成所有 outward lane 只做廉价局部评分，再按评分顺序逐条做可见盒筛选，直到每侧取得 3 条；这样不以距离预删结构类，也不对全部 lane 执行昂贵盒扫描。
+- 05:58 全 outward + 3 条支配集仍使 case-008 单图 29 指标红灯。独立排名审计得到 46 条可见 outward 候选，合法 y=2529.7517 的局部词典序排名为第 5；固定 top-3 再次构成 coverage escape。改用有限候选集上的 progressive deepening：每个 side 按局部质量排序，先以廉价严格交叉收益、可见盒、无环等条件筛选，再逐条进入完整事务，找到该 side 第一条全局可接受候选才停止；没有“第 N 条”截断，有限集合耗尽才算无解。
+- 06:04 progressive deepening 首次使 case-008 公开生成后的统一 29 指标全部 PASS，语法通过；但当前实现仍在进入逐条事务前一次性检查该 side 的全部候选可见盒，未利用“首个有效即停”，生成约 120s。把可见盒检查移动到逐条循环内：已接受的 side 不再扫描余下 lanes，安全语义不变，只缩短工作量；随后重跑 case-001/case-008 与全矩阵。
+- 06:10 惰性可见盒后 case-008 仍 clean，单次公开生成 112.10s；剩余回退来自所有 root 分支都计算完整 outward lane 排名。按问题诱因增加扩展资格：只有远端竖段跨越至少两个节点视觉中心行时才搜索目标外侧通道；普通分支继续使用原区间 lanes 与全图 top/bottom 边界。该谓词取自终态几何，不依赖名称、行号、列号或器件类型。
+- 06:15 多视觉行资格门后 case-008 仍由公开 CLI 与独立 023 Oracle 判 clean，单次生成 103.15s；较 112.10s 改善但仍高于历史基线，保留为已知性能成本，后续全量/发布门若超时则继续优化。因源码变化，先前 12 clean/1 red 矩阵全部作废；现在从 case-000 重跑 13×29，只有 planned/executed=13 与 106/106 且 reproductions=[] 才可进入回归阶段。
+- 06:39 最终候选矩阵目标 023 为 13/13 clean、计划/执行 106/106，但全指标审计发现 case-007 的旧 `avoidable_bends` 失败，故整体仍失败。witness 是非根单边 `public_outlier_probe -> public_outlier_probe_clock`：4 折点可降为 2，交叉/重叠不增、长度 2067.4567→2015.4583。根因与本轮相同：最终 single-edge channel owner 也固定只把局部 top-3 送入完整事务；合法候选在前三条被全局硬门拒绝后丢失。该 owner 同样改为按局部序逐条深化、每边首个全局可接受候选即停。搜索总收据也必须把任意非目标指标失败提升为 `quality_failed`，不能再仅按 023 判断 `not_reproduced`。
+- 06:47 对 case-007 的所谓 2 折点候选用生产精度完整后像重查：交叉/折点/长度虽改善，但新增 `e207 -> n93` 可见节点碰撞；生产 final single-edge 报告 70 次尝试、0 move，主要 blocker 为 endpoint/not-dominant，并正确拒绝该候选。Oracle `_candidate_quality` 仍调用 graphic-only `_rect_interior_hit`，与此前 023 的文字盒漏检同源，因此 `avoidable_bends` 是假红灯。撤回 single-edge progressive 扩围，修 Oracle 为 `_visual_rect_interior_hit` 并加专门负向 fixture；全矩阵必须在修正 Oracle 下从零重算。
+- 06:52 可见标签碰撞故障注入已建立稳定红灯：候选竖线不穿 `label_owner` 图形盒、但穿其 `visual_bounds`，旧 `_candidate_quality` 错误返回 `(0, 0, 110.0)` 而非拒绝。下一补丁只统一 Oracle 可见盒语义并恢复 single-edge owner 的原 top-3；测试转绿和 case-007 重验前不接受该指标。
+- 06:57 `_candidate_quality` 已统一改用 `_visual_rect_interior_hit`，专门故障注入 1/1 PASS；同一 case-007 原始终态 SVG 在不重新生成/不修改产物的条件下由修正 Oracle 重验为 29/29 PASS，证明原 `avoidable_bends` 是判定器假阳性。single-edge owner 已精确恢复原 top-3，未保留无自然证据的扩围。下一步给结构搜索收据增加总质量状态合同与 producer 源树绑定，再在最终不变源码上重建正式矩阵收据。
+- 07:01 新增收据状态负向单测：无 023 witness 但 `avoidable_bends` 失败时必须返回 `quality_failed` 并保留 case/指标；当前因 `classify_results` 尚不存在而稳定红灯。实现时同时把 producer `src/** + drawio-lib/**`、Oracle 和指标注册表哈希写入收据，避免结果与生成器/判定器版本失联。
+- 07:06 收据分类合同 3/3 PASS：任何非 023 指标失败优先得到 `quality_failed`/退出 4；只有无任何失败且无复现时才为 `clean_verified`。收据新增 producer Python+XML 树、Oracle 文件和质量注册表 SHA-256。开始对最终不变 producer/Oracle 从零重建 13 案正式矩阵；旧输出只保留诊断，不作最终收据。
+- 14:22 最终不变 producer/Oracle 的正式矩阵收据已落盘并独立回读：`status=clean_verified`，planned/executed=13/13，计划与实测 pairwise 均为 106/106，reproductions/quality_failures/unexpected_quality_failures 全空。逐文件复核 13 份结果，每份 required=executed=29 且 failed=[]。下一步把 case-001 的四折点等价延迟出口与 case-008 的允许 +2 折点强交叉收益两类形态都固化为公开 CLI 集成门；单一代表样例不再冒充算法形态覆盖。
+- 14:26 用户根 `case-generalization`、`agent-quality-workflow`、`proactive-skill-learning` 与 `clock-tree-layout` 已记录本轮五类结构逃逸：计划/实测覆盖分账、不同候选形态具名冻结、可见边界而非图形盒、跨层 ID 显式绑定、生产精度反事实与有限集合渐进深化。四个 skill 均通过 `quick_validate`。项目专题随后同步同一合同，避免只改通用规则而项目执行面仍缺项。
+- 14:28 项目 `clock-layout-algorithms` 已同步相同合同并通过 `quick_validate` 与五件套检查。公开 CLI 参数化回归分别冻结 case-001（等折点延迟出口）和 case-008（+2 折点换强交叉收益），两案均实际生成 SVG、逐案运行完整 29 指标并通过：`2 passed in 256.22s`。
+- 14:28 源码差异反向审计发现独立 `_detached_backbone_descent_witnesses` 仍用 `sorted(shortlisted)[:5]` 截断反事实；这与刚冻结的“固定 top-N 是 coverage escape”合同直接冲突。虽然现有 13 案已绿，收据不能证明第 6 名之后无合法候选，故撤销其最终性；先增加结构反作弊测试使旧 Oracle 红灯，再移除截断并因 Oracle 哈希变化从零重建矩阵。
+- 14:34 固定 top-N 结构测试先红后绿，Oracle 已穷尽有限排序候选。重算到 case-002 后由源码自审主动中止：收据尚未绑定 runner 哈希，且目标 metric 与直接 witness 不一致时可能错误分类 clean；该 3 案批次作废。下一步增加 runner 血缘和 witness/metric 一致性 mutant，修正后再从 case-000 开始。
+- 14:35 runner 血缘与 witness/metric 一致性测试已形成稳定失败基线：结构测试共 6 项，其中既有 3 项通过，新 3 项分别因 `classify_results` 只返回旧三元组和缺少 `evidence_identity` 而失败。实现补丁首次被实时工作记录门正确拒绝，零源码改动；登记该红灯后再修改 runner。
+- 14:37 runner 修正后结构门 6/6 PASS：收据在执行前固定 runner/producer/Oracle/registry 哈希，目标 metric 与直接 witness 任一方向不一致都产生 `quality_failed`。正式矩阵已在该不变版本上从 case-000 重启；发布 workflow 尚未调用新矩阵 runner，必须增加测试先行的调用顺序门，否则本地工具仍可被发布路径遗漏。
+- 14:38 发布调用测试已形成预期红灯：workflow 缺少 `search_structural_trunk_recurrence.py` 命令，测试在 `assertIn` 非零退出。一次测试选择器误写为不存在的复数类名，pytest 报 `not found` 且未计测试证据；改用真实 `FeedbackReproductionGateTest` 后取得上述有效红灯。
+- 14:39 workflow 调用顺序测试补丁后 1/1 PASS，但自审发现 runner 的 `reproduced` 状态仍返回 0；直接作为发布步骤会把复发当成功。当前重算在 case-001 后中止并作废。下一步用显式 `--expect clean|reproduced` 把“搜索到红灯”和“发布必须无红灯”分开，workflow 固定 `--expect clean`。
+- 14:40 期望状态测试取得有效红灯：5 个状态组合均因缺少 `expected_status_exit_code` 失败，另外 7 项既有/发布命令结构测试通过。workflow 命令已先固定 `--expect clean_verified`，但 runner 尚不认识参数，仍不可运行；登记后实现 CLI 与退出码映射。

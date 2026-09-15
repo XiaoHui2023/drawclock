@@ -8542,6 +8542,9 @@ def _route_root_branches_through_boundary_corridors(
         bottom_lane = max(box.bottom for box in boxes) + (
             profile.route_clearance + profile.grid
         )
+        visual_row_values = sorted({
+            (box.top + box.bottom) / 2.0 for box in boxes
+        })
         # Keep the envelope-adjacent lane in the candidate set.  Once another
         # net occupies the first outer grid lane, searching only farther
         # outward makes both stems cross that route.  The inner boundary lane
@@ -8609,6 +8612,46 @@ def _route_root_branches_through_boundary_corridors(
             ]
             for route_index, points in points_by_index.items()
         }
+        # Treat every logical root port as one routable net.  A branch can be
+        # serialized as H-V-H and therefore contain only its remote descent;
+        # recover the shared trunk from vertical tracks repeated by sibling
+        # branches instead of requiring both verticals on every edge.
+        vertical_owners: dict[
+            tuple[str, str], dict[float, set[int]]
+        ] = defaultdict(lambda: defaultdict(set))
+        vertical_spans: dict[tuple[str, str], Counter[float]] = defaultdict(
+            Counter
+        )
+        for route_index, route_points_value in points_by_index.items():
+            route_logical = logical_edges[route_index - 1]
+            anchor = (route_logical.source, route_logical.source_port)
+            for start, end in zip(
+                route_points_value, route_points_value[1:]
+            ):
+                if abs(start[0] - end[0]) > 1e-6:
+                    continue
+                x = round(start[0], 6)
+                vertical_owners[anchor][x].add(route_index)
+                vertical_spans[anchor][x] += abs(end[1] - start[1])
+        anchor_backbones = {}
+        for anchor, owners_by_x in vertical_owners.items():
+            repeated = [
+                x for x, owners in owners_by_x.items() if len(owners) >= 2
+            ]
+            if repeated:
+                anchor_backbones[anchor] = max(
+                    repeated,
+                    key=lambda x: (
+                        len(owners_by_x[x]),
+                        vertical_spans[anchor][x],
+                        -abs(x),
+                    ),
+                )
+        visibility_lane_values = sorted({
+            point[1]
+            for route_points_value in points_by_index.values()
+            for point in route_points_value
+        })
         for index, logical in enumerate(logical_edges, 1):
             if indegree[logical.source] or fanout[logical.source] < 2:
                 continue
@@ -8619,22 +8662,52 @@ def _route_root_branches_through_boundary_corridors(
                 if abs(a[0] - b[0]) <= 1e-6
                 and abs(a[1] - b[1]) > 1e-6
             ]
-            if len(points) < 6 or len(verticals) < 2:
+            if len(points) < 4 or not verticals:
                 continue
-            source_x = verticals[0][0][0]
+            anchor = (logical.source, logical.source_port)
+            source_x = anchor_backbones.get(anchor, verticals[0][0][0])
             target_x = verticals[-1][0][0]
             if abs(source_x - target_x) <= 1e-6:
                 continue
-            departure_y = verticals[0][1][1]
+            source_vertical = next((
+                item for item in verticals
+                if abs(item[0][0] - source_x) <= 1e-6
+            ), None)
+            departure_y = (
+                source_vertical[1][1]
+                if source_vertical is not None else points[0][1]
+            )
             target_y = points[-1][1]
-            local_lane_values = sorted({
-                point[1]
-                for candidate_points in points_by_index.values()
-                for point in candidate_points
+            interval_lane_values = {
+                lane_y for lane_y in visibility_lane_values
                 if (
-                    min(departure_y, target_y) + 1e-6 < point[1]
+                    min(departure_y, target_y) + 1e-6 < lane_y
                     < max(departure_y, target_y) - 1e-6
                 )
+            }
+            remote_start, remote_end = verticals[-1]
+            remote_crossed_rows = sum(
+                min(remote_start[1], remote_end[1]) + 1e-6 < row_y
+                < max(remote_start[1], remote_end[1]) - 1e-6
+                for row_y in visual_row_values
+            )
+            outward_lane_values = (
+                sorted(
+                    (
+                        lane_y for lane_y in visibility_lane_values
+                        if (
+                            lane_y > target_y + 1e-6
+                            if target_y > departure_y
+                            else lane_y < target_y - 1e-6
+                        )
+                    ),
+                    key=lambda lane_y: abs(lane_y - target_y),
+                )
+                if remote_crossed_rows >= 2 else []
+            )
+            local_lane_values = sorted({
+                *interval_lane_values,
+                *outward_lane_values,
             })
             lane_candidates = (
                 ("top", top_inner_lane),
@@ -8688,12 +8761,9 @@ def _route_root_branches_through_boundary_corridors(
                 for other in other_segments
                 if (point := crossing_point(segment, other)) is not None
             }
-            best_by_side: dict[str, tuple[tuple[Any, ...], float]] = {}
-            mandatory_lanes = {
-                "top": {top_inner_lane, top_lane},
-                "bottom": {bottom_inner_lane, bottom_lane},
-            }
-            admissible_mandatory: dict[str, set[float]] = defaultdict(set)
+            shortlisted_by_side: dict[
+                str, list[tuple[tuple[Any, ...], float]]
+            ] = defaultdict(list)
             for side, lane_y in lane_candidates:
                 local_points = _simplify([
                     points[0],
@@ -8726,8 +8796,11 @@ def _route_root_branches_through_boundary_corridors(
                 }
                 if (
                     local_overlaps > before_overlaps
-                    or len(local_crossing_points) > len(before_crossing_points)
-                    or local_crossings > before_crossings
+                    or (
+                        len(local_crossing_points), local_crossings
+                    ) >= (
+                        len(before_crossing_points), before_crossings
+                    )
                 ):
                     continue
                 inner_lane = (
@@ -8747,29 +8820,60 @@ def _route_root_branches_through_boundary_corridors(
                     abs(lane_y - inner_lane),
                     lane_y,
                 )
-                if (
-                    side not in best_by_side
-                    or local_score < best_by_side[side][0]
-                ):
-                    best_by_side[side] = (local_score, lane_y)
-                if lane_y in mandatory_lanes.get(side, set()):
-                    admissible_mandatory[side].add(lane_y)
+                shortlisted_by_side[side].append((local_score, lane_y))
 
-            selected_lanes = {
-                side: {
-                    *admissible_mandatory.get(side, set()),
-                    *(
-                        (best_by_side[side][1],)
-                        if side in best_by_side else ()
-                    ),
-                }
-                for side in ("top", "bottom", "local")
-            }
+            endpoint_ids = {edge.source_id, edge.target_id}
+
+            def lane_is_visible_clear(lane_y: float) -> bool:
+                candidate_points = _simplify([
+                    points[0],
+                    (source_x, points[0][1]),
+                    (source_x, lane_y),
+                    (target_x, lane_y),
+                    (target_x, points[-1][1]),
+                    points[-1],
+                ])
+                return not any(
+                    _segment_hits_rect(
+                        start,
+                        end,
+                        (
+                            visible_box.left,
+                            visible_box.top,
+                            visible_box.right,
+                            visible_box.bottom,
+                        ),
+                    )
+                    for start, end in zip(
+                        candidate_points, candidate_points[1:]
+                    )
+                    for vertex in accepted.vertices
+                    if vertex.cell_id not in endpoint_ids
+                    for visible_box in (vertex_visual_box(vertex),)
+                )
+
+            selected_lanes: dict[str, list[float]] = {}
+            for side in ("top", "bottom", "local"):
+                selected = []
+                seen_lanes: set[float] = set()
+                for _score, lane_y in sorted(
+                    shortlisted_by_side.get(side, ())
+                ):
+                    if lane_y in seen_lanes:
+                        continue
+                    seen_lanes.add(lane_y)
+                    selected.append(lane_y)
+                selected_lanes[side] = selected
+            accepted_sides: set[str] = set()
             for side, lane_y in (
                 (side, lane_y)
                 for side in ("top", "bottom", "local")
-                for lane_y in sorted(selected_lanes[side])
+                for lane_y in selected_lanes[side]
             ):
+                if side in accepted_sides:
+                    continue
+                if not lane_is_visible_clear(lane_y):
+                    continue
                 attempts += 1
                 candidate = _clone_layout_geometry(accepted)
                 candidate_edge = next(
@@ -8804,6 +8908,16 @@ def _route_root_branches_through_boundary_corridors(
                 new_endpoint = _route_endpoint_signature(
                     candidate, logical_edges, {index}, profile.route_clearance
                 )
+                bend_delta = (
+                    report["bends_total"] - accepted_report["bends_total"]
+                )
+                crossing_point_gain = (
+                    accepted_report["distinct_crossing_points"]
+                    - report["distinct_crossing_points"]
+                )
+                crossing_event_gain = (
+                    accepted_report["crossings"] - report["crossings"]
+                )
                 checks = {
                     "node-overlap": report["node_overlaps"] <= accepted_report["node_overlaps"],
                     "edge-node": report["edge_node_intersections"] <= accepted_report["edge_node_intersections"],
@@ -8818,7 +8932,14 @@ def _route_root_branches_through_boundary_corridors(
                     "different-net-overlap": (
                         candidate_final_overlap <= accepted_final_overlap
                     ),
-                    "bend": report["bends_total"] <= accepted_report["bends_total"],
+                    "bend": (
+                        bend_delta <= 0
+                        or (
+                            bend_delta <= 2
+                            and crossing_point_gain >= 2
+                            and crossing_event_gain >= 3
+                        )
+                    ),
                     "crossing": (
                         report["distinct_crossing_points"], report["crossings"]
                     ) < (
@@ -8839,6 +8960,7 @@ def _route_root_branches_through_boundary_corridors(
                 )
                 if best is None or key < best[0]:
                     best = (key, candidate, report)
+                accepted_sides.add(side)
         if best is None:
             break
         previous_crossings = accepted_report["crossings"]

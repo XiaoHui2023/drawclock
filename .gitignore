@@ -40,10 +40,14 @@ __pycache__/
 !.reproduction/fix-evidence/20260910T152557Z-0e313a24/**
 !.reproduction/fix-evidence/20260914T104230Z-c6a501e6/
 !.reproduction/fix-evidence/20260914T104230Z-c6a501e6/**
+!.reproduction/fix-evidence/20260915T065641Z-4f5cedfd/
+!.reproduction/fix-evidence/20260915T065641Z-4f5cedfd/**
 !.reproduction/recursive-evidence/
 .reproduction/recursive-evidence/*
 !.reproduction/recursive-evidence/20260914T110916Z-5d38f1ac/
 !.reproduction/recursive-evidence/20260914T110916Z-5d38f1ac/**
+!.reproduction/recursive-evidence/20260915T070216Z-e2dbf9c2/
+!.reproduction/recursive-evidence/20260915T070216Z-e2dbf9c2/**
 .mypy_cache/
 .ruff_cache/
 dist/

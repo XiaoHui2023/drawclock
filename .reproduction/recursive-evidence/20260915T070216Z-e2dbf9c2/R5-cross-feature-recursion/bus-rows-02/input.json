@@ -1,0 +1,65 @@
+{
+  "shared_root": {
+    "kind": "from"
+  },
+  "public_0": {
+    "kind": "gate",
+    "source": "shared_root"
+  },
+  "private_0": {
+    "kind": "from"
+  },
+  "private_0_0": {
+    "kind": "gate",
+    "source": "private_0"
+  },
+  "merge_0": {
+    "kind": "mux2",
+    "source": {
+      "0": "public_0",
+      "1": "private_0_0"
+    }
+  },
+  "clock_0": {
+    "kind": "clock",
+    "source": "merge_0"
+  },
+  "public_1": {
+    "kind": "cell",
+    "source": "shared_root"
+  },
+  "private_1": {
+    "kind": "from"
+  },
+  "private_1_0": {
+    "kind": "gate",
+    "source": "private_1"
+  },
+  "private_1_1": {
+    "kind": "div",
+    "source": "private_1_0"
+  },
+  "merge_1": {
+    "kind": "mux2",
+    "source": {
+      "0": "public_1",
+      "1": "private_1_1"
+    }
+  },
+  "post_1_0": {
+    "kind": "gate",
+    "source": "merge_1"
+  },
+  "clock_1": {
+    "kind": "clock",
+    "source": "post_1_0"
+  },
+  "shared_extra": {
+    "kind": "gate",
+    "source": "shared_root"
+  },
+  "shared_extra_clock": {
+    "kind": "clock",
+    "source": "shared_extra"
+  }
+}

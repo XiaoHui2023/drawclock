@@ -48,6 +48,31 @@ def test_geometry_predicates_separate_cross_touch_and_overlap() -> None:
     assert oracle.collinear_overlap((0, 5), (10, 5), (4, 6), (12, 6)) == 0
 
 
+def test_candidate_quality_rejects_visible_label_collision_outside_graphic_box() -> None:
+    route = oracle.Route(
+        1,
+        [(0.0, 0.0), (45.0, 0.0), (45.0, 10.0), (100.0, 10.0)],
+        source="source",
+        target="target",
+    )
+    boxes = [
+        oracle.Box("source", -10.0, -5.0, 10.0, 10.0),
+        oracle.Box("target", 100.0, 5.0, 10.0, 10.0),
+        oracle.Box(
+            "label_owner",
+            40.0,
+            30.0,
+            10.0,
+            10.0,
+            visible_x=40.0,
+            visible_y=0.0,
+            visible_w=10.0,
+            visible_h=20.0,
+        ),
+    ]
+    assert oracle._candidate_quality(route.points, route, [route], boxes) is None
+
+
 def test_crossing_predicate_is_translation_and_argument_order_invariant() -> None:
     horizontal = ((0, 5), (10, 5))
     vertical = ((4, 0), (4, 10))
@@ -974,6 +999,73 @@ def test_current_cli_closes_premature_interior_trunk_entry(
     assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
     assert "FB-ROUTE-023" not in report["detected_issues"]
     receipt = tmp_path / "premature-entry-quality.json"
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "svg_quality_system.py"),
+         "--input", str(input_path), "--svg", str(output),
+         "--registry", str(ROOT / "tests" / "quality-metrics.json"),
+         "--output", str(receipt)],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    quality = json.loads(receipt.read_text(encoding="utf-8"))
+    assert quality["required_metric_ids"] == quality["executed_metric_ids"]
+    assert len(quality["executed_metric_ids"]) == 29
+    assert quality["failed_metric_ids"] == []
+
+
+@pytest.mark.parametrize(
+    ("case_index", "expected_factors"),
+    [
+        (1, {
+            "target_band": "last",
+            "public_chain": "gate-cell",
+            "outlier_column": 13,
+            "outlier_constraint": "descendant",
+            "outlier_fanout": "extra-near",
+            "declaration_order": "forward",
+        }),
+        (8, {
+            "target_band": "last",
+            "public_chain": "gate",
+            "outlier_column": 9,
+            "outlier_constraint": "gate-and-descendant",
+            "outlier_fanout": "extra-near",
+            "declaration_order": "forward",
+        }),
+    ],
+)
+def test_current_cli_closes_pairwise_structural_trunk_recurrence(
+    tmp_path: Path,
+    case_index: int,
+    expected_factors: dict[str, object],
+) -> None:
+    search_path = ROOT / "tools" / "search_structural_trunk_recurrence.py"
+    spec = importlib.util.spec_from_file_location(
+        "structural_trunk_recurrence_builder", search_path
+    )
+    assert spec is not None and spec.loader is not None
+    search = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(search)
+    factors = search.factor_cases()[case_index]
+    config, root, outlier = search.build_case(factors)
+    assert factors == expected_factors
+    input_path = tmp_path / "pairwise-structural-trunk.json"
+    input_path.write_text(
+        json.dumps(config, indent=2) + "\n", encoding="utf-8"
+    )
+    output = tmp_path / "pairwise-structural-trunk.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "arc"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["roots"][root]["rendered_copies"] == 1
+    assert outlier in config
+    assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
+    assert "FB-ROUTE-023" not in report["detected_issues"]
+    receipt = tmp_path / "pairwise-structural-trunk-quality.json"
     completed = subprocess.run(
         [sys.executable, str(ROOT / "tools" / "svg_quality_system.py"),
          "--input", str(input_path), "--svg", str(output),

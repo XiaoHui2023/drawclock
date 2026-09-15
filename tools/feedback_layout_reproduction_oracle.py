@@ -826,7 +826,7 @@ def _candidate_quality(
         ):
             return None
     if any(
-        _rect_interior_hit(a, b, box)
+        _visual_rect_interior_hit(a, b, box)
         for a, b in zip(candidate, candidate[1:])
         for box in boxes
         if box.node not in {route.source, route.target}
@@ -2745,7 +2745,7 @@ def _route_hits_unrelated_box(
                 continue
             if box_index == target_index and segment_index == last_segment:
                 continue
-            if _rect_interior_hit(a, b, box):
+            if _visual_rect_interior_hit(a, b, box):
                 return True
     return False
 
@@ -3346,6 +3346,205 @@ def _premature_lateral_departure_witnesses(
     return witnesses
 
 
+def _detached_backbone_descent_witnesses(
+    roots: set[str], routes: list[Route], boxes: list[Box]
+) -> list[dict[str, Any]]:
+    """Detect a branch whose sole vertical is detached from its shared trunk.
+
+    A serialized branch may be only H-V-H: its remote descent is the only
+    vertical on that edge, while the common backbone is visible on sibling
+    routes.  Infer that backbone from repeated vertical x coordinates across
+    the source net, then compare the outlier with every later visible row.
+    """
+    grouped: dict[tuple[str, str], list[Route]] = defaultdict(list)
+    for route in routes:
+        if route.source in roots:
+            grouped[(route.source, route.source_port)].append(route)
+    before_crossings, before_overlaps = route_crossings(routes)
+    before_points = _distinct_crossing_count(before_crossings)
+    witnesses: list[dict[str, Any]] = []
+    for (root, source_port), members in sorted(grouped.items()):
+        if len(members) < 4:
+            continue
+        x_routes: dict[float, set[int]] = defaultdict(set)
+        x_span: Counter[float] = Counter()
+        for member in members:
+            for start, end in segments(member):
+                if abs(start[0] - end[0]) > EPS:
+                    continue
+                x = round(start[0], 4)
+                x_routes[x].add(member.index)
+                x_span[x] += abs(end[1] - start[1])
+        repeated = [x for x, owners in x_routes.items() if len(owners) >= 2]
+        if not repeated:
+            continue
+        backbone_x = max(
+            repeated,
+            key=lambda x: (len(x_routes[x]), x_span[x], -abs(x)),
+        )
+        target_rows = sorted({round(member.points[-1][1], 4) for member in members})
+        visual_rows = sorted({
+            *(round(item.points[-1][1], 4) for item in routes),
+            *(round(box.cy, 4) for box in boxes),
+        })
+        top_lane = min(box.visual_bounds[1] for box in boxes) - 24.0
+        bottom_lane = max(box.visual_bounds[3] for box in boxes) + 24.0
+        all_visible_rows = {
+            *target_rows,
+            *(round(point[1], 4) for item in routes for point in item.points),
+            round(top_lane, 4),
+            round(bottom_lane, 4),
+        }
+        for route in members:
+            remote_segments = [
+                (start, end)
+                for start, end in segments(route)
+                if (
+                    abs(start[0] - end[0]) <= EPS
+                    and abs(start[0] - backbone_x) > EPS
+                )
+            ]
+            if not remote_segments:
+                continue
+            remote_start, remote_end = max(
+                remote_segments,
+                key=lambda item: abs(item[1][1] - item[0][1]),
+            )
+            crossed_rows = [
+                row for row in visual_rows
+                if min(remote_start[1], remote_end[1]) + EPS < row
+                < max(remote_start[1], remote_end[1]) - EPS
+            ]
+            if len(crossed_rows) < 2:
+                continue
+            target_y = route.points[-1][1]
+            departure_y = remote_start[1]
+            lanes = [
+                row for row in all_visible_rows
+                if (
+                    (
+                        min(departure_y, target_y) + EPS < row
+                        < max(departure_y, target_y) - EPS
+                    )
+                    or (target_y > departure_y and row > target_y + EPS)
+                    or (target_y < departure_y and row < target_y - EPS)
+                )
+            ]
+            source_index = _endpoint_box_index(
+                route.points[0], route.source, boxes
+            )
+            target_index = _endpoint_box_index(
+                route.points[-1], route.target, boxes
+            )
+            old_bends = max(0, len(route.points) - 2)
+            old_length = _route_length(route)
+            old_local = _route_interactions(route, routes)
+            shortlisted = []
+            for lane_y in sorted(set(lanes)):
+                candidate = _copy_route(route, [
+                    route.points[0],
+                    (backbone_x, route.points[0][1]),
+                    (backbone_x, lane_y),
+                    (remote_start[0], lane_y),
+                    (remote_start[0], target_y),
+                    route.points[-1],
+                ])
+                if (
+                    len(candidate.points) - 2 > old_bends + 2
+                    or _route_hits_unrelated_box(
+                        candidate, boxes, source_index, target_index
+                    )
+                ):
+                    continue
+                candidate_routes = [
+                    candidate if item.index == route.index else item
+                    for item in routes
+                ]
+                candidate_net = [
+                    item for item in candidate_routes
+                    if (item.source, item.source_port) == (root, source_port)
+                ]
+                if _same_net_cycle(candidate_net):
+                    continue
+                after_local = _route_interactions(candidate, routes)
+                if not (
+                    after_local[0] <= old_local[0]
+                    and after_local[1] < old_local[1]
+                    and after_local[2] <= old_local[2]
+                ):
+                    continue
+                shortlisted.append((
+                    (
+                        after_local[0],
+                        after_local[1],
+                        after_local[2],
+                        max(0, len(candidate.points) - 2),
+                        _route_length(candidate),
+                        abs(lane_y - target_y),
+                    ),
+                    candidate,
+                    after_local,
+                    lane_y,
+                ))
+            best = None
+            for _, candidate, after_local, lane_y in sorted(shortlisted):
+                candidate_routes = [
+                    candidate if item.index == route.index else item
+                    for item in routes
+                ]
+                after_crossings, after_overlaps = route_crossings(candidate_routes)
+                after_points = _distinct_crossing_count(after_crossings)
+                if not (
+                    after_points < before_points
+                    and len(after_crossings) < len(before_crossings)
+                    and len(after_overlaps) <= len(before_overlaps)
+                ):
+                    continue
+                candidate_bends = max(0, len(candidate.points) - 2)
+                if candidate_bends > old_bends and not (
+                    before_points - after_points >= 2
+                    and len(before_crossings) - len(after_crossings) >= 3
+                ):
+                    continue
+                key = (
+                    after_points,
+                    len(after_crossings),
+                    len(after_overlaps),
+                    candidate_bends,
+                    _route_length(candidate),
+                    abs(lane_y - target_y),
+                )
+                if best is None or key < best[0]:
+                    best = (key, candidate, after_local, lane_y)
+            if best is None:
+                continue
+            _, candidate, after_local, lane_y = best
+            witnesses.append({
+                "root": root,
+                "source_port": source_port,
+                "edge_id": route.edge_id,
+                "target": route.target,
+                "backbone_x": round(backbone_x, 4),
+                "premature_departure_y": round(departure_y, 4),
+                "preferred_departure_y": round(lane_y, 4),
+                "remote_vertical_x": round(remote_start[0], 4),
+                "remote_vertical_span_px": round(
+                    abs(remote_end[1] - remote_start[1]), 4
+                ),
+                "crossed_target_rows": crossed_rows,
+                "global_crossing_points_before": before_points,
+                "global_crossing_points_after": best[0][0],
+                "global_crossing_events_before": len(before_crossings),
+                "global_crossing_events_after": best[0][1],
+                "local_crossing_events_before": old_local[1],
+                "local_crossing_events_after": after_local[1],
+                "bends_before": old_bends,
+                "bends_after": max(0, len(candidate.points) - 2),
+                "candidate_points": [list(point) for point in candidate.points],
+            })
+    return witnesses
+
+
 def _physical_anchor_relocation_witnesses(
     roots: set[str], routes: list[Route], boxes: list[Box]
 ) -> list[dict[str, Any]]:
@@ -3791,6 +3990,7 @@ def analyze(input_path: Path, svg_path: Path) -> dict[str, Any]:
     premature_interior_trunk_entry_witnesses = [
         *_premature_interior_trunk_entry_witnesses(roots, routes, boxes),
         *_premature_lateral_departure_witnesses(roots, routes, boxes),
+        *_detached_backbone_descent_witnesses(roots, routes, boxes),
     ]
     physical_anchor_relocation_witnesses = (
         _physical_anchor_relocation_witnesses(roots, routes, boxes)

@@ -2012,7 +2012,7 @@
             "summary": "公共根总线在中部过早进入行间并向下贯穿造成大量交叉",
             "expected": "跨越多行的同源公共主干应比较整体边界走廊与内部入口候选；若沿外侧到目标消费带再分支能保持硬门并严格减少异网交叉或折点，则中部提前进入行间的路线必须被拒绝",
             "actual": "用户观察到公共 from 本可先沿总线到最下面并绕整体连接，却在中部突然分叉进入两行之间，再向下走线，造成大量交叉和跨线",
-            "status": "fixed_verified",
+      "status": "fixed_verified",
             "owner_paths": [
                 "src/**"
             ],
@@ -2078,7 +2078,18 @@
             },
             "reproduction_proves": "冻结公开 CLI 的公共根物理主干存在被边界走廊反事实严格支配的过早内部入口，并直接量化减少的交叉/折点",
             "reproduction_does_not_prove": "所有公共根必须无条件走画布最外边界，或允许用更长边界路线交换更高优先级质量退化",
-            "reproduction_attempts": [
+      "reproduction_attempts": [
+        {
+          "attempted_at": "2026-09-15T04:35:00+08:00",
+          "hypothesis": "公共链深度、远后排列轴、约束 owner、额外扇出和声明顺序的交互会暴露冻结发行版仍存在的提前横穿后纵降。",
+          "method": "冻结发布提交 9deb186，按确定性 pairwise 结构矩阵从公开 CLI 自然生成；强制绑定全部逻辑边，以器件和文字完整可见盒检查候选可行性，并对命中输入双跑与统一质量注册表复核。",
+          "result": "reproduced",
+          "observed": "case-001 两次 SVG SHA-256 均为 b2148bd6201762edfd29d3265218dfeece5691017961963136462846c7bb2374。公共 from 边 svg-edge-0159 在 y=3152.5428 提前离开 x=416.36 主干，到 x=1101.86 后纵穿 8 个视觉行；延迟到 y=3368.5387 后全局交叉事件 1791→1787、交叉点 404→403、局部事件 18→14、折点 4→4。",
+          "analysis": "先前固定 corpus 未覆盖 target=last × gate-cell × descendant-only constraint × extra-near fanout 的结构交互；旧候选又因遗漏文字盒而是假红灯。本次 witness 已通过完整可见盒和双跑确定性门。",
+          "why_not_reproduced": "",
+          "evidence": ".reproduction/structural-trunk-recurrence-20260915-pairwise-full/case-001/input.json; .reproduction/structural-trunk-recurrence-20260915-pairwise-full/case-001/run-1.svg; .reproduction/structural-trunk-recurrence-20260915-pairwise-full/case-001/run-2.svg; .reproduction/structural-trunk-recurrence-20260915-pairwise-full/reproduction-receipt.json",
+          "next_condition": "当前版完成计划与实际 106/106 成对覆盖、13/13 个公开 CLI 用例及逐例 29/29 全指标后，刷新全部历史反馈双跑与发行闭环。"
+        },
                 {
                     "attempted_at": "2026-09-09T14:40:00+08:00",
                     "hypothesis": "路由器只优化单边或局部源侧干线，没有把完整公共网络的入口位置作为一个事务比较。",
@@ -2123,8 +2134,8 @@
                     "evidence": "tools/search_boundary_trunk_recurrence.py; tests/test_feedback_layout_oracle.py::test_boundary_corridor_survives_late_local_outer_detour_owner; .reproduction/scratch/fb-route-023-reset/post-fix-search/first-failure.json; .reproduction/scratch/fb-route-023-reset/post-fix-search-epoch-2/first-failure.json",
                     "next_condition": "保持最终外缘 owner、跨 alias 纯环门和统一终态精度；用覆盖方向、交互 exact-set 与全指标执行取代固定轮数。"
                 },
-                {
-                    "attempted_at": "2026-09-14T19:08:00+08:00",
+        {
+          "attempted_at": "2026-09-14T19:08:00+08:00",
                     "hypothesis": "后排错列外部目标、跨行障碍织网、额外消费者和不同链深的高阶交互会暴露公共主干过早横穿；修复必须允许沿既有纵干延迟到目标邻域通道。",
                     "method": "冻结 c21e734 公开 CLI 对 154 节点合法输入双跑，自终态 SVG 重建逐边方向/交叉并取得 lateral-departure witness；当前实现随后执行 14 轴值覆盖、全部适用 pairwise、指定高风险 triples、具名历史逃逸和六个最终几何方向的 coverage v3。",
                     "result": "reproduced",
@@ -2132,16 +2143,27 @@
                     "analysis": "旧门以 seed/轮数代理覆盖且 Oracle 只比较画布最外廊，遗漏了沿既有主干继续到目标邻域的通道。通用修复位于最终 root-corridor owner，以硬几何不退化和整图交叉严格下降选择 local/top/bottom 候选；没有器件名、固定坐标、行数或 MUX 特判。",
                     "why_not_reproduced": "",
                     "evidence": ".reproduction/coverage-driven-boundary/anchor-lower-24; .reproduction/coverage-driven-boundary/current-clean-final-v3/coverage-receipt.json; .reproduction/fix-receipts/FB-ROUTE-023.json",
-                    "next_condition": "保留 coverage exact-set 与全 29 指标为每次发布前置；新增诱因只扩展 required 集，不以增加轮数替代。"
-                }
+          "next_condition": "保留 coverage exact-set 与全 29 指标为每次发布前置；新增诱因只扩展 required 集，不以增加轮数替代。"
+        },
+        {
+          "attempted_at": "2026-09-15T00:00:00+08:00",
+          "hypothesis": "固定输入轴覆盖遗漏了结构消费端、整网共享路径、任意可见通道与最终 owner 序列，因此已发布版本仍可生成公共主干提前横穿后纵穿多行的同类错误。",
+          "method": "接受用户终态否定并冻结当前发布提交；撤销旧完成声明，恢复公开入口自然复现门，生产 src/** 尚未修改。",
+          "result": "reproduction_blocked",
+          "observed": "冻结发布版公开 CLI 双跑 SVG 哈希均为 C20146A78FF1EF6F32BA1F470E7300E763C766572652287F31323949D67549EF；公共 from 边在 x=416.36 主干提前横移至 x=1618.52 后纵穿 20 个整图视觉行。反事实使全图交叉点 450→447、事件 1453→1443、局部事件 52→42，折点 4→4、异网重叠 0→0。",
+          "analysis": "旧覆盖只建模输入轴与同源目标行，遗漏整图视觉行、H-V-H/多竖段结构、结构消费端和 owner 序列；快速 Oracle 还曾因未绑定逻辑边产生假 clean，现已由绑定完整性硬门阻止。",
+          "why_not_reproduced": "候选新增 1 个文字可见盒碰撞；独立 Oracle 只检查 graphic bbox，反事实不满足完整可见几何硬门，原 reproduced 结论已撤销。",
+          "evidence": ".reproduction/natural-recurrence-20260915/run-1.svg; .reproduction/natural-recurrence-20260915/run-2.svg; .reproduction/natural-recurrence-20260915/oracle-1.json; .reproduction/natural-recurrence-20260915/oracle-2.json",
+          "next_condition": "Oracle 改用 visual_bounds 后重新取得同输入双跑一致、且节点与文字可见盒碰撞均不增加的自然红灯，才可重新推进 reproduced。"
+        }
             ],
             "strict_reproduction": {
-                "verified_at": "2026-09-09T20:25:00+08:00",
+      "verified_at": "2026-09-15T15:03:00+08:00",
                 "variants": [
                     "premature-interior-trunk-entry"
                 ],
-                "case": "premature-interior-trunk-entry",
-                "baseline_sha256": "0754A64690E632C2564E60C651FC6B4B7978BFA0B00AFADF9763D041D1493271",
+      "case": "structural-trunk-recurrence-pairwise-case-001",
+      "baseline_sha256": "b2148bd6201762edfd29d3265218dfeece5691017961963136462846c7bb2374",
                 "runs": 2,
                 "witness": "from root interior descent 51→22 crossing events; 25→6 visible points; bends and overlaps nonworse"
             },
@@ -2150,8 +2172,8 @@
                 "baseline_fails": true,
                 "current_passes": true,
                 "receipt": ".reproduction/fix-receipts/FB-ROUTE-023.json",
-                "verification_group": "20260914T104230Z-c6a501e6",
-                "evidence": "Frozen public CLI reproduces the original and lower external misaligned-target forms; the current public CLI passes the independent issue Oracle twice, all 29 artifact metrics, the 843-unit coverage exact-set, and all six required final-geometry directions without recurrence.",
+      "verification_group": "20260915T065641Z-4f5cedfd",
+      "evidence": "Frozen public CLI reproduces the detached H-V-H public-root branch with a remote descent across eight visual rows. The current public CLI passes the independent issue Oracle twice, all 29 artifact metrics for every one of 13 structural cases, and the planned and executed 106/106 pairwise coverage without recurrence.",
                 "release_verification": {
                     "commit": "e5891275b7a0190c089a8ef75bb27d649863b2a7",
                     "run_id": 34843285835,
