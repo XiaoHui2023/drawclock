@@ -1,8 +1,8 @@
 # 用户反馈自然复现与防假完成门禁
 
-- status: active
+- status: done
 - created: 2026-09-03 13:32 +08:00
-- updated: 2026-09-16 17:50 +08:00
+- updated: 2026-09-16 19:05 +08:00
 
 ## 2026-09-16：发布版再次复发，撤销上一轮完成授权
 
@@ -2046,3 +2046,5 @@
 - 17:41 新验证组及当前复现/覆盖证据已精确暂存，release phase 回到 19/19 PASS；先前仅失败的项目 release 测试也单独转绿。为用户可见证据，已从 R6 首次自主命中的同一 seed-018 输入分别渲染修复前后 SVG，并用浏览器 `object-fit: contain` 包装生成完整 1600×1726 PNG；两张图已由原生图像查看器实际打开，避免把存在性当可见性。独立 Oracle 在修复前稳定报告唯一 `FB-ROUTE-023` witness（y=533.9934 提前横穿，建议 y=341.0014），修复后 witness 为空；统一 29 指标另行 PASS。下一步生成聚焦对照、运行全 SVG/发行门并发布回读。
 - 17:46 同一前后 SVG 已增加 1600×1200 聚焦可见图并由原生查看器实际打开；完整图与聚焦图均来自公开 CLI 制品，不修改线路。`check_all_svg_quality.py` 随后从输入重建全部公开图并明确通过 27/27，每图执行同一完整 29 指标。已完整加载 GitHub upload/release、Python rolling release、CI 值守、最终归档表面与 frozen release 六层门；下一步生成绑定当前 revision 的 delivery-ready 回执、构建最小归档并做本地解包消费。
 - 17:50 Windows 冻结构建成功：PyInstaller 6.22.3 / Python 3.11.9 产出 `drawclock.exe` 与 `drawclock-1.0.0-windows.zip`。项目归档检查和用户根通用 archive-surface 检查均 PASS；最终 ZIP SHA-256 `dc4963630a06555ecbe3f81e6b25c5cf2214807ec3eef088252c209c15ed7da6`，29 个文件，仅含 exe、`doc/`、`example/`、平铺 `libraries/*.xml`，许可附件 0。全新 GUID 临时目录解压后清空 PATH，用包内 exe 从包内示例和器件库生成 SVG，组件 10、边 9、无浏览器专属标签和文件名标题。`origin/main` fetch 后与本机 0 ahead/0 behind；敏感文件名当前跟踪与历史查询均为空。下一步完成 staged 密钥/跨仓/产物审计并由受管 hook 签发当前 prospective tree 的 delivery-ready。
+- 19:02 产品提交 `0855115ac90c780fc9af532f9bf625252d9e1234` 已推送。Release run `35081729425` 三个作业全部 `completed/success`：反馈覆盖门 65 分 41 秒、Ubuntu 16.04 PyInstaller/staticx 2 分 23 秒、publish/公开回下载 smoke 58 秒。`v1.0.0^{}` 已指向产品提交；公网下载资产 17,038,576 bytes、SHA-256 `17b5e490ec1d3aa7de33bd587c0bb77ae9ff5f265ef2607209c0548593cff199`，29 文件、license-like=0，两套归档门通过。匿名 API 轮询曾达到 GitHub rate limit，已按上限停止并降级为网页状态与 `ls-remote`；额度恢复后单次 API 回读取得最终 job 结论，不影响发布。023 现写回 closed；下一步提交本状态并再次值守滚动发布，使 tag 对齐最终状态提交。
+- 19:05 状态回写后的定向复验第一次误填不存在的 `tests/test_user_feedback_reproduction.py`，pytest 可验证报错 `file or directory not found` 且 0 项运行；未把该次当作通过。回读真实类/用例名后，账本结构、hash-bound release receipt、用户根多案例证据三项定向测试为 `3 passed`，项目 release phase 仍为 19/19 PASS。该失误只影响测试命令入口，不影响源码、证据或已发布构件。

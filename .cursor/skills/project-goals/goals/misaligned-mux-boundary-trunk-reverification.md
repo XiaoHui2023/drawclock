@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-09-16
 
@@ -17,6 +17,7 @@
 
 ## 当前证据
 
+- success: 提交 `0855115ac90c780fc9af532f9bf625252d9e1234` 已推送；Release run `35081729425` 的覆盖穷尽、结构矩阵、R1–R7、27 张全图、反馈门、Ubuntu 16.04 PyInstaller/staticx、解包 frozen/librsvg、publish 和公开资产回下载 smoke 全部 `completed/success`。`v1.0.0^{}` 与该提交一致；公开 Linux 资产 17,038,576 bytes、29 个文件、SHA-256 `17b5e490ec1d3aa7de33bd587c0bb77ae9ff5f265ef2607209c0548593cff199`，两套归档检查器均通过且 license-like=0。
 - failure: 2026-09-16 用户确认当前发布程序仍存在相同错误。此前 `f222dcdf`、Release run `34953190538`、13 案结构矩阵和 29 项统一指标的完成授权全部撤销；分类为 `oracle_escape + coverage_escape + ownership_escape + claim_escape`。生产 `src/**` 保持冻结，直到当前发布版经正常公开入口双跑自然红灯，且新 Oracle 能拒绝该漏放制品。
 
 - success: 提交 `9ab3939a762f83295f7c449afea373203819c0be` 已推送；Release run `34945409769` 的旧覆盖、新结构矩阵、R1–R7、27 张全图、反馈门、Ubuntu 16.04 PyInstaller/staticx、解包 frozen/librsvg、发布与公开回下载 smoke 全部 success。`v1.0.0^{}` 与该提交一致；公开 Linux 资产 17,038,409 bytes、34 项，SHA-256 `9c99598fd3f424a4bd4367a83bcfa77cb298f93f5e2855bd796197affc5837a5` 与 API digest 一致，license-like=0。

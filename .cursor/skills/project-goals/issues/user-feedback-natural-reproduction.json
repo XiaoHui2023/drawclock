@@ -2012,7 +2012,7 @@
             "summary": "公共根总线在中部过早进入行间并向下贯穿造成大量交叉",
             "expected": "跨越多行的同源公共主干应比较整体边界走廊与内部入口候选；若沿外侧到目标消费带再分支能保持硬门并严格减少异网交叉或折点，则中部提前进入行间的路线必须被拒绝",
             "actual": "用户在 2026-09-16 再次确认当前发布程序仍会让公共 from 过早离开共享纵向主干，随后在后排目标前纵向贯穿多行，造成大量交叉；此前 clean、发布与完成声明全部作废",
-            "status": "fixed_verified",
+            "status": "closed",
             "owner_paths": [
                 "src/**"
             ],
@@ -2184,7 +2184,13 @@
         "current_passes": true,
         "receipt": ".reproduction/fix-receipts/FB-ROUTE-023.json",
         "verification_group": "20260916T082756Z-b50fa7a1",
-        "evidence": "The current public CLI passes the independent FB-ROUTE-023 Oracle twice with deterministic artifacts. The final 34-case coverage matrix closes 979/979 units, the 13-case structural matrix closes planned and executed 106/106 pairwise coverage, and the restarted R1-R7 campaign is clean including the formerly failing boundary-offset-seed-018."
+        "evidence": "The current public CLI passes the independent FB-ROUTE-023 Oracle twice with deterministic artifacts. The final 34-case coverage matrix closes 979/979 units, the 13-case structural matrix closes planned and executed 106/106 pairwise coverage, and the restarted R1-R7 campaign is clean including the formerly failing boundary-offset-seed-018.",
+        "release_verification": {
+          "commit": "0855115ac90c780fc9af532f9bf625252d9e1234",
+          "run_id": 35081729425,
+          "tag": "v1.0.0",
+          "asset_sha256": "17B5E490EC1D3AA7DE33BD587C0BB77AE9FF5F265EF2607209C0548593CFF199"
+        }
       }
         }
     ],
