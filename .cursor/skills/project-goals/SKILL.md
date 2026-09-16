@@ -5,7 +5,7 @@ description: drawclock 当前目标、验证证据与完成条件索引。
 
 # 项目目标
 
-- [x] [错列 MUX 边界主干复验](goals/misaligned-mux-boundary-trunk-reverification.md)
+- [ ] [错列 MUX 边界主干复验](goals/misaligned-mux-boundary-trunk-reverification.md)
 - [频率列裁剪与发行目录收敛](goals/frequency-columns-and-release-layout.md)
 - [注释颜色与 Python 发行边界](goals/annotation-color-python-release-surface.md)
 
@@ -22,7 +22,7 @@ description: drawclock 当前目标、验证证据与完成条件索引。
 - [x] 非对称前后级的同源汇聚节点保持同列。
 - [ ] 跨大区域根从合适边界进入，同根消费域不夹杂可分离的无关域。
 - [x] `FB-ROOT-022`：远距分离消费带在完整几何收益成立时拆分为多个同名源显示设施。
-- [x] `FB-ROUTE-023`：公共根主干不得在中部过早进入行间并向下贯穿；边界绕行反事实支配时必须采用边界走廊。
+- [ ] `FB-ROUTE-023`：2026-09-16 用户确认发布版仍复发；旧 PASS 已撤销，必须重新自然复现并修复公共根主干过早横穿后纵向贯穿多行的问题。
 - [x] [远距源显示设施与边界主干路由](goals/source-alias-and-boundary-trunk-routing.md)
 - [x] Agent 质检记录末层交叉、根消费域夹杂、合理局部主干、微线段和可避免拐点。
 - [x] `gate_a_tap` 类长距末端使用结构性整组换行消除非必要拐点，面积不再优先于美观。

@@ -112,3 +112,21 @@ def test_detached_backbone_oracle_does_not_cap_ranked_candidates():
         and isinstance(node.slice.upper.value, int)
     ]
     assert capped_slices == []
+
+
+def test_final_single_edge_router_does_not_cap_ranked_candidates():
+    source_path = ROOT / "src" / "elk_layout.py"
+    module = ast.parse(source_path.read_text(encoding="utf-8"))
+    function = next(
+        node for node in module.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "_refine_final_single_edge_channels"
+    )
+    capped_slices = [
+        node for node in ast.walk(function)
+        if isinstance(node, ast.Subscript)
+        and isinstance(node.slice, ast.Slice)
+        and isinstance(node.slice.upper, ast.Constant)
+        and isinstance(node.slice.upper.value, int)
+    ]
+    assert capped_slices == []

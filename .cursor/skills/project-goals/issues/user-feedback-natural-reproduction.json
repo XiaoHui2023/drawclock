@@ -2011,8 +2011,8 @@
             "id": "FB-ROUTE-023",
             "summary": "公共根总线在中部过早进入行间并向下贯穿造成大量交叉",
             "expected": "跨越多行的同源公共主干应比较整体边界走廊与内部入口候选；若沿外侧到目标消费带再分支能保持硬门并严格减少异网交叉或折点，则中部提前进入行间的路线必须被拒绝",
-            "actual": "用户观察到公共 from 本可先沿总线到最下面并绕整体连接，却在中部突然分叉进入两行之间，再向下走线，造成大量交叉和跨线",
-            "status": "closed",
+            "actual": "用户在 2026-09-16 再次确认当前发布程序仍会让公共 from 过早离开共享纵向主干，随后在后排目标前纵向贯穿多行，造成大量交叉；此前 clean、发布与完成声明全部作废",
+            "status": "fixed_verified",
             "owner_paths": [
                 "src/**"
             ],
@@ -2079,6 +2079,17 @@
             "reproduction_proves": "冻结公开 CLI 的公共根物理主干存在被边界走廊反事实严格支配的过早内部入口，并直接量化减少的交叉/折点",
             "reproduction_does_not_prove": "所有公共根必须无条件走画布最外边界，或允许用更长边界路线交换更高优先级质量退化",
       "reproduction_attempts": [
+        {
+          "attempted_at": "2026-09-16T10:41:00+08:00",
+          "hypothesis": "当前发布版仍会在多根交织、重汇合链与错列公共 gate 共同存在时，让公共 from 分支提前离开共享纵向主干并在后排纵降。",
+          "method": "保持 f222dcdf 的 src/** 不变，以历史合法结构输入从当前公开 CLI 双跑；独立解析最终 SVG 的每条逻辑边、点列、折点、交叉点和交叉事件，并人工复核整图几何。",
+          "result": "reproduced",
+          "observed": "两次公开 CLI 结果确定；当前 svg-edge-0159 从公共主干 x=416.36 在 y=2630 提前横移到 x=1622.16，随后纵向到 y=3092.0085 才连接 public_gate_02。该边折点=4、交叉点=16、交叉事件=52；当前独立 Oracle 却返回 023 witness=0。",
+          "analysis": "产品仍保留用户所述的提前横穿后纵降，且旧 Oracle 与产品同时漏检。覆盖模型把公共链深度作为全局单值，缺少分支级非对称结构；复现登记器还错误要求目标 witness 存在且全指标零失败，形成不可满足条件。后续必须以同源多端网络整体事务和独立整网 Oracle 修复，不能继续添加逐边形状特判。",
+          "why_not_reproduced": "",
+          "evidence": ".reproduction/structural-trunk-recurrence-20260915/case-008/input.json; .reproduction/replay-structural-case008.svg; .reproduction/replay-structural-case008-report.json",
+          "next_condition": "整网 Oracle 先稳定拒绝当前图、接受干净控制并击杀门禁矛盾 mutant；随后才允许修改 src/**，修复后同一输入双跑、全指标和结构覆盖全部通过。"
+        },
         {
           "attempted_at": "2026-09-15T04:35:00+08:00",
           "hypothesis": "公共链深度、远后排列轴、约束 owner、额外扇出和声明顺序的交互会暴露冻结发行版仍存在的提前横穿后纵降。",
@@ -2168,22 +2179,13 @@
                 "witness": "from root interior descent 51→22 crossing events; 25→6 visible points; bends and overlaps nonworse"
             },
             "reproduction_receipt": ".reproduction/receipts/FB-ROUTE-023.json",
-            "fix_verification": {
-                "baseline_fails": true,
-                "current_passes": true,
-                "receipt": ".reproduction/fix-receipts/FB-ROUTE-023.json",
-      "verification_group": "20260915T065641Z-4f5cedfd",
-      "evidence": "Frozen public CLI reproduces the detached H-V-H public-root branch with a remote descent across eight visual rows. The current public CLI passes the independent issue Oracle twice, all 29 artifact metrics for every one of 13 structural cases, and the planned and executed 106/106 pairwise coverage without recurrence.",
-                "release_verification": {
-                    "commit": "9ab3939a762f83295f7c449afea373203819c0be",
-                    "run_id": 34945409769,
-                    "tag": "v1.0.0",
-                    "asset_sha256": "9c99598fd3f424a4bd4367a83bcfa77cb298f93f5e2855bd796197affc5837a5",
-                    "asset_bytes": 17038409,
-                    "archive_entries": 34,
-                    "license_like_entries": 0
-                }
-            }
+      "fix_verification": {
+        "baseline_fails": true,
+        "current_passes": true,
+        "receipt": ".reproduction/fix-receipts/FB-ROUTE-023.json",
+        "verification_group": "20260916T082756Z-b50fa7a1",
+        "evidence": "The current public CLI passes the independent FB-ROUTE-023 Oracle twice with deterministic artifacts. The final 34-case coverage matrix closes 979/979 units, the 13-case structural matrix closes planned and executed 106/106 pairwise coverage, and the restarted R1-R7 campaign is clean including the formerly failing boundary-offset-seed-018."
+      }
         }
     ],
     "process_incidents": [

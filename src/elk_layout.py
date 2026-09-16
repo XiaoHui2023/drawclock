@@ -2283,6 +2283,29 @@ def _refine_final_single_edge_channels(
                     edge_by_id[f"e{index}"].source_id,
                     edge_by_id[f"e{index}"].target_id,
                 }
+                source_box = visible_boxes[
+                    edge_by_id[f"e{index}"].source_id
+                ]
+                target_box = visible_boxes[
+                    edge_by_id[f"e{index}"].target_id
+                ]
+                vertical_axes = [
+                    a[0]
+                    for a, b in zip(candidate_points, candidate_points[1:])
+                    if abs(a[0] - b[0]) <= 1e-6
+                    and abs(a[1] - b[1]) > 1e-6
+                ]
+                # This is exactly the later endpoint-signature feasibility
+                # rule, evaluated before cloning and full-document scoring.
+                # It deletes only impossible visibility edges and therefore
+                # preserves progressive deepening without a top-N cutoff.
+                if vertical_axes and (
+                    vertical_axes[0]
+                    < source_box.right + route_clearance - 1e-6
+                    or vertical_axes[-1]
+                    > target_box.left - route_clearance + 1e-6
+                ):
+                    continue
                 if any(
                     _segment_hits_rect(
                         segment.a,
@@ -2306,7 +2329,13 @@ def _refine_final_single_edge_channels(
                     (local_overlaps, local_crossings, bends, length),
                     candidate_points,
                 ))
-            for _, candidate_points in sorted(shortlisted)[:3]:
+            # Progressive deepening is a correctness requirement here.  A
+            # locally attractive channel can fail a final visible-box or
+            # endpoint gate while a later visibility channel is globally
+            # valid.  Evaluate the finite ordered set until the first valid
+            # improvement for this edge; never make a fixed top-N shortlist
+            # the search boundary.
+            for _, candidate_points in sorted(shortlisted):
                 attempts += 1
                 candidate = _clone_layout_geometry(accepted)
                 candidate_edge = {edge.cell_id: edge for edge in candidate.edges}[f"e{index}"]
@@ -2356,6 +2385,7 @@ def _refine_final_single_edge_channels(
                 )
                 if best is None or score < best[0]:
                     best = (score, candidate)
+                break
         if best is None:
             break
         accepted = best[1]
@@ -3744,6 +3774,9 @@ def _refine_downstream_corridor_axes(
                         expandable.add(hit_edge.target_id)
                     else:
                         unresolved = True
+                        blockers[
+                            f"new-visible-edge-node-hit:{edge_id}:{hit_id}"
+                        ] += 1
                 if unresolved:
                     blockers["new-visible-edge-node-hit"] += 1
                     valid = False
@@ -8647,10 +8680,41 @@ def _route_root_branches_through_boundary_corridors(
                         -abs(x),
                     ),
                 )
+        # Build the horizontal tracks from the orthogonal visibility graph:
+        # existing route rows alone are incomplete because the first legal
+        # channel beside a dense row can lie on an expanded label/component
+        # boundary where no route currently exists.  Using visual boxes keeps
+        # both component shapes and their rendered text out of the corridor.
+        # Visibility routing has two useful obstacle expansions: the
+        # preferred route clearance and a stroke-safe minimum gap.  Dense
+        # diagrams can have a clean topological channel inside that band;
+        # searching only the preferred boundary hides it even though the
+        # final whole-layout transaction proves it is collision-free.  Keep
+        # both critical boundaries in the finite visibility graph instead of
+        # sampling a fixed number of locally ranked lanes.
+        minimum_visible_gap = min(
+            profile.route_clearance,
+            max(2.0, profile.grid * 0.8),
+        )
+        obstacle_boundary_lane_values = {
+            lane_y
+            for box in boxes
+            for gap in {
+                profile.route_clearance,
+                minimum_visible_gap,
+            }
+            for lane_y in (
+                box.top - gap,
+                box.bottom + gap,
+            )
+        }
         visibility_lane_values = sorted({
-            point[1]
-            for route_points_value in points_by_index.values()
-            for point in route_points_value
+            *obstacle_boundary_lane_values,
+            *(
+                point[1]
+                for route_points_value in points_by_index.values()
+                for point in route_points_value
+            ),
         })
         for index, logical in enumerate(logical_edges, 1):
             if indegree[logical.source] or fanout[logical.source] < 2:
@@ -8764,7 +8828,30 @@ def _route_root_branches_through_boundary_corridors(
             shortlisted_by_side: dict[
                 str, list[tuple[tuple[Any, ...], float]]
             ] = defaultdict(list)
+
+            def horizontal_lane_is_clear(lane_y: float) -> bool:
+                return not any(
+                    _segment_hits_rect(
+                        (source_x, lane_y),
+                        (target_x, lane_y),
+                        (
+                            visible_box.left,
+                            visible_box.top,
+                            visible_box.right,
+                            visible_box.bottom,
+                        ),
+                    )
+                    for vertex in accepted.vertices
+                    if vertex.cell_id not in {edge.source_id, edge.target_id}
+                    for visible_box in (vertex_visual_box(vertex),)
+                )
+
             for side, lane_y in lane_candidates:
+                # Visibility-graph edges must be obstacle-free.  Reject the
+                # blocked horizontal track before the quadratic route
+                # interaction score and the full-document transaction.
+                if not horizontal_lane_is_clear(lane_y):
+                    continue
                 local_points = _simplify([
                     points[0],
                     (source_x, points[0][1]),
@@ -9612,6 +9699,82 @@ def generate_elk_layout(
         route_clearance=profile.route_clearance,
     )
     report["selection"].update(single_edge_channel_report)
+    # The final root/corridor/channel owners can expose a downstream fan-in
+    # row translation that was blocked when the earlier placement pass ran.
+    # Close the owners to a fixed point in global quality order: downstream
+    # alignment strictly removes bends without adding crossings, boundary
+    # routing may add bends only for a strict crossing reduction, and the two
+    # cleanup owners never increase either.  Therefore every accepted round
+    # strictly improves the finite (crossings, bends, length) state and needs
+    # no diagram-size or round-count cutoff.
+    serialized_closure_rounds = 0
+    serialized_closure_moves: Counter[str] = Counter()
+    serialized_closure_blockers: Counter[str] = Counter()
+    while True:
+        document, closure_downstream = _refine_downstream_corridor_axes(
+            document,
+            logical_edges,
+            route_clearance=profile.route_clearance,
+        )
+        downstream_moves = closure_downstream[
+            "downstream_corridor_axis_moves"
+        ]
+        serialized_closure_moves["downstream"] += downstream_moves
+        serialized_closure_blockers.update(
+            closure_downstream["downstream_corridor_axis_blockers"]
+        )
+        # All later route-only owners have just run immediately above.  If
+        # the only placement owner is already at a fixed point, repeating
+        # their complete searches cannot expose new geometry and merely
+        # doubles work on dense diagrams.
+        if downstream_moves == 0:
+            break
+        document, closure_boundary = (
+            _route_root_branches_through_boundary_corridors(
+                document, nodes, logical_edges, profile
+            )
+        )
+        document, closure_source_lead = _restore_root_source_lead_clearance(
+            document,
+            nodes,
+            logical_edges,
+            route_clearance=profile.route_clearance,
+        )
+        document, closure_single_edge = _refine_final_single_edge_channels(
+            document,
+            logical_edges,
+            route_clearance=profile.route_clearance,
+        )
+        round_moves = {
+            "boundary": closure_boundary["boundary_corridor_moves"],
+            "source_lead": closure_source_lead["root_source_lead_moves"],
+            "single_edge": closure_single_edge[
+                "final_single_edge_channel_moves"
+            ],
+        }
+        serialized_closure_moves.update(round_moves)
+        for payload in (
+            closure_boundary,
+            closure_source_lead,
+            closure_single_edge,
+        ):
+            for key, value in payload.items():
+                if key.endswith("_blockers"):
+                    serialized_closure_blockers.update(value)
+        # Re-enter once after every accepted placement move so the placement
+        # owner itself proves the new geometry is a fixed point.  The next
+        # iteration exits above before repeating the route-only owners when
+        # downstream reports zero moves.
+        serialized_closure_rounds += 1
+    report["selection"].update({
+        "serialized_quality_closure_rounds": serialized_closure_rounds,
+        "serialized_quality_closure_moves": dict(
+            sorted(serialized_closure_moves.items())
+        ),
+        "serialized_quality_closure_blockers": dict(
+            sorted(serialized_closure_blockers.items())
+        ),
+    })
     accepted_assessment = None
     report["selection"]["source_rendering_replicas"] = (
         len(document.vertices) - len(nodes)

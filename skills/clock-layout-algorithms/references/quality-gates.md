@@ -92,7 +92,10 @@ fail closed。详细流程见 `feedback-reproduction-and-geometry-oracle.md`。
 - 共享单总线只约束结构化重复汇合子集，例如同类多输入器件阵列。任意横向或纵向远距消费者仍执行逐边设施反事实；若新增 glyph 后的同网正交并集成本更低，且交叉、折点、碰撞、端点和异网重叠均不退化，就必须开同名设施。
 - 多行公共根路线若在内部行间过早切入并沿不同 x 通道下行，独立 Oracle 比较完整图上/下边界 backbone。外侧候选不增加节点/文字命中、异网重叠或折点且严格减少真交叉时，内部路线失败；同一逻辑根复用稳定边界 lane，不同根分 lane。
 - 边界候选不得固定截断为局部 top-N。对有限的同一方向可见 lane 按局部交叉、折点和长度排序，逐条进入完整终态事务；首个满足端口、正交、可见边界、异网重叠、逻辑网无环和全指标不退化的候选才可采用。穷尽该方向后才能声明无解。分别保留“折点相同但交叉减少”和“增加最多 2 折点但至少减少 2 个交叉点、3 个交叉事件”的公开入口回归。
-- 结构攻击器必须输出 producer 源树、独立 Oracle 与质量注册表哈希，并分开记录 planned/executed case 和 pairwise required/covered。13 个计划 case 或 106 个计划值对不能直接冒充实际执行覆盖；只有 13/13 个有效结果都执行 29 项完整注册表且实测 106/106 时才通过当前合同。
+- 结构攻击器必须输出 producer 源树、独立 Oracle 与质量注册表哈希，并分开记录 planned/executed case 和 required/covered coverage unit。完成条件不绑定固定轮数、case 数或旧的 pairwise 数；每次从当前因素、取值、高风险 t-way 与历史逃逸动态重算 required exact-set，只有有效结果全部执行完整质量注册表且 `required == covered`、`missing=[]` 才通过。
+- 攻击因素必须区分多数公共分支深度与目标公共分支深度 override，并与目标的 array/external membership、终态上/中/下位置和错列 x-offset 组合。只记录一个全局 `common_depth` 会漏掉“仅目标直连/多一级”的复发现象，属于 coverage failure。
+- `expect=reproduced` 时只允许目标指标 `premature_interior_trunk_entry` 报红；要求 witness 存在同时又要求失败集合为空是不可满足门，目标红灯夹带任何其它指标失败也不得计作有效复现。
+- 碰撞回归按器件本体、原生名称/标签、description 注释和净空外框分层比较，不能只比较宽泛的 `(edge,node)` 对。原路线若已擦过文字，候选仍不得借同一对身份进一步穿入器件本体；保留“pair 不变但严重度升级”的 Oracle mutant。
 
 ## 需求与指标保留门
 

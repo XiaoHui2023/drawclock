@@ -1069,19 +1069,28 @@ def _downstream_corridor_tail_bend_witnesses(
         if _visual_boxes_overlap(left, right)
     }
 
-    def route_box_hits(candidate_routes: list[Route], candidate_boxes: list[Box]) -> set[tuple[int, int]]:
+    def route_box_hits(
+        candidate_routes: list[Route],
+        candidate_boxes: list[Box],
+        *,
+        visual: bool = True,
+    ) -> set[tuple[int, int]]:
         hits: set[tuple[int, int]] = set()
+        hit_test = _visual_rect_interior_hit if visual else _rect_interior_hit
         for candidate in candidate_routes:
             source_index = _endpoint_box_index(candidate.points[0], candidate.source, candidate_boxes)
             target_index = _endpoint_box_index(candidate.points[-1], candidate.target, candidate_boxes)
             for box_index, box in enumerate(candidate_boxes):
                 if box_index in {source_index, target_index}:
                     continue
-                if any(_visual_rect_interior_hit(a, b, box) for a, b in segments(candidate)):
+                if any(hit_test(a, b, box) for a, b in segments(candidate)):
                     hits.add((candidate.index, box_index))
         return hits
 
     original_route_box_hits = route_box_hits(routes, boxes)
+    original_graphic_box_hits = route_box_hits(
+        routes, boxes, visual=False
+    )
     witnesses: list[dict[str, Any]] = []
 
     for target, boundary_routes in sorted(incoming.items()):
@@ -1148,7 +1157,22 @@ def _downstream_corridor_tail_bend_witnesses(
                 candidate_routes.append(_copy_route(route, simplify(points)))
             if not feasible:
                 break
-            new_hits = route_box_hits(candidate_routes, candidate_boxes) - original_route_box_hits
+            # A pre-existing label-only intersection must not hide a newly
+            # introduced component-body hit.  Feed both severity layers into
+            # the same ownership closure: a hit on a moved obstacle may pull
+            # the external route's target into the transaction, while a hit
+            # on an unmoved obstacle is unresolved and rejects the move.
+            new_visual_hits = (
+                route_box_hits(candidate_routes, candidate_boxes)
+                - original_route_box_hits
+            )
+            new_graphic_hits = (
+                route_box_hits(
+                    candidate_routes, candidate_boxes, visual=False
+                )
+                - original_graphic_box_hits
+            )
+            new_hits = new_visual_hits | new_graphic_hits
             if not new_hits:
                 break
             route_by_index = {route.index: route for route in routes}
@@ -1172,7 +1196,15 @@ def _downstream_corridor_tail_bend_witnesses(
                 moved_nodes = expanded
         else:
             feasible = False
-        if not feasible or not route_box_hits(candidate_routes, candidate_boxes).issubset(original_route_box_hits):
+        if (
+            not feasible
+            or not route_box_hits(
+                candidate_routes, candidate_boxes
+            ).issubset(original_route_box_hits)
+            or not route_box_hits(
+                candidate_routes, candidate_boxes, visual=False
+            ).issubset(original_graphic_box_hits)
+        ):
             continue
         candidate_crossings, candidate_overlaps = route_crossings(candidate_routes)
         crossing_pairs = {tuple(sorted(row["edges"])) for row in candidate_crossings}
@@ -3389,9 +3421,25 @@ def _detached_backbone_descent_witnesses(
         })
         top_lane = min(box.visual_bounds[1] for box in boxes) - 24.0
         bottom_lane = max(box.visual_bounds[3] for box in boxes) + 24.0
+        # Orthogonal visibility graphs place candidate tracks on obstacle
+        # boundaries, not only on existing route centres.  The escaped route
+        # has no useful sibling/waypoint row beside its target: the first
+        # legal corridor lies immediately below the union of nearby labels.
+        # Enumerating expanded visual-box boundaries makes that channel an
+        # explicit, topology-independent candidate.
+        obstacle_clearance = 8.0
+        obstacle_boundary_rows = {
+            round(value, 4)
+            for box in boxes
+            for value in (
+                box.visual_bounds[1] - obstacle_clearance,
+                box.visual_bounds[3] + obstacle_clearance,
+            )
+        }
         all_visible_rows = {
             *target_rows,
             *(round(point[1], 4) for item in routes for point in item.points),
+            *obstacle_boundary_rows,
             round(top_lane, 4),
             round(bottom_lane, 4),
         }

@@ -2,9 +2,9 @@
 
 ## 状态
 
-- status: done
+- status: active
 - owner: agent
-- updated: 2026-09-15
+- updated: 2026-09-16
 
 ## 期望结果
 
@@ -16,6 +16,8 @@
 - 攻击停止条件改为覆盖驱动：目标横向错列、目标纵向区段、公共分支密度、上下游链深、端口、额外消费者、声明顺序、障碍带、约束和后置 owner 的取值覆盖、全部高风险二元交互及已知三元交互必须 exact-set 闭合；case 数或固定轮数不能授权完成。
 
 ## 当前证据
+
+- failure: 2026-09-16 用户确认当前发布程序仍存在相同错误。此前 `f222dcdf`、Release run `34953190538`、13 案结构矩阵和 29 项统一指标的完成授权全部撤销；分类为 `oracle_escape + coverage_escape + ownership_escape + claim_escape`。生产 `src/**` 保持冻结，直到当前发布版经正常公开入口双跑自然红灯，且新 Oracle 能拒绝该漏放制品。
 
 - success: 提交 `9ab3939a762f83295f7c449afea373203819c0be` 已推送；Release run `34945409769` 的旧覆盖、新结构矩阵、R1–R7、27 张全图、反馈门、Ubuntu 16.04 PyInstaller/staticx、解包 frozen/librsvg、发布与公开回下载 smoke 全部 success。`v1.0.0^{}` 与该提交一致；公开 Linux 资产 17,038,409 bytes、34 项，SHA-256 `9c99598fd3f424a4bd4367a83bcfa77cb298f93f5e2855bd796197affc5837a5` 与 API digest 一致，license-like=0。
 - success: 冻结 `9deb186` 的结构 case-001 公开 CLI 双跑哈希均为 `b2148bd6…2374`；同一逻辑边在 y=3152.5428 提前离开 x=416.36 主干，到 x=1101.86 后纵穿 8 个视觉行。当前版将出口延迟至 y=3368.5387，目标、端口与连接关系不变，023 witness 清零。

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import inspect
 import json
 import ast
 import shutil
@@ -291,6 +292,29 @@ def test_downstream_corridor_oracle_rejects_nonuniform_or_blocked_moves() -> Non
         oracle.Route(1, [(10, 25), (35, 25), (35, 20), (50, 20)], source="b", target="mux", target_port="1"),
     ]
     assert oracle._downstream_corridor_tail_bend_witnesses(logical, uniform, [*boxes, oracle.Box("obstacle", 50, 25, 10, 10)]) == []
+
+
+def test_downstream_corridor_oracle_rejects_new_graphic_hit_hidden_by_old_visual_hit() -> None:
+    logical = [
+        oracle.LogicalEdge("a", "mux", "0"),
+        oracle.LogicalEdge("b", "mux", "1"),
+        oracle.LogicalEdge("mux", "sink", "left"),
+    ]
+    routes = [
+        oracle.Route(0, [(10, 0), (30, 0), (30, 10), (50, 10)], source="a", target="mux", target_port="0"),
+        oracle.Route(1, [(10, 20), (35, 20), (35, 30), (50, 30)], source="b", target="mux", target_port="1"),
+        oracle.Route(2, [(50, 24), (80, 24)], source="mux", target="sink"),
+    ]
+    boxes = [
+        oracle.Box("a", 0, -5, 10, 10),
+        oracle.Box("b", 0, 15, 10, 10),
+        oracle.Box("mux", 50, 5, 10, 30),
+        oracle.Box("sink", 80, 19, 10, 10),
+        oracle.Box("obstacle", 60, 10, 10, 10, 60, 0, 10, 30),
+    ]
+    assert oracle._downstream_corridor_tail_bend_witnesses(
+        logical, routes, boxes
+    ) == []
 
 
 def test_downstream_corridor_oracle_expands_a_conflicting_target_row() -> None:
@@ -996,7 +1020,9 @@ def test_current_cli_closes_premature_interior_trunk_entry(
         cwd=ROOT, check=True,
     )
     report = oracle.analyze(input_path, output)
-    assert report["witnesses"]["premature_interior_trunk_entry_witnesses"] == []
+    assert report["witnesses"][
+        "premature_interior_trunk_entry_witnesses"
+    ] == []
     assert "FB-ROUTE-023" not in report["detected_issues"]
     receipt = tmp_path / "premature-entry-quality.json"
     completed = subprocess.run(
@@ -1011,6 +1037,15 @@ def test_current_cli_closes_premature_interior_trunk_entry(
     assert quality["required_metric_ids"] == quality["executed_metric_ids"]
     assert len(quality["executed_metric_ids"]) == 29
     assert quality["failed_metric_ids"] == []
+
+
+def test_detached_backbone_oracle_uses_visual_obstacle_boundaries() -> None:
+    source = inspect.getsource(
+        oracle._detached_backbone_descent_witnesses
+    )
+    assert "obstacle_boundary_rows" in source
+    assert "box.visual_bounds[1]" in source
+    assert "box.visual_bounds[3]" in source
 
 
 @pytest.mark.parametrize(
@@ -1148,6 +1183,44 @@ def test_boundary_trunk_coverage_model_closes_exact_set() -> None:
     assert {
         "top", "middle", "bottom"
     } == {case["target_band"] for case in suite}
+    assert {
+        "same", "direct", "gate"
+    } == {case["target_common_depth"] for case in suite}
+    assert any(
+        case["common_depth"] == 1
+        and case["target_common_depth"] == "direct"
+        for case in suite
+    )
+    assert any(
+        case["common_depth"] == 0
+        and case["target_common_depth"] == "gate"
+        for case in suite
+    )
+    for name in (
+        "visual-hit-does-not-hide-new-graphic-hit",
+        "late-ranked-final-single-edge-channel",
+    ):
+        assert search.REQUIRED_SCENARIOS[name] in suite
+
+
+def test_boundary_trunk_search_records_the_expected_metric_red_light() -> None:
+    search_path = ROOT / "tools" / "search_boundary_trunk_coverage.py"
+    spec = importlib.util.spec_from_file_location(
+        "boundary_trunk_reproduction_contract", search_path
+    )
+    assert spec is not None and spec.loader is not None
+    search = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(search)
+    witness = [{"edge_id": "svg-edge-0001"}]
+    assert search.is_target_reproduction(
+        witness, True, ["premature_interior_trunk_entry"]
+    )
+    assert not search.is_target_reproduction(witness, True, [])
+    assert not search.is_target_reproduction(
+        witness,
+        True,
+        ["premature_interior_trunk_entry", "different_net_overlap"],
+    )
 
 
 def test_premature_interior_trunk_entry_keeps_clean_control(
@@ -1189,7 +1262,7 @@ def test_premature_corridor_rejects_local_gain_that_worsens_global_crossings(
     assert "FB-ROUTE-023" not in report["detected_issues"]
 
 
-@pytest.mark.parametrize("seed", [0, 3, 13, 22, 23])
+@pytest.mark.parametrize("seed", [0, 3, 13, 18, 22, 23])
 def test_boundary_corridor_survives_misaligned_mux_column_attacks(
     seed: int, tmp_path: Path,
 ) -> None:

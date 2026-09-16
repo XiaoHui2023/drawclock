@@ -29,6 +29,7 @@ FACTORS = {
     "target_offset": (2, 4),
     "misalignment_cause": ("explicit-column", "depth"),
     "common_depth": (0, 1),
+    "target_common_depth": ("same", "direct", "gate"),
     "private_depth": (0, 1, 2),
     "extra_consumer": (False, True),
     "declaration_order": ("forward", "reverse", "interleaved"),
@@ -48,6 +49,7 @@ HIGH_RISK_TRIPLES = (
     ("target_membership", "target_band", "target_gate_fanout"),
     ("target_band", "extra_consumer", "declaration_order"),
     ("common_depth", "private_depth", "constraint_scope"),
+    ("common_depth", "target_common_depth", "target_membership"),
     ("obstacle_pattern", "target_membership", "target_band"),
     ("external_anchor", "obstacle_pattern", "target_membership"),
 )
@@ -62,6 +64,7 @@ REQUIRED_SCENARIOS = {
         "target_offset": 4,
         "misalignment_cause": "explicit-column",
         "common_depth": 1,
+        "target_common_depth": "same",
         "private_depth": 1,
         "extra_consumer": True,
         "declaration_order": "forward",
@@ -78,6 +81,7 @@ REQUIRED_SCENARIOS = {
         "target_offset": 4,
         "misalignment_cause": "explicit-column",
         "common_depth": 1,
+        "target_common_depth": "same",
         "private_depth": 1,
         "extra_consumer": False,
         "declaration_order": "forward",
@@ -86,6 +90,74 @@ REQUIRED_SCENARIOS = {
         "target_gate_fanout": "single",
         "obstacle_pattern": "local",
         "external_anchor": "first",
+    },
+    "lower-external-target-direct-among-gates": {
+        "row_count": 24,
+        "target_band": "bottom",
+        "target_membership": "external",
+        "target_offset": 4,
+        "misalignment_cause": "explicit-column",
+        "common_depth": 1,
+        "target_common_depth": "direct",
+        "private_depth": 2,
+        "extra_consumer": True,
+        "declaration_order": "interleaved",
+        "target_port": "1",
+        "constraint_scope": "mux",
+        "target_gate_fanout": "extra",
+        "obstacle_pattern": "double-weave-shared-roots",
+        "external_anchor": "opposed",
+    },
+    "middle-array-target-gate-among-direct": {
+        "row_count": 16,
+        "target_band": "middle",
+        "target_membership": "array",
+        "target_offset": 2,
+        "misalignment_cause": "explicit-column",
+        "common_depth": 0,
+        "target_common_depth": "gate",
+        "private_depth": 1,
+        "extra_consumer": False,
+        "declaration_order": "reverse",
+        "target_port": "0",
+        "constraint_scope": "mux-and-common-gate",
+        "target_gate_fanout": "single",
+        "obstacle_pattern": "dual-common-weave",
+        "external_anchor": "first",
+    },
+    "visual-hit-does-not-hide-new-graphic-hit": {
+        "row_count": 24,
+        "target_band": "middle",
+        "target_membership": "external",
+        "target_offset": 2,
+        "misalignment_cause": "explicit-column",
+        "common_depth": 1,
+        "target_common_depth": "direct",
+        "private_depth": 1,
+        "extra_consumer": False,
+        "declaration_order": "interleaved",
+        "target_port": "0",
+        "constraint_scope": "mux",
+        "target_gate_fanout": "single",
+        "obstacle_pattern": "external-anchor-only",
+        "external_anchor": "last",
+    },
+    "late-ranked-final-single-edge-channel": {
+        "row_count": 16,
+        "target_band": "bottom",
+        "target_membership": "external",
+        "target_offset": 2,
+        "misalignment_cause": "explicit-column",
+        "common_depth": 1,
+        "target_common_depth": "same",
+        "private_depth": 1,
+        "extra_consumer": False,
+        "declaration_order": "reverse",
+        "target_port": "0",
+        "constraint_scope": "mux",
+        "target_gate_fanout": "extra",
+        "obstacle_pattern": "double-weave-shared-roots",
+        "external_anchor": "middle",
     },
 }
 
@@ -230,6 +302,19 @@ def scenario_units(case: dict[str, Any]) -> set[str]:
     }
 
 
+def is_target_reproduction(
+    witnessed: list[dict[str, Any]],
+    semantic_preconditions_met: bool,
+    failed_metric_ids: list[str],
+) -> bool:
+    """Accept the expected target red light, reject every other failure."""
+    return (
+        bool(witnessed)
+        and semantic_preconditions_met
+        and failed_metric_ids == ["premature_interior_trunk_entry"]
+    )
+
+
 def build_case(factors: dict[str, Any]) -> dict[str, dict[str, Any]]:
     row_count = int(factors["row_count"])
     target_index = {
@@ -242,11 +327,23 @@ def build_case(factors: dict[str, Any]) -> dict[str, dict[str, Any]]:
     public_port = str(factors["target_port"])
     private_port = "1" if public_port == "0" else "0"
     blocks: list[list[tuple[str, dict[str, Any]]]] = []
+
+    def branch_common_depth(is_target: bool) -> int:
+        depth = int(factors["common_depth"])
+        if not is_target:
+            return depth
+        override = str(factors["target_common_depth"])
+        if override == "direct":
+            return 0
+        if override == "gate":
+            return 1
+        return depth
+
     for index in range(row_count):
         suffix = f"{index:02d}"
         is_target = index == target_index
         block: list[tuple[str, dict[str, Any]]] = []
-        if int(factors["common_depth"]):
+        if branch_common_depth(is_target):
             common_name = f"common_gate_{suffix}"
             common_item: dict[str, Any] = {
                 "kind": "gate", "source": "common_from"
@@ -299,7 +396,7 @@ def build_case(factors: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
     if factors["target_membership"] == "external":
         external: list[tuple[str, dict[str, Any]]] = []
-        if int(factors["common_depth"]):
+        if branch_common_depth(True):
             common_name = "external_common_gate"
             common_item = {"kind": "gate", "source": "common_from"}
             if (
@@ -611,9 +708,11 @@ def main() -> int:
             json.dumps(row, indent=2) + "\n", encoding="utf-8"
         )
         if (
-            witnessed
-            and semantic_preconditions_met
-            and not quality["failed_metric_ids"]
+            is_target_reproduction(
+                witnessed,
+                semantic_preconditions_met,
+                quality["failed_metric_ids"],
+            )
             and first_reproduction is None
         ):
             first_reproduction = row
