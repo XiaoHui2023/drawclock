@@ -4,8 +4,13 @@ import copy
 import time
 from pathlib import Path
 
-from auto_layout import load_clock_tree
-from elk_layout import generate_elk_layout
+from auto_layout import build_logical_edges, load_clock_tree, resolve_nodes
+from drawio_library import load_library_shapes
+from elk_layout import (
+    _regular_fanout_array_roots,
+    _shared_fanout_bus_roots,
+    generate_elk_layout,
+)
 from layout_quality import _points_for_edge, inspect_layout_quality
 from scripts.build_stress_examples import build_asymmetric_merge_route_bulge
 
@@ -53,6 +58,99 @@ def test_same_source_port_uses_one_vertical_distribution_trunk() -> None:
 
     assert quality["readability"]["fragmented_fanout_sources"] == {}
     assert quality["line_integrity"]["ambiguous_overlaps"] == []
+    assert quality["passed"] is True
+
+
+def _two_public_root_mux_array(rows: int = 4):
+    """Return repeated two-input mux rows with two reusable root networks."""
+    config = {
+        "public_from": {"kind": "from"},
+        "public_source": {"kind": "source"},
+    }
+    for index in range(rows):
+        suffix = f"{index:02d}"
+        from_gate = f"from_gate_{suffix}"
+        source_gate = f"source_gate_{suffix}"
+        mux = f"mux_{suffix}"
+        config[from_gate] = {"kind": "gate", "source": "public_from"}
+        config[source_gate] = {"kind": "gate", "source": "public_source"}
+        config[mux] = {
+            "kind": "mux2",
+            "source": {"0": from_gate, "1": source_gate},
+        }
+        config[f"clock_{suffix}"] = {"kind": "clock", "source": mux}
+    return config
+
+
+def test_two_public_root_mux_array_keeps_a_bus_for_each_root() -> None:
+    """Two shared mux inputs are two buses, not one bus plus row aliases."""
+    config = _two_public_root_mux_array()
+    nodes = resolve_nodes(
+        config, load_library_shapes(LIBRARY), {}, library_path=LIBRARY
+    )
+    logical_edges = build_logical_edges(config, nodes, LIBRARY)
+
+    assert _regular_fanout_array_roots(nodes, logical_edges) == {
+        "public_from", "public_source"
+    }
+    assert _shared_fanout_bus_roots(nodes, logical_edges) >= {
+        "public_from", "public_source"
+    }
+
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    for root in ("public_from", "public_source"):
+        facilities = [
+            vertex for vertex in document.vertices
+            if (vertex.logical_name or vertex.name) == root
+        ]
+        root_edges = [
+            edge for edge in document.edges
+            if edge.source_id == facilities[0].cell_id
+        ]
+        assert len(facilities) == 1
+        assert len(root_edges) == 4
+
+
+def test_similar_muxes_share_a_natural_column_with_asymmetric_inputs() -> None:
+    """Repeated mux landmarks align despite unequal input-chain depths."""
+    config = {
+        "public_from": {"kind": "from"},
+        "public_source": {"kind": "source"},
+    }
+    for index in range(5):
+        suffix = f"{index:02d}"
+        from_gate = f"from_gate_{suffix}"
+        source_gate = f"source_gate_{suffix}"
+        source_div = f"source_div_{suffix}"
+        mux = f"mux_{suffix}"
+        config[from_gate] = {"kind": "gate", "source": "public_from"}
+        config[source_gate] = {
+            "kind": "gate", "source": "public_source",
+        }
+        config[source_div] = {"kind": "div", "source": source_gate}
+        config[mux] = {
+            "kind": "mux2",
+            "source": {"0": from_gate, "1": source_div},
+        }
+        config[f"clock_{suffix}"] = {"kind": "clock", "source": mux}
+
+    # Natural alignment must not depend on declaration order or a user hint.
+    config = dict(reversed(config.items()))
+    assert all("layout_column" not in item for item in config.values())
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    muxes = [
+        vertex for vertex in document.vertices if vertex.name.startswith("mux_")
+    ]
+    quality = inspect_layout_quality(
+        config,
+        document,
+        library_path=LIBRARY,
+        grid=0.0001,
+        tolerance=0.01,
+    )
+
+    assert len(muxes) == 5
+    assert len({round(vertex.x, 6) for vertex in muxes}) == 1
     assert quality["passed"] is True
 
 

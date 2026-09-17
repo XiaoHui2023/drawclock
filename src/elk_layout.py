@@ -3906,11 +3906,28 @@ def _regular_fanout_array_roots(nodes, logical_edges) -> set[str]:
                 pending.extend(edge.source for edge in incoming[current])
         return roots
 
+    # Record merge rows reached by each zero-indegree root through a one-input
+    # / one-output branch.  A repeated mux array can have a row-local private
+    # counterpart *or* a second reusable public root.  Both shapes own a
+    # coherent distribution facility for each root; deciding from the other
+    # root's fan-out alone loses the latter grammar.
+    root_merge_targets: dict[str, set[str]] = defaultdict(set)
+    for root in nodes:
+        if incoming[root]:
+            continue
+        for edge in outgoing[root]:
+            child = edge.target
+            if len(incoming[child]) != 1 or len(outgoing[child]) != 1:
+                continue
+            merge = outgoing[child][0].target
+            if len(incoming[merge]) >= 2:
+                root_merge_targets[root].add(merge)
+
     for root in nodes:
         root_edges = outgoing[root]
         if incoming[root] or len(root_edges) < 2:
             continue
-        merges = []
+        candidate_rows = []
         for edge in root_edges:
             child = edge.target
             if len(incoming[child]) != 1 or len(outgoing[child]) != 1:
@@ -3918,20 +3935,25 @@ def _regular_fanout_array_roots(nodes, logical_edges) -> set[str]:
             merge = outgoing[child][0].target
             if len(incoming[merge]) < 2:
                 continue
-            competing_sources = [
-                candidate.source
+            competing_roots = {
+                counterpart_root
                 for candidate in incoming[merge]
                 if candidate.source != child
-            ]
-            # A visual public/private array has a route-local counterpart for
-            # every merge.  If every counterpart descends from another shared
-            # root, this is a cross-coupled multi-root domain whose consumer
-            # bands may legitimately need separate facilities.
+                for counterpart_root in upstream_roots(candidate.source)
+                if counterpart_root != root
+            }
+            candidate_rows.append((merge, competing_roots))
+        candidate_merges = {merge for merge, _ in candidate_rows}
+        merges = []
+        for merge, competing_roots in candidate_rows:
+            # A row-local root has one outgoing branch.  A reusable
+            # counterpart must share at least two exact merge rows with this
+            # root.  A cross-coupled root that does not repeat on this row set
+            # remains eligible for ordinary local-facility optimisation.
             if not any(
-                len(outgoing[private_root]) == 1
-                for source in competing_sources
-                for private_root in upstream_roots(source)
-                if private_root != root
+                len(outgoing[counterpart_root]) == 1
+                or len(root_merge_targets[counterpart_root] & candidate_merges) >= 2
+                for counterpart_root in competing_roots
             ):
                 continue
             merges.append(merge)
@@ -4077,7 +4099,6 @@ def _replicate_dispersed_roots(
         if (
             indegree[root]
             or len(outgoing[root]) < 2
-            or root in structured_bus_roots
         ):
             continue
         by_id = {vertex.cell_id: vertex for vertex in accepted.vertices}
@@ -4111,6 +4132,34 @@ def _replicate_dispersed_roots(
         )
         if len(partitions) <= 1:
             continue
+        if root in structured_bus_roots:
+            if root not in regular_array_roots:
+                # Direct collector buses have a different grammar: their
+                # shared trunk is the collector itself, not a repeated
+                # branch-to-merge cohort.  Keep their established owner
+                # protection; the new distant-band exception is specifically
+                # for repeated mux rows, where each branch is independently
+                # visible and a real blank band can be assessed globally.
+                replica_blockers["structured-bus-direct-collector"] += 1
+                continue
+            # A repeated array's ordinary row pitch is part of its visual
+            # grammar: an ink-only partitioner will otherwise replace one
+            # coherent trunk with one glyph per row whenever a normal row
+            # gap merely exceeds the glyph perimeter.  Let a structural bus
+            # open another same-name facility only across a true empty band,
+            # measured against the page's own row scale as well as the glyph
+            # cost.  This is geometry, not a component-name or fixture rule.
+            target_axes = sorted(value for value, _ in desired)
+            structural_gap = max(
+                partition_fixed_cost,
+                4.0 * row_pitch,
+            )
+            if not any(
+                right - left > structural_gap + 1e-6
+                for left, right in zip(target_axes, target_axes[1:])
+            ):
+                replica_blockers["structured-bus-compact"] += 1
+                continue
         candidate_roots += 1
         outgoing_edge_ids = {f"e{edge_index}" for edge_index in outgoing[root]}
         candidate = LayoutDocument(
@@ -6990,6 +7039,11 @@ def _split_root_rendering_anchors_by_local_rows(
         if deltas else geometry_pitch
     )
     facility_costs: list[float] = []
+    # Structural buses have a single facility-partition owner above.  That
+    # owner sees the complete root fan-out and can distinguish a genuine
+    # distant band from normal array pitch.  Local per-anchor splitting lacks
+    # that context and must never reopen an already rejected bus partition.
+    structured_bus_roots = _shared_fanout_bus_roots(nodes, logical_edges)
     # Both facility owners use the same geometry-derived objective. A second
     # display facility is justified only when the saved shared-net ink exceeds
     # the actual visible cost of duplicating this arbitrary library glyph.
@@ -6997,7 +7051,6 @@ def _split_root_rendering_anchors_by_local_rows(
     accepted_roots = 0
     accepted_replicas = 0
     blockers: Counter[str] = Counter()
-    structured_bus_roots = _shared_fanout_bus_roots(nodes, logical_edges)
     def metric(report: dict[str, Any]) -> tuple[float, ...]:
         return (
             report["source_crossing_points"],

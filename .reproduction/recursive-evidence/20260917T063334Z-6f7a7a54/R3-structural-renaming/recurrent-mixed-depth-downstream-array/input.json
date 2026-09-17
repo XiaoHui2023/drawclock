@@ -1,0 +1,141 @@
+{
+  "node_032": {
+    "kind": "gate",
+    "source": "node_026"
+  },
+  "node_031": {
+    "kind": "gate",
+    "source": "node_026"
+  },
+  "node_030": {
+    "kind": "gate",
+    "source": "node_026"
+  },
+  "node_029": {
+    "kind": "gate",
+    "source": "node_026"
+  },
+  "node_028": {
+    "kind": "clock",
+    "source": "node_027"
+  },
+  "node_027": {
+    "kind": "gate",
+    "source": "node_026"
+  },
+  "node_026": {
+    "kind": "from"
+  },
+  "node_025": {
+    "kind": "gate",
+    "source": "node_014"
+  },
+  "node_024": {
+    "kind": "gate",
+    "source": "node_013"
+  },
+  "node_023": {
+    "kind": "gate",
+    "source": "node_012"
+  },
+  "node_022": {
+    "kind": "gate",
+    "source": "node_011"
+  },
+  "node_021": {
+    "kind": "div",
+    "source": "node_025"
+  },
+  "node_020": {
+    "kind": "div",
+    "source": "node_019"
+  },
+  "node_019": {
+    "kind": "div",
+    "source": "node_018"
+  },
+  "node_018": {
+    "kind": "div",
+    "source": "node_024"
+  },
+  "node_017": {
+    "kind": "div",
+    "source": "node_016"
+  },
+  "node_016": {
+    "kind": "div",
+    "source": "node_023"
+  },
+  "node_015": {
+    "kind": "div",
+    "source": "node_022"
+  },
+  "node_014": {
+    "kind": "from"
+  },
+  "node_013": {
+    "kind": "from"
+  },
+  "node_012": {
+    "kind": "from"
+  },
+  "node_011": {
+    "kind": "from"
+  },
+  "node_010": {
+    "kind": "gate",
+    "source": "node_008"
+  },
+  "node_009": {
+    "kind": "gate",
+    "source": "node_005"
+  },
+  "node_008": {
+    "kind": "div",
+    "source": "node_006"
+  },
+  "node_007": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_032",
+      "1": "node_021"
+    }
+  },
+  "node_006": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_031",
+      "1": "node_020"
+    }
+  },
+  "node_005": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_030",
+      "1": "node_017"
+    }
+  },
+  "node_004": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_029",
+      "1": "node_015"
+    }
+  },
+  "node_003": {
+    "kind": "clock",
+    "source": "node_007"
+  },
+  "node_002": {
+    "kind": "clock",
+    "source": "node_010"
+  },
+  "node_001": {
+    "kind": "clock",
+    "source": "node_009"
+  },
+  "node_000": {
+    "kind": "clock",
+    "source": "node_004"
+  }
+}

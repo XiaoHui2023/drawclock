@@ -20,6 +20,7 @@ from auto_layout import (
 from drawio_library import load_library_shapes
 from elk_layout import (
     _optimal_source_anchor_partitions,
+    _regular_fanout_array_roots,
     _replicate_dispersed_roots,
     _relocate_root_rendering_anchors,
     _split_root_rendering_anchors_by_local_rows,
@@ -91,6 +92,52 @@ def _minimal_dispersed_config(root_kind="from"):
         "wide_gate_bottom_0": {"kind": "gate", "source": "wide_root"},
         "wide_clock_bottom_0": {"kind": "clock", "source": "wide_gate_bottom_0"},
     }
+
+
+def _two_public_root_distant_mux_config():
+    """Two bus roots with one upper and one distant lower mux row."""
+    config = {
+        "public_from": {"kind": "from"},
+        "public_source": {"kind": "source"},
+    }
+    for band in ("top_0", "bottom_0"):
+        from_gate = f"from_gate_{band}"
+        source_gate = f"source_gate_{band}"
+        mux = f"mux_{band}"
+        config[from_gate] = {"kind": "gate", "source": "public_from"}
+        config[source_gate] = {"kind": "gate", "source": "public_source"}
+        config[mux] = {
+            "kind": "mux2",
+            "source": {"0": from_gate, "1": source_gate},
+        }
+        config[f"clock_{band}"] = {"kind": "clock", "source": mux}
+    return config
+
+
+def test_distant_structured_bus_roots_can_open_same_name_facilities() -> None:
+    """Bus grammar does not forbid a geometrically dominated long facility."""
+    config = _two_public_root_distant_mux_config()
+    nodes = resolve_nodes(
+        config, load_library_shapes(LIBRARY), {}, library_path=LIBRARY
+    )
+    logical_edges = build_logical_edges(config, nodes, LIBRARY)
+    assert _regular_fanout_array_roots(nodes, logical_edges) == {
+        "public_from", "public_source"
+    }
+
+    document, report = _forced_dispersed_root_layout(config, offset=1500.0)
+    quality = inspect_layout_quality(
+        config, document, library_path=LIBRARY, grid=0.0001, tolerance=0.01
+    )
+    for root in ("public_from", "public_source"):
+        facilities = [
+            vertex for vertex in document.vertices
+            if (vertex.logical_name or vertex.name) == root
+        ]
+        assert len(facilities) == 2
+    assert report["source_replicated_roots"] == 2
+    assert quality["passed"] is True, quality["hard_failures"]
+    assert quality["line_integrity"]["split_rejoin_fanout_nets"] == []
 
 
 def _forced_multiband_root_layout(
