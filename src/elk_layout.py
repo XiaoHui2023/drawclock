@@ -4130,8 +4130,6 @@ def _replicate_dispersed_roots(
             row_axes=row_centers,
             max_intervening_rows=max_intervening_rows,
         )
-        if len(partitions) <= 1:
-            continue
         if root in structured_bus_roots:
             if root not in regular_array_roots:
                 # Direct collector buses have a different grammar: their
@@ -4142,24 +4140,81 @@ def _replicate_dispersed_roots(
                 # visible and a real blank band can be assessed globally.
                 replica_blockers["structured-bus-direct-collector"] += 1
                 continue
-            # A repeated array's ordinary row pitch is part of its visual
-            # grammar: an ink-only partitioner will otherwise replace one
-            # coherent trunk with one glyph per row whenever a normal row
-            # gap merely exceeds the glyph perimeter.  Let a structural bus
-            # open another same-name facility only across a true empty band,
-            # measured against the page's own row scale as well as the glyph
-            # cost.  This is geometry, not a component-name or fixture rule.
-            target_axes = sorted(value for value, _ in desired)
+            # A repeated array owns its *own* row grammar.  Page-wide rows
+            # contain labels, private paths and unrelated columns, so their
+            # local gaps cannot authorize breaking a shared public trunk.
+            # Split only between actual root->branch->merge cohort rows; the
+            # cohort's measured pitch makes a normal repeated row inseparable
+            # while preserving a true distant top/bottom band.
+            structural_edge_ids = []
+            for edge_index in outgoing[root]:
+                child = logical_edges[edge_index - 1].target
+                child_edges = outgoing.get(child, [])
+                if indegree[child] != 1 or len(child_edges) != 1:
+                    continue
+                merge = logical_edges[child_edges[0] - 1].target
+                if indegree[merge] >= 2:
+                    structural_edge_ids.append(edge_index)
+            desired_by_edge = {
+                edge_index: axis for axis, edge_index in desired
+            }
+            structural_axes = sorted(
+                (desired_by_edge[edge_index], edge_index)
+                for edge_index in structural_edge_ids
+                if edge_index in desired_by_edge
+            )
+            structural_deltas = [
+                right[0] - left[0]
+                for left, right in zip(structural_axes, structural_axes[1:])
+                if right[0] - left[0] > 1e-6
+            ]
+            cohort_pitch = (
+                median(structural_deltas)
+                if len(structural_deltas) >= 2
+                else row_pitch
+            )
             structural_gap = max(
                 partition_fixed_cost,
-                4.0 * row_pitch,
-            )
-            if not any(
-                right - left > structural_gap + 1e-6
-                for left, right in zip(target_axes, target_axes[1:])
-            ):
+                4.0 * cohort_pitch,
+            ) if structural_deltas else float("inf")
+            structural_partitions: list[list[int]] = []
+            previous_axis: float | None = None
+            for axis, edge_index in structural_axes:
+                if (
+                    structural_partitions
+                    and previous_axis is not None
+                    and axis - previous_axis > structural_gap + 1e-6
+                ):
+                    structural_partitions.append([])
+                if not structural_partitions:
+                    structural_partitions.append([])
+                structural_partitions[-1].append(edge_index)
+                previous_axis = axis
+            if len(structural_partitions) <= 1:
                 replica_blockers["structured-bus-compact"] += 1
                 continue
+            # Non-cohort consumers (probes and unrelated leaves) may share
+            # this root but must not create an independent facility.  Attach
+            # each to the nearest structural band, then render one facility
+            # per real empty band rather than per local output row.
+            partition_axes = [
+                median([desired_by_edge[edge_index] for edge_index in partition])
+                for partition in structural_partitions
+            ]
+            structural_set = set(structural_edge_ids)
+            for axis, edge_index in desired:
+                if edge_index in structural_set:
+                    continue
+                nearest = min(
+                    range(len(structural_partitions)),
+                    key=lambda index: (abs(partition_axes[index] - axis), index),
+                )
+                structural_partitions[nearest].append(edge_index)
+            partitions = [
+                sorted(partition) for partition in structural_partitions
+            ]
+        if len(partitions) <= 1:
+            continue
         candidate_roots += 1
         outgoing_edge_ids = {f"e{edge_index}" for edge_index in outgoing[root]}
         candidate = LayoutDocument(

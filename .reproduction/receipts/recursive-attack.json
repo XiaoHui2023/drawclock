@@ -3,7 +3,7 @@
   "campaign_name": "defect-driven-adversarial-regression-loop",
   "risk_class": "high",
   "status": "clean",
-  "run_id": "20260917T063334Z-6f7a7a54",
+  "run_id": "20260917T090757Z-8c29ddb5",
   "issues": [
     "FB-ROUTE-002",
     "FB-ROOT-003",
@@ -27,7 +27,7 @@
   "required_consecutive_clean_rounds": 7,
   "consecutive_clean_rounds": 7,
   "restart_semantics": "any reproduction resets to zero and requires a new run from R1",
-  "source_tree_sha256": "47a5dd32569e072d3ac587637f457795cff488c9b120dfae769c4a6007eac1e4",
+  "source_tree_sha256": "2e025a655d48d90ec2bc836d7b3564f7db0b817827eef1c56d4b67dac30ba44d",
   "manifest_sha256": "b7698a13158c5cd3cfe56542c353599ec128a226cbedbc6285c194d38685e2bf",
   "runner_sha256": "f1e686a691e968bf8fe5f2f1c964f8a1576b9c8a1ed65a71e5fc82cdf63c0d2e",
   "oracle_sha256": "0353dcd390ddde8b7d1b81b8795301120a030721749fbe14d6e5f8e75ca79bfa",

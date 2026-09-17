@@ -44,6 +44,8 @@ __pycache__/
 !.reproduction/fix-evidence/20260915T065641Z-4f5cedfd/**
 !.reproduction/fix-evidence/20260917T051659Z-e7aca1f8/
 !.reproduction/fix-evidence/20260917T051659Z-e7aca1f8/**
+!.reproduction/fix-evidence/20260917T090032Z-f9611418/
+!.reproduction/fix-evidence/20260917T090032Z-f9611418/**
 !.reproduction/recursive-evidence/
 .reproduction/recursive-evidence/*
 !.reproduction/recursive-evidence/20260914T110916Z-5d38f1ac/
@@ -52,6 +54,8 @@ __pycache__/
 !.reproduction/recursive-evidence/20260915T070216Z-e2dbf9c2/**
 !.reproduction/recursive-evidence/20260917T063334Z-6f7a7a54/
 !.reproduction/recursive-evidence/20260917T063334Z-6f7a7a54/**
+!.reproduction/recursive-evidence/20260917T090757Z-8c29ddb5/
+!.reproduction/recursive-evidence/20260917T090757Z-8c29ddb5/**
 .mypy_cache/
 .ruff_cache/
 dist/
