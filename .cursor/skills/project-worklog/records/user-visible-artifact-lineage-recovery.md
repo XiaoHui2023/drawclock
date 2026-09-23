@@ -1,8 +1,8 @@
 # 实际 Windows 制品与布局复现恢复
 
-- status: active
+- status: done
 - created: 2026-09-18 11:10 +08:00
-- updated: 2026-09-23 10:20 +08:00
+- updated: 2026-09-23 11:52 +08:00
 - scene: 实际 Windows 制品与布局复现恢复
 
 ## 失败基线和冻结范围
@@ -1971,3 +1971,11 @@
 - 首次普通暂存被 ignore 门拒绝，因为 Windows frozen 正式收据位于根级 receipt 规则下的子目录；未使用 `-f` 绕过。现同步把 `windows-frozen-runtime/**` 加入正式白名单后重试，确保所有发行证据都能由干净 checkout 正常取得。
 - staged 上传扫描未发现密钥或冲突标记，但发现两条本机临时目录与一条邻仓进程绝对路径。保留审计事实和证据语义，将其分别脱敏为 `<local-temp>` 与 `<external-project>`；下一步重新解析 JSON、重暂存并复扫。
 - 最终上传门通过：staged 593 路径，552 个为最终机器证据；未跟踪可见项为 0，敏感信息、本机/跨仓路径、父目录逃逸、冲突标记、超大 blob 与 whitespace 错误均为空。release gate `PASS issues=19`、五件套 PASS、官方 actionlint v1.7.12 PASS、JSON/YAML 解析 PASS；远端关系 0/0。下一步提交并非强推 `main`，随后值守 Release 到公开资产回下载验收。
+
+## 2026-09-23 11:52：首轮远端发布与公开资产消费闭合
+
+- 产品提交 `20f2f28cf0830f8fc93d22775ce22a3f10f997f2` 已正常推送到 `origin/main`；Release run `35810094595` 整体 success。反馈门 1h17m21s 全绿，Linux Ubuntu 16.04/staticx 2m16s 全绿，Windows PyInstaller/60 秒门 5m15s 全绿，publish 1m17s 全绿；无 skipped/cancelled job。
+- `HEAD == origin/main == v1.0.0^{}` 均为 `20f2f28…997f2`。公开附件 Linux tar SHA-256 `f09ed1bd…0ffbf`、Windows ZIP `349d1f18…0a5a7`、Windows runtime receipt `8e75895d…849a2`，本机重新下载后的摘要与 GitHub asset digest 一致；两份归档表面检查 PASS。
+- CI 已从公开 Release 回下载 Linux 包并跑 frozen smoke。本机另从全新临时目录解压公开 Windows ZIP，完整 frozen workflow PASS；同一下载 EXE 对 7302-byte、63 组件、110 边场景双跑 46.601097/45.201012 秒，均小于 60 秒，输出同为 70,985 bytes、SHA-256 `a28fc307…a56`，29/29 指标全绿、失败集合空、专项 witness 0、deterministic=true。
+- 发布学习降级有两次可验证事件：Docker actionlint 因 `dockerDesktopLinuxEngine` 命名管道不存在失败；首次官方 Windows 二进制下载误用不存在的 `windows_x86_64` 资产名，校验条目缺失。随后查询官方 v1.7.12 资产清单，下载并校验 `windows_amd64` SHA-256 `6e7241b5…2f6e9`，actionlint PASS，因此未影响发布正确性。
+- GitHub 仅产生未来维护告警：`ubuntu-latest` 将在 2026-10-19 起迁移 Ubuntu 26，且部分 action 的 Node 20 元数据被 runner 强制使用 Node 24；本次所有 job 成功，附件与下载消费均通过。记录现置为 done；状态提交后仍按常驻自动发布约定再次对齐 main/tag/附件。
