@@ -2,7 +2,7 @@
 
 - status: active
 - created: 2026-09-18 11:10 +08:00
-- updated: 2026-09-23 14:57 +08:00
+- updated: 2026-09-23 17:13 +08:00
 - scene: 实际 Windows 制品与布局复现恢复
 
 ## 失败基线和冻结范围
@@ -2009,3 +2009,12 @@
 - 项目五件套 PASS、feedback release gate `PASS issues=19`；官方 actionlint v1.7.12 Windows amd64 ZIP 按 checksums 校验 SHA-256 `6e7241b5…2f6e9` 后执行 PASS。
 - 2,394 个 Git 跟踪 JSON 全部解析 PASS，`compileall src tools tests`、`git diff --cached --check`、staged 敏感路径/密钥模式检查均 PASS。暂存 578 路径，其中 552 个为当前 fix/recursive 正式证据；没有批量纳入探索文件。
 - `.cursor/skills/drawclock-drawio-pitfalls/SKILL.md` 仍因 Windows 索引/行尾刷新显示工作树 `M`，但 `git diff --` 为 0 行且未暂存；它不属于本轮改动。下一步 fetch 核对远端分叉后提交、正常 push，并对新自动 Release 完整值守。
+
+## 2026-09-23 16:27：公开附件列表异常与下载消费闭合
+
+- 性能提交 `d7c6791be5a1d9a472c1673418f6c7ea7ff08d7f` 的 Release run `35829283088` 四个 job 均 success；Windows 60 秒门、Linux 公开下载 smoke 和发布步骤均通过，标签已对齐该提交。
+- 发布后 REST Release `assets` 列表持续返回 0，但 action 日志明确三件上传成功，逐件再次上传返回 `422 ReleaseAsset.name already exists`。删除并重建 Release 时第一次因本地只检查顶层文件安全阻断，未删除；第二次删除后因多行正文被 PowerShell 拆参导致创建失败，随后已用单字符串正文恢复 Release。`gh release create` 的路径数组调用仍形成不可枚举附件，但三个固定公开下载 URL 均可成功下载。
+- 公开直链下载摘要：Linux tar `3ca5aeb6…a32b`、Windows ZIP `da76e4d4…891e`、receipt `30b3fd78…4212`。两份归档表面 PASS；公开 Windows ZIP 解压后的 EXE SHA-256 `878d43c7…4244`，完整 frozen workflow PASS，真实规模双跑 39.334177/39.345995 秒，输出同为 `a28fc307…a56`，29/29、失败 0、专项 witness 0。
+- 当前公开附件可实际消费，但 workflow 只对 Linux 做发布后消费，不能防止 Windows/receipt 发布面异常。下一步新增依赖 publish 的 Windows 公开下载 job，必须下载 ZIP 与 receipt、验证归档、执行完整 frozen surface 和两次 60 秒门；随后 actionlint/测试、提交并再次值守发布。
+- 已新增 `verify-published-windows` job：依赖 `publish-release`，在 Windows runner 通过固定公开下载 URL 获取 ZIP 与 receipt，校验归档与 receipt 的双跑/29 项合同，再对解压 EXE 执行完整 frozen surface 和 60 秒双跑。下一步增加 workflow 结构回归断言并运行 actionlint/定向测试。
+- 发布硬门结构断言与旧 DAG 合同定向 `6 passed`，官方 actionlint PASS；在最终 workflow/test 工作树上再次从 0% 运行完整套件，`658 passed in 2541.39s (0:42:21)`，无失败或跳过。产品源码未再改变，先前 27/27 与公开 Windows 39/39 秒证据保持适用。下一步执行最终 diff/上传检查、提交推送，并值守新增的第五个发布后 Windows job。

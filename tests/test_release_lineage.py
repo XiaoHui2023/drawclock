@@ -91,3 +91,8 @@ def test_release_requires_windows_frozen_runtime_gate() -> None:
     assert "--max-render-seconds 60" in workflow
     assert "needs: [feedback-reproduction-gate, build-linux-ubuntu16, build-windows]" in workflow
     assert "name: windows-release" in workflow
+    assert "verify-published-windows:" in workflow
+    assert "needs: publish-release" in workflow
+    assert 'releases/download/$tag' in workflow
+    assert "published runtime receipt does not prove the complete quality metric set" in workflow
+    assert workflow.count("tools/verify_frozen_runtime_budget.py") == 2

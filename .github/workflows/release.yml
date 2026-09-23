@@ -202,3 +202,56 @@ jobs:
           test -n "$PACKAGE_ROOT"
           test -n "$BINARY"
           python3 tools/run_frozen_example.py "$BINARY"
+
+  verify-published-windows:
+    name: Verify published Windows release
+    needs: publish-release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download and exercise public Windows assets
+        shell: pwsh
+        run: |
+          $text = Get-Content pyproject.toml -Raw
+          if ($text -notmatch '(?m)^version\s*=\s*["'']([^"'']+)["'']') {
+            throw "missing project version in pyproject.toml"
+          }
+          $version = $Matches[1]
+          $tag = "v$version"
+          $base = "https://github.com/${{ github.repository }}/releases/download/$tag"
+          New-Item -ItemType Directory -Path remote-windows | Out-Null
+          $archive = "remote-windows/drawclock-$version-windows.zip"
+          $publishedReceipt = "remote-windows/receipt.json"
+          curl.exe -fL --retry 3 --retry-delay 2 -o $archive "$base/drawclock-$version-windows.zip"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          curl.exe -fL --retry 3 --retry-delay 2 -o $publishedReceipt "$base/receipt.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/check_release_archive.py $archive
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $receipt = Get-Content $publishedReceipt -Raw | ConvertFrom-Json
+          if ($receipt.status -ne "passed" -or -not $receipt.deterministic) {
+            throw "published runtime receipt is not passed and deterministic"
+          }
+          if ($receipt.runs.Count -ne 2 -or @($receipt.runs | Where-Object status -ne "passed").Count) {
+            throw "published runtime receipt does not contain two passed runs"
+          }
+          if (@($receipt.quality | Where-Object { -not $_.passed -or $_.required_metric_ids.Count -ne 29 -or $_.executed_metric_ids.Count -ne 29 -or $_.failed_metric_ids.Count }).Count) {
+            throw "published runtime receipt does not prove the complete quality metric set"
+          }
+          Expand-Archive -LiteralPath $archive -DestinationPath remote-windows/extracted
+          $binary = Get-ChildItem remote-windows/extracted -Recurse -File -Filter drawclock.exe | Select-Object -First 1
+          if (-not $binary) { throw "published Windows archive has no executable" }
+          python tools/run_frozen_example.py $binary.FullName
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python tools/verify_frozen_runtime_budget.py `
+            --binary $binary.FullName `
+            --library drawio-lib `
+            --output remote-windows/runtime-budget `
+            --max-render-seconds 60
