@@ -2345,6 +2345,174 @@
                 "release_workflow_gate": "tools/check_all_svg_quality.py",
                 "final_artifact_precision_digits": 4
             }
+        },
+        {
+            "id": "FB-LINEAGE-024",
+            "summary": "用户实际 Windows 制品仍显示已声称修复的公共根总线布局问题",
+            "expected": "修复结论必须绑定用户实际运行的公开入口、有效输入、Windows 制品哈希、两次 SVG 和独立几何 Oracle；缺任一项不得发布或声称完成。",
+            "actual": "已由当前工作树构建 Windows EXE，对一分钟内自然复现输入双跑并通过确定性、29 项质量与目标症状消失检查；Release DAG 现强制 Windows 构建、同门验证和资产上传。",
+            "status": "closed",
+            "release_blocking": true,
+            "owner_paths": [
+                "src/**",
+                ".github/workflows/release.yml",
+                "tools/bundle_release.py"
+            ],
+            "reproduction_paths": [
+                "tests/**",
+                "tools/**",
+                ".cursor/**",
+                ".reproduction/**",
+                ".github/**"
+            ],
+            "baseline_revision": "a854b00b05edaaa331da6ef58088af79001805f2",
+            "entrypoint": {
+                "kind": "public_cli_windows_artifact",
+                "command": [
+                    ".venv/Scripts/python.exe",
+                    "tools/verify_frozen_runtime_budget.py",
+                    "--binary",
+                    "work/windows-candidate/dist/drawclock.exe",
+                    "--library",
+                    "drawio-lib",
+                    "--output",
+                    ".reproduction/receipts/windows-frozen-runtime",
+                    "--max-render-seconds",
+                    "60"
+                ],
+                "working_directory": ".",
+                "artifacts": [
+                    ".reproduction/receipts/windows-frozen-runtime/run-1.svg",
+                    ".reproduction/receipts/windows-frozen-runtime/run-2.svg",
+                    ".reproduction/receipts/windows-frozen-runtime/receipt.json"
+                ],
+                "input_paths": [
+                    ".reproduction/receipts/windows-frozen-runtime/input.json"
+                ],
+                "deterministic": true
+            },
+            "oracle": {
+                "command": [
+                    ".venv/Scripts/python.exe",
+                    "tools/verify_frozen_runtime_budget.py",
+                    "--binary",
+                    "work/windows-candidate/dist/drawclock.exe",
+                    "--output",
+                    ".reproduction/receipts/windows-frozen-runtime",
+                    "--max-render-seconds",
+                    "60"
+                ],
+                "working_directory": ".",
+                "files": [
+                    "tools/svg_quality_system.py",
+                    "tools/feedback_layout_reproduction_oracle.py"
+                ],
+                "read_only": true,
+                "reported_symptom_direct": true
+            },
+            "reproduction_policy": {
+                "fault_injection": false,
+                "output_mutation": false,
+                "production_code_change": false
+            },
+            "reproduction_proves": "用户实际 Windows 可执行制品经公开 CLI 对实际有效输入稳定产生所述总线/交叉症状，或稳定暴露该入口无法运行。",
+            "reproduction_does_not_prove": "历史合成 corpus 已修复，或当前源码在另一平台通过。",
+            "reproduction_attempts": [
+                {
+                    "attempted_at": "2026-09-18T11:05:00+08:00",
+                    "hypothesis": "项目内旧 Windows EXE 能用现有公开 corpus 自然重现用户所述过早横穿总线。",
+                    "method": "两次执行 dist/drawclock.exe -i tests/reproduction-corpus/premature-interior-trunk-entry.json -l drawio-lib/drawclock -o TEMP/output.svg --crossing-style none，等待 30 秒。",
+                    "result": "reproduction_blocked",
+                    "observed": "两个本轮启动的 drawclock.exe 进程未退出且没有输出 SVG；已停止，未改写生产输入或产物。",
+                    "analysis": "该结果揭示 Windows 发行制品没有运行时/血缘验收；入口未到达时不能以无 SVG 解释为布局问题不存在。",
+                    "why_not_reproduced": "缺少可运行的实际 Windows 制品和用户实际输入/命令，无法获得最终 SVG 的直接几何 witness。",
+                    "evidence": "<local-temp>/drawclock-lineage-audit; dist/drawclock.exe StartTime=2026-09-16; source commit=a854b00",
+                    "next_condition": "取得正在使用的 EXE/ZIP 绝对路径、输入 JSON 和完整公开命令；或由当前提交构建 Windows 包后对同一入口双跑。"
+                },
+                {
+                    "attempted_at": "2026-09-18T11:30:00+08:00",
+                    "hypothesis": "项目内旧 Windows EXE 对 retained premature-interior-trunk corpus 会自然出现用户所述公共根横穿。",
+                    "method": "以记录 PID 的 dist/drawclock.exe 对同一 JSON 和 library 公开 CLI 独立运行两次，等待正常退出；对原始 SVG 执行只读 FB-ROUTE-023 Oracle 与全 29 项质量系统。",
+                    "result": "not_reproduced",
+                    "observed": "两次约 80 秒后生成相同 160692-byte SVG，SHA-256 D4F63ACB32BEA876049B0EEF1303EC7B3AAE0AC4B5EB7776F2DE498421B8E751；专项 Oracle symptom not observed，29/29 指标通过。",
+                    "analysis": "旧 Windows 制品可运行且此输入确定，但该 retained corpus 是干净反例，不能以它的通过否定用户当前图的实际症状。制品仍无 build manifest，不能证明与当前源码血缘一致。",
+                    "why_not_reproduced": "当前实际用户 JSON、运行命令和输出路径不在项目可见范围；历史 corpus 不含触发用户当前缺陷的必要结构或参数。",
+                    "evidence": "<local-temp>/drawclock-lineage-audit/old-default-*.svg; old-route023-oracle.log; old-default-quality.json",
+                    "next_condition": "读取正在使用的 JSON/命令/输出，或获得其可验证副本；随后在同一 Windows EXE 双跑并由最终 SVG Oracle 判定。"
+                },
+                {
+                    "attempted_at": "2026-09-22T16:04:00+08:00",
+                    "hypothesis": "保留 direct peer_1，仅将每行 peer_2 改为 gate→clock，可移除 direct triple 的局部阻碍并让公共根内部主干反事实成为唯一失败指标。",
+                    "method": "用公开 JSON/CLI 对命名场景 dual-public-repeated-direct-port-swap-staggered-branch-port-swap-triple-second-gate-clock-twelve 独立渲染两次，并由不导入生产布局模块的最终 SVG Oracle 执行 29 项 exact-set 与目标合同。",
+                    "result": "not_reproduced",
+                    "observed": "两张 234432-byte SVG 的 SHA-256 均为 ebcb0d9cbd4d032d0ccf73701af86d4b18d76dd1d1ff6b74c6e412a77276342e；语义前置条件成立，覆盖 210/210，failed_metric_ids、detected_issues 与 target_witnesses 均为空，target_reproduced=false。",
+                    "analysis": "仅 gate peer_2 也使整体布局重新排列，正式 Oracle 没有得到精确 premature_interior_trunk_entry 红灯；mux01 路线退化为 2 点直线，7 条合格 public_root_a 边的 14 个 top/bottom 反事实均至少失败 4 项。该输入不能解冻 src/elk_layout.py。",
+                    "why_not_reproduced": "最终 SVG 中没有满足严格反事实支配条件的自然 witness，全部注册质量指标均通过。",
+                    "evidence": ".reproduction/receipts/dual-public-staggered-branch-port-swap-triple-second-gate-clock-twelve/coverage-receipt.json",
+                    "next_condition": "运行 peer_clock_fanout 四值因素的编译、结构和 pairwise 门；通过后对 first-double 命名场景执行公开 CLI 双跑与独立 Oracle，检验它能否保留 direct triple 改善并移动 peer_1 输出纵段。"
+                },
+                {
+                    "attempted_at": "2026-09-22T18:55:00+08:00",
+                    "hypothesis": "在每行保留 direct peer_1→clock 的同时增加第二个 direct clock 扇出，可移动造成 direct triple 单重叠的输出纵段，并保留公共根边界反事实的点/事件改善。",
+                    "method": "将 peer_clock_fanout 作为 single/first-double/second-double/both-double 四值正式因素；编译、结构和 pairwise 门通过后，对 first-double 命名场景执行两次公开 CLI 渲染及独立最终 SVG Oracle。",
+                    "result": "not_reproduced",
+                    "observed": "两张 241311-byte SVG 的 SHA-256 均为 3bc6d5d1341236dad44732b30b4ac63008ef41724425c1714bcf92bb490a6d2b；语义前置条件成立，覆盖 231/231，29 项指标全部通过，failed_metric_ids、detected_issues 与 target_witnesses 为空，target_reproduced=false。",
+                    "analysis": "first-double 保持了自然公开拓扑与确定性，但正式 Oracle 没有得到精确 premature_interior_trunk_entry 红灯；15 条合格 public_root_a 边均至少失败 2 项，最佳 bottom 候选同时失败 same-net cycle 与 global points。该输入不能解冻 src/elk_layout.py。",
+                    "why_not_reproduced": "最终 SVG 中没有满足严格反事实支配条件的自然 witness，全部注册质量指标均通过。",
+                    "evidence": ".reproduction/receipts/dual-public-staggered-branch-port-swap-triple-first-double-clock-twelve/coverage-receipt.json",
+                    "next_condition": "为同一正式因素增加 second-double 命名场景与结构断言；保留 peer_1 单 clock、只增加 peer_2 direct clock 扇出，经结构门后执行完整公开 CLI 双跑与独立 Oracle。"
+                },
+                {
+                    "attempted_at": "2026-09-22T19:51:10+08:00",
+                    "hypothesis": "保留 peer_1 单 direct clock、只给每行 peer_2 增加第二个 direct clock，可移动非目标纵段并留下精确公共根内部主干红灯。",
+                    "method": "对 second-double 命名场景执行两次公开 CLI 渲染、SHA 一致性检查及独立最终 SVG Oracle；随后按用户补充约束统计全部已有输入的组件数、source 连接数、字节数和实际生成耗时。",
+                    "result": "not_reproduced",
+                    "observed": "两张 234880-byte SVG 的 SHA-256 均为 bb08f1b7aaccdecf685c0d045dc23ba0731ca9a1799a919eb91c804b48c9df95；语义前置条件成立，覆盖 231/231，但 failed_metric_ids=[\"crossing_treatment\"]、target_witnesses=[]、target_reproduced=false。两次生成约 13:40 和 13:14，超过用户明确的单次不超过一分钟约束。",
+                    "analysis": "second-double 自然触发了非目标交叉处理红灯，未触发公共根过早进入图内部；它与整个 12 行 triple 族均过大、过慢，不代表用户实际输入规模，不能解冻 src/elk_layout.py。",
+                    "why_not_reproduced": "正式收据的唯一失败指标不是 premature_interior_trunk_entry，且没有目标 witness；输入规模和生成耗时也违反新确认的用户边界。",
+                    "evidence": ".reproduction/receipts/dual-public-staggered-branch-port-swap-triple-second-double-clock-twelve/coverage-receipt.json",
+                    "next_condition": "从已有单次生成 <=60s 的小型输入筛选双公共根、重复 direct 和跨行纵向结构；缩减行数后先做一次公开 CLI 性能预检，超时即淘汰，只有一分钟内候选才进入正式双跑与独立 Oracle。"
+                },
+                {
+                    "attempted_at": "2026-09-22T20:20:08+08:00",
+                    "hypothesis": "4 行 triple 小型图只需将 direct_entry_pattern 从 all 改为 top-main-omit-b，即可移除同网闭环拒因并自然暴露公共根过早进入内部的唯一红灯。",
+                    "method": "从 pairwise case-28 出发，移除非必要 row-band 注释压力后执行 60 秒单跑预检，再对命名场景 dual-public-small-staggered-triple-four 执行两次公开 CLI、SHA 一致性、29 指标 exact-set 与独立最终 SVG Oracle。",
+                    "result": "reproduced",
+                    "observed": "两张 70983-byte SVG 的 SHA-256 均为 740172f06f082f75f23690e796908dd9dce8dbecdcc8062bd03dcd1c138ab259；两轮各约 47 秒。schema v2 覆盖 231/231、语义前置 true、failed_metric_ids=[\"premature_interior_trunk_entry\"]、FB-ROUTE-023 witness 1、target_reproduced=true。",
+                    "analysis": "小型公开输入在用户一分钟预算内稳定自然复现，且没有任何伴随质量失败；正式 witness 证明 public_root_a→reconvergent_mux_01 过早离开公共根主干并跨越多个目标行，外移反事实同时减少全局点、全局事件和局部事件。全部产品 owner 解冻条件首次成立。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/dual-public-small-staggered-triple-four/coverage-receipt.json",
+                    "next_condition": "审计 src/elk_layout.py 从 root facility、route scoring 到最终边路径的最早责任点；实施单一 owner 修复后，用同一命名输入公开 CLI 双跑、29 指标、独立 Oracle及相邻小型回归完成闭环。"
+                },
+                {
+                    "attempted_at": "2026-09-22T20:54:43+08:00",
+                    "hypothesis": "boundary corridor 的跨行开启条件漏掉全图 route endpoint axes，使可见的延后离开通道未进入交易门。",
+                    "method": "将 crossed visible rows 从仅组件可视框中心扩充为组件中心与全部 route 终点轴的并集；保持候选评分与全图安全门不变，然后对同一命名场景公开 CLI 双跑并执行独立 29 项 exact-set。",
+                    "result": "source_fix_verified",
+                    "observed": "两张 70985-byte SVG 的 SHA-256 均为 a28fc307465570a5b214cf647a3324b3e06772a3bc1d41c175092871aee89a56；两轮生成约 56.86 秒和 56.43 秒。schema v2 覆盖 231/231，语义前置 true，failed_metric_ids、detected_issues 与 target_witnesses 全空。",
+                    "analysis": "修复前同输入精确单红，修复后双跑确定且全绿。最早责任点是 route candidate enumeration 的 visible-row 语义，不是 serializer、cycle 安全门或后续 owner 覆盖。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/dual-public-small-staggered-triple-four-fixed/coverage-receipt.json",
+                    "next_condition": "运行命名 current-CLI 回归、相邻 boundary corridor 攻击、五件套与 diff 审计；Windows 发布制品仍需独立的可验证构建和血缘收据。"
+                },
+                {
+                    "attempted_at": "2026-09-22T23:08:00+08:00",
+                    "hypothesis": "当前工作树构建的 Windows frozen 入口可在 60 秒内稳定生成修复后的相同 SVG，且未来 Release 必须经过同一门才能发布 Windows 资产。",
+                    "method": "以 drawclock.spec 在隔离 work 目录构建 EXE；verify_frozen_runtime_budget 从具名场景生成 7302-byte 输入，隔离 PATH 后真实双跑 frozen CLI，每轮 subprocess 60 秒硬超时，再执行完整 29 指标、目标 witness 与双 SHA 检查；工作流测试确认 publish 必须等待 Windows job。",
+                    "result": "artifact_fix_verified",
+                    "observed": "正式 frozen 收据两轮均在 60 秒内完成，输出均为 70985 bytes 且 SHA-256 为 a28fc307465570a5b214cf647a3324b3e06772a3bc1d41c175092871aee89a56；deterministic=true，29 项 required/executed 完整、failed_metric_ids 为空、目标 witness 总数 0。超时 mutant 与 Release 三前驱合同测试均通过。",
+                    "analysis": "源码修复、实际 Windows EXE、真实规模输入、最终 SVG Oracle 和未来发布 DAG 已形成闭环；本机候选不是用源码解释器代替制品，CI 也不能再绕过 Windows 门只发布 Linux。",
+                    "why_not_reproduced": "",
+                    "evidence": ".reproduction/receipts/windows-frozen-runtime/receipt.json; .github/workflows/release.yml; tests/test_release_lineage.py",
+                    "next_condition": "每次源码、布局 Oracle、运行预算 verifier 或发布工作流变化后必须重新构建 Windows 制品并重跑该门；任一失败阻断 publish。"
+                }
+            ],
+            "reproduction_receipt": ".reproduction/receipts/dual-public-small-staggered-triple-four/coverage-receipt.json",
+            "fix_verification": {
+                "baseline_fails": true,
+                "current_passes": true,
+                "receipt": ".reproduction/receipts/windows-frozen-runtime/receipt.json"
+            }
         }
     ]
 }

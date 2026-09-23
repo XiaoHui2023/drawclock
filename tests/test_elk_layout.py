@@ -7,6 +7,7 @@ from pathlib import Path
 from auto_layout import build_logical_edges, load_clock_tree, resolve_nodes
 from drawio_library import load_library_shapes
 from elk_layout import (
+    _logical_fanout_cycle_count,
     _regular_fanout_array_roots,
     _shared_fanout_bus_roots,
     generate_elk_layout,
@@ -109,6 +110,28 @@ def test_two_public_root_mux_array_keeps_a_bus_for_each_root() -> None:
         ]
         assert len(facilities) == 1
         assert len(root_edges) == 4
+
+
+def test_fanout_cycle_count_decomposes_by_source_port_network() -> None:
+    config = _two_public_root_mux_array()
+    nodes = resolve_nodes(
+        config, load_library_shapes(LIBRARY), {}, library_path=LIBRARY
+    )
+    logical_edges = build_logical_edges(config, nodes, LIBRARY)
+    document, _ = generate_elk_layout(config, library_path=LIBRARY)
+    source_nets = {
+        (edge.source, edge.source_port) for edge in logical_edges
+    }
+
+    global_count = _logical_fanout_cycle_count(document, logical_edges)
+    decomposed_count = sum(
+        _logical_fanout_cycle_count(
+            document, logical_edges, source_nets={source_net},
+        )
+        for source_net in source_nets
+    )
+
+    assert decomposed_count == global_count
 
 
 def test_similar_muxes_share_a_natural_column_with_asymmetric_inputs() -> None:

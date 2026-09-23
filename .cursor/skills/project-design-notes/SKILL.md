@@ -50,6 +50,9 @@ description: >-
 
 ## 质量检查
 
+- 正确性与性能采用非补偿式双硬门：先通过公开入口的拓扑、端口、几何、确定性、指标 exact-set、历史故障和正常反例，再评估耗时；性能改善不能交换任何质量退化。真实用户输入与压力输入分别声明规模和预算，当前 7302-byte、63 组件、110 边的具名回归单次生成预算为 60 秒；压力场景只用于定位复杂度与容量边界。
+- 正式性能收据逐轮记录墙钟耗时、退出码、输入与产物哈希、预算和超限状态。同输入双跑必须各自满足预算且 SVG 哈希一致；超时、缺产物、预算超限、指标缺项或旧 witness 复现均阻断后续发行。性能剖析只定位重复工作，不能作为耗时基准；预算以未插桩公开 CLI 墙钟为准。
+
 - 质量检查是独立于设计制作的终态系统。`tools/svg_graph_inspector.py` schema v2 从最终 SVG 与输入 JSON 提取全部节点、显示框/中心/行列，以及每条边的完整点序列、逐段起止/实际行进方向/长度/包围框、结构化拐点、交叉坐标/伙伴、异网重叠；每个 source-port 网络另输出顶点、分段、连通分量、结点度数、分叉/叶点、共享段和环秩。它不导入生产布局模块，逐线字段缺失由 `geometry_inventory_completeness` 直接拒绝。
 - `tests/quality-metrics.json` 是唯一指标注册表。`tools/svg_quality_system.py` 对每张图执行完整指标 exact-set，并要求 `required_metric_ids == executed_metric_ids == receipted_metric_ids`；不适用项也必须执行并写出可核验的 applicability proof。`tools/check_all_svg_quality.py` 独立枚举全部公开输入，新鲜生成后执行制品×指标笛卡尔积，任何缺失、重复、乱序、无回执或质量 witness 都非零结束。
 - `crossing_treatment` 从最终 arc SVG 复算全部异网正交真交叉与圆弧中心，要求每个交叉恰有一条参与边绘制桥，并拒绝零桥、双桥、孤立桥和 junction 圆点冒充桥。几何分类先量化到 SVG 四位坐标精度，内存浮点尾差不得改变最终可见判定。

@@ -168,7 +168,10 @@ class FeedbackReproductionGateTest(unittest.TestCase):
         self.assertLess(workflow.index(structural_command), workflow.index(checker_command))
         self.assertLess(workflow.index(all_svg_command), workflow.index(checker_command))
         self.assertIn("needs: feedback-reproduction-gate", workflow)
-        self.assertIn("needs: [feedback-reproduction-gate, build-linux-ubuntu16]", workflow)
+        self.assertIn(
+            "needs: [feedback-reproduction-gate, build-linux-ubuntu16, build-windows]",
+            workflow,
+        )
         self.assertNotIn("if: always()", workflow)
 
     def test_pack_entrypoints_gate_before_dependencies_and_output_mutation(self) -> None:

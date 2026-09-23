@@ -3,7 +3,7 @@
   "campaign_name": "defect-driven-adversarial-regression-loop",
   "risk_class": "high",
   "status": "clean",
-  "run_id": "20260917T090757Z-8c29ddb5",
+  "run_id": "20260922T183524Z-e80ce0a2",
   "issues": [
     "FB-ROUTE-002",
     "FB-ROOT-003",
@@ -27,10 +27,10 @@
   "required_consecutive_clean_rounds": 7,
   "consecutive_clean_rounds": 7,
   "restart_semantics": "any reproduction resets to zero and requires a new run from R1",
-  "source_tree_sha256": "2e025a655d48d90ec2bc836d7b3564f7db0b817827eef1c56d4b67dac30ba44d",
+  "source_tree_sha256": "737c89932cdd8d439c34f307d07a6f8393af444c65f20eb6a493eb418ac89e36",
   "manifest_sha256": "b7698a13158c5cd3cfe56542c353599ec128a226cbedbc6285c194d38685e2bf",
   "runner_sha256": "f1e686a691e968bf8fe5f2f1c964f8a1576b9c8a1ed65a71e5fc82cdf63c0d2e",
-  "oracle_sha256": "0353dcd390ddde8b7d1b81b8795301120a030721749fbe14d6e5f8e75ca79bfa",
+  "oracle_sha256": "73b5cced131a35aff91c12be0b307869446272d471e2becbfb22c1bd8b57a185",
   "semantics_sha256": "9110e75d06071f93bc9837b695a63d9cbefb5e336210a8fca32b8a146b37bb0e",
   "quality_system_sha256": "f2d927690239fe20c15e3a437173b56b61ade2cc851974e7871b1db73f00da44",
   "quality_registry_sha256": "f9beadff9796275c977b4acc37b41aa25a309b0f7764bd7214960dd06682f761",
@@ -45,8 +45,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "2ac1478b80793aeab8b0d2c1fc97667e1b5f3a69e46e1919a6d4c4845108126d",
-          "artifact_before_oracle_sha256": "e89cee36cb7a130cab09ed2a6b78a64fc1171e9dcb2bda5fad6765888e9eb08b",
-          "artifact_after_oracle_sha256": "e89cee36cb7a130cab09ed2a6b78a64fc1171e9dcb2bda5fad6765888e9eb08b",
+          "artifact_before_oracle_sha256": "a60116ae32cb75df94da5444445859f1ac29c95e0ab94d35374917080ad728b5",
+          "artifact_after_oracle_sha256": "a60116ae32cb75df94da5444445859f1ac29c95e0ab94d35374917080ad728b5",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"

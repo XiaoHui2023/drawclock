@@ -956,6 +956,34 @@ def test_two_regular_common_domains_remain_separate_single_bus_networks(
     assert report["totals"]["different_net_overlaps"] == 0
 
 
+def test_shared_bus_metric_distinguishes_source_facilities_from_from_bus() -> None:
+    boxes = [
+        oracle.Box("root", 0.0, 0.0, 20.0, 20.0),
+        oracle.Box("root", 0.0, 100.0, 20.0, 20.0),
+        oracle.Box("mux_a", 100.0, 0.0, 20.0, 20.0),
+        oracle.Box("mux_b", 100.0, 100.0, 20.0, 20.0),
+    ]
+    routes = [
+        oracle.Route(0, [(20.0, 10.0), (100.0, 10.0)], source="root", target="mux_a"),
+        oracle.Route(1, [(20.0, 110.0), (100.0, 110.0)], source="root", target="mux_b"),
+    ]
+    targets = {
+        "mux_a": {"kind": "mux2", "source": {"0": "root", "1": "peer_a"}},
+        "mux_b": {"kind": "mux2", "source": {"0": "root", "1": "peer_b"}},
+    }
+    source_config = {"root": {"kind": "source"}, **targets}
+    from_config = {"root": {"kind": "from"}, **targets}
+
+    assert oracle._shared_root_bus_fragmentation_witnesses(
+        source_config, {"root"}, routes, boxes,
+    ) == []
+    witnesses = oracle._shared_root_bus_fragmentation_witnesses(
+        from_config, {"root"}, routes, boxes,
+    )
+    assert len(witnesses) == 1
+    assert witnesses[0]["physical_facilities"] == 2
+
+
 def test_oracle_rejects_recurrent_shared_root_replication() -> None:
     input_path = ROOT / "tests/reproduction-corpus/recurrent-mixed-depth-downstream-array.json"
     svg_path = (
@@ -1025,6 +1053,52 @@ def test_current_cli_closes_premature_interior_trunk_entry(
     ] == []
     assert "FB-ROUTE-023" not in report["detected_issues"]
     receipt = tmp_path / "premature-entry-quality.json"
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "svg_quality_system.py"),
+         "--input", str(input_path), "--svg", str(output),
+         "--registry", str(ROOT / "tests" / "quality-metrics.json"),
+         "--output", str(receipt)],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    quality = json.loads(receipt.read_text(encoding="utf-8"))
+    assert quality["required_metric_ids"] == quality["executed_metric_ids"]
+    assert len(quality["executed_metric_ids"]) == 29
+    assert quality["failed_metric_ids"] == []
+
+
+def test_current_cli_closes_small_staggered_dual_public_trunk(
+    tmp_path: Path,
+) -> None:
+    search_path = ROOT / "tools" / "search_dual_public_bus_coverage.py"
+    spec = importlib.util.spec_from_file_location(
+        "dual_public_small_staggered_regression", search_path,
+    )
+    assert spec is not None and spec.loader is not None
+    search = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(search)
+    factors = search.REQUIRED_SCENARIOS[
+        "dual-public-small-staggered-triple-four"
+    ]
+    config = search.build_case(factors)
+    assert search.semantic_preconditions_met(factors, config)
+    input_path = tmp_path / "dual-public-small-staggered.json"
+    input_path.write_text(
+        json.dumps(config, indent=2) + "\n", encoding="utf-8"
+    )
+    output = tmp_path / "dual-public-small-staggered.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "arc"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["witnesses"][
+        "premature_interior_trunk_entry_witnesses"
+    ] == []
+    assert "FB-ROUTE-023" not in report["detected_issues"]
+    receipt = tmp_path / "dual-public-small-staggered-quality.json"
     completed = subprocess.run(
         [sys.executable, str(ROOT / "tools" / "svg_quality_system.py"),
          "--input", str(input_path), "--svg", str(output),
@@ -1201,6 +1275,299 @@ def test_boundary_trunk_coverage_model_closes_exact_set() -> None:
         "late-ranked-final-single-edge-channel",
     ):
         assert search.REQUIRED_SCENARIOS[name] in suite
+
+
+def test_dual_public_root_generator_uses_public_cli_and_full_svg_oracle(
+    tmp_path: Path,
+) -> None:
+    """A second public ``source`` is a bus candidate, not a private alias."""
+    search_path = ROOT / "tools" / "search_dual_public_bus_coverage.py"
+    spec = importlib.util.spec_from_file_location(
+        "dual_public_bus_coverage", search_path,
+    )
+    assert spec is not None and spec.loader is not None
+    search = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(search)
+    suite = search.covering_suite()
+    covered = set().union(*(search.coverage_units(case) for case in suite))
+    assert covered == search.required_units()
+    factors = search.REQUIRED_SCENARIOS["second-public-source-extra-output"]
+    config = search.build_case(factors)
+    assert config["public_root_a"]["kind"] == "from"
+    assert config["public_root_b"]["kind"] == "source"
+    assert config["public_root_b_probe"]["source"] == "public_root_b"
+    assert config["b_div_00"]["source"] == "b_gate_00"
+    input_path = tmp_path / "dual-public.json"
+    input_path.write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
+    output = tmp_path / "dual-public.svg"
+    subprocess.run(
+        [sys.executable, str(ROOT / "src"), "-i", str(input_path),
+         "-l", str(ROOT / "drawio-lib"), "-o", str(output),
+         "--crossing-style", "arc"],
+        cwd=ROOT, check=True,
+    )
+    report = oracle.analyze(input_path, output)
+    assert report["witnesses"]["shared_root_bus_fragmentation_witnesses"] == []
+    receipt = tmp_path / "dual-public-quality.json"
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "svg_quality_system.py"),
+         "--input", str(input_path), "--svg", str(output),
+         "--registry", str(ROOT / "tests" / "quality-metrics.json"),
+         "--output", str(receipt)],
+        cwd=ROOT, capture_output=True, text=True, check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    quality = json.loads(receipt.read_text(encoding="utf-8"))
+    assert quality["required_metric_ids"] == quality["executed_metric_ids"]
+    assert len(quality["executed_metric_ids"]) == 29
+    assert quality["failed_metric_ids"] == []
+
+
+def test_dual_public_root_generator_models_repeated_direct_reconvergence() -> None:
+    search_path = ROOT / "tools" / "search_dual_public_bus_coverage.py"
+    spec = importlib.util.spec_from_file_location(
+        "dual_public_bus_repeated_direct_contract", search_path,
+    )
+    assert spec is not None and spec.loader is not None
+    search = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(search)
+    factors = search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-reconvergent"
+    ]
+    config = search.build_case(factors)
+    direct_muxes = search.repeated_direct_muxes(config)
+    assert len(direct_muxes) >= 2
+    assert "reconvergent_mux_00" in direct_muxes
+    assert config["reconvergent_mux_00"]["kind"] == "mux4"
+    assert config["mux_07"]["layout_column"] == 9
+    assert config["reconvergent_mux_07"]["layout_column"] == 10
+    assert search.semantic_preconditions_met(factors, config)
+    swapped = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap"
+    ])
+    assert swapped["reconvergent_mux_00"]["source"]["1"] == "public_root_b"
+    assert swapped["reconvergent_mux_00"]["source"]["2"] == "public_root_a"
+    reverse_interleaved = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-reverse-interleaved"
+    ])
+    assert reverse_interleaved["mux_07"]["source"]["3"] == "obstacle_gate_00"
+    assert reverse_interleaved["mux_00"]["source"]["3"] == "obstacle_gate_07"
+    staggered = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-staggered-reverse-interleaved"
+    ])
+    assert staggered["reconvergent_mux_00"]["kind"] == "mux3"
+    assert set(staggered["reconvergent_mux_00"]["source"]) == {"0", "1", "2"}
+    assert "public_root_b" not in staggered["reconvergent_mux_00"]["source"].values()
+    assert {"public_root_a", "public_root_b"}.issubset(
+        staggered["reconvergent_mux_01"]["source"].values()
+    )
+    private_obstacles = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-staggered-reverse-private-twelve"
+    ])
+    assert private_obstacles["obstacle_gate_00"]["source"] == "obstacle_root_00"
+    assert private_obstacles["obstacle_gate_01"]["source"] == "obstacle_root_01"
+    assert private_obstacles["mux_11"]["source"]["3"] == "obstacle_gate_00"
+    penultimate = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-staggered-penultimate-twelve"
+    ])
+    assert penultimate["reconvergent_mux_10"]["layout_column"] == 10
+    assert "layout_column" not in penultimate["reconvergent_mux_11"]
+    rotated_obstacles = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-staggered-rotate-twelve"
+    ])
+    assert rotated_obstacles["mux_06"]["source"]["3"] == "obstacle_gate_00"
+    assert rotated_obstacles["mux_00"]["source"]["3"] == "obstacle_gate_06"
+    penultimate_omit_a = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-penultimate-omit-a-twelve"
+    ])
+    assert penultimate_omit_a["reconvergent_mux_10"]["kind"] == "mux3"
+    assert "public_root_a" not in penultimate_omit_a["reconvergent_mux_10"]["source"].values()
+    assert {"public_root_a", "public_root_b"}.issubset(
+        penultimate_omit_a["reconvergent_mux_11"]["source"].values()
+    )
+    penultimate_omit_b = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-penultimate-omit-b-twelve"
+    ])
+    assert penultimate_omit_b["reconvergent_mux_10"]["kind"] == "mux3"
+    assert "public_root_b" not in penultimate_omit_b["reconvergent_mux_10"]["source"].values()
+    assert "public_root_a" in penultimate_omit_b["reconvergent_mux_10"]["source"].values()
+    direct_peer_output = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-staggered-branch-port-swap-triple-twelve"
+    ])
+    assert "clock_01_peer_1_gate" not in direct_peer_output
+    assert direct_peer_output["clock_01_peer_1"] == {
+        "kind": "clock", "source": "reconvergent_mux_01_peer_1",
+    }
+    gated_peer_output = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-staggered-branch-port-swap-triple-gate-clock-twelve"
+    ])
+    assert gated_peer_output["clock_01_peer_1_gate"] == {
+        "kind": "gate", "source": "reconvergent_mux_01_peer_1",
+    }
+    assert gated_peer_output["clock_01_peer_1"] == {
+        "kind": "clock", "source": "clock_01_peer_1_gate",
+    }
+    first_gated_peer_output = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-staggered-branch-port-swap-triple-first-gate-clock-twelve"
+    ])
+    assert first_gated_peer_output["clock_01_peer_1_gate"] == {
+        "kind": "gate", "source": "reconvergent_mux_01_peer_1",
+    }
+    assert first_gated_peer_output["clock_01_peer_1"]["source"] == (
+        "clock_01_peer_1_gate"
+    )
+    assert "clock_01_peer_2_gate" not in first_gated_peer_output
+    assert first_gated_peer_output["clock_01_peer_2"]["source"] == (
+        "reconvergent_mux_01_peer_2"
+    )
+    second_gated_peer_output = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-staggered-branch-port-swap-triple-second-gate-clock-twelve"
+    ])
+    assert "clock_01_peer_1_gate" not in second_gated_peer_output
+    assert second_gated_peer_output["clock_01_peer_1"]["source"] == (
+        "reconvergent_mux_01_peer_1"
+    )
+    assert second_gated_peer_output["clock_01_peer_2_gate"] == {
+        "kind": "gate", "source": "reconvergent_mux_01_peer_2",
+    }
+    assert second_gated_peer_output["clock_01_peer_2"]["source"] == (
+        "clock_01_peer_2_gate"
+    )
+    first_double_clock = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-staggered-branch-port-swap-triple-first-double-clock-twelve"
+    ])
+    assert first_double_clock["clock_01_peer_1_extra"] == {
+        "kind": "clock", "source": "reconvergent_mux_01_peer_1",
+    }
+    assert "clock_01_peer_2_extra" not in first_double_clock
+    assert first_double_clock["clock_01_peer_2"]["source"] == (
+        "reconvergent_mux_01_peer_2"
+    )
+    second_double_clock = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-repeated-direct-port-swap-staggered-branch-port-swap-triple-second-double-clock-twelve"
+    ])
+    assert "clock_01_peer_1_extra" not in second_double_clock
+    assert second_double_clock["clock_01_peer_1"]["source"] == (
+        "reconvergent_mux_01_peer_1"
+    )
+    assert second_double_clock["clock_01_peer_2_extra"] == {
+        "kind": "clock", "source": "reconvergent_mux_01_peer_2",
+    }
+    small_staggered = search.build_case(search.REQUIRED_SCENARIOS[
+        "dual-public-small-staggered-triple-four"
+    ])
+    assert search.REQUIRED_SCENARIOS[
+        "dual-public-small-staggered-triple-four"
+    ]["annotation_pressure"] == "none"
+    assert small_staggered["reconvergent_mux_00"]["kind"] == "mux3"
+    assert "public_root_b" not in (
+        small_staggered["reconvergent_mux_00"]["source"].values()
+    )
+    assert {"public_root_a", "public_root_b"}.issubset(
+        small_staggered["reconvergent_mux_01"]["source"].values()
+    )
+    assert "reconvergent_mux_03_peer_1" in small_staggered
+    assert "reconvergent_mux_03_peer_2" in small_staggered
+    assert search.semantic_preconditions_met(
+        search.REQUIRED_SCENARIOS["dual-public-small-staggered-triple-four"],
+        small_staggered,
+    )
+    suite = search.covering_suite()
+    covered = set().union(*(search.coverage_units(case) for case in suite))
+    assert covered == search.required_units()
+
+
+def test_dual_public_root_target_red_light_requires_exact_metric_contract() -> None:
+    search_path = ROOT / "tools" / "search_dual_public_bus_coverage.py"
+    spec = importlib.util.spec_from_file_location(
+        "dual_public_bus_target_contract", search_path,
+    )
+    assert spec is not None and spec.loader is not None
+    search = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(search)
+    witness = [{"edge_id": "svg-edge-0001"}]
+    assert search.is_target_reproduction(
+        witness, True, ["premature_interior_trunk_entry"]
+    )
+    assert not search.is_target_reproduction(witness, False, [
+        "premature_interior_trunk_entry"
+    ])
+    assert not search.is_target_reproduction(witness, True, [])
+    assert not search.is_target_reproduction(witness, True, [
+        "premature_interior_trunk_entry", "different_net_overlap",
+    ])
+
+
+def test_dual_public_render_budget_records_success_and_timeout(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    search_path = ROOT / "tools" / "search_dual_public_bus_coverage.py"
+    spec = importlib.util.spec_from_file_location(
+        "dual_public_bus_render_budget", search_path,
+    )
+    assert spec is not None and spec.loader is not None
+    search = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(search)
+    input_path = tmp_path / "input.json"
+    input_path.write_text("{}\n", encoding="utf-8")
+    output = tmp_path / "output.svg"
+    observed = {}
+
+    def succeed(command, **kwargs):
+        observed["timeout"] = kwargs["timeout"]
+        output.write_text("<svg/>\n", encoding="utf-8")
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.setattr(search.subprocess, "run", succeed)
+    passed = search._run(
+        tmp_path, input_path, output, max_seconds=1.25,
+    )
+    assert observed["timeout"] == 1.25
+    assert passed["status"] == "passed"
+    assert passed["output_exists"] is True
+    assert passed["max_seconds"] == 1.25
+
+    output.unlink()
+
+    def time_out(command, **kwargs):
+        raise subprocess.TimeoutExpired(
+            command, kwargs["timeout"], stderr="bounded timeout",
+        )
+
+    monkeypatch.setattr(search.subprocess, "run", time_out)
+    timed_out = search._run(
+        tmp_path, input_path, output, max_seconds=0.01,
+    )
+    assert timed_out["status"] == "timeout"
+    assert timed_out["output_exists"] is False
+    assert timed_out["max_seconds"] == 0.01
+    assert timed_out["returncode"] is None
+    assert timed_out["stderr_tail"] == "bounded timeout"
+
+
+def test_shared_bus_oracle_rejects_fragmented_public_source_mutant() -> None:
+    """The bus invariant applies to both public root glyph kinds."""
+    config = {
+        "public_source": {"kind": "source"},
+        "mux_top": {"kind": "mux2", "source": {"0": "public_source", "1": "p0"}},
+        "mux_bottom": {"kind": "mux2", "source": {"0": "public_source", "1": "p1"}},
+    }
+    boxes = [
+        oracle.Box("public_source", 0.0, 0.0, 20.0, 20.0),
+        oracle.Box("mux_top", 100.0, 0.0, 20.0, 20.0),
+        oracle.Box("mux_bottom", 100.0, 100.0, 20.0, 20.0),
+    ]
+    routes = [
+        oracle.Route(1, [(20.0, 10.0), (40.0, 10.0), (40.0, 20.0), (100.0, 20.0)], "public_source", "mux_top", "0"),
+        oracle.Route(2, [(20.0, 10.0), (70.0, 10.0), (70.0, 110.0), (100.0, 110.0)], "public_source", "mux_bottom", "0"),
+    ]
+    witnesses = oracle._shared_root_bus_fragmentation_witnesses(
+        config, {"public_source"}, routes, boxes,
+    )
+    assert witnesses
+    assert witnesses[0]["root"] == "public_source"
+    assert witnesses[0]["expected_vertical_channels"] == 1
+    assert witnesses[0]["vertical_channel_xs"] == [40.0, 70.0]
 
 
 def test_boundary_trunk_search_records_the_expected_metric_red_light() -> None:

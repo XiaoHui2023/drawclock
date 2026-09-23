@@ -1626,7 +1626,8 @@ def _shared_root_bus_fragmentation_witnesses(
     for route in routes:
         if (
             route.source in roots
-            and str(config.get(route.source, {}).get("kind", "")) == "from"
+            and str(config.get(route.source, {}).get("kind", ""))
+            in {"from", "source"}
         ):
             grouped[(route.source, route.source_port)].append(route)
     witnesses: list[dict[str, Any]] = []
@@ -1685,6 +1686,15 @@ def _shared_root_bus_fragmentation_witnesses(
         vertical_channels = sorted(first_vertical_axes)
         expected_vertical_channels = 1 if len(target_axes) > 1 else 0
         facility_count = len(facilities) if facilities else len(starts)
+        # A physical source may be replicated into distant consumer bands;
+        # facility split/merge dominance owns whether that partition is
+        # justified.  Within one physical source facility, however, repeated
+        # first vertical channels are still a fragmented bus.  A ``from`` is
+        # a logical reference bus rather than a replicable source facility,
+        # so it retains the strict single-facility contract.
+        root_kind = str(config.get(root, {}).get("kind", ""))
+        if root_kind == "source" and facility_count > 1:
+            continue
         if facility_count == 1 and len(starts) == 1 and (
             len(vertical_channels) == expected_vertical_channels
         ):

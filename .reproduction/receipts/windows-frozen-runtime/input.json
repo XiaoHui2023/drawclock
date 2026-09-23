@@ -1,0 +1,351 @@
+{
+  "public_root_a": {
+    "kind": "source"
+  },
+  "public_root_b": {
+    "kind": "from"
+  },
+  "external_a_gate_04": {
+    "kind": "gate",
+    "source": "public_root_a"
+  },
+  "external_b_gate_04": {
+    "kind": "gate",
+    "source": "public_root_b"
+  },
+  "external_mux": {
+    "kind": "mux4",
+    "source": {
+      "0": "external_a_gate_04",
+      "1": "external_b_gate_04",
+      "2": "public_root_a",
+      "3": "public_root_b"
+    }
+  },
+  "external_clock": {
+    "kind": "clock",
+    "source": "external_mux"
+  },
+  "a_gate_03": {
+    "kind": "gate",
+    "source": "public_root_a"
+  },
+  "b_gate_03": {
+    "kind": "gate",
+    "source": "public_root_b"
+  },
+  "mux_03": {
+    "kind": "mux4",
+    "source": {
+      "0": "a_gate_03",
+      "1": "b_gate_03",
+      "2": "a_pll_00[0]",
+      "3": "obstacle_gate_03"
+    }
+  },
+  "a_pll_03": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "public_root_a"
+  },
+  "b_pll_03": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "public_root_b"
+  },
+  "primary_gate_03": {
+    "kind": "gate",
+    "source": "mux_03"
+  },
+  "primary_div_03": {
+    "kind": "div",
+    "source": "primary_gate_03"
+  },
+  "reconvergent_mux_03": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_03",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_03[1]"
+    }
+  },
+  "reconvergent_mux_03_peer_1": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_03",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_03[1]"
+    },
+    "layout_column": 7
+  },
+  "clock_03_peer_1": {
+    "kind": "clock",
+    "source": "reconvergent_mux_03_peer_1"
+  },
+  "reconvergent_mux_03_peer_2": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_03",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_03[1]"
+    },
+    "layout_column": 8
+  },
+  "clock_03_peer_2": {
+    "kind": "clock",
+    "source": "reconvergent_mux_03_peer_2"
+  },
+  "clock_03": {
+    "kind": "clock",
+    "source": "reconvergent_mux_03"
+  },
+  "a_gate_02": {
+    "kind": "gate",
+    "source": "public_root_a"
+  },
+  "b_gate_02": {
+    "kind": "gate",
+    "source": "public_root_b"
+  },
+  "mux_02": {
+    "kind": "mux4",
+    "source": {
+      "0": "a_gate_02",
+      "1": "b_gate_02",
+      "2": "a_pll_01[0]",
+      "3": "obstacle_gate_02"
+    }
+  },
+  "a_pll_02": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "public_root_a"
+  },
+  "b_pll_02": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "public_root_b"
+  },
+  "primary_gate_02": {
+    "kind": "gate",
+    "source": "mux_02"
+  },
+  "primary_div_02": {
+    "kind": "div",
+    "source": "primary_gate_02"
+  },
+  "reconvergent_mux_02": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_02",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_02[1]"
+    }
+  },
+  "reconvergent_mux_02_peer_1": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_02",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_02[1]"
+    },
+    "layout_column": 7
+  },
+  "clock_02_peer_1": {
+    "kind": "clock",
+    "source": "reconvergent_mux_02_peer_1"
+  },
+  "reconvergent_mux_02_peer_2": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_02",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_02[1]"
+    },
+    "layout_column": 8
+  },
+  "clock_02_peer_2": {
+    "kind": "clock",
+    "source": "reconvergent_mux_02_peer_2"
+  },
+  "clock_02": {
+    "kind": "clock",
+    "source": "reconvergent_mux_02"
+  },
+  "a_gate_01": {
+    "kind": "gate",
+    "source": "public_root_a"
+  },
+  "b_gate_01": {
+    "kind": "gate",
+    "source": "public_root_b"
+  },
+  "mux_01": {
+    "kind": "mux4",
+    "source": {
+      "0": "a_gate_01",
+      "1": "b_gate_01",
+      "2": "a_pll_02[0]",
+      "3": "obstacle_gate_01"
+    }
+  },
+  "a_pll_01": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "public_root_a"
+  },
+  "b_pll_01": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "public_root_b"
+  },
+  "primary_gate_01": {
+    "kind": "gate",
+    "source": "mux_01"
+  },
+  "primary_div_01": {
+    "kind": "div",
+    "source": "primary_gate_01"
+  },
+  "reconvergent_mux_01": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_01",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_01[1]"
+    }
+  },
+  "reconvergent_mux_01_peer_1": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_01",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_01[1]"
+    },
+    "layout_column": 7
+  },
+  "clock_01_peer_1": {
+    "kind": "clock",
+    "source": "reconvergent_mux_01_peer_1"
+  },
+  "reconvergent_mux_01_peer_2": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_01",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_01[1]"
+    },
+    "layout_column": 8
+  },
+  "clock_01_peer_2": {
+    "kind": "clock",
+    "source": "reconvergent_mux_01_peer_2"
+  },
+  "clock_01": {
+    "kind": "clock",
+    "source": "reconvergent_mux_01"
+  },
+  "a_gate_00": {
+    "kind": "gate",
+    "source": "public_root_a"
+  },
+  "b_gate_00": {
+    "kind": "gate",
+    "source": "public_root_b"
+  },
+  "mux_00": {
+    "kind": "mux4",
+    "source": {
+      "0": "a_gate_00",
+      "1": "b_gate_00",
+      "2": "a_pll_03[0]",
+      "3": "obstacle_gate_00"
+    }
+  },
+  "a_pll_00": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "public_root_a"
+  },
+  "b_pll_00": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "public_root_b"
+  },
+  "primary_gate_00": {
+    "kind": "gate",
+    "source": "mux_00"
+  },
+  "primary_div_00": {
+    "kind": "div",
+    "source": "primary_gate_00"
+  },
+  "reconvergent_mux_00": {
+    "kind": "mux3",
+    "source": {
+      "0": "primary_div_00",
+      "1": "public_root_a",
+      "2": "b_pll_00[1]"
+    }
+  },
+  "reconvergent_mux_00_peer_1": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_00",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_00[1]"
+    },
+    "layout_column": 7
+  },
+  "clock_00_peer_1": {
+    "kind": "clock",
+    "source": "reconvergent_mux_00_peer_1"
+  },
+  "reconvergent_mux_00_peer_2": {
+    "kind": "mux4",
+    "source": {
+      "0": "primary_div_00",
+      "1": "public_root_a",
+      "2": "public_root_b",
+      "3": "b_pll_00[1]"
+    },
+    "layout_column": 8
+  },
+  "clock_00_peer_2": {
+    "kind": "clock",
+    "source": "reconvergent_mux_00_peer_2"
+  },
+  "clock_00": {
+    "kind": "clock",
+    "source": "reconvergent_mux_00"
+  },
+  "obstacle_root": {
+    "kind": "from"
+  },
+  "obstacle_gate_00": {
+    "kind": "gate",
+    "source": "obstacle_root"
+  },
+  "obstacle_gate_01": {
+    "kind": "gate",
+    "source": "obstacle_root"
+  },
+  "obstacle_gate_02": {
+    "kind": "gate",
+    "source": "obstacle_root"
+  },
+  "obstacle_gate_03": {
+    "kind": "gate",
+    "source": "obstacle_root"
+  }
+}

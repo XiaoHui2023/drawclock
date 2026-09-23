@@ -2008,9 +2008,6 @@ def _restore_root_outer_detours(
         indegree[logical.target] += 1
 
     accepted = _clone_layout_geometry(document)
-    accepted_fanout_cycles = _logical_fanout_cycle_count(
-        accepted, logical_edges
-    )
     attempts = 0
     moves = 0
     blockers: Counter[str] = Counter()
@@ -2087,6 +2084,10 @@ def _restore_root_outer_detours(
             before_endpoint = _route_endpoint_signature(
                 accepted, logical_edges, {index}, route_clearance
             )
+            source_nets = {(logical.source, logical.source_port)}
+            accepted_fanout_cycles = _logical_fanout_cycle_count(
+                accepted, logical_edges, source_nets=source_nets
+            )
             for lane_y in sorted(lane_candidates):
                 candidate_points = _simplify([
                     start,
@@ -2105,7 +2106,7 @@ def _restore_root_outer_detours(
                 }[edge.cell_id]
                 candidate_edge.waypoints = tuple(candidate_points[1:-1])
                 candidate_fanout_cycles = _logical_fanout_cycle_count(
-                    candidate, logical_edges
+                    candidate, logical_edges, source_nets=source_nets
                 )
                 candidate_report = assess_layout(
                     candidate, logical_edges, 0.0
@@ -2156,9 +2157,6 @@ def _restore_root_outer_detours(
         if best is None:
             break
         accepted = best[1]
-        accepted_fanout_cycles = _logical_fanout_cycle_count(
-            accepted, logical_edges
-        )
         moves += 1
 
     return accepted, {
@@ -4440,6 +4438,8 @@ def _clone_layout_geometry(document: LayoutDocument) -> LayoutDocument:
 def _logical_fanout_cycle_count(
     document: LayoutDocument,
     logical_edges,
+    *,
+    source_nets=None,
 ) -> int:
     """Return split/rejoin cycle count without running any repair transaction.
 
@@ -4452,6 +4452,9 @@ def _logical_fanout_cycle_count(
     edge_by_id = {edge.cell_id: edge for edge in document.edges}
     groups: dict[tuple[str, str], list[list[tuple[float, float]]]] = defaultdict(list)
     for index, logical in enumerate(logical_edges, 1):
+        source_net = (logical.source, logical.source_port)
+        if source_nets is not None and source_net not in source_nets:
+            continue
         edge = edge_by_id[f"e{index}"]
         source = by_id[edge.source_id]
         target = by_id[edge.target_id]
@@ -4479,7 +4482,7 @@ def _logical_fanout_cycle_count(
                 serialized_points.insert(1, (second[0], first[1]))
             elif 0.0 < abs(first[0] - second[0]) <= 0.01:
                 serialized_points.insert(1, (first[0], second[1]))
-        groups[(logical.source, logical.source_port)].append(serialized_points)
+        groups[source_net].append(serialized_points)
 
     def point_on_segment(point, first, second) -> bool:
         if abs(first[0] - second[0]) <= 1e-6:
@@ -8645,9 +8648,6 @@ def _route_root_branches_through_boundary_corridors(
     """
     accepted = _clone_layout_geometry(document)
     accepted_report = assess_layout(accepted, logical_edges, 0.0)
-    accepted_fanout_cycles = _logical_fanout_cycle_count(
-        accepted, logical_edges
-    )
     indegree = Counter(edge.target for edge in logical_edges)
     fanout = Counter(edge.source for edge in logical_edges)
     attempts = 0
@@ -8683,9 +8683,6 @@ def _route_root_branches_through_boundary_corridors(
         bottom_lane = max(box.bottom for box in boxes) + (
             profile.route_clearance + profile.grid
         )
-        visual_row_values = sorted({
-            (box.top + box.bottom) / 2.0 for box in boxes
-        })
         # Keep the envelope-adjacent lane in the candidate set.  Once another
         # net occupies the first outer grid lane, searching only farther
         # outward makes both stems cross that route.  The inner boundary lane
@@ -8693,6 +8690,9 @@ def _route_root_branches_through_boundary_corridors(
         top_inner_lane = min(box.top for box in boxes) - profile.route_clearance
         bottom_inner_lane = max(box.bottom for box in boxes) + profile.route_clearance
         base_visible = _visible_layout_signature(accepted, logical_edges)
+        accepted_final_overlap = _final_artifact_overlap_count(
+            accepted, logical_edges
+        )
         best = None
         fanout_roots = sorted({
             logical.source for logical in logical_edges
@@ -8737,6 +8737,13 @@ def _route_root_branches_through_boundary_corridors(
             points_by_index[route_index] = _simplify([
                 route_start, *route_edge.waypoints, route_end
             ])
+        visual_row_values = {
+            (box.top + box.bottom) / 2.0 for box in boxes
+        }
+        visual_row_values.update(
+            route_points_value[-1][1]
+            for route_points_value in points_by_index.values()
+        )
         segments_by_index = {
             route_index: [
                 Segment(
@@ -8858,6 +8865,10 @@ def _route_root_branches_through_boundary_corridors(
                 )
             }
             remote_start, remote_end = verticals[-1]
+            # Visible rows include both component centres and actual consumer
+            # port axes.  A tall mux can contain several route rows while
+            # contributing only one box centre; ignoring those axes can hide
+            # the only clean delayed-departure lane from enumeration.
             remote_crossed_rows = sum(
                 min(remote_start[1], remote_end[1]) + 1e-6 < row_y
                 < max(remote_start[1], remote_end[1]) - 1e-6
@@ -8903,6 +8914,10 @@ def _route_root_branches_through_boundary_corridors(
                 ),
             )
             source_net = (logical.source, logical.source_port)
+            source_nets = {source_net}
+            accepted_fanout_cycles = _logical_fanout_cycle_count(
+                accepted, logical_edges, source_nets=source_nets
+            )
             other_segments = [
                 segment
                 for other_index, segments in segments_by_index.items()
@@ -9059,6 +9074,9 @@ def _route_root_branches_through_boundary_corridors(
                     seen_lanes.add(lane_y)
                     selected.append(lane_y)
                 selected_lanes[side] = selected
+            old_endpoint = _route_endpoint_signature(
+                accepted, logical_edges, {index}, profile.route_clearance
+            )
             accepted_sides: set[str] = set()
             for side, lane_y in (
                 (side, lane_y)
@@ -9084,21 +9102,15 @@ def _route_root_branches_through_boundary_corridors(
                 ])
                 candidate_edge.waypoints = tuple(candidate_points[1:-1])
                 candidate_fanout_cycles = _logical_fanout_cycle_count(
-                    candidate, logical_edges
+                    candidate, logical_edges, source_nets=source_nets
                 )
                 if candidate_fanout_cycles > accepted_fanout_cycles:
                     blockers["logical-fanout-cycle"] += 1
                     continue
                 report = assess_layout(candidate, logical_edges, 0.0)
                 visible = _visible_layout_signature(candidate, logical_edges)
-                accepted_final_overlap = _final_artifact_overlap_count(
-                    accepted, logical_edges
-                )
                 candidate_final_overlap = _final_artifact_overlap_count(
                     candidate, logical_edges
-                )
-                old_endpoint = _route_endpoint_signature(
-                    accepted, logical_edges, {index}, profile.route_clearance
                 )
                 new_endpoint = _route_endpoint_signature(
                     candidate, logical_edges, {index}, profile.route_clearance
@@ -9161,9 +9173,6 @@ def _route_root_branches_through_boundary_corridors(
         previous_crossings = accepted_report["crossings"]
         accepted = best[1]
         accepted_report = best[2]
-        accepted_fanout_cycles = _logical_fanout_cycle_count(
-            accepted, logical_edges
-        )
         moves += 1
         crossings_removed += previous_crossings - accepted_report["crossings"]
 
