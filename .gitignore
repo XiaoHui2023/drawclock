@@ -51,6 +51,8 @@ __pycache__/
 !.reproduction/fix-evidence/20260917T090032Z-f9611418/**
 !.reproduction/fix-evidence/20260922T182939Z-1d3acd3e/
 !.reproduction/fix-evidence/20260922T182939Z-1d3acd3e/**
+!.reproduction/fix-evidence/20260923T054757Z-5b397bf8/
+!.reproduction/fix-evidence/20260923T054757Z-5b397bf8/**
 !.reproduction/recursive-evidence/
 .reproduction/recursive-evidence/*
 !.reproduction/recursive-evidence/20260914T110916Z-5d38f1ac/
@@ -63,6 +65,8 @@ __pycache__/
 !.reproduction/recursive-evidence/20260917T090757Z-8c29ddb5/**
 !.reproduction/recursive-evidence/20260922T183524Z-e80ce0a2/
 !.reproduction/recursive-evidence/20260922T183524Z-e80ce0a2/**
+!.reproduction/recursive-evidence/20260923T055240Z-f1f8cce5/
+!.reproduction/recursive-evidence/20260923T055240Z-f1f8cce5/**
 
 # 本轮搜索空间探索回执只供本机诊断；正式回执使用具名 canonical 文件。
 .reproduction/receipts/annotation-pressure-control*.json

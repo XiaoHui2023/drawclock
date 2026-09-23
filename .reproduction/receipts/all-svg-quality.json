@@ -2801,9 +2801,9 @@
     {
       "input": "18-asymmetric-merge-columns.json",
       "producer_exit": 0,
-      "sha256": "681c7a9649e4506419820781290121f9d5b51be06cd11672777824d17133b7f8",
-      "crossings": 0,
-      "bends": 0,
+      "sha256": "4126acbcdb834eb11e373fed2a2a76c214bdc9a422c10782a28b6f6920387e28",
+      "crossings": 48,
+      "bends": 28,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_color_failures": 0,

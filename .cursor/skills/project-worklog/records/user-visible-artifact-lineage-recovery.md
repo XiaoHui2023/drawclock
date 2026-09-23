@@ -1,8 +1,8 @@
 # 实际 Windows 制品与布局复现恢复
 
-- status: done
+- status: active
 - created: 2026-09-18 11:10 +08:00
-- updated: 2026-09-23 11:52 +08:00
+- updated: 2026-09-23 14:57 +08:00
 - scene: 实际 Windows 制品与布局复现恢复
 
 ## 失败基线和冻结范围
@@ -1979,3 +1979,33 @@
 - CI 已从公开 Release 回下载 Linux 包并跑 frozen smoke。本机另从全新临时目录解压公开 Windows ZIP，完整 frozen workflow PASS；同一下载 EXE 对 7302-byte、63 组件、110 边场景双跑 46.601097/45.201012 秒，均小于 60 秒，输出同为 70,985 bytes、SHA-256 `a28fc307…a56`，29/29 指标全绿、失败集合空、专项 witness 0、deterministic=true。
 - 发布学习降级有两次可验证事件：Docker actionlint 因 `dockerDesktopLinuxEngine` 命名管道不存在失败；首次官方 Windows 二进制下载误用不存在的 `windows_x86_64` 资产名，校验条目缺失。随后查询官方 v1.7.12 资产清单，下载并校验 `windows_amd64` SHA-256 `6e7241b5…2f6e9`，actionlint PASS，因此未影响发布正确性。
 - GitHub 仅产生未来维护告警：`ubuntu-latest` 将在 2026-10-19 起迁移 Ubuntu 26，且部分 action 的 Node 20 元数据被 runner 强制使用 Node 24；本次所有 job 成功，附件与下载消费均通过。记录现置为 done；状态提交后仍按常驻自动发布约定再次对齐 main/tag/附件。
+
+## 2026-09-23 13:08：状态对齐发布捕获性能余量不足
+
+- 状态记录提交 `b227b47cc26d9c4033f21819f6e01ffc7612b8b2` 自动触发 Release run `35816122562`。反馈穷举、结构覆盖、历史反馈语料、27 个公开 SVG 和 Linux 冻结发行全部通过；Windows 真实规模 60 秒门两轮均以 `timeout` 失败，发布 job 因依赖门未满足而未执行。失败资产没有发布。
+- 同一代码在上一轮远端下载制品上为 46.60/45.20 秒，在本机为约 42 秒；本轮共享 runner 两次超过 60 秒，证明现有约 25% 余量不足以抵抗环境速度波动，不能放宽门或简单重跑碰运气。
+- 对同一 7302-byte/63-node/110-edge 输入执行 `cProfile`：总运行 145.37 秒，其中 `_route_root_branches_through_boundary_corridors` 136.17 秒；`_logical_fanout_cycle_count` 1,969 次、累计 53.85 秒，`_proper_cross` 53,213,252 次、累计 39.37 秒。下一步只做语义等价优化：缓存每轮不变的 source-port 基线环计数、合并重复交叉/交点扫描、缓存可视盒；保持候选集合、完整事务验收与 60 秒阈值不变。
+
+## 2026-09-23 14:03：等价热点优化与证据重签
+
+- 已实现三项等价优化：同一候选 sweep 按 source-port net 缓存不变的 accepted cycle count；把 overlap/crossing/crossing-point 三次扫描合并为一次 pair scan；按 cell id 缓存 visible box。候选 lane、候选文档环检查、全图 assess 与所有接受条件均未删减。
+- 同一正式输入源码运行由最终基线约 42 秒降到 32.738 秒，输出仍为 70,985 bytes、SHA-256 `a28fc307…a56`。按失败 runner 相对上一轮约 1.3 倍的慢速折算约为 43 秒，低于 60 秒且不依赖放宽门限。
+- 定向布局/Oracle/压力/发布门/血缘集合第一次结果为 189 passed、2 failed；两项均明确拒绝源码哈希变化后的 stale fix receipts。重新生成 fix evidence 批次 `20260923T054757Z-5b397bf8`，`failures=[]`；递归攻击 run `20260923T055240Z-f1f8cce5` 从 R1 连续 7/7 clean。下一步切换 `.gitignore` 正式证据白名单、重跑 stale 两项和 release gate，再构建 frozen EXE 双跑。
+
+## 2026-09-23 14:08：新 Windows 冻结制品恢复充足预算
+
+- stale 血缘两项重跑 `2 passed`，正式 feedback release gate `PASS issues=19`。Windows 按 CI 同一 PyInstaller/bundle/archive surface 入口重建成功，完整 frozen public workflow PASS。
+- 新 EXE SHA-256 `9456f626…620d` 对 7302-byte、63-node、110-edge 正式输入双跑 30.962367/33.781452 秒；输出均为 70,985 bytes、SHA-256 `a28fc307…a56`，deterministic=true、29/29 指标执行、失败 0、专项 witness 0。相较旧最终本机 41.88/41.82 秒约再降低 21%–26%，正确输出字节未变。
+- 下一步暂存新 frozen receipt，从零运行完整 pytest 与全部公开 SVG/发布门；全绿后提交并推送，再值守自动 Release 和公开 Windows 下载制品的同一门复验。
+
+## 2026-09-23 14:54：完整测试与公开 example 指标门全绿
+
+- 最终工作树从 0% 到 100% 跑完整 pytest，明确退出码 0：`658 passed in 2436.65s (0:40:36)`，无失败、跳过或 xfail；相较同规模优化前 55:47 缩短约 27%。此前定向集合的两个 stale receipt 失败在重签后已无法复现。
+- 从输入重新生成全部公开 SVG 并执行独立质量门：`PASS 27/27`。每个 case 均为 required=29、executed=29、failed=0；注册表 29 项，metric execution failures、batch failures 和 missing annotation profiles 均为空。
+- 下一步同步最终收据与记录，执行五件套、release gate、actionlint、JSON/语法/diff/敏感信息上传检查；全部通过才提交并正常推送，随后完整值守新 Release。
+
+## 2026-09-23 14:57：最终上传门通过
+
+- 项目五件套 PASS、feedback release gate `PASS issues=19`；官方 actionlint v1.7.12 Windows amd64 ZIP 按 checksums 校验 SHA-256 `6e7241b5…2f6e9` 后执行 PASS。
+- 2,394 个 Git 跟踪 JSON 全部解析 PASS，`compileall src tools tests`、`git diff --cached --check`、staged 敏感路径/密钥模式检查均 PASS。暂存 578 路径，其中 552 个为当前 fix/recursive 正式证据；没有批量纳入探索文件。
+- `.cursor/skills/drawclock-drawio-pitfalls/SKILL.md` 仍因 Windows 索引/行尾刷新显示工作树 `M`，但 `git diff --` 为 0 行且未暂存；它不属于本轮改动。下一步 fetch 核对远端分叉后提交、正常 push，并对新自动 Release 完整值守。

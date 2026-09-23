@@ -8,7 +8,7 @@
 | `drafts/case-generalization-fanout-simulation.md` | draft | done | 2026-09-07 10:24 +08:00 | 2026-09-07 16:28 +08:00 | 举一反三扇出数组模拟 | 五轮递归 epoch 实际捕获复发后重启通过，复杂组合、结构边界与远端发行均已闭合。 |
 | `records/user-feedback-natural-reproduction-gate.md` | record | done | 2026-09-03 13:32 +08:00 | 2026-09-16 19:05 +08:00 | 用户反馈自然复现与防假完成门禁 | 产品提交与 Release run 全绿，tag/公网资产/归档回下载闭合；状态提交后再次对齐滚动 tag。 |
 | `records/two-public-root-bus-and-distant-facility.md` | record | active | 2026-09-17 10:57 +08:00 | 2026-09-17 17:25 +08:00 | two-public-root mux bus and distant facility | Current-tree fix and seven-round recursive evidence are clean and explicitly tracked; release checker is next. |
-| `records/user-visible-artifact-lineage-recovery.md` | record | done | 2026-09-18 11:10 +08:00 | 2026-09-23 11:52 +08:00 | 实际 Windows 制品与布局复现恢复 | 修复、性能、全量质量门、双平台发布与公开资产回下载消费全部闭合。 |
+| `records/user-visible-artifact-lineage-recovery.md` | record | active | 2026-09-18 11:10 +08:00 | 2026-09-23 14:57 +08:00 | 实际 Windows 制品与布局复现恢复 | 完整测试、example、指标、冻结版与上传门全绿，正在提交并值守自动发布。 |
 | `analysis/managed-delivery-gate-invocation.md` | analysis | done | 2026-09-04 18:30 +08:00 | 2026-09-04 18:40 +08:00 | 闭环提交后的新鲜回执与 push 误阻断诊断 | 已修复绝对可执行文件路径发现崩溃，记录 Code Mode 剩余上游覆盖边界。 |
 | `analysis/user-feedback-reproduction-escape.md` | analysis | active | 2026-09-03 13:32 +08:00 | 2026-09-03 16:24 +08:00 | 人工故障冒充复现与声明逃逸根因 | 六项触发结构、直接观测、未命中反例和 current/06c 版本边界已归纳。 |
 | `records/free-source-coverage-observability.md` | record | active | 2026-09-02 14:42 +08:00 | 2026-09-03 12:42 +08:00 | 自由源分层、逐节点/逐边统计与特性覆盖闭环 | split-rejoin 双基线与 407 项全量门通过，准备补充上传并重发。 |

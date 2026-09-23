@@ -8674,7 +8674,11 @@ def _route_root_branches_through_boundary_corridors(
     # Every accepted move strictly lowers this finite pair.  Rebuilding all
     # candidates after each move avoids an order-dependent local batch.
     while True:
-        boxes = [vertex_visual_box(vertex) for vertex in accepted.vertices]
+        visible_boxes_by_id = {
+            vertex.cell_id: vertex_visual_box(vertex)
+            for vertex in accepted.vertices
+        }
+        boxes = list(visible_boxes_by_id.values())
         if not boxes:
             break
         top_lane = min(box.top for box in boxes) - (
@@ -8760,6 +8764,30 @@ def _route_root_branches_through_boundary_corridors(
             ]
             for route_index, points in points_by_index.items()
         }
+
+        def interaction_statistics(segments, other_segments):
+            """Count route interactions with one geometric scan per pair."""
+            overlaps = 0
+            crossings = 0
+            crossing_points = set()
+            for segment in segments:
+                for other in other_segments:
+                    if _overlap_length(segment, other) >= profile.grid:
+                        overlaps += 1
+                    if not _proper_cross(segment, other):
+                        continue
+                    crossings += 1
+                    if abs(segment.a[0] - segment.b[0]) <= 1e-6:
+                        crossing_points.add((segment.a[0], other.a[1]))
+                    else:
+                        crossing_points.add((other.a[0], segment.a[1]))
+            return overlaps, crossings, crossing_points
+
+        # The accepted document is immutable during one candidate sweep.
+        # Several branches can belong to the same source-port net, so compute
+        # its baseline topology once instead of rebuilding the arrangement for
+        # every branch. Candidate documents still receive their own full check.
+        accepted_cycle_counts: dict[tuple[str, str], int] = {}
         # Treat every logical root port as one routable net.  A branch can be
         # serialized as H-V-H and therefore contain only its remote descent;
         # recover the shared trunk from vertical tracks repeated by sibling
@@ -8915,9 +8943,11 @@ def _route_root_branches_through_boundary_corridors(
             )
             source_net = (logical.source, logical.source_port)
             source_nets = {source_net}
-            accepted_fanout_cycles = _logical_fanout_cycle_count(
-                accepted, logical_edges, source_nets=source_nets
-            )
+            if source_net not in accepted_cycle_counts:
+                accepted_cycle_counts[source_net] = _logical_fanout_cycle_count(
+                    accepted, logical_edges, source_nets=source_nets
+                )
+            accepted_fanout_cycles = accepted_cycle_counts[source_net]
             other_segments = [
                 segment
                 for other_index, segments in segments_by_index.items()
@@ -8925,29 +8955,13 @@ def _route_root_branches_through_boundary_corridors(
                 for segment in segments
                 if segment.source_net != source_net
             ]
-            before_overlaps = sum(
-                _overlap_length(segment, other) >= profile.grid
-                for segment in segments_by_index[index]
-                for other in other_segments
+            (
+                before_overlaps,
+                before_crossings,
+                before_crossing_points,
+            ) = interaction_statistics(
+                segments_by_index[index], other_segments
             )
-            before_crossings = sum(
-                _proper_cross(segment, other)
-                for segment in segments_by_index[index]
-                for other in other_segments
-            )
-            def crossing_point(segment, other):
-                if not _proper_cross(segment, other):
-                    return None
-                if abs(segment.a[0] - segment.b[0]) <= 1e-6:
-                    return (segment.a[0], other.a[1])
-                return (other.a[0], segment.a[1])
-
-            before_crossing_points = {
-                point
-                for segment in segments_by_index[index]
-                for other in other_segments
-                if (point := crossing_point(segment, other)) is not None
-            }
             shortlisted_by_side: dict[
                 str, list[tuple[tuple[Any, ...], float]]
             ] = defaultdict(list)
@@ -8964,9 +8978,8 @@ def _route_root_branches_through_boundary_corridors(
                             visible_box.bottom,
                         ),
                     )
-                    for vertex in accepted.vertices
-                    if vertex.cell_id not in {edge.source_id, edge.target_id}
-                    for visible_box in (vertex_visual_box(vertex),)
+                    for cell_id, visible_box in visible_boxes_by_id.items()
+                    if cell_id not in {edge.source_id, edge.target_id}
                 )
 
             for side, lane_y in lane_candidates:
@@ -8988,22 +9001,11 @@ def _route_root_branches_through_boundary_corridors(
                     for a, b in zip(local_points, local_points[1:])
                     if a != b
                 ]
-                local_overlaps = sum(
-                    _overlap_length(segment, other) >= profile.grid
-                    for segment in local_segments
-                    for other in other_segments
-                )
-                local_crossings = sum(
-                    _proper_cross(segment, other)
-                    for segment in local_segments
-                    for other in other_segments
-                )
-                local_crossing_points = {
-                    point
-                    for segment in local_segments
-                    for other in other_segments
-                    if (point := crossing_point(segment, other)) is not None
-                }
+                (
+                    local_overlaps,
+                    local_crossings,
+                    local_crossing_points,
+                ) = interaction_statistics(local_segments, other_segments)
                 if (
                     local_overlaps > before_overlaps
                     or (
@@ -9057,9 +9059,8 @@ def _route_root_branches_through_boundary_corridors(
                     for start, end in zip(
                         candidate_points, candidate_points[1:]
                     )
-                    for vertex in accepted.vertices
-                    if vertex.cell_id not in endpoint_ids
-                    for visible_box in (vertex_visual_box(vertex),)
+                    for cell_id, visible_box in visible_boxes_by_id.items()
+                    if cell_id not in endpoint_ids
                 )
 
             selected_lanes: dict[str, list[float]] = {}
