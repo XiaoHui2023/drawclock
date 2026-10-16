@@ -1,8 +1,8 @@
 # 注释、多行名称与自定义频率表实施记录
 
-- status: active
+- status: done
 - created: 2026-10-16 12:22 +08:00
-- updated: 2026-10-16 14:48 +08:00
+- updated: 2026-10-16 15:56 +08:00
 - scene: 注释布局、Python全局选项、多行文字与数组频率表
 
 用户提出八项功能并明确要求设置目标。正式运行目标已建立，项目目标保存为project-goals/goals/annotation-multiline-and-custom-frequency-table.md，尚未宣称实现完成。
@@ -153,3 +153,8 @@ pack首轮通过release门，但pip配置global.proxy指向127.0.0.1:7897并出�
 用户明确代理正确端口7890并要求修错。重新实际TCP探测7890 OPEN、7897拒绝；pip内部配置加载定位唯一错误来源为用户AppData/Roaming/pip/pip.ini第三行。先逐字节备份到.qa/annotation-20261016/before/pip.ini-before-proxy-20261016-144705并记录前后SHA，仅将该proxy端口7897改7890。原配置读取现为http://127.0.0.1:7890，未禁用配置或清除代理的真实pip index versions pip获取成功（exit0），证明常规入口联网恢复。
 
 独立ZIP消费完成：仅使用解压包配置/库和空PATH执行新功能smoke，三个SVG与源码逐字节一致，windows-archive-validation.json包含exe/ZIP SHA。40675真实63器件110连接规模双跑预算终态PASS，receipt在local-frozen-runtime/receipt.json。全部705项唯一测试覆盖审计PASS；打包allowlist相邻19项及真正冻结完整smoke均通过。仍待代码审查、提交推送及CI发布/远端资产验证。
+
+
+最终闭合（2026-10-16 15:56 +08:00）：run38863419678全部成功，前置54m27s、Windows4m58s、Linux2m22s、publish1m8s、公开Windows验证4m32s。独立API核对tag=d335df9984f417ba4d462b32dcab8a7a57593f53，三附件大小/摘要exact-set通过；公开ZIP原生包内消费、空PATH及三个SVG源码字节一致通过。Linux原生执行由该CI证明，本机仅验证Linux归档而未冒充Windows原生运行Linux。首次独立下载脚本因Windows默认GBK解码gh JSON报UnicodeDecodeError；显式UTF-8修正取证脚本后同一入口成功，无生产代码改动。公开Windows ZIP SHA256=90b05c87964c2217629843004b08697e0dce729ecdfb69649a4defae0906230d，Linux tar.gz SHA256=f92047f6a4c46d2c202d41520c03bae7e28a27fdf14abaefe627435a23035b03。完整completion-audit.json和published-assets/validation.json绑定本次正式提交。
+
+八项产品要求及学习/回归/冻结/公开资产交付均已完成；当前仅将这些最终事实同步到项目记录，不修改生产源、构建配置或测试。记录提交会按既有push-main策略再次触发CI，继续核对最终tag与附件，不以此前CI替代后续发布状态。

@@ -2,8 +2,8 @@
 
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `analysis/annotation-multiline-and-custom-frequency-table.md` | analysis | active | 2026-10-16 12:34 +08:00 | 2026-10-16 13:40 +08:00 | 文本布局与公开配置合同 | 全部选项及预布局占用已实现，记录Oracle修正/真实端口验证和方法比较，等待最终全量证据。 |
-| `records/annotation-multiline-and-custom-frequency-table.md` | record | active | 2026-10-16 12:22 +08:00 | 2026-10-16 14:48 +08:00 | 注释布局、Python全局选项、多行文字与数组频率表 | pip代理7897已备份修正7890并常规联网通过；705项覆盖、独立ZIP和冻结预算通过，待提交发布。 |
+| `analysis/annotation-multiline-and-custom-frequency-table.md` | analysis | done | 2026-10-16 12:34 +08:00 | 2026-10-16 15:56 +08:00 | 文本布局与公开配置合同 | 八项功能、705项测试、双平台冻结及公开资产回下载验收完成；研究与恢复证据已归档。 |
+| `records/annotation-multiline-and-custom-frequency-table.md` | record | done | 2026-10-16 12:22 +08:00 | 2026-10-16 15:56 +08:00 | 注释布局、Python全局选项、多行文字与数组频率表 | 八项功能、705项测试、双平台冻结及公开资产回下载验收完成；研究与恢复证据已归档。 |
 | `records/frequency-columns-and-release-layout.md` | record | done | 2026-09-11 20:15 +08:00 | 2026-09-12 00:12 +08:00 | 频率列裁剪、发布目录与错列 mux 主干 | 动态列、发行布局、错列 mux 攻击、GitHub 停滞恢复及公开资产回下载全部闭合。 |
 | `analysis/annotation-color-python-release-surface.md` | analysis | done | 2026-09-11 16:17 +08:00 | 2026-09-11 19:43 +08:00 | description_color、最低 Python 与精简归档 | CSS 颜色、Python 3.9 下界、精简归档及全制品质量合同已落地并公开验证。 |
 | `records/annotation-color-python-release-surface.md` | record | done | 2026-09-11 16:17 +08:00 | 2026-09-11 19:43 +08:00 | description_color、最低 Python、精简归档与文档门禁 | 607 项测试、七轮攻击、公开回下载与 Ubuntu 16.04 冻结消费均已通过。 |

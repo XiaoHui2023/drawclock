@@ -6,9 +6,9 @@ description: >-
 
 # 设计笔记
 
-## 本轮新增要求（2026-10-16，已实现、验收中）
+## 本轮新增要求（2026-10-16，已实现并验收）
 
-统一配置为presentation.DrawingOptions，通过generate_elk_layout/generate_layout的options参数传入；注释默认top-left方位、left文字对齐，节点同名字段逐项覆盖全局值。八方位与三对齐分别控制位置和块内文字，x/y偏移单位像素，正值向右/下。horizontal_spacing为最小列间距，布线可增大；name_align和frequency_align默认center，frequency_headers为与实际列数一致的字符串序列。frequencies数组定义任意数量列，支持多行标题/值，短行缺项为空；旧三个字段保留兼容但同节点不能混填。名称换行保留原始逻辑身份和引用，显示多行；文字空间在布局前预留。完成证据由项目目标维护，当前仍需全量质量验收。
+统一配置为presentation.DrawingOptions，通过generate_elk_layout/generate_layout的options参数传入；注释默认top-left方位、left文字对齐，节点同名字段逐项覆盖全局值。八方位与三对齐分别控制位置和块内文字，x/y偏移单位像素，正值向右/下。horizontal_spacing为最小列间距，布线可增大；name_align和frequency_align默认center，frequency_headers为与实际列数一致的字符串序列。frequencies数组定义任意数量列，支持多行标题/值，短行缺项为空；旧三个字段保留兼容但同节点不能混填。名称换行保留原始逻辑身份和引用，显示多行；文字空间在布局前预留。完成证据由项目目标维护，功能、完整质量指标与双平台发行消费均已验收。
 
 ## 产品范围
 
