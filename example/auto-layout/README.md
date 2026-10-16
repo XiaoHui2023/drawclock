@@ -40,6 +40,7 @@ python src `
 | 节点说明 | `31-node-descriptions.json` | source、gate、mux、clock 均使用通用 `description`，输出自动避让的简单文字 |
 | 注释文本压力 | `32-annotation-text-stress.json` | 短文本、无空格长串、长中文、显式多行、空行、尾随换行、中英混排及密集终端/频率表组合 |
 | 注释颜色 | `33-description-colors.json` | 命名色、十六进制透明度、RGB、HSL 与 HWB 输入的统一规范化输出 |
+| 文字与自定义频率 | `34-configurable-text-and-frequency.json` | 多行名称、节点注释对齐/方位/偏移覆盖、四列频率数组、多行值与短行缺项 |
 
 代表性复杂示例包含少量晶振和 PLL、复用的 mux、分频器、gate、多类 clock cell 和末端 clock。13 至 14 改变连接顺序、链深、复用源和实例名，不只是放大同一种阵列。坐标由输入连接关系以及当前器件库的尺寸、标签和端口一次计算得到，不进行成图后的坐标校准。
 

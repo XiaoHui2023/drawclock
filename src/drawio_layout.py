@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from typing import Any
+
+from presentation import DrawingOptions
 
 
 LAYOUT_VERSION = 1
@@ -37,6 +39,7 @@ class LayoutDocument:
     version: int
     vertices: list[VertexLayout]
     edges: list[EdgeLayout]
+    options: DrawingOptions = field(default_factory=DrawingOptions)
 
 
 def apply_crossing_style(document: LayoutDocument, crossing_style: str) -> None:
@@ -57,6 +60,7 @@ def apply_crossing_style(document: LayoutDocument, crossing_style: str) -> None:
 def layout_to_dict(doc: LayoutDocument) -> dict[str, Any]:
     return {
         "version": doc.version,
+        **({"options": asdict(doc.options)} if doc.options != DrawingOptions() else {}),
         "vertices": [
             {
                 "name": vertex.name,
@@ -131,4 +135,5 @@ def layout_from_dict(data: dict[str, Any]) -> LayoutDocument:
                 waypoints=waypoints,
             )
         )
-    return LayoutDocument(version=version, vertices=vertices, edges=edges)
+    return LayoutDocument(version=version, vertices=vertices, edges=edges,
+                          options=DrawingOptions(**data.get("options", {})))

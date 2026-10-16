@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 
+from presentation import LEGACY_FREQUENCIES, TEXT_ANCHORS, frequency_values, text_lines, text_width, wrap_text
+
 from drawio_layout import LayoutDocument, VertexLayout
 from drawio_ports import abs_port_xy, edge_attachment, port_anchors
 from css_color import DEFAULT_DESCRIPTION_COLOR, parse_css_color
@@ -19,11 +21,7 @@ from visual_geometry import vertex_visual_box
 HTML_LABEL_CONTENT_OFFSET_X = 2.0
 HTML_LABEL_CONTENT_OFFSET_Y = 7.0
 
-FREQUENCY_COLUMNS = (
-    ("func_freq", "工作频率"),
-    ("scan_freq", "SCAN"),
-    ("bist_freq", "BIST"),
-)
+FREQUENCY_COLUMNS = LEGACY_FREQUENCIES
 FREQUENCY_FONT_SIZE = 12.0
 FREQUENCY_COLUMN_GAP = 20.0
 FREQUENCY_TABLE_GAP = 34.0
@@ -37,6 +35,8 @@ class FrequencyTable:
     min_y: float
     max_x: float
     max_y: float
+    column_widths: tuple[float, ...] = ()
+    align: str = "center"
 
 
 @dataclass(frozen=True)
@@ -49,6 +49,8 @@ class NodeAnnotation:
     width: float
     height: float
     color: str
+    align: str = "left"
+    anchor: str = "top-left"
 
 
 ANNOTATION_FONT_SIZE = 11.0
@@ -69,25 +71,21 @@ def _wrap_annotation(
     text: str, max_width: float = ANNOTATION_MAX_WIDTH
 ) -> tuple[str, ...]:
     """Wrap Unicode text in pixels while preserving explicit empty lines."""
-    result: list[str] = []
-    normalized = text.replace("\r\n", "\n").replace("\r", "\n")
-    for paragraph in normalized.split("\n"):
-        current = ""
-        width = 0.0
-        for char in paragraph:
-            char_width = _annotation_char_width(char)
-            if current and width + char_width > max_width:
-                result.append(current)
-                current = ""
-                width = 0.0
-            current += char
-            width += char_width
-        result.append(current)
-    return tuple(result or ("",))
+    return wrap_text(text, max_width, ANNOTATION_FONT_SIZE)
 
 
 def _annotation_node_box(vertex: VertexLayout) -> tuple[float, float, float, float]:
     """Return the final-render obstacle, including names below component art."""
+    if "_drawclock_body_box" in vertex.object_attrs:
+        import json
+        from visual_geometry import visual_box
+        dx, dy, width, height = json.loads(vertex.object_attrs["_drawclock_body_box"])
+        box = visual_box(name=vertex.logical_name or vertex.name,
+                         label=vertex.object_attrs.get("label", ""),
+                         x=vertex.x + dx, y=vertex.y + dy, width=width, height=height,
+                         include_presentation=False)
+        extra = float(vertex.object_attrs.get("_drawclock_name_extra_height", 0))
+        return box.left, box.top, box.right, max(box.bottom, vertex.y + dy + height + extra + 9)
     box = vertex_visual_box(vertex)
     label = str(vertex.object_attrs.get("label", ""))
     match = _OUTER_LABEL_HEIGHT_RE.search(label)
@@ -123,6 +121,15 @@ def _node_annotations(
         for start, end in zip(points, points[1:])
     ]
     occupied = [*node_boxes, *reserved]
+    column_boxes: dict[float, tuple[float, float]] = {}
+    column_widths: dict[float, float] = {}
+    for vertex in primary.values():
+        column = round(vertex.x, 4)
+        left, _, right, _ = _annotation_node_box(vertex)
+        previous = column_boxes.get(column, (left, right))
+        column_boxes[column] = (min(left, previous[0]), max(right, previous[1]))
+        width = max(_estimated_text_width(line) for line in _wrap_annotation(vertex.object_attrs["description"]))
+        column_widths[column] = max(column_widths.get(column, 0.0), min(ANNOTATION_MAX_WIDTH, width))
 
     def overlaps(a, b) -> bool:
         return a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]
@@ -144,14 +151,18 @@ def _node_annotations(
     ):
         text = vertex.object_attrs["description"]
         wrapped = _wrap_annotation(text)
+        align, anchor, offset_x, offset_y = document.options.description(vertex.object_attrs)
         width = min(
             ANNOTATION_MAX_WIDTH,
             max(ANNOTATION_FONT_SIZE * 0.5,
                 max(_estimated_text_width(line) for line in wrapped)),
         )
         height = len(wrapped) * ANNOTATION_LINE_HEIGHT
+        column = round(vertex.x, 4)
+        width = max(width, column_widths[column])
         owner_left, owner_top, owner_right, owner_bottom = _annotation_node_box(vertex)
-        cx = (owner_left + owner_right) / 2.0
+        column_left, column_right = column_boxes[column]
+        cx = (column_left + column_right) / 2.0
         cy = (owner_top + owner_bottom) / 2.0
         candidates = []
         ring_count = int(
@@ -160,16 +171,24 @@ def _node_annotations(
         ) + 1
         for ring in range(ring_count):
             gap = ANNOTATION_GAP + ring * ANNOTATION_LINE_HEIGHT
-            candidates.extend((
-                (cx - width / 2.0, owner_top - height - gap, 0, ring),
-                (cx - width / 2.0, owner_bottom + gap, 1, ring),
-                (owner_right + gap, cy - height / 2.0, 2, ring),
-                (owner_left - width - gap, cy - height / 2.0, 3, ring),
-                (owner_right + gap, owner_top - height - gap, 4, ring),
-                (owner_left - width - gap, owner_top - height - gap, 5, ring),
-                (owner_right + gap, owner_bottom + gap, 6, ring),
-                (owner_left - width - gap, owner_bottom + gap, 7, ring),
-            ))
+            positions = {
+                "top-left": (column_left, owner_top - height - gap),
+                "top": (cx - width / 2, owner_top - height - gap),
+                "top-right": (column_right - width, owner_top - height - gap),
+                "right": (column_right + gap, cy - height / 2),
+                "bottom-right": (column_right - width, owner_bottom + gap),
+                "bottom": (cx - width / 2, owner_bottom + gap),
+                "bottom-left": (column_left, owner_bottom + gap),
+                "left": (column_left - width - gap, cy - height / 2),
+            }
+            x, y = positions[anchor]
+            candidates.append((x + offset_x, y + offset_y, 0, ring))
+            if anchor in {"left", "right"} and ring:
+                side_x = column_left - width - ANNOTATION_GAP if anchor == "left" else column_right + ANNOTATION_GAP
+                for preference, direction in ((1, -1), (2, 1)):
+                    candidates.append((side_x + offset_x,
+                                       cy - height / 2 + direction * ring * ANNOTATION_LINE_HEIGHT + offset_y,
+                                       preference, ring))
         valid = []
         for x, y, preference, ring in candidates:
             box = (x, y, x + width, y + height)
@@ -182,7 +201,7 @@ def _node_annotations(
                 max(owner_left - box[2], box[0] - owner_right, 0.0)
                 + max(owner_top - box[3], box[1] - owner_bottom, 0.0)
             )
-            if owner_distance > ANNOTATION_MAX_OWNER_DISTANCE:
+            if owner_distance > ANNOTATION_MAX_OWNER_DISTANCE + abs(offset_x) + abs(offset_y):
                 continue
             if any(overlaps(collision_box, obstacle) for obstacle in occupied):
                 continue
@@ -208,6 +227,8 @@ def _node_annotations(
                     "description_color", DEFAULT_DESCRIPTION_COLOR
                 ))
             ),
+            align=align,
+            anchor=anchor,
         ))
         occupied.append((
             x - ANNOTATION_CLEARANCE, y - ANNOTATION_CLEARANCE,
@@ -223,17 +244,18 @@ def _render_node_annotations(
     lines = ['<g class="node-annotations">']
     for note in annotations:
         escaped_name = _escape(note.logical_name)
-        x0, y0 = note.x, note.y
+        x0, y0 = note.x + {"left": 0, "center": note.width / 2, "right": note.width}[note.align], note.y
         lines.append(
             f'<g class="node-annotation" data-node-id="{escaped_name}" '
-            f'data-description-color="{note.color}">'
+            f'data-description-color="{note.color}" data-description-align="{note.align}" '
+            f'data-description-anchor="{note.anchor}">'
             f'<title>{_escape(note.text)}</title>'
         )
         for index, text in enumerate(note.lines):
             lines.append(
                 f'<text x="{_svg_num(x0)}" '
                 f'y="{_svg_num(y0 + ANNOTATION_FONT_SIZE + index * ANNOTATION_LINE_HEIGHT)}" '
-                f'fill="{note.color}">'
+                f'fill="{note.color}" text-anchor="{TEXT_ANCHORS[note.align]}">'
                 f'{_escape(text)}</text>'
             )
         lines.append('</g>')
@@ -244,6 +266,15 @@ def _render_node_annotations(
 def _estimated_text_width(text: str) -> float:
     """Conservative SVG text width without depending on an installed font."""
     return sum(_annotation_char_width(char) for char in text)
+
+
+def _frequency_value(vertex: VertexLayout, field: str) -> str:
+    if field.startswith("frequencies["):
+        index = int(field[len("frequencies["):-1])
+        values = (frequency_values(vertex.object_attrs) if "frequencies" in vertex.object_attrs
+                  else tuple(str(vertex.object_attrs.get(key, "")) for key, _ in LEGACY_FREQUENCIES))
+        return values[index] if index < len(values) else ""
+    return str(vertex.object_attrs.get(field, ""))
 
 
 def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
@@ -270,28 +301,40 @@ def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
         rows.append((vertex, row_axis))
     rows.sort(key=lambda row: (row[1], row[0].name))
 
-    columns = tuple(
-        (field, heading)
-        for field, heading in FREQUENCY_COLUMNS
-        if any(vertex.object_attrs.get(field, "") for vertex, _ in rows)
-    )
+    array_mode = any("frequencies" in vertex.object_attrs for vertex, _ in rows)
+    if array_mode:
+        count = max((len(frequency_values(vertex.object_attrs)) if "frequencies" in vertex.object_attrs
+                     else (len(LEGACY_FREQUENCIES) if any(vertex.object_attrs.get(key, "") for key, _ in LEGACY_FREQUENCIES) else 0)
+                     for vertex, _ in rows), default=0)
+        headings = document.options.frequency_headers
+        if count and headings and len(headings) != count:
+            raise ValueError("frequency_headers count must match the longest frequencies array")
+        columns = tuple((f"frequencies[{index}]", headings[index] if headings else f"频率 {index + 1}")
+                        for index in range(count))
+    else:
+        columns = tuple((field, heading) for field, heading in LEGACY_FREQUENCIES
+                        if any(vertex.object_attrs.get(field, "") for vertex, _ in rows))
+        if document.options.frequency_headers and columns:
+            if len(document.options.frequency_headers) != len(columns):
+                raise ValueError("frequency_headers count must match the displayed legacy columns")
+            columns = tuple((field, heading) for (field, _), heading in zip(columns, document.options.frequency_headers))
     if not columns:
         return None
 
     table_left = max(
-        vertex.x + vertex.width + HTML_LABEL_CONTENT_OFFSET_X
+        vertex_visual_box(vertex).right + HTML_LABEL_CONTENT_OFFSET_X
         for vertex, _ in rows
     ) + FREQUENCY_TABLE_GAP
     column_widths: list[float] = []
     for field, heading in columns:
         widest = max(
-            [_estimated_text_width(heading)]
+            [text_width(heading, FREQUENCY_FONT_SIZE)]
             + [
-                _estimated_text_width(vertex.object_attrs.get(field, ""))
+                text_width(_frequency_value(vertex, field), FREQUENCY_FONT_SIZE)
                 for vertex, _ in rows
             ]
         )
-        column_widths.append(max(58.0, widest + 12.0))
+        column_widths.append(max(12.0 if array_mode else 58.0, widest + 12.0))
     centers: list[float] = []
     cursor = table_left
     for width in column_widths:
@@ -299,7 +342,12 @@ def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
         cursor += width + FREQUENCY_COLUMN_GAP
     max_x = cursor - FREQUENCY_COLUMN_GAP
     first_axis = rows[0][1]
-    header_y = first_axis - 28.0
+    line_height = FREQUENCY_FONT_SIZE * 1.35
+    header_lines = max(len(text_lines(heading)) for _, heading in columns)
+    row_half_heights = [max((len(text_lines(_frequency_value(vertex, field))) - 1) * line_height / 2
+                           + FREQUENCY_FONT_SIZE for field, _ in columns) for vertex, _ in rows]
+    first_half = row_half_heights[0]
+    header_y = first_axis - max(28.0, first_half + 16.0) - (header_lines - 1) * line_height
     return FrequencyTable(
         terminals=tuple(rows),
         columns=columns,
@@ -308,38 +356,43 @@ def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
         min_x=table_left,
         min_y=header_y - FREQUENCY_FONT_SIZE,
         max_x=max_x,
-        max_y=max(row_axis + FREQUENCY_FONT_SIZE / 2 for _, row_axis in rows),
+        max_y=max(row_axis + half for (_, row_axis), half in zip(rows, row_half_heights)),
+        column_widths=tuple(column_widths),
+        align=document.options.frequency_align,
     )
 
 
 def _render_frequency_table(table: FrequencyTable) -> list[str]:
     lines = ['<g class="frequency-table">']
-    for (field, heading), center_x in zip(
-        table.columns, table.column_centers
-    ):
-        lines.append(
-            f'<text class="frequency-heading" data-frequency-field="{field}" '
-            f'x="{_svg_num(center_x)}" y="{_svg_num(table.header_y)}" '
-            'text-anchor="middle" font-family="Microsoft YaHei,WenQuanYi Micro Hei,Arial,sans-serif" '
-            f'font-size="{_svg_num(FREQUENCY_FONT_SIZE)}" fill="#20252b">'
-            f'{_escape(heading)}</text>'
-        )
+    line_height = FREQUENCY_FONT_SIZE * 1.35
+
+    def render_cell(text: str, field: str, index: int, y: float, *, node: str | None = None) -> str:
+        center = table.column_centers[index]
+        width = table.column_widths[index]
+        x = center + {"left": -width / 2 + 6, "center": 0.0, "right": width / 2 - 6}[table.align]
+        content_lines = text_lines(text)
+        if node is not None:
+            y -= (len(content_lines) - 1) * line_height / 2
+        content = (_escape(text) if len(content_lines) == 1 else "".join(
+            f'<tspan x="{_svg_num(x)}" y="{_svg_num(y + line * line_height)}">{_escape(value)}</tspan>'
+            for line, value in enumerate(content_lines)))
+        node_attr = f' data-node-id="{_escape(node)}"' if node is not None else ""
+        cls = "frequency-value" if node is not None else "frequency-heading"
+        color = "#d02020" if node is not None else "#20252b"
+        return (f'<text class="{cls}" data-frequency-field="{field}" data-frequency-index="{index}"'
+                f'{node_attr} aria-label="{_escape(text)}" x="{_svg_num(x)}" y="{_svg_num(y)}" '
+                f'text-anchor="{TEXT_ANCHORS[table.align]}" font-family="Microsoft YaHei,WenQuanYi Micro Hei,Arial,sans-serif" '
+                f'font-size="{_svg_num(FREQUENCY_FONT_SIZE)}" fill="{color}">{content}</text>')
+
+    for index, (field, heading) in enumerate(table.columns):
+        lines.append(render_cell(heading, field, index, table.header_y))
     for vertex, row_axis in table.terminals:
         logical_name = vertex.logical_name or vertex.name
-        for (field, _), center_x in zip(
-            table.columns, table.column_centers
-        ):
-            value = vertex.object_attrs.get(field, "")
+        for index, (field, _) in enumerate(table.columns):
+            value = _frequency_value(vertex, field)
             if not value:
                 continue
-            lines.append(
-                f'<text class="frequency-value" data-node-id="{_escape(logical_name)}" '
-                f'data-frequency-field="{field}" x="{_svg_num(center_x)}" '
-                f'y="{_svg_num(row_axis + FREQUENCY_FONT_SIZE * 0.35)}" '
-                'text-anchor="middle" font-family="Arial,Noto Sans CJK SC,sans-serif" '
-                f'font-size="{_svg_num(FREQUENCY_FONT_SIZE)}" fill="#d02020">'
-                f'{_escape(value)}</text>'
-            )
+            lines.append(render_cell(value, field, index, row_axis + FREQUENCY_FONT_SIZE * 0.35, node=logical_name))
     lines.append("</g>")
     return lines
 
@@ -641,7 +694,7 @@ def build_preview_svg(
     all_y = [
         coordinate
         for vertex in document.vertices
-        for coordinate in (vertex.y, vertex.y + vertex.height + HTML_LABEL_CONTENT_OFFSET_Y)
+        for coordinate in (vertex.y, vertex_visual_box(vertex).bottom + HTML_LABEL_CONTENT_OFFSET_Y)
     ]
     for points in edge_points.values():
         all_x.extend(x for x, _ in points)
@@ -720,6 +773,7 @@ def build_preview_svg(
                 height=vertex.height,
                 content_offset_x=HTML_LABEL_CONTENT_OFFSET_X,
                 content_offset_y=HTML_LABEL_CONTENT_OFFSET_Y,
+                name_align=document.options.name_align,
             )
             logical_name = _escape(vertex.logical_name or vertex.name)
             lines.append(rendered.replace(
@@ -771,4 +825,6 @@ def _escape(text: str) -> str:
         .replace("<", "&lt;")
         .replace(">", "&gt;")
         .replace('"', "&quot;")
+        .replace("\r", "&#13;")
+        .replace("\n", "&#10;")
     )

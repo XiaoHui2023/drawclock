@@ -15,7 +15,7 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 from collections import Counter, defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from statistics import median
 from typing import Any, Iterable
@@ -71,6 +71,7 @@ class Box:
     visible_y: float | None = None
     visible_w: float | None = None
     visible_h: float | None = None
+    annotation_bounds: tuple[tuple[float, float, float, float], ...] = ()
 
     @property
     def cy(self) -> float:
@@ -183,6 +184,16 @@ def _parse_path_as_polyline(data: str) -> list[tuple[float, float]]:
     return simplify(points)
 
 
+def _annotation_text_rect(element) -> tuple[float, float, float, float]:
+    value = "".join(element.itertext())
+    size = float(element.get("font-size", "11"))
+    x, baseline = float(element.get("x", "0")), float(element.get("y", "0"))
+    width = max(size * 0.5, sum(size * (1.1 if ord(c) > 127 else 0.68) for c in value))
+    anchor = element.get("text-anchor", "start")
+    left = x - (width / 2 if anchor == "middle" else width if anchor == "end" else 0)
+    return left, baseline - size, left + width, baseline + size * 0.25
+
+
 def parse_svg(path: Path, node_names: set[str] | None = None) -> tuple[list[Box], list[Route]]:
     root = ET.parse(path).getroot()
     boxes: list[Box] = []
@@ -207,19 +218,20 @@ def parse_svg(path: Path, node_names: set[str] | None = None) -> tuple[list[Box]
             ))
             left, top, right, bottom = x, y, x + width, y + height
             for label in (child for child in group if child.tag == f"{NS}text"):
-                value = "".join(label.itertext())
                 size = float(label.get("font-size", "11"))
-                anchor_x = float(label.get("x", "0"))
-                baseline_y = float(label.get("y", "0"))
-                label_width = max(size, len(value) * size * 0.7)
-                anchor = label.get("text-anchor", "start")
-                label_left = anchor_x - (
-                    label_width / 2 if anchor == "middle" else label_width if anchor == "end" else 0
-                )
-                left = min(left, label_left)
-                right = max(right, label_left + label_width)
-                top = min(top, baseline_y - size)
-                bottom = max(bottom, baseline_y + size * 0.25)
+                for line in label.findall(f"{NS}tspan") or [label]:
+                    value = "".join(line.itertext())
+                    anchor_x = float(line.get("x", label.get("x", "0")))
+                    baseline_y = float(line.get("y", label.get("y", "0")))
+                    label_width = max(size, len(value) * size * 0.7)
+                    anchor = line.get("text-anchor", label.get("text-anchor", "start"))
+                    label_left = anchor_x - (
+                        label_width / 2 if anchor == "middle" else label_width if anchor == "end" else 0
+                    )
+                    left = min(left, label_left)
+                    right = max(right, label_left + label_width)
+                    top = min(top, baseline_y - size)
+                    bottom = max(bottom, baseline_y + size * 0.25)
             boxes.append(Box(node, x, y, width, height, left, top, right - left, bottom - top))
     if not boxes and node_names:
         for foreign in root.iter(f"{NS}foreignObject"):
@@ -230,6 +242,17 @@ def parse_svg(path: Path, node_names: set[str] | None = None) -> tuple[list[Box]
                     foreign.get("x", "0"), foreign.get("y", "0"),
                     foreign.get("width", "0"), foreign.get("height", "0"),
                 ))))
+    for group in root.iter(f"{NS}g"):
+        if "node-annotation" not in (group.get("class") or "").split():
+            continue
+        rects = tuple(_annotation_text_rect(text) for text in group.findall(f"{NS}text"))
+        owners = [box for box in boxes if box.node == group.get("data-node-id")]
+        if owners and rects:
+            def distance(box):
+                left, top, right, bottom = box.visual_bounds
+                return min(max(left-r[2], r[0]-right, 0) + max(top-r[3], r[1]-bottom, 0) for r in rects)
+            owner = min(owners, key=distance)
+            boxes[boxes.index(owner)] = replace(owner, annotation_bounds=owner.annotation_bounds + rects)
     for element in root.iter():
         if "edge" not in (element.get("class") or "").split():
             continue
@@ -343,11 +366,7 @@ def _annotation_quality(
             value = "".join(element.itertext())
             line_values.append(value)
             line_colors.append(element.get("fill", ""))
-            size = float(element.get("font-size", "11"))
-            x = float(element.get("x", "0"))
-            baseline = float(element.get("y", "0"))
-            width = sum(size * (1.1 if ord(char) > 0x7F else 0.68) for char in value)
-            text_boxes.append((x, baseline - size, x + max(size * 0.5, width), baseline + size * 0.25))
+            text_boxes.append(_annotation_text_rect(element))
         if text_boxes:
             observed_lines.append((node, tuple(line_values)))
             observed_colors.append((
@@ -616,7 +635,7 @@ def generic_quality_failures(report: dict[str, Any]) -> list[str]:
 
 
 def _source_reference(reference: str) -> tuple[str, str]:
-    match = re.fullmatch(r"(.+)\[([^][]+)\]", reference)
+    match = re.fullmatch(r"(.+)\[([^][]+)\]", reference, re.DOTALL)
     return (match.group(1), match.group(2)) if match else (reference, "right")
 
 
@@ -1298,6 +1317,23 @@ def _vertical_root_facility_bend_witnesses(
             continue
         moved_start = (route.points[0][0], route.points[-1][1])
         end = route.points[-1]
+        moved_rects = (moved.visual_bounds,) + tuple(
+            (left, top + delta_y, right, bottom + delta_y)
+            for left, top, right, bottom in source_box.annotation_bounds
+        )
+        other_rects = [rect for box in boxes if box is not source_box
+                       for rect in (box.visual_bounds,) + box.annotation_bounds]
+        if any(max(a[0], b[0]) < min(a[2], b[2]) - EPS
+               and max(a[1], b[1]) < min(a[3], b[3]) - EPS
+               for a in moved_rects for b in other_rects):
+            continue
+        annotation_obstacles = [rect for box in boxes if box is not source_box
+                                for rect in box.annotation_bounds] + list(moved_rects[1:])
+        if any(_segment_rect_interior_hit(moved_start, end, rect) for rect in annotation_obstacles):
+            continue
+        if any(other is not route and any(_segment_rect_interior_hit(a, b, rect)
+               for a, b in segments(other) for rect in moved_rects[1:]) for other in routes):
+            continue
         if moved_start[0] >= end[0] - EPS:
             continue
         if any(

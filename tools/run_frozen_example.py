@@ -384,7 +384,7 @@ def _assert_multi_source_row_patterns(path: Path, config_path: Path) -> None:
         )
 
 
-def _assert_frequency_table(path: Path, config_path: Path) -> None:
+def _assert_frequency_table(path: Path, config_path: Path, headers: tuple[str, ...] | None = None) -> None:
     config = json.loads(config_path.read_text(encoding="utf-8"))
     referenced = set()
     for item in config.values():
@@ -427,6 +427,18 @@ def _assert_frequency_table(path: Path, config_path: Path) -> None:
         (field, label) for field, label in columns
         if any(str(config[name].get(field, "")) for name in terminals)
     ]
+    array_rows = None
+    if any("frequencies" in config[name] for name in terminals):
+        array_rows = {}
+        for name in terminals:
+            legacy = [config[name].get(field, "") for field, _ in columns]
+            array_rows[name] = config[name].get("frequencies", legacy if any(str(v) for v in legacy) else [])
+        count = max((len(row) for row in array_rows.values()), default=0)
+        expected_columns = [(f"frequencies[{i}]", f"频率 {i + 1}") for i in range(count)]
+    if headers is not None:
+        if len(headers) != len(expected_columns):
+            raise SystemExit("custom frequency heading count differs")
+        expected_columns = [(field, label) for (field, _), label in zip(expected_columns, headers)]
     labels = [element.get("aria-label", element.text or "") for element in headings]
     fields = [element.get("data-frequency-field") for element in headings]
     if labels != [label for _, label in expected_columns] or fields != [
@@ -444,7 +456,9 @@ def _assert_frequency_table(path: Path, config_path: Path) -> None:
         if element.get("class") == "frequency-value"
     ]
     observed = {
-        (element.get("data-node-id"), element.get("data-frequency-field")): element.text
+        (element.get("data-node-id"), element.get("data-frequency-field")): (
+            "\n".join("".join(span.itertext()) for span in element if span.tag.rsplit("}", 1)[-1] == "tspan")
+            if len(element) else element.text)
         for element in values
     }
     expected = {
@@ -454,10 +468,77 @@ def _assert_frequency_table(path: Path, config_path: Path) -> None:
         for field in ("func_freq", "scan_freq", "bist_freq")
         if field in item and str(item[field])
     }
+    if array_rows is not None:
+        expected = {(name, f"frequencies[{i}]"): str(value)
+                    for name, row in array_rows.items() for i, value in enumerate(row) if str(value)}
     if observed != expected or any(
         element.get("fill") != "#d02020" for element in values
     ):
         raise SystemExit(f"frequency values are invalid: {observed=}, {expected=}")
+
+
+def _assert_configurable_presentation(binary: Path, out: Path) -> None:
+    source = ROOT / "example/auto-layout/34-configurable-text-and-frequency.json"
+    default = out / "presentation-default.svg"
+    _draw(binary, source, default)
+    _assert_frequency_table(default, source)
+    ns = {"s": SVG_NS}
+    default_root = ET.parse(default).getroot()
+    config = json.loads(source.read_text(encoding="utf-8"))
+    components = {e.get("data-node-id"): e for e in default_root.iter() if e.get("class") == "component"}
+    for name in config:
+        texts = [e for e in components[name] if e.tag == f"{{{SVG_NS}}}text" and len(e)]
+        if not texts or [span.text or "" for span in texts[0]] != name.split("\n"):
+            raise SystemExit("frozen multiline name differs from original identity")
+        if texts[0].get("text-anchor") != "middle":
+            raise SystemExit("default multiline name is not centered")
+    notes = {e.get("data-node-id"): e for e in default_root.iter() if e.get("class") == "node-annotation"}
+    terminals = [name for name in config if config[name]["kind"] == "clock"]
+    if len({notes[name].find("s:text", ns).get("x") for name in terminals}) != 1:
+        raise SystemExit("default terminal descriptions are not aligned")
+    headers = ("Operating\nfrequency", "SCAN", "BIST", "Custom")
+    common = ["--description-align", "center", "--description-anchor", "top-left",
+              "--horizontal-spacing", "240", "--name-align", "right",
+              "--frequency-align", "left", "--frequency-headers", *headers]
+    documents = []
+    for index, offsets in enumerate(((0, 0), (5, -7))):
+        output = out / f"presentation-global-{index}.svg"
+        _draw(binary, source, output, *common, "--description-offset-x", str(offsets[0]),
+              "--description-offset-y", str(offsets[1]))
+        _assert_frequency_table(output, source, headers)
+        document = ET.parse(output).getroot()
+        for text in document.iter(f"{{{SVG_NS}}}text"):
+            if text.get("class") in {"frequency-heading", "frequency-value"} and text.get("text-anchor") != "start":
+                raise SystemExit("frozen frequency alignment was ignored")
+        graphics = [e for e in document.iter() if e.get("class") == "component-graphic"]
+        xs = sorted({float(e.get("x")) for e in graphics})
+        if any(b - a - 40 < 239.99 for a, b in zip(xs, xs[1:])):
+            raise SystemExit("frozen horizontal spacing was compacted away")
+        documents.append(document)
+
+    def note_position(document, name):
+        component = next(e for e in document.iter() if e.get("class") == "component" and e.get("data-node-id") == name)
+        graphic = component.find("s:svg", ns)
+        name_text = next(e for e in component if e.tag == f"{{{SVG_NS}}}text" and len(e))
+        if name_text.get("text-anchor") != "end":
+            raise SystemExit("frozen name alignment was ignored")
+        note = next(e for e in document.iter() if e.get("class") == "node-annotation" and e.get("data-node-id") == name)
+        text = note.find("s:text", ns)
+        expected = config[name].get("description_align", "center")
+        if text.get("text-anchor") != {"center": "middle", "right": "end"}[expected]:
+            raise SystemExit("frozen node/global description alignment differs")
+        return float(text.get("x")) - float(graphic.get("x")), float(text.get("y")) - float(graphic.get("y"))
+
+    for name in config:
+        before, after = (note_position(document, name) for document in documents)
+        expected = (0, 0) if "description_offset_x" in config[name] else (5, -7)
+        if any(abs(after[i] - before[i] - expected[i]) > 0.01 for i in (0, 1)):
+            raise SystemExit(f"frozen description offsets or per-node overrides differ: {name}")
+    rejected = out / "presentation-invalid.svg"
+    _run(binary, ["-i", str(source), "-l", str(LIBRARY), "-o", str(rejected),
+                  "--frequency-headers", "only-one"], expect_success=False)
+    if rejected.exists():
+        raise SystemExit("invalid presentation wrote a partial SVG")
 
 
 def main() -> int:
@@ -482,6 +563,7 @@ def main() -> int:
     required = (
         binary, DRAW_EXAMPLE, LINEAR, DENSE, MEDIUM, ASYMMETRIC,
         COLUMN_PREFERENCE, FREQUENCY, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE,
+        ROOT / "example/auto-layout/34-configurable-text-and-frequency.json",
         SKILLS / "clock-diagram-design" / "SKILL.md",
         SKILLS / "clock-json-schema" / "SKILL.md",
         SKILLS / "clock-layout-algorithms" / "SKILL.md",
@@ -547,6 +629,7 @@ def main() -> int:
     frequency_output = out / "terminal-frequency-frozen.svg"
     _draw(binary, FREQUENCY, frequency_output)
     _assert_frequency_table(frequency_output, FREQUENCY)
+    _assert_configurable_presentation(binary, out)
 
     multi_source_output = out / "multi-source-rows-frozen.svg"
     _draw(binary, MULTI_SOURCE, multi_source_output)

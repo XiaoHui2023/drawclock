@@ -14,6 +14,7 @@ REQUIRED = {
     "doc/draw.md",
     "example/draw.json",
     "example/auto-layout/33-description-colors.json",
+    "example/auto-layout/34-configurable-text-and-frequency.json",
 }
 
 

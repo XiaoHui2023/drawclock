@@ -7,7 +7,7 @@ import sys
 import time
 from collections import Counter, defaultdict
 from bisect import bisect_left, bisect_right
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from statistics import median
 from typing import Any
 
@@ -29,8 +29,9 @@ from auto_layout import (
 from drawio_layout import EdgeLayout, LAYOUT_VERSION, LayoutDocument
 from drawio_library import LibrarySource, library_cache_key, load_library_shapes
 from drawio_ports import EDGE_DRAW_STYLE, port_anchors
-from drawio_ports import abs_port_xy
+from drawio_ports import abs_port_xy, format_port_ratio
 from validate_config import validate_config
+from presentation import DrawingOptions, prepare_nodes
 from visual_geometry import estimated_label_width, vertex_visual_box, visual_box
 
 
@@ -902,6 +903,7 @@ def _generate_scalable_layout(
             2 * profile.route_clearance
             + max(0, lane_count.get(level, 0) - 1) * profile.grid,
             profile.grid,
+            profile.minimum_layer_spacing,
         )
         rank_x[level] = (
             rank_x[level - 1]
@@ -1220,8 +1222,8 @@ def _generate_scalable_layout(
         target_anchor = port_anchors(target.shape.style, target.shape.title)[edge.target_port]
         style = (
             f"{EDGE_DRAW_STYLE}jumpStyle=arc;jumpSize=6;"
-            f"exitX={source_anchor[0]:g};exitY={source_anchor[1]:g};"
-            f"entryX={target_anchor[0]:g};entryY={target_anchor[1]:g};"
+            f"exitX={format_port_ratio(source_anchor[0])};exitY={format_port_ratio(source_anchor[1])};"
+            f"entryX={format_port_ratio(target_anchor[0])};entryY={format_port_ratio(target_anchor[1])};"
         )
         layouts.append(
             EdgeLayout(
@@ -1419,9 +1421,9 @@ def _generate_scalable_layout(
                 if a[0] == b[0] and left_edge < a[0] < right_edge
             )
         ordered_lanes = sorted(used_lanes)
-        required_gap = 2 * profile.route_clearance + max(
+        required_gap = max(profile.minimum_layer_spacing, 2 * profile.route_clearance + max(
             0, len(ordered_lanes) - 1
-        ) * profile.grid
+        ) * profile.grid)
         delta = right_edge - left_edge - required_gap
         if delta <= 1e-6:
             continue
@@ -4432,6 +4434,7 @@ def _clone_layout_geometry(document: LayoutDocument) -> LayoutDocument:
         version=document.version,
         vertices=[copy.copy(vertex) for vertex in document.vertices],
         edges=[copy.copy(edge) for edge in document.edges],
+        options=document.options,
     )
 
 
@@ -9192,6 +9195,7 @@ def generate_elk_layout(
     component_hints: dict[str, str] | None = None,
     profile_name: str = "readable",
     include_statistics: bool = False,
+    options: DrawingOptions | None = None,
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     """Compute exact-rank, exact-port layout with one deterministic policy."""
     started = time.perf_counter()
@@ -9204,7 +9208,13 @@ def generate_elk_layout(
         config, shapes, component_hints or {}, library_path=library_path
     )
     logical_edges = build_logical_edges(config, nodes, library_path)
+    options = options or DrawingOptions()
+    prepare_nodes(nodes, logical_edges, options, _ranks(nodes, logical_edges, _layout_column_groups(config)))
+    options = options or DrawingOptions()
     profile = PROFILES[profile_name]
+    if options.horizontal_spacing is not None:
+        profile = replace(profile, layer_spacing=options.horizontal_spacing,
+                          minimum_layer_spacing=options.horizontal_spacing)
     plan = select_layout_plan(nodes, logical_edges)
     indegree = {name: 0 for name in nodes}
     outdegree = Counter(edge.source for edge in logical_edges)
@@ -9223,6 +9233,7 @@ def generate_elk_layout(
             plan,
             source_position_mode=source_mode,
         )
+        document.options = options
         selection = report["selection"]
         score = (
             selection["route_overlaps"],
@@ -9250,6 +9261,7 @@ def generate_elk_layout(
             plan,
             source_position_mode="top-aligned",
         )
+        document.options = options
         selection = report["selection"]
         score = (
             selection["route_overlaps"],
@@ -9924,4 +9936,5 @@ def generate_elk_layout(
         }
         for _, _, candidate_report in candidates
     ]
+    document.options = options
     return document, report

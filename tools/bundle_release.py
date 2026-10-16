@@ -22,6 +22,10 @@ RELEASE_FILES = (
         "example/auto-layout/33-description-colors.json",
         "example/auto-layout/33-description-colors.json",
     ),
+    (
+        "example/auto-layout/34-configurable-text-and-frequency.json",
+        "example/auto-layout/34-configurable-text-and-frequency.json",
+    ),
 )
 LIBRARY_SOURCE = "drawio-lib/drawclock"
 LIBRARY_DESTINATION = "libraries"

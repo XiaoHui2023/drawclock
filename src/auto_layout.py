@@ -5,7 +5,7 @@ import math
 import time
 from bisect import bisect_left, bisect_right
 from collections import Counter, defaultdict, deque
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from statistics import median
 from typing import Any, Iterable
@@ -19,11 +19,12 @@ from drawio_library import (
     library_cache_key,
     load_library_shapes,
 )
-from drawio_ports import EDGE_DRAW_STYLE, abs_port_xy, port_anchors
+from drawio_ports import EDGE_DRAW_STYLE, abs_port_xy, port_anchors, format_port_ratio
 from source_reference import parse_source_ref
 from internal_kind import INTERNAL_OBJECT_KEYS
 from library_ports import input_connection_keys, output_connection_keys, port_topology_from_style
 from validate_config import validate_config
+from presentation import DrawingOptions, prepare_nodes
 
 
 def _bit_count(value: int) -> int:
@@ -44,6 +45,7 @@ class LayoutProfile:
     margin: float
     route_clearance: float
     grid: float
+    minimum_layer_spacing: float = 0.0
 
 
 PROFILES = {
@@ -899,8 +901,8 @@ def _route_edges(
         style = (
             f"{EDGE_DRAW_STYLE}"
             "jumpStyle=arc;jumpSize=6;"
-            f"exitX={source_anchor[0]:g};exitY={source_anchor[1]:g};"
-            f"entryX={target_anchor[0]:g};entryY={target_anchor[1]:g};"
+            f"exitX={format_port_ratio(source_anchor[0])};exitY={format_port_ratio(source_anchor[1])};"
+            f"entryX={format_port_ratio(target_anchor[0])};entryY={format_port_ratio(target_anchor[1])};"
         )
         layouts.append(
             EdgeLayout(
@@ -926,7 +928,7 @@ def _vertex_layouts(
         for key, value in node.item.items():
             if key == "source" or key in INTERNAL_OBJECT_KEYS:
                 continue
-            attrs[key] = str(value)
+            attrs[key] = json.dumps(value, ensure_ascii=False) if key == "frequencies" else str(value)
         attrs["name"] = name
         attrs = canonical_object_attrs(
             node.shape.title,
@@ -1495,6 +1497,7 @@ def generate_layout(
     component_hints: dict[str, str] | None = None,
     profile_name: str = "readable",
     candidate_limit: int = 6,
+    options: DrawingOptions | None = None,
 ) -> tuple[LayoutDocument, dict[str, Any]]:
     started = time.perf_counter()
     if profile_name not in PROFILES:
@@ -1508,9 +1511,15 @@ def generate_layout(
         config, shapes, component_hints or {}, library_path=library_path
     )
     logical_edges = build_logical_edges(config, nodes, library_path)
+    options = options or DrawingOptions()
+    prepare_nodes(nodes, logical_edges, options, _ranks(nodes, logical_edges, _layout_column_groups(config)))
     rank = _ranks(nodes, logical_edges, _layout_column_groups(config))
     orders = _candidate_orders(config, logical_edges, rank, candidate_limit)
+    options = options or DrawingOptions()
     profile = PROFILES[profile_name]
+    if options.horizontal_spacing is not None:
+        profile = replace(profile, layer_spacing=options.horizontal_spacing,
+                          minimum_layer_spacing=options.horizontal_spacing)
     best: tuple[tuple[float, ...], LayoutDocument, dict[str, Any]] | None = None
     candidate_reports: list[dict[str, Any]] = []
     consecutive_non_improvements = 0
@@ -1561,4 +1570,5 @@ def generate_layout(
             "candidate_reports": candidate_reports,
         }
     )
+    document.options = options
     return document, final_report

@@ -43,22 +43,24 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 }
 ```
 
-末端 clock 可选填写 `func_freq`、`scan_freq`、`bist_freq`，值为字符串或数字。所有末端独占一行并对齐到最右列；后方按“工作频率”、“SCAN”、“BIST”的固定顺序显示非空列。某列所有末端都没有值时整列隐藏；三列全空时不生成频率表。频率值为红色，显示列中的单个未填项保持空白。
+末端节点通过 `frequencies` 数组填写表格值，元素为字符串或有限数字。列数取所有末端数组的最大长度，较短行的缺项留空；空数组不增加列。默认表头为“频率 1”、“频率 2”等，可全局设置。标题和值支持 `\n` 换行，默认居中，列宽按最长一行调整。所有末端独占一行并对齐到最右列，频率值为红色。
 
 ```json
 {
   "clock_a": {
     "kind": "clock",
     "source": "gate_a",
-    "func_freq": "800 MHz",
-    "scan_freq": "50 MHz",
-    "bist_freq": "100 MHz"
+    "frequencies": ["800\nMHz", "50 MHz", "100 MHz", "25 MHz"]
   },
-  "clock_b": {"kind": "clock", "source": "gate_b", "func_freq": 400}
+  "clock_b": {"kind": "clock", "source": "gate_b", "frequencies": [400]}
 }
 ```
 
-所有节点都可选填写字符串字段 `description`。它是面向读图者的说明，不参与连接或布局语义；输出只使用简单文字，相同逻辑节点即使存在显示副本也只标一次。显式换行、空行和尾随换行会保留；长行会按保守字符宽度确定性换行。文字必须避开节点可见边界、线路、频率表和其他注释；限定距离内没有安全位置时生成直接失败，不输出带碰撞的图。
+旧配置仍接受 `func_freq`、`scan_freq`、`bist_freq`，保留原有非空列显示方式；同一节点不能混填旧字段与 `frequencies`。
+
+所有节点都可选填写字符串字段 `description`。相同列的注释共享文字排列边界；相同逻辑节点即使存在显示副本也只标一次。显式换行、空行和尾随换行会保留，长行自动换行。布局会预留文字空间；限定距离内没有安全位置时生成失败。
+
+节点的 `description_align` 可为 `left`、`center`、`right`，默认 `left`。`description_anchor` 可为 `top-left`、`top`、`top-right`、`right`、`bottom-right`、`bottom`、`bottom-left`、`left`，默认 `top-left`。`description_offset_x`、`description_offset_y` 默认 `0`，单位为像素，正值分别向右、向下移动。避障会在所选方位内调整距离。
 
 `description_color` 只修饰该节点的 `description`。省略时为 `#4b5563`。输入支持 CSS 命名色、3/4/6/8 位十六进制、RGB(A)、HSL(A) 和 HWB；输出统一为小写 `#rrggbb` 或 `#rrggbbaa`。动态值 `var()`、`currentColor`、`url()` 与宽色域函数不进入 SVG，配置阶段直接报错。
 
@@ -68,7 +70,11 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
     "kind": "pll",
     "source": "xtal",
     "description": "主 PLL；上电后由固件配置倍频参数",
-    "description_color": "hsl(271 81% 56%)"
+    "description_color": "hsl(271 81% 56%)",
+    "description_align": "right",
+    "description_anchor": "top-right",
+    "description_offset_x": 12,
+    "description_offset_y": -6
   }
 }
 ```
@@ -76,6 +82,43 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 纯文字排布示例为 `example/auto-layout/31-node-descriptions.json`；颜色输入示例为 `example/auto-layout/33-description-colors.json`。
 
 输出画布不添加输入文件名或文件名前缀标题。
+
+实例名中的 `\n` 在图中显示为多行，名称对齐默认居中。`source` 仍引用完整原始实例名，包括其中的换行；多输出后缀保持不变。
+
+```json
+{
+  "PLL\nmain": {"kind": "gate"},
+  "clock": {"kind": "clock", "source": "PLL\nmain"}
+}
+```
+
+## Python 调用
+
+`DrawingOptions` 设置整张图的默认值；节点显式填写的注释属性逐项覆盖全局值。`horizontal_spacing` 为列间最小距离，复杂布线可能使用更大距离。自定义表头数量必须与实际表格列数一致。
+
+```python
+from auto_layout import load_clock_tree
+from elk_layout import generate_elk_layout
+from layout_preview import write_preview_svg
+from presentation import DrawingOptions
+
+options = DrawingOptions(
+    description_align="left",
+    description_anchor="top-left",
+    description_offset_x=0,
+    description_offset_y=0,
+    horizontal_spacing=160,
+    name_align="center",
+    frequency_headers=("工作\n频率", "SCAN", "BIST", "自定义"),
+    frequency_align="center",
+)
+document, report = generate_elk_layout(
+    load_clock_tree("clock.json"),
+    library_path="drawio-lib/drawclock",
+    options=options,
+)
+write_preview_svg(document, "clock.svg")
+```
 
 器件库可定义任意类型。布局只依据连接关系、库内几何、标签和端口计算，不按固定器件名或实例名分支。
 

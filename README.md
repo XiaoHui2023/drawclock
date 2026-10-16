@@ -8,7 +8,7 @@
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 ```
 
-末端 clock 可选填写 `func_freq`、`scan_freq`、`bist_freq`。输出会将末端逐行对齐，并在右侧按 `工作频率 / SCAN / BIST` 的固定顺序显示红色数值；只有至少一个末端填写了对应值时才显示该列，三类值全空时不显示频率表。示例为 `example/auto-layout/22-terminal-frequency-table.json`。
+末端节点用 `frequencies` 数组设置右侧表格内容，列数由数组长度决定。表头可自定义，标题和值均支持换行，列宽随文字调整。
 
 任意节点可填写字符串 `description`。`description_color` 设置该段注释的颜色；省略时使用 `#4b5563`。支持 CSS 命名色、3/4/6/8 位十六进制、`rgb()`、`rgba()`、`hsl()`、`hsla()` 和 `hwb()`。示例为 `example/auto-layout/33-description-colors.json`。
 
@@ -22,3 +22,11 @@ SVG 不显示输入文件名或文件名前缀标题。
 | `--library` | `-l` | 多个路径 | ✓ |  | 单器件 draw.io 库 XML 或目录 |
 | `--output` | `-o` | 文件路径 | ✓ |  | 内容固定为 SVG，后缀不改变格式 |
 | `--crossing-style` |  | `arc` / `gap` / `sharp` / `none` |  | `arc` | 跨线样式 |
+| `--description-align` |  | `left` / `center` / `right` |  | `left` | 注释文字对齐 |
+| `--description-anchor` |  | 八方位 |  | `top-left` | `top-left`、`top`、`top-right`、`right`、`bottom-right`、`bottom`、`bottom-left`、`left` |
+| `--description-offset-x` |  | 数字 |  | `0` | 注释水平偏移，单位像素 |
+| `--description-offset-y` |  | 数字 |  | `0` | 注释垂直偏移，单位像素 |
+| `--horizontal-spacing` |  | 非负数字 |  |  | 列间最小距离，单位像素；布线需要时增加 |
+| `--name-align` |  | `left` / `center` / `right` |  | `center` | 多行名称对齐 |
+| `--frequency-headers` |  | 多个字符串 |  |  | 依次对应各列，可含换行 |
+| `--frequency-align` |  | `left` / `center` / `right` |  | `center` | 表头和内容对齐 |

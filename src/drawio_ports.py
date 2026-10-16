@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from decimal import Decimal
 
 from library_ports import port_anchors as _port_anchors
 from library_ports import resolve_port
@@ -14,6 +15,12 @@ EDGE_DRAW_STYLE = (
 )
 
 _STYLE_XY_RE = re.compile(r"(exit|entry)(X|Y)=(-?[0-9.]+)")
+
+
+def format_port_ratio(value: float) -> str:
+    """Keep round-trip precision and compact legacy decimals without exponents."""
+    text = format(Decimal(str(float(value))), "f")
+    return text.rstrip("0").rstrip(".") if "." in text else text
 
 
 def port_anchors(style: str, drawclock_type: str) -> dict[str, tuple[float, float]]:

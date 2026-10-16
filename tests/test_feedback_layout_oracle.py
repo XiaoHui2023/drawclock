@@ -159,6 +159,20 @@ def test_vertical_root_facility_oracle_counts_visible_label_footprint() -> None:
     ) == []
 
 
+def test_root_move_must_preserve_own_and_neighbor_annotation_clearance() -> None:
+    from dataclasses import replace
+    route = oracle.Route(0, [(10, 5), (30, 5), (30, 25), (50, 25)], source="root", target="sink")
+    root = oracle.Box("root", 0, 0, 10, 10)
+    sink = oracle.Box("sink", 50, 20, 10, 10)
+    distant = oracle.Box("other", 80, 60, 10, 10, annotation_bounds=((0, 24, 8, 28),))
+    assert oracle._vertical_root_facility_bend_witnesses({"root"}, [route], [root, sink])
+    assert not oracle._vertical_root_facility_bend_witnesses({"root"}, [route], [root, sink, distant])
+    own_note = replace(root, annotation_bounds=((45, 1, 55, 8),))
+    assert not oracle._vertical_root_facility_bend_witnesses({"root"}, [route], [own_note, sink])
+    safe_note = replace(root, annotation_bounds=((-15, -10, -5, -5),))
+    assert oracle._vertical_root_facility_bend_witnesses({"root"}, [route], [safe_note, sink])
+
+
 def test_adjacent_root_height_oracle_uses_visible_clearance() -> None:
     route = oracle.Route(
         0,

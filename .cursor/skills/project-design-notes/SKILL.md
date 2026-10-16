@@ -6,6 +6,10 @@ description: >-
 
 # 设计笔记
 
+## 本轮新增要求（2026-10-16，已实现、验收中）
+
+统一配置为presentation.DrawingOptions，通过generate_elk_layout/generate_layout的options参数传入；注释默认top-left方位、left文字对齐，节点同名字段逐项覆盖全局值。八方位与三对齐分别控制位置和块内文字，x/y偏移单位像素，正值向右/下。horizontal_spacing为最小列间距，布线可增大；name_align和frequency_align默认center，frequency_headers为与实际列数一致的字符串序列。frequencies数组定义任意数量列，支持多行标题/值，短行缺项为空；旧三个字段保留兼容但同节点不能混填。名称换行保留原始逻辑身份和引用，显示多行；文字空间在布局前预留。完成证据由项目目标维护，当前仍需全量质量验收。
+
 ## 产品范围
 
 - drawclock 只把时钟连接配置和指定的 draw.io 器件库转换为 SVG。
@@ -83,7 +87,7 @@ description: >-
 ## 发布
 
 - PyInstaller 可执行文件内含本项目 Python 模块，不依赖宿主 Python、Node.js、ELK 或浏览器。
-- 默认发行包只含主程序、`doc/README.md`、`doc/draw.md`、`doc/licenses/`、平铺的 `libraries/*.xml`、最小示例和颜色字段示例；完整源码由仓库与发布 tag 提供。仓库内部开发路径不因发行映射而改名。
+- 默认发行包只含主程序、`doc/README.md`、`doc/draw.md`、`doc/licenses/`、平铺的 `libraries/*.xml`、最小示例、颜色字段示例和文字/数组组合示例；完整源码由仓库与发布 tag 提供。仓库内部开发路径不因发行映射而改名。
 - 源码运行只要求 CPython 3.9 或更高版本；以 `-I -S` 禁用用户目录和 site-packages 后仍可直接生成 SVG，Python 3.9、3.10 与当前版本对代表输入结果一致。
 - 发布包执行独立 allowlist 门，拒绝 `src/`、项目 Skills、`pyproject.toml`、source manifest、批量质量语料、Runtime、npm 清单、wheelhouse 和缓存进入默认附件。
 - 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、严格 JSON 拒绝规则、文件与目录混合器件库、默认圆弧和维护范围示例。

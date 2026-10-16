@@ -115,9 +115,11 @@ def _native_svg_fragment(element: ET.Element, box: _Box) -> str:
     return ET.tostring(positioned, encoding="unicode", short_empty_elements=True)
 
 
-def _text_fragment(element: ET.Element, box: _Box) -> str:
-    text = "".join(element.itertext()).strip()
-    if not text:
+def _text_fragment(element: ET.Element, box: _Box, name_align: str = "center") -> str:
+    text = "".join(element.itertext())
+    if element.get("data-drawclock-name") != "1":
+        text = text.strip()
+    if not text.strip():
         return ""
     style = _style_map(element.get("style"))
     font_size = _length(style.get("font-size"), 1.0, 11.0)
@@ -141,10 +143,34 @@ def _text_fragment(element: ET.Element, box: _Box) -> str:
         attrs.append(f'font-style="{escape(style["font-style"], quote=True)}"')
     if centered_x:
         attrs.append('text-anchor="middle"')
+    text_lines = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    if element.get("data-drawclock-name") == "1":
+        from presentation import TEXT_ANCHORS, text_width
+        center = x if centered_x else x + box.width / 2
+        extent = text_width(text, font_size) / 2
+        x = center + {"left": -extent, "center": 0.0, "right": extent}[name_align]
+        attrs = [part for part in attrs if not part.startswith(('x=', 'text-anchor='))]
+        attrs.extend((f'x="{_number(x)}"', f'text-anchor="{TEXT_ANCHORS[name_align]}"'))
+    if len(text_lines) > 1:
+        raw_height = style.get("line-height", "normal")
+        if raw_height == "normal":
+            line_height = font_size * 1.3
+        elif raw_height.endswith("px"):
+            line_height = _length(raw_height, font_size)
+        else:
+            line_height = float(raw_height) * font_size
+        line_height = max(line_height, font_size * 1.3)
+        first_y = y - (len(text_lines) - 1) * line_height / 2 if centered_y else y
+        spans = "".join(
+            f'<tspan x="{_number(x)}" y="{_number(first_y + index * line_height)}">'
+            f'{escape(line)}</tspan>'
+            for index, line in enumerate(text_lines)
+        )
+        return f"<text {' '.join(attrs)}>{spans}</text>"
     return f"<text {' '.join(attrs)}>{escape(text)}</text>"
 
 
-def _render_html_element(element: ET.Element, parent: _Box) -> list[str]:
+def _render_html_element(element: ET.Element, parent: _Box, name_align: str = "center") -> list[str]:
     tag = _local_name(element.tag)
     box = _box_for(element, parent)
     if tag == "svg":
@@ -153,16 +179,16 @@ def _render_html_element(element: ET.Element, parent: _Box) -> list[str]:
         raise NativeSvgLabelError(f"器件标签包含不兼容的 HTML 元素: {tag}")
     children = list(element)
     if not children:
-        fragment = _text_fragment(element, box)
+        fragment = _text_fragment(element, box, name_align)
         return [fragment] if fragment else []
     transform = _style_map(element.get("style")).get("transform")
     if transform:
         raise NativeSvgLabelError("器件标签的容器 transform 无法转换为静态 SVG")
     fragments: list[str] = []
     if (element.text or "").strip():
-        fragments.append(_text_fragment(element, box))
+        fragments.append(_text_fragment(element, box, name_align))
     for child in children:
-        fragments.extend(_render_html_element(child, box))
+        fragments.extend(_render_html_element(child, box, name_align))
     return fragments
 
 
@@ -175,6 +201,7 @@ def render_native_label(
     height: float,
     content_offset_x: float,
     content_offset_y: float,
+    name_align: str = "center",
 ) -> str:
     """Convert the library's deterministic HTML label subset to native SVG."""
     try:
@@ -189,7 +216,7 @@ def render_native_label(
     )
     fragments: list[str] = []
     for child in root:
-        fragments.extend(_render_html_element(child, parent))
+        fragments.extend(_render_html_element(child, parent, name_align))
     if not any('class="component-graphic"' in fragment for fragment in fragments):
         raise NativeSvgLabelError("器件标签没有可渲染的原生 SVG 图形")
     return "<g class=\"component\">" + "".join(fragments) + "</g>"

@@ -383,6 +383,15 @@ def _artifact_metric_witnesses(
         for field in expected_fields
         if str(config[name].get(field, ""))
     )
+    if any("frequencies" in config[name] for name in terminals):
+        rows = {name: config[name].get("frequencies", [config[name].get(field, "") for field in FREQUENCY_COLUMNS])
+                for name in terminals}
+        rows = {name: row if any(str(value) for value in row) or "frequencies" in config[name] else []
+                for name, row in rows.items()}
+        count = max((len(row) for row in rows.values()), default=0)
+        expected_fields = [f"frequencies[{index}]" for index in range(count)]
+        expected_values = sorted((name, f"frequencies[{index}]", str(value))
+                                 for name, row in rows.items() for index, value in enumerate(row) if str(value))
     frequency_groups = [
         element for element in root.iter()
         if element.get("class") == "frequency-table"
@@ -396,7 +405,8 @@ def _artifact_metric_witnesses(
         (
             element.get("data-node-id"),
             element.get("data-frequency-field"),
-            "".join(element.itertext()),
+            ("\n".join("".join(span.itertext()) for span in element.findall(f"{NS}tspan"))
+             if element.findall(f"{NS}tspan") else "".join(element.itertext())),
         )
         for element in root.iter()
         if element.get("class") == "frequency-value"

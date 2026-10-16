@@ -8,6 +8,7 @@ import xml.etree.ElementTree as ET
 from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import lru_cache
+from html import escape
 from pathlib import Path
 from typing import Union
 
@@ -213,12 +214,17 @@ def _patch_div_r_ratio_font(label: str, ratio: str) -> str:
     return label[:start] + f"font-size:{font_px}px" + label[end:]
 
 
-def bake_label_placeholders(label: str, attrs: dict[str, str]) -> str:
+def bake_label_placeholders(label: str, attrs: dict[str, str], *, mark_name: bool = False) -> str:
     """Replace editable placeholders with object attribute values for draw.io display."""
     baked = label
     name = attrs.get("name", "")
     if name:
-        baked = baked.replace("%name%", name)
+        if mark_name:
+            baked = re.sub(
+                r'(<(?:div|span)\b[^>]*)(>[^<>]*%name%[^<>]*</(?:div|span)>)',
+                r'\1 data-drawclock-name="1"\2', baked,
+            )
+        baked = baked.replace("%name%", escape(name, quote=False))
     if "%pll_kind%" in baked:
         baked = baked.replace("%pll_kind%", attrs.get("pll_kind", DEFAULT_PLL_KIND))
     if "%ratio%" in baked:
@@ -248,7 +254,7 @@ def canonical_object_attrs(
     if not label and shape is not None:
         label = shape.label
     if label:
-        out["label"] = bake_label_placeholders(label, out)
+        out["label"] = bake_label_placeholders(label, out, mark_name=True)
         if not LABEL_PLACEHOLDER_RE.search(out["label"]):
             out["placeholders"] = "0"
     return out

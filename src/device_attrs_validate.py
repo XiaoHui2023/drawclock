@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from css_color import parse_css_color
+from presentation import ALIGNMENTS, ANCHORS, finite_number, frequency_values
 
 
 FREQUENCY_FIELDS = ("func_freq", "scan_freq", "bist_freq")
@@ -26,6 +27,24 @@ def collect_device_attr_errors(config: dict[str, dict[str, Any]]) -> list[str]:
                 f"器件 {name} 的 layout_column 必须是整数"
             )
         description = item.get(DESCRIPTION_FIELD)
+        for key, choices in (("description_align", ALIGNMENTS), ("description_anchor", ANCHORS)):
+            if key in item and item[key] not in choices:
+                errors.append(f"器件 {name} 的 {key} 必须是 {choices}")
+        for key in ("description_offset_x", "description_offset_y"):
+            if key in item:
+                try:
+                    finite_number(item[key], key)
+                except ValueError as error:
+                    errors.append(f"器件 {name}: {error}")
+        if "frequencies" in item:
+            try:
+                if not isinstance(item["frequencies"], list):
+                    raise ValueError("frequencies must be an array")
+                frequency_values(item)
+                if any(field in item for field in FREQUENCY_FIELDS):
+                    raise ValueError("frequencies cannot be mixed with legacy frequency fields")
+            except ValueError as error:
+                errors.append(f"器件 {name}: {error}")
         if DESCRIPTION_FIELD in item and not isinstance(description, str):
             errors.append(f"器件 {name} 的 description 必须是字符串")
         description_color = item.get(DESCRIPTION_COLOR_FIELD)

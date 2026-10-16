@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 
 
-_SOURCE_REF_RE = re.compile(r"^(?P<name>.+?)(?:\[(?P<output>[^\[\]]+)\])?$")
+_SOURCE_REF_RE = re.compile(r"^(?P<name>.+?)(?:\[(?P<output>[^\[\]]+)\])?$", re.DOTALL)
 
 
 def parse_source_ref(value: str) -> tuple[str, str | None]:

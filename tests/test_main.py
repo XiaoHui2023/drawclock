@@ -276,6 +276,7 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         prefix + "doc/draw.md",
         prefix + "example/draw.json",
         prefix + "example/auto-layout/33-description-colors.json",
+        prefix + "example/auto-layout/34-configurable-text-and-frequency.json",
         prefix + "libraries/source.xml",
     }
     assert names == expected

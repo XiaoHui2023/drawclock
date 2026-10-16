@@ -3,11 +3,20 @@ from __future__ import annotations
 from pathlib import Path
 
 from drawio_library import bake_label_placeholders, load_library_shapes
-from drawio_ports import abs_port_xy, infer_port_from_attachment, port_anchors
+from drawio_ports import abs_port_xy, infer_port_from_attachment, port_anchors, format_port_ratio, edge_attachment
 
 
 ROOT = Path(__file__).resolve().parents[1]
 LIBRARY = ROOT / "drawio-lib" / "drawclock"
+
+
+def test_port_ratios_keep_compact_legacy_values_and_full_precision_without_exponents():
+    assert format_port_ratio(0.24) == "0.24"
+    assert format_port_ratio(1.0) == "1"
+    for value in (0.0, 0.688, 1e-12, 0.24691357802469135):
+        text = format_port_ratio(value)
+        assert "e" not in text.lower()
+        assert edge_attachment(f"exitX=1;exitY={text};", end="exit") == (1.0, value)
 
 
 def test_bake_label_replaces_name_and_defaults() -> None:

@@ -1,0 +1,155 @@
+# 注释、多行名称与自定义频率表实施记录
+
+- status: active
+- created: 2026-10-16 12:22 +08:00
+- updated: 2026-10-16 14:48 +08:00
+- scene: 注释布局、Python全局选项、多行文字与数组频率表
+
+用户提出八项功能并明确要求设置目标。正式运行目标已建立，项目目标保存为project-goals/goals/annotation-multiline-and-custom-frequency-table.md，尚未宣称实现完成。
+
+已定位drawclock而非前一任务LocalFlow。基线HEAD为6eda7d27a584396b549b9fccd54adb546ba579fa；起始已有drawclock-drawio-pitfalls/SKILL.md的未提交修改，保留其归属，不覆盖或纳入本轮成果。
+
+实现主交付为八项功能、公开入口验证、真实SVG和现有全量质量回归。学习附加交付为成熟方案联网核实、设计比较、可复用结论与项目证据归档；两组完成条件分别结算。
+
+当前仅完成目标设置、项目定位和初始接口搜索。后续先补自然失败输入与公开Python调用基线，再决定参数命名、默认锚点、文本归一化及旧频率字段迁移规则。原始要求不得被新参数或学习工作覆盖。
+
+本轮进展：实际CLI两节点输入包含root换行long及相同source引用，基线退出1，直接错误为source引用格式错误；.qa/annotation-20261016/multiline-baseline.json保留命令和原始输出。九个生产源文件修改前逐字节备份与SHA保存在同目录before和backup-manifest.json。旧反馈solve门19项通过，尚未代表本轮新需求通过。
+
+自主学习首阶段已完成：MDN text-anchor、ELK Node Label Placement/Label Node Spacing/Spacing Options、Graphviz nojustify及Eclipse论坛资料检索成功；npx skills find svg text layout返回多个候选，未安装不必要依赖。采用原生SVG逐行文字锚点及共享文本占用模型，保持Python3.9/标准库和静态SVG约束。资料：https://developer.mozilla.org/en-US/docs/Web/SVG/Reference/Attribute/text-anchor 、https://eclipse.dev/elk/reference/options/org-eclipse-elk-nodeLabels-placement.html 、https://eclipse.dev/elk/documentation/tooldevelopers/graphdatastructure/spacingdocumentation.html 、https://www.graphviz.org/docs/attrs/nojustify/ 。
+
+首组生产修改：source引用正则支持名称内部换行但保留原始身份；库名称先转义HTML；原生SVG按显式换行生成逐行tspan；文字占用按最长行估宽并增加多行高度；SVG元数据的CR/LF用字符引用保留，画布使用多行后的可见下界。尚待专项测试与实际渲染，未宣称NAME-07全部完成（全局对齐仍未接入）。
+
+新增专项测试：LF/CRLF/中文多行引用与输出口后缀、最长行宽及多行高度、实际公开CLI含HTML特殊字符的多行名称、原始元数据身份和静态SVG输出。准备执行，不以测试文件存在宣称通过。
+
+验证结果：专项与layout_preview相邻回归81项通过；同一CLI失败输入修复后退出0，产物multiline-after.svg。真实Edge截图和getBBox证明两行及原始逻辑名称保留、字形在viewBox内；同时发现旧库单行line-height=11px直接用于多行时比实际12px字形框更紧，需要生产文本owner设置最小可读行距后复测。浏览器SVGRect首次直接JSON序列化为{}，已改为显式读取x/y/width/height并重新实际执行，当前证据包含真实字形范围；未将空对象当度量通过。
+
+现已对多行文本统一设置至少1.3em行距，保持单行输出分支不变，并在公开CLI回归中要求两行基线差大于旧12px字形高度；等待重跑与真实Edge复测。
+
+复测完成：81项再次通过，Edge实际基线差14.3px，第一行字形底部128.0184、第二行顶部130.3183，字形不相交且均在viewBox内，截图已更新。四元素frequencies数组自然CLI退出0但没有显示任何预期值，另存frequency-array-baseline-proof.json，作为TABLE-08直接红灯。diff空白检查与Python编译通过。接下来实现统一全局/节点选项、同列注释联合布局、横距与数组表格，并接入现有全部质量矩阵；未发布或宣称目标完成。
+
+本轮新增presentation.DrawingOptions作为Python与CLI共享配置合同，包含注释align/anchor/x/y、horizontal_spacing、name_align、frequency_headers/align，严格拒绝非法枚举、bool数值和非有限偏移。LayoutDocument携带可序列化选项；两个生成入口接收options并将横距写入profile。节点frequencies数组开始严格校验、禁止同节点同时填写新旧字段，内部以JSON保存，未宣称渲染链路已接通。
+
+CLI现已暴露对应全局参数；原生SVG通过明确的名称文本标记应用name_align，避免同时改变器件内部比率/端口文字。表格已开始携带列宽与对齐状态，接下来替换为按数组列数和最长显式行宽计算。
+
+数组表格渲染已接通：新数组按最长行的元素数生成任意列，严格检查标题数量，多行标题/内容采用原生tspan，按最宽显式行分配列宽；旧字段仅留在兼容适配器和旧输入分支。同节点新旧字段混填拒绝。81项名称/表现层相邻测试仍通过。发现ELK后续路由会重算层间距，单改初始profile不足，正在将显式最小横距写入路由层约束；注释正在切换为同列共享文字槽和指定锚点。
+
+注释已接入三种对齐、八锚点、节点逐字段覆盖和x/y偏移；同列共享横向文字槽，指定方位内避障而不静默跳到其它方向。默认top-left+left，复杂密集图仍需预留文字空间。横距实测发现路由末尾的整层压缩再次抹去已传入值，正在修正该最早压缩owner；四元素数组实际显示与options序列化往返已通过。
+
+整层压缩现消费minimum_layer_spacing；新增tests/test_presentation_options.py，覆盖同列槽、八方位、逐字段节点覆盖、实际偏移、非法全局/节点值、四列多行表格三对齐、自适应宽度、标题数量错误、options往返和最终横距。准备执行，复杂图预留空间及独立质量Oracle尚未完成。
+
+专项首轮111项通过、1项测试判据错误：默认注释已共线于x=299.5，fixture名称比40px节点宽1px，真实可见左界不等于名义x=300。保留共线硬要求，修正固定坐标假设；产品没有为测试恢复错误的名义边界。最终横距100/240的真实测量已在新测试通过。
+
+测试已保留严格共线并验证轴仍靠近所属列，移除错误的固定300坐标假设，准备重跑。
+
+重跑112项全部通过；实际CLI示例31/33通过，但32长注释在select_mixed没有指定方位的无碰撞候选，直接证据在presentation-examples.json。分类为新增固定锚点暴露的生产布局空间不足，不能回退到随机左右摆放。开始在布局前扩展文字占用：纵向增加节点虚拟高度且归一化端口y以维持实际连接点；横向在可见几何中记录非对称注释范围，不改变端口输入/输出分类；多行频率值给终端行预留高度。
+
+布局前预留已初步接入生成入口与可见几何：标签包装只平移原始图形，端口y按新高度归一化，横向以可见范围扩展而不修改端口x（现有端口合同按x<0.5区分输入/输出，不能随意改宽）。将继续保留不可变ResolvedNode并按层计算共享注释槽，避免短注释行没有预留列级宽度；中间候选的DrawingOptions必须保留，不能在克隆时丢失。
+
+现按不可变节点替换、层级共享文字宽度/左右边界预留，生成候选和几何克隆保留同一DrawingOptions，准备重新运行专项和真实长注释示例。
+
+预留后112项仍通过；长注释32失败移到clock_dense_b，真实连接图八锚点中六个可渲染，左右方位仍失败。定位表格左界未消费注释右侧可见范围，以及左右注释与输入线同高时仅向外搜索无法避障。期间一次记录补丁被bootstrap预检选择变化拒绝，未执行；核实实际注册入口为带-I -S -B的独立bootstrap，旧doctor把这些解释器参数误作路径而失败，本会话未改宿主注册或共享核心。现按当前入口重试原项目记录。
+
+项目原记录重试成功，随后正式源补丁正常通过门禁：表格从完整可见右界起排，左右锚点在所选侧增加上下切向候选，未静默改方位。准备专项与真实示例复验。
+
+2026-10-16 13:03 +08:00：112项专项再次通过，示例32和八锚点实际连接图均成功生成。独立29项检查仅annotation_geometry失败，检查到部分线段端点存在0.0001px左右的纵向差；端口比例在edge style中用:g截为6位有效数字，与路由保留的原比例不同，检查器将微斜段保守判为穿过所有注释。准备保留足够小数精度修复真实序列化差异，不放宽检查。全量pytest已出现一项失败后继续昂贵压力测试；已核实PID69008和命令身份后主动终止，session61546为未完成探索运行，不作全量通过证据。修复后重跑相关测试并重新安排全量验收。
+
+两个布局入口的端口比例序列化现保留17位小数，避免有效数字截断且不输出现有解析器不接受的科学计数。新增真实SVG逐段坐标严格相等测试。一次补丁因记录文件updated与INDEX不一致被拒绝，已修正记录元数据后原补丁成功执行，未改门禁。
+
+端口精度专项通过；相邻测试直接复现探索全量中的失败：bake_label_placeholders原本返回普通HTML，新增名称定位属性改变了其精确输出。将名称标记改成显式可选参数，仅canonical_object_attrs的SVG生成路径开启，保持独立文本替换API的旧输出。压力示例32已重新生成，等待独立检查。
+
+名称标记现通过mark_name显式启用，直接替换API默认保持原输出。精度修复后独立annotation_geometry已通过，但29项检查进一步发现vertical_root_facility_bend和adjacent_root_height_bend；继续读取反事实证据，不把27项通过表述为完整通过。
+
+相邻回归现116项通过。两项根移动证据均要求将ref_short向下14.4993px或ref_multiline向上14.4993px；检查器只考虑器件本体和名称，未纳入附属于节点的注释。SVG中两节点原图安全间隔很小，移动会让ref_short名称与ref_multiline注释相交。先补真实浏览器字形测量，再给独立反事实检查增加注释障碍；不按字段存在直接豁免检查，继续要求无注释图和可安全移动图检出原缺陷。
+
+真实Edge测量已证明：ref_short实际字形底194.5207，ref_multiline注释顶202.5007，原图不相交；将前者按反事实建议向下14.4993后底209.0200，实际产生重叠，证据root-move-browser.json。准备让反事实移动整组正文+注释，并检查所有正文、注释、连线障碍。
+
+独立Oracle已增加注释行矩形和text-anchor解析，根设施反事实同时移动所属注释并检查节点/注释/连线。接下来修正冻结Box的更新方式并增加可移动/被注释阻挡的成对测试，再运行原检查。
+
+冻结Box已改为dataclasses.replace替换；长注释示例32现在完整29项独立质量检查通过。下一步补充根移动反向测试及24组合实际浏览器检查，覆盖八锚点、三对齐、多行名称和多行数组表格；这些组合尚未宣称通过。
+
+已新增根设施可安全移动、邻节点注释阻挡、所属注释随移后阻挡、所属注释安全四种判据；新增Edge一次加载24张实际生成SVG的检查，直接量测字形是否裁切/与注释相交，并采样原生图元检查48个连线端点贴合。准备运行。
+
+24组合首次检查文字全部安全，但48端点采样失败。读取现有最终SVG浏览器测试发现新探针错误使用getCTM，其对嵌套SVG映射到最近viewport而非公共屏幕坐标；改用getScreenCTM后统一到外层SVG坐标，再实际执行，不将初次失败算产品缺陷或通过。
+
+统一屏幕坐标后24组合真实Edge测试通过：48端点均贴合，多行名称/表格和注释字形未裁切或重叠。新反向测试发现fixture移动后注释只是碰到目标边界而非相交，将改为确实有内部交叠的坐标；产品检查逻辑不因此放宽。接下来独立频率表检查从固定字段扩展到数组元素，并从实际tspan恢复换行，避免只信aria-label元数据。
+
+反例fixture已调整成真实相交，独立表格检查已识别任意数组列及实际tspan换行，组合回归session96921运行中。用户文档套装及CLI/专题体裁规则已读取；准备更新README参数表和draw.md中的数组、节点注释设置、多行名称及Python全局调用示例，不把Agent验收记录写入用户文档。
+
+README参数表与draw.md用法已更新，逐句删掉检验及禁词检索通过，git diff --check无空白错误。补充研究实际打开MDN getScreenCTM/getCTM、原作者论文Visualizing Graphs with Node and Edge Labels、ELK维护者spacing讨论及Stack Overflow坐标讨论；分别比较预布局占用、后处理无重叠调整、浏览器真实字形测量，采用前者+真实浏览器验证，保持标准库静态SVG运行时。
+
+通用学习已回写用户根drawio-generate-from-config的单层reference，包含预布局文字占用、端口比例精度、正文+注释反事实移动、嵌套SVG公共屏幕坐标及实际tspan反例；根入口只加条件路由。原SKILL完整备份SHA256为1C846DA9D1CC1549711ED61B74C56F000DAA75235A87D4AD2531A82986F0E13B，validate-skill返回Skill is valid。未安装第三方Skill或引入运行时依赖，未修改发现/注入/门禁配置。
+
+项目公开JSON结构与末端表格指引已同步数组和逐字段覆盖，两项validate-skill均通过；项目目标增加当前证据并明确历史段落，设计笔记标为已实现/验收中。接下来增加数组终态Oracle反例，重点包括实际tspan值被修改而元数据不变、删列、改下标，以及空数组与无表格旧节点混用。
+
+数组Oracle反例已建；首次执行在测试自身重新序列化XML时使用utf8声明，非ASCII表头导致ElementTree回读ParseError，原生成SVG有效。改为规范utf-8声明后再运行，不能把测试序列化失败算产品红灯。
+
+规范编码后数组正例及删列、改下标、修改实际tspan但保留aria元数据三个反例均通过。空数组+未配置频率节点的边界暴露新Oracle将无值旧节点当三个空字段的错误；生成器已正确无表格，修复Oracle默认行不能凭空增加旧列。
+
+空数组兼容边界修复后5项数组终态正反例全部通过。继续同步冻结可执行文件消费检查，并让独立节点可见边界按实际tspan逐行计算、source引用后缀接受名字内换行，保持旧单行边界模型不变。
+
+冻结消费检查现支持数组默认标题和实际多行值；独立节点边界现逐tspan计算，带输出后缀的多行原名引用也已接通独立解析。接下来把同一正反例同时交给冻结消费检查，并新增公开组合示例用于默认参数的全指标矩阵。
+
+5项数组正反例同时通过独立质量检查和冻结消费检查。公开34组合示例CLI成功且完整29指标通过，Edge截图34-preview.png已实际查看，注释共线、多行名称和红色频率表均清晰。接下来检查名称首尾空行保留、极大数非法输入，以及安装后Python API是否包含完整模块，之后冻结生产代码运行完整验收。
+
+公开CLI边界直接证明首尾空行被_text_fragment.strip裁掉，中间空行仍保留；10**400偏移暴露OverflowError未归类为ValueError。wheel构建成功；首次pip target安装受环境默认--user冲突阻止，显式--isolated --no-user重试后安装/隔离导入成功。pyproject模块列表未含svg_native，当前成功可能受已有build/lib缓存影响，准备在全新临时源树构建再判断，不以缓存wheel证明包装完整。
+
+全新临时源树的wheel构建和安装均退出0，但-I -S隔离导入实际退出1：ModuleNotFoundError: No module named 'svg_native'，证据clean-wheel-before/result.json。确认为包装清单遗漏被旧build缓存掩盖，补齐svg_native模块；同时修复已复现的首尾空行和超大整数错误，不改变普通单行标签处理。
+
+三处修复后最新专项与相邻测试124项通过（含24组合Edge、48端点、空行、极大整数和数组反向检查），回执presentation-tests.xml。准备干净wheel重建并在-I -S隔离安装路径运行真实生成；此前组合回归96921仍活跃，它启动于本次边界修复之前，仅作为探索回归，最终仍需冻结当前源树运行完整检查。
+
+干净wheel重建后构建/安装/-I -S隔离导入全部退出0；隔离安装目录实际生成installed-api.svg，使用horizontal_spacing=160及多行自定义frequency_headers，五个关键模块与当前源码SHA一致。全部28个公开示例含34组合均完整执行29指标，共812项检查通过，无缺项、重复或注释profile缺失，回执all-svg-quality.json。
+
+探索组合回归96921终态为155 passed in1195.64s；在尝试取消旧源树探索运行以腾出资源时，PID身份检查发现原PID已退出而拒绝操作，随后原session确认已正常完成，未终止任何其它进程。准备运行当前冻结源树全量pytest，并补八方位视觉比较；正式目标仍未完成。
+
+当前源全量pytest首轮39通过后捕获端口文本兼容回归：17位定点格式把旧0.24写成0.23999999999999999，test_auto_layout要求精确旧字符串。准备在drawio_ports统一最短可往返浮点值到纯十进制的格式化，既不回到6位截断，也不放宽旧断言，并增加极小比例无科学计数且可精确解析的测试。
+
+统一格式器采用Decimal(str(float(value)))转纯十进制并仅去除小数部分多余零；0.24/1恢复原紧凑文本，极小比例保持无指数且解析回同一浮点值。两入口复用后auto_layout/端口/表现层/数组反例/真实浏览器120项通过（15.42s），port-compatibility-tests.xml保留结果。现在冻结生产源，启动完整pytest与全部公开SVG矩阵的新鲜复验。
+
+当前冻结源完整pytest运行于session32526，全部公开SVG复验运行于session57248。特性覆盖清单新增注释、横距、多行名称、数组表格四项及两个真实浏览器组合关系，绑定已有实际执行的测试函数，不把未测的任意偏移可行性或频率计算冒充已覆盖。
+
+57248终态全部28/28公开例×29指标再次通过。八方位真实截图anchor-comparison.png已查看，top-left把注释放在名称上方且保持列边界，作为默认；左右方位在输入线同轴时需要切向避让，仍保留用户选择。覆盖清单/公开Skills六项测试通过，目标/工作记录结构验证通过，19模块Python3.9语法解析通过（不是3.9运行验证）。最终干净wheel再次导入成功，并由-I -S实际调用全局选项生成installed-api-current.svg；源指纹核实未变化。
+
+为运行独立librsvg验证，首次Docker只读调用被门禁在副作用前拒绝并注入docker-agent-environment；已按受控脚本Diagnose核实Desktop/daemon/WSL正常，未更改宿主设置。受控镜像清单发现已有drawclock-rsvg-test:2.58，准备仅创建带独占名字/标签、只读源挂载、资源限制、无网络且自动删除的测试容器，不清理现有资源。
+
+librsvg2.58.0已将34、32压力图、安装后全局选项图实际转成SVG路径和PNG，三项结构检查通过，精确名字过滤确认--rm容器已移除。实际看PNG发现容器缺CJK字体导致中文缺字，不能据路径数量宣称中文正确；准备只读挂载系统msyh.ttc，在新输出目录复验，原缺字体输出保留。现有CPython3.9.0直接运行CLI和-I -S隔离安装API均成功，已生成python39-cli.svg与python39-installed-api.svg，没有下载/安装宿主解释器。
+
+只读字体挂载后的三张librsvg图均通过结构检查，实际PNG已查看，中文表头正确，精确容器名查询为空证明自动清理完成。3.9.0的CLI/API两份SVG与3.11对应结果逐字节一致。仓库查询确认XiaoHui2023/drawclock为公开main，依项目上传规则将本地.qa证据/浏览器/安装目录统一忽略，避免加入远端。备用Python API组合检查首次shell内联引号失误产生SyntaxError，尚未运行，改成独立QA脚本后重试。
+
+备用generate_layout的24个八方位/三对齐组合已实际生成，横距160和表头/注释设置断言通过；.qa忽略规则已用git check-ignore确认。根图形指引新增中文缺字不能由路径数量证明的教训并结构验证通过。最终安装18模块逐字节匹配当前源，当前生产源指纹仍未变化。
+
+正式solve门19项通过；release门41项过期错误，全部来自源码/Oracle/quality_system变化后的历史回执血缘，不是当前问题的新复现。将未修改的正式fix_verification和recursive runner放入当前字节快照执行，避免其覆盖正在全量测试读取的规范回执；仅当源/库/runner哈希一致、实际运行全部通过后，再将新输出按原相对路径归回。保留旧规范回执备份，不修改门禁或伪造哈希。
+
+快照正式fix_verification已终态退出0，verification_group=20261016T055849Z-7704354a，19问题无失败（22输入各双跑）。完整pytest在231项通过后，于第232项准确拒绝旧fix回执，终态1 failed/231 passed；不是新图形失败。现在验证新回执全部源码/库/runner/Oracle/语义及产物哈希，确认旧规范回执未被他人改动后原字节归回，再重跑该项。递归59796仍运行。
+
+19回执和228份证据已按原字节归回，全部生产源/库/runner/Oracle/语义哈希与当前一致，旧回执与备份一致后才原子替换。原失败test_fix_receipts_bind_current_source_and_reject_stale_lineage实际重跑通过。源码/测试/Oracle保持冻结，将通过JUnit已通过名单继续执行未跑项目，并暂留整份反馈门禁测试待递归回执完成，最终用全收集清单核对覆盖并集，不能把部分通过当全量通过。
+
+继续测试的QA脚本首次收集因pytest.main与python -m pytest的sys.path差异，无法导入仓库scripts.build_stress_examples；没有执行测试，不计通过。补齐仓库根到QA脚本导入路径，保持生产代码和测试文件不动后重试。
+
+导入路径修正后，继续测试session15718已正常执行，选择过程绑定原JUnit哈希并核对222文件快照中的所有Python代码未变；所有已通过ID都必须仍存在，不能悄悄少收集。接下来补公开CLI数组列数0/1/2/3/4/8/16的直接输出与完整29指标检查，补足任意列数不被四列示例掩盖的边界证据，不更改生产代码或当前测试文件。
+
+七种数组列数的公开CLI输出、短行缺项和全部29指标均通过。实际完整测试清单为705项：231已通过、455继续测试、19等待门禁回执；三者无缺口。递归59796正式终态clean，连续7轮共162个组合，每例完整29指标，无复发。准备使用项目原validator校验新递归回执与当前源码/Oracle等身份，逐份核对输入/产物SHA后归回原字节，并只为这两组实际新证据增加Git忽略例外。
+
+新组Git例外已限定于实际两个运行ID。递归归回QA脚本首次因误写内部validator函数名AttributeError而未发生复制；已检索定义，正式函数为_validate_recursive_attack_receipt，修正后重试。
+
+递归新回执与全部162组输入/输出SHA已核验并归回，原validator无错误。反馈门禁文件17项通过后只因新证据未Git-tracked而拒绝完整release正例（260条重复路径诊断、唯一证据228份）；下一步备份Git索引并仅暂存两组已核验新证据，保留原用户文件，不提交或推送，然后重跑24项门禁测试。
+
+两组552份新证据已暂存，旧Git索引已备份，没有暂存原用户pitfalls文件或提交/推送。反馈门禁24项完整通过，正式release门PASS issues=19，当前并非权限阻塞。剩余455项session15718仍活跃；原231项与24项门禁有5项重合，已确认并集250/705。示例34的现有SVG已核对与最终新鲜示例矩阵中的SHA完全一致。尚需剩余测试终态/完整并集审计，以及冻结CLI对新全局参数的直接smoke和规定发布流程，不能标记目标完成。
+
+继续轮次先核实15718仍活跃，生产源未修改。冻结消费主流程目前只运行旧频率例，因此将新增直接smoke：公开34默认同列注释/多行名称/四列数组，全局对齐/标题/横距及偏移的实际相对坐标变化，节点覆盖保留，错误表头数量拒绝。此改动仅扩展冻结QA入口，不修改生产或现有反馈Oracle，随后单独复验该入口。
+
+冻结QA入口现已接入默认例和两次全局选项绘制，直接检查名称原始行、同列注释、实际横距、全局/节点文字锚点、相对偏移与非法标题无输出；自定义表头检查仅新增可选参数，旧调用保留。准备先用实际源码CLI排练检查器，随后必须以真正冻结exe重跑，不将源码排练算冻结通过。
+
+源码CLI排练和5项数组正反例通过。15718终态455 passed/250 deselected，结合原231与门禁24项应为705个唯一通过项；准备按完整节点清单审计并集。最长两项历史压力测试各约477/468秒解释主要耗时，未因耗时跳过。生产源保持原冻结SHA，新增冻结QA入口另有源码排练，将由实际exe验证补齐。
+
+705项唯一通过并集与原完整收集清单完全一致，missing/unexpected均空，回执full-test-coverage-audit.json。准备把公开34示例纳入发行allowlist与缺失检查，并更新相应归档测试；现有组包器已将README中的drawio-lib映射到libraries，因此不额外改动文档路径策略。随后备份build/dist和依赖版本，校验清理目标确在本仓库后调用原pack.bat。
+
+发行示例34及allowlist/归档测试已同步，test_main与数组正反例19项通过。原build/dist完整复制到.qa/before，对两个目录确认非reparse point且绝对解析路径均在F:/Project/python/drawclock内；保存原构建环境pip freeze。现在通过原tools/pack.bat构建，不绕过其release前置门。
+
+pack首轮通过release门，但pip配置global.proxy指向127.0.0.1:7897并出现WinError10061；父进程HTTP(S)/ALL_PROXY为7890，该端口亦无监听。核实cmd80780和其pip子进程54764身份后停止本次构建，确认无遗留子进程、build/dist仍未被重建。官方pip文档确认PIP_CONFIG_FILE=os.devnull可仅在当前进程禁用配置；使用无代理的直接PyPI请求实际200。准备在本次pack进程禁用失效代理/配置、重试上限1和10秒超时后重跑，系统配置不变；若依赖获取仍失败将明确披露。
+
+32248进程内重试成功，依赖获取完成，原pack入口构建PyInstaller6.22.3/Python3.11.9 exe和ZIP且归档门通过。构建警告仅标准库跨平台/可选模块，不缺presentation/svg_native。真正dist exe的完整run_frozen_example（含新参数实际偏移和节点覆盖断言）2433终态通过，不再只是源码排练。历史敏感路径Git查询为空；fetch后HEAD仍6eda7d27且与origin/main为0/0。初始pitfalls当前过滤后blob与HEAD相同，refresh仍报告缓存需要更新，未改其字节、未暂存。准备独立ZIP消费与冻结运行预算验证。
+
+
+用户明确代理正确端口7890并要求修错。重新实际TCP探测7890 OPEN、7897拒绝；pip内部配置加载定位唯一错误来源为用户AppData/Roaming/pip/pip.ini第三行。先逐字节备份到.qa/annotation-20261016/before/pip.ini-before-proxy-20261016-144705并记录前后SHA，仅将该proxy端口7897改7890。原配置读取现为http://127.0.0.1:7890，未禁用配置或清除代理的真实pip index versions pip获取成功（exit0），证明常规入口联网恢复。
+
+独立ZIP消费完成：仅使用解压包配置/库和空PATH执行新功能smoke，三个SVG与源码逐字节一致，windows-archive-validation.json包含exe/ZIP SHA。40675真实63器件110连接规模双跑预算终态PASS，receipt在local-frozen-runtime/receipt.json。全部705项唯一测试覆盖审计PASS；打包allowlist相邻19项及真正冻结完整smoke均通过。仍待代码审查、提交推送及CI发布/远端资产验证。
