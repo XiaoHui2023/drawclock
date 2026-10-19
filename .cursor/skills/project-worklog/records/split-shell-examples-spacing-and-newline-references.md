@@ -4,7 +4,7 @@
 
 - status: done
 - created: 2026-10-19 15:30 +08:00
-- updated: 2026-10-19 19:48 +08:00
+- updated: 2026-10-19 19:50 +08:00
 - scene: 分项脚本、横向间距与换行无关引用
 
 ## 当前工作
@@ -37,6 +37,7 @@
 - 19:48 `v1.0.0` 指向 `38a2d8f78203810ff82fcd6cb10ba8953ec51a0f`。远端资产 exact-set 为 Linux 归档、Windows 归档、版本化 Windows 性能收据；本机重新下载后三项 SHA-256 与 GitHub API digest 逐项一致，Windows ZIP 再次通过归档门、完整 frozen workflow 和 7 个 `.bat`。
 - 19:48 公开性能收据为 7,302 bytes、63 节点、110 边，双跑 45.464s / 45.272s，SVG 各 71,011 bytes、哈希一致，两轮均完整执行 29 项指标。公开大例本机排序数据仍为 176/190=2.600s、148/168=3.883s、136/196=41.388s、136/166=2.177s、121/122=4.500s，未发现单次超过 60 秒的维护范围输入。
 - 19:48 自主验证限制披露：尝试 `gh release verify-asset` 时返回 `no attestations found`，失败环节是 Release 未附 GitHub artifact attestation；不影响已发布字节、运行或质量，但不能给出 attestation 证明。替代方案为读取 GitHub Release API 的三项 `sha256:` digest 与本地下载字节逐项比对，全部一致。若要恢复该能力，后续需在 workflow 中生成并发布 GitHub artifact attestations。
+- 19:50 目标、changelog 与完成记录已提交为 `64b616d`；受管门要求将该最终状态提交身份同步到工作记录后才允许 push，本条为最后的状态 checkpoint。
 
 ## 已有证据
 
