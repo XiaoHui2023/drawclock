@@ -215,14 +215,25 @@ class FeedbackReproductionGateTest(unittest.TestCase):
             capture_output=True, check=True,
         )
         status = subprocess.run(
-            ["git", "status", "--porcelain=v2", "-z", "--untracked-files=normal"], cwd=ROOT,
+            ["git", "status", "--porcelain=v2", "-z", "--untracked-files=all"], cwd=ROOT,
             capture_output=True, check=True,
         )
         import hashlib
+        untracked = hashlib.sha256()
+        for record in status.stdout.split(b"\0"):
+            if not record.startswith(b"? "):
+                continue
+            relative = os.fsdecode(record[2:])
+            path = ROOT / relative
+            self.assertTrue(path.is_file(), relative)
+            untracked.update(
+                record[2:] + b"\0" + hashlib.sha256(path.read_bytes()).digest() + b"\0"
+            )
         digest = hashlib.sha256()
         for label, value in (
             (b"head", head.stdout), (b"tracked", tracked.stdout),
             (b"cached", cached.stdout), (b"status", status.stdout),
+            (b"untracked-content", untracked.digest()),
         ):
             digest.update(label + b"\0" + value + b"\0")
         self.assertEqual(observed, "git-state-sha256:" + digest.hexdigest())

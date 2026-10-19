@@ -89,7 +89,7 @@ def test_native_preview_visible_graphic_origin_equals_geometry_origin(spec) -> N
     validate_static_svg(svg)
 
 
-def test_preview_omits_the_input_filename_title() -> None:
+def test_preview_uses_explicit_metadata_title_without_visible_canvas_text() -> None:
     mod = ALL[0].module
     vertex = VertexLayout(
         name=mod.TITLE, cell_id="v1", drawclock_type=mod.TITLE,
@@ -100,7 +100,9 @@ def test_preview_omits_the_input_filename_title() -> None:
         LayoutDocument(version=1, vertices=[vertex], edges=[]),
         title="input-file-stem",
     )
-    assert "input-file-stem" not in svg
+    root = ET.fromstring(svg)
+    assert root.find("{http://www.w3.org/2000/svg}title").text == "input-file-stem"
+    assert not root.findall("{http://www.w3.org/2000/svg}text")
 
 
 def test_description_renders_once_as_safe_plain_text_annotation() -> None:

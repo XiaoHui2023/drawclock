@@ -733,6 +733,7 @@ def build_preview_svg(
             f'{_svg_num(width)} {_svg_num(height)}" '
             f'width="{_svg_num(width)}" height="{_svg_num(height)}">'
         ),
+        f"<title>{_escape(title)}</title>",
         "<style>.edge-gap{fill:none;stroke:#fff;stroke-width:6;stroke-linejoin:round}.edge{fill:none;stroke:#20252b;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:square}.node-annotation text{font-family:Arial,Noto Sans CJK SC,sans-serif;font-size:11px}</style>",
         f'<rect x="{_svg_num(min_x)}" y="{_svg_num(min_y)}" '
         f'width="{_svg_num(width)}" height="{_svg_num(height)}" fill="#ffffff"/>',

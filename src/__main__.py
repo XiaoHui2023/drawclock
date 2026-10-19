@@ -36,6 +36,10 @@ def _build_parser() -> argparse.ArgumentParser:
         help="输出 SVG 文件；后缀不影响内容格式",
     )
     parser.add_argument(
+        "--title",
+        help="SVG 元数据标题；默认使用输入文件名，不在画布中显示",
+    )
+    parser.add_argument(
         "--crossing-style",
         choices=CROSSING_STYLES,
         default="arc",
@@ -73,7 +77,7 @@ def main(argv: list[str] | None = None) -> int:
         write_preview_svg(
             document,
             output,
-            title=Path(args.input).stem,
+            title=args.title if args.title is not None else "drawclock",
             crossing_style=args.crossing_style,
         )
     except (ValueError, OSError, KeyError) as exc:

@@ -1,0 +1,63 @@
+{
+  "node_014": {
+    "kind": "source"
+  },
+  "node_013": {
+    "kind": "gate",
+    "source": "node_011"
+  },
+  "node_012": {
+    "kind": "clock",
+    "source": "node_013"
+  },
+  "node_011": {
+    "kind": "source"
+  },
+  "node_010": {
+    "kind": "gate",
+    "source": "node_007"
+  },
+  "node_009": {
+    "kind": "div",
+    "source": "node_010"
+  },
+  "node_008": {
+    "kind": "clock",
+    "source": "node_009"
+  },
+  "node_007": {
+    "kind": "source"
+  },
+  "node_006": {
+    "kind": "gate",
+    "source": "node_002"
+  },
+  "node_005": {
+    "kind": "div",
+    "source": "node_006"
+  },
+  "node_004": {
+    "kind": "clock",
+    "source": "node_003"
+  },
+  "node_003": {
+    "kind": "cell",
+    "source": "node_005"
+  },
+  "node_002": {
+    "kind": "source"
+  },
+  "node_001": {
+    "kind": "mux4",
+    "source": {
+      "0": "node_002",
+      "1": "node_007",
+      "2": "node_011",
+      "3": "node_014"
+    }
+  },
+  "node_000": {
+    "kind": "clock",
+    "source": "node_001"
+  }
+}

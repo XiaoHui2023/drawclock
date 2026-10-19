@@ -18,14 +18,8 @@ RELEASE_FILES = (
     ("README.md", "doc/README.md"),
     ("draw.md", "doc/draw.md"),
     ("example/draw.json", "example/draw.json"),
-    (
-        "example/auto-layout/33-description-colors.json",
-        "example/auto-layout/33-description-colors.json",
-    ),
-    (
-        "example/auto-layout/34-configurable-text-and-frequency.json",
-        "example/auto-layout/34-configurable-text-and-frequency.json",
-    ),
+    ("example/README.md", "example/README.md"),
+    ("example/auto-layout/README.md", "example/auto-layout/README.md"),
 )
 LIBRARY_SOURCE = "drawio-lib/drawclock"
 LIBRARY_DESTINATION = "libraries"
@@ -69,7 +63,21 @@ def main() -> int:
         print("错误: dist 中未找到可执行文件。", file=sys.stderr)
         return 1
 
-    for source_rel, destination_rel in RELEASE_FILES:
+    release_files = [
+        *RELEASE_FILES,
+        *(
+            (str(path.relative_to(ROOT)), str(path.relative_to(ROOT)))
+            for path in sorted((ROOT / "example" / "auto-layout").glob("*.json"))
+        ),
+    ]
+    platform_script = (
+        "example/run-example.bat"
+        if platform.system() == "Windows"
+        else "example/run-example.sh"
+    )
+    release_files.append((platform_script, platform_script))
+
+    for source_rel, destination_rel in release_files:
         src = ROOT / source_rel
         if not src.exists():
             print(f"错误: 未找到 {src}", file=sys.stderr)

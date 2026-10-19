@@ -6,6 +6,13 @@ description: >-
 
 # 设计笔记
 
+## 发行示例合同（2026-10-19）
+
+- 每个平台发行包必须包含仓库当前全部公开 `example/auto-layout/*.json`、`example/draw.json`、`example/README.md` 与 `example/auto-layout/README.md`；新增公开 JSON 后归档 exact-set 自动扩展，禁止维护另一份会过时的手写子集。
+- Windows 包提供 `example/run-example.bat`，Linux 包提供可执行的 `example/run-example.sh`。脚本从自身位置定位包内冻结程序、器件库和 34 号配置，默认把 `drawclock-example.svg` 写入调用时的当前工作目录，并允许第一个参数覆盖输出路径、第二个参数覆盖 SVG 元数据标题。
+- `--title` 设置根 SVG 的可访问性 `<title>` 元数据；默认固定为 `drawclock`，不泄漏输入文件名。它不生成画布内游离文字，不得破坏 `diagram_title_absence` 质量合同。
+- 归档检查器要求完整公开示例 exact-set 与平台脚本，并继续拒绝生成图、源码、测试语料、缓存和构建中间物。CI 在本地归档和公开回下载归档中都必须实际运行脚本、确认输出存在且标题正确。
+
 ## 本轮新增要求（2026-10-16，已实现并验收）
 
 统一配置为presentation.DrawingOptions，通过generate_elk_layout/generate_layout的options参数传入；注释默认top-left方位、left文字对齐，节点同名字段逐项覆盖全局值。八方位与三对齐分别控制位置和块内文字，x/y偏移单位像素，正值向右/下。horizontal_spacing为最小列间距，布线可增大；name_align和frequency_align默认center，frequency_headers为与实际列数一致的字符串序列。frequencies数组定义任意数量列，支持多行标题/值，短行缺项为空；旧三个字段保留兼容但同节点不能混填。名称换行保留原始逻辑身份和引用，显示多行；文字空间在布局前预留。完成证据由项目目标维护，功能、完整质量指标与双平台发行消费均已验收。
@@ -87,7 +94,7 @@ description: >-
 ## 发布
 
 - PyInstaller 可执行文件内含本项目 Python 模块，不依赖宿主 Python、Node.js、ELK 或浏览器。
-- 默认发行包只含主程序、`doc/README.md`、`doc/draw.md`、`doc/licenses/`、平铺的 `libraries/*.xml`、最小示例、颜色字段示例和文字/数组组合示例；完整源码由仓库与发布 tag 提供。仓库内部开发路径不因发行映射而改名。
+- 默认发行包只含主程序、`doc/README.md`、`doc/draw.md`、平铺的 `libraries/*.xml`、完整公开示例输入/说明和当前平台运行脚本；完整源码由仓库与发布 tag 提供。仓库内部开发路径不因发行映射而改名。
 - 源码运行只要求 CPython 3.9 或更高版本；以 `-I -S` 禁用用户目录和 site-packages 后仍可直接生成 SVG，Python 3.9、3.10 与当前版本对代表输入结果一致。
 - 发布包执行独立 allowlist 门，拒绝 `src/`、项目 Skills、`pyproject.toml`、source manifest、批量质量语料、Runtime、npm 清单、wheelhouse 和缓存进入默认附件。
 - 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、严格 JSON 拒绝规则、文件与目录混合器件库、默认圆弧和维护范围示例。

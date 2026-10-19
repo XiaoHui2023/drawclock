@@ -8,13 +8,19 @@ import tarfile
 import zipfile
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+
 
 REQUIRED = {
     "doc/README.md",
     "doc/draw.md",
     "example/draw.json",
-    "example/auto-layout/33-description-colors.json",
-    "example/auto-layout/34-configurable-text-and-frequency.json",
+    "example/README.md",
+    "example/auto-layout/README.md",
+    *{
+        f"example/auto-layout/{path.name}"
+        for path in (ROOT / "example" / "auto-layout").glob("*.json")
+    },
 }
 
 
@@ -46,6 +52,22 @@ def validate(path: Path) -> list[str]:
     binaries = [name for name in names if name in {"drawclock", "drawclock.exe"}]
     if len(binaries) != 1:
         errors.append("archive must contain exactly one drawclock executable")
+    platform_scripts = {
+        "drawclock": "example/run-example.sh",
+        "drawclock.exe": "example/run-example.bat",
+    }
+    expected_scripts = {
+        platform_scripts[binary] for binary in binaries if binary in platform_scripts
+    }
+    missing_scripts = sorted(expected_scripts - set(names))
+    if missing_scripts:
+        errors.append("missing platform example script: " + ", ".join(missing_scripts))
+    unexpected_scripts = sorted(
+        ({"example/run-example.sh", "example/run-example.bat"} & set(names))
+        - expected_scripts
+    )
+    if unexpected_scripts:
+        errors.append("unexpected platform example script: " + ", ".join(unexpected_scripts))
     libraries = [name for name in names if name.startswith("libraries/")]
     if (
         not libraries
@@ -62,7 +84,7 @@ def validate(path: Path) -> list[str]:
     ]
     if license_files:
         errors.append("license files are forbidden: " + ", ".join(license_files))
-    allowed = REQUIRED | set(binaries) | set(libraries)
+    allowed = REQUIRED | set(binaries) | set(libraries) | expected_scripts
     unexpected = sorted(set(names) - allowed)
     if unexpected:
         errors.append("unexpected files: " + ", ".join(unexpected))

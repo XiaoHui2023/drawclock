@@ -3,7 +3,7 @@
   "campaign_name": "defect-driven-adversarial-regression-loop",
   "risk_class": "high",
   "status": "clean",
-  "run_id": "20261016T055850Z-b118da77",
+  "run_id": "20261019T030258Z-0ab653a9",
   "issues": [
     "FB-ROUTE-002",
     "FB-ROOT-003",
@@ -27,7 +27,7 @@
   "required_consecutive_clean_rounds": 7,
   "consecutive_clean_rounds": 7,
   "restart_semantics": "any reproduction resets to zero and requires a new run from R1",
-  "source_tree_sha256": "5629e5f6933e28d69eaa2e940c3c0c25915ef3fa5b2a7a2b324eb359de18f532",
+  "source_tree_sha256": "aae4ec87fc7931c5d9ca2b3fc0b10eb21ea89550d03a676e1805dd13b8e9e605",
   "manifest_sha256": "b7698a13158c5cd3cfe56542c353599ec128a226cbedbc6285c194d38685e2bf",
   "runner_sha256": "f1e686a691e968bf8fe5f2f1c964f8a1576b9c8a1ed65a71e5fc82cdf63c0d2e",
   "oracle_sha256": "34bf69ef941edc852399b7d5acf423de4ea7c5bfa79619d1735b873b38cf1040",
@@ -45,8 +45,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "2ac1478b80793aeab8b0d2c1fc97667e1b5f3a69e46e1919a6d4c4845108126d",
-          "artifact_before_oracle_sha256": "cb57af3cfde867120643db0877eb3f9927a338feafeb5ff261b717f38362d572",
-          "artifact_after_oracle_sha256": "cb57af3cfde867120643db0877eb3f9927a338feafeb5ff261b717f38362d572",
+          "artifact_before_oracle_sha256": "55c2f0e99a7eca3a32aacaf5a18dd60faec793e9fc14b6813f13a056195410df",
+          "artifact_after_oracle_sha256": "55c2f0e99a7eca3a32aacaf5a18dd60faec793e9fc14b6813f13a056195410df",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -297,8 +297,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "cfe902f95e318636e705fc9937007e359ed4323cbca3e8eb36ad4a0aa1fcb9cb",
-          "artifact_before_oracle_sha256": "48e096e9197d7ac8441d1e2a577c60118f61675047533130fc2e8fa0a05bd72e",
-          "artifact_after_oracle_sha256": "48e096e9197d7ac8441d1e2a577c60118f61675047533130fc2e8fa0a05bd72e",
+          "artifact_before_oracle_sha256": "bf8061a1e1146f5cb63ba7cfae1a99ae061cfb7004fa946a6a7f479cb6e7904f",
+          "artifact_after_oracle_sha256": "bf8061a1e1146f5cb63ba7cfae1a99ae061cfb7004fa946a6a7f479cb6e7904f",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -549,8 +549,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "1c341b8664d4d5eba5cf8576b398d5265795ffacb03c64747e037ef35f8e572c",
-          "artifact_before_oracle_sha256": "2fa80ba73be1340f00e231c0a25d76c138897c7e774fdd30ccc1e704ce944be5",
-          "artifact_after_oracle_sha256": "2fa80ba73be1340f00e231c0a25d76c138897c7e774fdd30ccc1e704ce944be5",
+          "artifact_before_oracle_sha256": "3f7e7b5119b0ed14736f8f5df72b0b32305e2f8460f784d5e9e0944460b58587",
+          "artifact_after_oracle_sha256": "3f7e7b5119b0ed14736f8f5df72b0b32305e2f8460f784d5e9e0944460b58587",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -801,8 +801,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3279d8860b1f4bb5dc065d3858e2f31d9231ca10abdf632ab4ece95f153762a0",
-          "artifact_before_oracle_sha256": "9149981389641aad82b757d1b5859058d8ed1142703c54e9cafee5a549dcd2c9",
-          "artifact_after_oracle_sha256": "9149981389641aad82b757d1b5859058d8ed1142703c54e9cafee5a549dcd2c9",
+          "artifact_before_oracle_sha256": "6dc867e25a8f602e17058645032954cec8f45c512fe67c1acfdf83f733a2182e",
+          "artifact_after_oracle_sha256": "6dc867e25a8f602e17058645032954cec8f45c512fe67c1acfdf83f733a2182e",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -1053,8 +1053,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "60e1272306302e1dcc66faf363e0fcac802346708d579a4b6cfccdca2f8af103",
-          "artifact_before_oracle_sha256": "6311cec5d9a6153934ddece3bad7e668617928efb048c171f79aa35db5c1d84b",
-          "artifact_after_oracle_sha256": "6311cec5d9a6153934ddece3bad7e668617928efb048c171f79aa35db5c1d84b",
+          "artifact_before_oracle_sha256": "81fda657ca507247de902ba429761fc082a11129f213ba6bdab70b94a0956a20",
+          "artifact_after_oracle_sha256": "81fda657ca507247de902ba429761fc082a11129f213ba6bdab70b94a0956a20",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -1305,8 +1305,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "31805210c835281375937e6ffc0a8952ed34f365080e79d95efcfffcd1238740",
-          "artifact_before_oracle_sha256": "c40521eab7e87c15b30a297a2d5eec10b39a662138149cd36f00b34304f9cc4a",
-          "artifact_after_oracle_sha256": "c40521eab7e87c15b30a297a2d5eec10b39a662138149cd36f00b34304f9cc4a",
+          "artifact_before_oracle_sha256": "0f6c9095777c19aec4ad9fe39b2df5e2be040f968b012ad9d5c9eeec260a1783",
+          "artifact_after_oracle_sha256": "0f6c9095777c19aec4ad9fe39b2df5e2be040f968b012ad9d5c9eeec260a1783",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -1557,8 +1557,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "272e1cd9bf382246c3f96249cd809c4c3f553a91c0318a0fcf45d3e4acbd4cbd",
-          "artifact_before_oracle_sha256": "45993d421dc9dcebb487d9b172cac325d2813ce4f8e4d1e7fbe27e2cb102992c",
-          "artifact_after_oracle_sha256": "45993d421dc9dcebb487d9b172cac325d2813ce4f8e4d1e7fbe27e2cb102992c",
+          "artifact_before_oracle_sha256": "16814f5707a9317e0ca0250aa94ed8e97c832327e06eaba025a8ff6425284f92",
+          "artifact_after_oracle_sha256": "16814f5707a9317e0ca0250aa94ed8e97c832327e06eaba025a8ff6425284f92",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -1809,8 +1809,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "31805210c835281375937e6ffc0a8952ed34f365080e79d95efcfffcd1238740",
-          "artifact_before_oracle_sha256": "c40521eab7e87c15b30a297a2d5eec10b39a662138149cd36f00b34304f9cc4a",
-          "artifact_after_oracle_sha256": "c40521eab7e87c15b30a297a2d5eec10b39a662138149cd36f00b34304f9cc4a",
+          "artifact_before_oracle_sha256": "0f6c9095777c19aec4ad9fe39b2df5e2be040f968b012ad9d5c9eeec260a1783",
+          "artifact_after_oracle_sha256": "0f6c9095777c19aec4ad9fe39b2df5e2be040f968b012ad9d5c9eeec260a1783",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -2061,8 +2061,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "040aedc0e650d1c83c72fbd0ce68cd0ab2b2f1ea26d9f2f6c812e6da660714f9",
-          "artifact_before_oracle_sha256": "7ef85d22bb2b45556614dabc7d9bb977280523037996aa07b861b1a2046169cb",
-          "artifact_after_oracle_sha256": "7ef85d22bb2b45556614dabc7d9bb977280523037996aa07b861b1a2046169cb",
+          "artifact_before_oracle_sha256": "48b3bd6a8528cf7130aa454f6503c2ca28a1559f8ba46656b53c9fbb58582589",
+          "artifact_after_oracle_sha256": "48b3bd6a8528cf7130aa454f6503c2ca28a1559f8ba46656b53c9fbb58582589",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -2314,8 +2314,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3158ea2911b219a703113adaf95d8f72641fa1349a838e5fb30d81d6d8f5fe18",
-          "artifact_before_oracle_sha256": "26e86602a6b8d38ed4d0b30cfbd52f588aa653d1333cc07ac24d3a6985d23dab",
-          "artifact_after_oracle_sha256": "26e86602a6b8d38ed4d0b30cfbd52f588aa653d1333cc07ac24d3a6985d23dab",
+          "artifact_before_oracle_sha256": "562c331023ad0818e1ecf3330bc4fe5f5c817dea657dfc7fac9dd095c39a2b58",
+          "artifact_after_oracle_sha256": "562c331023ad0818e1ecf3330bc4fe5f5c817dea657dfc7fac9dd095c39a2b58",
           "observed_issue_ids": [],
           "semantic_variants": [
             "outer-boundary-offset-fanout-clean",
@@ -2574,8 +2574,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "74a2be68883654535545b6165c42aaf1eae31a8a79933fe68239ceee9be8a3d7",
-          "artifact_before_oracle_sha256": "3ccb3344f41680b88c40c0b0dd3b28f6139ae15923056a213459d227e6579419",
-          "artifact_after_oracle_sha256": "3ccb3344f41680b88c40c0b0dd3b28f6139ae15923056a213459d227e6579419",
+          "artifact_before_oracle_sha256": "badd33628cdff6cd3fd55f05a9fe0ac1d32c8ed25b58cc074daa9f97fa3675ff",
+          "artifact_after_oracle_sha256": "badd33628cdff6cd3fd55f05a9fe0ac1d32c8ed25b58cc074daa9f97fa3675ff",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -2826,8 +2826,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3c16dad73c88ac09539231671db701f709d71fb57530f5da1593232bc219e49c",
-          "artifact_before_oracle_sha256": "f53fcfa06cdd492d18c3d30bcfcb6c251c6c51e7de2179480bf7e2f7e28eaf93",
-          "artifact_after_oracle_sha256": "f53fcfa06cdd492d18c3d30bcfcb6c251c6c51e7de2179480bf7e2f7e28eaf93",
+          "artifact_before_oracle_sha256": "4fb290704655f23a5e1a6149ae2cd01d531472c2b57c043409e9d83ad1458a71",
+          "artifact_after_oracle_sha256": "4fb290704655f23a5e1a6149ae2cd01d531472c2b57c043409e9d83ad1458a71",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -3078,8 +3078,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "86fcf811d3aab909c9212ba8d67377b11d198ceb9fbc26584f9b92dc991dcffd",
-          "artifact_before_oracle_sha256": "9d8d28244e4bd53dc256bd0fd4ea087adb34e04f93ac7250c0acbab9fa620d20",
-          "artifact_after_oracle_sha256": "9d8d28244e4bd53dc256bd0fd4ea087adb34e04f93ac7250c0acbab9fa620d20",
+          "artifact_before_oracle_sha256": "0cb4763d54b22b9eb927910e489c1943ff0887536e18cb23c0fe7f5fec9980de",
+          "artifact_after_oracle_sha256": "0cb4763d54b22b9eb927910e489c1943ff0887536e18cb23c0fe7f5fec9980de",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -3330,8 +3330,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3376b415460f3b630cf1493c451bcbf6a876551773d5dd2a60635ec7f8b5f00d",
-          "artifact_before_oracle_sha256": "916eb502f7ad93e1608f845c2d7039ed383c490f5c8d67e1ad1232f7483b7596",
-          "artifact_after_oracle_sha256": "916eb502f7ad93e1608f845c2d7039ed383c490f5c8d67e1ad1232f7483b7596",
+          "artifact_before_oracle_sha256": "9aac10c19a082074c2a36f263b35f5a7362b4bc1a8f71e367df43b39b3c76db3",
+          "artifact_after_oracle_sha256": "9aac10c19a082074c2a36f263b35f5a7362b4bc1a8f71e367df43b39b3c76db3",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -3582,8 +3582,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "146efcfb9a69bedb3a0fca633b23fd71fd005aaa82628112ce4cebca842a66b6",
-          "artifact_before_oracle_sha256": "9eb33188179300746919c256e8979471d32b717c0ea1d3937f48eb292259abe7",
-          "artifact_after_oracle_sha256": "9eb33188179300746919c256e8979471d32b717c0ea1d3937f48eb292259abe7",
+          "artifact_before_oracle_sha256": "757d0ef9aa4ccd3891861e121b434c3697c7c163e9e4b10b29e45d1f849b1192",
+          "artifact_after_oracle_sha256": "757d0ef9aa4ccd3891861e121b434c3697c7c163e9e4b10b29e45d1f849b1192",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -3834,8 +3834,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "339e75b83be9bf5a449507eeadb12e6a76c1b6af15032ddef0cba7bc7fb33e10",
-          "artifact_before_oracle_sha256": "a9764a2ad3724531a249c90146cbe646a8958b5a9fcc51b219ff40e4eaec1075",
-          "artifact_after_oracle_sha256": "a9764a2ad3724531a249c90146cbe646a8958b5a9fcc51b219ff40e4eaec1075",
+          "artifact_before_oracle_sha256": "32c1e9fed33f710b65ddf69ace1751baf8d0b971b3dcaeee570f82c2f3c133fd",
+          "artifact_after_oracle_sha256": "32c1e9fed33f710b65ddf69ace1751baf8d0b971b3dcaeee570f82c2f3c133fd",
           "observed_issue_ids": [],
           "semantic_variants": [
             "outer-boundary-offset-fanout-clean",
@@ -4094,8 +4094,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "b49dfd389e3cc2394a524dde41fe53c697c733cfdcb406a46cd704b3d64d8963",
-          "artifact_before_oracle_sha256": "23112550808c164db18efaac213301402ca60ec98d611585d9a5005f06eed57b",
-          "artifact_after_oracle_sha256": "23112550808c164db18efaac213301402ca60ec98d611585d9a5005f06eed57b",
+          "artifact_before_oracle_sha256": "5aeb52b6cfb6f4be94b172f59641732e15f5c56da069c5661d9b3f55741c8e61",
+          "artifact_after_oracle_sha256": "5aeb52b6cfb6f4be94b172f59641732e15f5c56da069c5661d9b3f55741c8e61",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -4346,8 +4346,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "ca774ffb27167e0ebf43d38aa66f1cfd24061f5fec7f554d528f5ccf4debc126",
-          "artifact_before_oracle_sha256": "e32b7baef5993aaa3fdfd72b9156296da4f0381e79bed1fad16109a16515bf16",
-          "artifact_after_oracle_sha256": "e32b7baef5993aaa3fdfd72b9156296da4f0381e79bed1fad16109a16515bf16",
+          "artifact_before_oracle_sha256": "d3a897e31dd464e71cf83e8017c6d0ba2821468941514f713585f6bf904b7337",
+          "artifact_after_oracle_sha256": "d3a897e31dd464e71cf83e8017c6d0ba2821468941514f713585f6bf904b7337",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -4598,8 +4598,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3e8defa6f6d8148d371e8f02f4bbc6514b186ee5f2b0d6933c17dc4e75bf1b7e",
-          "artifact_before_oracle_sha256": "c0bb910dce413bf703faa0a73db3eae6730564ca36e4efbd07c738e1d8ccfe01",
-          "artifact_after_oracle_sha256": "c0bb910dce413bf703faa0a73db3eae6730564ca36e4efbd07c738e1d8ccfe01",
+          "artifact_before_oracle_sha256": "a74620fde950e70c775ed149a23a16efcef20ad96cdfef8cfaa70a8e2c33f4d5",
+          "artifact_after_oracle_sha256": "a74620fde950e70c775ed149a23a16efcef20ad96cdfef8cfaa70a8e2c33f4d5",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -4850,8 +4850,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "0499e91d1ab3a8f6ad0a377dfd69ea32be0be522625671fd617a442ca8d6a8e9",
-          "artifact_before_oracle_sha256": "8bd722ce97276f5637d8f5a4ab4a21ec86e8dc8c7d9b14febf732dfbd0becbba",
-          "artifact_after_oracle_sha256": "8bd722ce97276f5637d8f5a4ab4a21ec86e8dc8c7d9b14febf732dfbd0becbba",
+          "artifact_before_oracle_sha256": "300689e5fd3b9c18597df730ec572b79f3a281b21a7e3796921cd1a481b47c1e",
+          "artifact_after_oracle_sha256": "300689e5fd3b9c18597df730ec572b79f3a281b21a7e3796921cd1a481b47c1e",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -5102,8 +5102,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "390496fbda493e981dc2de1da7ac2160f437622ccdab9f4f225344d97916c708",
-          "artifact_before_oracle_sha256": "2220ea98ae325c1e44af12a4a0a44da90684eb7399b5853cc03db0e7a4dc7761",
-          "artifact_after_oracle_sha256": "2220ea98ae325c1e44af12a4a0a44da90684eb7399b5853cc03db0e7a4dc7761",
+          "artifact_before_oracle_sha256": "9f52dc0de02eefb56bf2fda7358728230f0a48341e2324941f4996147026d88c",
+          "artifact_after_oracle_sha256": "9f52dc0de02eefb56bf2fda7358728230f0a48341e2324941f4996147026d88c",
           "observed_issue_ids": [],
           "semantic_variants": [
             "outer-boundary-offset-fanout-clean",
@@ -5362,8 +5362,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "c08d85721888775208ce1adf98dd84508307dd99a32864f3c201b7c6106c3fdd",
-          "artifact_before_oracle_sha256": "b92bd0be1b2b533e45000071fec6fc3f6c733192f85cdd5cfcde36fa821c40c9",
-          "artifact_after_oracle_sha256": "b92bd0be1b2b533e45000071fec6fc3f6c733192f85cdd5cfcde36fa821c40c9",
+          "artifact_before_oracle_sha256": "c7da94e021fd2f2ef867eee929bde3d877790258f9a13cfa309fc2cd01ab89b6",
+          "artifact_after_oracle_sha256": "c7da94e021fd2f2ef867eee929bde3d877790258f9a13cfa309fc2cd01ab89b6",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -5614,8 +5614,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f25869415da2414e764d2a27180e7dae4262dba34c6756f812c229f6faf52af9",
-          "artifact_before_oracle_sha256": "74404733902aeab68bd37c696c22db688ed6d8bcb8941b912258b8ce6e6996b2",
-          "artifact_after_oracle_sha256": "74404733902aeab68bd37c696c22db688ed6d8bcb8941b912258b8ce6e6996b2",
+          "artifact_before_oracle_sha256": "a5b587fc728385969cd4b2f12fa40ce0b39e45d7b16c668e3b2d6479a13f0157",
+          "artifact_after_oracle_sha256": "a5b587fc728385969cd4b2f12fa40ce0b39e45d7b16c668e3b2d6479a13f0157",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -5867,8 +5867,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "272e1cd9bf382246c3f96249cd809c4c3f553a91c0318a0fcf45d3e4acbd4cbd",
-          "artifact_before_oracle_sha256": "45993d421dc9dcebb487d9b172cac325d2813ce4f8e4d1e7fbe27e2cb102992c",
-          "artifact_after_oracle_sha256": "45993d421dc9dcebb487d9b172cac325d2813ce4f8e4d1e7fbe27e2cb102992c",
+          "artifact_before_oracle_sha256": "16814f5707a9317e0ca0250aa94ed8e97c832327e06eaba025a8ff6425284f92",
+          "artifact_after_oracle_sha256": "16814f5707a9317e0ca0250aa94ed8e97c832327e06eaba025a8ff6425284f92",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -6119,8 +6119,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "e58de660a89920a79ada7a72d9682bf0825008994d9089b02b6ef6bec1a97da0",
-          "artifact_before_oracle_sha256": "514a5e8606f922db571e55aa10c93eee73595751b3174cce2fb44edd9c500362",
-          "artifact_after_oracle_sha256": "514a5e8606f922db571e55aa10c93eee73595751b3174cce2fb44edd9c500362",
+          "artifact_before_oracle_sha256": "520791e6809e93ffb076e981e89f60a6a052a045954083d4ee257755501777dd",
+          "artifact_after_oracle_sha256": "520791e6809e93ffb076e981e89f60a6a052a045954083d4ee257755501777dd",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -6372,8 +6372,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f23c3d109a03bec3199d902a12709d196286a0dcaeb9ba5f927d5de0a6e6f16e",
-          "artifact_before_oracle_sha256": "e9a1498ce0dcb61cc8c685acd7ee91289dfb25bf27e551415bedda67e41f40af",
-          "artifact_after_oracle_sha256": "e9a1498ce0dcb61cc8c685acd7ee91289dfb25bf27e551415bedda67e41f40af",
+          "artifact_before_oracle_sha256": "1eb87c0db66af3e93e67185b35d1659f7e95b8b78e6e85b8e458a6a78390f252",
+          "artifact_after_oracle_sha256": "1eb87c0db66af3e93e67185b35d1659f7e95b8b78e6e85b8e458a6a78390f252",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -6624,8 +6624,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "7e5eafd64471b8dc14c9c7526cefa48d04c50c148b4b7130c92ff74de2cccc97",
-          "artifact_before_oracle_sha256": "79cc6960c7ea3a3e4ac8b48cd3b8dd852f12cf55b7130f49c84b660c994ff544",
-          "artifact_after_oracle_sha256": "79cc6960c7ea3a3e4ac8b48cd3b8dd852f12cf55b7130f49c84b660c994ff544",
+          "artifact_before_oracle_sha256": "db47b2efe7113b4d1989eb29f657332bb1815e981ff8d30b049e3dc7272b14e8",
+          "artifact_after_oracle_sha256": "db47b2efe7113b4d1989eb29f657332bb1815e981ff8d30b049e3dc7272b14e8",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -6877,8 +6877,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "d009105141d4a3a4eae308b9eb20d7fcafdea84fa60ec988e974d90de6a5a937",
-          "artifact_before_oracle_sha256": "2dc28faa0083c0eeac1f66e40ab56e9b70881a89406e973443ca41ae05336f94",
-          "artifact_after_oracle_sha256": "2dc28faa0083c0eeac1f66e40ab56e9b70881a89406e973443ca41ae05336f94",
+          "artifact_before_oracle_sha256": "a857209fe244539964d2719183db02afd5b0c4c17748c7ed557882560b1e4a99",
+          "artifact_after_oracle_sha256": "a857209fe244539964d2719183db02afd5b0c4c17748c7ed557882560b1e4a99",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -7129,8 +7129,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3078b2ccd1d687aaa96bfae693f548f2a5e5538ff42926e54b91eb2068fd1e56",
-          "artifact_before_oracle_sha256": "96358188b3cb31fe4d1e687867138eb04f9ee07ea6862e7e25e47a8dae27fdf4",
-          "artifact_after_oracle_sha256": "96358188b3cb31fe4d1e687867138eb04f9ee07ea6862e7e25e47a8dae27fdf4",
+          "artifact_before_oracle_sha256": "bbbf0b08ed9bc36354411d89d6ce303fc6f3b33e95898b04228b8365e35d0c13",
+          "artifact_after_oracle_sha256": "bbbf0b08ed9bc36354411d89d6ce303fc6f3b33e95898b04228b8365e35d0c13",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -7382,8 +7382,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "7fd75a249e58620ac1f363a2884b5bc8501e00f5cfddd441b51b0e28cff43c74",
-          "artifact_before_oracle_sha256": "88e1ba61c3531d0e2edbbc662edc42dcada75ed6c7c7690e7f37ae913cc8431b",
-          "artifact_after_oracle_sha256": "88e1ba61c3531d0e2edbbc662edc42dcada75ed6c7c7690e7f37ae913cc8431b",
+          "artifact_before_oracle_sha256": "5d7975a3ca7681950b45a950e57a8c2f6c1aed41618d204c98257f1fb9c55a30",
+          "artifact_after_oracle_sha256": "5d7975a3ca7681950b45a950e57a8c2f6c1aed41618d204c98257f1fb9c55a30",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -7634,8 +7634,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "531e54fd45b8b6a3350d04888dc8a37fabb6a0bbf264ffd864d176cbd585c797",
-          "artifact_before_oracle_sha256": "558232f7c3e882e797f54f8f49c6560b6da2b73c1f324d843c6bd313e3a4f9d2",
-          "artifact_after_oracle_sha256": "558232f7c3e882e797f54f8f49c6560b6da2b73c1f324d843c6bd313e3a4f9d2",
+          "artifact_before_oracle_sha256": "d8840a10b95d908262be94f2a9a116aed215f5bb804393e674c5d30e234f9306",
+          "artifact_after_oracle_sha256": "d8840a10b95d908262be94f2a9a116aed215f5bb804393e674c5d30e234f9306",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -7887,8 +7887,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "1e87ddcf48081be89e7b74d5eb4c190c025ad3cdd3aa3a6b6fe8afb8812b2224",
-          "artifact_before_oracle_sha256": "294d64e6cce667c81b21b2182f120b58abd7f584809a288ed36bd7f2c0132f40",
-          "artifact_after_oracle_sha256": "294d64e6cce667c81b21b2182f120b58abd7f584809a288ed36bd7f2c0132f40",
+          "artifact_before_oracle_sha256": "0ace8b4c1a04fd091204757b7ef0fcd21e2e5050ca5913c628c75643f7fb2f9b",
+          "artifact_after_oracle_sha256": "0ace8b4c1a04fd091204757b7ef0fcd21e2e5050ca5913c628c75643f7fb2f9b",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -8139,8 +8139,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "9f5c395e1f0a83cd4cb05c49e220f8806658cc3656429542c73deb1a496f5233",
-          "artifact_before_oracle_sha256": "a56c971a5d8bf3c37d3e8e6355936cc124ea8faed6995872f1cd5a0750f60790",
-          "artifact_after_oracle_sha256": "a56c971a5d8bf3c37d3e8e6355936cc124ea8faed6995872f1cd5a0750f60790",
+          "artifact_before_oracle_sha256": "436c6cbb6dd49fecc9275d6039de9ef7a58f73c5c0bf8469963cfbac819fcb8e",
+          "artifact_after_oracle_sha256": "436c6cbb6dd49fecc9275d6039de9ef7a58f73c5c0bf8469963cfbac819fcb8e",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -8392,8 +8392,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "2bf9116a3ecde849164b220cdcd9f8b9fdaa351f67e8a78825899b992a472a57",
-          "artifact_before_oracle_sha256": "eaa205abd72084683f8d2e6484a1a47f0ed5e8aa74162a495d92b093521a80a9",
-          "artifact_after_oracle_sha256": "eaa205abd72084683f8d2e6484a1a47f0ed5e8aa74162a495d92b093521a80a9",
+          "artifact_before_oracle_sha256": "9404b7af536785607f191dcebb115c1ab1fd0d318581419bd968a64af2405fde",
+          "artifact_after_oracle_sha256": "9404b7af536785607f191dcebb115c1ab1fd0d318581419bd968a64af2405fde",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -8644,8 +8644,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "30b111d7c7a9bca9f936ad573a7896345ac3a402792590006b2309b304b6b574",
-          "artifact_before_oracle_sha256": "dca4a2044399e12d4996ea64caa74a761b595f78c40f5154bc46812be364241b",
-          "artifact_after_oracle_sha256": "dca4a2044399e12d4996ea64caa74a761b595f78c40f5154bc46812be364241b",
+          "artifact_before_oracle_sha256": "d4b8fc7c005605f1ebe4f9b18df5a45d96dacccd6d14a38e4ac2923d756ee1d5",
+          "artifact_after_oracle_sha256": "d4b8fc7c005605f1ebe4f9b18df5a45d96dacccd6d14a38e4ac2923d756ee1d5",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -8897,8 +8897,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "4782469b29815c1c25cb8fb1f42d239680d1d73b112bbd6be1531a73279ec3a7",
-          "artifact_before_oracle_sha256": "c2248c8e1d2ba4a35d100462628548aef91b3dfbb701cbe44ea3e9936c39c069",
-          "artifact_after_oracle_sha256": "c2248c8e1d2ba4a35d100462628548aef91b3dfbb701cbe44ea3e9936c39c069",
+          "artifact_before_oracle_sha256": "55998e68fb74bc9df9a100d31d77b52340ff0970d54e30404fd043416386c8b2",
+          "artifact_after_oracle_sha256": "55998e68fb74bc9df9a100d31d77b52340ff0970d54e30404fd043416386c8b2",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -9149,8 +9149,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "b03e7dbabdf867bfa62d6c6335869f184da8157da395a77728392e99702c20c5",
-          "artifact_before_oracle_sha256": "be5dad15be614ff4be8b2ecb84aedb949d90a58d1b14bb5b762fbf6ba2791749",
-          "artifact_after_oracle_sha256": "be5dad15be614ff4be8b2ecb84aedb949d90a58d1b14bb5b762fbf6ba2791749",
+          "artifact_before_oracle_sha256": "c1d13cc0baa42ea4dc9fc00d0b8c276c63813a40ebc082b65d624b8365623242",
+          "artifact_after_oracle_sha256": "c1d13cc0baa42ea4dc9fc00d0b8c276c63813a40ebc082b65d624b8365623242",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -9402,8 +9402,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "2e6f2cfac7547df999d008608f1af0eacf28ffbbb9fe3d24bf1556daff6f665f",
-          "artifact_before_oracle_sha256": "71bf892507c3ae323c117d1d710548af22a79350b4e2cd9cc6e1e73b9658e4c0",
-          "artifact_after_oracle_sha256": "71bf892507c3ae323c117d1d710548af22a79350b4e2cd9cc6e1e73b9658e4c0",
+          "artifact_before_oracle_sha256": "c77aa481944dc8669b179c06792c032c5f61431a759f0c6347946dc7368b317d",
+          "artifact_after_oracle_sha256": "c77aa481944dc8669b179c06792c032c5f61431a759f0c6347946dc7368b317d",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -9654,8 +9654,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "e5a51985ff0b9b696349cdda28c788bb0a5401c7326abc6525a3dab93359fcc6",
-          "artifact_before_oracle_sha256": "26692e605b8fe6f62e49d6eda2e8dcbb176cc693d9757d07c9d14eda9d957ec5",
-          "artifact_after_oracle_sha256": "26692e605b8fe6f62e49d6eda2e8dcbb176cc693d9757d07c9d14eda9d957ec5",
+          "artifact_before_oracle_sha256": "dce54c530d57a4bdc24ad8004d211f8196c5748b6b32efd3c6fea8d21a8428d5",
+          "artifact_after_oracle_sha256": "dce54c530d57a4bdc24ad8004d211f8196c5748b6b32efd3c6fea8d21a8428d5",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -9907,8 +9907,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "16d7f1f999d3ad84fe02656bbd4097c589f7996bd5df9d90ae4f0513554df33f",
-          "artifact_before_oracle_sha256": "3af11701d105d84f7ff3b771e05812abdb033ff011e6c8698dc99ede4acd17fb",
-          "artifact_after_oracle_sha256": "3af11701d105d84f7ff3b771e05812abdb033ff011e6c8698dc99ede4acd17fb",
+          "artifact_before_oracle_sha256": "4f244199c35c871193e5e76698b7a946790a7b1a936b4b017c7a105cc57582f8",
+          "artifact_after_oracle_sha256": "4f244199c35c871193e5e76698b7a946790a7b1a936b4b017c7a105cc57582f8",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -10159,8 +10159,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3539c19e4039a177a17d7932c98f222db9b3a8f526bd584594771b5ee480e3c6",
-          "artifact_before_oracle_sha256": "b34d1dfc9d7ee86ef62817136b493afe4b0bef74b719276b3774ebcd12f0437c",
-          "artifact_after_oracle_sha256": "b34d1dfc9d7ee86ef62817136b493afe4b0bef74b719276b3774ebcd12f0437c",
+          "artifact_before_oracle_sha256": "7ceb383e15d37389d3942a6fb4fae56c5a817955e2a9ff84cdfc5368648c9af3",
+          "artifact_after_oracle_sha256": "7ceb383e15d37389d3942a6fb4fae56c5a817955e2a9ff84cdfc5368648c9af3",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -10412,8 +10412,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "65d19718179bb136cf2074c61fa7c5a29feb6c7376c242c30df38a7bb16e3013",
-          "artifact_before_oracle_sha256": "525e246fe9c1846f5f4b7615197120b093d31f9e79a3abee3b4e8ce979827644",
-          "artifact_after_oracle_sha256": "525e246fe9c1846f5f4b7615197120b093d31f9e79a3abee3b4e8ce979827644",
+          "artifact_before_oracle_sha256": "273ca20437ea8ab1f0dcd0866071a22446d579428fe1596310a8d702ce8b8260",
+          "artifact_after_oracle_sha256": "273ca20437ea8ab1f0dcd0866071a22446d579428fe1596310a8d702ce8b8260",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -10664,8 +10664,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "c954401a241d83e5b045b29b5b08811c9a04edfc188e8e36d59a5143c085eaef",
-          "artifact_before_oracle_sha256": "0f1576fd2d6f01035d119bf2c73eb6fe6c0a14feff985f2a361536afbf30aef8",
-          "artifact_after_oracle_sha256": "0f1576fd2d6f01035d119bf2c73eb6fe6c0a14feff985f2a361536afbf30aef8",
+          "artifact_before_oracle_sha256": "853c481f8413d237c31afaf8de91722cdf636570a43905dfe8db7f916d7fe627",
+          "artifact_after_oracle_sha256": "853c481f8413d237c31afaf8de91722cdf636570a43905dfe8db7f916d7fe627",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -10917,8 +10917,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "8e845ebdfb7379f158a9f5ce1a3f69cdf8730f8bab31eea48d4a64de2f6367e4",
-          "artifact_before_oracle_sha256": "3beab7497d8c3200478b5c91a7842ce0544ce2a1306f0da59b18a2abbcb60f8f",
-          "artifact_after_oracle_sha256": "3beab7497d8c3200478b5c91a7842ce0544ce2a1306f0da59b18a2abbcb60f8f",
+          "artifact_before_oracle_sha256": "b0b56804b5e0c58020148a94b8f991f0abf4431312ad66cbef5650eee649d51b",
+          "artifact_after_oracle_sha256": "b0b56804b5e0c58020148a94b8f991f0abf4431312ad66cbef5650eee649d51b",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -11169,8 +11169,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "adb80ce057d5b8506120d9d4854d59e900958408e1bc8c34cbecbeabcf325184",
-          "artifact_before_oracle_sha256": "547e4c3a2487164c4c4275951eb400b9012b7dd15ba46851e2c0d81203182394",
-          "artifact_after_oracle_sha256": "547e4c3a2487164c4c4275951eb400b9012b7dd15ba46851e2c0d81203182394",
+          "artifact_before_oracle_sha256": "eaa296a6f7932f51aa3080c434ee0edcee16529f28e010f0930f509b9eda18cc",
+          "artifact_after_oracle_sha256": "eaa296a6f7932f51aa3080c434ee0edcee16529f28e010f0930f509b9eda18cc",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -11422,8 +11422,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5325d515f28640d73262e36977d47002508c58b1db672fd1779f930c1217b380",
-          "artifact_before_oracle_sha256": "c1e6613de1bdcdb891a522b82eae41e08c9dafa943db1c8ee31e387ac9f3f82b",
-          "artifact_after_oracle_sha256": "c1e6613de1bdcdb891a522b82eae41e08c9dafa943db1c8ee31e387ac9f3f82b",
+          "artifact_before_oracle_sha256": "b8841affe83659e16a87f59d3fe6b7bcb84999a3396d1e40ca07cbb10e015327",
+          "artifact_after_oracle_sha256": "b8841affe83659e16a87f59d3fe6b7bcb84999a3396d1e40ca07cbb10e015327",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -11674,8 +11674,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "80f3ce94757e0da4380d0ac51fd44438c6762c3b6abf954dc71f02defb303a7c",
-          "artifact_before_oracle_sha256": "02e677f0408a496057d8590b85f38cd3a15b4b45935c70fcbc81ae51c4b98a75",
-          "artifact_after_oracle_sha256": "02e677f0408a496057d8590b85f38cd3a15b4b45935c70fcbc81ae51c4b98a75",
+          "artifact_before_oracle_sha256": "77ff180bb62b922649d7844f3128ee7a4e1be03b6e13b85de7b8e4482f2cf209",
+          "artifact_after_oracle_sha256": "77ff180bb62b922649d7844f3128ee7a4e1be03b6e13b85de7b8e4482f2cf209",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -11927,8 +11927,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "25a86e0c3405fb9fa7ffb4d8e0d127036650433c51176be4f35aaf7603d2398e",
-          "artifact_before_oracle_sha256": "e013ba9e746ff9b13d1341bbee34814873379131cfb544d3fa9835dc8c44ee98",
-          "artifact_after_oracle_sha256": "e013ba9e746ff9b13d1341bbee34814873379131cfb544d3fa9835dc8c44ee98",
+          "artifact_before_oracle_sha256": "89aaaf069511a9c97ab1ce709ade378b66d7c578cd0c1745b5d0674e0c71e715",
+          "artifact_after_oracle_sha256": "89aaaf069511a9c97ab1ce709ade378b66d7c578cd0c1745b5d0674e0c71e715",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -12179,8 +12179,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "130f0563c16a724acb92e584100a3c7f410d5e27ec33216b892651afb6a41cb7",
-          "artifact_before_oracle_sha256": "30948fd1464c14072252d406f8ee0c2e7b35a347afd21065da6214a217e708e0",
-          "artifact_after_oracle_sha256": "30948fd1464c14072252d406f8ee0c2e7b35a347afd21065da6214a217e708e0",
+          "artifact_before_oracle_sha256": "35bbd76884e4e80ebe057db401b06cfc1e98253a2859742b916768985ce491c4",
+          "artifact_after_oracle_sha256": "35bbd76884e4e80ebe057db401b06cfc1e98253a2859742b916768985ce491c4",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -12432,8 +12432,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "474d05c5391398b3f774b4f00cb7f2e0c572e5ebe32f1d277f78b66fc70945f0",
-          "artifact_before_oracle_sha256": "9c3ff43fe98902d4ba177d7df3b6565afbf77e87c38b4704f083f99ad8340afb",
-          "artifact_after_oracle_sha256": "9c3ff43fe98902d4ba177d7df3b6565afbf77e87c38b4704f083f99ad8340afb",
+          "artifact_before_oracle_sha256": "e690cc17cd610652709b2c3b2dd5df3c5f646436f689d0118351e84609526a4e",
+          "artifact_after_oracle_sha256": "e690cc17cd610652709b2c3b2dd5df3c5f646436f689d0118351e84609526a4e",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -12684,8 +12684,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "de092c990aa2b0bacd30e091397417bf2816fed91474a0828928abb9bb27a93c",
-          "artifact_before_oracle_sha256": "954ff47787d0dea5b4364f2c3d4d39dce8872747e21ce9b8c0adc1d609a30ae6",
-          "artifact_after_oracle_sha256": "954ff47787d0dea5b4364f2c3d4d39dce8872747e21ce9b8c0adc1d609a30ae6",
+          "artifact_before_oracle_sha256": "d40bf38041a447e11c93d21503fa910a9679c7fa93d2fb749bf0d3cf729a5a00",
+          "artifact_after_oracle_sha256": "d40bf38041a447e11c93d21503fa910a9679c7fa93d2fb749bf0d3cf729a5a00",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -12937,8 +12937,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "77883568fe3cd58f5cca4c4d31112810da1d27ad6e4d7b4ff6c843fd2e930e5e",
-          "artifact_before_oracle_sha256": "2a0d368e562163d00de7173c8d00ea750b0372d689e1f214a67437f100c8f8e1",
-          "artifact_after_oracle_sha256": "2a0d368e562163d00de7173c8d00ea750b0372d689e1f214a67437f100c8f8e1",
+          "artifact_before_oracle_sha256": "936d5a5e7d120daf249f19ab5330f3196fcb34719cae62b6d42f8fd9227b9a1f",
+          "artifact_after_oracle_sha256": "936d5a5e7d120daf249f19ab5330f3196fcb34719cae62b6d42f8fd9227b9a1f",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -13189,8 +13189,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "9b5ba817c82a30b42423bef88035912027fd379a74801cfea94f5cbfc074b280",
-          "artifact_before_oracle_sha256": "28aca5fa9dd6e76d9b675225fb808a599c5b2deccf93130dbd82d457b16418b7",
-          "artifact_after_oracle_sha256": "28aca5fa9dd6e76d9b675225fb808a599c5b2deccf93130dbd82d457b16418b7",
+          "artifact_before_oracle_sha256": "f7e4c46a7fa05a624f7f08f7ac73a84bf3f1ad79b427be97bbbb41e37975717a",
+          "artifact_after_oracle_sha256": "f7e4c46a7fa05a624f7f08f7ac73a84bf3f1ad79b427be97bbbb41e37975717a",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -13442,8 +13442,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "4d370b144a9fa06f4d42b634f0148a03e15fe445c78db2548a2f8900403699f1",
-          "artifact_before_oracle_sha256": "690bac5964086487be9796163dd9605386fefcfd0db5ff3adc6bcf0bb8f6c39e",
-          "artifact_after_oracle_sha256": "690bac5964086487be9796163dd9605386fefcfd0db5ff3adc6bcf0bb8f6c39e",
+          "artifact_before_oracle_sha256": "ab46c5df28979b49f84a54f90e3973dbd0785acec0e3a8f7b8e0387b696e5fb2",
+          "artifact_after_oracle_sha256": "ab46c5df28979b49f84a54f90e3973dbd0785acec0e3a8f7b8e0387b696e5fb2",
           "observed_issue_ids": [],
           "semantic_variants": [
             "outer-boundary-offset-fanout-clean",
@@ -13702,8 +13702,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "6965e0806873f3c2f0f5b07cd64fe75c06800481dc46439ea619aff2f47935ef",
-          "artifact_before_oracle_sha256": "9b586e47b7f7acce36870a6d3c6a8be7864e3b15d142321ce4b9a2217679f1c3",
-          "artifact_after_oracle_sha256": "9b586e47b7f7acce36870a6d3c6a8be7864e3b15d142321ce4b9a2217679f1c3",
+          "artifact_before_oracle_sha256": "df99606f3431ef4c0f28af7ecbc73621057c9581e197ed0f289e872c4c65f387",
+          "artifact_after_oracle_sha256": "df99606f3431ef4c0f28af7ecbc73621057c9581e197ed0f289e872c4c65f387",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -13954,8 +13954,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "6b7feb20c0b0d1383a1873f88a19b92ddffbc3ab8c74a2b596cb59e964ca813c",
-          "artifact_before_oracle_sha256": "79fb07aa9d1eda54441f5644fa54d5ac79a96ceede8c552764e1f2b57e087f17",
-          "artifact_after_oracle_sha256": "79fb07aa9d1eda54441f5644fa54d5ac79a96ceede8c552764e1f2b57e087f17",
+          "artifact_before_oracle_sha256": "c5673c98da30a04a96269836983d62892a3ad6f0886c36e20ed8830ea46c8ecb",
+          "artifact_after_oracle_sha256": "c5673c98da30a04a96269836983d62892a3ad6f0886c36e20ed8830ea46c8ecb",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -14207,8 +14207,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "b14aada38e3468b3fbac8ded554df66e32fb6bcc28ebb9b9ae614e62ed247939",
-          "artifact_before_oracle_sha256": "c914d995c7b74df6175fd2505d6ca23678b26a923604ac44a1c2f0270db05149",
-          "artifact_after_oracle_sha256": "c914d995c7b74df6175fd2505d6ca23678b26a923604ac44a1c2f0270db05149",
+          "artifact_before_oracle_sha256": "85faa637938e402d77d37f7065740e0521e086fba866e6613003e5bfda2cd7ab",
+          "artifact_after_oracle_sha256": "85faa637938e402d77d37f7065740e0521e086fba866e6613003e5bfda2cd7ab",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -14459,8 +14459,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "b41a16855221515f3d9eeb563250c7a6a5a364a73dbe3f0e8229f574178e89c7",
-          "artifact_before_oracle_sha256": "65c3532189cb865a7226e52b363ac273a4c84cd697b75fb1b34db9a81b2e689c",
-          "artifact_after_oracle_sha256": "65c3532189cb865a7226e52b363ac273a4c84cd697b75fb1b34db9a81b2e689c",
+          "artifact_before_oracle_sha256": "b9c51703510ab03d1464bb06a19eb2066fc20f92997497b0dec664a421d437c2",
+          "artifact_after_oracle_sha256": "b9c51703510ab03d1464bb06a19eb2066fc20f92997497b0dec664a421d437c2",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -14712,8 +14712,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5b21d0cddadd192d88e5246fdd4e3b4746ee47a6a2d8ccd79493d24ac0d3f309",
-          "artifact_before_oracle_sha256": "de92f0d7aebfb3052f8b1ffa5df030684be9e9fa65661a040818f156b06480cb",
-          "artifact_after_oracle_sha256": "de92f0d7aebfb3052f8b1ffa5df030684be9e9fa65661a040818f156b06480cb",
+          "artifact_before_oracle_sha256": "3a2415740799c00471402bf2af9c46c8b82e81bb6315eaa88c4b4fb4d794fcab",
+          "artifact_after_oracle_sha256": "3a2415740799c00471402bf2af9c46c8b82e81bb6315eaa88c4b4fb4d794fcab",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -14964,8 +14964,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "fdb5395608e627ef2f8679a97ab016fbdb8b58224ae829ad3fa447ebcbff8e15",
-          "artifact_before_oracle_sha256": "74dcb8a3ef9634156f0ba68632f3fbb7da5391629eea3b13a507213edf9874a9",
-          "artifact_after_oracle_sha256": "74dcb8a3ef9634156f0ba68632f3fbb7da5391629eea3b13a507213edf9874a9",
+          "artifact_before_oracle_sha256": "d2bb4c4b13b4f606cc6a179d0bcd6ec01ffa40eadc1c5e25164a395c116df0f6",
+          "artifact_after_oracle_sha256": "d2bb4c4b13b4f606cc6a179d0bcd6ec01ffa40eadc1c5e25164a395c116df0f6",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -15217,8 +15217,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "0ea99ef5885cc22a9b59242f93c5ec8d49625410b4c3644f02176f6f1e026926",
-          "artifact_before_oracle_sha256": "8eb9a938cc3272aad8c951ac62216d4817492718004034e0c4c109bac2b736a9",
-          "artifact_after_oracle_sha256": "8eb9a938cc3272aad8c951ac62216d4817492718004034e0c4c109bac2b736a9",
+          "artifact_before_oracle_sha256": "8853c4d4842d75d70b5dc18d2318a837c4a609e72193eb15a7040bb619006dd4",
+          "artifact_after_oracle_sha256": "8853c4d4842d75d70b5dc18d2318a837c4a609e72193eb15a7040bb619006dd4",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -15469,8 +15469,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f6e3e0bc91124d8b8d6da1cbfd5f7037c6c50ad26d32f6b0f4bf9ee035548169",
-          "artifact_before_oracle_sha256": "4bc1ac30cb05c15b599ec0f77faadb0d28d3c1827f2076deda83bd5d369a2cc2",
-          "artifact_after_oracle_sha256": "4bc1ac30cb05c15b599ec0f77faadb0d28d3c1827f2076deda83bd5d369a2cc2",
+          "artifact_before_oracle_sha256": "ce02d119e8bb9913860b556e5937245e9d5b26bfe95127e1d877001df632a9da",
+          "artifact_after_oracle_sha256": "ce02d119e8bb9913860b556e5937245e9d5b26bfe95127e1d877001df632a9da",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -15722,8 +15722,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "c5f04c8d888abc0f081922828e8ff30c84c45be208e97a801c13c20c84a554e8",
-          "artifact_before_oracle_sha256": "dc1c00f446c2a350d476b4bb74ff52f1e048eccabea97584b5b4a5f952311aa5",
-          "artifact_after_oracle_sha256": "dc1c00f446c2a350d476b4bb74ff52f1e048eccabea97584b5b4a5f952311aa5",
+          "artifact_before_oracle_sha256": "5d55e68a8062f3f750e851f913237c1355540feb1cb4489276e883a8e9285ed4",
+          "artifact_after_oracle_sha256": "5d55e68a8062f3f750e851f913237c1355540feb1cb4489276e883a8e9285ed4",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -15974,8 +15974,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "1de9756c5008433c4d190ae297d19b3f6cdfae24198685f2a16e6f9b357c4c23",
-          "artifact_before_oracle_sha256": "76c7bc660524f501abbaaa56cdccbb59693e29af210af33dca6788b40dc6045b",
-          "artifact_after_oracle_sha256": "76c7bc660524f501abbaaa56cdccbb59693e29af210af33dca6788b40dc6045b",
+          "artifact_before_oracle_sha256": "96dd975516773e70070f274484c2d893a5d87d73d31f53698a7dafbb8af0d2aa",
+          "artifact_after_oracle_sha256": "96dd975516773e70070f274484c2d893a5d87d73d31f53698a7dafbb8af0d2aa",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -16227,8 +16227,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "92f7fdee94d87d420ae392b8e2bb5b35780fc80b1c7acfac2d7ee3f174970b57",
-          "artifact_before_oracle_sha256": "7040540ba2fffd966f987c7eda24413ee2b7bcdf302e572b8079586cf4bcc197",
-          "artifact_after_oracle_sha256": "7040540ba2fffd966f987c7eda24413ee2b7bcdf302e572b8079586cf4bcc197",
+          "artifact_before_oracle_sha256": "401a239829688caf580d0895357bb8b1d167958e00fd0c4a121f9881cd36f4fd",
+          "artifact_after_oracle_sha256": "401a239829688caf580d0895357bb8b1d167958e00fd0c4a121f9881cd36f4fd",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -16479,8 +16479,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "868b869f1aa2c393a5914910f685d83ee61be98fe611c616d7049ac883c70700",
-          "artifact_before_oracle_sha256": "c7d4db0b197156925b602c06a84048e2dcd7e4d07917d409a9f67ff6031c3da5",
-          "artifact_after_oracle_sha256": "c7d4db0b197156925b602c06a84048e2dcd7e4d07917d409a9f67ff6031c3da5",
+          "artifact_before_oracle_sha256": "fa7adb90b971063c4bf1de12095a798b318e1b4e60b9260c16805fadeafa2923",
+          "artifact_after_oracle_sha256": "fa7adb90b971063c4bf1de12095a798b318e1b4e60b9260c16805fadeafa2923",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -16732,8 +16732,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "d03884b5df1c40421e27a853d6497fa267b6bc31ccbb61a6c43e48e5b6f68dab",
-          "artifact_before_oracle_sha256": "21eacf041b84b112880823af6c02ad4f2d262a0eae79ae435b8f33df5d56ed9e",
-          "artifact_after_oracle_sha256": "21eacf041b84b112880823af6c02ad4f2d262a0eae79ae435b8f33df5d56ed9e",
+          "artifact_before_oracle_sha256": "d172ed8bb8b387a9e385ec35de0e52ddfff258167b7fdebf66d4de144ff45795",
+          "artifact_after_oracle_sha256": "d172ed8bb8b387a9e385ec35de0e52ddfff258167b7fdebf66d4de144ff45795",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -16984,8 +16984,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "1de3b6200bfe4cacfa5a88ac353fa53d99bce7975975d7641e3cc99febe101cc",
-          "artifact_before_oracle_sha256": "9bbb6844c9ffe3b01dc6d99ca4ba7c36cb24feb6feb29670bc2a93a5fb5b1739",
-          "artifact_after_oracle_sha256": "9bbb6844c9ffe3b01dc6d99ca4ba7c36cb24feb6feb29670bc2a93a5fb5b1739",
+          "artifact_before_oracle_sha256": "1d010dadbfa49048df4650fd02a74a0778064abbee3ef0cbeaa09436bb2cb8f7",
+          "artifact_after_oracle_sha256": "1d010dadbfa49048df4650fd02a74a0778064abbee3ef0cbeaa09436bb2cb8f7",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -17237,8 +17237,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "21240a48552abc411f9837dc05fdcc542dc34d554d8a7948a6ec4709d7b7f434",
-          "artifact_before_oracle_sha256": "b7c87ec53a6cb44fcd7bcc4d1e5cfd18e1d610c086709660f1c17880cf4bf8bf",
-          "artifact_after_oracle_sha256": "b7c87ec53a6cb44fcd7bcc4d1e5cfd18e1d610c086709660f1c17880cf4bf8bf",
+          "artifact_before_oracle_sha256": "4ddec859aab2eae7a3c879e10377faed00a96dbaa3a49f48d34a862c73c69bbd",
+          "artifact_after_oracle_sha256": "4ddec859aab2eae7a3c879e10377faed00a96dbaa3a49f48d34a862c73c69bbd",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -17489,8 +17489,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "0f9d2a60f9442eed7ecb1a539e4535571b94d1fd95ca7c5a0e081e44868ecfd3",
-          "artifact_before_oracle_sha256": "fcc5296c35d9e4cb92faec42205280c44e55ab99e56640b1e0d276abde48d855",
-          "artifact_after_oracle_sha256": "fcc5296c35d9e4cb92faec42205280c44e55ab99e56640b1e0d276abde48d855",
+          "artifact_before_oracle_sha256": "a64dfdd8ad94cd263c6159c39503c3402b337bfc73d6afe47e8ad38bf94cce84",
+          "artifact_after_oracle_sha256": "a64dfdd8ad94cd263c6159c39503c3402b337bfc73d6afe47e8ad38bf94cce84",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -17742,8 +17742,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "93ae5ec93ed12c2ab8b421b67e83d346afc0d4a2b8a6fcc2b8c49acd6326cfdd",
-          "artifact_before_oracle_sha256": "535fe84cae15262cf01dcf9b81a93ffc385f05625a99df351323c78bbe0385e8",
-          "artifact_after_oracle_sha256": "535fe84cae15262cf01dcf9b81a93ffc385f05625a99df351323c78bbe0385e8",
+          "artifact_before_oracle_sha256": "21ec3838565898509a9e5de51e1adbd8856ba32062c3764a6c5850e4d0a0b88a",
+          "artifact_after_oracle_sha256": "21ec3838565898509a9e5de51e1adbd8856ba32062c3764a6c5850e4d0a0b88a",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -17994,8 +17994,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5c7239193b7c2d24ddcac54003929ed6ab07aafa9c7b89eebabbeea3a87860d6",
-          "artifact_before_oracle_sha256": "c38a401ad603c30d1fa6e54b9ca6555eeca1299d5fb4fb4549ce4f1003b8cd66",
-          "artifact_after_oracle_sha256": "c38a401ad603c30d1fa6e54b9ca6555eeca1299d5fb4fb4549ce4f1003b8cd66",
+          "artifact_before_oracle_sha256": "0535daf11459a636d84ce198781e04fe415aad33d9aad9ea6a10bf813edad9a8",
+          "artifact_after_oracle_sha256": "0535daf11459a636d84ce198781e04fe415aad33d9aad9ea6a10bf813edad9a8",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -18246,8 +18246,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "0a8575f4f5bee60c1d614dfbca3426261e854c965cd0b397ac258a7b7160a46f",
-          "artifact_before_oracle_sha256": "53222267c1adbb16cd982cc378456cfb996d839c5f511bf5b992e08140ea8bfc",
-          "artifact_after_oracle_sha256": "53222267c1adbb16cd982cc378456cfb996d839c5f511bf5b992e08140ea8bfc",
+          "artifact_before_oracle_sha256": "f1e26817a62cd7162305035076ff136829ef9ee3eceb88a3606da983e1bddc01",
+          "artifact_after_oracle_sha256": "f1e26817a62cd7162305035076ff136829ef9ee3eceb88a3606da983e1bddc01",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -18498,8 +18498,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "2446aec7c836d23d4b7b1eab2daf41bec0d33f1f7728f3463eb0f72f1fca1e72",
-          "artifact_before_oracle_sha256": "6cc6ac3c637e3233f0ba93f67d383bafa24243985a43e663da8586c002e29f16",
-          "artifact_after_oracle_sha256": "6cc6ac3c637e3233f0ba93f67d383bafa24243985a43e663da8586c002e29f16",
+          "artifact_before_oracle_sha256": "f7e1d8f6e4a2c418ba0be31fa5acb7b5b4e9dfcbe326a06476becb5fdbcd87c2",
+          "artifact_after_oracle_sha256": "f7e1d8f6e4a2c418ba0be31fa5acb7b5b4e9dfcbe326a06476becb5fdbcd87c2",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -18750,8 +18750,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "073885e5057c1c90dc60c3ddc1befc4df15356ebedf7299eaa2c700ab25dc9e0",
-          "artifact_before_oracle_sha256": "e7ef2a9a23e5f541f3727d1f75dd99ed902a9ab98561e3333d68cd5b672fb28c",
-          "artifact_after_oracle_sha256": "e7ef2a9a23e5f541f3727d1f75dd99ed902a9ab98561e3333d68cd5b672fb28c",
+          "artifact_before_oracle_sha256": "e0c8795963d029154f325264a0d8e2bb8bf380f768807c2bd73fadc50992aafb",
+          "artifact_after_oracle_sha256": "e0c8795963d029154f325264a0d8e2bb8bf380f768807c2bd73fadc50992aafb",
           "observed_issue_ids": [],
           "semantic_variants": [
             "outer-boundary-offset-fanout-clean",
@@ -19010,8 +19010,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f9e5d0d299ae4dd6ee6503d986f8faf4f3f672d95de9fb26af90440486058c22",
-          "artifact_before_oracle_sha256": "4465d0e1a59666975352abc5af5950c5fd0412373dac7e9f05389dd0da41978f",
-          "artifact_after_oracle_sha256": "4465d0e1a59666975352abc5af5950c5fd0412373dac7e9f05389dd0da41978f",
+          "artifact_before_oracle_sha256": "37b8f810c055ae8b2a9b9fd03d52f91a99abf00e4371f5fefe675ade222832ad",
+          "artifact_after_oracle_sha256": "37b8f810c055ae8b2a9b9fd03d52f91a99abf00e4371f5fefe675ade222832ad",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -19262,8 +19262,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "9ec83f765c9875972007ffe72a2c7e50b05fd8e5f02b242468dd037d8d4dba4a",
-          "artifact_before_oracle_sha256": "cd986dd72be8aa6fb57aeef0b26ba9c3ba9a0e097c76dac7be5fd7a05ffc7142",
-          "artifact_after_oracle_sha256": "cd986dd72be8aa6fb57aeef0b26ba9c3ba9a0e097c76dac7be5fd7a05ffc7142",
+          "artifact_before_oracle_sha256": "d16325d2458fd1e944f4334e5bdb5f718524d6ac7f80b78525fc7d6b90d4283e",
+          "artifact_after_oracle_sha256": "d16325d2458fd1e944f4334e5bdb5f718524d6ac7f80b78525fc7d6b90d4283e",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -19515,8 +19515,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "562311a09f9905341f61772521604196a78805e782ce92565495613373820b8c",
-          "artifact_before_oracle_sha256": "6a492c97b725b48ea1c305b01fbbeb62edc53e473eebdc4f5f32129143645cd6",
-          "artifact_after_oracle_sha256": "6a492c97b725b48ea1c305b01fbbeb62edc53e473eebdc4f5f32129143645cd6",
+          "artifact_before_oracle_sha256": "c0e1fe13a555a32abc56cfa556c83581c3e8e16d392160f62d37228aaead6f1a",
+          "artifact_after_oracle_sha256": "c0e1fe13a555a32abc56cfa556c83581c3e8e16d392160f62d37228aaead6f1a",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -19767,8 +19767,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "4284338cb3bfc93fb04717e9ce1d7f6dd7034611c7eba573dc3ed24f5fcb97fc",
-          "artifact_before_oracle_sha256": "504bbf3f213ef40f5b98c68ad9ae7b31bec401131694a31e7a60956ffcaf81ee",
-          "artifact_after_oracle_sha256": "504bbf3f213ef40f5b98c68ad9ae7b31bec401131694a31e7a60956ffcaf81ee",
+          "artifact_before_oracle_sha256": "8a70d3bf4a44ef1c16ff400a484defbe9fa905aada72c079a0711722ed8ca392",
+          "artifact_after_oracle_sha256": "8a70d3bf4a44ef1c16ff400a484defbe9fa905aada72c079a0711722ed8ca392",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -20020,8 +20020,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "54cc38b4f02803464ebf1846a70475ad372e82a85258de7cc1fe0c4a1bfd530c",
-          "artifact_before_oracle_sha256": "846e9bf9cfe40966bffec0ac0e64e42194c719786a9bb38614b1d08b8f93cfc3",
-          "artifact_after_oracle_sha256": "846e9bf9cfe40966bffec0ac0e64e42194c719786a9bb38614b1d08b8f93cfc3",
+          "artifact_before_oracle_sha256": "3b9483904a69cb3e8136add06a3e5cd0bb1cbe7b724bc8cb0a8b6104749b8f08",
+          "artifact_after_oracle_sha256": "3b9483904a69cb3e8136add06a3e5cd0bb1cbe7b724bc8cb0a8b6104749b8f08",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -20272,8 +20272,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "e360753990e8a7fe0c01ad36e8bbac6758e9bd22ad3d9f87884ef343d426efa2",
-          "artifact_before_oracle_sha256": "6aa8853d7564c20d23ca3e1830852a0147adb8f8d3d62901de45799932ba3659",
-          "artifact_after_oracle_sha256": "6aa8853d7564c20d23ca3e1830852a0147adb8f8d3d62901de45799932ba3659",
+          "artifact_before_oracle_sha256": "be549ccfa13d787988b1dcb42ffd0ee4c8dbb4edac568a3268741dea52f95ccf",
+          "artifact_after_oracle_sha256": "be549ccfa13d787988b1dcb42ffd0ee4c8dbb4edac568a3268741dea52f95ccf",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -20525,8 +20525,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "d305068823813672c3c9caf44533585b456e5131e09b6e3d255b74ab909b2441",
-          "artifact_before_oracle_sha256": "0f85c120b42c4e13342b3e2490d77f7f1789bd98d6a0540c241eac480cf40be3",
-          "artifact_after_oracle_sha256": "0f85c120b42c4e13342b3e2490d77f7f1789bd98d6a0540c241eac480cf40be3",
+          "artifact_before_oracle_sha256": "f15fcc5fbe7253a492f39ae72523629c962e87566b3dfecb495111902a7bdb07",
+          "artifact_after_oracle_sha256": "f15fcc5fbe7253a492f39ae72523629c962e87566b3dfecb495111902a7bdb07",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -20777,8 +20777,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "fe53cca7ee6c4c0a3858f1a50d1795069ae4affc4f08bf2f662cf42c3fa271c8",
-          "artifact_before_oracle_sha256": "2c7583dd24bcf6217e420ef628c50260d92b4d23e6fe9884a29a792e8868cd66",
-          "artifact_after_oracle_sha256": "2c7583dd24bcf6217e420ef628c50260d92b4d23e6fe9884a29a792e8868cd66",
+          "artifact_before_oracle_sha256": "87d6e977f3e154c2a71ffb04604057fe74de8a72a785fba016742c8c15f1c62f",
+          "artifact_after_oracle_sha256": "87d6e977f3e154c2a71ffb04604057fe74de8a72a785fba016742c8c15f1c62f",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -21030,8 +21030,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "8458047cf97c0a8dd7de4804f7eb4a3968adb0ca8e0a33eb037eb9837fcb5713",
-          "artifact_before_oracle_sha256": "ec888a3fd459438f91e5e104cebe2875c2a3c43ff0d071415eb6a89c0fe87a29",
-          "artifact_after_oracle_sha256": "ec888a3fd459438f91e5e104cebe2875c2a3c43ff0d071415eb6a89c0fe87a29",
+          "artifact_before_oracle_sha256": "22ff996146f7e21d4b99920b65c666a13334839e79d463311f59dd62dfb05fdb",
+          "artifact_after_oracle_sha256": "22ff996146f7e21d4b99920b65c666a13334839e79d463311f59dd62dfb05fdb",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -21282,8 +21282,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "acaf9f964d4055a27dacc5764f95002e5cafd96b7c942bba5d9e0cde28d1b2db",
-          "artifact_before_oracle_sha256": "6aafc3efa9bf9541e054a41331c2a86f665ad94fcc8a5101939c6d15fc93f16f",
-          "artifact_after_oracle_sha256": "6aafc3efa9bf9541e054a41331c2a86f665ad94fcc8a5101939c6d15fc93f16f",
+          "artifact_before_oracle_sha256": "df4c456563efe17dcdca0cc3600fa62a3cbfa341dd342f732c72c6ff32524999",
+          "artifact_after_oracle_sha256": "df4c456563efe17dcdca0cc3600fa62a3cbfa341dd342f732c72c6ff32524999",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -21535,8 +21535,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "4a2ae0cadf7963f5a6baf54e06c23a5da5ff2eefdf8dfe7ff2719095fed5328d",
-          "artifact_before_oracle_sha256": "07b317101b48ca205c53df98494f4a6b6a99270f1698e1435e855fcb887fe4f2",
-          "artifact_after_oracle_sha256": "07b317101b48ca205c53df98494f4a6b6a99270f1698e1435e855fcb887fe4f2",
+          "artifact_before_oracle_sha256": "9053b2da11247dbd7f889b2bd96edf63312dfb36970a049ff6eec1828123f11b",
+          "artifact_after_oracle_sha256": "9053b2da11247dbd7f889b2bd96edf63312dfb36970a049ff6eec1828123f11b",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -21787,8 +21787,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "8b1fc059b82502f3d9f586960468ee231b28623708a2c9fd7202879e75fbd63a",
-          "artifact_before_oracle_sha256": "050303c6945a8d1e0127b52b8a326c369e362958bc60d8f88ea51093d1687907",
-          "artifact_after_oracle_sha256": "050303c6945a8d1e0127b52b8a326c369e362958bc60d8f88ea51093d1687907",
+          "artifact_before_oracle_sha256": "3ec58359318e79de940b416b840fbb21af30a2f39109cf6093f953339d4f964e",
+          "artifact_after_oracle_sha256": "3ec58359318e79de940b416b840fbb21af30a2f39109cf6093f953339d4f964e",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -22040,8 +22040,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "ed8a89c5c95b18d50b373f1c558522c54629e08e765c0db795edd3b2ad8c6aa5",
-          "artifact_before_oracle_sha256": "f025b626d5f0c3c0bbbbc66174950e6cd099d940823161133ca2f0bf561856d1",
-          "artifact_after_oracle_sha256": "f025b626d5f0c3c0bbbbc66174950e6cd099d940823161133ca2f0bf561856d1",
+          "artifact_before_oracle_sha256": "217afa556479e6940250451edf6825501897ce781748371285d5a160b675f437",
+          "artifact_after_oracle_sha256": "217afa556479e6940250451edf6825501897ce781748371285d5a160b675f437",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -22292,8 +22292,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5b746a7f8ebcfc5203cc9b4c7836ffe505070a97106f4fa9e9e72e7537fd131d",
-          "artifact_before_oracle_sha256": "c75e6ca2e698d23b0d411479dbc7739557c2cfcfc85f82864507abe25e209c1a",
-          "artifact_after_oracle_sha256": "c75e6ca2e698d23b0d411479dbc7739557c2cfcfc85f82864507abe25e209c1a",
+          "artifact_before_oracle_sha256": "8d491a172f46f79e9d9ea161701036a1becbb52f84c598f611f61247baca058b",
+          "artifact_after_oracle_sha256": "8d491a172f46f79e9d9ea161701036a1becbb52f84c598f611f61247baca058b",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -22545,8 +22545,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "ddae42773fedf6f5caed88fbc1d5db3fa15947794270c1f6b6c7873ec0a66f6b",
-          "artifact_before_oracle_sha256": "0818468d4e8d6a376f54f64f3a333aedbefbb7605b34e8087295396eeac02fc9",
-          "artifact_after_oracle_sha256": "0818468d4e8d6a376f54f64f3a333aedbefbb7605b34e8087295396eeac02fc9",
+          "artifact_before_oracle_sha256": "ab37292ba1150ff9fc7be0759890ce47a029a4c8ea42eb106e2d98702f05e202",
+          "artifact_after_oracle_sha256": "ab37292ba1150ff9fc7be0759890ce47a029a4c8ea42eb106e2d98702f05e202",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -22797,8 +22797,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "145b8caf4828e7bd30ef75dc74ad5a2dd595540e8ecea95e043be4e74094ccf2",
-          "artifact_before_oracle_sha256": "283b7749607fdd71b85442806b1b90aadcae593903cea56524d5f455bb8024bf",
-          "artifact_after_oracle_sha256": "283b7749607fdd71b85442806b1b90aadcae593903cea56524d5f455bb8024bf",
+          "artifact_before_oracle_sha256": "62e577fcdf35990b90a06a76464fb5fa6fcb89e21b93ea3f2bb2fdcaa6ed9476",
+          "artifact_after_oracle_sha256": "62e577fcdf35990b90a06a76464fb5fa6fcb89e21b93ea3f2bb2fdcaa6ed9476",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -23050,8 +23050,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "1185a8832639867ffe9ea2552b55fbc824cf5ae8896ee29fee98922a6f4be9f8",
-          "artifact_before_oracle_sha256": "b6e2133b26afe94f3f5081a3655bbcf7c06b9c0180ee5677971875e5f761ab02",
-          "artifact_after_oracle_sha256": "b6e2133b26afe94f3f5081a3655bbcf7c06b9c0180ee5677971875e5f761ab02",
+          "artifact_before_oracle_sha256": "a6654f5ebc5be4b8ac8eaf120e68339e0465ab5a041550d39c2813325f4ed61d",
+          "artifact_after_oracle_sha256": "a6654f5ebc5be4b8ac8eaf120e68339e0465ab5a041550d39c2813325f4ed61d",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -23302,8 +23302,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "25998bc5442e482caef284060ebc925ef42794c2aca6743878bfba5f512f414e",
-          "artifact_before_oracle_sha256": "9de398d4c8a92a40f48f1c3a2d4a215fddef35284bd8b883e680fd2c1a051339",
-          "artifact_after_oracle_sha256": "9de398d4c8a92a40f48f1c3a2d4a215fddef35284bd8b883e680fd2c1a051339",
+          "artifact_before_oracle_sha256": "93999905ef1c6492b6df6d3b51b56332f005026b7dcf38cfe41b585a60a654ea",
+          "artifact_after_oracle_sha256": "93999905ef1c6492b6df6d3b51b56332f005026b7dcf38cfe41b585a60a654ea",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -23555,8 +23555,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "ccefdd4edc167263a5a37485f5f79460f24eccf7b4c0c4c19bbb377651b7bea6",
-          "artifact_before_oracle_sha256": "57d69af186160042d564b61bf102b107f4efd9fb04febd9f20f3f3ce01654c43",
-          "artifact_after_oracle_sha256": "57d69af186160042d564b61bf102b107f4efd9fb04febd9f20f3f3ce01654c43",
+          "artifact_before_oracle_sha256": "c840a4ad0a1f85b82caa8f7638720400cf700acf2860626e903a6ac9594a4d53",
+          "artifact_after_oracle_sha256": "c840a4ad0a1f85b82caa8f7638720400cf700acf2860626e903a6ac9594a4d53",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -23807,8 +23807,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "1c2becb5ec3a109e276a4b6921e31caa69a9d9f8fda2b32bef4d52aba4ba5d83",
-          "artifact_before_oracle_sha256": "cab5f3c3040fe708dfbe1a8027c3c3e206b4f5f589688777e3c0a9fcd0a737dc",
-          "artifact_after_oracle_sha256": "cab5f3c3040fe708dfbe1a8027c3c3e206b4f5f589688777e3c0a9fcd0a737dc",
+          "artifact_before_oracle_sha256": "6bbf6f9808ec99e4c0431c43a009294f15177661469a5e1890a6af632c11ba5f",
+          "artifact_after_oracle_sha256": "6bbf6f9808ec99e4c0431c43a009294f15177661469a5e1890a6af632c11ba5f",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -24060,8 +24060,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "253f159630b2cda6ae226674f420911483ab75ec6b48f13c8d60b372bb7ea3b9",
-          "artifact_before_oracle_sha256": "a34ee7612ef843f5398363225a5dd984bdee2312cf4b519c9922cf1abe8d3732",
-          "artifact_after_oracle_sha256": "a34ee7612ef843f5398363225a5dd984bdee2312cf4b519c9922cf1abe8d3732",
+          "artifact_before_oracle_sha256": "7e683f0530e787bcff8d9e520cc47d3372623120f406aa877232a42301b5f22b",
+          "artifact_after_oracle_sha256": "7e683f0530e787bcff8d9e520cc47d3372623120f406aa877232a42301b5f22b",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -24312,8 +24312,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "406ad01c8db3b4ed29ff04aff9561d04cbd70c26d0d56d3b573a3d857c6341c7",
-          "artifact_before_oracle_sha256": "ab45d8c2b7eece7df113c1fd642dc14b1c23516fd5f7c8d2c069855aa5183fa0",
-          "artifact_after_oracle_sha256": "ab45d8c2b7eece7df113c1fd642dc14b1c23516fd5f7c8d2c069855aa5183fa0",
+          "artifact_before_oracle_sha256": "026537e273e32347459372f46731d4a3129434a2319cf20b024cc639ec234f09",
+          "artifact_after_oracle_sha256": "026537e273e32347459372f46731d4a3129434a2319cf20b024cc639ec234f09",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -24565,8 +24565,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "b86b815d35e989ffd860a43d8e47246c6ed416521c392e55e3af55c1caed972b",
-          "artifact_before_oracle_sha256": "221f0e4d751307c067856e50f0718f5ed6f44f20300066913a334ed13a89bb27",
-          "artifact_after_oracle_sha256": "221f0e4d751307c067856e50f0718f5ed6f44f20300066913a334ed13a89bb27",
+          "artifact_before_oracle_sha256": "8730f16ba48d89fa19ec368eee1bbdf37c9349d6019b302f49605c6c91720bc2",
+          "artifact_after_oracle_sha256": "8730f16ba48d89fa19ec368eee1bbdf37c9349d6019b302f49605c6c91720bc2",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -24817,8 +24817,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f1bf075b5e29f3c3f9797c48596bb0ba6e4975730f8d188151b4871de44e9518",
-          "artifact_before_oracle_sha256": "816f1db4515b82038ca883754c8f532c6a8e05f5f8366f1fd4cd4495df292c31",
-          "artifact_after_oracle_sha256": "816f1db4515b82038ca883754c8f532c6a8e05f5f8366f1fd4cd4495df292c31",
+          "artifact_before_oracle_sha256": "f32810b4999aa94ce77bbf9a2dde276f9b350519e79d21d37a17ee55c1098e35",
+          "artifact_after_oracle_sha256": "f32810b4999aa94ce77bbf9a2dde276f9b350519e79d21d37a17ee55c1098e35",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -25070,8 +25070,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "8dd0c181097be71cbccaeb46bc33b29a2fff290b156e0e259668c075905555be",
-          "artifact_before_oracle_sha256": "d7711bbbf0a9aa5528a2753622dd7721f4ad88e6ab8122fdac4372fdcb29dd77",
-          "artifact_after_oracle_sha256": "d7711bbbf0a9aa5528a2753622dd7721f4ad88e6ab8122fdac4372fdcb29dd77",
+          "artifact_before_oracle_sha256": "144869b60caa9e1fd49292a3c0535a673913015717093b753c8e8e71a541acef",
+          "artifact_after_oracle_sha256": "144869b60caa9e1fd49292a3c0535a673913015717093b753c8e8e71a541acef",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -25322,8 +25322,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f358325e53e9627d52077d7cef4af020d1e7be10526a4baf84f913e8e3b7cb35",
-          "artifact_before_oracle_sha256": "103efec0b664c1916d9e019354690f88c0c1714f10ea50bcd29f1e413a4fa0e8",
-          "artifact_after_oracle_sha256": "103efec0b664c1916d9e019354690f88c0c1714f10ea50bcd29f1e413a4fa0e8",
+          "artifact_before_oracle_sha256": "5cdfde29e4f04a2f38a1119a926ef13f4e41cb241c6c403dbbddb64527864d84",
+          "artifact_after_oracle_sha256": "5cdfde29e4f04a2f38a1119a926ef13f4e41cb241c6c403dbbddb64527864d84",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -25575,8 +25575,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "d757bfc7338058aea2490b386e20e4ae0da8d2eac82682cb7447e07e0ebd01ab",
-          "artifact_before_oracle_sha256": "dd7de385ed1b37329705d9cb42c68b802e30051aa4e8f6910519842ba9c2811c",
-          "artifact_after_oracle_sha256": "dd7de385ed1b37329705d9cb42c68b802e30051aa4e8f6910519842ba9c2811c",
+          "artifact_before_oracle_sha256": "efdd7382ca1293e5e3d4f5e5ef5163305839d41e82c65aaa475e4ab6201dd1cb",
+          "artifact_after_oracle_sha256": "efdd7382ca1293e5e3d4f5e5ef5163305839d41e82c65aaa475e4ab6201dd1cb",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -25827,8 +25827,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3c777c081045d62cecf7c679548348a897f9e1c088d00e90e2b501fb8ac9fb36",
-          "artifact_before_oracle_sha256": "e8d171b4e44c9b3215d22ccb8c69a2aceae75bf3ab4cb816c6bd10a996400841",
-          "artifact_after_oracle_sha256": "e8d171b4e44c9b3215d22ccb8c69a2aceae75bf3ab4cb816c6bd10a996400841",
+          "artifact_before_oracle_sha256": "1ddac48599cbb7c20d837b636b486c6d6f3680cd4c1c6fbcd900bb0acc9eb3e9",
+          "artifact_after_oracle_sha256": "1ddac48599cbb7c20d837b636b486c6d6f3680cd4c1c6fbcd900bb0acc9eb3e9",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -26080,8 +26080,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "74f75e2b9d38e3ea877abcfe09996f0b8a595d318ca89020a14b44c5e0150893",
-          "artifact_before_oracle_sha256": "ea940e3747145bf409e5e1af98020645c5f1e88904df949f6756a4d91de7880a",
-          "artifact_after_oracle_sha256": "ea940e3747145bf409e5e1af98020645c5f1e88904df949f6756a4d91de7880a",
+          "artifact_before_oracle_sha256": "f653749f36c5f6d6bd911fc75b3575d24f74696ebe3508e2cc650b5a16029a6a",
+          "artifact_after_oracle_sha256": "f653749f36c5f6d6bd911fc75b3575d24f74696ebe3508e2cc650b5a16029a6a",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -26332,8 +26332,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "56629ac0b55b82b317757c6fedec8caf8d26bcc3bd99fdebf743f89a87de1cd3",
-          "artifact_before_oracle_sha256": "baa8522be0f5703d22c2c86328251e14bb5d3626480c7a271a5bc9f0a328fb77",
-          "artifact_after_oracle_sha256": "baa8522be0f5703d22c2c86328251e14bb5d3626480c7a271a5bc9f0a328fb77",
+          "artifact_before_oracle_sha256": "9be7e6976c6137ae638a872f7f186bedaff90bb6faa228c4265501c7dbc3068f",
+          "artifact_after_oracle_sha256": "9be7e6976c6137ae638a872f7f186bedaff90bb6faa228c4265501c7dbc3068f",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -26585,8 +26585,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "064cab4b377e8bbdaec9132ab4c599a08fe20ddd89520dd63d5a7ff0d03cd304",
-          "artifact_before_oracle_sha256": "6206ed455df265d70e49c6a2f1d1b7f80c4693db793999b1ae56f88867b86388",
-          "artifact_after_oracle_sha256": "6206ed455df265d70e49c6a2f1d1b7f80c4693db793999b1ae56f88867b86388",
+          "artifact_before_oracle_sha256": "18a3b6b7ca053f1c81a2a3f43dbcdeb49e7e69f48adfa4793d096deaf0964a68",
+          "artifact_after_oracle_sha256": "18a3b6b7ca053f1c81a2a3f43dbcdeb49e7e69f48adfa4793d096deaf0964a68",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -26837,8 +26837,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "46098e088857949b8ca10c25bf923ddeadbba1032fc9ec1762045613ecc0eda4",
-          "artifact_before_oracle_sha256": "1b6fff57826bfd8c69c19e419520ea3f88fb39d8f2be71bcf52a12b17a02f4ed",
-          "artifact_after_oracle_sha256": "1b6fff57826bfd8c69c19e419520ea3f88fb39d8f2be71bcf52a12b17a02f4ed",
+          "artifact_before_oracle_sha256": "c4893ad00ba35bd1a7fa689c7be3261ccbded5a76e734bbb00a4e8a289bcfff7",
+          "artifact_after_oracle_sha256": "c4893ad00ba35bd1a7fa689c7be3261ccbded5a76e734bbb00a4e8a289bcfff7",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -27090,8 +27090,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "495b87f3a86dda9e7986862d1c3c168e3a206515a447d329f2be1f7be5d89736",
-          "artifact_before_oracle_sha256": "5283531c1d37ec4e42d543b53f9ea684298e7fa0e3034c910a4a65cf5f767cc6",
-          "artifact_after_oracle_sha256": "5283531c1d37ec4e42d543b53f9ea684298e7fa0e3034c910a4a65cf5f767cc6",
+          "artifact_before_oracle_sha256": "46ad23727f24c9e4743e5fd3849fda831066bd474aea126995c134d26c61e54d",
+          "artifact_after_oracle_sha256": "46ad23727f24c9e4743e5fd3849fda831066bd474aea126995c134d26c61e54d",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -27342,8 +27342,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f7f19d953767589ba997726ebb17a462fafa217508de730d981afffc84b4f7ee",
-          "artifact_before_oracle_sha256": "83f1017379f8c0d912da7f96f7a68fa4d0de87dbd7dfdc229b3ee3d1a12d0d6b",
-          "artifact_after_oracle_sha256": "83f1017379f8c0d912da7f96f7a68fa4d0de87dbd7dfdc229b3ee3d1a12d0d6b",
+          "artifact_before_oracle_sha256": "d97c162c62172da124c9566c8d58af99f7ef64b3245f683cf7213e5b82cfc8c3",
+          "artifact_after_oracle_sha256": "d97c162c62172da124c9566c8d58af99f7ef64b3245f683cf7213e5b82cfc8c3",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -27595,8 +27595,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "a7ee59c3026d628a5d2c68b97db52c2fd81b872587d2ad7e98acd6a37c0c6e73",
-          "artifact_before_oracle_sha256": "7cd881f3522b4626cf98951f981bee3d3af351ee127e0211b8860399b5b228ff",
-          "artifact_after_oracle_sha256": "7cd881f3522b4626cf98951f981bee3d3af351ee127e0211b8860399b5b228ff",
+          "artifact_before_oracle_sha256": "b6fad7f3f234e3fe77d37e4c8e7ddcae1be730fa08a1528c463d69108e312fe3",
+          "artifact_after_oracle_sha256": "b6fad7f3f234e3fe77d37e4c8e7ddcae1be730fa08a1528c463d69108e312fe3",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -27847,8 +27847,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "fceb8c066b5f129b1758f6d3db736088425c966cebf8459eb2e7cffd1f6cf4e4",
-          "artifact_before_oracle_sha256": "469a4aec621bb26313b0a64b26566ed539e6ed6f0e13259da01615f0d1c96539",
-          "artifact_after_oracle_sha256": "469a4aec621bb26313b0a64b26566ed539e6ed6f0e13259da01615f0d1c96539",
+          "artifact_before_oracle_sha256": "d6b087d2b41641fc071efb5ab243f19785c3b67658c1c3bbbb46193f9a366e93",
+          "artifact_after_oracle_sha256": "d6b087d2b41641fc071efb5ab243f19785c3b67658c1c3bbbb46193f9a366e93",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -28100,8 +28100,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5f3ddfa80cfa111e54c61d8c9748f10522572bd34faefc1e00b079f7626db2d7",
-          "artifact_before_oracle_sha256": "f52dec31e34c4e4403e8cd66dd715b5b69e899e230cb5bc9011845b7f699fbda",
-          "artifact_after_oracle_sha256": "f52dec31e34c4e4403e8cd66dd715b5b69e899e230cb5bc9011845b7f699fbda",
+          "artifact_before_oracle_sha256": "a81fdf425cf34ce3d160df9559eaf7e1270f313d43a40c4c02aef61d2123722a",
+          "artifact_after_oracle_sha256": "a81fdf425cf34ce3d160df9559eaf7e1270f313d43a40c4c02aef61d2123722a",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -28352,8 +28352,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5e2c8c2c299f4e77c4427b7603fce4f42adbc73c007fa2e422210e78b18d15f3",
-          "artifact_before_oracle_sha256": "8d443b4467379b50d93e80e2cbe53567b4bbe7b2bcd9d292d76bc8ee8a21d8d6",
-          "artifact_after_oracle_sha256": "8d443b4467379b50d93e80e2cbe53567b4bbe7b2bcd9d292d76bc8ee8a21d8d6",
+          "artifact_before_oracle_sha256": "4b15fc5744dda27d89721c5901909a3c4f52ce96b67e3fd35a7a08176418b6a9",
+          "artifact_after_oracle_sha256": "4b15fc5744dda27d89721c5901909a3c4f52ce96b67e3fd35a7a08176418b6a9",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -28605,8 +28605,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "e69205ce55d038cec30a508a8d81c0a624216b250eebb52b1d3d02a1ee6f31b0",
-          "artifact_before_oracle_sha256": "cab1b8f364741385ca47e39e15da8dc56e4d1366562b1ee148ace77d4c2aaaa3",
-          "artifact_after_oracle_sha256": "cab1b8f364741385ca47e39e15da8dc56e4d1366562b1ee148ace77d4c2aaaa3",
+          "artifact_before_oracle_sha256": "7933c8110b000aedc0f262a4e86b3555577fa49eb448cfba2c93ea1d4305915d",
+          "artifact_after_oracle_sha256": "7933c8110b000aedc0f262a4e86b3555577fa49eb448cfba2c93ea1d4305915d",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -28857,8 +28857,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "c25f891d80040da5f9710c19f05a9f27e0d9816be988e67289165e0fd3c9a7b2",
-          "artifact_before_oracle_sha256": "f3aa98d7b9141e42797b09be0e4342326f53b639a9e737b126eb9fa892a2f66b",
-          "artifact_after_oracle_sha256": "f3aa98d7b9141e42797b09be0e4342326f53b639a9e737b126eb9fa892a2f66b",
+          "artifact_before_oracle_sha256": "3854d8bc0cba3e8d5d0e380a4d4b08f272613b3ea874f0c5d11f02a7fd96837d",
+          "artifact_after_oracle_sha256": "3854d8bc0cba3e8d5d0e380a4d4b08f272613b3ea874f0c5d11f02a7fd96837d",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -29110,8 +29110,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "06b5256443f4cfd2c694c4caba6d883d650d1134e0e136793cc6dd69332c417d",
-          "artifact_before_oracle_sha256": "cf90c9a7558c845cc79df90cbf028037331d4f9484a501c8a1542e57021d6aaf",
-          "artifact_after_oracle_sha256": "cf90c9a7558c845cc79df90cbf028037331d4f9484a501c8a1542e57021d6aaf",
+          "artifact_before_oracle_sha256": "16d986f7349d74fd7de0f49c04b2d2ee5364cacc2a9ad06118ff92c2e4796545",
+          "artifact_after_oracle_sha256": "16d986f7349d74fd7de0f49c04b2d2ee5364cacc2a9ad06118ff92c2e4796545",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -29362,8 +29362,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5a903864128ee9e2b4ddff14e32c0dcbf135552a9ccd56dbbac2b625cc6fc9a8",
-          "artifact_before_oracle_sha256": "c0cb77508a3dedf2dfa3a1e4cd8d8c955e4f205f7fb73575d1ad923939059f1e",
-          "artifact_after_oracle_sha256": "c0cb77508a3dedf2dfa3a1e4cd8d8c955e4f205f7fb73575d1ad923939059f1e",
+          "artifact_before_oracle_sha256": "73a501e962e0910bb2b3faa8b6f3a1a44892b564555b23f5273dcc82478a263d",
+          "artifact_after_oracle_sha256": "73a501e962e0910bb2b3faa8b6f3a1a44892b564555b23f5273dcc82478a263d",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -29615,8 +29615,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "ca0cf7917106faa3bcdd6ebcbbfe631cf0f8595c5c5310f170ea626ce607c04c",
-          "artifact_before_oracle_sha256": "9f92d02517eab33362ffbbc1f5b2c1ed14c4fb43a51c03f3cfafe413095faff2",
-          "artifact_after_oracle_sha256": "9f92d02517eab33362ffbbc1f5b2c1ed14c4fb43a51c03f3cfafe413095faff2",
+          "artifact_before_oracle_sha256": "72025efc334157afa2945f1c92e3026aab594d6bf7cd9ee520fec03b1fd64884",
+          "artifact_after_oracle_sha256": "72025efc334157afa2945f1c92e3026aab594d6bf7cd9ee520fec03b1fd64884",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -29867,8 +29867,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "dedefdb8a4dc29048fc4ab42abeebf243b6c758ef67149004492d8447084a52f",
-          "artifact_before_oracle_sha256": "0acd2f88e0897ae6777862d02527f635d60d73b690546e522025e64c55dfa494",
-          "artifact_after_oracle_sha256": "0acd2f88e0897ae6777862d02527f635d60d73b690546e522025e64c55dfa494",
+          "artifact_before_oracle_sha256": "c77ce23d7569cba7466ca7fed934c98cbd1535f3194a51b679f42a0a29438862",
+          "artifact_after_oracle_sha256": "c77ce23d7569cba7466ca7fed934c98cbd1535f3194a51b679f42a0a29438862",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -30120,8 +30120,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "63fd6a5c619b71d51a2d32ac7ca024dc3478f9f92574e63f161a6e9895295545",
-          "artifact_before_oracle_sha256": "6bb69c6008c2b89eec6c108a15ff24d091bfe30930222d02b03db9d25eba9c81",
-          "artifact_after_oracle_sha256": "6bb69c6008c2b89eec6c108a15ff24d091bfe30930222d02b03db9d25eba9c81",
+          "artifact_before_oracle_sha256": "ea19c05de1e43b95df5de226d1bac7ca0bf9f13b4606ec823ced9e3b2f0d15af",
+          "artifact_after_oracle_sha256": "ea19c05de1e43b95df5de226d1bac7ca0bf9f13b4606ec823ced9e3b2f0d15af",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -30372,8 +30372,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "0aa93320fbb65e38b6e832f4ffea60d90929ef2cad0d2f008cd722d8a1bd0a5e",
-          "artifact_before_oracle_sha256": "67bb5cafa5cc846764c46b612fe62527d0a0bb4e52ab24b9120f558a1208d785",
-          "artifact_after_oracle_sha256": "67bb5cafa5cc846764c46b612fe62527d0a0bb4e52ab24b9120f558a1208d785",
+          "artifact_before_oracle_sha256": "bcd9b598b4b6dd6238c0d6dfcb2893149760c8b72e62e240afeb05754ea67e39",
+          "artifact_after_oracle_sha256": "bcd9b598b4b6dd6238c0d6dfcb2893149760c8b72e62e240afeb05754ea67e39",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -30625,8 +30625,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "282af64c77071f859ed1c7c5c09d772f2574491bdf6b7e8dce60a121244437da",
-          "artifact_before_oracle_sha256": "b21d9bbdef2d3c14c20392c00bcf5f9103eadc9890d6641af1a2a3ae99c8464b",
-          "artifact_after_oracle_sha256": "b21d9bbdef2d3c14c20392c00bcf5f9103eadc9890d6641af1a2a3ae99c8464b",
+          "artifact_before_oracle_sha256": "6fef65ae0cc05a50121c4d71132ed94f5d56d094608b832d9bac0ffac6ef58fe",
+          "artifact_after_oracle_sha256": "6fef65ae0cc05a50121c4d71132ed94f5d56d094608b832d9bac0ffac6ef58fe",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -30877,8 +30877,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "91f0f0a62a13f0f0bccafc3a7c89114d86d6dce578f9b91623e9fe28dbea0183",
-          "artifact_before_oracle_sha256": "e179984599f441816a0a59883fe1aff264032b3ea921e4c7d048044973185052",
-          "artifact_after_oracle_sha256": "e179984599f441816a0a59883fe1aff264032b3ea921e4c7d048044973185052",
+          "artifact_before_oracle_sha256": "30db111e1465a2c5caa31c6282cf249e4d7ad4591070fd35a01f3d76e0a4bf1f",
+          "artifact_after_oracle_sha256": "30db111e1465a2c5caa31c6282cf249e4d7ad4591070fd35a01f3d76e0a4bf1f",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -31130,8 +31130,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "46a4efbea7cf4017830567d4692fe781ad0ef481579a9838b9666398942b7df4",
-          "artifact_before_oracle_sha256": "2a604f2b9574ee5b477f02008e818f54b53bd1ec5be42609d992a631009dce18",
-          "artifact_after_oracle_sha256": "2a604f2b9574ee5b477f02008e818f54b53bd1ec5be42609d992a631009dce18",
+          "artifact_before_oracle_sha256": "70cb485cc05d87b781a5d703d2a2340b0d22d9042621ad328fa8e8b1c9fcdd77",
+          "artifact_after_oracle_sha256": "70cb485cc05d87b781a5d703d2a2340b0d22d9042621ad328fa8e8b1c9fcdd77",
           "observed_issue_ids": [],
           "semantic_variants": [
             "outer-boundary-offset-fanout-clean",
@@ -31390,8 +31390,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "cd676bafab434581223ec704dce34ce94e1401fce396dc5709a4b2a1668785ca",
-          "artifact_before_oracle_sha256": "ba90535482a249f3d55238def30f41720f5a30f73ea6a5181880d7c49e2b2495",
-          "artifact_after_oracle_sha256": "ba90535482a249f3d55238def30f41720f5a30f73ea6a5181880d7c49e2b2495",
+          "artifact_before_oracle_sha256": "8fdf89e1f79fb6c0569c828adaf0236be22dbcf1eefcac4bba87140d6ed08dea",
+          "artifact_after_oracle_sha256": "8fdf89e1f79fb6c0569c828adaf0236be22dbcf1eefcac4bba87140d6ed08dea",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -31642,8 +31642,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "c283254dad7c9e71cf0abcbbe2856edd44b83aa8fa192abbca5d1dbf7180f65b",
-          "artifact_before_oracle_sha256": "9d2b9d0f7ff987bc8397462390abbaa050fb800c97c9c8d189215e007dd390a2",
-          "artifact_after_oracle_sha256": "9d2b9d0f7ff987bc8397462390abbaa050fb800c97c9c8d189215e007dd390a2",
+          "artifact_before_oracle_sha256": "da2e2c48f934549d8d2812f9ba1f0802ae6defd27b7be524b6f1d59027a38526",
+          "artifact_after_oracle_sha256": "da2e2c48f934549d8d2812f9ba1f0802ae6defd27b7be524b6f1d59027a38526",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -31895,8 +31895,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "71e8785cbd4d98216b7c6d6f6eadc390bafff4a5b662445490ff7e6e180bd598",
-          "artifact_before_oracle_sha256": "d70063594d4c3a0d370cae919e2c3b3ae58d9985632680a7640195314408c641",
-          "artifact_after_oracle_sha256": "d70063594d4c3a0d370cae919e2c3b3ae58d9985632680a7640195314408c641",
+          "artifact_before_oracle_sha256": "f854695fd3ac5636ed39f8a633e14cd3b3e3746fc6fc67577a3960439bc15ae6",
+          "artifact_after_oracle_sha256": "f854695fd3ac5636ed39f8a633e14cd3b3e3746fc6fc67577a3960439bc15ae6",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -32147,8 +32147,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "6b53573f97a3f1e97c71303f4daa990bcbafaa0a49b0748ba8d272bd3d829562",
-          "artifact_before_oracle_sha256": "79befd35b1548860567f94e285686aa6ea7be82571c9adc0e0b02f3dbb745e6b",
-          "artifact_after_oracle_sha256": "79befd35b1548860567f94e285686aa6ea7be82571c9adc0e0b02f3dbb745e6b",
+          "artifact_before_oracle_sha256": "a94796964a8ea4414f6cc815c164f88da6631eab52cfba6b6764607366fb5550",
+          "artifact_after_oracle_sha256": "a94796964a8ea4414f6cc815c164f88da6631eab52cfba6b6764607366fb5550",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -32400,8 +32400,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "b21dac23bdda8125548f9b07978ff1c22d4b4450b6ee37ac790396cf70ee8a93",
-          "artifact_before_oracle_sha256": "ad5cdbd98535f53837117540fafa807f3c4c6d2f9455015bc0923d412276e662",
-          "artifact_after_oracle_sha256": "ad5cdbd98535f53837117540fafa807f3c4c6d2f9455015bc0923d412276e662",
+          "artifact_before_oracle_sha256": "981bcf76fef26f2dc1c3d560470acbd29591d256ca4807a6eed948000969e86b",
+          "artifact_after_oracle_sha256": "981bcf76fef26f2dc1c3d560470acbd29591d256ca4807a6eed948000969e86b",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -32652,8 +32652,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "0b8e3ad8098d4ecbfae6bf5d58fa834a150a84ab36167de008d7993f3b1d21b4",
-          "artifact_before_oracle_sha256": "878a01aad5253ecf334b10e3bda62b2815a12a80e2da696a873e77af94aba318",
-          "artifact_after_oracle_sha256": "878a01aad5253ecf334b10e3bda62b2815a12a80e2da696a873e77af94aba318",
+          "artifact_before_oracle_sha256": "d51b7f9b9e7b97677b2e3501da3537d4207ea7f2d72c8bed68ee8a09299403a8",
+          "artifact_after_oracle_sha256": "d51b7f9b9e7b97677b2e3501da3537d4207ea7f2d72c8bed68ee8a09299403a8",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -32905,8 +32905,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "8b6a17f18efc4d134898cb5bd259f7cdfb8a54b720fddc710e16e35ef24fe82b",
-          "artifact_before_oracle_sha256": "4ddbcc91fcd6df5c3c9d154849054f04f17c7b1f89a2dda44774c2a59a12e6bc",
-          "artifact_after_oracle_sha256": "4ddbcc91fcd6df5c3c9d154849054f04f17c7b1f89a2dda44774c2a59a12e6bc",
+          "artifact_before_oracle_sha256": "730f2f67454f06e0e8e7d97269deebecec8af463967bb68ae7d79bdb287495fa",
+          "artifact_after_oracle_sha256": "730f2f67454f06e0e8e7d97269deebecec8af463967bb68ae7d79bdb287495fa",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -33157,8 +33157,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "fed4cc5993f78ecc2f4f2d8e51b1027bf9c4e405aca142c18a99da9d3a40124e",
-          "artifact_before_oracle_sha256": "b6f2fa60d82e00338c6c2c7be6cc5ab0f3ecdf8dbad684d7c6689075adc6866b",
-          "artifact_after_oracle_sha256": "b6f2fa60d82e00338c6c2c7be6cc5ab0f3ecdf8dbad684d7c6689075adc6866b",
+          "artifact_before_oracle_sha256": "6d529c88594775032fb532c8d58e3e8c79d5622a88cb7f4b2180161ea5069c3f",
+          "artifact_after_oracle_sha256": "6d529c88594775032fb532c8d58e3e8c79d5622a88cb7f4b2180161ea5069c3f",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -33410,8 +33410,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "b93e306cbface41a66f2d96993e78f0fda5dfa1584099b9ed683e2ab025ca831",
-          "artifact_before_oracle_sha256": "fe1a82afb833377bf4c9266b1acd0e5203826c0bb22fbea0c913df811625905e",
-          "artifact_after_oracle_sha256": "fe1a82afb833377bf4c9266b1acd0e5203826c0bb22fbea0c913df811625905e",
+          "artifact_before_oracle_sha256": "c37d08c5399fa35e10e13c1ce8b1dea86bbc37cb9dc8bbed35a86913d6bf7368",
+          "artifact_after_oracle_sha256": "c37d08c5399fa35e10e13c1ce8b1dea86bbc37cb9dc8bbed35a86913d6bf7368",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -33662,8 +33662,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "311a851b6c4500592b6809d52e4b463151e039dee26ab1c65eefe7e36b12bf83",
-          "artifact_before_oracle_sha256": "7387b43141874fe7695c2bd5aa2d7bda2eabdf505d81faca3cb480b3f8c79939",
-          "artifact_after_oracle_sha256": "7387b43141874fe7695c2bd5aa2d7bda2eabdf505d81faca3cb480b3f8c79939",
+          "artifact_before_oracle_sha256": "e8002d8ba71a8e2f4a9a24cb313a798919b2d123f063ae1f410052ccac740f50",
+          "artifact_after_oracle_sha256": "e8002d8ba71a8e2f4a9a24cb313a798919b2d123f063ae1f410052ccac740f50",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -33915,8 +33915,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "6f97ec8edf3532f2da22e9eb5aef2c8ef467fc1c911ea4f0d8c58e1ecc48cece",
-          "artifact_before_oracle_sha256": "da844eec727437856e607bf814610548d6e23b65b30dd264fdc6641735d8a565",
-          "artifact_after_oracle_sha256": "da844eec727437856e607bf814610548d6e23b65b30dd264fdc6641735d8a565",
+          "artifact_before_oracle_sha256": "3050b36d7c73fae6d1cc42d40fe50859fa70eb4d9edcbc45813163e0989a923b",
+          "artifact_after_oracle_sha256": "3050b36d7c73fae6d1cc42d40fe50859fa70eb4d9edcbc45813163e0989a923b",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -34167,8 +34167,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5ffd127b94d3ce4f95a8690601b914676cb05439f05307a4736cb5f07bf68310",
-          "artifact_before_oracle_sha256": "fb00488087bfe6455459f9a1931158f390b8effcc853b31ac8805608e16364f0",
-          "artifact_after_oracle_sha256": "fb00488087bfe6455459f9a1931158f390b8effcc853b31ac8805608e16364f0",
+          "artifact_before_oracle_sha256": "db584ddb966395a00545227aa53a8d8d45f9597169c0012c1c66cb4a441efabf",
+          "artifact_after_oracle_sha256": "db584ddb966395a00545227aa53a8d8d45f9597169c0012c1c66cb4a441efabf",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -34420,8 +34420,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "dbdcceb36248f75c7056ad897f7a1e77595fcb8016a2f986118886bda0c78e76",
-          "artifact_before_oracle_sha256": "a28cd1b8bd54fc3ed00b14950d57624511fede8576eb2a99bf6200c1e43d3715",
-          "artifact_after_oracle_sha256": "a28cd1b8bd54fc3ed00b14950d57624511fede8576eb2a99bf6200c1e43d3715",
+          "artifact_before_oracle_sha256": "7ed7d9569e991a640fbae26b3941fa8f3031ac63ab3a18e211948ddc89e6fc73",
+          "artifact_after_oracle_sha256": "7ed7d9569e991a640fbae26b3941fa8f3031ac63ab3a18e211948ddc89e6fc73",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -34672,8 +34672,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "452c541ff74ada63fd15cd739f4adc53c3eea3bc094355af5cdc982fa4487756",
-          "artifact_before_oracle_sha256": "8a8552dd28f245513989dae84550d6099e710f56c682c9e77c4c85cb2346977c",
-          "artifact_after_oracle_sha256": "8a8552dd28f245513989dae84550d6099e710f56c682c9e77c4c85cb2346977c",
+          "artifact_before_oracle_sha256": "8782314d870491c3f3efe56bc61937b3d58e158d1ced497c05257d7b00437f34",
+          "artifact_after_oracle_sha256": "8782314d870491c3f3efe56bc61937b3d58e158d1ced497c05257d7b00437f34",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -34925,8 +34925,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "30db8719ce5020839b73ff8987b3e59aabac40806e1c9d686f53c3eb992293a7",
-          "artifact_before_oracle_sha256": "55baf1eb0cd120dbb6e8f25db2e9dba813191e298d208e609991caeedbe5d06f",
-          "artifact_after_oracle_sha256": "55baf1eb0cd120dbb6e8f25db2e9dba813191e298d208e609991caeedbe5d06f",
+          "artifact_before_oracle_sha256": "a4be08d60f8dae02897146fc631a38a20ab8650f196d9fc12625604733012d33",
+          "artifact_after_oracle_sha256": "a4be08d60f8dae02897146fc631a38a20ab8650f196d9fc12625604733012d33",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -35177,8 +35177,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "8ace443c3f36c774cad6ad17024f1b21b91ccfc409cb95173c90f64de9d7bf86",
-          "artifact_before_oracle_sha256": "ee957e387bd35c9ca2e9f726aea789f3f5d468dc562423f6c5cdd5a13a77362f",
-          "artifact_after_oracle_sha256": "ee957e387bd35c9ca2e9f726aea789f3f5d468dc562423f6c5cdd5a13a77362f",
+          "artifact_before_oracle_sha256": "9402821c1bf973639ca5efc4ff19119ca9feafac7d516a4894e7bab93670a14f",
+          "artifact_after_oracle_sha256": "9402821c1bf973639ca5efc4ff19119ca9feafac7d516a4894e7bab93670a14f",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -35430,8 +35430,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "dd66525264fd197e1450ee082d40325c5ebe10c1af1b136b0d48f7ffc142d1df",
-          "artifact_before_oracle_sha256": "89636329f5f00aa279aebe9873fe9286af7265b75056d5af318d7e0c0be20dba",
-          "artifact_after_oracle_sha256": "89636329f5f00aa279aebe9873fe9286af7265b75056d5af318d7e0c0be20dba",
+          "artifact_before_oracle_sha256": "37425be7272dda7d6335be53b1247fd90d6f7ea2800bce7f546eebb05ad84ac5",
+          "artifact_after_oracle_sha256": "37425be7272dda7d6335be53b1247fd90d6f7ea2800bce7f546eebb05ad84ac5",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -35682,8 +35682,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "6793eb9aefcbe1f187b4fd2cd037a8a270d0cbc32529084c0b0d7d9da0f4f360",
-          "artifact_before_oracle_sha256": "a8d9c909b0c9794f41b4e99f1c6a74ceae52f9281c1784bfc08a568620bf5900",
-          "artifact_after_oracle_sha256": "a8d9c909b0c9794f41b4e99f1c6a74ceae52f9281c1784bfc08a568620bf5900",
+          "artifact_before_oracle_sha256": "09424824de397d46e62c08b9e7736b8813efdd7b806d9e25c073bf775869a25d",
+          "artifact_after_oracle_sha256": "09424824de397d46e62c08b9e7736b8813efdd7b806d9e25c073bf775869a25d",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -35935,8 +35935,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "5d7e395861258690d2da424a96af6c93cbc23242f11eb11f2eecaeb990543997",
-          "artifact_before_oracle_sha256": "3cd10e718487e9df72ea3b09f61329b9b482e1f5be86af3e8fdea9567e4fc465",
-          "artifact_after_oracle_sha256": "3cd10e718487e9df72ea3b09f61329b9b482e1f5be86af3e8fdea9567e4fc465",
+          "artifact_before_oracle_sha256": "52e5f90ea3eec358b43e37a0c5c00c655b00ebbe9e04706956dce42e6c55bf17",
+          "artifact_after_oracle_sha256": "52e5f90ea3eec358b43e37a0c5c00c655b00ebbe9e04706956dce42e6c55bf17",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -36187,8 +36187,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "dd2d68967e6629731ff626a5f4f5bcdd09390f2388c9aed752a11bafdcb0b499",
-          "artifact_before_oracle_sha256": "447bcd5f1891669b0e14ee8eb586e371e30f658ba5e636dbebc76db4673a5a9f",
-          "artifact_after_oracle_sha256": "447bcd5f1891669b0e14ee8eb586e371e30f658ba5e636dbebc76db4673a5a9f",
+          "artifact_before_oracle_sha256": "33d73776802a9de18ac8c98842bdf533b8921298eddee0a971a8b55582346070",
+          "artifact_after_oracle_sha256": "33d73776802a9de18ac8c98842bdf533b8921298eddee0a971a8b55582346070",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -36440,8 +36440,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "043dfa49a0d4dec517bbcedd61a9171811fdabf4928f4544df6f1b08c6bc1627",
-          "artifact_before_oracle_sha256": "c76c158389858a0c2641b3f544b3e91576dddc84b302aaf310e53787e9711ca8",
-          "artifact_after_oracle_sha256": "c76c158389858a0c2641b3f544b3e91576dddc84b302aaf310e53787e9711ca8",
+          "artifact_before_oracle_sha256": "da57336753e8f2cee2fe0ae981466bd945612a19e1a7de31e5dcf26ba2f78ba6",
+          "artifact_after_oracle_sha256": "da57336753e8f2cee2fe0ae981466bd945612a19e1a7de31e5dcf26ba2f78ba6",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -36692,8 +36692,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "30bfddbcc1eb9c740b796e8dbf6ee759de7ed5370840a5307d0e8c0b83f2e1bb",
-          "artifact_before_oracle_sha256": "3ccc8db65d308c30bd88e951b51a43099f778532cc559c7b6d12e49dfc7d66db",
-          "artifact_after_oracle_sha256": "3ccc8db65d308c30bd88e951b51a43099f778532cc559c7b6d12e49dfc7d66db",
+          "artifact_before_oracle_sha256": "d164cf2c66256485bd47563a586ef050201f53fe4b5a8f9436b301266f1a5137",
+          "artifact_after_oracle_sha256": "d164cf2c66256485bd47563a586ef050201f53fe4b5a8f9436b301266f1a5137",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -36945,8 +36945,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f4e0008c5cffcb36b28f8f3bc5ce3fd23af028929f9df5629bb70e54b163ecec",
-          "artifact_before_oracle_sha256": "47f5af716d345f52b3e7dc11fcf43390acea1f877d20fa8cdf49e333d280bb53",
-          "artifact_after_oracle_sha256": "47f5af716d345f52b3e7dc11fcf43390acea1f877d20fa8cdf49e333d280bb53",
+          "artifact_before_oracle_sha256": "4c46d6e754e30b793322ddf4ce8d7c982942a113f93700a732dcfb4b19ed3c6d",
+          "artifact_after_oracle_sha256": "4c46d6e754e30b793322ddf4ce8d7c982942a113f93700a732dcfb4b19ed3c6d",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -37197,8 +37197,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "42aea6761394069676803e961767a0adfab390c71c6302858e0e7004e0f825d7",
-          "artifact_before_oracle_sha256": "c4188821fca0acca85538e8c3194965dd41df523292f0eeaf4a711991f235754",
-          "artifact_after_oracle_sha256": "c4188821fca0acca85538e8c3194965dd41df523292f0eeaf4a711991f235754",
+          "artifact_before_oracle_sha256": "2b7120d3ac875f7e44750dfbe07eedcf620b6203dacfb3129355f17d1b50b72a",
+          "artifact_after_oracle_sha256": "2b7120d3ac875f7e44750dfbe07eedcf620b6203dacfb3129355f17d1b50b72a",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -37450,8 +37450,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "621f1cc03eb415b5d92e1ddd78080b0d606da615aa8170371ff76ee124e2f996",
-          "artifact_before_oracle_sha256": "7d9d21a6f42115e83f41232970adeb8f07341ed9c9a8490be69788b9d4a6dcff",
-          "artifact_after_oracle_sha256": "7d9d21a6f42115e83f41232970adeb8f07341ed9c9a8490be69788b9d4a6dcff",
+          "artifact_before_oracle_sha256": "97bd0f22e8925b6c2db1d33f77c8ce960995d4f4f9ff08daf5b2ae79a07b5888",
+          "artifact_after_oracle_sha256": "97bd0f22e8925b6c2db1d33f77c8ce960995d4f4f9ff08daf5b2ae79a07b5888",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -37702,8 +37702,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "36836441933cfb31de9e1341d63d43af7a2c02883b8f8638791f07941529eb63",
-          "artifact_before_oracle_sha256": "2c252618ff90e1e7685a8aae640ee7c8c6f4f0518b300a3c6daf7bd53360e123",
-          "artifact_after_oracle_sha256": "2c252618ff90e1e7685a8aae640ee7c8c6f4f0518b300a3c6daf7bd53360e123",
+          "artifact_before_oracle_sha256": "4f926547f1a56a4675dab1754943ae8d8a01b9f319d4174e5c416e853dd207ba",
+          "artifact_after_oracle_sha256": "4f926547f1a56a4675dab1754943ae8d8a01b9f319d4174e5c416e853dd207ba",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -37955,8 +37955,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "e7f46d579a74d8913b0ad1acef8fbaf4c254e3b4e739fb2406424279ea7b45fa",
-          "artifact_before_oracle_sha256": "746c32db9d578a6e73d0295b42f25b787744ed5b588aae72155923d812e768c1",
-          "artifact_after_oracle_sha256": "746c32db9d578a6e73d0295b42f25b787744ed5b588aae72155923d812e768c1",
+          "artifact_before_oracle_sha256": "50bc7501aec39f61acdbf45287c9e00d7c4f799333b3f8624a4cc603be8f8cc1",
+          "artifact_after_oracle_sha256": "50bc7501aec39f61acdbf45287c9e00d7c4f799333b3f8624a4cc603be8f8cc1",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -38207,8 +38207,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "21eeb217b315b45147d436cffba02c520dff6f22c40f1390dbc33ed892ee6544",
-          "artifact_before_oracle_sha256": "bf45ee5042fc0d07a84949cbd2ad9f6d888a558304b025267634d4b6d48f2e52",
-          "artifact_after_oracle_sha256": "bf45ee5042fc0d07a84949cbd2ad9f6d888a558304b025267634d4b6d48f2e52",
+          "artifact_before_oracle_sha256": "ade4c412ced84aed64a0c87c1845be04b300449e4ba328e705e07507cb29f19d",
+          "artifact_after_oracle_sha256": "ade4c412ced84aed64a0c87c1845be04b300449e4ba328e705e07507cb29f19d",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -38460,8 +38460,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "ffcf68bb47ff376e35da7744fe7e4100c9cc88df7a3e40d1e492fbc3b46c7353",
-          "artifact_before_oracle_sha256": "b99684749dc5a6896f870d04bf8605d08b95e40840854e239962af21b2ef2148",
-          "artifact_after_oracle_sha256": "b99684749dc5a6896f870d04bf8605d08b95e40840854e239962af21b2ef2148",
+          "artifact_before_oracle_sha256": "7ce59c748a63d85f9a6e861f6684e93f3b06f89cad54ff8cc754b2bdf09277b7",
+          "artifact_after_oracle_sha256": "7ce59c748a63d85f9a6e861f6684e93f3b06f89cad54ff8cc754b2bdf09277b7",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -38712,8 +38712,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "0724e9cfa7e6def03054f3ad97142107375a276196ef32fd46153e6be16b9cbe",
-          "artifact_before_oracle_sha256": "ffcf9e4b3060c6ed5200326a224641e1a21f163589bbdaf9b5fe17fb46c0f0a4",
-          "artifact_after_oracle_sha256": "ffcf9e4b3060c6ed5200326a224641e1a21f163589bbdaf9b5fe17fb46c0f0a4",
+          "artifact_before_oracle_sha256": "7632f2492a3c24cc1bc9f2267d721b707554500880f0a99e314c74586aebfa92",
+          "artifact_after_oracle_sha256": "7632f2492a3c24cc1bc9f2267d721b707554500880f0a99e314c74586aebfa92",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -38965,8 +38965,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "f497c0eecad2e9b9449a618feb11dbd0f8b3d2b2b5073f5190351c9b26fb3526",
-          "artifact_before_oracle_sha256": "d99b90956535be9856c2f6af4a369a0ecbc45c3f68446feb0ddebd5e4f7e9e6c",
-          "artifact_after_oracle_sha256": "d99b90956535be9856c2f6af4a369a0ecbc45c3f68446feb0ddebd5e4f7e9e6c",
+          "artifact_before_oracle_sha256": "5829126c41c3ddf87f497b2878b740542c5e43cde6c036f0608654d87776c84c",
+          "artifact_after_oracle_sha256": "5829126c41c3ddf87f497b2878b740542c5e43cde6c036f0608654d87776c84c",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-source-column-clean"
@@ -39217,8 +39217,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "86462b1c594f504f022a01a36e79b359f01652db21fdf4229e2ce82fe44a4e61",
-          "artifact_before_oracle_sha256": "e7505f45c4183b8329df5767ed71318e035e03f48b193cebf31c1c8b65ef5831",
-          "artifact_after_oracle_sha256": "e7505f45c4183b8329df5767ed71318e035e03f48b193cebf31c1c8b65ef5831",
+          "artifact_before_oracle_sha256": "ea51312b929825a8b67e8b3c24548b6b5b6bff054e4503141a24b61d1be1868f",
+          "artifact_after_oracle_sha256": "ea51312b929825a8b67e8b3c24548b6b5b6bff054e4503141a24b61d1be1868f",
           "observed_issue_ids": [],
           "semantic_variants": [
             "direct-from-column-clean",
@@ -39470,8 +39470,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "16bf92fffa07ea2245e2f26135039148a1513cfc7fe09f107d0b695cf02f6bc2",
-          "artifact_before_oracle_sha256": "3536777d0ae42450715aa081e4de4e3031d8c9baf4c4fd3b8e89fe1278854901",
-          "artifact_after_oracle_sha256": "3536777d0ae42450715aa081e4de4e3031d8c9baf4c4fd3b8e89fe1278854901",
+          "artifact_before_oracle_sha256": "f0966b30230198ae1de8c83df3b9fb0860b1a4d4dfac98219bcd1f591958421d",
+          "artifact_after_oracle_sha256": "f0966b30230198ae1de8c83df3b9fb0860b1a4d4dfac98219bcd1f591958421d",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -39722,8 +39722,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "48759b2e778fdaac3a2d8e03f123263be4193943dbdd6cb53be1b6f1ef611533",
-          "artifact_before_oracle_sha256": "9e2b473765467afb78fc60e025703e5d90819eaabfddd95cbc5a783a1d989fce",
-          "artifact_after_oracle_sha256": "9e2b473765467afb78fc60e025703e5d90819eaabfddd95cbc5a783a1d989fce",
+          "artifact_before_oracle_sha256": "101045d8edf3a393fbe544f3bbac7b1eb7c105208b531d5b1b2dc751f2f3bc77",
+          "artifact_after_oracle_sha256": "101045d8edf3a393fbe544f3bbac7b1eb7c105208b531d5b1b2dc751f2f3bc77",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -39974,8 +39974,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "369dd12f0fda22cd3a9282fe62a7e4eb1bbe71f2ab0448615dd2b69cbb51a16d",
-          "artifact_before_oracle_sha256": "09946223519fbc6919ad5aa9d0cbc573e9f06d59b7832236314c8dba11674380",
-          "artifact_after_oracle_sha256": "09946223519fbc6919ad5aa9d0cbc573e9f06d59b7832236314c8dba11674380",
+          "artifact_before_oracle_sha256": "f52eeb96f4ce4fc66bfcdb4f08976e7a0c984ae12f09326444d27ae79d9df11e",
+          "artifact_after_oracle_sha256": "f52eeb96f4ce4fc66bfcdb4f08976e7a0c984ae12f09326444d27ae79d9df11e",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -40226,8 +40226,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "11ccf43d3215c0ee30269f24f20030fcd4563bd2c99de21355c9e06a9ab68c82",
-          "artifact_before_oracle_sha256": "d72ed0c01ef4495dd27ed605c157d4a06eab130a076862a3f648120c90acc132",
-          "artifact_after_oracle_sha256": "d72ed0c01ef4495dd27ed605c157d4a06eab130a076862a3f648120c90acc132",
+          "artifact_before_oracle_sha256": "50516cb11711eb58d35439587c398213d6961ac64447a16981a9b27074f4c9ab",
+          "artifact_after_oracle_sha256": "50516cb11711eb58d35439587c398213d6961ac64447a16981a9b27074f4c9ab",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -40478,8 +40478,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "1c0729534aad8930b0622bb45ecd5572752ec099ae069d85711b3e6167ab1ce3",
-          "artifact_before_oracle_sha256": "c8b1fd341852ae277ede53232756964d5397ba6de3142cf657873eaf3ec677a2",
-          "artifact_after_oracle_sha256": "c8b1fd341852ae277ede53232756964d5397ba6de3142cf657873eaf3ec677a2",
+          "artifact_before_oracle_sha256": "9d01dcb38137ba379c8b2deb159dfb668798006a41d154755e3e0d0418bfe2a4",
+          "artifact_after_oracle_sha256": "9d01dcb38137ba379c8b2deb159dfb668798006a41d154755e3e0d0418bfe2a4",
           "observed_issue_ids": [],
           "semantic_variants": [
             "public-from-tree-clean"
@@ -40730,8 +40730,8 @@
           "public_entrypoint": "public_cli",
           "producer_exit_code": 0,
           "input_sha256": "3a9da5999c94775e5361df8928064ba1f63d3e4f298e570105d7964ff98e0f07",
-          "artifact_before_oracle_sha256": "51b437dd60511db2f81d1f7a8a8e030decc3113f54cfcc004feb3f767e5a8f20",
-          "artifact_after_oracle_sha256": "51b437dd60511db2f81d1f7a8a8e030decc3113f54cfcc004feb3f767e5a8f20",
+          "artifact_before_oracle_sha256": "ef9f16535a6a2a0e657f777f14b32c694ffea54aadfb2d192f35072590607726",
+          "artifact_after_oracle_sha256": "ef9f16535a6a2a0e657f777f14b32c694ffea54aadfb2d192f35072590607726",
           "observed_issue_ids": [],
           "semantic_variants": [
             "outer-boundary-offset-fanout-clean",

@@ -56,15 +56,27 @@ def prospective_tree() -> str:
         cwd=ROOT, check=True, capture_output=True,
     )
     status = subprocess.run(
-        ["git", "status", "--porcelain=v2", "-z", "--untracked-files=normal"],
+        ["git", "status", "--porcelain=v2", "-z", "--untracked-files=all"],
         cwd=ROOT, check=True, capture_output=True,
     )
+    untracked = hashlib.sha256()
+    for record in status.stdout.split(b"\0"):
+        if not record.startswith(b"? "):
+            continue
+        relative = os.fsdecode(record[2:])
+        path = ROOT / relative
+        if not path.is_file():
+            raise ValueError(f"untracked status entry is not a regular file: {relative}")
+        untracked.update(
+            record[2:] + b"\0" + hashlib.sha256(path.read_bytes()).digest() + b"\0"
+        )
     digest = hashlib.sha256()
     for label, value in (
         (b"head", head.stdout if head.returncode == 0 else b"<unborn>"),
         (b"tracked", tracked.stdout),
         (b"cached", cached.stdout),
         (b"status", status.stdout),
+        (b"untracked-content", untracked.digest()),
     ):
         digest.update(label + b"\0" + value + b"\0")
     return "git-state-sha256:" + digest.hexdigest()

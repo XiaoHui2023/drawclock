@@ -52,6 +52,12 @@ jobs:
           BINARY="$(find release-smoke -maxdepth 2 -type f -name drawclock -print -quit)"
           test -n "$BINARY"
           python3 tools/run_frozen_example.py "$BINARY"
+          PACKAGE_ROOT="$(find release-smoke -mindepth 1 -maxdepth 1 -type d -print -quit)"
+          test -n "$PACKAGE_ROOT"
+          cd "$PACKAGE_ROOT/example"
+          ./run-example.sh
+          test -s drawclock-example.svg
+          grep -F '<title>DrawClock release example</title>' drawclock-example.svg
 
       - name: Verify frozen SVG with GNOME librsvg
         run: |
@@ -93,7 +99,21 @@ jobs:
           python tools/check_release_archive.py $archive.FullName
 
       - name: Exercise complete frozen public surface
-        run: python tools/run_frozen_example.py dist/drawclock.exe
+        shell: pwsh
+        run: |
+          python tools/run_frozen_example.py dist/drawclock.exe
+          Expand-Archive -LiteralPath (Get-ChildItem dist/drawclock-*-windows.zip -File | Select-Object -First 1).FullName -DestinationPath release-smoke
+          $packageRoot = Get-ChildItem release-smoke -Directory | Select-Object -First 1
+          if (-not $packageRoot) { throw "extracted Windows package root is missing" }
+          Push-Location (Join-Path $packageRoot.FullName example)
+          try {
+            cmd /c run-example.bat
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            if (-not (Test-Path drawclock-example.svg)) { throw "example script did not generate SVG" }
+            if (-not (Select-String -LiteralPath drawclock-example.svg -SimpleMatch '<title>DrawClock release example</title>')) { throw "example SVG title is missing" }
+          } finally {
+            Pop-Location
+          }
 
       - name: Enforce real-scale deterministic 60-second render budget
         run: >-
@@ -202,6 +222,10 @@ jobs:
           test -n "$PACKAGE_ROOT"
           test -n "$BINARY"
           python3 tools/run_frozen_example.py "$BINARY"
+          cd "$PACKAGE_ROOT/example"
+          ./run-example.sh
+          test -s drawclock-example.svg
+          grep -F '<title>DrawClock release example</title>' drawclock-example.svg
 
   verify-published-windows:
     name: Verify published Windows release
@@ -250,6 +274,16 @@ jobs:
           if (-not $binary) { throw "published Windows archive has no executable" }
           python tools/run_frozen_example.py $binary.FullName
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $packageRoot = $binary.Directory
+          Push-Location (Join-Path $packageRoot.FullName example)
+          try {
+            cmd /c run-example.bat
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            if (-not (Test-Path drawclock-example.svg)) { throw "published example script did not generate SVG" }
+            if (-not (Select-String -LiteralPath drawclock-example.svg -SimpleMatch '<title>DrawClock release example</title>')) { throw "published example SVG title is missing" }
+          } finally {
+            Pop-Location
+          }
           python tools/verify_frozen_runtime_budget.py `
             --binary $binary.FullName `
             --library drawio-lib `

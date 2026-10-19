@@ -1,0 +1,211 @@
+{
+  "node_042": {
+    "kind": "gate"
+  },
+  "node_041": {
+    "kind": "from"
+  },
+  "node_040": {
+    "kind": "source"
+  },
+  "node_039": {
+    "kind": "gate"
+  },
+  "node_038": {
+    "kind": "from"
+  },
+  "node_037": {
+    "kind": "source"
+  },
+  "node_036": {
+    "kind": "gate"
+  },
+  "node_035": {
+    "kind": "from"
+  },
+  "node_034": {
+    "kind": "source"
+  },
+  "node_033": {
+    "kind": "gate"
+  },
+  "node_032": {
+    "kind": "from"
+  },
+  "node_031": {
+    "kind": "source"
+  },
+  "node_030": {
+    "kind": "gate"
+  },
+  "node_029": {
+    "kind": "from"
+  },
+  "node_028": {
+    "kind": "source"
+  },
+  "node_027": {
+    "kind": "gate"
+  },
+  "node_026": {
+    "kind": "source"
+  },
+  "node_025": {
+    "kind": "gate"
+  },
+  "node_024": {
+    "kind": "from"
+  },
+  "node_023": {
+    "kind": "pad3",
+    "source": {
+      "0": "node_026",
+      "1": "node_027",
+      "2": "node_034"
+    }
+  },
+  "node_022": {
+    "kind": "pad3",
+    "source": {
+      "0": "node_032",
+      "1": "node_025",
+      "2": "node_041"
+    }
+  },
+  "node_021": {
+    "kind": "pad3",
+    "source": {
+      "0": "node_039",
+      "1": "node_030",
+      "2": "node_024"
+    }
+  },
+  "node_020": {
+    "kind": "pad3",
+    "source": {
+      "0": "node_026",
+      "1": "node_037",
+      "2": "node_028"
+    }
+  },
+  "node_019": {
+    "kind": "pad3",
+    "source": {
+      "0": "node_042",
+      "1": "node_025",
+      "2": "node_035"
+    }
+  },
+  "node_018": {
+    "kind": "pad3",
+    "source": {
+      "0": "node_033",
+      "1": "node_040",
+      "2": "node_024"
+    }
+  },
+  "node_017": {
+    "kind": "pad3",
+    "source": {
+      "0": "node_026",
+      "1": "node_031",
+      "2": "node_038"
+    }
+  },
+  "node_016": {
+    "kind": "pad3",
+    "source": {
+      "0": "node_036",
+      "1": "node_025",
+      "2": "node_029"
+    }
+  },
+  "node_015": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_023",
+      "1": "node_025"
+    }
+  },
+  "node_014": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_022",
+      "1": "node_024"
+    }
+  },
+  "node_013": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_021",
+      "1": "node_026"
+    }
+  },
+  "node_012": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_020",
+      "1": "node_025"
+    }
+  },
+  "node_011": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_019",
+      "1": "node_024"
+    }
+  },
+  "node_010": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_018",
+      "1": "node_026"
+    }
+  },
+  "node_009": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_017",
+      "1": "node_025"
+    }
+  },
+  "node_008": {
+    "kind": "mux2",
+    "source": {
+      "0": "node_016",
+      "1": "node_024"
+    }
+  },
+  "node_007": {
+    "kind": "clock",
+    "source": "node_015"
+  },
+  "node_006": {
+    "kind": "clock",
+    "source": "node_014"
+  },
+  "node_005": {
+    "kind": "clock",
+    "source": "node_013"
+  },
+  "node_004": {
+    "kind": "clock",
+    "source": "node_012"
+  },
+  "node_003": {
+    "kind": "clock",
+    "source": "node_011"
+  },
+  "node_002": {
+    "kind": "clock",
+    "source": "node_010"
+  },
+  "node_001": {
+    "kind": "clock",
+    "source": "node_009"
+  },
+  "node_000": {
+    "kind": "clock",
+    "source": "node_008"
+  }
+}

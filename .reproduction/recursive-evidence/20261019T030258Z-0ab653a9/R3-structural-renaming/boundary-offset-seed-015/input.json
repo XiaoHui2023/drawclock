@@ -1,0 +1,754 @@
+{
+  "node_135": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_063",
+      "1": "node_101",
+      "2": "node_098[1]"
+    },
+    "layout_column": 5
+  },
+  "node_134": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_062",
+      "1": "node_100",
+      "2": "node_097[0]"
+    },
+    "layout_column": 5
+  },
+  "node_133": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_061",
+      "1": "node_103",
+      "2": "node_096[1]"
+    },
+    "layout_column": 5
+  },
+  "node_132": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_060",
+      "1": "node_102",
+      "2": "node_099[0]"
+    },
+    "layout_column": 5
+  },
+  "node_131": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_059",
+      "1": "node_101",
+      "2": "node_098[1]"
+    },
+    "layout_column": 5
+  },
+  "node_130": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_058",
+      "1": "node_100",
+      "2": "node_097[0]"
+    },
+    "layout_column": 5
+  },
+  "node_129": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_057",
+      "1": "node_103",
+      "2": "node_096[1]"
+    },
+    "layout_column": 5
+  },
+  "node_128": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_056",
+      "1": "node_102",
+      "2": "node_099[0]"
+    },
+    "layout_column": 5
+  },
+  "node_127": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_055",
+      "1": "node_101",
+      "2": "node_098[1]"
+    },
+    "layout_column": 5
+  },
+  "node_126": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_054",
+      "1": "node_100",
+      "2": "node_097[0]"
+    },
+    "layout_column": 5
+  },
+  "node_125": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_053",
+      "1": "node_103",
+      "2": "node_096[1]"
+    },
+    "layout_column": 5
+  },
+  "node_124": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_052",
+      "1": "node_102",
+      "2": "node_099[0]"
+    },
+    "layout_column": 5
+  },
+  "node_123": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_051",
+      "1": "node_101",
+      "2": "node_098[1]"
+    },
+    "layout_column": 5
+  },
+  "node_122": {
+    "kind": "mux3",
+    "source": {
+      "2": "node_097[0]",
+      "1": "node_100",
+      "0": "node_050"
+    },
+    "layout_column": 9
+  },
+  "node_121": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_049",
+      "1": "node_103",
+      "2": "node_096[1]"
+    },
+    "layout_column": 5
+  },
+  "node_120": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_048",
+      "1": "node_102",
+      "2": "node_099[0]"
+    },
+    "layout_column": 5
+  },
+  "node_119": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_101",
+      "1": "node_096[0]",
+      "2": "node_099[1]"
+    }
+  },
+  "node_118": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_102",
+      "1": "node_099[0]",
+      "2": "node_096[1]"
+    }
+  },
+  "node_117": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_103",
+      "1": "node_098[0]",
+      "2": "node_097[1]"
+    }
+  },
+  "node_116": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_100",
+      "1": "node_097[0]",
+      "2": "node_098[1]"
+    }
+  },
+  "node_115": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_101",
+      "1": "node_096[0]",
+      "2": "node_099[1]"
+    }
+  },
+  "node_114": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_102",
+      "1": "node_099[0]",
+      "2": "node_096[1]"
+    }
+  },
+  "node_113": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_103",
+      "1": "node_098[0]",
+      "2": "node_097[1]"
+    }
+  },
+  "node_112": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_100",
+      "1": "node_097[0]",
+      "2": "node_098[1]"
+    }
+  },
+  "node_111": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_101",
+      "1": "node_096[0]",
+      "2": "node_099[1]"
+    }
+  },
+  "node_110": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_102",
+      "1": "node_099[0]",
+      "2": "node_096[1]"
+    }
+  },
+  "node_109": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_103",
+      "1": "node_098[0]",
+      "2": "node_097[1]"
+    }
+  },
+  "node_108": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_100",
+      "1": "node_097[0]",
+      "2": "node_098[1]"
+    }
+  },
+  "node_107": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_101",
+      "1": "node_096[0]",
+      "2": "node_099[1]"
+    }
+  },
+  "node_106": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_102",
+      "1": "node_099[0]",
+      "2": "node_096[1]"
+    }
+  },
+  "node_105": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_103",
+      "1": "node_098[0]",
+      "2": "node_097[1]"
+    }
+  },
+  "node_104": {
+    "kind": "mux3",
+    "source": {
+      "0": "node_100",
+      "1": "node_097[0]",
+      "2": "node_098[1]"
+    }
+  },
+  "node_103": {
+    "kind": "source"
+  },
+  "node_102": {
+    "kind": "source"
+  },
+  "node_101": {
+    "kind": "source"
+  },
+  "node_100": {
+    "kind": "from"
+  },
+  "node_099": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "node_101"
+  },
+  "node_098": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "node_102"
+  },
+  "node_097": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "node_103"
+  },
+  "node_096": {
+    "kind": "pll2",
+    "pll_kind": "INNO",
+    "source": "node_100"
+  },
+  "node_095": {
+    "kind": "gate",
+    "source": "node_119"
+  },
+  "node_094": {
+    "kind": "gate",
+    "source": "node_118"
+  },
+  "node_093": {
+    "kind": "gate",
+    "source": "node_117"
+  },
+  "node_092": {
+    "kind": "gate",
+    "source": "node_116"
+  },
+  "node_091": {
+    "kind": "gate",
+    "source": "node_115"
+  },
+  "node_090": {
+    "kind": "gate",
+    "source": "node_114"
+  },
+  "node_089": {
+    "kind": "gate",
+    "source": "node_113"
+  },
+  "node_088": {
+    "kind": "gate",
+    "source": "node_112"
+  },
+  "node_087": {
+    "kind": "gate",
+    "source": "node_111"
+  },
+  "node_086": {
+    "kind": "gate",
+    "source": "node_110"
+  },
+  "node_085": {
+    "kind": "gate",
+    "source": "node_109"
+  },
+  "node_084": {
+    "kind": "gate",
+    "source": "node_108"
+  },
+  "node_083": {
+    "kind": "gate",
+    "source": "node_107"
+  },
+  "node_082": {
+    "kind": "gate",
+    "source": "node_106"
+  },
+  "node_081": {
+    "kind": "gate",
+    "source": "node_105"
+  },
+  "node_080": {
+    "kind": "gate",
+    "source": "node_104"
+  },
+  "node_079": {
+    "kind": "dto",
+    "source": "node_135"
+  },
+  "node_078": {
+    "kind": "dto",
+    "source": "node_134"
+  },
+  "node_077": {
+    "kind": "dto",
+    "source": "node_133"
+  },
+  "node_076": {
+    "kind": "dto",
+    "source": "node_132"
+  },
+  "node_075": {
+    "kind": "dto",
+    "source": "node_131"
+  },
+  "node_074": {
+    "kind": "dto",
+    "source": "node_130"
+  },
+  "node_073": {
+    "kind": "dto",
+    "source": "node_129"
+  },
+  "node_072": {
+    "kind": "dto",
+    "source": "node_128"
+  },
+  "node_071": {
+    "kind": "dto",
+    "source": "node_127"
+  },
+  "node_070": {
+    "kind": "dto",
+    "source": "node_126"
+  },
+  "node_069": {
+    "kind": "dto",
+    "source": "node_125"
+  },
+  "node_068": {
+    "kind": "dto",
+    "source": "node_124"
+  },
+  "node_067": {
+    "kind": "dto",
+    "source": "node_123"
+  },
+  "node_066": {
+    "kind": "dto",
+    "source": "node_122"
+  },
+  "node_065": {
+    "kind": "dto",
+    "source": "node_121"
+  },
+  "node_064": {
+    "kind": "dto",
+    "source": "node_120"
+  },
+  "node_063": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "node_095"
+  },
+  "node_062": {
+    "kind": "div",
+    "ratio": "32",
+    "source": "node_094"
+  },
+  "node_061": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "node_093"
+  },
+  "node_060": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "node_092"
+  },
+  "node_059": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "node_091"
+  },
+  "node_058": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "node_090"
+  },
+  "node_057": {
+    "kind": "div_r",
+    "ratio": "32",
+    "source": "node_089"
+  },
+  "node_056": {
+    "kind": "div",
+    "ratio": "16",
+    "source": "node_088"
+  },
+  "node_055": {
+    "kind": "div_r",
+    "ratio": "8",
+    "source": "node_087"
+  },
+  "node_054": {
+    "kind": "div",
+    "ratio": "4",
+    "source": "node_086"
+  },
+  "node_053": {
+    "kind": "div_r",
+    "ratio": "2",
+    "source": "node_085"
+  },
+  "node_052": {
+    "kind": "div",
+    "ratio": "32",
+    "source": "node_084"
+  },
+  "node_051": {
+    "kind": "div_r",
+    "ratio": "16",
+    "source": "node_083"
+  },
+  "node_050": {
+    "kind": "div",
+    "ratio": "8",
+    "source": "node_082"
+  },
+  "node_049": {
+    "kind": "div_r",
+    "ratio": "4",
+    "source": "node_081"
+  },
+  "node_048": {
+    "kind": "div",
+    "ratio": "2",
+    "source": "node_080"
+  },
+  "node_047": {
+    "kind": "clock",
+    "freq": "425 MHz",
+    "source": "node_015"
+  },
+  "node_046": {
+    "kind": "clock",
+    "freq": "400 MHz",
+    "source": "node_015"
+  },
+  "node_045": {
+    "kind": "clock",
+    "freq": "400 MHz",
+    "source": "node_014"
+  },
+  "node_044": {
+    "kind": "clock",
+    "freq": "375 MHz",
+    "source": "node_014"
+  },
+  "node_043": {
+    "kind": "clock",
+    "freq": "375 MHz",
+    "source": "node_013"
+  },
+  "node_042": {
+    "kind": "clock",
+    "freq": "350 MHz",
+    "source": "node_013"
+  },
+  "node_041": {
+    "kind": "clock",
+    "freq": "350 MHz",
+    "source": "node_012"
+  },
+  "node_040": {
+    "kind": "clock",
+    "freq": "325 MHz",
+    "source": "node_012"
+  },
+  "node_039": {
+    "kind": "clock",
+    "freq": "325 MHz",
+    "source": "node_011"
+  },
+  "node_038": {
+    "kind": "clock",
+    "freq": "300 MHz",
+    "source": "node_011"
+  },
+  "node_037": {
+    "kind": "clock",
+    "freq": "300 MHz",
+    "source": "node_010"
+  },
+  "node_036": {
+    "kind": "clock",
+    "freq": "275 MHz",
+    "source": "node_010"
+  },
+  "node_035": {
+    "kind": "clock",
+    "freq": "275 MHz",
+    "source": "node_009"
+  },
+  "node_034": {
+    "kind": "clock",
+    "freq": "250 MHz",
+    "source": "node_009"
+  },
+  "node_033": {
+    "kind": "clock",
+    "freq": "250 MHz",
+    "source": "node_008"
+  },
+  "node_032": {
+    "kind": "clock",
+    "freq": "225 MHz",
+    "source": "node_008"
+  },
+  "node_031": {
+    "kind": "clock",
+    "freq": "225 MHz",
+    "source": "node_007"
+  },
+  "node_030": {
+    "kind": "clock",
+    "freq": "200 MHz",
+    "source": "node_007"
+  },
+  "node_029": {
+    "kind": "clock",
+    "freq": "200 MHz",
+    "source": "node_006"
+  },
+  "node_028": {
+    "kind": "clock",
+    "freq": "175 MHz",
+    "source": "node_006"
+  },
+  "node_027": {
+    "kind": "clock",
+    "freq": "175 MHz",
+    "source": "node_005"
+  },
+  "node_026": {
+    "kind": "clock",
+    "freq": "150 MHz",
+    "source": "node_005"
+  },
+  "node_025": {
+    "kind": "clock",
+    "freq": "150 MHz",
+    "source": "node_004"
+  },
+  "node_024": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "node_004"
+  },
+  "node_023": {
+    "kind": "clock",
+    "freq": "125 MHz",
+    "source": "node_003"
+  },
+  "node_022": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "node_003"
+  },
+  "node_021": {
+    "kind": "clock",
+    "freq": "100 MHz",
+    "source": "node_002"
+  },
+  "node_020": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "node_002"
+  },
+  "node_019": {
+    "kind": "clock",
+    "freq": "75 MHz",
+    "source": "node_001"
+  },
+  "node_018": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "node_001"
+  },
+  "node_017": {
+    "kind": "clock",
+    "freq": "50 MHz",
+    "source": "node_000"
+  },
+  "node_016": {
+    "kind": "clock",
+    "freq": "25 MHz",
+    "source": "node_000"
+  },
+  "node_015": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "node_079"
+  },
+  "node_014": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "node_078"
+  },
+  "node_013": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "node_077"
+  },
+  "node_012": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "node_076"
+  },
+  "node_011": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "node_075"
+  },
+  "node_010": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "node_074"
+  },
+  "node_009": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "node_073"
+  },
+  "node_008": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "node_072"
+  },
+  "node_007": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "node_071"
+  },
+  "node_006": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "node_070"
+  },
+  "node_005": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "node_069"
+  },
+  "node_004": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "node_068"
+  },
+  "node_003": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "node_067"
+  },
+  "node_002": {
+    "kind": "cell",
+    "cell_kind": "bist_clk_cell",
+    "source": "node_066"
+  },
+  "node_001": {
+    "kind": "cell",
+    "cell_kind": "gen_cell",
+    "source": "node_065"
+  },
+  "node_000": {
+    "kind": "cell",
+    "cell_kind": "occ_clk_cell",
+    "source": "node_064"
+  }
+}

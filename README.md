@@ -12,7 +12,7 @@ drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 
 任意节点可填写字符串 `description`。`description_color` 设置该段注释的颜色；省略时使用 `#4b5563`。支持 CSS 命名色、3/4/6/8 位十六进制、`rgb()`、`rgba()`、`hsl()`、`hsla()` 和 `hwb()`。示例为 `example/auto-layout/33-description-colors.json`。
 
-SVG 不显示输入文件名或文件名前缀标题。
+SVG 不显示输入文件名或文件名前缀标题。`--title` 只设置 SVG 的可访问性元数据标题，不在画布中增加文字。
 
 ## 命令行参数
 
@@ -21,6 +21,7 @@ SVG 不显示输入文件名或文件名前缀标题。
 | `--input` | `-i` | 文件路径 | ✓ |  | JSON 配置 |
 | `--library` | `-l` | 多个路径 | ✓ |  | 单器件 draw.io 库 XML 或目录 |
 | `--output` | `-o` | 文件路径 | ✓ |  | 内容固定为 SVG，后缀不改变格式 |
+| `--title` |  | 字符串 |  | `drawclock` | SVG 元数据标题，不在画布中显示 |
 | `--crossing-style` |  | `arc` / `gap` / `sharp` / `none` |  | `arc` | 跨线样式 |
 | `--description-align` |  | `left` / `center` / `right` |  | `left` | 注释文字对齐 |
 | `--description-anchor` |  | 八方位 |  | `top-left` | `top-left`、`top`、`top-right`、`right`、`bottom-right`、`bottom`、`bottom-left`、`left` |

@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import sys
 import zipfile
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 import pytest
@@ -25,7 +26,7 @@ def test_direct_draw_help_exits_zero() -> None:
     )
     assert proc.returncode == 0
     assert all(option in proc.stdout for option in (
-        "--input", "--library", "--output", "--crossing-style"
+        "--input", "--library", "--output", "--title", "--crossing-style"
     ))
     assert all(command not in proc.stdout for command in (
         "extract", "reload", "drawio-to-json", "json-to-drawio"
@@ -44,6 +45,31 @@ def test_direct_draw_requires_input_library_and_output() -> None:
     assert "input" in combined
     assert "library" in combined
     assert "output" in combined
+
+
+def test_direct_draw_sets_escaped_svg_metadata_title(tmp_path: Path) -> None:
+    output = tmp_path / "custom-title.svg"
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(SRC_DIR),
+            "-i",
+            str(ROOT / "example/draw.json"),
+            "-l",
+            str(ROOT / "drawio-lib/drawclock"),
+            "-o",
+            str(output),
+            "--title",
+            "Main & scan clock tree",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stderr
+    root = ET.parse(output).getroot()
+    assert root.find("{http://www.w3.org/2000/svg}title").text == "Main & scan clock tree"
+    assert not root.findall("{http://www.w3.org/2000/svg}text")
 
 
 def _load_frozen_example_gate():
@@ -246,12 +272,19 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     )
     shutil.copytree(ROOT / "skills", project / "skills")
     (project / "example" / "README.md").write_text(
-        "# Examples\n", encoding="utf-8"
+        "# Examples\n\ndrawclock -l drawio-lib/drawclock -o out.svg\n",
+        encoding="utf-8",
     )
     (project / "example" / "auto-layout" / "README.md").write_text(
         "# Automatic layout examples\n", encoding="utf-8"
     )
     (project / "example" / "draw.json").write_text("{}", encoding="utf-8")
+    (project / "example" / "run-example.bat").write_text(
+        "@echo off\r\n", encoding="ascii"
+    )
+    (project / "example" / "run-example.sh").write_text(
+        "#!/usr/bin/env sh\n", encoding="ascii"
+    )
     packaged_layout_examples = tuple(
         path.name for path in sorted((ROOT / "example" / "auto-layout").glob("*.json"))
     )
@@ -275,8 +308,10 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         prefix + "doc/README.md",
         prefix + "doc/draw.md",
         prefix + "example/draw.json",
-        prefix + "example/auto-layout/33-description-colors.json",
-        prefix + "example/auto-layout/34-configurable-text-and-frequency.json",
+        prefix + "example/README.md",
+        prefix + "example/auto-layout/README.md",
+        *(prefix + "example/auto-layout/" + name for name in packaged_layout_examples),
+        prefix + "example/run-example.bat",
         prefix + "libraries/source.xml",
     }
     assert names == expected
@@ -285,6 +320,10 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         packaged_readme = zf.read(prefix + "doc/README.md").decode("utf-8")
     assert "-l libraries" in packaged_readme
     assert "drawio-lib" not in packaged_readme
+    with zipfile.ZipFile(archive) as zf:
+        packaged_example_readme = zf.read(prefix + "example/README.md").decode("utf-8")
+    assert "-l libraries" in packaged_example_readme
+    assert "drawio-lib" not in packaged_example_readme
 
     checker_spec = importlib.util.spec_from_file_location(
         "check_release_archive", ROOT / "tools" / "check_release_archive.py"
@@ -293,6 +332,17 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     checker = importlib.util.module_from_spec(checker_spec)
     checker_spec.loader.exec_module(checker)
     assert checker.validate(archive) == []
+
+    missing_example = project / "dist" / "missing-example.zip"
+    omitted = prefix + "example/auto-layout/01-linear.json"
+    with zipfile.ZipFile(archive) as source, zipfile.ZipFile(missing_example, "w") as target:
+        for item in source.infolist():
+            if item.filename != omitted:
+                target.writestr(item, source.read(item.filename))
+    assert checker.validate(missing_example) == [
+        "missing required files: example/auto-layout/01-linear.json"
+    ]
+
     with zipfile.ZipFile(archive, "a") as zf:
         zf.writestr(prefix + "pyproject.toml", "[project]\n")
     assert checker.validate(archive) == ["unexpected files: pyproject.toml"]

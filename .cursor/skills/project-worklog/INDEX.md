@@ -2,6 +2,7 @@
 
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
+| `records/complete-release-examples-and-runnable-scripts.md` | record | active | 2026-10-19 09:58 +08:00 | 2026-10-19 12:42 +08:00 | 完整发行示例与跨平台演示脚本 | 产品提交已创建；正修复项目/宿主 Git 指纹算法漂移，再完成受保护 push 与公开发布反验。 |
 | `analysis/annotation-multiline-and-custom-frequency-table.md` | analysis | done | 2026-10-16 12:34 +08:00 | 2026-10-16 15:56 +08:00 | 文本布局与公开配置合同 | 八项功能、705项测试、双平台冻结及公开资产回下载验收完成；研究与恢复证据已归档。 |
 | `records/annotation-multiline-and-custom-frequency-table.md` | record | done | 2026-10-16 12:22 +08:00 | 2026-10-16 15:56 +08:00 | 注释布局、Python全局选项、多行文字与数组频率表 | 八项功能、705项测试、双平台冻结及公开资产回下载验收完成；研究与恢复证据已归档。 |
 | `records/frequency-columns-and-release-layout.md` | record | done | 2026-09-11 20:15 +08:00 | 2026-09-12 00:12 +08:00 | 频率列裁剪、发布目录与错列 mux 主干 | 动态列、发行布局、错列 mux 攻击、GitHub 停滞恢复及公开资产回下载全部闭合。 |

@@ -3,7 +3,7 @@
 ## 命令
 
 ```text
-drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录> ...] -o <输出文件> [--crossing-style <风格>]
+drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录> ...] -o <输出文件> [--title <标题>] [--crossing-style <风格>]
 ```
 
 | 参数 | 取值 | 必填 | 默认值 | 说明 |
@@ -11,6 +11,7 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 | `-i`, `--input` | 文件路径 | ✓ |  | JSON |
 | `-l`, `--library` | 多个路径 | ✓ |  | 单器件库 XML 或目录；目录递归扫描 XML |
 | `-o`, `--output` | 文件路径 | ✓ |  | 内容固定为 SVG |
+| `--title` | 字符串 |  | `drawclock` | SVG 元数据标题，不在画布中显示 |
 | `--crossing-style` | `arc` / `gap` / `sharp` / `none` |  | `arc` | 跨线样式 |
 
 ## 配置
@@ -81,7 +82,7 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 
 纯文字排布示例为 `example/auto-layout/31-node-descriptions.json`；颜色输入示例为 `example/auto-layout/33-description-colors.json`。
 
-输出画布不添加输入文件名或文件名前缀标题。
+输出画布不添加输入文件名或文件名前缀标题。`--title` 设置根 SVG 的可访问性 `<title>` 元数据，不会生成画布内文字。
 
 实例名中的 `\n` 在图中显示为多行，名称对齐默认居中。`source` 仍引用完整原始实例名，包括其中的换行；多输出后缀保持不变。
 
@@ -138,6 +139,7 @@ write_preview_svg(document, "clock.svg")
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 drawclock -i example/draw.json -l libraries/source.xml libraries/components -l libraries/project -o clock-tree.svg
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg --crossing-style gap
+drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg --title "Main clock tree"
 drawclock -i example/auto-layout/22-terminal-frequency-table.json -l drawio-lib/drawclock -o terminal-frequency.svg
 drawclock -i example/auto-layout/25-mixed-root-port-order-torture.json -l drawio-lib/drawclock -o mixed-root-torture.svg
 ```

@@ -115,3 +115,6 @@ description: >-
 - `api-documentation-contract`、`python-doc-comments`、`doc-surface-topic-page-zh`、`doc-surface-subdir-readme-zh`（`layout_column` 配置接口、源码说明与示例文档）
 - `agent-project-worklog`、`agent-project-init`、`project-evolution-engine`（五件套迁移、任务记录与项目演进门）
 - `quality-oracle-integrity`、`test-coverage-discovery`（离线源码部署门、故障注入与独立浏览器 oracle）
+- `proactive-skill-learning`、`find-skills`（发行示例缺失后的双轨学习与候选检索）
+- `enforce-machine-gates`、`codex-agent-hard-gates`（完整示例 exact-set、解压运行与发布阶段强门）
+- `skill-creator`、`codex-skill-lifecycle`（把发行示例完整性经验渐进回写用户根打包/发布 skill）

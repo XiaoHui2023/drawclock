@@ -1,6 +1,6 @@
 # 自动布局示例
 
-所有示例只需输入连接配置、器件库和一个输出文件：
+发行包包含本目录列出的全部 JSON 示例。所有示例只需输入连接配置、器件库和一个输出文件：
 
 ```powershell
 python src `
@@ -44,7 +44,7 @@ python src `
 
 代表性复杂示例包含少量晶振和 PLL、复用的 mux、分频器、gate、多类 clock cell 和末端 clock。13 至 14 改变连接顺序、链深、复用源和实例名，不只是放大同一种阵列。坐标由输入连接关系以及当前器件库的尺寸、标签和端口一次计算得到，不进行成图后的坐标校准。
 
-生成全部示例：
+源码仓库中生成全部示例：
 
 ```powershell
 python scripts/build_auto_layout_examples.py
