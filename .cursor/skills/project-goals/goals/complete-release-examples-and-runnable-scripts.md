@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-10-19
 
@@ -18,6 +18,8 @@
 - success: 已确认仓库存在 28 个公开 `auto-layout` JSON。
 - failure: 公开 v1.0.0 Windows 归档仅含 33、34 和 `draw.json`；`bundle_release.py` 与 `check_release_archive.py` 的旧白名单共同强制该缺失。
 - success: 完整测试 706/706 通过；新鲜 Windows 包 exact-set、冻结工作流和解压脚本均通过，单次大输入两轮为 32.00s/32.53s，低于 60s 且质量指标全绿。
+- success: Release run `39198290012` 全绿；原生 Ubuntu 16.04 解压并执行 `run-example.sh`、Windows 公开回下载与 `run-example.bat` 均通过。公开 tag `v1.0.0` 指向 `447c44af2e1aef34aa920062f40520acf3f00151`。
+- success: 公开 Windows/Linux 归档均通过 exact-set；Windows 含 28 个 auto-layout JSON，脚本生成标题为 `Public release title` 的 8154 字节 SVG。远端预算收据两轮 45.788081s/45.589065s，确定性相同且 29/29 指标零失败。
 
 ## 已尝试
 
@@ -25,7 +27,7 @@
 
 ## 下一步
 
-- 提交并推送当前实现，值守双平台 Release；从公开资产重新下载做 exact-set、脚本执行与发布血缘验收，然后将目标置为完成。
+- 无。本目标已收敛；后续新增公开示例时由动态归档清单、平台脚本消费和远端 exact-set 自动阻断漏包。
 
 ## 收敛条件
 
