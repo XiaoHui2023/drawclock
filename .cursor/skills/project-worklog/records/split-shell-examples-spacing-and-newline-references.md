@@ -2,9 +2,9 @@
 
 ## 状态
 
-- status: active
+- status: done
 - created: 2026-10-19 15:30 +08:00
-- updated: 2026-10-19 18:46 +08:00
+- updated: 2026-10-19 19:48 +08:00
 - scene: 分项脚本、横向间距与换行无关引用
 
 ## 当前工作
@@ -33,6 +33,10 @@
 - 18:43 冻结性能门使用 7,302 bytes、63 节点、110 边的交叉密集反例双跑 32.003s / 31.800s，输出确定且两轮各执行 29 项质量指标。公开大例额外实测：176 节点/190 边 2.600s，148/168 3.883s，136/196 长标签交织 41.388s，136/166 2.177s，121/122 4.500s；均低于 60s。
 - 18:43 冻结消费门首次发现自身仍按精确字符串推断终端，错误把 `reference\nclock` 识别为终端；生产 SVG 的两个真实 clock 本已同列。检查器改为独立移除 CR/LF 后解析引用，并把单测改成键带换行、引用不带换行，随后定向 5/5 与 frozen workflow 均通过。
 - 18:46 功能、测试、示例、文档、门禁与新鲜证据已提交为 `d656913`。首次 push 被受管门以“提交后的工作记录与 INDEX 尚未同步”拒绝；本条补齐该阶段事实，之后重新签发当前树回执并正常推送。
+- 19:48 `38a2d8f` 已推送，Release run `39239959711` 全绿：反馈门 47m06s、Linux 2m29s、Windows 5m01s、publish 56s、公开 Windows 回下载 4m37s。Linux/Windows 解压脚本、librsvg、完整 frozen workflow 与 60 秒双跑均在原生 runner 通过。
+- 19:48 `v1.0.0` 指向 `38a2d8f78203810ff82fcd6cb10ba8953ec51a0f`。远端资产 exact-set 为 Linux 归档、Windows 归档、版本化 Windows 性能收据；本机重新下载后三项 SHA-256 与 GitHub API digest 逐项一致，Windows ZIP 再次通过归档门、完整 frozen workflow 和 7 个 `.bat`。
+- 19:48 公开性能收据为 7,302 bytes、63 节点、110 边，双跑 45.464s / 45.272s，SVG 各 71,011 bytes、哈希一致，两轮均完整执行 29 项指标。公开大例本机排序数据仍为 176/190=2.600s、148/168=3.883s、136/196=41.388s、136/166=2.177s、121/122=4.500s，未发现单次超过 60 秒的维护范围输入。
+- 19:48 自主验证限制披露：尝试 `gh release verify-asset` 时返回 `no attestations found`，失败环节是 Release 未附 GitHub artifact attestation；不影响已发布字节、运行或质量，但不能给出 attestation 证明。替代方案为读取 GitHub Release API 的三项 `sha256:` digest 与本地下载字节逐项比对，全部一致。若要恢复该能力，后续需在 workflow 中生成并发布 GitHub artifact attestations。
 
 ## 已有证据
 
@@ -43,4 +47,4 @@
 
 ## 待完成
 
-- 提交并推送主分支，值守滚动 Release 至 Linux/Windows 构建与 publish 全绿，再下载公开资产完成 exact-set、摘要、解压及代表性 frozen smoke。
+- 无。

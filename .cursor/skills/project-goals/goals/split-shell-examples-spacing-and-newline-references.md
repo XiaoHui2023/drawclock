@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-10-19
 
@@ -21,9 +21,9 @@
 - failure: 简单 `source→div→clock` 在 `horizontal_spacing=0/1/10` 时两个节点体间距都固定为 36px；无纵向通道路由仍被 `2 * route_clearance` 无条件钳制。
 - failure: 当前 `validate_config` 与 `build_logical_edges` 按字符串精确查找节点名；键为 `reference\nclock` 时，`source: referenceclock` 会被判未知器件。
 - failure: 已支持任意列值与任意标题的右侧表格仍以 `frequencies`、`frequency_headers`、`frequency_align` 及 SVG `frequency-*` 命名，接口含义窄于真实能力。
-- pass: 当前实现与 717 项分组全量测试通过；28 个公开示例各执行 29 项质量指标，19 项历史问题 release gate 和七轮递归攻击均通过。
-- pass: 当前 Windows 冻结版在 7,302 bytes、63 节点、110 边的真实复杂反例上双跑 32.003s / 31.800s，确定性一致且低于 60 秒；公开 136 节点、196 边长标签交织反例为 41.388s。
-- pass: Windows 归档 exact-set 与新鲜解压消费通过，7 个 `.bat` 均实际运行；POSIX 7 个 `.sh` 语法与执行位已由本地结构门验证，待 Linux CI 原生执行。
+- success: 当前实现与 717 项分组全量测试通过；28 个公开示例各执行 29 项质量指标，19 项历史问题 release gate 和七轮递归攻击均通过。
+- success: 当前 Windows 冻结版在 7,302 bytes、63 节点、110 边的真实复杂反例上双跑 32.003s / 31.800s，确定性一致且低于 60 秒；公开 136 节点、196 边长标签交织反例为 41.388s。
+- success: Windows 归档 exact-set 与新鲜解压消费通过，7 个 `.bat` 均实际运行；Release run `39239959711` 的 Linux 与 Windows 原生消费、publish 和公网回下载全部通过。
 
 ## 已尝试
 
@@ -32,7 +32,7 @@
 
 ## 下一步
 
-- 提交并推送 main，值守 Linux/Windows Release jobs 与 publish；从公开 Release 下载资产后完成 tag/SHA、exact-set、摘要和解压运行复验。
+- 无
 
 ## 收敛条件
 

@@ -15,6 +15,7 @@ description: >-
 - `horizontal_spacing` 明确约束相邻器件可见本体的最小横向距离；无实际纵向通道时不得强加固定路由下限，显示锚点后处理也不得把显式间距压小。
 - 单一混合 `run-example` 被 `example/run-example/` 下七组单功能跨平台脚本取代；归档 exact-set、解压消费和发布后下载门会动态检查并逐个执行全部平台脚本。
 - Release 资产采用版本化 exact-set：`drawclock-{version}-linux.tar.gz`、`drawclock-{version}-windows.zip`、`drawclock-{version}-windows-runtime.json`；publish 后必须拒绝缺失、额外或无版本名资产。
+- Release run `39239959711` 已在 `38a2d8f` 完成反馈门、Ubuntu 16.04/staticx、Windows 60 秒双跑、发布及两平台公网回下载；公开 Windows 双跑为 45.464s / 45.272s，三项资产摘要与本机下载一致。
 - 用户确认发行包的 `example` 必须齐全，不能只保留 33、34；全部公开自动布局 JSON、示例说明与平台运行脚本均属于用户交付面。
 - Linux/Windows 示例脚本必须从新鲜解压包直接调用冻结程序，展示标题等常用参数，并在调用脚本的当前工作目录生成 SVG；该行为进入本地归档检查、解压消费和远端回下载门禁。
 - 2026-09-11 的“默认附件只含最小示例、颜色示例和组合示例”口径被本条取代；仍禁止源码、项目 Skills、测试语料、缓存和构建中间物进入默认附件。

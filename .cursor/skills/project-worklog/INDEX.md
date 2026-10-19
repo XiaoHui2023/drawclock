@@ -2,7 +2,7 @@
 
 | 路径 | 类型 | 状态 | 创建时间 | 更新时间 | 场景 | 摘要 |
 | --- | --- | --- | --- | --- | --- | --- |
-| `records/split-shell-examples-spacing-and-newline-references.md` | record | active | 2026-10-19 15:30 +08:00 | 2026-10-19 18:46 +08:00 | 分项脚本、横向间距与换行无关引用 | 产品提交 `d656913` 已建立；717 项与本地发行门全绿，待推送和远端滚动 Release 回下载闭环。 |
+| `records/split-shell-examples-spacing-and-newline-references.md` | record | done | 2026-10-19 15:30 +08:00 | 2026-10-19 19:48 +08:00 | 分项脚本、横向间距与换行无关引用 | 717 项、28×29、双平台脚本、60 秒预算、run `39239959711` 与公开资产回下载全部闭合。 |
 | `records/complete-release-examples-and-runnable-scripts.md` | record | done | 2026-10-19 09:58 +08:00 | 2026-10-19 13:37 +08:00 | 完整发行示例与跨平台演示脚本 | 双平台脚本、28 示例、706 项、60 秒预算和公开资产回下载全部通过，Release run 39198290012 全绿。 |
 | `analysis/annotation-multiline-and-custom-frequency-table.md` | analysis | done | 2026-10-16 12:34 +08:00 | 2026-10-16 15:56 +08:00 | 文本布局与公开配置合同 | 八项功能、705项测试、双平台冻结及公开资产回下载验收完成；研究与恢复证据已归档。 |
 | `records/annotation-multiline-and-custom-frequency-table.md` | record | done | 2026-10-16 12:22 +08:00 | 2026-10-16 15:56 +08:00 | 注释布局、Python全局选项、多行文字与数组频率表 | 八项功能、705项测试、双平台冻结及公开资产回下载验收完成；研究与恢复证据已归档。 |
