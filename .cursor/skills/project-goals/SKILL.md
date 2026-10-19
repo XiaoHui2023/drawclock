@@ -5,6 +5,8 @@ description: drawclock 当前目标、验证证据与完成条件索引。
 
 # 项目目标
 
+- [ ] [分项 Shell 示例、可控横向间距与换行无关引用](goals/split-shell-examples-spacing-and-newline-references.md)
+
 - [x] [完整发行示例与可执行演示脚本](goals/complete-release-examples-and-runnable-scripts.md)
 
 - [x] [注释布局、多行名称与自定义频率表](goals/annotation-multiline-and-custom-frequency-table.md)

@@ -4,30 +4,30 @@
   "scenario": "dual-public-small-staggered-triple-four",
   "max_render_seconds": 60.0,
   "binary": "F:\\Project\\python\\drawclock\\dist\\drawclock.exe",
-  "binary_sha256": "9456f62696d32037673baf75ab6eebf7f340a73bac57426478646dd84b91620d",
+  "binary_sha256": "9d0ebc1c3a1fabc6b352d2fdcef4a5e4b9914c159414fa20a162f27d84db5f00",
   "input": "F:\\Project\\python\\drawclock\\.reproduction\\receipts\\windows-frozen-runtime\\input.json",
   "input_bytes": 7302,
   "input_sha256": "2139fe15c552ace1554f1b1a543c516bd17126797a5b6fe1648211334be37c28",
   "runs": [
     {
       "status": "passed",
-      "duration_seconds": 30.962367,
+      "duration_seconds": 32.002556,
       "max_seconds": 60.0,
       "returncode": 0,
       "output_exists": true,
-      "output_bytes": 70985,
-      "output_sha256": "a28fc307465570a5b214cf647a3324b3e06772a3bc1d41c175092871aee89a56",
+      "output_bytes": 71011,
+      "output_sha256": "438dba9dd1a21b2b9c6881854d2c65a1d5cf8af97c171c5e8dd41e657f7a2682",
       "stdout_tail": "",
       "stderr_tail": "��д�� F:\\Project\\python\\drawclock\\.reproduction\\receipts\\windows-frozen-runtime\\run-1.svg\n"
     },
     {
       "status": "passed",
-      "duration_seconds": 33.781452,
+      "duration_seconds": 31.799638,
       "max_seconds": 60.0,
       "returncode": 0,
       "output_exists": true,
-      "output_bytes": 70985,
-      "output_sha256": "a28fc307465570a5b214cf647a3324b3e06772a3bc1d41c175092871aee89a56",
+      "output_bytes": 71011,
+      "output_sha256": "438dba9dd1a21b2b9c6881854d2c65a1d5cf8af97c171c5e8dd41e657f7a2682",
       "stdout_tail": "",
       "stderr_tail": "��д�� F:\\Project\\python\\drawclock\\.reproduction\\receipts\\windows-frozen-runtime\\run-2.svg\n"
     }

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "input_dir": "F:\\Project\\python\\drawclock\\example\\auto-layout",
   "library": "F:\\Project\\python\\drawclock\\drawio-lib\\drawclock",
-  "expected_count": 27,
-  "observed_count": 27,
+  "expected_count": 28,
+  "observed_count": 28,
   "failed_count": 0,
   "annotation_profile_case_counts": {
     "blank_line": 1,
@@ -51,7 +51,7 @@
     {
       "input": "01-linear.json",
       "producer_exit": 0,
-      "sha256": "cba9264d0a64eb164d30030dbf8e80253bd6aba2d7c25f093ae06aedf265cc19",
+      "sha256": "f5c1eb193ee69e98d7ba0fa61a710d91cba1cb3c52e9147dacf758a400614a3b",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -301,7 +301,7 @@
     {
       "input": "02-branch-tree.json",
       "producer_exit": 0,
-      "sha256": "c495d0ee0397a307cb12e1fac0ae593bf02056e71a8e6f513d72368466199d51",
+      "sha256": "c4ca1107c38415f1b84669932eaaf49a794f11647c3535bd27b0e72c95ac1771",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -551,7 +551,7 @@
     {
       "input": "03-mux-dag.json",
       "producer_exit": 0,
-      "sha256": "9301713c2c0bbdfc3a799ee21bb798e0423bb518ddc70f64a9ffdc603b2efb76",
+      "sha256": "9675d8b9474d0f40bf039c6f3126e4ef4632dd3443ee8e6ae495a12f3fd02c52",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -801,7 +801,7 @@
     {
       "input": "04-dual-pll.json",
       "producer_exit": 0,
-      "sha256": "f34edbe93cec22b1ddd8ea84f66c42f89be2a60646c5df5c62921bf84b0981e6",
+      "sha256": "887794ea280948414d64ca3f73dbbad4c452e5901091cd28a45b8ecf1fdfcf27",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -1051,7 +1051,7 @@
     {
       "input": "05-dense-cross-root.json",
       "producer_exit": 0,
-      "sha256": "3678972907ce3b1d15ee29df7b64667ed4be09cad0b48292f43aa8d40e79f1c4",
+      "sha256": "5400431a7a84ef0d8933b7e8ec56d038777ce23d17f051a921f209cde919294e",
       "crossings": 6,
       "bends": 22,
       "different_net_overlaps": 0,
@@ -1301,7 +1301,7 @@
     {
       "input": "06-simple-16-clocks.json",
       "producer_exit": 0,
-      "sha256": "bac0cfc460394bdf8cf67b2a9a6da4233506c4fa314481b5e31fdfa024d2e9f6",
+      "sha256": "dc2a880ec1d65dcc5285cb450865121aa895089a8f5b290a33d1b8e3e2149227",
       "crossings": 22,
       "bends": 68,
       "different_net_overlaps": 0,
@@ -1551,7 +1551,7 @@
     {
       "input": "07-medium-64-clocks.json",
       "producer_exit": 0,
-      "sha256": "bc1075c756757e350388ac002429fdb72e47c4a9c13dc137498dd8c0cf83261f",
+      "sha256": "2e11cf8de6900affa2771b4b520cd1503e0d7a3041f3edb35b8845b25351f211",
       "crossings": 169,
       "bends": 216,
       "different_net_overlaps": 0,
@@ -1801,7 +1801,7 @@
     {
       "input": "12-dual-from-reuse.json",
       "producer_exit": 0,
-      "sha256": "8ecf2a2c37d7f715633eb4b71c96c8a4cac9dc9e5c8f3d74f4c79ca9b4ae0771",
+      "sha256": "bcfc83b0947b4e49da62ed22233f2f56f0fe50f34cec9150cc275c7699654517",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -2051,7 +2051,7 @@
     {
       "input": "13-label-clearance-weave.json",
       "producer_exit": 0,
-      "sha256": "76165a2cb66e84bc105e5b825c8cb6cd9844b7c38caf88fd15911fb8c47f1388",
+      "sha256": "eb1e4b2a13c562a5901d954c45485c13279ddc9c5ea437df8405de2b5960f34f",
       "crossings": 1417,
       "bends": 252,
       "different_net_overlaps": 0,
@@ -2301,7 +2301,7 @@
     {
       "input": "16-multi-from-clusters.json",
       "producer_exit": 0,
-      "sha256": "c9544354fe12ab1f8fbc41541f44217a02e45b5a106acf1d867373b2c4963e44",
+      "sha256": "b7f4d5732b74bedb3d6d65ec22aad1a44c2d712aa90eda56caf3a13ec69e93ce",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -2551,7 +2551,7 @@
     {
       "input": "17-terminal-fanout-order.json",
       "producer_exit": 0,
-      "sha256": "f9f0c9f6e2bebcf37645126f176c3e5274bfd269d6db0f6087d53e029ec95306",
+      "sha256": "01773457a1392ab00bdb01d013950f65dbf3659215ced786dcb7c1c348357599",
       "crossings": 0,
       "bends": 8,
       "different_net_overlaps": 0,
@@ -2801,7 +2801,7 @@
     {
       "input": "18-asymmetric-merge-columns.json",
       "producer_exit": 0,
-      "sha256": "4126acbcdb834eb11e373fed2a2a76c214bdc9a422c10782a28b6f6920387e28",
+      "sha256": "a7dda7c4f2dde0bf75595a4b6b3080be0942b472707c838a3b81a8b1ef0d2204",
       "crossings": 48,
       "bends": 28,
       "different_net_overlaps": 0,
@@ -3051,7 +3051,7 @@
     {
       "input": "19-dispersed-root-fanout.json",
       "producer_exit": 0,
-      "sha256": "fffd2fd994b44abe7a5bef0a733836a6e6b4e4455e7a58b68be50042775cc4c0",
+      "sha256": "e05f5144bf01d7f56bcd5245e64e9e2f418c8e9fe865683f30365ac1efc4e3f4",
       "crossings": 710,
       "bends": 122,
       "different_net_overlaps": 0,
@@ -3301,7 +3301,7 @@
     {
       "input": "20-asymmetric-merge-route-bulge.json",
       "producer_exit": 0,
-      "sha256": "0610e9c2cd22815b5c91aae56db650a39d2d638474a40d8687c28c5a45ce93ce",
+      "sha256": "0cac84aa9ebad6ee3e330b78108ce88bc34787cd9f47a73d6aa63455146a6dca",
       "crossings": 0,
       "bends": 2,
       "different_net_overlaps": 0,
@@ -3551,7 +3551,7 @@
     {
       "input": "21-layout-column-preference.json",
       "producer_exit": 0,
-      "sha256": "f6e09385ea9c3595fe5413683b24589860e64609949e8d34353e466100f1bb3f",
+      "sha256": "d0bdb974a158e7104deb74fd7e9cdde46ce7ffe529b0386c6fd4bb57db85f9cb",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -3799,9 +3799,9 @@
       "failures": []
     },
     {
-      "input": "22-terminal-frequency-table.json",
+      "input": "22-terminal-data-table.json",
       "producer_exit": 0,
-      "sha256": "7ad9a8280488a1ae930ae04caf544ad50ba42f36eacd7d07af0f58a51645c2c9",
+      "sha256": "7bfa0b77831255af1d5a7e7d097860230a3fc36966d9186cd17f5873512cc48a",
       "crossings": 0,
       "bends": 4,
       "different_net_overlaps": 0,
@@ -4051,7 +4051,7 @@
     {
       "input": "23-middle-column-low-use-sources.json",
       "producer_exit": 0,
-      "sha256": "8b6f74d0f7bcbaaafca2e6324abab6c12ba37d3c9d4a3f052d50b7f78a9a7506",
+      "sha256": "7363e3059c64e51fb4d39c432c57a768faf12e24f52b40ca19deac74b3d6e229",
       "crossings": 0,
       "bends": 14,
       "different_net_overlaps": 0,
@@ -4301,7 +4301,7 @@
     {
       "input": "24-single-source-rendering-alias.json",
       "producer_exit": 0,
-      "sha256": "54639e7dbd78696ec29c7bd1e5e61b58175d1d84162f8da6a65120769c8f61a9",
+      "sha256": "f23da36659caf9e5fbd1c5fff10ab74ed54e0699133e1eea669294b4ccf9c777",
       "crossings": 0,
       "bends": 22,
       "different_net_overlaps": 0,
@@ -4551,7 +4551,7 @@
     {
       "input": "25-mixed-root-port-order-torture.json",
       "producer_exit": 0,
-      "sha256": "e1e897c47ca7e89f7f11bae22ffdfb995062f0376741fbf562ab1e41bdfde38f",
+      "sha256": "339e60d88086be13b46741168ce66f2829fa99c4b15c4ce56d860ab58b3ab0b9",
       "crossings": 0,
       "bends": 18,
       "different_net_overlaps": 0,
@@ -4801,7 +4801,7 @@
     {
       "input": "26-feedback-reproduction-combined.json",
       "producer_exit": 0,
-      "sha256": "e697e892bc780bbb6b70425b2dab77acfd014d5537ce3c9d76afad8cebdb88a9",
+      "sha256": "77cae32a3acf379755b46717ce196a7b92228941d8806499bbdbdc1012de81c5",
       "crossings": 1,
       "bends": 16,
       "different_net_overlaps": 0,
@@ -5051,7 +5051,7 @@
     {
       "input": "27-interleaved-common-root-mux3.json",
       "producer_exit": 0,
-      "sha256": "36612c53ca21750025cc495b180cc94181942150709b36d92b48f56bb8508df6",
+      "sha256": "251dd0e5564f32a0a8216af4c54c3427cf12fe15c61a19f4886bcbf80d19d921",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -5301,7 +5301,7 @@
     {
       "input": "28-common-private-from-mux-clock-array.json",
       "producer_exit": 0,
-      "sha256": "bbda1a4715d01a6fc9bdae6b5d2eb156cae7ac7f4c8c7b2052e39597a4adeb20",
+      "sha256": "bb038e23b7df020ff1cd7121683c36b41b437ecd114e4da1128c63756b2f7354",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -5551,7 +5551,7 @@
     {
       "input": "29-asymmetric-depth-common-private-mux-array.json",
       "producer_exit": 0,
-      "sha256": "1a0245bfd6d9cc739dd057336a0ef3d41be3fc211655e3f64efe362c00a7470a",
+      "sha256": "1ac5efb55ee30ddc88d4dde05842a4a65cb0894ce911fa17fb7b911e4797b125",
       "crossings": 0,
       "bends": 10,
       "different_net_overlaps": 0,
@@ -5801,7 +5801,7 @@
     {
       "input": "30-staggered-four-source-mux.json",
       "producer_exit": 0,
-      "sha256": "1a2cb7b52830a4336a6a23594f5bdc282f5175ab5075d189f86a0ecc8fc50d48",
+      "sha256": "f7e7ab3e9585846b080a5b9c01cac3e3e6e17fec537544395bdf500f73f894d6",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -6051,7 +6051,7 @@
     {
       "input": "31-node-descriptions.json",
       "producer_exit": 0,
-      "sha256": "3df83f0d7f229caa49a1b8f4dc87d2caa0a31ad6bcf84e3b0707d4d1b5189dad",
+      "sha256": "e8679085691b261c6a27d7e773eb8830fe40342cd7dbb1f253ab7b63c8a1ff77",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -6261,8 +6261,8 @@
             "outside_viewport": [],
             "owner_distances_px": {
               "gate_cpu": 9.25,
-              "xtal": 9.23,
-              "mux_cpu": 9.23,
+              "xtal": 9.25,
+              "mux_cpu": 9.25,
               "clk_cpu": 9.25
             },
             "too_far": [],
@@ -6396,8 +6396,8 @@
             "outside_viewport": [],
             "owner_distances_px": {
               "gate_cpu": 9.25,
-              "xtal": 9.23,
-              "mux_cpu": 9.23,
+              "xtal": 9.25,
+              "mux_cpu": 9.25,
               "clk_cpu": 9.25
             },
             "too_far": [],
@@ -6429,9 +6429,9 @@
     {
       "input": "32-annotation-text-stress.json",
       "producer_exit": 0,
-      "sha256": "f977351b5d754caffadb985a7d80c3032c73e7fbe84592ad7b973231b78e22af",
+      "sha256": "84826896bc39c7dcae91792f5b289fbb3c6e39400c83b90c6362a1d6a3c57085",
       "crossings": 0,
-      "bends": 4,
+      "bends": 12,
       "different_net_overlaps": 0,
       "annotation_failures": 0,
       "annotation_color_failures": 0,
@@ -6607,13 +6607,6 @@
               "clock_dense_b": "#4b5563"
             },
             "observed_colors": {
-              "clock_dense_a": {
-                "declared": "#4b5563",
-                "fills": [
-                  "#4b5563",
-                  "#4b5563"
-                ]
-              },
               "gate_long_ascii": {
                 "declared": "#4b5563",
                 "fills": [
@@ -6624,12 +6617,6 @@
                   "#4b5563"
                 ]
               },
-              "ref_short": {
-                "declared": "#4b5563",
-                "fills": [
-                  "#4b5563"
-                ]
-              },
               "select_mixed": {
                 "declared": "#4b5563",
                 "fills": [
@@ -6637,6 +6624,19 @@
                   "#4b5563",
                   "#4b5563",
                   "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "clock_dense_a": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "ref_short": {
+                "declared": "#4b5563",
+                "fills": [
                   "#4b5563"
                 ]
               },
@@ -6657,20 +6657,20 @@
                   "#4b5563"
                 ]
               },
-              "div_long_cjk": {
-                "declared": "#4b5563",
-                "fills": [
-                  "#4b5563",
-                  "#4b5563",
-                  "#4b5563"
-                ]
-              },
               "ref_multiline": {
                 "declared": "#4b5563",
                 "fills": [
                   "#4b5563",
                   "#4b5563",
                   "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "div_long_cjk": {
+                "declared": "#4b5563",
+                "fills": [
                   "#4b5563",
                   "#4b5563",
                   "#4b5563"
@@ -6702,14 +6702,14 @@
             "edge_intersections": [],
             "outside_viewport": [],
             "owner_distances_px": {
-              "clock_dense_a": 9.25,
               "gate_long_ascii": 9.25,
-              "ref_short": 9.25,
-              "select_mixed": 9.23,
-              "cell_trailing": 45.01,
-              "clock_dense_b": 10.01,
-              "div_long_cjk": 19.45,
-              "ref_multiline": 19.03
+              "select_mixed": 9.25,
+              "clock_dense_a": 9.25,
+              "ref_short": 14.33,
+              "cell_trailing": 9.25,
+              "clock_dense_b": 9.25,
+              "ref_multiline": 9.25,
+              "div_long_cjk": 9.25
             },
             "too_far": [],
             "decorative_elements": 0,
@@ -6805,13 +6805,6 @@
               "clock_dense_b": "#4b5563"
             },
             "observed_colors": {
-              "clock_dense_a": {
-                "declared": "#4b5563",
-                "fills": [
-                  "#4b5563",
-                  "#4b5563"
-                ]
-              },
               "gate_long_ascii": {
                 "declared": "#4b5563",
                 "fills": [
@@ -6822,12 +6815,6 @@
                   "#4b5563"
                 ]
               },
-              "ref_short": {
-                "declared": "#4b5563",
-                "fills": [
-                  "#4b5563"
-                ]
-              },
               "select_mixed": {
                 "declared": "#4b5563",
                 "fills": [
@@ -6835,6 +6822,19 @@
                   "#4b5563",
                   "#4b5563",
                   "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "clock_dense_a": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "ref_short": {
+                "declared": "#4b5563",
+                "fills": [
                   "#4b5563"
                 ]
               },
@@ -6855,20 +6855,20 @@
                   "#4b5563"
                 ]
               },
-              "div_long_cjk": {
-                "declared": "#4b5563",
-                "fills": [
-                  "#4b5563",
-                  "#4b5563",
-                  "#4b5563"
-                ]
-              },
               "ref_multiline": {
                 "declared": "#4b5563",
                 "fills": [
                   "#4b5563",
                   "#4b5563",
                   "#4b5563",
+                  "#4b5563",
+                  "#4b5563",
+                  "#4b5563"
+                ]
+              },
+              "div_long_cjk": {
+                "declared": "#4b5563",
+                "fills": [
                   "#4b5563",
                   "#4b5563",
                   "#4b5563"
@@ -6900,14 +6900,14 @@
             "edge_intersections": [],
             "outside_viewport": [],
             "owner_distances_px": {
-              "clock_dense_a": 9.25,
               "gate_long_ascii": 9.25,
-              "ref_short": 9.25,
-              "select_mixed": 9.23,
-              "cell_trailing": 45.01,
-              "clock_dense_b": 10.01,
-              "div_long_cjk": 19.45,
-              "ref_multiline": 19.03
+              "select_mixed": 9.25,
+              "clock_dense_a": 9.25,
+              "ref_short": 14.33,
+              "cell_trailing": 9.25,
+              "clock_dense_b": 9.25,
+              "ref_multiline": 9.25,
+              "div_long_cjk": 9.25
             },
             "too_far": [],
             "decorative_elements": 0,
@@ -6938,7 +6938,7 @@
     {
       "input": "33-description-colors.json",
       "producer_exit": 0,
-      "sha256": "d3a4c2d070f3e827ee951081c026039b1c96b5f478c523606c829000aa7a7bb6",
+      "sha256": "e145d27c442dc3cc9cef270b8111470df22706287f02f3dc9bbdaa2bac19de81",
       "crossings": 0,
       "bends": 0,
       "different_net_overlaps": 0,
@@ -7155,9 +7155,9 @@
             "outside_viewport": [],
             "owner_distances_px": {
               "div_core": 9.25,
-              "gate_core": 9.23,
+              "gate_core": 9.25,
               "xtal": 9.25,
-              "mux_core": 9.23,
+              "mux_core": 9.25,
               "clk_core": 9.25
             },
             "too_far": [],
@@ -7298,10 +7298,378 @@
             "outside_viewport": [],
             "owner_distances_px": {
               "div_core": 9.25,
-              "gate_core": 9.23,
+              "gate_core": 9.25,
               "xtal": 9.25,
-              "mux_core": 9.23,
+              "mux_core": 9.25,
               "clk_core": 9.25
+            },
+            "too_far": [],
+            "decorative_elements": 0,
+            "failure_count": 0
+          }
+        },
+        {
+          "metric_id": "diagram_title_absence",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "frequency_column_visibility",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        },
+        {
+          "metric_id": "geometry_inventory_completeness",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": []
+        }
+      ],
+      "failures": []
+    },
+    {
+      "input": "34-configurable-text-and-table.json",
+      "producer_exit": 0,
+      "sha256": "430045d9d0e0eb94d2fce900b5378dcaa5ceca7b44a168baf533e190c8e0a479",
+      "crossings": 0,
+      "bends": 4,
+      "different_net_overlaps": 0,
+      "annotation_failures": 0,
+      "annotation_color_failures": 0,
+      "annotation_profiles": [],
+      "required_metric_ids": [
+        "topology_identity",
+        "orthogonal_segments",
+        "crossing_treatment",
+        "different_net_overlap",
+        "split_rejoin",
+        "avoidable_bends",
+        "port_order",
+        "root_fanout_axis_dominance",
+        "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
+        "regular_array_single_facility",
+        "shared_root_single_bus",
+        "annotation_geometry",
+        "mixed_root_quality",
+        "public_root_crossing",
+        "root_relocation_dominance",
+        "root_facility_split_dominance",
+        "physical_anchor_relocation",
+        "vertical_root_facility_bend",
+        "root_facility_column_lag",
+        "downstream_corridor_tail_bend",
+        "adjacent_root_height_bend",
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
+      ],
+      "executed_metric_ids": [
+        "topology_identity",
+        "orthogonal_segments",
+        "crossing_treatment",
+        "different_net_overlap",
+        "split_rejoin",
+        "avoidable_bends",
+        "port_order",
+        "root_fanout_axis_dominance",
+        "direct_root_mux_column",
+        "feasible_direct_root_fanin_column",
+        "root_first_column",
+        "regular_array_single_facility",
+        "shared_root_single_bus",
+        "annotation_geometry",
+        "mixed_root_quality",
+        "public_root_crossing",
+        "root_relocation_dominance",
+        "root_facility_split_dominance",
+        "physical_anchor_relocation",
+        "vertical_root_facility_bend",
+        "root_facility_column_lag",
+        "downstream_corridor_tail_bend",
+        "adjacent_root_height_bend",
+        "mergeable_root_facility",
+        "premature_interior_trunk_entry",
+        "annotation_color",
+        "diagram_title_absence",
+        "frequency_column_visibility",
+        "geometry_inventory_completeness"
+      ],
+      "metric_results": [
+        {
+          "metric_id": "topology_identity",
+          "status": "pass",
+          "applicability_proof": "artifact",
+          "witnesses": {}
+        },
+        {
+          "metric_id": "orthogonal_segments",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "crossing_treatment",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "different_net_overlap",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "split_rejoin",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "avoidable_bends",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "port_order",
+          "status": "not_applicable",
+          "applicability_proof": "merges=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_fanout_axis_dominance",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "direct_root_mux_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_mux_arrays=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "feasible_direct_root_fanin_column",
+          "status": "not_applicable",
+          "applicability_proof": "direct_root_fanins=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_first_column",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "regular_array_single_facility",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "shared_root_single_bus",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "annotation_geometry",
+          "status": "pass",
+          "applicability_proof": "annotations=4",
+          "witnesses": {
+            "expected": 4,
+            "rendered": 4,
+            "missing": [],
+            "unexpected": [],
+            "duplicates": [],
+            "text_mismatches": [],
+            "line_mismatches": [],
+            "expected_colors": {
+              "reference\nclock": "#4b5563",
+              "divider\nA": "#4b5563",
+              "clock\noutput A": "#4b5563",
+              "clock\noutput B": "#4b5563"
+            },
+            "observed_colors": {
+              "clock\noutput A": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "divider\nA": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "reference\nclock": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "clock\noutput B": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              }
+            },
+            "color_mismatches": [],
+            "noncanonical_colors": [],
+            "style_color_overrides": [],
+            "color_failure_count": 0,
+            "profile_counts": {},
+            "profiles_present": [],
+            "annotation_overlaps": [],
+            "node_overlaps": [],
+            "edge_intersections": [],
+            "outside_viewport": [],
+            "owner_distances_px": {
+              "clock\noutput A": 9.25,
+              "divider\nA": 13.25,
+              "reference\nclock": 9.25,
+              "clock\noutput B": 9.25
+            },
+            "too_far": [],
+            "decorative_elements": 0,
+            "failure_count": 0
+          }
+        },
+        {
+          "metric_id": "mixed_root_quality",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "public_root_crossing",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_relocation_dominance",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_facility_split_dominance",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "physical_anchor_relocation",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "vertical_root_facility_bend",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "root_facility_column_lag",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "downstream_corridor_tail_bend",
+          "status": "pass",
+          "applicability_proof": "logical_edges",
+          "witnesses": []
+        },
+        {
+          "metric_id": "adjacent_root_height_bend",
+          "status": "pass",
+          "applicability_proof": "roots=1",
+          "witnesses": []
+        },
+        {
+          "metric_id": "mergeable_root_facility",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "premature_interior_trunk_entry",
+          "status": "not_applicable",
+          "applicability_proof": "root_fanouts=0",
+          "witnesses": []
+        },
+        {
+          "metric_id": "annotation_color",
+          "status": "pass",
+          "applicability_proof": "annotations=4",
+          "witnesses": {
+            "expected": 4,
+            "rendered": 4,
+            "missing": [],
+            "unexpected": [],
+            "duplicates": [],
+            "text_mismatches": [],
+            "line_mismatches": [],
+            "expected_colors": {
+              "reference\nclock": "#4b5563",
+              "divider\nA": "#4b5563",
+              "clock\noutput A": "#4b5563",
+              "clock\noutput B": "#4b5563"
+            },
+            "observed_colors": {
+              "clock\noutput A": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "divider\nA": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "reference\nclock": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              },
+              "clock\noutput B": {
+                "declared": "#4b5563",
+                "fills": [
+                  "#4b5563"
+                ]
+              }
+            },
+            "color_mismatches": [],
+            "noncanonical_colors": [],
+            "style_color_overrides": [],
+            "color_failure_count": 0,
+            "profile_counts": {},
+            "profiles_present": [],
+            "annotation_overlaps": [],
+            "node_overlaps": [],
+            "edge_intersections": [],
+            "outside_viewport": [],
+            "owner_distances_px": {
+              "clock\noutput A": 9.25,
+              "divider\nA": 13.25,
+              "reference\nclock": 9.25,
+              "clock\noutput B": 9.25
             },
             "too_far": [],
             "decorative_elements": 0,

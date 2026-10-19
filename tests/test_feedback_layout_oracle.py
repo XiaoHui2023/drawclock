@@ -42,6 +42,25 @@ def test_oracle_source_has_no_production_import() -> None:
         assert not any(name == "src" or name.startswith("src.") for name in imports)
 
 
+def test_oracle_resolves_source_references_without_cr_lf(tmp_path: Path) -> None:
+    path = tmp_path / "multiline.json"
+    path.write_text(json.dumps({
+        "root\nclock": {"kind": "source"},
+        "sink": {"kind": "clock", "source": "rootclock"},
+    }), encoding="utf-8")
+    _, edges = oracle.parse_topology(path)
+    assert [(edge.source, edge.target) for edge in edges] == [
+        ("root\nclock", "sink")
+    ]
+
+    path.write_text(json.dumps({
+        "rootclock": {"kind": "source"},
+        "root\nclock": {"kind": "source"},
+    }), encoding="utf-8")
+    with pytest.raises(ValueError, match="ambiguous"):
+        oracle.parse_topology(path)
+
+
 def test_geometry_predicates_separate_cross_touch_and_overlap() -> None:
     assert oracle.proper_cross((0, 5), (10, 5), (4, 0), (4, 10)) == (4, 5)
     assert oracle.proper_cross((0, 5), (10, 5), (0, 0), (0, 10)) is None

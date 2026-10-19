@@ -639,10 +639,24 @@ def _source_reference(reference: str) -> tuple[str, str]:
     return (match.group(1), match.group(2)) if match else (reference, "right")
 
 
+def _reference_index(names: Iterable[str]) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for name in names:
+        identity = name.replace("\r", "").replace("\n", "")
+        if identity in result and result[identity] != name:
+            raise ValueError(
+                "node names are ambiguous when CR/LF are ignored: "
+                f"{result[identity]!r}, {name!r}"
+            )
+        result[identity] = name
+    return result
+
+
 def parse_topology(path: Path) -> tuple[dict[str, dict[str, Any]], list[LogicalEdge]]:
     config = json.loads(path.read_text(encoding="utf-8-sig"))
     if not isinstance(config, dict):
         raise ValueError("input JSON must be an object")
+    references = _reference_index(config)
     edges: list[LogicalEdge] = []
     for target, item in config.items():
         if not isinstance(item, dict):
@@ -650,10 +664,16 @@ def parse_topology(path: Path) -> tuple[dict[str, dict[str, Any]], list[LogicalE
         source = item.get("source")
         if isinstance(source, str):
             source_name, source_port = _source_reference(source)
+            source_name = references.get(
+                source_name.replace("\r", "").replace("\n", ""), source_name
+            )
             edges.append(LogicalEdge(source_name, target, "left", source_port))
         elif isinstance(source, dict):
             for port, reference in source.items():
                 source_name, source_port = _source_reference(str(reference))
+                source_name = references.get(
+                    source_name.replace("\r", "").replace("\n", ""), source_name
+                )
                 edges.append(LogicalEdge(source_name, target, str(port), source_port))
         elif source is not None:
             raise ValueError(f"node {target} has invalid source")

@@ -1,0 +1,27 @@
+{
+  "reference\nclock": {
+    "kind": "gate",
+    "description": "Reference clock"
+  },
+  "divider\nA": {
+    "kind": "div",
+    "source": "referenceclock",
+    "description": "Divide by two",
+    "description_align": "right",
+    "description_anchor": "top-right",
+    "description_offset_x": 6,
+    "description_offset_y": -4
+  },
+  "clock\noutput A": {
+    "kind": "clock",
+    "source": "dividerA",
+    "description": "Primary output",
+    "table_values": ["800\nMHz", "50 MHz", "100 MHz", "25 MHz"]
+  },
+  "clock\noutput B": {
+    "kind": "clock",
+    "source": "divider\nA",
+    "description": "Secondary output",
+    "table_values": ["400\nMHz", "25 MHz"]
+  }
+}

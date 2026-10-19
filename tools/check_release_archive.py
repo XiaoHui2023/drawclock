@@ -24,13 +24,27 @@ REQUIRED = {
 }
 
 
-def _names(path: Path) -> list[str]:
+def _platform_scripts(binary: str) -> set[str]:
+    suffix = ".bat" if binary == "drawclock.exe" else ".sh"
+    return {
+        f"example/run-example/{path.name}"
+        for path in (ROOT / "example" / "run-example").glob(f"*{suffix}")
+    }
+
+
+def _names(path: Path) -> tuple[list[str], dict[str, int]]:
+    modes: dict[str, int] = {}
     if zipfile.is_zipfile(path):
         with zipfile.ZipFile(path) as archive:
             names = [item.filename for item in archive.infolist() if not item.is_dir()]
     elif tarfile.is_tarfile(path):
         with tarfile.open(path, "r:*") as archive:
-            names = [item.name for item in archive.getmembers() if item.isfile()]
+            members = [item for item in archive.getmembers() if item.isfile()]
+            names = [item.name for item in members]
+            modes = {
+                item.name.replace("\\", "/").lstrip("./"): item.mode
+                for item in members
+            }
     else:
         raise ValueError("archive must be ZIP or tar")
     names = [name.replace("\\", "/").lstrip("./") for name in names]
@@ -40,11 +54,16 @@ def _names(path: Path) -> list[str]:
     prefix = next(iter(top)) + "/"
     if any(not name.startswith(prefix) for name in names):
         raise ValueError("archive contains a file outside its top directory")
-    return sorted(name[len(prefix):] for name in names)
+    stripped_modes = {
+        name[len(prefix):]: mode
+        for name, mode in modes.items()
+        if name.startswith(prefix)
+    }
+    return sorted(name[len(prefix):] for name in names), stripped_modes
 
 
 def validate(path: Path) -> list[str]:
-    names = _names(path)
+    names, modes = _names(path)
     errors = []
     missing = sorted(REQUIRED - set(names))
     if missing:
@@ -52,22 +71,29 @@ def validate(path: Path) -> list[str]:
     binaries = [name for name in names if name in {"drawclock", "drawclock.exe"}]
     if len(binaries) != 1:
         errors.append("archive must contain exactly one drawclock executable")
-    platform_scripts = {
-        "drawclock": "example/run-example.sh",
-        "drawclock.exe": "example/run-example.bat",
-    }
-    expected_scripts = {
-        platform_scripts[binary] for binary in binaries if binary in platform_scripts
-    }
+    expected_scripts = set().union(
+        *(_platform_scripts(binary) for binary in binaries)
+    ) if binaries else set()
+    if binaries and not expected_scripts:
+        errors.append("source example script directory is empty")
     missing_scripts = sorted(expected_scripts - set(names))
     if missing_scripts:
-        errors.append("missing platform example script: " + ", ".join(missing_scripts))
+        errors.append("missing platform example scripts: " + ", ".join(missing_scripts))
     unexpected_scripts = sorted(
-        ({"example/run-example.sh", "example/run-example.bat"} & set(names))
-        - expected_scripts
+        {
+            name for name in names
+            if name.startswith("example/run-example/")
+            and Path(name).suffix in {".sh", ".bat"}
+        } - expected_scripts
     )
     if unexpected_scripts:
         errors.append("unexpected platform example script: " + ", ".join(unexpected_scripts))
+    non_executable = sorted(
+        name for name in expected_scripts
+        if name.endswith(".sh") and name in modes and not modes[name] & 0o111
+    )
+    if non_executable:
+        errors.append("non-executable shell example scripts: " + ", ".join(non_executable))
     libraries = [name for name in names if name.startswith("libraries/")]
     if (
         not libraries

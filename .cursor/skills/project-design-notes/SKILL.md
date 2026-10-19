@@ -9,13 +9,14 @@ description: >-
 ## 发行示例合同（2026-10-19）
 
 - 每个平台发行包必须包含仓库当前全部公开 `example/auto-layout/*.json`、`example/draw.json`、`example/README.md` 与 `example/auto-layout/README.md`；新增公开 JSON 后归档 exact-set 自动扩展，禁止维护另一份会过时的手写子集。
-- Windows 包提供 `example/run-example.bat`，Linux 包提供可执行的 `example/run-example.sh`。脚本从自身位置定位包内冻结程序、器件库和 34 号配置，默认把 `drawclock-example.svg` 写入调用时的当前工作目录，并允许第一个参数覆盖输出路径、第二个参数覆盖 SVG 元数据标题。
+- Windows 包提供 `example/run-example/*.bat`，Linux 包提供同名且可执行的 `example/run-example/*.sh`。每个脚本只演示一个方面，从自身位置定位包内冻结程序、器件库和配置，默认把独立命名的 SVG 写入调用时的当前工作目录；第一个参数统一覆盖输出路径，需要额外值的脚本用第二个参数。
 - `--title` 设置根 SVG 的可访问性 `<title>` 元数据；默认固定为 `drawclock`，不泄漏输入文件名。它不生成画布内游离文字，不得破坏 `diagram_title_absence` 质量合同。
 - 归档检查器要求完整公开示例 exact-set 与平台脚本，并继续拒绝生成图、源码、测试语料、缓存和构建中间物。CI 在本地归档和公开回下载归档中都必须实际运行脚本、确认输出存在且标题正确。
+- 滚动 Release 的公开资产 exact-set 为版本化 Linux 归档、Windows 归档与 Windows 性能收据；发布后先核对三项名称完全一致，再执行下载与解压消费，禁止保留通用 `receipt.json` 或陈旧附件。
 
 ## 本轮新增要求（2026-10-16，已实现并验收）
 
-统一配置为presentation.DrawingOptions，通过generate_elk_layout/generate_layout的options参数传入；注释默认top-left方位、left文字对齐，节点同名字段逐项覆盖全局值。八方位与三对齐分别控制位置和块内文字，x/y偏移单位像素，正值向右/下。horizontal_spacing为最小列间距，布线可增大；name_align和frequency_align默认center，frequency_headers为与实际列数一致的字符串序列。frequencies数组定义任意数量列，支持多行标题/值，短行缺项为空；旧三个字段保留兼容但同节点不能混填。名称换行保留原始逻辑身份和引用，显示多行；文字空间在布局前预留。完成证据由项目目标维护，功能、完整质量指标与双平台发行消费均已验收。
+统一配置为 `presentation.DrawingOptions`，通过 `generate_elk_layout` / `generate_layout` 的 `options` 参数传入；注释默认 `top-left` 方位、`left` 文字对齐，节点同名字段逐项覆盖全局值。八方位与三对齐分别控制位置和块内文字，x/y 偏移单位像素，正值向右/下。`horizontal_spacing` 是相邻器件可见本体之间的最小横向距离，路由或文字防撞可增大但后处理不得缩小；`name_align` 和 `table_align` 默认 `center`，`table_headers` 必须与实际列数一致。`table_values` 数组定义任意含义、任意数量的列，支持多行标题/值，短行缺项为空；`frequencies`、`func_freq`、`scan_freq`、`bist_freq` 仅作为兼容输入，不能与规范字段混填。名称中的换行只影响显示；引用匹配仅移除 CR/LF，保留其他字符，并拒绝规范化后冲突。文字空间在布局前预留。
 
 ## 产品范围
 

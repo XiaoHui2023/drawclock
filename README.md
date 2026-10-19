@@ -8,7 +8,7 @@
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 ```
 
-末端节点用 `frequencies` 数组设置右侧表格内容，列数由数组长度决定。表头可自定义，标题和值均支持换行，列宽随文字调整。
+末端节点用 `table_values` 数组设置右侧数据表内容，列数由数组长度决定。表头可自定义，标题和值均支持换行，列宽随文字调整。
 
 任意节点可填写字符串 `description`。`description_color` 设置该段注释的颜色；省略时使用 `#4b5563`。支持 CSS 命名色、3/4/6/8 位十六进制、`rgb()`、`rgba()`、`hsl()`、`hsla()` 和 `hwb()`。示例为 `example/auto-layout/33-description-colors.json`。
 
@@ -29,5 +29,5 @@ SVG 不显示输入文件名或文件名前缀标题。`--title` 只设置 SVG �
 | `--description-offset-y` |  | 数字 |  | `0` | 注释垂直偏移，单位像素 |
 | `--horizontal-spacing` |  | 非负数字 |  |  | 列间最小距离，单位像素；布线需要时增加 |
 | `--name-align` |  | `left` / `center` / `right` |  | `center` | 多行名称对齐 |
-| `--frequency-headers` |  | 多个字符串 |  |  | 依次对应各列，可含换行 |
-| `--frequency-align` |  | `left` / `center` / `right` |  | `center` | 表头和内容对齐 |
+| `--table-headers` |  | 多个字符串 |  |  | 依次对应各列，可含换行 |
+| `--table-align` |  | `left` / `center` / `right` |  | `center` | 表头和内容对齐 |

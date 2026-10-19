@@ -4,7 +4,7 @@ from typing import Any
 
 from device_attrs_validate import collect_device_attr_errors
 from drawio_library import LibrarySource, library_cache_key
-from source_reference import parse_source_ref
+from source_reference import build_reference_name_index, resolve_source_ref
 from library_ports import output_connection_key_suffixes
 
 
@@ -16,14 +16,19 @@ def validate_config(
   library_path = library_cache_key(library_path)
   errors: list[str] = []
   errors.extend(collect_device_attr_errors(config))
-  device_names = set(config.keys())
+  try:
+    device_names = build_reference_name_index(config.keys())
+  except ValueError as error:
+    errors.append(str(error))
+    device_names = {}
 
   for name, item in config.items():
     kind = item.get("kind")
     refs = _referenced_peers(item)
     for peer in refs:
-      base, suffix = parse_source_ref(peer)
-      if base not in device_names:
+      try:
+        base, suffix = resolve_source_ref(peer, device_names)
+      except KeyError:
         errors.append(f"器件 {name} 连接到未知器件 {peer}")
         continue
       if suffix is not None:

@@ -7,7 +7,7 @@ import pytest
 
 from drawio_layout import LayoutDocument, VertexLayout, layout_to_dict, layout_from_dict
 from elk_layout import generate_elk_layout
-from layout_preview import _node_annotations, _frequency_table, build_preview_svg
+from layout_preview import _data_table, _node_annotations, build_preview_svg
 from presentation import ANCHORS, DrawingOptions
 from validate_config import validate_config
 
@@ -67,7 +67,7 @@ def test_node_overrides_are_independent_and_offsets_are_actual_translations():
     {"description_align": "start"}, {"description_anchor": "center"},
     {"description_offset_x": True}, {"description_offset_y": float("nan")},
     {"description_offset_x": float("inf")}, {"horizontal_spacing": -1},
-    {"horizontal_spacing": False}, {"frequency_headers": "one"},
+    {"horizontal_spacing": False}, {"table_headers": "one"},
     {"description_offset_x": 10 ** 400},
 ])
 def test_invalid_global_options_fail_early(values):
@@ -76,9 +76,9 @@ def test_invalid_global_options_fail_early(values):
 
 
 @pytest.mark.parametrize("values", [
-    {"frequencies": "100 MHz"}, {"frequencies": [True]},
-    {"frequencies": [float("inf")]}, {"frequencies": [["100"]]},
-    {"frequencies": [1], "func_freq": 1}, {"description_offset_x": True},
+    {"table_values": "100 MHz"}, {"table_values": [True]},
+    {"table_values": [float("inf")]}, {"table_values": [["100"]]},
+    {"table_values": [1], "func_freq": 1}, {"description_offset_x": True},
     {"description_anchor": "invalid"}, {"description_align": "invalid"},
 ])
 def test_invalid_node_options_fail_config_validation(values):
@@ -86,32 +86,32 @@ def test_invalid_node_options_fail_config_validation(values):
         validate_config({"node": {"kind": "gate", **values}}, library_path=LIBRARY)
 
 
-def frequency_config():
+def table_config():
     return {"root": {"kind": "gate"}, "sink": {"kind": "clock", "source": "root",
-            "frequencies": ["100\nMHz", "50 MHz", "10 MHz", "1 MHz"]}}
+            "table_values": ["100\nMHz", "50 MHz", "10 MHz", "1 MHz"]}}
 
 
 @pytest.mark.parametrize("alignment,anchor", [("left", "start"), ("center", "middle"), ("right", "end")])
-def test_array_frequency_table_multiline_alignment_and_widths(alignment, anchor):
-    options = DrawingOptions(frequency_align=alignment, frequency_headers=("Very long\nheading", "B", "C", "D"))
-    document, _ = generate_elk_layout(frequency_config(), library_path=LIBRARY, options=options)
+def test_array_data_table_multiline_alignment_and_widths(alignment, anchor):
+    options = DrawingOptions(table_align=alignment, table_headers=("Very long\nheading", "B", "C", "D"))
+    document, _ = generate_elk_layout(table_config(), library_path=LIBRARY, options=options)
     root = ET.fromstring(build_preview_svg(document))
-    headings = root.findall(".//s:text[@class='frequency-heading']", NS)
-    values = root.findall(".//s:text[@class='frequency-value']", NS)
+    headings = root.findall(".//s:text[@class='table-heading']", NS)
+    values = root.findall(".//s:text[@class='table-value']", NS)
     assert len(headings) == len(values) == 4
-    assert [value.get("aria-label") for value in values] == frequency_config()["sink"]["frequencies"]
-    assert [value.get("data-frequency-field") for value in values] == [f"frequencies[{i}]" for i in range(4)]
+    assert [value.get("aria-label") for value in values] == table_config()["sink"]["table_values"]
+    assert [value.get("data-table-field") for value in values] == [f"table_values[{i}]" for i in range(4)]
     assert all(value.get("text-anchor") == anchor for value in headings + values)
     assert [span.text for span in headings[0].findall("s:tspan", NS)] == ["Very long", "heading"]
-    table = _frequency_table(document)
+    table = _data_table(document)
     assert table.column_widths[0] > table.column_widths[1]
     for index in range(3):
         assert table.column_centers[index + 1] - table.column_centers[index] >= (table.column_widths[index] + table.column_widths[index + 1]) / 2 + 19.99
     assert layout_from_dict(layout_to_dict(document)).options == options
 
 
-def test_frequency_header_count_mismatch_is_not_silently_dropped():
-    document, _ = generate_elk_layout(frequency_config(), library_path=LIBRARY, options=DrawingOptions(frequency_headers=("a",)))
+def test_table_header_count_mismatch_is_not_silently_dropped():
+    document, _ = generate_elk_layout(table_config(), library_path=LIBRARY, options=DrawingOptions(table_headers=("a",)))
     with pytest.raises(ValueError, match="count must match"):
         build_preview_svg(document)
 
@@ -119,12 +119,55 @@ def test_frequency_header_count_mismatch_is_not_silently_dropped():
 def test_horizontal_spacing_survives_routing_compaction():
     gaps = []
     for spacing in (100.0, 240.0):
-        document, _ = generate_elk_layout(frequency_config(), library_path=LIBRARY, options=DrawingOptions(horizontal_spacing=spacing))
+        document, _ = generate_elk_layout(table_config(), library_path=LIBRARY, options=DrawingOptions(horizontal_spacing=spacing))
         nodes = {v.name: v for v in document.vertices}
         gap = nodes["sink"].x - nodes["root"].x - nodes["root"].width
         assert gap >= spacing
         gaps.append(gap)
     assert gaps[1] > gaps[0]
+
+
+@pytest.mark.parametrize("spacing", [0.0, 1.0, 10.0])
+def test_small_horizontal_spacing_is_not_clamped_without_route_lanes(spacing):
+    config = {
+        "s": {"kind": "source"},
+        "d": {"kind": "div", "source": "s"},
+        "c": {"kind": "clock", "source": "d"},
+    }
+    document, _ = generate_elk_layout(
+        config, library_path=LIBRARY,
+        options=DrawingOptions(horizontal_spacing=spacing),
+    )
+    nodes = {vertex.name: vertex for vertex in document.vertices}
+    assert nodes["d"].x - nodes["s"].x - nodes["s"].width == pytest.approx(spacing)
+    assert nodes["c"].x - nodes["d"].x - nodes["d"].width == pytest.approx(spacing)
+
+
+def test_root_anchor_relocation_preserves_explicit_horizontal_spacing():
+    config = {
+        "source\nname": {"kind": "from", "description": "source note"},
+        "divider": {"kind": "div", "source": "sourcename", "description": "divider note"},
+        "mux": {"kind": "mux2", "source": {"0": "divider"}},
+        "clock": {"kind": "clock", "source": "mux"},
+    }
+    gaps = []
+    for spacing in (40.0, 240.0):
+        document, _ = generate_elk_layout(
+            config, library_path=LIBRARY,
+            options=DrawingOptions(horizontal_spacing=spacing),
+        )
+        nodes = {vertex.name: vertex for vertex in document.vertices}
+        gap = nodes["divider"].x - nodes["source\nname"].x - nodes["source\nname"].width
+        assert gap >= spacing
+        gaps.append(gap)
+    assert gaps[1] > gaps[0]
+
+
+def test_frequency_option_aliases_normalize_to_table_options():
+    options = DrawingOptions(frequency_headers=("A", "B"), frequency_align="left")
+    assert options == DrawingOptions(table_headers=("A", "B"), table_align="left")
+    with pytest.raises(ValueError, match="cannot be mixed"):
+        DrawingOptions(table_headers=("A",), frequency_headers=("A",))
 
 
 def test_reserved_description_space_preserves_serialized_orthogonal_axes():

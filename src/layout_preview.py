@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 
-from presentation import LEGACY_FREQUENCIES, TEXT_ANCHORS, frequency_values, text_lines, text_width, wrap_text
+from presentation import LEGACY_FREQUENCIES, TEXT_ANCHORS, table_values, text_lines, text_width, wrap_text
 
 from drawio_layout import LayoutDocument, VertexLayout
 from drawio_ports import abs_port_xy, edge_attachment, port_anchors
@@ -21,12 +21,11 @@ from visual_geometry import vertex_visual_box
 HTML_LABEL_CONTENT_OFFSET_X = 2.0
 HTML_LABEL_CONTENT_OFFSET_Y = 7.0
 
-FREQUENCY_COLUMNS = LEGACY_FREQUENCIES
-FREQUENCY_FONT_SIZE = 12.0
-FREQUENCY_COLUMN_GAP = 20.0
-FREQUENCY_TABLE_GAP = 34.0
+TABLE_FONT_SIZE = 12.0
+TABLE_COLUMN_GAP = 20.0
+TABLE_GAP = 34.0
 @dataclass(frozen=True)
-class FrequencyTable:
+class DataTable:
     terminals: tuple[tuple[VertexLayout, float], ...]
     columns: tuple[tuple[str, str], ...]
     column_centers: tuple[float, ...]
@@ -268,16 +267,16 @@ def _estimated_text_width(text: str) -> float:
     return sum(_annotation_char_width(char) for char in text)
 
 
-def _frequency_value(vertex: VertexLayout, field: str) -> str:
-    if field.startswith("frequencies["):
-        index = int(field[len("frequencies["):-1])
-        values = (frequency_values(vertex.object_attrs) if "frequencies" in vertex.object_attrs
+def _table_value(vertex: VertexLayout, field: str) -> str:
+    if field.startswith("table_values["):
+        index = int(field[len("table_values["):-1])
+        values = (table_values(vertex.object_attrs) if {"table_values", "frequencies"} & vertex.object_attrs.keys()
                   else tuple(str(vertex.object_attrs.get(key, "")) for key, _ in LEGACY_FREQUENCIES))
         return values[index] if index < len(values) else ""
     return str(vertex.object_attrs.get(field, ""))
 
 
-def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
+def _data_table(document: LayoutDocument) -> DataTable | None:
     outgoing_ids = {edge.source_id for edge in document.edges}
     terminals = [
         vertex for vertex in document.vertices if vertex.cell_id not in outgoing_ids
@@ -301,36 +300,39 @@ def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
         rows.append((vertex, row_axis))
     rows.sort(key=lambda row: (row[1], row[0].name))
 
-    array_mode = any("frequencies" in vertex.object_attrs for vertex, _ in rows)
+    array_mode = any(
+        {"table_values", "frequencies"} & vertex.object_attrs.keys()
+        for vertex, _ in rows
+    )
     if array_mode:
-        count = max((len(frequency_values(vertex.object_attrs)) if "frequencies" in vertex.object_attrs
+        count = max((len(table_values(vertex.object_attrs)) if {"table_values", "frequencies"} & vertex.object_attrs.keys()
                      else (len(LEGACY_FREQUENCIES) if any(vertex.object_attrs.get(key, "") for key, _ in LEGACY_FREQUENCIES) else 0)
                      for vertex, _ in rows), default=0)
-        headings = document.options.frequency_headers
+        headings = document.options.table_headers
         if count and headings and len(headings) != count:
-            raise ValueError("frequency_headers count must match the longest frequencies array")
-        columns = tuple((f"frequencies[{index}]", headings[index] if headings else f"频率 {index + 1}")
+            raise ValueError("table_headers count must match the longest table_values array")
+        columns = tuple((f"table_values[{index}]", headings[index] if headings else f"列 {index + 1}")
                         for index in range(count))
     else:
         columns = tuple((field, heading) for field, heading in LEGACY_FREQUENCIES
                         if any(vertex.object_attrs.get(field, "") for vertex, _ in rows))
-        if document.options.frequency_headers and columns:
-            if len(document.options.frequency_headers) != len(columns):
-                raise ValueError("frequency_headers count must match the displayed legacy columns")
-            columns = tuple((field, heading) for (field, _), heading in zip(columns, document.options.frequency_headers))
+        if document.options.table_headers and columns:
+            if len(document.options.table_headers) != len(columns):
+                raise ValueError("table_headers count must match the displayed legacy columns")
+            columns = tuple((field, heading) for (field, _), heading in zip(columns, document.options.table_headers))
     if not columns:
         return None
 
     table_left = max(
         vertex_visual_box(vertex).right + HTML_LABEL_CONTENT_OFFSET_X
         for vertex, _ in rows
-    ) + FREQUENCY_TABLE_GAP
+    ) + TABLE_GAP
     column_widths: list[float] = []
     for field, heading in columns:
         widest = max(
-            [text_width(heading, FREQUENCY_FONT_SIZE)]
+            [text_width(heading, TABLE_FONT_SIZE)]
             + [
-                text_width(_frequency_value(vertex, field), FREQUENCY_FONT_SIZE)
+                text_width(_table_value(vertex, field), TABLE_FONT_SIZE)
                 for vertex, _ in rows
             ]
         )
@@ -339,32 +341,32 @@ def _frequency_table(document: LayoutDocument) -> FrequencyTable | None:
     cursor = table_left
     for width in column_widths:
         centers.append(cursor + width / 2)
-        cursor += width + FREQUENCY_COLUMN_GAP
-    max_x = cursor - FREQUENCY_COLUMN_GAP
+        cursor += width + TABLE_COLUMN_GAP
+    max_x = cursor - TABLE_COLUMN_GAP
     first_axis = rows[0][1]
-    line_height = FREQUENCY_FONT_SIZE * 1.35
+    line_height = TABLE_FONT_SIZE * 1.35
     header_lines = max(len(text_lines(heading)) for _, heading in columns)
-    row_half_heights = [max((len(text_lines(_frequency_value(vertex, field))) - 1) * line_height / 2
-                           + FREQUENCY_FONT_SIZE for field, _ in columns) for vertex, _ in rows]
+    row_half_heights = [max((len(text_lines(_table_value(vertex, field))) - 1) * line_height / 2
+                           + TABLE_FONT_SIZE for field, _ in columns) for vertex, _ in rows]
     first_half = row_half_heights[0]
     header_y = first_axis - max(28.0, first_half + 16.0) - (header_lines - 1) * line_height
-    return FrequencyTable(
+    return DataTable(
         terminals=tuple(rows),
         columns=columns,
         column_centers=tuple(centers),
         header_y=header_y,
         min_x=table_left,
-        min_y=header_y - FREQUENCY_FONT_SIZE,
+        min_y=header_y - TABLE_FONT_SIZE,
         max_x=max_x,
         max_y=max(row_axis + half for (_, row_axis), half in zip(rows, row_half_heights)),
         column_widths=tuple(column_widths),
-        align=document.options.frequency_align,
+        align=document.options.table_align,
     )
 
 
-def _render_frequency_table(table: FrequencyTable) -> list[str]:
-    lines = ['<g class="frequency-table">']
-    line_height = FREQUENCY_FONT_SIZE * 1.35
+def _render_data_table(table: DataTable) -> list[str]:
+    lines = ['<g class="data-table">']
+    line_height = TABLE_FONT_SIZE * 1.35
 
     def render_cell(text: str, field: str, index: int, y: float, *, node: str | None = None) -> str:
         center = table.column_centers[index]
@@ -377,22 +379,22 @@ def _render_frequency_table(table: FrequencyTable) -> list[str]:
             f'<tspan x="{_svg_num(x)}" y="{_svg_num(y + line * line_height)}">{_escape(value)}</tspan>'
             for line, value in enumerate(content_lines)))
         node_attr = f' data-node-id="{_escape(node)}"' if node is not None else ""
-        cls = "frequency-value" if node is not None else "frequency-heading"
+        cls = "table-value" if node is not None else "table-heading"
         color = "#d02020" if node is not None else "#20252b"
-        return (f'<text class="{cls}" data-frequency-field="{field}" data-frequency-index="{index}"'
+        return (f'<text class="{cls}" data-table-field="{field}" data-table-index="{index}"'
                 f'{node_attr} aria-label="{_escape(text)}" x="{_svg_num(x)}" y="{_svg_num(y)}" '
                 f'text-anchor="{TEXT_ANCHORS[table.align]}" font-family="Microsoft YaHei,WenQuanYi Micro Hei,Arial,sans-serif" '
-                f'font-size="{_svg_num(FREQUENCY_FONT_SIZE)}" fill="{color}">{content}</text>')
+                f'font-size="{_svg_num(TABLE_FONT_SIZE)}" fill="{color}">{content}</text>')
 
     for index, (field, heading) in enumerate(table.columns):
         lines.append(render_cell(heading, field, index, table.header_y))
     for vertex, row_axis in table.terminals:
         logical_name = vertex.logical_name or vertex.name
         for index, (field, _) in enumerate(table.columns):
-            value = _frequency_value(vertex, field)
+            value = _table_value(vertex, field)
             if not value:
                 continue
-            lines.append(render_cell(value, field, index, row_axis + FREQUENCY_FONT_SIZE * 0.35, node=logical_name))
+            lines.append(render_cell(value, field, index, row_axis + TABLE_FONT_SIZE * 0.35, node=logical_name))
     lines.append("</g>")
     return lines
 
@@ -703,14 +705,14 @@ def build_preview_svg(
     for x, y in junctions:
         all_x.extend((x - 3.0, x + 3.0))
         all_y.extend((y - 3.0, y + 3.0))
-    frequency_table = _frequency_table(document)
-    if frequency_table is not None:
-        all_x.extend((frequency_table.min_x, frequency_table.max_x))
-        all_y.extend((frequency_table.min_y, frequency_table.max_y))
+    data_table = _data_table(document)
+    if data_table is not None:
+        all_x.extend((data_table.min_x, data_table.max_x))
+        all_y.extend((data_table.min_y, data_table.max_y))
     reserved = (
-        ((frequency_table.min_x, frequency_table.min_y,
-          frequency_table.max_x, frequency_table.max_y),)
-        if frequency_table is not None else ()
+        ((data_table.min_x, data_table.min_y,
+          data_table.max_x, data_table.max_y),)
+        if data_table is not None else ()
     )
     annotations = _node_annotations(
         document, edge_points, reserved=reserved
@@ -794,8 +796,8 @@ def build_preview_svg(
                 'text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9">'
                 f'{_escape(vertex.logical_name or vertex.name)}</text>'
             )
-    if frequency_table is not None:
-        lines.extend(_render_frequency_table(frequency_table))
+    if data_table is not None:
+        lines.extend(_render_data_table(data_table))
     if annotations:
         lines.extend(_render_node_annotations(annotations))
     lines.append("</svg>")

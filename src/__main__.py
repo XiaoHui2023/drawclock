@@ -37,7 +37,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--title",
-        help="SVG 元数据标题；默认使用输入文件名，不在画布中显示",
+        help="SVG 元数据标题；默认 drawclock，不在画布中显示",
     )
     parser.add_argument(
         "--crossing-style",
@@ -51,8 +51,10 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--description-offset-y", type=float, default=0.0, help="注释垂直偏移（像素）")
     parser.add_argument("--horizontal-spacing", type=float, help="节点列之间的最小水平间距（像素）")
     parser.add_argument("--name-align", choices=ALIGNMENTS, default="center", help="多行节点名对齐")
-    parser.add_argument("--frequency-headers", nargs="+", help="频率数组的各列表头；字符串可含换行")
-    parser.add_argument("--frequency-align", choices=ALIGNMENTS, default="center", help="频率表文字对齐")
+    parser.add_argument("--table-headers", nargs="+", help="右侧表格的各列表头；字符串可含换行")
+    parser.add_argument("--table-align", choices=ALIGNMENTS, default="center", help="右侧表格文字对齐")
+    parser.add_argument("--frequency-headers", nargs="+", help=argparse.SUPPRESS)
+    parser.add_argument("--frequency-align", choices=ALIGNMENTS, help=argparse.SUPPRESS)
     return parser
 
 
@@ -61,6 +63,10 @@ def main(argv: list[str] | None = None) -> int:
     output = Path(args.output)
     libraries = [path for group in args.library for path in group]
     try:
+        if args.table_headers and args.frequency_headers:
+            raise ValueError("--table-headers cannot be mixed with --frequency-headers")
+        if args.frequency_align is not None and args.table_align != "center":
+            raise ValueError("--table-align cannot be mixed with --frequency-align")
         config = load_clock_tree(args.input)
         options = DrawingOptions(
             description_align=args.description_align,
@@ -69,7 +75,11 @@ def main(argv: list[str] | None = None) -> int:
             description_offset_y=args.description_offset_y,
             horizontal_spacing=args.horizontal_spacing,
             name_align=args.name_align,
-            frequency_headers=tuple(args.frequency_headers or ()),
+            table_headers=tuple(args.table_headers or ()),
+            table_align=args.table_align,
+            frequency_headers=(
+                tuple(args.frequency_headers) if args.frequency_headers else None
+            ),
             frequency_align=args.frequency_align,
         )
         document, _ = generate_elk_layout(config, library_path=libraries, options=options)

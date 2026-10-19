@@ -160,15 +160,15 @@ def test_frequency_column_metric_rejects_inactive_column_mutant(
 
     text = svg_path.read_text(encoding="utf-8")
     heading = (
-        f'<text class="frequency-heading" data-frequency-field="{unexpected_field}" '
+        f'<text class="table-heading" data-table-field="{unexpected_field}" '
         'x="0" y="0">unexpected</text>'
     )
-    if '<g class="frequency-table">' in text:
-        text = text.replace('<g class="frequency-table">',
-                            '<g class="frequency-table">' + heading, 1)
+    if '<g class="data-table">' in text:
+        text = text.replace('<g class="data-table">',
+                            '<g class="data-table">' + heading, 1)
     else:
         text = text.replace('</svg>',
-                            '<g class="frequency-table">' + heading + '</g></svg>')
+                            '<g class="data-table">' + heading + '</g></svg>')
     svg_path.write_text(text, encoding="utf-8")
     mutant = quality.evaluate(input_path, svg_path)
     metric = next(

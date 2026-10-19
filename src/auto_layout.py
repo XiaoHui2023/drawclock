@@ -20,7 +20,7 @@ from drawio_library import (
     load_library_shapes,
 )
 from drawio_ports import EDGE_DRAW_STYLE, abs_port_xy, port_anchors, format_port_ratio
-from source_reference import parse_source_ref
+from source_reference import build_reference_name_index, resolve_source_ref
 from internal_kind import INTERNAL_OBJECT_KEYS
 from library_ports import input_connection_keys, output_connection_keys, port_topology_from_style
 from validate_config import validate_config
@@ -191,13 +191,15 @@ def build_logical_edges(
     library_path: LibrarySource,
 ) -> list[LogicalEdge]:
     edges: list[LogicalEdge] = []
+    name_index = build_reference_name_index(nodes)
     for target, item in config.items():
         target_node = nodes[target]
         target_topology = port_topology_from_style(target_node.shape.style)
         target_keys = input_connection_keys(target_node.shape.title, library_path=library_path)
         for input_key, raw in _source_values(item):
-            source, suffix = parse_source_ref(raw)
-            if source not in nodes:
+            try:
+                source, suffix = resolve_source_ref(raw, name_index)
+            except KeyError:
                 raise ValueError(f"器件 {target} 连接到未知器件 {raw}")
             source_node = nodes[source]
             source_topology = port_topology_from_style(source_node.shape.style)
@@ -928,7 +930,11 @@ def _vertex_layouts(
         for key, value in node.item.items():
             if key == "source" or key in INTERNAL_OBJECT_KEYS:
                 continue
-            attrs[key] = json.dumps(value, ensure_ascii=False) if key == "frequencies" else str(value)
+            attrs[key] = (
+                json.dumps(value, ensure_ascii=False)
+                if key in {"table_values", "frequencies"}
+                else str(value)
+            )
         attrs["name"] = name
         attrs = canonical_object_attrs(
             node.shape.title,

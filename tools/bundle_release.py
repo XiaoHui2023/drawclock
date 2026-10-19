@@ -70,12 +70,20 @@ def main() -> int:
             for path in sorted((ROOT / "example" / "auto-layout").glob("*.json"))
         ),
     ]
-    platform_script = (
-        "example/run-example.bat"
-        if platform.system() == "Windows"
-        else "example/run-example.sh"
+    script_suffix = ".bat" if platform.system() == "Windows" else ".sh"
+    platform_scripts = sorted(
+        (ROOT / "example" / "run-example").glob(f"*{script_suffix}")
     )
-    release_files.append((platform_script, platform_script))
+    if not platform_scripts:
+        print(
+            f"错误: example/run-example 中没有 {script_suffix} 演示脚本。",
+            file=sys.stderr,
+        )
+        return 1
+    release_files.extend(
+        (str(path.relative_to(ROOT)), str(path.relative_to(ROOT)))
+        for path in platform_scripts
+    )
 
     for source_rel, destination_rel in release_files:
         src = ROOT / source_rel

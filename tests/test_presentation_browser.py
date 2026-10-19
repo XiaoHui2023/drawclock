@@ -19,10 +19,10 @@ def test_all_anchor_alignment_combinations_have_real_glyph_and_port_clearance(tm
         for align in ALIGNMENTS:
             config = {"Root <&>\nlong name": {"kind": "gate", "description": "Root note"},
                       "Clock\noutput": {"kind": "clock", "source": "Root <&>\nlong name",
-                                          "description": "Output note", "frequencies": ["100\nMHz", "50", "10", "1"]}}
+                                          "description": "Output note", "table_values": ["100\nMHz", "50", "10", "1"]}}
             options = DrawingOptions(description_anchor=anchor, description_align=align,
-                                     name_align=align, frequency_align=align,
-                                     frequency_headers=("Operating\nfrequency", "SCAN", "BIST", "Custom"))
+                                     name_align=align, table_align=align,
+                                     table_headers=("Operating\nvalue", "SCAN", "BIST", "Custom"))
             document, _ = generate_elk_layout(config, library_path=library, options=options)
             svg = build_preview_svg(document)
             cards.append(f'<section data-case="{anchor}/{align}">{svg}</section>')

@@ -26,7 +26,7 @@ DENSE = ROOT / "example" / "auto-layout" / "05-dense-cross-root.json"
 MEDIUM = ROOT / "example" / "auto-layout" / "07-medium-64-clocks.json"
 ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
 COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
-FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
+DATA_TABLE = ROOT / "example" / "auto-layout" / "22-terminal-data-table.json"
 MULTI_SOURCE = ROOT / "example" / "auto-layout" / "19-dispersed-root-fanout.json"
 SINGLE_ALIAS = ROOT / "example" / "auto-layout" / "24-single-source-rendering-alias.json"
 MIDDLE_SOURCE = ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
@@ -384,14 +384,21 @@ def _assert_multi_source_row_patterns(path: Path, config_path: Path) -> None:
         )
 
 
-def _assert_frequency_table(path: Path, config_path: Path, headers: tuple[str, ...] | None = None) -> None:
+def _assert_data_table(path: Path, config_path: Path, headers: tuple[str, ...] | None = None) -> None:
     config = json.loads(config_path.read_text(encoding="utf-8"))
+    normalized_names = {
+        name.replace("\r", "").replace("\n", ""): name
+        for name in config
+    }
     referenced = set()
     for item in config.values():
         source = item.get("source")
         values = source.values() if isinstance(source, dict) else (source,)
         referenced.update(
-            value.split("[", 1)[0]
+            normalized_names.get(
+                value.split("[", 1)[0].replace("\r", "").replace("\n", ""),
+                value.split("[", 1)[0],
+            )
             for value in values
             if isinstance(value, str)
         )
@@ -403,20 +410,20 @@ def _assert_frequency_table(path: Path, config_path: Path, headers: tuple[str, .
         and element.get("data-node-id") in terminals
     ]
     if len(components) != len(terminals):
-        raise SystemExit("frequency example terminal traceability is incomplete")
+        raise SystemExit("table example terminal traceability is incomplete")
     graphics = [
         next(child for child in component.iter()
              if child.get("class") == "component-graphic")
         for component in components
     ]
     if len({graphic.get("x") for graphic in graphics}) != 1:
-        raise SystemExit("frequency example terminals are not co-column")
+        raise SystemExit("table example terminals are not co-column")
     if len({graphic.get("y") for graphic in graphics}) != len(graphics):
-        raise SystemExit("frequency example places multiple terminals on one row")
+        raise SystemExit("table example places multiple terminals on one row")
 
     headings = [
         element for element in root.iter()
-        if element.get("class") == "frequency-heading"
+        if element.get("class") == "table-heading"
     ]
     columns = (
         ("func_freq", "工作频率"),
@@ -428,35 +435,35 @@ def _assert_frequency_table(path: Path, config_path: Path, headers: tuple[str, .
         if any(str(config[name].get(field, "")) for name in terminals)
     ]
     array_rows = None
-    if any("frequencies" in config[name] for name in terminals):
+    if any({"table_values", "frequencies"} & config[name].keys() for name in terminals):
         array_rows = {}
         for name in terminals:
             legacy = [config[name].get(field, "") for field, _ in columns]
-            array_rows[name] = config[name].get("frequencies", legacy if any(str(v) for v in legacy) else [])
+            array_rows[name] = config[name].get("table_values", config[name].get("frequencies", legacy if any(str(v) for v in legacy) else []))
         count = max((len(row) for row in array_rows.values()), default=0)
-        expected_columns = [(f"frequencies[{i}]", f"频率 {i + 1}") for i in range(count)]
+        expected_columns = [(f"table_values[{i}]", f"列 {i + 1}") for i in range(count)]
     if headers is not None:
         if len(headers) != len(expected_columns):
-            raise SystemExit("custom frequency heading count differs")
+            raise SystemExit("custom table heading count differs")
         expected_columns = [(field, label) for (field, _), label in zip(expected_columns, headers)]
     labels = [element.get("aria-label", element.text or "") for element in headings]
-    fields = [element.get("data-frequency-field") for element in headings]
+    fields = [element.get("data-table-field") for element in headings]
     if labels != [label for _, label in expected_columns] or fields != [
         field for field, _ in expected_columns
     ]:
-        raise SystemExit(f"frequency headings are invalid: {labels=} {fields=}")
+        raise SystemExit(f"table headings are invalid: {labels=} {fields=}")
     if any(element.get("fill") != "#20252b" for element in headings):
-        raise SystemExit("frequency headings are not black")
+        raise SystemExit("table headings are not black")
     if expected_columns and expected_columns[0][0] == "func_freq":
         if headings[0].text != "工作频率":
             raise SystemExit("Chinese frequency heading text is missing")
 
     values = [
         element for element in root.iter()
-        if element.get("class") == "frequency-value"
+        if element.get("class") == "table-value"
     ]
     observed = {
-        (element.get("data-node-id"), element.get("data-frequency-field")): (
+        (element.get("data-node-id"), element.get("data-table-field")): (
             "\n".join("".join(span.itertext()) for span in element if span.tag.rsplit("}", 1)[-1] == "tspan")
             if len(element) else element.text)
         for element in values
@@ -469,19 +476,19 @@ def _assert_frequency_table(path: Path, config_path: Path, headers: tuple[str, .
         if field in item and str(item[field])
     }
     if array_rows is not None:
-        expected = {(name, f"frequencies[{i}]"): str(value)
+        expected = {(name, f"table_values[{i}]"): str(value)
                     for name, row in array_rows.items() for i, value in enumerate(row) if str(value)}
     if observed != expected or any(
         element.get("fill") != "#d02020" for element in values
     ):
-        raise SystemExit(f"frequency values are invalid: {observed=}, {expected=}")
+        raise SystemExit(f"table values are invalid: {observed=}, {expected=}")
 
 
 def _assert_configurable_presentation(binary: Path, out: Path) -> None:
-    source = ROOT / "example/auto-layout/34-configurable-text-and-frequency.json"
+    source = ROOT / "example/auto-layout/34-configurable-text-and-table.json"
     default = out / "presentation-default.svg"
     _draw(binary, source, default)
-    _assert_frequency_table(default, source)
+    _assert_data_table(default, source)
     ns = {"s": SVG_NS}
     default_root = ET.parse(default).getroot()
     config = json.loads(source.read_text(encoding="utf-8"))
@@ -499,17 +506,17 @@ def _assert_configurable_presentation(binary: Path, out: Path) -> None:
     headers = ("Operating\nfrequency", "SCAN", "BIST", "Custom")
     common = ["--description-align", "center", "--description-anchor", "top-left",
               "--horizontal-spacing", "240", "--name-align", "right",
-              "--frequency-align", "left", "--frequency-headers", *headers]
+              "--table-align", "left", "--table-headers", *headers]
     documents = []
     for index, offsets in enumerate(((0, 0), (5, -7))):
         output = out / f"presentation-global-{index}.svg"
         _draw(binary, source, output, *common, "--description-offset-x", str(offsets[0]),
               "--description-offset-y", str(offsets[1]))
-        _assert_frequency_table(output, source, headers)
+        _assert_data_table(output, source, headers)
         document = ET.parse(output).getroot()
         for text in document.iter(f"{{{SVG_NS}}}text"):
-            if text.get("class") in {"frequency-heading", "frequency-value"} and text.get("text-anchor") != "start":
-                raise SystemExit("frozen frequency alignment was ignored")
+            if text.get("class") in {"table-heading", "table-value"} and text.get("text-anchor") != "start":
+                raise SystemExit("frozen table alignment was ignored")
         graphics = [e for e in document.iter() if e.get("class") == "component-graphic"]
         xs = sorted({float(e.get("x")) for e in graphics})
         if any(b - a - 40 < 239.99 for a, b in zip(xs, xs[1:])):
@@ -536,14 +543,14 @@ def _assert_configurable_presentation(binary: Path, out: Path) -> None:
             raise SystemExit(f"frozen description offsets or per-node overrides differ: {name}")
     rejected = out / "presentation-invalid.svg"
     _run(binary, ["-i", str(source), "-l", str(LIBRARY), "-o", str(rejected),
-                  "--frequency-headers", "only-one"], expect_success=False)
+                  "--table-headers", "only-one"], expect_success=False)
     if rejected.exists():
         raise SystemExit("invalid presentation wrote a partial SVG")
 
 
 def main() -> int:
     global ROOT, LIBRARY, DRAW_EXAMPLE, LINEAR, DENSE, MEDIUM, ASYMMETRIC
-    global COLUMN_PREFERENCE, FREQUENCY, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE, SKILLS
+    global COLUMN_PREFERENCE, DATA_TABLE, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE, SKILLS
     binary = _binary_path()
     package_root = binary.parent
     if (package_root / "source-manifest.json").is_file():
@@ -555,15 +562,15 @@ def main() -> int:
         MEDIUM = ROOT / "example" / "auto-layout" / "07-medium-64-clocks.json"
         ASYMMETRIC = ROOT / "example" / "auto-layout" / "20-asymmetric-merge-route-bulge.json"
         COLUMN_PREFERENCE = ROOT / "example" / "auto-layout" / "21-layout-column-preference.json"
-        FREQUENCY = ROOT / "example" / "auto-layout" / "22-terminal-frequency-table.json"
+        DATA_TABLE = ROOT / "example" / "auto-layout" / "22-terminal-data-table.json"
         MULTI_SOURCE = ROOT / "example" / "auto-layout" / "19-dispersed-root-fanout.json"
         SINGLE_ALIAS = ROOT / "example" / "auto-layout" / "24-single-source-rendering-alias.json"
         MIDDLE_SOURCE = ROOT / "example" / "auto-layout" / "23-middle-column-low-use-sources.json"
         SKILLS = ROOT / "skills"
     required = (
         binary, DRAW_EXAMPLE, LINEAR, DENSE, MEDIUM, ASYMMETRIC,
-        COLUMN_PREFERENCE, FREQUENCY, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE,
-        ROOT / "example/auto-layout/34-configurable-text-and-frequency.json",
+        COLUMN_PREFERENCE, DATA_TABLE, MULTI_SOURCE, SINGLE_ALIAS, MIDDLE_SOURCE,
+        ROOT / "example/auto-layout/34-configurable-text-and-table.json",
         SKILLS / "clock-diagram-design" / "SKILL.md",
         SKILLS / "clock-json-schema" / "SKILL.md",
         SKILLS / "clock-layout-algorithms" / "SKILL.md",
@@ -626,9 +633,9 @@ def main() -> int:
             f"root={root_x}, mux={mux_x}, clock={clock_x}"
         )
 
-    frequency_output = out / "terminal-frequency-frozen.svg"
-    _draw(binary, FREQUENCY, frequency_output)
-    _assert_frequency_table(frequency_output, FREQUENCY)
+    data_table_output = out / "terminal-data-table-frozen.svg"
+    _draw(binary, DATA_TABLE, data_table_output)
+    _assert_data_table(data_table_output, DATA_TABLE)
     _assert_configurable_presentation(binary, out)
 
     multi_source_output = out / "multi-source-rows-frozen.svg"

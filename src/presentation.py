@@ -27,7 +27,7 @@ def finite_number(value: Any, name: str, *, minimum: float | None = None) -> flo
     return number
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, init=False)
 class DrawingOptions:
     """Global presentation defaults; individual node descriptions may override them."""
 
@@ -43,13 +43,44 @@ class DrawingOptions:
     """Minimum horizontal layer gap; None retains the selected layout profile."""
     name_align: str = "center"
     """Alignment of explicit lines within a node name."""
-    frequency_headers: tuple[str, ...] = ()
-    """Column headings for frequency arrays; each string may contain newlines."""
-    frequency_align: str = "center"
-    """Alignment of frequency headings and cell contents within each column."""
+    table_headers: tuple[str, ...] = ()
+    """Column headings for the terminal data table; strings may contain newlines."""
+    table_align: str = "center"
+    """Alignment of table headings and cell contents within each column."""
+
+    def __init__(
+        self,
+        description_align: str = "left",
+        description_anchor: str = "top-left",
+        description_offset_x: float = 0.0,
+        description_offset_y: float = 0.0,
+        horizontal_spacing: float | None = None,
+        name_align: str = "center",
+        table_headers: tuple[str, ...] = (),
+        table_align: str = "center",
+        *,
+        frequency_headers: tuple[str, ...] | None = None,
+        frequency_align: str | None = None,
+    ) -> None:
+        if frequency_headers is not None:
+            if table_headers:
+                raise ValueError("table_headers cannot be mixed with frequency_headers")
+            table_headers = frequency_headers
+        if frequency_align is not None:
+            if table_align != "center":
+                raise ValueError("table_align cannot be mixed with frequency_align")
+            table_align = frequency_align
+        values = locals().copy()
+        for key in (
+            "description_align", "description_anchor", "description_offset_x",
+            "description_offset_y", "horizontal_spacing", "name_align",
+            "table_headers", "table_align",
+        ):
+            object.__setattr__(self, key, values[key])
+        self.__post_init__()
 
     def __post_init__(self) -> None:
-        for key in ("description_align", "name_align", "frequency_align"):
+        for key in ("description_align", "name_align", "table_align"):
             if getattr(self, key) not in ALIGNMENTS:
                 raise ValueError(f"{key} must be one of {ALIGNMENTS}")
         if self.description_anchor not in ANCHORS:
@@ -58,9 +89,9 @@ class DrawingOptions:
             finite_number(getattr(self, key), key)
         if self.horizontal_spacing is not None:
             finite_number(self.horizontal_spacing, "horizontal_spacing", minimum=0.0)
-        if not isinstance(self.frequency_headers, (tuple, list)) or not all(isinstance(s, str) for s in self.frequency_headers):
-            raise ValueError("frequency_headers must be an array of strings")
-        object.__setattr__(self, "frequency_headers", tuple(self.frequency_headers))
+        if not isinstance(self.table_headers, (tuple, list)) or not all(isinstance(s, str) for s in self.table_headers):
+            raise ValueError("table_headers must be an array of strings")
+        object.__setattr__(self, "table_headers", tuple(self.table_headers))
 
     def description(self, attrs: Mapping[str, Any]) -> tuple[str, str, float, float]:
         """Resolve each explicit node property independently over global defaults."""
@@ -85,19 +116,20 @@ def text_width(value: str, font_size: float) -> float:
                 for line in text_lines(value)), default=0.0)
 
 
-def frequency_values(attrs: Mapping[str, Any]) -> tuple[str, ...]:
-    """Read canonical arrays; JSON strings are the internal layout representation."""
-    value = attrs.get("frequencies", ())
+def table_values(attrs: Mapping[str, Any]) -> tuple[str, ...]:
+    """Read canonical table arrays and the legacy frequency alias."""
+    key = "table_values" if "table_values" in attrs else "frequencies"
+    value = attrs.get(key, ())
     if isinstance(value, str):
         value = json.loads(value)
     if not isinstance(value, (list, tuple)):
-        raise ValueError("frequencies must be an array")
+        raise ValueError(f"{key} must be an array")
     result = []
     for item in value:
         if isinstance(item, bool) or not isinstance(item, (str, int, float)):
-            raise ValueError("frequencies entries must be strings or finite numbers")
+            raise ValueError(f"{key} entries must be strings or finite numbers")
         if isinstance(item, (int, float)):
-            finite_number(item, "frequencies entry")
+            finite_number(item, f"{key} entry")
         result.append(str(item))
     return tuple(result)
 
@@ -143,7 +175,7 @@ def prepare_nodes(nodes: dict[str, Any], logical_edges: Any, options: DrawingOpt
         shape = node.shape
         description = node.item.get("description", "")
         name_lines = len(text_lines(name))
-        values = (frequency_values(node.item) if "frequencies" in node.item else
+        values = (table_values(node.item) if {"table_values", "frequencies"} & node.item.keys() else
                   tuple(str(node.item.get(key, "")) for key, _ in LEGACY_FREQUENCIES))
         cell_lines = max((len(text_lines(value)) for value in values), default=1) if name not in outgoing else 1
         if not description and name_lines <= 1 and cell_lines <= 1:

@@ -279,12 +279,14 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         "# Automatic layout examples\n", encoding="utf-8"
     )
     (project / "example" / "draw.json").write_text("{}", encoding="utf-8")
-    (project / "example" / "run-example.bat").write_text(
-        "@echo off\r\n", encoding="ascii"
-    )
-    (project / "example" / "run-example.sh").write_text(
-        "#!/usr/bin/env sh\n", encoding="ascii"
-    )
+    (project / "example" / "run-example").mkdir()
+    for stem in ("01-basic", "02-title"):
+        (project / "example" / "run-example" / f"{stem}.bat").write_text(
+            "@echo off\r\n", encoding="ascii"
+        )
+        (project / "example" / "run-example" / f"{stem}.sh").write_text(
+            "#!/usr/bin/env sh\n", encoding="ascii"
+        )
     packaged_layout_examples = tuple(
         path.name for path in sorted((ROOT / "example" / "auto-layout").glob("*.json"))
     )
@@ -311,7 +313,8 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         prefix + "example/README.md",
         prefix + "example/auto-layout/README.md",
         *(prefix + "example/auto-layout/" + name for name in packaged_layout_examples),
-        prefix + "example/run-example.bat",
+        prefix + "example/run-example/01-basic.bat",
+        prefix + "example/run-example/02-title.bat",
         prefix + "libraries/source.xml",
     }
     assert names == expected
@@ -331,6 +334,7 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
     assert checker_spec is not None and checker_spec.loader is not None
     checker = importlib.util.module_from_spec(checker_spec)
     checker_spec.loader.exec_module(checker)
+    monkeypatch.setattr(checker, "ROOT", project)
     assert checker.validate(archive) == []
 
     missing_example = project / "dist" / "missing-example.zip"
@@ -341,6 +345,16 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
                 target.writestr(item, source.read(item.filename))
     assert checker.validate(missing_example) == [
         "missing required files: example/auto-layout/01-linear.json"
+    ]
+
+    missing_script = project / "dist" / "missing-script.zip"
+    omitted_script = prefix + "example/run-example/02-title.bat"
+    with zipfile.ZipFile(archive) as source, zipfile.ZipFile(missing_script, "w") as target:
+        for item in source.infolist():
+            if item.filename != omitted_script:
+                target.writestr(item, source.read(item.filename))
+    assert checker.validate(missing_script) == [
+        "missing platform example scripts: example/run-example/02-title.bat"
     ]
 
     with zipfile.ZipFile(archive, "a") as zf:
@@ -373,7 +387,7 @@ def test_source_manifest_rejects_missing_or_modified_source(
         "src/__main__.py": b"print('ok')\n",
         "drawio-lib/drawclock/source.xml": b"<mxlibrary/>\n",
         "example/draw.json": b"{}\n",
-        "example/auto-layout/22-terminal-frequency-table.json": b"{}\n",
+        "example/auto-layout/22-terminal-data-table.json": b"{}\n",
         "licenses/NotoSansCJK-OFL-1.1.txt": b"SIL Open Font License 1.1\n",
         "skills/clock-diagram-design/SKILL.md": b"---\nname: clock-diagram-design\ndescription: test\n---\n",
         "skills/clock-json-schema/SKILL.md": b"---\nname: clock-json-schema\ndescription: test\n---\n",

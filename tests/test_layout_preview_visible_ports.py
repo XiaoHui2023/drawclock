@@ -372,7 +372,7 @@ def test_preview_viewbox_contains_routes_below_all_nodes() -> None:
     assert min_y + height >= 945.0
 
 
-def test_terminal_frequency_table_has_one_aligned_row_per_sink() -> None:
+def test_terminal_data_table_has_one_aligned_row_per_sink() -> None:
     style = "points=[[0,0.5,0,0,0],[1,0.5,0,0,0]];"
     vertices = [
         VertexLayout("root", "v0", "generic", 0, 80, 40, 40, style),
@@ -405,14 +405,14 @@ def test_terminal_frequency_table_has_one_aligned_row_per_sink() -> None:
     ns = {"svg": "http://www.w3.org/2000/svg"}
     headings = [
         element for element in root.iter()
-        if element.attrib.get("class") == "frequency-heading"
+        if element.attrib.get("class") == "table-heading"
     ]
-    values = root.findall(".//svg:text[@class='frequency-value']", ns)
+    values = root.findall(".//svg:text[@class='table-value']", ns)
 
     assert [heading.attrib.get("aria-label", heading.text) for heading in headings] == [
         "工作频率", "SCAN", "BIST",
     ]
-    assert [heading.attrib["data-frequency-field"] for heading in headings] == [
+    assert [heading.attrib["data-table-field"] for heading in headings] == [
         "func_freq", "scan_freq", "bist_freq",
     ]
     assert all(heading.attrib["fill"] == "#20252b" for heading in headings)
@@ -445,7 +445,7 @@ def test_terminal_frequency_table_has_one_aligned_row_per_sink() -> None:
     assert min_y + height > max(float(value.attrib["y"]) for value in values)
 
 
-def test_frequency_text_is_xml_escaped_and_long_value_expands_canvas() -> None:
+def test_table_text_is_xml_escaped_and_long_value_expands_canvas() -> None:
     vertex = VertexLayout(
         "clk", "v1", "generic", 10, 20, 40, 40,
         "points=[[0,0.5,0,0,0]];",
@@ -454,7 +454,7 @@ def test_frequency_text_is_xml_escaped_and_long_value_expands_canvas() -> None:
     svg = build_preview_svg(LayoutDocument(version=1, vertices=[vertex], edges=[]))
     root = ET.fromstring(svg)
     ns = {"svg": "http://www.w3.org/2000/svg"}
-    value = root.find(".//svg:text[@class='frequency-value']", ns)
+    value = root.find(".//svg:text[@class='table-value']", ns)
     assert value is not None
     assert value.text == "A&B <nominal> " + "9" * 80
     assert "A&amp;B &lt;nominal&gt;" in svg
@@ -479,7 +479,7 @@ def test_frequency_text_is_xml_escaped_and_long_value_expands_canvas() -> None:
         ),
     ],
 )
-def test_frequency_table_only_renders_nonempty_columns(
+def test_legacy_frequency_fields_render_as_table_columns(
     attrs: dict[str, str],
     expected_fields: list[str],
     expected_labels: list[str],
@@ -493,18 +493,18 @@ def test_frequency_table_only_renders_nonempty_columns(
     ))
     headings = [
         element for element in root.iter()
-        if element.attrib.get("class") == "frequency-heading"
+        if element.attrib.get("class") == "table-heading"
     ]
-    assert [element.attrib["data-frequency-field"] for element in headings] == expected_fields
+    assert [element.attrib["data-table-field"] for element in headings] == expected_fields
     assert [element.attrib.get("aria-label", element.text) for element in headings] == expected_labels
     values = [
         element for element in root.iter()
-        if element.attrib.get("class") == "frequency-value"
+        if element.attrib.get("class") == "table-value"
     ]
-    assert [element.attrib["data-frequency-field"] for element in values] == expected_fields
+    assert [element.attrib["data-table-field"] for element in values] == expected_fields
 
 
-def test_frequency_table_disappears_when_all_terminal_values_are_empty() -> None:
+def test_data_table_disappears_when_all_terminal_values_are_empty() -> None:
     style = "points=[[0,0.5,0,0,0]];"
     empty = VertexLayout(
         "clk", "v1", "generic", 10, 20, 40, 40, style,
@@ -521,11 +521,11 @@ def test_frequency_table_disappears_when_all_terminal_values_are_empty() -> None
         LayoutDocument(version=1, vertices=[populated], edges=[])
     ))
     assert not any(
-        element.attrib.get("class") == "frequency-table"
+        element.attrib.get("class") == "data-table"
         for element in empty_root.iter()
     )
     assert not any(
-        element.attrib.get("class") in {"frequency-heading", "frequency-value"}
+        element.attrib.get("class") in {"table-heading", "table-value"}
         for element in empty_root.iter()
     )
     assert float(empty_root.attrib["width"]) < float(populated_root.attrib["width"])

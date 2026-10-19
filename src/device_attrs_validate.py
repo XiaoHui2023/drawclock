@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from css_color import parse_css_color
-from presentation import ALIGNMENTS, ANCHORS, finite_number, frequency_values
+from presentation import ALIGNMENTS, ANCHORS, finite_number, table_values
 
 
 FREQUENCY_FIELDS = ("func_freq", "scan_freq", "bist_freq")
@@ -36,13 +36,17 @@ def collect_device_attr_errors(config: dict[str, dict[str, Any]]) -> list[str]:
                     finite_number(item[key], key)
                 except ValueError as error:
                     errors.append(f"器件 {name}: {error}")
-        if "frequencies" in item:
+        table_keys = {"table_values", "frequencies"} & item.keys()
+        if table_keys:
             try:
-                if not isinstance(item["frequencies"], list):
-                    raise ValueError("frequencies must be an array")
-                frequency_values(item)
+                if len(table_keys) > 1:
+                    raise ValueError("table_values cannot be mixed with frequencies")
+                key = next(iter(table_keys))
+                if not isinstance(item[key], list):
+                    raise ValueError(f"{key} must be an array")
+                table_values(item)
                 if any(field in item for field in FREQUENCY_FIELDS):
-                    raise ValueError("frequencies cannot be mixed with legacy frequency fields")
+                    raise ValueError(f"{key} cannot be mixed with legacy frequency fields")
             except ValueError as error:
                 errors.append(f"器件 {name}: {error}")
         if DESCRIPTION_FIELD in item and not isinstance(description, str):

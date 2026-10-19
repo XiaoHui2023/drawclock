@@ -52,3 +52,35 @@ def test_public_cli_renders_multiline_name_and_keeps_metadata_identity(tmp_path,
     assert float(spans[1].get("y")) - float(spans[0].get("y")) > 12
     assert "foreignObject" not in output.read_text(encoding="utf-8")
     assert any(name == value for element in document.iter() for value in element.attrib.values())
+
+
+@pytest.mark.parametrize("reference", ["rootlong", "root\nlong", "root\r\nlong"])
+def test_source_reference_ignores_newlines_but_preserves_display_name(tmp_path, reference):
+    name = "root\nlong"
+    config = {name: {"kind": "gate"}, "sink": {"kind": "clock", "source": reference}}
+    source = tmp_path / "input.json"
+    source.write_text(json.dumps(config), encoding="utf-8")
+    output = tmp_path / "result.svg"
+    result = subprocess.run(
+        [sys.executable, "src", "-i", str(source), "-l", "drawio-lib/drawclock", "-o", str(output)],
+        cwd=ROOT, env={**os.environ, "PYTHONUTF8": "1"}, capture_output=True, timeout=60,
+    )
+    assert result.returncode == 0, result.stderr.decode("utf-8", errors="replace")
+    root = ET.parse(output).getroot()
+    assert root.find(".//s:g[@class='component'][@data-node-id='root\nlong']", SVG) is not None
+
+
+def test_newline_insensitive_names_reject_ambiguous_nodes():
+    from validate_config import validate_config
+
+    config = {"rootlong": {"kind": "gate"}, "root\nlong": {"kind": "gate"}}
+    with pytest.raises(ValueError, match="忽略换行后不能唯一匹配"):
+        validate_config(config, library_path=ROOT / "drawio-lib/drawclock")
+
+
+def test_source_reference_does_not_ignore_spaces():
+    from validate_config import validate_config
+
+    config = {"root long": {"kind": "gate"}, "sink": {"kind": "clock", "source": "rootlong"}}
+    with pytest.raises(ValueError, match="未知器件"):
+        validate_config(config, library_path=ROOT / "drawio-lib/drawclock")

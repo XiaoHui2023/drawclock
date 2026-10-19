@@ -123,6 +123,7 @@ def select_layout_plan(nodes, logical_edges) -> LayoutPlan:
 def _generate_scalable_layout(
     nodes, logical_edges, profile, started, library_path, plan=None,
     source_position_mode="consumer-median",
+    explicit_horizontal_spacing=False,
 ):
     """Linear layered layout for very large high-reuse clock networks."""
     column_groups = _layout_column_groups(nodes)
@@ -1421,9 +1422,13 @@ def _generate_scalable_layout(
                 if a[0] == b[0] and left_edge < a[0] < right_edge
             )
         ordered_lanes = sorted(used_lanes)
-        required_gap = max(profile.minimum_layer_spacing, 2 * profile.route_clearance + max(
-            0, len(ordered_lanes) - 1
-        ) * profile.grid)
+        route_gap = (
+            2 * profile.route_clearance
+            + (len(ordered_lanes) - 1) * profile.grid
+            if ordered_lanes
+            else (0.0 if explicit_horizontal_spacing else 2 * profile.route_clearance)
+        )
+        required_gap = max(profile.minimum_layer_spacing, route_gap)
         delta = right_edge - left_edge - required_gap
         if delta <= 1e-6:
             continue
@@ -6551,8 +6556,12 @@ def _relocate_root_rendering_anchors(
                     vertex_visual_box(target).left for target in targets
                 )
                 right_overhang = vertex_visual_box(anchor).right - anchor.x
-                continuous_latest = (
-                    target_left - profile.route_clearance - right_overhang
+                continuous_latest = min(
+                    target_left - profile.route_clearance - right_overhang,
+                    min(
+                        target.x - anchor.width - profile.minimum_layer_spacing
+                        for target in targets
+                    ),
                 )
                 anchor_columns = (
                     [
@@ -6567,6 +6576,11 @@ def _relocate_root_rendering_anchors(
                 if any(
                     column_x > anchor.x + 1e-6
                     and all(column_x < target.x - 1e-6 for target in targets)
+                    and all(
+                        column_x + anchor.width + profile.minimum_layer_spacing
+                        <= target.x + 1e-6
+                        for target in targets
+                    )
                     and (
                         vertex_visual_box(copy.copy(anchor)).right
                         + (column_x - anchor.x)
@@ -6620,8 +6634,12 @@ def _relocate_root_rendering_anchors(
                 target_left = min(vertex_visual_box(target).left for target in targets)
                 feasible = []
                 right_overhang = vertex_visual_box(anchor).right - anchor.x
-                continuous_latest = (
-                    target_left - profile.route_clearance - right_overhang
+                continuous_latest = min(
+                    target_left - profile.route_clearance - right_overhang,
+                    min(
+                        target.x - anchor.width - profile.minimum_layer_spacing
+                        for target in targets
+                    ),
                 )
                 anchor_columns = (
                     [
@@ -6639,6 +6657,11 @@ def _relocate_root_rendering_anchors(
                     if (
                         column_x >= anchor.x - 1e-6
                         and all(column_x < target.x - 1e-6 for target in targets)
+                        and all(
+                            column_x + anchor.width + profile.minimum_layer_spacing
+                            <= target.x + 1e-6
+                            for target in targets
+                        )
                         and vertex_visual_box(probe).right + profile.route_clearance
                         <= target_left + 1e-6
                     ):
@@ -9232,6 +9255,7 @@ def generate_elk_layout(
             library_path,
             plan,
             source_position_mode=source_mode,
+            explicit_horizontal_spacing=options.horizontal_spacing is not None,
         )
         document.options = options
         selection = report["selection"]

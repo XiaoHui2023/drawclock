@@ -44,20 +44,20 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 }
 ```
 
-末端节点通过 `frequencies` 数组填写表格值，元素为字符串或有限数字。列数取所有末端数组的最大长度，较短行的缺项留空；空数组不增加列。默认表头为“频率 1”、“频率 2”等，可全局设置。标题和值支持 `\n` 换行，默认居中，列宽按最长一行调整。所有末端独占一行并对齐到最右列，频率值为红色。
+末端节点通过 `table_values` 数组填写右侧数据表，元素为字符串或有限数字。列数取所有末端数组的最大长度，较短行的缺项留空；空数组不增加列。默认表头为“列 1”、“列 2”等，可全局设置。标题和值支持 `\n` 换行，默认居中，列宽按最长一行调整。所有末端独占一行并对齐到最右列，表格值为红色。字段不限定含义，可用于频率、电压、模式或其他需要并列展示的数据。
 
 ```json
 {
   "clock_a": {
     "kind": "clock",
     "source": "gate_a",
-    "frequencies": ["800\nMHz", "50 MHz", "100 MHz", "25 MHz"]
+    "table_values": ["800\nMHz", "0.90 V", "RUN", "primary"]
   },
-  "clock_b": {"kind": "clock", "source": "gate_b", "frequencies": [400]}
+  "clock_b": {"kind": "clock", "source": "gate_b", "table_values": [400]}
 }
 ```
 
-旧配置仍接受 `func_freq`、`scan_freq`、`bist_freq`，保留原有非空列显示方式；同一节点不能混填旧字段与 `frequencies`。
+旧配置仍接受 `frequencies` 数组以及 `func_freq`、`scan_freq`、`bist_freq` 三个字段；它们只作为兼容输入。同一节点不能混填 `table_values` 与旧字段。
 
 所有节点都可选填写字符串字段 `description`。相同列的注释共享文字排列边界；相同逻辑节点即使存在显示副本也只标一次。显式换行、空行和尾随换行会保留，长行自动换行。布局会预留文字空间；限定距离内没有安全位置时生成失败。
 
@@ -84,12 +84,13 @@ drawclock -i <配置.json> -l <器件库.xml或目录> [<器件库.xml或目录>
 
 输出画布不添加输入文件名或文件名前缀标题。`--title` 设置根 SVG 的可访问性 `<title>` 元数据，不会生成画布内文字。
 
-实例名中的 `\n` 在图中显示为多行，名称对齐默认居中。`source` 仍引用完整原始实例名，包括其中的换行；多输出后缀保持不变。
+实例名中的 `\n` 在图中显示为多行，名称对齐默认居中。解析 `source` 时会忽略实例名和引用中的 CR/LF，因此引用既可以写换行，也可以不写；空格等其他字符仍参与匹配。若两个实例名仅换行位置不同，配置会因引用有歧义而被拒绝。多输出后缀保持不变。
 
 ```json
 {
   "PLL\nmain": {"kind": "gate"},
-  "clock": {"kind": "clock", "source": "PLL\nmain"}
+  "clock_a": {"kind": "clock", "source": "PLLmain"},
+  "clock_b": {"kind": "clock", "source": "PLL\nmain"}
 }
 ```
 
@@ -110,8 +111,8 @@ options = DrawingOptions(
     description_offset_y=0,
     horizontal_spacing=160,
     name_align="center",
-    frequency_headers=("工作\n频率", "SCAN", "BIST", "自定义"),
-    frequency_align="center",
+    table_headers=("工作\n频率", "电压", "模式", "备注"),
+    table_align="center",
 )
 document, report = generate_elk_layout(
     load_clock_tree("clock.json"),
@@ -140,7 +141,7 @@ drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 drawclock -i example/draw.json -l libraries/source.xml libraries/components -l libraries/project -o clock-tree.svg
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg --crossing-style gap
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg --title "Main clock tree"
-drawclock -i example/auto-layout/22-terminal-frequency-table.json -l drawio-lib/drawclock -o terminal-frequency.svg
+drawclock -i example/auto-layout/22-terminal-data-table.json -l drawio-lib/drawclock -o terminal-data-table.svg
 drawclock -i example/auto-layout/25-mixed-root-port-order-torture.json -l drawio-lib/drawclock -o mixed-root-torture.svg
 ```
 
