@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import copy
 import hashlib
 import importlib.util
+import io
 import json
 import shutil
 import subprocess
 import sys
+import tarfile
 import zipfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -284,9 +287,11 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         (project / "example" / "run-example" / f"{stem}.bat").write_text(
             "@echo off\r\n", encoding="ascii"
         )
-        (project / "example" / "run-example" / f"{stem}.sh").write_text(
+        shell_script = project / "example" / "run-example" / f"{stem}.sh"
+        shell_script.write_text(
             "#!/usr/bin/env sh\n", encoding="ascii"
         )
+        shell_script.chmod(0o755)
     packaged_layout_examples = tuple(
         path.name for path in sorted((ROOT / "example" / "auto-layout").glob("*.json"))
     )
@@ -357,9 +362,95 @@ def test_release_archive_contains_only_draw_surface(tmp_path: Path, monkeypatch)
         "missing platform example scripts: example/run-example/02-title.bat"
     ]
 
+    (project / "dist" / "drawclock.exe").unlink()
+    (project / "dist" / "drawclock").write_text("", encoding="utf-8")
+    monkeypatch.setattr(bundle_release.platform, "system", lambda: "Linux")
+    assert bundle_release.main() == 0
+
+    linux_archive = project / "dist" / "drawclock-1.2.3-linux.tar.gz"
+    linux_prefix = "drawclock-1.2.3-linux/"
+    with tarfile.open(linux_archive, "r:gz") as archive_file:
+        linux_names = {
+            item.name for item in archive_file.getmembers() if item.isfile()
+        }
+        packaged_source = archive_file.extractfile(
+            linux_prefix + "src/__main__.py"
+        )
+        assert packaged_source is not None
+        assert packaged_source.read() == (project / "src" / "__main__.py").read_bytes()
+    linux_expected = {
+        linux_prefix + "drawclock",
+        linux_prefix + "doc/README.md",
+        linux_prefix + "doc/draw.md",
+        linux_prefix + "example/draw.json",
+        linux_prefix + "example/README.md",
+        linux_prefix + "example/auto-layout/README.md",
+        *(linux_prefix + "example/auto-layout/" + name for name in packaged_layout_examples),
+        linux_prefix + "example/run-example/01-basic.sh",
+        linux_prefix + "example/run-example/02-title.sh",
+        linux_prefix + "libraries/source.xml",
+        linux_prefix + "src/__main__.py",
+    }
+    assert linux_names == linux_expected
+    assert checker.validate(linux_archive) == []
+
+    missing_source = project / "dist" / "missing-source.tar.gz"
+    with tarfile.open(linux_archive, "r:gz") as source_archive, tarfile.open(
+        missing_source, "w:gz"
+    ) as target_archive:
+        for item in source_archive.getmembers():
+            if item.name == linux_prefix + "src/__main__.py":
+                continue
+            stream = source_archive.extractfile(item) if item.isfile() else None
+            target_archive.addfile(item, stream)
+    assert checker.validate(missing_source) == [
+        "missing Linux source files: src/__main__.py"
+    ]
+
+    changed_source = project / "dist" / "changed-source.tar.gz"
+    with tarfile.open(linux_archive, "r:gz") as source_archive, tarfile.open(
+        changed_source, "w:gz"
+    ) as target_archive:
+        for item in source_archive.getmembers():
+            copied_item = copy.copy(item)
+            if item.name == linux_prefix + "src/__main__.py":
+                changed_bytes = b"print('changed')\n"
+                copied_item.size = len(changed_bytes)
+                target_archive.addfile(copied_item, io.BytesIO(changed_bytes))
+                continue
+            stream = source_archive.extractfile(item) if item.isfile() else None
+            target_archive.addfile(copied_item, stream)
+    assert checker.validate(changed_source) == [
+        "source file bytes differ: src/__main__.py"
+    ]
+
     with zipfile.ZipFile(archive, "a") as zf:
         zf.writestr(prefix + "pyproject.toml", "[project]\n")
     assert checker.validate(archive) == ["unexpected files: pyproject.toml"]
+
+
+def test_packaged_source_runner_needs_no_frozen_binary(tmp_path: Path) -> None:
+    package = tmp_path / "package"
+    shutil.copytree(
+        ROOT / "src",
+        package / "src",
+        ignore=shutil.ignore_patterns("__pycache__", "*.pyc", "*.pyo", "*.egg-info"),
+    )
+    shutil.copytree(ROOT / "drawio-lib" / "drawclock", package / "libraries")
+    (package / "example").mkdir()
+    shutil.copy2(ROOT / "example" / "draw.json", package / "example" / "draw.json")
+
+    completed = subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "run_packaged_source.py"), str(package)],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stdout + completed.stderr
+    assert "packaged source-only deployment passed" in completed.stdout
+    assert not (package / "drawclock").exists()
+    assert not (package / "drawclock.exe").exists()
 
 
 def test_source_manifest_rejects_missing_or_modified_source(

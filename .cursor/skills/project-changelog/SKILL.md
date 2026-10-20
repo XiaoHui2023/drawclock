@@ -8,6 +8,12 @@ description: >-
 
 （规则见 `~/.cursor/skills/agent-project-changelog/SKILL.md`。）
 
+## 2026-10-20
+
+- **要求**：正式 `drawclock-{version}-linux.tar.gz` 必须直接包含独立 `src/` 源码入口；不依赖 GitHub 自动生成的 Source code 包。
+- **边界**：新增 `src/` 不改变现有归档其它表面；`example/run-example/*.sh` 仍调用冻结可执行程序，源码仅供接收者使用系统 Python 离线部署。
+- **门禁**：Linux 归档必须动态收录完整产品源码、排除缓存与构建元数据、核对归档字节，并在本地解压与公开回下载阶段用 `python3 -I -S src` 实际生成 SVG。2026-10-19 关于默认附件拒绝源码的口径仅继续适用于 Windows ZIP。
+
 ## 2026-10-19
 
 - 右侧区域的规范定位改为任意数据表：JSON 使用 `table_values`，Python/CLI 使用 `table_headers`、`table_align` / `--table-headers`、`--table-align`；旧 frequency 名称只作兼容输入，新生成的 SVG 使用通用 table 语义。

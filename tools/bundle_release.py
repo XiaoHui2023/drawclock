@@ -1,4 +1,4 @@
-"""Assemble release archive: dist binaries plus docs and static assets."""
+"""Assemble release archive: binaries, public assets, and Linux source."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import platform
 import re
 import shutil
 import sys
+import tarfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 
@@ -23,6 +24,18 @@ RELEASE_FILES = (
 )
 LIBRARY_SOURCE = "drawio-lib/drawclock"
 LIBRARY_DESTINATION = "libraries"
+
+
+def _product_source_files(root: pathlib.Path) -> list[pathlib.Path]:
+    source_root = root / "src"
+    return [
+        path
+        for path in sorted(source_root.rglob("*"))
+        if path.is_file()
+        and "__pycache__" not in path.parts
+        and not any(part.endswith(".egg-info") for part in path.parts)
+        and path.suffix.lower() == ".py"
+    ]
 
 
 def _project_version(root: pathlib.Path) -> str:
@@ -93,6 +106,8 @@ def main() -> int:
         dest = bundle_dir / destination_rel
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(src, dest)
+        if platform.system() == "Linux" and dest.suffix == ".sh":
+            dest.chmod(dest.stat().st_mode | 0o111)
         if dest.suffix.lower() == ".md":
             text = dest.read_text(encoding="utf-8")
             text = text.replace("drawio-lib/drawclock", "libraries")
@@ -112,16 +127,37 @@ def main() -> int:
     for src in library_files:
         shutil.copy2(src, library_destination / src.name)
 
+    if platform.system() == "Linux":
+        source_files = _product_source_files(ROOT)
+        if not source_files:
+            print("错误: src 中没有产品源码。", file=sys.stderr)
+            return 1
+        for src in source_files:
+            destination = bundle_dir / src.relative_to(ROOT)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, destination)
+
     archive_base = dist / tag
-    fmt = "zip" if platform.system() == "Windows" else "gztar"
+    is_windows = platform.system() == "Windows"
     for old in (dist / f"{tag}.zip", dist / f"{tag}.tar.gz"):
         if old.is_file():
             old.unlink()
 
-    shutil.make_archive(str(archive_base), fmt, staging_root, tag)
+    if is_windows:
+        shutil.make_archive(str(archive_base), "zip", staging_root, tag)
+    else:
+        def executable_release_files(info: tarfile.TarInfo) -> tarfile.TarInfo:
+            if info.isfile() and (
+                info.name == f"{tag}/drawclock" or info.name.endswith(".sh")
+            ):
+                info.mode |= 0o111
+            return info
+
+        with tarfile.open(f"{archive_base}.tar.gz", "w:gz") as archive:
+            archive.add(bundle_dir, arcname=tag, filter=executable_release_files)
     shutil.rmtree(staging_root)
 
-    suffix = ".zip" if fmt == "zip" else ".tar.gz"
+    suffix = ".zip" if is_windows else ".tar.gz"
     print(f"完成: {archive_base}{suffix}")
     return 0
 

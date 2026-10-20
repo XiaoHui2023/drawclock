@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import tarfile
 import zipfile
 from pathlib import Path
@@ -30,6 +31,48 @@ def _platform_scripts(binary: str) -> set[str]:
         f"example/run-example/{path.name}"
         for path in (ROOT / "example" / "run-example").glob(f"*{suffix}")
     }
+
+
+def _source_payloads(root: Path) -> dict[str, bytes]:
+    source_root = root / "src"
+    return {
+        path.relative_to(root).as_posix(): path.read_bytes()
+        for path in sorted(source_root.rglob("*"))
+        if path.is_file()
+        and "__pycache__" not in path.parts
+        and not any(part.endswith(".egg-info") for part in path.parts)
+        and path.suffix.lower() == ".py"
+    }
+
+
+def _archive_source_payloads(path: Path) -> dict[str, bytes]:
+    payloads: dict[str, bytes] = {}
+    if zipfile.is_zipfile(path):
+        with zipfile.ZipFile(path) as archive:
+            files = [item for item in archive.infolist() if not item.is_dir()]
+            if not files:
+                return payloads
+            prefix = files[0].filename.replace("\\", "/").split("/", 1)[0] + "/"
+            for item in files:
+                name = item.filename.replace("\\", "/").lstrip("./")
+                relative = name[len(prefix):] if name.startswith(prefix) else name
+                if relative.startswith("src/"):
+                    payloads[relative] = archive.read(item)
+    elif tarfile.is_tarfile(path):
+        with tarfile.open(path, "r:*") as archive:
+            files = [item for item in archive.getmembers() if item.isfile()]
+            if not files:
+                return payloads
+            prefix = files[0].name.replace("\\", "/").lstrip("./").split("/", 1)[0] + "/"
+            for item in files:
+                name = item.name.replace("\\", "/").lstrip("./")
+                relative = name[len(prefix):] if name.startswith(prefix) else name
+                if relative.startswith("src/"):
+                    stream = archive.extractfile(item)
+                    if stream is None:
+                        raise ValueError(f"unable to read archive member: {name}")
+                    payloads[relative] = stream.read()
+    return payloads
 
 
 def _names(path: Path) -> tuple[list[str], dict[str, int]]:
@@ -104,13 +147,32 @@ def validate(path: Path) -> list[str]:
         errors.append("documentation must be contained in doc/")
     if any(name.startswith("drawio-lib/") for name in names):
         errors.append("legacy drawio-lib directory is forbidden")
+    expected_sources = _source_payloads(ROOT) if binaries == ["drawclock"] else {}
+    archived_sources = _archive_source_payloads(path)
+    missing_sources = sorted(set(expected_sources) - set(archived_sources))
+    if missing_sources:
+        errors.append("missing Linux source files: " + ", ".join(missing_sources))
+    unexpected_sources = sorted(set(archived_sources) - set(expected_sources))
+    if unexpected_sources:
+        errors.append("unexpected source files: " + ", ".join(unexpected_sources))
+    mismatched_sources = sorted(
+        name
+        for name in set(expected_sources) & set(archived_sources)
+        if hashlib.sha256(expected_sources[name]).digest()
+        != hashlib.sha256(archived_sources[name]).digest()
+    )
+    if mismatched_sources:
+        errors.append("source file bytes differ: " + ", ".join(mismatched_sources))
     license_files = [
         name for name in names
         if Path(name).name.lower().startswith(("license", "licence", "copying", "notice"))
     ]
     if license_files:
         errors.append("license files are forbidden: " + ", ".join(license_files))
-    allowed = REQUIRED | set(binaries) | set(libraries) | expected_scripts
+    allowed = (
+        REQUIRED | set(binaries) | set(libraries) | expected_scripts
+        | set(expected_sources)
+    )
     unexpected = sorted(set(names) - allowed)
     if unexpected:
         errors.append("unexpected files: " + ", ".join(unexpected))

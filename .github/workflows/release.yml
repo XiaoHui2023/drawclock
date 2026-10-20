@@ -54,6 +54,7 @@ jobs:
           python3 tools/run_frozen_example.py "$BINARY"
           PACKAGE_ROOT="$(find release-smoke -mindepth 1 -maxdepth 1 -type d -print -quit)"
           test -n "$PACKAGE_ROOT"
+          python3 tools/run_packaged_source.py "$PACKAGE_ROOT"
           cd "$PACKAGE_ROOT/example"
           for script in run-example/*.sh; do "$script"; done
           test -s drawclock-basic.svg
@@ -202,8 +203,9 @@ jobs:
           body: |
             Rolling release: self-contained Ubuntu 16.04 and Windows PyInstaller bundles from the main commit.
             Each archive contains the executable, component library, concise usage files, and runnable
-            examples. Complete source remains available from
-            this tag. It does not bundle Node.js, ELK, a browser, or Python runtime dependencies.
+            examples. The Linux archive also contains an independent src directory that runs with system
+            Python without the frozen executable. It does not bundle Node.js, ELK, a browser, or Python
+            runtime dependencies.
             Before publishing, CI extracts the archive and exercises the frozen executable with the
             host PATH isolated for direct SVG generation under arbitrary output suffixes,
             supplied and merged-library rendering, strict JSON input, and large-layout bounds checks.
@@ -239,6 +241,7 @@ jobs:
           test -n "$PACKAGE_ROOT"
           test -n "$BINARY"
           python3 tools/run_frozen_example.py "$BINARY"
+          python3 tools/run_packaged_source.py "$PACKAGE_ROOT"
           cd "$PACKAGE_ROOT/example"
           for script in run-example/*.sh; do "$script"; done
           test -s drawclock-basic.svg

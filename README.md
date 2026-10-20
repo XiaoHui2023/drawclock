@@ -8,6 +8,12 @@
 drawclock -i example/draw.json -l drawio-lib/drawclock -o clock-tree.svg
 ```
 
+Linux 发行包也可以跳过冻结程序，直接使用包内源码与器件库：
+
+```bash
+python3 -I -S src -i example/draw.json -l libraries -o clock-tree.svg
+```
+
 末端节点用 `table_values` 数组设置右侧数据表内容，列数由数组长度决定。表头可自定义，标题和值均支持换行，列宽随文字调整。
 
 任意节点可填写字符串 `description`。`description_color` 设置该段注释的颜色；省略时使用 `#4b5563`。支持 CSS 命名色、3/4/6/8 位十六进制、`rgb()`、`rgba()`、`hsl()`、`hsla()` 和 `hwb()`。示例为 `example/auto-layout/33-description-colors.json`。

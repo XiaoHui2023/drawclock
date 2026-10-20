@@ -96,3 +96,9 @@ def test_release_requires_windows_frozen_runtime_gate() -> None:
     assert 'releases/download/$tag' in workflow
     assert "published runtime receipt does not prove the complete quality metric set" in workflow
     assert workflow.count("tools/verify_frozen_runtime_budget.py") == 2
+
+
+def test_release_requires_independent_linux_source_consumption() -> None:
+    workflow = (ROOT / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
+    assert workflow.count("tools/run_packaged_source.py") == 2
+    assert "The Linux archive also contains an independent src directory" in workflow

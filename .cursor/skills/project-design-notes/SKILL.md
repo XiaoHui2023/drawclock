@@ -6,6 +6,14 @@ description: >-
 
 # 设计笔记
 
+## Linux 归档源码入口
+
+- `drawclock-{version}-linux.tar.gz` 在现有冻结程序、`doc/`、`example/` 与 `libraries/` 表面之外，额外包含当前产品源码 `src/`。源码目录是独立的离线部署入口，不替代冻结程序。
+- `example/run-example/*.sh` 继续调用包根的 `drawclock`；加入源码后不得改变脚本入口、默认输出位置或现有示例行为。
+- Linux 归档只收录 `src/` 中的产品 Python 文件，排除 `__pycache__`、`*.pyc`、`*.pyo`、`*.egg-info` 与其它构建缓存。归档 Oracle 从仓库源码动态推导 exact-set，并核对每个文件字节。
+- 解压消费门分别执行冻结入口和源码入口。源码入口使用系统 CPython 3.9 或更高版本，以 `python3 -I -S src`、包内 `libraries/` 和公开 JSON 生成 SVG；不安装项目、不读取 site-packages，也不依赖 PyInstaller 可执行程序。
+- Windows ZIP 保持当前冻结程序交付表面，不因 Linux 源码部署要求增加或切换入口。
+
 ## 发行示例合同（2026-10-19）
 
 - 每个平台发行包必须包含仓库当前全部公开 `example/auto-layout/*.json`、`example/draw.json`、`example/README.md` 与 `example/auto-layout/README.md`；新增公开 JSON 后归档 exact-set 自动扩展，禁止维护另一份会过时的手写子集。
@@ -95,9 +103,9 @@ description: >-
 ## 发布
 
 - PyInstaller 可执行文件内含本项目 Python 模块，不依赖宿主 Python、Node.js、ELK 或浏览器。
-- 默认发行包只含主程序、`doc/README.md`、`doc/draw.md`、平铺的 `libraries/*.xml`、完整公开示例输入/说明和当前平台运行脚本；完整源码由仓库与发布 tag 提供。仓库内部开发路径不因发行映射而改名。
+- 默认发行包只含主程序、`doc/README.md`、`doc/draw.md`、平铺的 `libraries/*.xml`、完整公开示例输入/说明和当前平台运行脚本；Linux 正式归档额外包含独立 `src/` 源码入口，Windows ZIP 不增加源码。仓库内部开发路径不因发行映射而改名。
 - 源码运行只要求 CPython 3.9 或更高版本；以 `-I -S` 禁用用户目录和 site-packages 后仍可直接生成 SVG，Python 3.9、3.10 与当前版本对代表输入结果一致。
-- 发布包执行独立 allowlist 门，拒绝 `src/`、项目 Skills、`pyproject.toml`、source manifest、批量质量语料、Runtime、npm 清单、wheelhouse 和缓存进入默认附件。
+- 发布包执行独立 allowlist 门；Linux 只允许当前产品 `src/*.py` 进入源码入口，Windows 仍拒绝 `src/`。两个平台都拒绝项目 Skills、`pyproject.toml`、source manifest、批量质量语料、Runtime、npm 清单、wheelhouse 和缓存。
 - 发布前从真实 ZIP 解压，在隔离 PATH 下测试直接入口、任意输出后缀、严格 JSON 拒绝规则、文件与目录混合器件库、默认圆弧和维护范围示例。
 - 本地 `pack.sh` / `pack.bat` 在创建环境、下载依赖或修改 `dist/` 之前执行自包含 release 门；任一反馈未自然复现、未修复验证或未关闭均非零退出。
 - GitHub Actions 的反馈门是 build 的必要前驱，publish 同时依赖反馈门与 build；发布 job 禁止用 `always()` 绕过失败传播。
