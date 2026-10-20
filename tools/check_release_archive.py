@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import subprocess
 import tarfile
 import zipfile
 from pathlib import Path
@@ -33,16 +34,57 @@ def _platform_scripts(binary: str) -> set[str]:
     }
 
 
-def _source_payloads(root: Path) -> dict[str, bytes]:
+def _git_blob_sha1(payload: bytes) -> str:
+    header = f"blob {len(payload)}\0".encode("ascii")
+    return hashlib.sha1(header + payload).hexdigest()
+
+
+def _source_digests(root: Path) -> dict[str, str]:
     source_root = root / "src"
-    return {
-        path.relative_to(root).as_posix(): path.read_bytes()
+    files = {
+        path.relative_to(root).as_posix(): path
         for path in sorted(source_root.rglob("*"))
         if path.is_file()
         and "__pycache__" not in path.parts
         and not any(part.endswith(".egg-info") for part in path.parts)
         and path.suffix.lower() == ".py"
     }
+    git_root = subprocess.run(
+        ["git", "rev-parse", "--show-toplevel"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if (
+        git_root.returncode == 0
+        and Path(git_root.stdout.strip()).resolve() == root.resolve()
+    ):
+        digests: dict[str, str] = {}
+        for relative, source in files.items():
+            result = subprocess.run(
+                ["git", "hash-object", f"--path={relative}", relative],
+                cwd=root,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if result.returncode:
+                raise ValueError(
+                    f"unable to hash source through Git filters: {relative}"
+                )
+            digests[relative] = "git:" + result.stdout.strip()
+        return digests
+    return {
+        relative: "sha256:" + hashlib.sha256(source.read_bytes()).hexdigest()
+        for relative, source in files.items()
+    }
+
+
+def _payload_digest(payload: bytes, expected: str) -> str:
+    if expected.startswith("git:"):
+        return "git:" + _git_blob_sha1(payload)
+    return "sha256:" + hashlib.sha256(payload).hexdigest()
 
 
 def _archive_source_payloads(path: Path) -> dict[str, bytes]:
@@ -147,7 +189,7 @@ def validate(path: Path) -> list[str]:
         errors.append("documentation must be contained in doc/")
     if any(name.startswith("drawio-lib/") for name in names):
         errors.append("legacy drawio-lib directory is forbidden")
-    expected_sources = _source_payloads(ROOT) if binaries == ["drawclock"] else {}
+    expected_sources = _source_digests(ROOT) if binaries == ["drawclock"] else {}
     archived_sources = _archive_source_payloads(path)
     missing_sources = sorted(set(expected_sources) - set(archived_sources))
     if missing_sources:
@@ -158,8 +200,8 @@ def validate(path: Path) -> list[str]:
     mismatched_sources = sorted(
         name
         for name in set(expected_sources) & set(archived_sources)
-        if hashlib.sha256(expected_sources[name]).digest()
-        != hashlib.sha256(archived_sources[name]).digest()
+        if expected_sources[name]
+        != _payload_digest(archived_sources[name], expected_sources[name])
     )
     if mismatched_sources:
         errors.append("source file bytes differ: " + ", ".join(mismatched_sources))

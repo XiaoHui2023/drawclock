@@ -13,6 +13,7 @@ description: >-
 - **要求**：正式 `drawclock-{version}-linux.tar.gz` 必须直接包含独立 `src/` 源码入口；不依赖 GitHub 自动生成的 Source code 包。
 - **边界**：新增 `src/` 不改变现有归档其它表面；`example/run-example/*.sh` 仍调用冻结可执行程序，源码仅供接收者使用系统 Python 离线部署。
 - **门禁**：Linux 归档必须动态收录完整产品源码、排除缓存与构建元数据、核对归档字节，并在本地解压与公开回下载阶段用 `python3 -I -S src` 实际生成 SVG。2026-10-19 关于默认附件拒绝源码的口径仅继续适用于 Windows ZIP。
+- **跨平台字节**：归档 Oracle 用 Git 过滤后的 blob 比较提交源码与归档源码；无 Git 临时夹具才比较原始字节，Windows CRLF 工作区不能误拒 Linux LF 资产。
 
 ## 2026-10-19
 

@@ -10,7 +10,7 @@ description: >-
 
 - `drawclock-{version}-linux.tar.gz` 在现有冻结程序、`doc/`、`example/` 与 `libraries/` 表面之外，额外包含当前产品源码 `src/`。源码目录是独立的离线部署入口，不替代冻结程序。
 - `example/run-example/*.sh` 继续调用包根的 `drawclock`；加入源码后不得改变脚本入口、默认输出位置或现有示例行为。
-- Linux 归档只收录 `src/` 中的产品 Python 文件，排除 `__pycache__`、`*.pyc`、`*.pyo`、`*.egg-info` 与其它构建缓存。归档 Oracle 从仓库源码动态推导 exact-set，并核对每个文件字节。
+- Linux 归档只收录 `src/` 中的产品 Python 文件，排除 `__pycache__`、`*.pyc`、`*.pyo`、`*.egg-info` 与其它构建缓存。归档 Oracle 从仓库源码动态推导 exact-set，并比较 Git 过滤后的规范 blob；无 Git 的隔离夹具回退到原始字节，避免 Windows CRLF 工作区误拒 Linux LF 归档。
 - 解压消费门分别执行冻结入口和源码入口。源码入口使用系统 CPython 3.9 或更高版本，以 `python3 -I -S src`、包内 `libraries/` 和公开 JSON 生成 SVG；不安装项目、不读取 site-packages，也不依赖 PyInstaller 可执行程序。
 - Windows ZIP 保持当前冻结程序交付表面，不因 Linux 源码部署要求增加或切换入口。
 

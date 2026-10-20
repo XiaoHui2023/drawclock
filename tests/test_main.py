@@ -453,6 +453,31 @@ def test_packaged_source_runner_needs_no_frozen_binary(tmp_path: Path) -> None:
     assert not (package / "drawclock.exe").exists()
 
 
+def test_release_checker_uses_git_normalized_source_bytes(tmp_path: Path) -> None:
+    checker_spec = importlib.util.spec_from_file_location(
+        "check_release_archive_git_bytes", ROOT / "tools" / "check_release_archive.py"
+    )
+    assert checker_spec is not None and checker_spec.loader is not None
+    checker = importlib.util.module_from_spec(checker_spec)
+    checker_spec.loader.exec_module(checker)
+
+    project = tmp_path / "project"
+    (project / "src").mkdir(parents=True)
+    (project / ".gitattributes").write_text("*.py text eol=lf\n", encoding="ascii")
+    (project / "src" / "example.py").write_bytes(b"print('ok')\r\n")
+    subprocess.run(["git", "init", "-q"], cwd=project, check=True)
+    subprocess.run(
+        ["git", "add", ".gitattributes", "src/example.py"],
+        cwd=project,
+        check=True,
+    )
+
+    expected = checker._source_digests(project)["src/example.py"]
+    assert expected.startswith("git:")
+    assert checker._payload_digest(b"print('ok')\n", expected) == expected
+    assert checker._payload_digest(b"print('changed')\n", expected) != expected
+
+
 def test_source_manifest_rejects_missing_or_modified_source(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -2,7 +2,7 @@
 
 - status: active
 - created: 2026-08-25 11:19 +08:00
-- updated: 2026-10-20 14:27 +08:00
+- updated: 2026-10-20 16:34 +08:00
 - scene: 发行包源码离线部署
 
 ## 当前状态
@@ -20,6 +20,10 @@
 - 公开 SVG 汇总质量门耗时 169.19 秒：28/28 输入、29/29 指标执行，失败、批处理失败与指标缺失均为 0。
 - 本地 Windows 正式结构复验通过：归档源码文件为 0，7/7 个批处理示例从冻结程序生成 SVG。独立源码临时包含 19 个 Python 文件、0 个冻结程序，以 `-I -S` 生成 SVG 耗时 1.413 秒。
 - 用户根 `github-release/release-archive-surface.md` 已新增独立源码入口专题，明确平台分离、逐字节 Oracle、三条消费路径与故障注入；共享 skill 校验通过。
+- 提交 `e9e984d` 的 Release run 39380954081 五个 job 全绿；公开 Linux/Windows 资产均已发布，Linux 与 Windows 公开回下载 job 通过。
+- 独立 Windows 回下载检查捕获跨平台 Oracle 假失败：Linux 资产中的 LF 源码与 Git blob 一致，但 Windows checkout 把 `drawio_library.py`、`validate_config.py` 展开为 CRLF。检查器改为比较 Git 过滤后的 blob，保留无 Git 夹具的原始字节回退，并增加 CRLF/LF 正反测试。
+- 修正后聚焦测试 9 项通过，首轮公开 Linux/Windows 资产归档检查均通过。Linux 资产含 19 个 Python 源文件、0 个缓存或构建元数据；移除冻结程序后的源码消费耗时 0.872 秒。Linux SHA-256 为 `FD349666A938BEEB17FC742AF92A9ED56A242AE0500F95D2B745C6558609E8C1`，Windows SHA-256 为 `B40FA266D4F15DB22222920C4AD5863CE5CE3094B9EBC41BF3D1D693B419D4BB`；远端 `v1.0.0` peeled commit 为 `e9e984d`。
+- Oracle 修正后的完整测试 720 项全部通过，总耗时 2256.38 秒。
 
 - 已确认 Windows 压缩包含 `source/`，但 `pyproject.toml` 仍指向 `src/`。
 - 包内没有离线 Python 依赖，断网环境不能安装 configlib 及各输入格式依赖。
@@ -38,4 +42,4 @@
 
 ## 下一步
 
-- 完成 CI 与公开 Release 回下载验证后关闭目标。
+- 重跑跨平台 Oracle 测试与公开资产检查；重新发布并回下载验证后关闭目标。

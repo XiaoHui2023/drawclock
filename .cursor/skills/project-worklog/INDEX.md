@@ -20,8 +20,8 @@
 | `records/routing-attribution-row-budget.md` | record | done | 2026-09-02 10:14 +08:00 | 2026-09-02 12:36 +08:00 | 通用零入度源显示副本与逐边/逐源路由归因 | 任意设施分区、独立归因、规模性能、本地与最终远端冻结/源码消费均已闭环。 |
 | `records/one-component-library-files.md` | record | done | 2026-08-26 09:42 +08:00 | 2026-08-26 10:21 +08:00 | 器件库从单文件全集迁移为一文件一器件 | 新结构、本地与远端发行消费均已通过。 |
 | `records/release-project-skills.md` | record | done | 2026-08-25 16:30 +08:00 | 2026-08-25 17:53 +08:00 | 发布项目 Skills | 五个脱敏项目 skill、渐进披露、包内完整性与发布复验。 |
-| `records/offline-source-release.md` | record | active | 2026-08-25 11:19 +08:00 | 2026-10-20 14:27 +08:00 | 发行包源码离线部署 | 全量 719 项、28×29 质量指标、Windows 7 个冻结示例与独立源码消费均通过；等待公开发布复验。 |
-| `analysis/offline-source-gap.md` | analysis | active | 2026-08-25 11:19 +08:00 | 2026-10-20 13:33 +08:00 | 现有发行包缺口分析 | 当前 Linux 包只含冻结入口；修复限定为增加干净 src 并保持现有脚本入口不变。 |
+| `records/offline-source-release.md` | record | active | 2026-08-25 11:19 +08:00 | 2026-10-20 16:34 +08:00 | 发行包源码离线部署 | 首次发布与独立源码消费通过；CRLF/LF Oracle 修正后 720 项全绿，等待最终重发。 |
+| `analysis/offline-source-gap.md` | analysis | active | 2026-08-25 11:19 +08:00 | 2026-10-20 15:54 +08:00 | 现有发行包缺口分析 | Linux 包新增独立 src 且脚本入口不变；跨平台字节 Oracle 以 Git 规范 blob 为准。 |
 | `records/json-only-zero-dependencies.md` | record | done | 2026-08-25 14:00 +08:00 | 2026-08-25 15:45 +08:00 | JSON-only 零依赖收敛 | 严格 JSON、零 Python 运行时依赖与远端源码消费门已闭环。 |
 | `analysis/json-only-dependency-pruning.md` | analysis | done | 2026-08-25 14:00 +08:00 | 2026-08-25 14:00 +08:00 | 配置依赖裁剪分析 | 严格 JSON 可由标准库解析，ELK 运行时与配置依赖分离。 |
 | `records/multiple-library-inputs.md` | record | done | 2026-08-25 14:03 +08:00 | 2026-08-25 15:45 +08:00 | 多器件库输入与合并 | 文件、目录、混合输入与远端冻结门已闭环。 |
