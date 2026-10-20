@@ -1,8 +1,8 @@
 # 发行包源码离线部署
 
-- status: active
+- status: done
 - created: 2026-08-25 11:19 +08:00
-- updated: 2026-10-20 16:34 +08:00
+- updated: 2026-10-20 17:58 +08:00
 - scene: 发行包源码离线部署
 
 ## 当前状态
@@ -24,6 +24,8 @@
 - 独立 Windows 回下载检查捕获跨平台 Oracle 假失败：Linux 资产中的 LF 源码与 Git blob 一致，但 Windows checkout 把 `drawio_library.py`、`validate_config.py` 展开为 CRLF。检查器改为比较 Git 过滤后的 blob，保留无 Git 夹具的原始字节回退，并增加 CRLF/LF 正反测试。
 - 修正后聚焦测试 9 项通过，首轮公开 Linux/Windows 资产归档检查均通过。Linux 资产含 19 个 Python 源文件、0 个缓存或构建元数据；移除冻结程序后的源码消费耗时 0.872 秒。Linux SHA-256 为 `FD349666A938BEEB17FC742AF92A9ED56A242AE0500F95D2B745C6558609E8C1`，Windows SHA-256 为 `B40FA266D4F15DB22222920C4AD5863CE5CE3094B9EBC41BF3D1D693B419D4BB`；远端 `v1.0.0` peeled commit 为 `e9e984d`。
 - Oracle 修正后的完整测试 720 项全部通过，总耗时 2256.38 秒。
+- 提交 `2848428` 的最终 Release run 39394449351 五个 job 全绿；Linux/Windows 公开回下载均通过，远端 `v1.0.0` peeled commit 为 `2848428bc05b713cab8266a65dd88d8dfd6c3f81`。
+- 最终公开 Linux 包含 19 个产品 Python 文件、0 个缓存或构建元数据，隔离源码目录包含 0 个冻结程序，`-I -S` 源码消费耗时 0.917 秒。Linux SHA-256 为 `6159AE50540222029F4F133F1BB99CEE0634F42A8CF4119CC4F5547EB8C7AD4F`，Windows SHA-256 为 `27734FCE21A87FF376A8ADB3964413FCB026A4EE233F915BAFE8659A3D07B276`。
 
 - 已确认 Windows 压缩包含 `source/`，但 `pyproject.toml` 仍指向 `src/`。
 - 包内没有离线 Python 依赖，断网环境不能安装 configlib 及各输入格式依赖。
@@ -42,4 +44,4 @@
 
 ## 下一步
 
-- 重跑跨平台 Oracle 测试与公开资产检查；重新发布并回下载验证后关闭目标。
+- 无。

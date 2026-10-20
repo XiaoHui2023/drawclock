@@ -2,7 +2,7 @@
 
 ## 状态
 
-- status: active
+- status: done
 - owner: agent
 - updated: 2026-10-20
 
@@ -22,6 +22,9 @@
 - success: Release run 32817679182 成功，v1.0.0 指向功能提交 `e2eb8cc57de980dc103a4959ab851c7cacb36e87`。
 - success: 远端 Linux 包 SHA-256 为 `9B7AD06C2789612F397A22EBB2032260F75158EBC1733A34B86F3290122096A9`；隔离容器冻结门 27.182 秒、源码门 5.160 秒，均通过。
 - failure: 2026-10-20 复核当前 `v1.0.0` 的 `drawclock-1.0.0-linux.tar.gz`，归档中没有任何 `src/` 条目；`bundle_release.py` 未复制源码，`check_release_archive.py` 还会把源码判为 unexpected files。
+- success: Oracle 修正后的本地完整测试 720 项通过；公开 SVG 质量门覆盖 28 个输入与 29 项指标，失败为 0。
+- success: Release run 39394449351 五个 job 全绿；`v1.0.0` 指向 `2848428bc05b713cab8266a65dd88d8dfd6c3f81`。
+- success: 最终公开 Linux 包含 19 个产品 Python 文件、0 个缓存或构建元数据；隔离目录不含冻结程序，`-I -S` 源码消费耗时 0.917 秒。Linux SHA-256 为 `6159AE50540222029F4F133F1BB99CEE0634F42A8CF4119CC4F5547EB8C7AD4F`，Windows SHA-256 为 `27734FCE21A87FF376A8ADB3964413FCB026A4EE233F915BAFE8659A3D07B276`。
 - worklog: `../../project-worklog/records/offline-source-release.md`
 - worklog: `../../project-worklog/records/json-only-zero-dependencies.md`
 
@@ -34,10 +37,12 @@
 - 2026-08-25: 排除 `*.egg-info` 后重新发布并下载复验 -> 源码集合、断网安装、源码绘图和冻结程序入口全部通过。
 - 2026-08-25: 审计 configlib extras 与多格式加载器 -> JSON-only 可改用标准库 `json`，同时删除 wheelhouse 工艺。
 - 2026-10-20: 用户重新确认 Linux 正式归档必须直接包含独立 `src/` -> 当前公开归档自然复现缺失，目标重新打开。
+- 2026-10-20: 首次发布后由 Windows 独立回下载发现 CRLF/LF 字节 Oracle 假失败 -> 改用 Git 过滤后的规范 blob 比较并增加正反测试。
+- 2026-10-20: 重新发布并独立回下载 -> Linux/Windows 归档检查、冻结入口、源码入口、全部平台示例与公开资产验证全部通过。
 
 ## 下一步
 
-- 将 Linux 归档的源码 exact-set、缓存排除、解压后 `python3 -I -S src` 离线运行和远端回下载复验接入发布硬门；保持现有 Shell 示例继续调用冻结程序。
+- 无。
 
 ## 收敛条件
 
